@@ -20,6 +20,7 @@
 
 package org.catacombae.hfsexplorer.partitioning;
 
+import org.catacombae.hfsexplorer.LowLevelFile;
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.Util2;
 import java.io.PrintStream;
@@ -57,6 +58,9 @@ public class DriverDescriptorRecord {
     private final DriverDescriptorEntry[] entries;
     private final byte[] ddPad;
     
+    public DriverDescriptorRecord(LowLevelFile llf, long offset) {
+	this(readData(llf, offset), 0);
+    }
     public DriverDescriptorRecord(byte[] data, int offset) {
 	System.arraycopy(data, offset+0, sbSig, 0, 2);
 	System.arraycopy(data, offset+2, sbBlkSize, 0, 2);
@@ -72,6 +76,14 @@ public class DriverDescriptorRecord {
 	int padOffset = offset+18 + DriverDescriptorEntry.length()*i;
 	ddPad = new byte[length()-padOffset];
 	System.arraycopy(data, padOffset, ddPad, 0, ddPad.length);
+    }
+    
+    private static byte[] readData(LowLevelFile llf, long offset) {
+	byte[] data = new byte[length()];
+	llf.seek(offset);
+	if(llf.read(data) != data.length)
+	    throw new RuntimeException("Could not read enough bytes from LowLevelFile!");
+	return data;
     }
     
     public static int length() { return 269; }

@@ -619,10 +619,11 @@ public class FileSystemBrowserWindow extends JFrame {
 							  true,
 							  "Load file system from device");
 			deviceDialog.setVisible(true);
+			LowLevelFile io = deviceDialog.getPartitionStream();
 			String pathName = deviceDialog.getPathName();
-			if(pathName != null) {
+			if(io != null) {
 			    try {
-				WindowsLowLevelIO io = new WindowsLowLevelIO(pathName);
+				//WindowsLowLevelIO io = new WindowsLowLevelIO(pathName);
 				try { loadFS(io, pathName); }
 				catch(Exception e) {
 				    e.printStackTrace();
@@ -778,29 +779,43 @@ public class FileSystemBrowserWindow extends JFrame {
 		    InputStream infoDictStream = null;
 		    for(String s : VERSION_INFO_DICTIONARY) {
 			try {
+			    System.out.println("Retrieveing version info from " + s + "...");
 			    infoDictStream = new URL(s).openStream();
 			    SimpleDictionaryParser sdp = new SimpleDictionaryParser(infoDictStream);
 			    String dictVersion = sdp.getValue("Version");
-			    Boolean dictVersionIsHigher = null;
-			    char[] dictVersionArray = dictVersion.toCharArray();
-			    char[] myVersionArray = HFSExplorer.VERSION.toCharArray();
-			    int minArrayLength = Math.min(dictVersionArray.length, myVersionArray.length);
-			    for(int i = 0; i < minArrayLength; ++i) {
-				if(dictVersionArray[i] > myVersionArray[i]) {
-				    dictVersionIsHigher = true;
-				    break;
-				}
-				else if(dictVersionArray[i] < myVersionArray[i]) {
-				    dictVersionIsHigher = false;
-				    break;
-				}
+			    long dictBuildNumber = Long.parseLong(sdp.getValue("Build"));
+			    System.out.println("  Version: " + dictVersion);
+			    System.out.println("  Build number: " + dictBuildNumber);
+			    boolean dictVersionIsHigher = false;
+			    if(true) {
+				dictVersionIsHigher = dictBuildNumber > BuildNumber.BUILD_NUMBER;
 			    }
-			    if(dictVersionIsHigher == null)
-				dictVersionIsHigher = dictVersionArray.length > myVersionArray.length;
+			    else { // Old disabled code
+				char[] dictVersionArray = dictVersion.toCharArray();
+				char[] myVersionArray = HFSExplorer.VERSION.toCharArray();
+				int minArrayLength = Math.min(dictVersionArray.length, myVersionArray.length);
+				boolean foundDifference = false;
+				for(int i = 0; i < minArrayLength; ++i) {
+				    if(dictVersionArray[i] > myVersionArray[i]) {
+					dictVersionIsHigher = true;
+					foundDifference = true;
+					break;
+				    }
+				    else if(dictVersionArray[i] < myVersionArray[i]) {
+					dictVersionIsHigher = false;
+					foundDifference = true;
+					break;
+				    }
+				}
+				if(!foundDifference)
+				    dictVersionIsHigher = dictVersionArray.length > myVersionArray.length;
+			    }
+			    
 			    if(dictVersionIsHigher)
 				JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
 							      "There are updates available!\n" +
-							      "Latest version is: " + dictVersion, 
+							      "Latest version is: " + dictVersion +
+							      " (build number #" + dictBuildNumber + ")", 
 							      "Information", JOptionPane.INFORMATION_MESSAGE);
 			    else
 				JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
@@ -808,7 +823,7 @@ public class FileSystemBrowserWindow extends JFrame {
 							      "Information", JOptionPane.INFORMATION_MESSAGE);
 			    return;
 			}
-			catch(Exception e) {}
+			catch(Exception e) { e.printStackTrace(); }
 		    }
 		    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
 						  "Could not contact version URL.", 

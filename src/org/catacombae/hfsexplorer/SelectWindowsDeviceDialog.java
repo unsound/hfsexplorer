@@ -22,6 +22,7 @@ package org.catacombae.hfsexplorer;
 
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
 import org.catacombae.hfsexplorer.gui.SelectWindowsDevicePanel;
+import org.catacombae.hfsexplorer.partitioning.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -45,7 +46,8 @@ public class SelectWindowsDeviceDialog extends JDialog {
     // Additional gui stuff
     private ButtonGroup selectSpecifyGroup;
     
-    private String result = null;
+    private LowLevelFile result = null;
+    private String resultCreatePath = null;
     private String[] detectedDeviceNames;
     
     public SelectWindowsDeviceDialog(Frame owner, boolean modal, String title) {
@@ -102,7 +104,8 @@ public class SelectWindowsDeviceDialog extends JDialog {
 	    });
 	loadButton.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
-		    result = specifyDeviceNameField.getText();
+		    resultCreatePath = specifyDeviceNameField.getText();
+		    result = new WindowsLowLevelIO(resultCreatePath);
 		    setVisible(false);
 		}
 	    });
@@ -123,7 +126,10 @@ public class SelectWindowsDeviceDialog extends JDialog {
 	setResizable(false);
     }
 
-    public String getPathName() { return result; }
+    public LowLevelFile getPartitionStream() { return result; }
+    
+    /** Could include an identifier of a partitioning scheme. This should only be used to display a descriptive locator. */
+    public String getPathName() { return resultCreatePath; }
     
     /**
      * This method is only tested with Windows XP (SP2, x86).
@@ -172,6 +178,9 @@ public class SelectWindowsDeviceDialog extends JDialog {
     }
     protected void autodetectFilesystems() {
 	LinkedList<String> plainFileSystems = new LinkedList<String>();
+	LinkedList<String[]> embeddedFileSystems = new LinkedList<String[]>();
+	
+	// Look for file systems in Windows supported partitioning schemes
 	for(String name : detectedDeviceNames) {
 	    try {
 		LowLevelFile llf = new WindowsLowLevelIO(DEVICE_PREFIX + name);
@@ -183,33 +192,109 @@ public class SelectWindowsDeviceDialog extends JDialog {
 		System.out.println("INFO: Non-critical exception while detecting file system at \"" + DEVICE_PREFIX + name + "\": " + e.toString());
 	    }
 	}
+	// Look for file systems that sit inside partition systems unsupported by Windows.
+	for(int i = 0; i < detectedDeviceNames.length; ++i) {
+	    String name = detectedDeviceNames[i];
+	    if(name.endsWith("Partition0") &&
+	       !(i+1 < detectedDeviceNames.length && detectedDeviceNames[i+1].endsWith("Partition1"))) {
+		// We have an unidentifed partition system at "name"
+		LowLevelFile llf = new WindowsLowLevelIO(DEVICE_PREFIX + name);
+		PartitionSystemRecognizer psr = new PartitionSystemRecognizer(llf);
+		PartitionSystemRecognizer.PartitionSystemType pst = psr.detectPartitionSystem();
+		if(pst == PartitionSystemRecognizer.PartitionSystemType.APPLE_PARTITION_MAP) {
+		    DriverDescriptorRecord ddr = new DriverDescriptorRecord(llf, 0);
+		    if(ddr.isSignatureValid()) {
+			ApplePartitionMap apm = new ApplePartitionMap(llf, 0, ddr.getSbBlkSize());
+			Partition[] parts = apm.getUsedPartitionEntries();
+			for(int j = 0; j < parts.length; ++j) {
+			    Partition part = parts[j];
+			    if(part.getType() == Partition.PartitionType.APPLE_HFS) {
+				FileSystemRecognizer fsr = new FileSystemRecognizer(llf, part.getStartOffset());
+				if(fsr.detectFileSystem() == FileSystemRecognizer.FileSystemType.HFS_PLUS) {
+				    embeddedFileSystems.add(new String[] { "APM", name, j + "" });
+				}
+			    }
+			}
+		    }
+		    
+		}
+		else if(pst == PartitionSystemRecognizer.PartitionSystemType.GUID_PARTITION_TABLE) {}
+		else if(pst == PartitionSystemRecognizer.PartitionSystemType.MASTER_BOOT_RECORD) {}
+		
+		llf.close();
+	    }
+	}
 	
-	if(plainFileSystems.size() > 1) {
-	    String[] devices = plainFileSystems.toArray(new String[plainFileSystems.size()]);
+	if(plainFileSystems.size() >= 1 || embeddedFileSystems.size() >= 1) {
+	    String[] plainStrings = plainFileSystems.toArray(new String[plainFileSystems.size()]);
+	    String[] embeddedStrings = new String[embeddedFileSystems.size()];
+	    int i = 0;
+	    for(String[] cur : embeddedFileSystems)
+		embeddedStrings[i++] = cur[1] + "[" + cur[0] + ":Partition" + cur[2] + "]";
+	    
+	    String[] allOptions = new String[plainStrings.length+embeddedStrings.length];
+	    for(i = 0; i < plainStrings.length; ++i)
+		allOptions[i] = plainStrings[i];
+	    for(i = 0; i < embeddedStrings.length; ++i)
+		allOptions[plainStrings.length+i] = embeddedStrings[i];
+	    
 	    Object selectedValue = JOptionPane.showInputDialog(this, "Autodetection complete! Found " +
-							       plainFileSystems.size() + " HFS+ file systems.\n" +
+							       allOptions.length + " HFS+ file systems.\n" +
 							       "Please choose which one to load:", 
 							       "Load HFS+ file system", 
 							       JOptionPane.QUESTION_MESSAGE,
-							       null, devices, devices[0]);
+							       null, allOptions, allOptions[0]);
 	    if(selectedValue != null) {
-		result = DEVICE_PREFIX + selectedValue.toString();
-		setVisible(false);
+		int selectedIndex = -1;
+		for(i = 0; i < allOptions.length; ++i) {
+		    if(selectedValue.equals(allOptions[i])) {
+			selectedIndex = i;
+			break;
+		    }
+		}
+		if(selectedIndex != -1) {
+		    throw new RuntimeException("Internal error!");
+		}
+		else {
+		    if(selectedIndex >= plainStrings.length) {
+			// We have an embedded FS
+			selectedIndex -= plainStrings.length;
+			String[] embeddedInfo = embeddedFileSystems.get(selectedIndex);
+			if(embeddedInfo == null)
+			    throw new RuntimeException("Internal error again.");
+			
+			if(embeddedInfo[0].equals("APM")) {
+			    LowLevelFile llf = new WindowsLowLevelIO(DEVICE_PREFIX + embeddedInfo[1]);
+			    DriverDescriptorRecord ddr = new DriverDescriptorRecord(llf, 0);
+			    ApplePartitionMap apm = new ApplePartitionMap(llf, 0, ddr.getSbBlkSize());
+			    Partition p = apm.getPartitionEntry(Integer.parseInt(embeddedInfo[2]));
+			    resultCreatePath = DEVICE_PREFIX + selectedValue.toString();
+			    result = new ConcatenatedFile(llf, p.getStartOffset(), p.getLength());
+			}
+			else if(embeddedInfo[0].equals("GPT")) {}
+			else if(embeddedInfo[0].equals("MBR")) {}
+		    }
+		    else {
+			resultCreatePath = DEVICE_PREFIX + selectedValue.toString();
+			result = new WindowsLowLevelIO(resultCreatePath);
+			setVisible(false);
+		    }
+		}
 	    }
 	}
-	else if(plainFileSystems.size() > 0) {
-	    int res = JOptionPane.showConfirmDialog(this, "Autodetection complete! Found an " +
-						    "HFS+ file system at \"" + 
-						    plainFileSystems.getFirst() +"\".\n" +
-						    "Do you want to load it?", 
-						    "Load HFS+ file system",
-						    JOptionPane.YES_NO_OPTION,
-						    JOptionPane.QUESTION_MESSAGE);
-	    if(res == JOptionPane.YES_OPTION) {
-		result = DEVICE_PREFIX + plainFileSystems.getFirst();
-		setVisible(false);
-	    }
-	}
+// 	else if(plainFileSystems.size() > 0) {
+// 	    int res = JOptionPane.showConfirmDialog(this, "Autodetection complete! Found an " +
+// 						    "HFS+ file system at \"" + 
+// 						    plainFileSystems.getFirst() +"\".\n" +
+// 						    "Do you want to load it?", 
+// 						    "Load HFS+ file system",
+// 						    JOptionPane.YES_NO_OPTION,
+// 						    JOptionPane.QUESTION_MESSAGE);
+// 	    if(res == JOptionPane.YES_OPTION) {
+// 		result = DEVICE_PREFIX + plainFileSystems.getFirst();
+// 		setVisible(false);
+// 	    }
+// 	}
 	else
 	    JOptionPane.showMessageDialog(this, "No HFS+ file systems found...",
 					  "Result", JOptionPane.INFORMATION_MESSAGE);

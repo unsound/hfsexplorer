@@ -56,11 +56,11 @@ public class CRC32FilterLLF implements LowLevelFile {
 	return res;
     }
     public void readFully(byte[] data) {
-	source.read(data);
+	source.readFully(data);
 	checksum.update(data);
     }
     public void readFully(byte[] data, int offset, int length) {
-	source.read(data, offset, length);
+	source.readFully(data, offset, length);
 	checksum.update(data, offset, length);
     }
     public long length() { return source.length(); }
