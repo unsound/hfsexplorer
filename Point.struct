@@ -1,0 +1,4 @@
+struct Point {
+  SInt16              v;
+  SInt16              h;
+};

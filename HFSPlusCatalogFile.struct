@@ -1,0 +1,18 @@
+struct HFSPlusCatalogFile {
+    SInt16              recordType;
+    UInt16              flags;
+    UInt32              reserved1;
+    HFSCatalogNodeID    fileID;
+    UInt32              createDate;
+    UInt32              contentModDate;
+    UInt32              attributeModDate;
+    UInt32              accessDate;
+    UInt32              backupDate;
+    HFSPlusBSDInfo      permissions;
+    FileInfo            userInfo;
+    ExtendedFileInfo    finderInfo;
+    UInt32              textEncoding;
+    UInt32              reserved2;
+    HFSPlusForkData     dataFork;
+    HFSPlusForkData     resourceFork;
+};

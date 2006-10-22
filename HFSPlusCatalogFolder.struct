@@ -1,0 +1,16 @@
+struct HFSPlusCatalogFolder {
+    SInt16              recordType;
+    UInt16              flags;
+    UInt32              valence;
+    HFSCatalogNodeID    folderID;
+    UInt32              createDate;
+    UInt32              contentModDate;
+    UInt32              attributeModDate;
+    UInt32              accessDate;
+    UInt32              backupDate;
+    HFSPlusBSDInfo      permissions;
+    FolderInfo          userInfo;
+    ExtendedFolderInfo  finderInfo;
+    UInt32              textEncoding;
+    UInt32              reserved;
+};

@@ -1,0 +1,8 @@
+struct HFSPlusBSDInfo {
+    UInt32  ownerID;
+    UInt32  groupID;
+    UInt8   adminFlags;
+    UInt8   ownerFlags;
+    UInt16  fileMode;
+    UInt32  special;
+};

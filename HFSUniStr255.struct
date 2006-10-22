@@ -1,0 +1,4 @@
+struct HFSUniStr255 {
+    UInt16  length;
+    UniChar unicode[255];
+};

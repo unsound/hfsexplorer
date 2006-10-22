@@ -1,0 +1,6 @@
+struct HFSPlusCatalogThread {
+    SInt16              recordType;
+    SInt16              reserved;
+    HFSCatalogNodeID    parentID;
+    HFSUniStr255        nodeName;
+};

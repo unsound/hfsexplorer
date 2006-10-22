@@ -23,6 +23,27 @@ public class Util2 {
 	}
     }
 
+    public static char readCharLE(byte[] data) {
+	return readCharLE(data, 0);
+    }
+    public static char readCharLE(byte[] data, int offset) {
+	return (char) ((data[offset+1] & 0xFF) << 8 |
+		       (data[offset+0] & 0xFF) << 0);
+    }
+    public static char readCharBE(byte[] data) {
+	return readCharBE(data, 0);
+    }
+    public static char readCharBE(byte[] data, int offset) {
+	return (char) ((data[offset+0] & 0xFF) << 8 |
+		       (data[offset+1] & 0xFF) << 0);
+    }
+
+    public static char[] readCharArrayBE(byte[] b) {
+	char[] result = new char[b.length/2];
+	for(int i = 0; i < result.length; ++i)
+	    result[i] = Util2.readCharBE(b, i*2);
+	return result;
+    }
     public static short[] readShortArrayBE(byte[] b) {
 	short[] result = new short[b.length/2];
 	for(int i = 0; i < result.length; ++i)
@@ -41,5 +62,14 @@ public class Util2 {
 	dis.readFully(buffer);
 	return buffer;
     }
-	
+    
+    public static int unsign(byte b) {
+	return b & 0xFF;
+    }
+    public static int unsign(short s) {
+	return s & 0xFFFF;
+    }
+    public static long unsign(int i) {
+	return i & 0xFFFFFFFFL;
+    }
 }

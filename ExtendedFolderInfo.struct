@@ -1,0 +1,7 @@
+struct ExtendedFolderInfo {
+  Point     scrollPosition;     // Scroll position (for icon views)
+  SInt32    reserved1;
+  UInt16    extendedFinderFlags;
+  SInt16    reserved2;
+  SInt32    putAwayFolderID;
+};

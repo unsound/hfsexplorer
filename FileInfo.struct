@@ -1,0 +1,7 @@
+struct FileInfo {
+  OSType    fileType;           // The type of the file
+  OSType    fileCreator;        // The file's creator
+  UInt16    finderFlags;
+  Point     location;           // File's location in the folder.
+  UInt16    reservedField;
+};

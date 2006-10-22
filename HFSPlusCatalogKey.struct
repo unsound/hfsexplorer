@@ -1,0 +1,5 @@
+struct HFSPlusCatalogKey {
+    UInt16              keyLength;
+    HFSCatalogNodeID    parentID;
+    HFSUniStr255        nodeName;
+};

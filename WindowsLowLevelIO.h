@@ -55,6 +55,30 @@ JNIEXPORT void JNICALL Java_WindowsLowLevelIO_ejectMedia
 JNIEXPORT void JNICALL Java_WindowsLowLevelIO_loadMedia
   (JNIEnv *, jclass, jbyteArray);
 
+/*
+ * Class:     WindowsLowLevelIO
+ * Method:    length
+ * Signature: ([B)J
+ */
+JNIEXPORT jlong JNICALL Java_WindowsLowLevelIO_length
+  (JNIEnv *, jclass, jbyteArray);
+
+/*
+ * Class:     WindowsLowLevelIO
+ * Method:    getFilePointer
+ * Signature: ([B)J
+ */
+JNIEXPORT jlong JNICALL Java_WindowsLowLevelIO_getFilePointer
+  (JNIEnv *, jclass, jbyteArray);
+
+/*
+ * Class:     WindowsLowLevelIO
+ * Method:    getSectorSize
+ * Signature: ([B)I
+ */
+JNIEXPORT jint JNICALL Java_WindowsLowLevelIO_getSectorSize
+  (JNIEnv *, jclass, jbyteArray);
+
 #ifdef __cplusplus
 }
 #endif
