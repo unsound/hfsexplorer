@@ -13,15 +13,16 @@ public class WindowsLowLevelIO implements LowLevelFile {
 	}
     }
     public WindowsLowLevelIO(String filename) {
+	boolean verbose = false;
 	fileHandle = open(filename);
-	System.out.println("fileHandle: 0x" + Util.byteArrayToHexString(fileHandle));
+	//System.out.println("fileHandle: 0x" + Util.byteArrayToHexString(fileHandle));
 	int tmpSectorSize = getSectorSize(fileHandle);
 	if(tmpSectorSize > 0) {
-	    System.out.println("Sector size determined: " + tmpSectorSize);
+	    if(verbose) System.out.println("Sector size determined: " + tmpSectorSize);
 	    sectorSize = tmpSectorSize;
 	}
 	else
-	    System.out.println("Could not determine sector size.");
+	    if(verbose) System.out.println("Could not determine sector size.");
     }
     public void seek(long pos) {
 	if(fileHandle != null) {

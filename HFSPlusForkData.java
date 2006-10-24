@@ -44,7 +44,7 @@ public class HFSPlusForkData {
     }
 	
     public void print(PrintStream ps, String prefix) {
-	ps.println(prefix + "logicalSize: " + getLogicalSize() + " (0x" + Util.byteArrayToHexString(logicalSize));
+	ps.println(prefix + "logicalSize: " + getLogicalSize()/* + " (0x" + Util.byteArrayToHexString(logicalSize) + ")"*/);
 	ps.println(prefix + "clumpSize: " + getClumpSize());
 	ps.println(prefix + "totalBlocks: " + getTotalBlocks());
 	ps.println(prefix + "extents:");

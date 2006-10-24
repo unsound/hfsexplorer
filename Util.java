@@ -48,14 +48,14 @@ public class Util {
 	return readLongLE(data, 0);
     }
     public static long readLongLE(byte[] data, int offset) {
-	return ((data[offset+7] & 0xFF) << 56 |
-		(data[offset+6] & 0xFF) << 48 |
-		(data[offset+5] & 0xFF) << 40 |
-		(data[offset+4] & 0xFF) << 32 |
-		(data[offset+3] & 0xFF) << 24 |
-		(data[offset+2] & 0xFF) << 16 |
-		(data[offset+1] & 0xFF) << 8 |
-		(data[offset+0] & 0xFF) << 0);
+	return (((long)data[offset+7] & 0xFF) << 56 |
+		((long)data[offset+6] & 0xFF) << 48 |
+		((long)data[offset+5] & 0xFF) << 40 |
+		((long)data[offset+4] & 0xFF) << 32 |
+		((long)data[offset+3] & 0xFF) << 24 |
+		((long)data[offset+2] & 0xFF) << 16 |
+		((long)data[offset+1] & 0xFF) << 8 |
+		((long)data[offset+0] & 0xFF) << 0);
     }
     public static int readIntLE(byte[] data) {
 	return readIntLE(data, 0);
@@ -83,15 +83,47 @@ public class Util {
 	return readLongBE(data, 0);
     }
 
+//     public static void main(String[] args) {
+// 	byte[] longTest1 = { 0, 0, 0, 0, 0, 0, 0, 13 };
+// 	byte[] longTest2 = { 0, 31, 0, 0, 0, 0, 0, 0 };
+// 	byte[] longTest3 = { 127, 0, 0, 0, 0, 0, 0, 0 };
+// 	byte[] longTest4 = { 0, 0, 0, 1, 1, 1, 1, 1 };
+// 	System.out.println("longTest1: " + readLongBE(longTest1));
+// 	System.out.println("longTest2: " + readLongBE(longTest2));
+// 	System.out.println("longTest3: " + readLongBE(longTest3));
+// 	System.out.println("longTest4: " + readLongBE(longTest4));
+//     }
+
     public static long readLongBE(byte[] data, int offset) {
-	return ((data[offset+0] & 0xFF) << 56 |
-		(data[offset+1] & 0xFF) << 48 |
-		(data[offset+2] & 0xFF) << 40 |
-		(data[offset+3] & 0xFF) << 32 |
-		(data[offset+4] & 0xFF) << 24 |
-		(data[offset+5] & 0xFF) << 16 |
-		(data[offset+6] & 0xFF) << 8 |
-		(data[offset+7] & 0xFF) << 0);
+// 	if(false) {
+// 	    long d1 = (data[offset+0] & 0xFFL) << 56;
+// 	    long d2 = (data[offset+1] & 0xFFL) << 48;
+// 	    long d3 = (data[offset+2] & 0xFFL) << 40;
+// 	    long d4 = (data[offset+3] & 0xFFL) << 32;
+// 	    long d5 = (data[offset+4] & 0xFFL) << 24;
+// 	    long d6 = (data[offset+5] & 0xFFL) << 16;
+// 	    long d7 = (data[offset+6] & 0xFFL) << 8;
+// 	    long d8 = (data[offset+7] & 0xFFL) << 0;
+// 	    System.out.println("1. 0x" + toHexStringBE(d1));
+// 	    System.out.println("2. 0x" + toHexStringBE(d2));
+// 	    System.out.println("3. 0x" + toHexStringBE(d3));
+// 	    System.out.println("4. 0x" + toHexStringBE(d4));
+// 	    System.out.println("5. 0x" + toHexStringBE(d5));
+// 	    System.out.println("6. 0x" + toHexStringBE(d6));
+// 	    System.out.println("7. 0x" + toHexStringBE(d7));
+// 	    System.out.println("8. 0x" + toHexStringBE(d8));
+// 	    return d1 | d2 | d3 | d4 | d5 | d6 | d7 | d8; 
+// 	}
+// 	else {
+	return (((long)data[offset+0] & 0xFF) << 56 |
+		((long)data[offset+1] & 0xFF) << 48 |
+		((long)data[offset+2] & 0xFF) << 40 |
+		((long)data[offset+3] & 0xFF) << 32 |
+		((long)data[offset+4] & 0xFF) << 24 |
+		((long)data[offset+5] & 0xFF) << 16 |
+		((long)data[offset+6] & 0xFF) << 8 |
+		((long)data[offset+7] & 0xFF) << 0);
+// 	}
     }
     public static int readIntBE(byte[] data) {
 	return readIntBE(data, 0);

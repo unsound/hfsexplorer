@@ -312,8 +312,8 @@ public class HFSExplorer {
 		}
 	    }
 	    
-	    long nextID = -1;
-	    while(nextID < 0) {
+	    //long nextID = -1;
+	    while(true) {
 		print("Command[?]: ");
 		
 		String input = null;
@@ -325,17 +325,21 @@ public class HFSExplorer {
 		}
 		if(input.equalsIgnoreCase("?")) {
 		    println("Available commands:");
-		    println(" cd <dirID>|'..'   Changes directory");
+		    println(" ls                List contents of current directory");
+		    println(" cd <dirName>      Changes directory by name");
+		    println(" cdn <dirID>       Changes directory by ID");
+		    println(" info <fileID>     Gets extensive information about the file.");
 		    println(" extract <fileID>  Extracts <fileID> to current directory");
 		    println(" q                 Quits program");
 		}
 		else if(input.equals("q"))
 		    return;
-		else if(input.startsWith("extract")) {
-		    input = input.substring("extract".length()).trim();
+		else if(input.equals("ls"))
+		    break;
+		else if(input.startsWith("extract ")) {
+		    input = input.substring("extract ".length()).trim();
 		    try {
-			
-			nextID = Long.parseLong(input);
+			long nextID = Long.parseLong(input);
 			
 			HFSPlusCatalogLeafRecord selectedFileRecord = null;
 			HFSPlusCatalogFile selectedFile = null;
@@ -343,16 +347,19 @@ public class HFSExplorer {
 			    HFSPlusCatalogLeafRecordData recData = rec.getData();
 			    if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
 			       recData instanceof HFSPlusCatalogFile) {
-				selectedFileRecord = rec;
-				selectedFile = (HFSPlusCatalogFile)recData;
+				HFSPlusCatalogFile catFile = (HFSPlusCatalogFile)recData;
+				if(Util2.unsign(catFile.getFileID().toInt()) == nextID) {
+				    selectedFileRecord = rec;
+				    selectedFile = (HFSPlusCatalogFile)recData;
+				    break;
+				}
 			    }
 			}
 			if(selectedFileRecord == null) {
 			    println("ID not present in dir.");
-			    nextID = -1;
+			    //nextID = -1;
 			}
 			else {
-			    selectedFileRecord.print(System.out, "");
 			    String dataForkFilename = selectedFileRecord.getKey().getNodeName().toString();
 			    FileOutputStream dataOut = new FileOutputStream(dataForkFilename);
 			    print("Extracting data fork to file \"" + dataForkFilename + "\"...");
@@ -377,24 +384,52 @@ public class HFSExplorer {
 				ioe.printStackTrace();
 				try { dataOut.close(); } catch(IOException ioe2) {}
 			    }
+			    //break; // to reread the directory
 			}
 			
 		    } catch(FileNotFoundException fnfe) {
 			fnfe.printStackTrace();
 		    } catch(NumberFormatException nfe) {
-			nextID = -1;
+			//nextID = -1;
 			println("Invalid input!");
 		    }
 		}
-		else if(input.startsWith("cd")) {
-		    input = input.substring(2).trim();
+		else if(input.startsWith("info ")) {
+		    input = input.substring("info ".length()).trim();
+		    try {
+			long nextID = Long.parseLong(input);
+			
+			HFSPlusCatalogLeafRecord selectedFileRecord = null;
+			for(HFSPlusCatalogLeafRecord rec : recordsInDir) {
+			    HFSPlusCatalogLeafRecordData recData = rec.getData();
+			    if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
+			       recData instanceof HFSPlusCatalogFile) {
+				HFSPlusCatalogFile catFile = (HFSPlusCatalogFile)recData;
+				if(Util2.unsign(catFile.getFileID().toInt()) == nextID) {
+				    selectedFileRecord = rec;
+				    rec.print(System.out, "");
+				    break;
+				}
+			    }
+			}
+			if(selectedFileRecord == null) {
+			    println("ID not present in dir.");
+			    //nextID = -1;
+			}
+		    } catch(NumberFormatException nfe) {
+			//nextID = -1;
+			println("Invalid input!");
+		    }
+		}
+		else if(input.startsWith("cdn ")) {
+		    input = input.substring("cdn ".length()).trim();
 		    if(input.equals("..")) {
 			println("Not yet implemented.");
 			// Implement this.
 		    }
 		    else {
 			try {
-			    nextID = Long.parseLong(input);
+			    long nextID = Long.parseLong(input);
 			    HFSPlusCatalogLeafRecord nextDir = null;
 			    for(HFSPlusCatalogLeafRecord rec : recordsInDir) {
 				HFSPlusCatalogLeafRecordData recData = rec.getData();
@@ -409,18 +444,57 @@ public class HFSExplorer {
 			    }
 			    if(nextDir == null) {
 				println("ID not present in dir.");
-				nextID = -1;
+				//nextID = -1;
 			    }
 			    else {
 				pathStack.addLast(nextDir.getKey().getNodeName().toString());
 				currentDir = nextDir;
+				break;
 			    }
 			} catch(Exception e) {
-			    nextID = -1;
+			    //nextID = -1;
 			    println("Invalid input!");
 			}
 		    }
 		}
+		else if(input.startsWith("cd ")) {
+		    input = input.substring("cd ".length());
+		    if(input.equals("..")) {
+			println("Not yet implemented.");
+			// Implement this.
+		    }
+		    else {
+			try {
+			    
+			    HFSPlusCatalogLeafRecord nextDir = null;
+			    for(HFSPlusCatalogLeafRecord rec : recordsInDir) {
+				HFSPlusCatalogLeafRecordData recData = rec.getData();
+				if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
+				   recData instanceof HFSPlusCatalogFolder) {
+				    //System.out.println(rec.getKey().getNodeName() + ".equals(" + input +")");
+				    if(rec.getKey().getNodeName().toString().equals(input)) {
+					nextDir = rec;
+					break;
+				    }
+				}
+			    }
+			    if(nextDir == null) {
+				println("Unknown directory.");
+				//nextID = -1;
+			    }
+			    else {
+				pathStack.addLast(nextDir.getKey().getNodeName().toString());
+				currentDir = nextDir;
+				break;
+			    }
+			} catch(Exception e) {
+			    //nextID = -1;
+			    println("Invalid input!");
+			}
+		    }
+		}
+		else
+		    println("Unknown command.");
 	    }
 	    println();
 	}
