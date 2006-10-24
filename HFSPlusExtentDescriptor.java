@@ -37,3 +37,11 @@ public class HFSPlusExtentDescriptor {
 	ps.println(prefix + "blockCount: " + getBlockCount());
     }
 }
+
+/* Maximal filstorlek i HFS+ måste vara blockSize*2^32*8. Dvs. vid blockSize = 4096:
+ * 140737488355328 B
+ * 137438953472 KiB
+ * 134217728 MiB
+ * 131072 GiB
+ * 128 TiB
+ */

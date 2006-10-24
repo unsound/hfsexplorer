@@ -45,7 +45,7 @@ public class Util {
     }
     
     public static long readLongLE(byte[] data) {
-	return readIntLE(data, 0);
+	return readLongLE(data, 0);
     }
     public static long readLongLE(byte[] data, int offset) {
 	return ((data[offset+7] & 0xFF) << 56 |
@@ -80,8 +80,9 @@ public class Util {
 	return data[offset];
     }
     public static long readLongBE(byte[] data) {
-	return readIntLE(data, 0);
+	return readLongBE(data, 0);
     }
+
     public static long readLongBE(byte[] data, int offset) {
 	return ((data[offset+0] & 0xFF) << 56 |
 		(data[offset+1] & 0xFF) << 48 |

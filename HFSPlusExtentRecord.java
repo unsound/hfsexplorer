@@ -19,9 +19,12 @@ public class HFSPlusExtentRecord {
     public HFSPlusExtentDescriptor getExtentDescriptor(int index) {
 	return array[index];
     }
-//     public HFSPlusExtentDescriptor getExtentDescriptors() {
-// 	return array;
-//     }
+    public HFSPlusExtentDescriptor[] getExtentDescriptors() {
+	HFSPlusExtentDescriptor[] arrayCopy = new HFSPlusExtentDescriptor[array.length];
+	for(int i = 0; i < array.length; ++i)
+	    arrayCopy[i] = array[i];
+	return arrayCopy;
+    }
 	
     public void print(PrintStream ps, int pregap) {
 	String pregapString = "";

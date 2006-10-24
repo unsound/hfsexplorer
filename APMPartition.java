@@ -89,9 +89,9 @@ public class APMPartition {
     public short[] getPmPad()      { return Util2.readShortArrayBE(pmPad); }
     
     public String getPmSigAsString() { return Util2.toASCIIString(pmSig); }
-    public String getPmPartNameAsString() { return Util2.toASCIIString(pmPartName); }
-    public String getPmParTypeAsString() { return Util2.toASCIIString(pmParType); }
-    public String getPmProcessorAsString() { return Util2.toASCIIString(pmProcessor); }
+    public String getPmPartNameAsString() { return Util2.readNullTerminatedASCIIString(pmPartName); }
+    public String getPmParTypeAsString() { return Util2.readNullTerminatedASCIIString(pmParType); }
+    public String getPmProcessorAsString() { return Util2.readNullTerminatedASCIIString(pmProcessor); }
     
     public void printPartitionInfo(PrintStream ps) {
 	printPartitionInfo(ps, "");

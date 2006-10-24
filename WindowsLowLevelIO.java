@@ -1,6 +1,6 @@
 import java.io.*;
 
-public class WindowsLowLevelIO {
+public class WindowsLowLevelIO implements LowLevelFile {
     private byte[] fileHandle;
     private int sectorSize = 512; //Detect this later..
     private long filePointer = 0;

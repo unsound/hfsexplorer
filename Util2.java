@@ -2,25 +2,31 @@ import java.io.*;
 
 public class Util2 {
     public static String toASCIIString(byte[] data) {
+	return toASCIIString(data, 0, data.length);
+    }
+    public static String toASCIIString(byte[] data, int offset, int length) {
 	try {
-	    return new String(data, "US-ASCII");
+	    return new String(data, offset, length, "US-ASCII");
 	} catch(Exception e) {
 	    return null;
 	}
     }
     public static String toASCIIString(short i) {
-	try {
-	    return new String(Util.toByteArrayBE(i), "US-ASCII");
-	} catch(Exception e) {
-	    return null;
-	}
+	return toASCIIString(Util.toByteArrayBE(i));
     }
     public static String toASCIIString(int i) {
-	try {
-	    return new String(Util.toByteArrayBE(i), "US-ASCII");
-	} catch(Exception e) {
-	    return null;
-	}
+	return toASCIIString(Util.toByteArrayBE(i));
+    }
+
+    public static String readNullTerminatedASCIIString(byte[] data) {
+	return readNullTerminatedASCIIString(data, 0, data.length);
+    }
+    
+    public static String readNullTerminatedASCIIString(byte[] data, int offset, int maxLength) {
+	int i;
+	for(i = offset; i < (offset+maxLength); ++i)
+	    if(data[i] == 0) break;
+	return toASCIIString(data, offset, i-offset);
     }
 
     public static char readCharLE(byte[] data) {
@@ -36,6 +42,19 @@ public class Util2 {
     public static char readCharBE(byte[] data, int offset) {
 	return (char) ((data[offset+0] & 0xFF) << 8 |
 		       (data[offset+1] & 0xFF) << 0);
+    }
+    
+    public static byte[] toByteArrayLE(char c) {
+	byte[] result = new byte[2];
+	result[0] = (byte) ((c >> 0) & 0xFF);
+	result[1] = (byte) ((c >> 8) & 0xFF);
+	return result;
+    }
+    public static byte[] toByteArrayBE(char c) {
+	byte[] result = new byte[2];
+	result[0] = (byte) ((c >> 8) & 0xFF);
+	result[1] = (byte) ((c >> 0) & 0xFF);
+	return result;
     }
 
     public static char[] readCharArrayBE(byte[] b) {
@@ -54,6 +73,31 @@ public class Util2 {
 	int[] result = new int[b.length/4];
 	for(int i = 0; i < result.length; ++i)
 	    result[i] = Util.readIntBE(b, i*4);
+	return result;
+    }
+    
+    public static byte[] readByteArrayLE(char[] data) {
+	return readByteArrayLE(data, 0, data.length);
+    }
+    public static byte[] readByteArrayLE(char[] data, int offset, int size) {
+	byte[] result = new byte[data.length*2];
+	for(int i = 0; i < data.length; ++i) {
+	    byte[] cur = toByteArrayLE(data[i]);
+	    result[i*2] = cur[0];
+	    result[i*2+1] = cur[1];
+	}
+	return result;
+    }
+    public static byte[] readByteArrayBE(char[] data) {
+	return readByteArrayBE(data, 0, data.length);
+    }
+    public static byte[] readByteArrayBE(char[] data, int offset, int size) {
+	byte[] result = new byte[data.length*2];
+	for(int i = 0; i < data.length; ++i) {
+	    byte[] cur = toByteArrayBE(data[i]);
+	    result[i*2] = cur[0];
+	    result[i*2+1] = cur[1];
+	}
 	return result;
     }
 

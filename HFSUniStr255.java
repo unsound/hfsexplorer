@@ -21,13 +21,27 @@ public class HFSUniStr255 {
 	unicode = new byte[2*Util2.unsign(getLength())];
 	System.arraycopy(data, offset+2, unicode, 0, unicode.length);
     }
+    public HFSUniStr255(String unicodeString) {
+	char[] unicodeChars = unicodeString.toCharArray();
+	if(unicodeChars.length > 255)
+	    throw new RuntimeException("String too large.");
+	System.arraycopy(Util.toByteArrayBE((short)unicodeChars.length), 0, length, 0, 2);
+	unicode = Util2.readByteArrayBE(unicodeChars);
+    }
     
     public int length() { return 2+unicode.length; }
     
     public short getLength() { return Util.readShortBE(length); }
     public char[] getUnicode() { return Util2.readCharArrayBE(unicode); }
     public String getUnicodeAsString() { return new String(getUnicode()); }
-
+    
+    public byte[] getData() {
+	byte[] result = new byte[length()];
+	System.arraycopy(length, 0, result, 0, 2);
+	System.arraycopy(unicode, 0, result, 2, unicode.length);
+	return result;
+    }
+    
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " length: " + Util2.unsign(getLength()));
 	ps.println(prefix + " unicode: \"" + getUnicodeAsString() + "\"");
@@ -36,5 +50,9 @@ public class HFSUniStr255 {
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "HFSUniStr255:");
 	printFields(ps, prefix);
+    }
+
+    public String toString() {
+	return getUnicodeAsString();
     }
 }

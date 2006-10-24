@@ -15,6 +15,9 @@ public class HFSCatalogNodeID {
     public HFSCatalogNodeID(byte[] data, int offset) {
 	System.arraycopy(data, offset, hfsCatalogNodeID, 0, 4);
     }
+    public HFSCatalogNodeID(int nodeID) {
+	System.arraycopy(Util.toByteArrayBE(nodeID), 0, hfsCatalogNodeID, 0, 4);
+    }
     
     public static int length() { return 4; }
 
@@ -75,11 +78,11 @@ public class HFSCatalogNodeID {
 	return result;
     }
     public String toString() {
-	return toInt() + " (" + getDescription() + ")";
+	return "" + Util2.unsign(toInt());// + " (" + getDescription() + ")";
     }
     
     public void printFields(PrintStream ps, String prefix) {
-	ps.println(prefix + " hfsCatalogNodeID: " + toString());
+	ps.println(prefix + " hfsCatalogNodeID: " + toString() + " (" + getDescription());
     }
     
     public void print(PrintStream ps, String prefix) {
