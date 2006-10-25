@@ -88,50 +88,61 @@ public class HFSFileSystemView {
 				       nodeDescriptor.getKind());
     }
     
-    /*
-    public HFSPlusCatalogLeafRecord getRecord(HFSCatalogNodeID id, UniStr...??) {
+    public HFSPlusCatalogLeafRecord getRecord(HFSCatalogNodeID parentID, HFSUniStr255 nodeName) {
 	// Boring intialization... (read everything)
 	// Details of the catalog file should be moved to a catalog file view later
+	// This is ugly code that repeats itself at the beginning of almost every method.
+	// Somebody kick me for doing this...
 	HFSPlusVolumeHeader header = getVolumeHeader();
-	long catalogFilePosition = header.getBlockSize()*header.getCatalogFile().getExtents().getExtentDescriptor(0).getStartBlock();
-	long catalogFileLength = header.getBlockSize()*header.getCatalogFile().getExtents().getExtentDescriptor(0).getBlockCount();
+	long catalogFilePosition = Util2.unsign(header.getBlockSize())*Util2.unsign(header.getCatalogFile().getExtents().getExtentDescriptor(0).getStartBlock());
+	long catalogFileLength = Util2.unsign(header.getBlockSize())*Util2.unsign(header.getCatalogFile().getExtents().getExtentDescriptor(0).getBlockCount());
 	hfsFile.seek(fsOffset + catalogFilePosition);
 	byte[] nodeDescriptorData = new byte[14];
 	if(hfsFile.read(nodeDescriptorData) != nodeDescriptorData.length)
 	    System.out.println("ERROR: Did not read nodeDescriptor completely.");
 	BTNodeDescriptor btnd = new BTNodeDescriptor(nodeDescriptorData, 0);
 	
-	int nodeSize = bthr.getNodeSize();
-	byte[] currentNode = new byte[nodeSize];
+	byte[] headerRec = new byte[BTHeaderRec.length()];
+	hfsFile.readFully(headerRec);
+	BTHeaderRec bthr = new BTHeaderRec(headerRec, 0);
+	// End of boring intialization... 
 	
-	HFSCatalogNodeID dirID = id;
+	int nodeSize = bthr.getNodeSize();
+	
+	//HFSCatalogNodeID dirID = id;
 	int currentNodeNumber = bthr.getRootNode();
 	
 	// Search down through the layers of indices (O(log n) steps, where n is the size of the tree)
-	int requestedDir = dirID.toInt();
-	long catalogFilePosition = header.getBlockSize()*header.getCatalogFile().getExtents().getExtentDescriptor(0).getStartBlock();
 	
 	byte[] currentNodeData = new byte[bthr.getNodeSize()];
-	hfsFile.seek(fsOffset + catalogFilePosition + Util2.unsign(currentNodeNumber)*bthr.getNodeSize());
+	hfsFile.seek(fsOffset + catalogFilePosition + Util2.unsign(currentNodeNumber)*Util2.unsign(bthr.getNodeSize()));
 	hfsFile.readFully(currentNodeData);
 	BTNodeDescriptor nodeDescriptor = new BTNodeDescriptor(currentNodeData, 0);
+	
 	while(nodeDescriptor.getKind() == BTNodeDescriptor.BT_INDEX_NODE) {
-	    BTIndexNode currentNode = new HFSPlusCatalogIndexNode(currentNodeData, 0, bthr.getNodeSize());
-	    BTIndexRecord[] matchingRecords = findLEKey(currentNode, dirID);
-	    //System.out.println("Matching records: " + matchingRecords.length);
+	    HFSPlusCatalogIndexNode currentNode = new HFSPlusCatalogIndexNode(currentNodeData, 0, bthr.getNodeSize());
+	    BTIndexRecord matchingRecord = findLEKey(currentNode, parentID, nodeName);
 	    
-	    LinkedList<HFSPlusCatalogLeafRecord> results = new LinkedList<HFSPlusCatalogLeafRecord>();
-	    for(BTIndexRecord bir : matchingRecords) {
-		HFSPlusCatalogLeafRecord[] partResult = collectFilesInDir(dirID, bir.getIndex(), hfsFile, 
-									  fsOffset, header, bthr);
-		for(HFSPlusCatalogLeafRecord curRes : partResult)
-		    results.addLast(curRes);
-	    }
-	    return results.toArray(new HFSPlusCatalogLeafRecord[results.size()]);
-	    
+	    currentNodeNumber = matchingRecord.getIndex();
+	    hfsFile.seek(fsOffset + catalogFilePosition + Util2.unsign(currentNodeNumber)*Util2.unsign(bthr.getNodeSize()));
+	    hfsFile.readFully(currentNodeData);
+	    nodeDescriptor = new BTNodeDescriptor(currentNodeData, 0);
 	}
+	
+	// Leaf node reached. Find record.)
+	if(nodeDescriptor.getKind() == BTNodeDescriptor.BT_LEAF_NODE) {
+	    HFSPlusCatalogLeafNode leaf = new HFSPlusCatalogLeafNode(currentNodeData, 0, bthr.getNodeSize());
+	    HFSPlusCatalogLeafRecord[] recs = leaf.getLeafRecords();
+	    for(HFSPlusCatalogLeafRecord rec : recs)
+		if(rec.getKey().compareTo(new HFSPlusCatalogKey(parentID, nodeName)) == 0)
+		    return rec;
+	    return null;
+	}
+	else
+	    throw new RuntimeException("Expected leaf node. Found other kind: " + 
+				       nodeDescriptor.getKind());
     }
-    */
+    
     
     /** More typesafe than <code>listRecords(HFSCatalogNodeID)</code> since it checks that folderRecord
 	is of appropriate type first. */
@@ -145,8 +156,9 @@ public class HFSFileSystemView {
 	else
 	    throw new RuntimeException("Invalid input (not a folder record).");
     }
-    /** Not public because you really should use the method above to access folder listings. */
-    HFSPlusCatalogLeafRecord[] listRecords(HFSCatalogNodeID folderID) {	
+    /** You really should use the method above to access folder listings. However, the folderID is all
+	that's really needed. */
+    public HFSPlusCatalogLeafRecord[] listRecords(HFSCatalogNodeID folderID) {	
 	// Boring intialization... (read everything)
 	// Details of the catalog file should be moved to a catalog file view later
 	HFSPlusVolumeHeader header = getVolumeHeader();
@@ -320,7 +332,7 @@ public class HFSFileSystemView {
 	return null;
     }
     
-    private static BTIndexRecord findLEKey(BTIndexNode indexNode, HFSCatalogNodeID nodeID, String searchString) {
+    private static BTIndexRecord findLEKey(BTIndexNode indexNode, HFSCatalogNodeID nodeID, HFSUniStr255 searchString) {
 	/* 
 	 * Algoritm:
 	 *   Key searchKey
@@ -329,8 +341,8 @@ public class HFSFileSystemView {
 	 *     If n.key <= searchKey && n.key > greatestMatchingKey
 	 *       greatestMatchingKey = n.key
 	 */
-	HFSPlusCatalogKey searchKey = new HFSPlusCatalogKey(nodeID.toInt(), searchString);
-	long unsignedNodeID = Util2.unsign(nodeID.toInt());
+	HFSPlusCatalogKey searchKey = new HFSPlusCatalogKey(nodeID, searchString);
+	//long unsignedNodeID = Util2.unsign(nodeID.toInt());
 	BTIndexRecord records[] = indexNode.getIndexRecords();
 	BTIndexRecord largestMatchingRecord = null;//records[0];
 	for(int i = 0; i < records.length; ++i) {

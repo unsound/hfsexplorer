@@ -1,62 +1,73 @@
-//
-//  FastUnicodeCompare - Compare two Unicode strings; produce a relative ordering
-//
-//      IF              RESULT
-//  --------------------------
-//  str1 < str2     =>  -1
-//  str1 = str2     =>   0
-//  str1 > str2     =>  +1
-//
-//  The lower case table starts with 256 entries (one for each of the upper bytes
-//  of the original Unicode char).  If that entry is zero, then all characters with
-//  that upper byte are already case folded.  If the entry is non-zero, then it is
-//  the _index_ (not byte offset) of the start of the sub-table for the characters
-//  with that upper byte.  All ignorable characters are folded to the value zero.
-//
-//  In pseudocode:
-//
-//      Let c = source Unicode character
-//      Let table[] = lower case table 
-//
-//      lower = table[highbyte(c)]
-//      if (lower == 0)
-//          lower = c
-//      else
-//          lower = table[lower+lowbyte(c)]
-//
-//      if (lower == 0)
-//          ignore this character
-//
-//  To handle ignorable characters, we now need a loop to find the next valid
-//  character.  Also, we can't pre-compute the number of characters to compare;
-//  the string length might be larger than the number of non-ignorable characters.
-//  Further, we must be able to handle ignorable characters at any point in the
-//  string, including as the first or last characters.  We use a zero value as a
-//  sentinel to detect both end-of-string and ignorable characters.  Since the File
-//  Manager doesn't prevent the NUL character (value zero) as part of a filename,
-//  the case mapping table is assumed to map u+0000 to some non-zero value (like
-//  0xFFFF, which is an invalid Unicode character).
-//
-//  Pseudocode:
-//
-//      while (1) {
-//          c1 = GetNextValidChar(str1)         //  returns zero if at end of string
-//          c2 = GetNextValidChar(str2)
-//
-//          if (c1 != c2) break                 //  found a difference
-//
-//          if (c1 == 0)                        //  reached end of string on both
-//                                              //  strings at once?
-//              return 0;                       //  yes, so strings are equal
-//      }
-//
-//      // When we get here, c1 != c2.  So, we just need to determine which one is
-//      // less.
-//      if (c1 < c2)
-//          return -1;
-//      else
-//          return 1;
-//
+/*-
+ * This code is written by Apple. I ripped it from their Technical Note TN1150
+ * and then converted it to Java. They don't explicitly state any license, and
+ * I believe the intention is for all HFS Plus implementors to be able to use
+ * this piece of code. My interpretation is that it is in the public domain,
+ * with no use restrictions.
+ *  Erik Larsson, 2006
+ */
+
+/**
+ * <pre>
+ * FastUnicodeCompare - Compare two Unicode strings; produce a relative ordering
+ *
+ *     IF              RESULT
+ * --------------------------
+ * str1 < str2     =>  -1
+ * str1 = str2     =>   0
+ * str1 > str2     =>  +1
+ *
+ * The lower case table starts with 256 entries (one for each of the upper bytes
+ * of the original Unicode char).  If that entry is zero, then all characters with
+ * that upper byte are already case folded.  If the entry is non-zero, then it is
+ * the _index_ (not byte offset) of the start of the sub-table for the characters
+ * with that upper byte.  All ignorable characters are folded to the value zero.
+ *
+ * In pseudocode:
+ *
+ *     Let c = source Unicode character
+ *     Let table[] = lower case table 
+ *
+ *     lower = table[highbyte(c)]
+ *     if (lower == 0)
+ *         lower = c
+ *     else
+ *         lower = table[lower+lowbyte(c)]
+ *
+ *     if (lower == 0)
+ *         ignore this character
+ *
+ * To handle ignorable characters, we now need a loop to find the next valid
+ * character.  Also, we can't pre-compute the number of characters to compare;
+ * the string length might be larger than the number of non-ignorable characters.
+ * Further, we must be able to handle ignorable characters at any point in the
+ * string, including as the first or last characters.  We use a zero value as a
+ * sentinel to detect both end-of-string and ignorable characters.  Since the File
+ * Manager doesn't prevent the NUL character (value zero) as part of a filename,
+ * the case mapping table is assumed to map u+0000 to some non-zero value (like
+ * 0xFFFF, which is an invalid Unicode character).
+ *
+ * Pseudocode:
+ *
+ *     while (1) {
+ *         c1 = GetNextValidChar(str1)         //  returns zero if at end of string
+ *         c2 = GetNextValidChar(str2)
+ *
+ *         if (c1 != c2) break                 //  found a difference
+ *
+ *         if (c1 == 0)                        //  reached end of string on both
+ *                                             //  strings at once?
+ *             return 0;                       //  yes, so strings are equal
+ *     }
+ *
+ *     // When we get here, c1 != c2.  So, we just need to determine which one is
+ *     // less.
+ *     if (c1 < c2)
+ *         return -1;
+ *     else
+ *         return 1;
+ * </pre>
+ */
 
 public class FastUnicodeCompare {
     public static int compare(char[] str1, char[] str2) {

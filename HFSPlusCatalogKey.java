@@ -24,6 +24,11 @@ public class HFSPlusCatalogKey extends BTKey {
 	nodeName = new HFSUniStr255(data, offset+6);
     }
     
+    public HFSPlusCatalogKey(HFSCatalogNodeID parentID, HFSUniStr255 nodeName) {
+	this.parentID = parentID;
+	this.nodeName = nodeName;
+	System.arraycopy(Util.toByteArrayBE((short)(4+nodeName.length())), 0, keyLength, 0, 2);
+    }
     public HFSPlusCatalogKey(int parentIDInt, String nodeNameString) {
 	parentID = new HFSCatalogNodeID(parentIDInt);
 	nodeName = new HFSUniStr255(nodeNameString);

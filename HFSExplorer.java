@@ -284,12 +284,15 @@ public class HFSExplorer {
 	HFSFileSystemView fsView = new HFSFileSystemView(hfsFile, fsOffset);
 	HFSPlusCatalogLeafRecord rootRecord = fsView.getRoot();
 	HFSPlusCatalogLeafRecord currentDir = rootRecord;
+	//HFSCatalogNodeID = new HFSCatalogNodeID(1); //rootRecord.getFolderID();
 	LinkedList<String> pathStack = new LinkedList<String>();
+	LinkedList<HFSPlusCatalogLeafRecord> pathThread = new LinkedList<HFSPlusCatalogLeafRecord>();
 	pathStack.addLast("");
 
 	BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 	
 	while(true) {
+	    HFSPlusCatalogThread currentThread = null;
 	    StringBuilder currentPath = new StringBuilder();
 	    for(String pathComponent : pathStack) {
 		currentPath.append(pathComponent);
@@ -297,6 +300,7 @@ public class HFSExplorer {
 	    }
 	    println("Listing files in \"" + currentPath.toString() + "\":");
 	    
+	    boolean atLeastOneNonThreadEntryFound = false;
 	    HFSPlusCatalogLeafRecord[] recordsInDir = fsView.listRecords(currentDir);
 	    for(HFSPlusCatalogLeafRecord rec : recordsInDir) {
 		HFSPlusCatalogLeafRecordData recData = rec.getData();
@@ -304,13 +308,35 @@ public class HFSExplorer {
 		   recData instanceof HFSPlusCatalogFile) {
 		    HFSPlusCatalogFile catFile = (HFSPlusCatalogFile)recData;
 		    println("  [" + catFile.getFileID() + "] \"" + rec.getKey().getNodeName() + "\" (" + catFile.getDataFork().getLogicalSize() + " B)");
+		    if(!atLeastOneNonThreadEntryFound)
+			atLeastOneNonThreadEntryFound = true;
 		}
 		else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
 			recData instanceof HFSPlusCatalogFolder) {
 		    HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder)recData;
 		    println("  [" + catFolder.getFolderID() + "] \"" + rec.getKey().getNodeName() + "/\"");
+		    if(!atLeastOneNonThreadEntryFound)
+			atLeastOneNonThreadEntryFound = true;
+		}
+		else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
+			recData instanceof HFSPlusCatalogThread) {
+		    HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
+		    println("  [Folder Thread: [" + catThread.getParentID() + "] \"" + catThread.getNodeName() + "\"]");
+		    if(currentThread == null)
+			currentThread = catThread;
+		    else
+			println("WARNING: Found more than one folder thread in " + currentPath + "!");
+		    //println("  [" + catFolder.getFolderID() + "] <Folder Thread: [" + catThread.getParentID() + "] \"" + catThread.getNodeName() + "\"");
+		}
+		else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE_THREAD &&
+			recData instanceof HFSPlusCatalogThread) {
+		    HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
+		    println("  [File Thread: [" + catThread.getParentID() + "] \"" + catThread.getNodeName() + "\"]");
+		    // This thread probably does not exist in directories...?
 		}
 	    }
+	    if(currentThread == null && atLeastOneNonThreadEntryFound)
+		println("WARNING: Found no folder thread in " + currentPath + "! Won't be able to go back from children in hierarchy.");
 	    
 	    //long nextID = -1;
 	    while(true) {
@@ -435,6 +461,7 @@ public class HFSExplorer {
 				HFSPlusCatalogLeafRecordData recData = rec.getData();
 				if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
 				   recData instanceof HFSPlusCatalogFolder) {
+				    //System.out.println(rec.getKey().getNodeName() + ".equals(" + input +")");
 				    HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder)recData;
 				    if(Util2.unsign(catFolder.getFolderID().toInt()) == nextID) {
 					nextDir = rec;
@@ -448,7 +475,8 @@ public class HFSExplorer {
 			    }
 			    else {
 				pathStack.addLast(nextDir.getKey().getNodeName().toString());
-				currentDir = nextDir;
+				pathThread.addLast(currentDir);
+				currentDir = nextDir;//nextFolder.getFolderID();
 				break;
 			    }
 			} catch(Exception e) {
@@ -460,13 +488,33 @@ public class HFSExplorer {
 		else if(input.startsWith("cd ")) {
 		    input = input.substring("cd ".length());
 		    if(input.equals("..")) {
-			println("Not yet implemented.");
-			// Implement this.
+// 			HFSPlusCatalogLeafRecord nextDir = null;
+// 			for(HFSPlusCatalogLeafRecord rec : recordsInDir) {
+// 			    HFSPlusCatalogLeafRecordData recData = rec.getData();
+// 			    if((recData.getRecordType() == 
+// 				HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD) &&
+// 			       recData instanceof HFSPlusCatalogThread) {
+// 				HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
+// 				nextDir = fsView.getRecord(catThread.getParentID(), catThread.getNodeName());
+// 				if(nextDir == null)
+// 				    System.err.println("OCULD NOTT FIAAND DIDIIRR!!!");
+// 			    }
+// 			}
+// 			if(nextDir == null) {
+// 			    println("ID not present in dir.");
+// 			    //nextID = -1;
+// 			}
+// 			else {
+			    pathStack.removeLast();
+			    
+			    currentDir = pathThread.removeLast();//nextDir;//nextFolder.getFolderID();
+			    break;
+// 			}
 		    }
 		    else {
 			try {
-			    
 			    HFSPlusCatalogLeafRecord nextDir = null;
+			    HFSPlusCatalogFolder nextFolder = null;
 			    for(HFSPlusCatalogLeafRecord rec : recordsInDir) {
 				HFSPlusCatalogLeafRecordData recData = rec.getData();
 				if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
@@ -474,6 +522,7 @@ public class HFSExplorer {
 				    //System.out.println(rec.getKey().getNodeName() + ".equals(" + input +")");
 				    if(rec.getKey().getNodeName().toString().equals(input)) {
 					nextDir = rec;
+					nextFolder = (HFSPlusCatalogFolder)recData;
 					break;
 				    }
 				}
@@ -484,7 +533,8 @@ public class HFSExplorer {
 			    }
 			    else {
 				pathStack.addLast(nextDir.getKey().getNodeName().toString());
-				currentDir = nextDir;
+				pathThread.addLast(currentDir);
+				currentDir = nextDir;//nextFolder.getFolderID();
 				break;
 			    }
 			} catch(Exception e) {
