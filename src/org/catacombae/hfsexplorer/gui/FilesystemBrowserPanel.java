@@ -24,39 +24,50 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
      */
     // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
     private void initComponents() {
-        jSplitPane1 = new javax.swing.JSplitPane();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTree1 = new javax.swing.JTree();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jTextField1 = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        treeTableSplit = new javax.swing.JSplitPane();
+        dirTreeScroller = new javax.swing.JScrollPane();
+        dirTree = new javax.swing.JTree();
+        fileTableScroller = new javax.swing.JScrollPane();
+        fileTable = new javax.swing.JTable();
+        addressField = new javax.swing.JTextField();
+        pathLabel = new javax.swing.JLabel();
+        goButton = new javax.swing.JButton();
 
-        jSplitPane1.setDividerLocation(150);
-        jSplitPane1.setContinuousLayout(true);
-        jScrollPane1.setViewportView(jTree1);
+        treeTableSplit.setDividerLocation(150);
+        treeTableSplit.setContinuousLayout(true);
+        dirTreeScroller.setViewportView(dirTree);
 
-        jSplitPane1.setLeftComponent(jScrollPane1);
+        treeTableSplit.setLeftComponent(dirTreeScroller);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        fileTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
+                {"yada.txt", "1 KiB", "Textdokument", "2006-06-11 14:34"},
                 {null, null, null, null},
                 {null, null, null, null},
                 {null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Namn", "Storlek", "Typ", "Senast ändrad"
             }
-        ));
-        jScrollPane2.setViewportView(jTable1);
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
 
-        jSplitPane1.setRightComponent(jScrollPane2);
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        fileTable.setIntercellSpacing(new java.awt.Dimension(0, 0));
+        fileTable.setShowHorizontalLines(false);
+        fileTable.setShowVerticalLines(false);
+        fileTableScroller.setViewportView(fileTable);
 
-        jLabel1.setText("Path:");
+        treeTableSplit.setRightComponent(fileTableScroller);
 
-        jButton1.setText("Go");
+        pathLabel.setText("Path:");
+
+        goButton.setText("Go");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -65,13 +76,13 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, treeTableSplit, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 580, Short.MAX_VALUE)
                     .add(layout.createSequentialGroup()
-                        .add(jLabel1)
+                        .add(pathLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jTextField1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 411, Short.MAX_VALUE)
+                        .add(addressField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 499, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jButton1)))
+                        .add(goButton)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -79,25 +90,25 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel1)
-                    .add(jButton1)
-                    .add(jTextField1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(pathLabel)
+                    .add(goButton)
+                    .add(addressField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 415, Short.MAX_VALUE)
+                .add(treeTableSplit, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 415, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JSplitPane jSplitPane1;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTree jTree1;
+    public javax.swing.JTextField addressField;
+    public javax.swing.JTree dirTree;
+    private javax.swing.JScrollPane dirTreeScroller;
+    public javax.swing.JTable fileTable;
+    private javax.swing.JScrollPane fileTableScroller;
+    public javax.swing.JButton goButton;
+    private javax.swing.JLabel pathLabel;
+    private javax.swing.JSplitPane treeTableSplit;
     // End of variables declaration//GEN-END:variables
     
 }

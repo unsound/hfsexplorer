@@ -1,0 +1,5 @@
+struct DriverDescriptorEntry {
+  UInt32  ddBlock;  {first driver's starting block}
+  UInt16  ddSize;   {size of the driver, in 512-byte blocks}
+  UInt16  ddType;   {operating system type (MacOS = 1)}
+};

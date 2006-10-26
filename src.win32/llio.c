@@ -41,7 +41,7 @@ void handleMultiByteToWideCharError(JNIEnv *env, DWORD errorCode) {
    shouldn't matter as it will never be transfered between platforms.
    The size of the byte array will be equal to sizeof(HANDLE). */
 jbyteArray getHandleData(JNIEnv *env, HANDLE hnd) {
-  jbyteArray result = (*env)->NewByteArray(env, sizeof(HANDLE));
+  jbyteArray result = (*env)->NewByteArray(env, sizeof(HANDLE)); // I *think* this returns a local reference, so I won't have to free it manually.
   jbyte byteArray[sizeof(HANDLE)];
   int i;
   BYTE *rawHnd = (BYTE*)&hnd;
@@ -70,6 +70,10 @@ HANDLE getHandle(JNIEnv *env, jbyteArray handleData) {
 
 JNIEXPORT jbyteArray JNICALL Java_WindowsLowLevelIO_open(JNIEnv *env, jclass cls, jstring str) {
   if(DEBUG) printf("Java_WindowsLowLevelIO_open called\n");
+  if(str == NULL) { // Must check input, or we can crash the jvm.
+    throwByName(env, "java/lang/NullPointerException", "Filename is null.");
+    return 0;
+  }
   
   /* First, we convert the jstring to a jbyte array with the string encoded
      into UTF-8. */
@@ -89,6 +93,7 @@ JNIEXPORT jbyteArray JNICALL Java_WindowsLowLevelIO_open(JNIEnv *env, jclass cls
   WCHAR *wcFilename = (WCHAR*)malloc(sizeof(WCHAR)*wcFilenameSize);
   if(MultiByteToWideChar(CP_UTF8, 0, utf8Filename, utf8FilenameLength, wcFilename, wcFilenameSize) == 0) {
     handleMultiByteToWideCharError(env, GetLastError());
+    free(wcFilename);
     return 0;
   }
   wcFilename[wcFilenameSize-1] = L'\0'; // Null termination.

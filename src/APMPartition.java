@@ -117,4 +117,8 @@ public class APMPartition {
 	ps.println("pmProcessor: \"" + getPmProcessorAsString() + "\"");
 	ps.println("pmPad: " + getPmPad());
     }
+
+    public String toString() {
+	return "\"" + getPmPartNameAsString() + "\" (" + getPmParTypeAsString() + ")";
+    }
 }

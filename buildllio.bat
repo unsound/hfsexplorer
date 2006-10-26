@@ -1,6 +1,4 @@
-@echo off
-pushd %~dp0
-javac WindowsLowLevelIO.java
-javah -jni WindowsLowLevelIO
-gcc -Wall -D_JNI_IMPLEMENTATION_ -Wl,--kill-at -shared llio.c -o llio.dll
-popd
+rem @echo off
+call "%dp0\buildall.bat"
+javah -jni -classpath "%~dp0\build.~" -d "%~dp0\src.win32" WindowsLowLevelIO
+gcc -Wall -D_JNI_IMPLEMENTATION_ -Wl,--kill-at -shared "%~dp0\src.win32\llio.c" -o "%~dp0\llio.dll"

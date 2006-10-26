@@ -32,7 +32,7 @@ public class HFSFileSystemView {
     }
     
     public HFSPlusVolumeHeader getVolumeHeader() {
-	byte[] currentBlock = new byte[512]; // Could be made a global var?
+	byte[] currentBlock = new byte[512]; // Could be made a global var? (war?)
 	hfsFile.seek(fsOffset + 1024);
 	hfsFile.read(currentBlock);
 	return new HFSPlusVolumeHeader(currentBlock);

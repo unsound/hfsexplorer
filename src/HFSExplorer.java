@@ -3,7 +3,7 @@ import java.io.*;
 import java.math.BigInteger;
 
 public class HFSExplorer {
-    public static final String VERSION = "0.05";
+    public static final String VERSION = "0.1";
     public static final String COPYRIGHT = "Copyright (C) Erik Larsson 2006";
     public static BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
     private static class Options {
@@ -569,7 +569,7 @@ public class HFSExplorer {
 	println("    test    Launches a test mode for extensive exploration of file system");
 	println("            structures. Only for debugging purposes.");
 	println();
-	println("  Verbs options:");
+	println("  Verb options:");
 	println("    <none defined>");
     }
     
