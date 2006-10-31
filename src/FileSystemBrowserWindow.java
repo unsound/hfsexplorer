@@ -164,14 +164,53 @@ public class FileSystemBrowserWindow extends JFrame {
 	
 	// Menus
 	JMenuItem loadFSFromDeviceItem = null;
-	if(System.getProperty("os.name").toLowerCase().startsWith("windows")) {
+	JMenuItem loadFSFromDeviceWithAPMItem = null;
+	if(System.getProperty("os.name").toLowerCase().startsWith("windows") &&
+	   System.getProperty("os.arch").toLowerCase().equals("x86")) {
 	    loadFSFromDeviceItem = new JMenuItem("Load file system from device");
 	    loadFSFromDeviceItem.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent ae) {
-			String pathName = JOptionPane.showInputDialog(FileSystemBrowserWindow.this,
-								      "Enter the UNC path for the file system",
-								      "\\\\?\\GLOBALROOT\\Device\\Harddisk2\\Partition2");
-			loadFS(pathName, false, true);
+			SelectWindowsDeviceDialog deviceDialog = new SelectWindowsDeviceDialog(FileSystemBrowserWindow.this,
+											       true,
+											       "Load file system from device");
+			deviceDialog.setVisible(true);
+			String pathName = deviceDialog.getPathName();
+// 			String pathName = JOptionPane.showInputDialog(FileSystemBrowserWindow.this,
+// 								      "Enter the UNC path for the file system",
+// 								      "\\\\?\\GLOBALROOT\\Device\\Harddisk2\\Partition2");
+			//System.out.println("loadFS(" + pathName + ", false, true);");
+			try {
+			    if(pathName != null)
+				loadFS(pathName, false, true);
+			} catch(Exception e) {
+			    e.printStackTrace();
+			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+							  "Could not read contents of partition!",
+							  "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		    }
+		});
+	    loadFSFromDeviceWithAPMItem = new JMenuItem("Load file system from device with APM");
+	    loadFSFromDeviceWithAPMItem.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent ae) {
+			SelectWindowsDeviceDialog deviceDialog = new SelectWindowsDeviceDialog(FileSystemBrowserWindow.this,
+											       true,
+											       "Load file system from device with APM");
+			deviceDialog.setVisible(true);
+			String pathName = deviceDialog.getPathName();
+// 			String pathName = JOptionPane.showInputDialog(FileSystemBrowserWindow.this,
+// 								      "Enter the UNC path for the file system",
+// 								      "\\\\?\\GLOBALROOT\\Device\\Harddisk2\\Partition2");
+			//System.out.println("loadFS(" + pathName + ", false, true);");
+			try {
+			    if(pathName != null)
+				loadFS(pathName, true, true);
+			} catch(Exception e) {
+			    e.printStackTrace();
+			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+							  "Could not read contents of partition!",
+							  "Error", JOptionPane.ERROR_MESSAGE);
+			}
 		    }
 		});
 	}
@@ -188,6 +227,14 @@ public class FileSystemBrowserWindow extends JFrame {
 			    loadFS(pathName, true, false);
 			} catch(IOException ioe) {
 			    ioe.printStackTrace();
+			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+							  "Count not resolve pathname!",
+							  "Error", JOptionPane.ERROR_MESSAGE);
+			} catch(Exception e) {
+			    e.printStackTrace();
+			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+							  "Could not read contents of partition!",
+							  "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		    }
 		}
@@ -196,6 +243,8 @@ public class FileSystemBrowserWindow extends JFrame {
 	JMenu fileMenu = new JMenu("File");
 	if(loadFSFromDeviceItem != null)
 	    fileMenu.add(loadFSFromDeviceItem);
+	if(loadFSFromDeviceWithAPMItem != null)
+	    fileMenu.add(loadFSFromDeviceWithAPMItem);
 	fileMenu.add(loadAPMFSFromFileItem);
 	JMenuBar menuBar = new JMenuBar();
 	menuBar.add(fileMenu);
@@ -218,7 +267,9 @@ public class FileSystemBrowserWindow extends JFrame {
 	    byte[] firstBlock = new byte[blockSize];
 	    fsFile.readFully(firstBlock);
 	    DriverDescriptorRecord ddr = new DriverDescriptorRecord(firstBlock, 0);
+	    //ddr.print(System.out, "");
 	    ApplePartitionMap apm = new ApplePartitionMap(fsFile, 0x200, ddr.getSbBlkSize());
+	    //apm.print(System.out, "");
 	    APMPartition[] partitions = apm.getPartitions();
 	    Object selectedValue;
 	    while(true) {
@@ -235,6 +286,8 @@ public class FileSystemBrowserWindow extends JFrame {
 			JOptionPane.showMessageDialog(this, "Can't find handler for partition type \"" + partitionType + "\"",
 						      "Unknown partition type", JOptionPane.ERROR_MESSAGE);
 		}
+		else
+		    return;
 	    }
 	    if(selectedValue instanceof APMPartition) {
 		APMPartition selectedPartition = (APMPartition)selectedValue;

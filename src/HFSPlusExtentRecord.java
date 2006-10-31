@@ -7,7 +7,7 @@ public class HFSPlusExtentRecord {
      *
      * BP   Size  Type                        Variable name             Description
      * ----------------------------------------------------------------------------
-     * 0    8*8   HFSPlusExtentDescriptor[8]  hfsPlusExtentDescriptors
+     * 0    8*8   HFSPlusExtentDescriptor[8]  array
      */
     private final HFSPlusExtentDescriptor[] array = new HFSPlusExtentDescriptor[8];
 

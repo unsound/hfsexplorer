@@ -97,25 +97,33 @@ public class APMPartition {
 	printPartitionInfo(ps, "");
     }
     public void printPartitionInfo(PrintStream ps, String prefix) {
-	ps.println("pmSig: \"" + getPmSigAsString() + "\"");
-	ps.println("pmSigPad: " + getPmSigPad());
-	ps.println("pmMapBlkCnt: " + getPmMapBlkCnt());
-	ps.println("pmPyPartStart: " + getPmPyPartStart());
-	ps.println("pmPartBlkCnt: " + getPmPartBlkCnt());
-	ps.println("pmPartName: \"" +  getPmPartNameAsString() + "\"");
-	ps.println("pmParType: \"" +  getPmParTypeAsString() + "\"");
-	ps.println("pmLgDataStart: " + getPmLgDataStart());
-	ps.println("pmDataCnt: " + getPmDataCnt());
-	ps.println("pmPartStatus: " + getPmPartStatus());
-	ps.println("pmLgBootStart: " + getPmLgBootStart());
-	ps.println("pmBootSize: " + getPmBootSize());
-	ps.println("pmBootAddr: " + getPmBootAddr());
-	ps.println("pmBootAddr2: " + getPmBootAddr2());
-	ps.println("pmBootEntry: " + getPmBootEntry());
-	ps.println("pmBootEntry2: " + getPmBootEntry2());
-	ps.println("pmBootCksum: " + getPmBootCksum());
-	ps.println("pmProcessor: \"" + getPmProcessorAsString() + "\"");
-	ps.println("pmPad: " + getPmPad());
+	ps.println(prefix + "pmSig: \"" + getPmSigAsString() + "\"");
+	ps.println(prefix + "pmSigPad: " + getPmSigPad());
+	ps.println(prefix + "pmMapBlkCnt: " + getPmMapBlkCnt());
+	ps.println(prefix + "pmPyPartStart: " + getPmPyPartStart());
+	ps.println(prefix + "pmPartBlkCnt: " + getPmPartBlkCnt());
+	ps.println(prefix + "pmPartName: \"" +  getPmPartNameAsString() + "\"");
+	ps.println(prefix + "pmParType: \"" +  getPmParTypeAsString() + "\"");
+	ps.println(prefix + "pmLgDataStart: " + getPmLgDataStart());
+	ps.println(prefix + "pmDataCnt: " + getPmDataCnt());
+	ps.println(prefix + "pmPartStatus: " + getPmPartStatus());
+	ps.println(prefix + "pmLgBootStart: " + getPmLgBootStart());
+	ps.println(prefix + "pmBootSize: " + getPmBootSize());
+	ps.println(prefix + "pmBootAddr: " + getPmBootAddr());
+	ps.println(prefix + "pmBootAddr2: " + getPmBootAddr2());
+	ps.println(prefix + "pmBootEntry: " + getPmBootEntry());
+	ps.println(prefix + "pmBootEntry2: " + getPmBootEntry2());
+	ps.println(prefix + "pmBootCksum: " + getPmBootCksum());
+	ps.println(prefix + "pmProcessor: \"" + getPmProcessorAsString() + "\"");
+	ps.println(prefix + "pmPad: " + getPmPad());
+    }
+    
+    public void printFields(PrintStream ps, String prefix) {
+	printPartitionInfo(ps, prefix + " ");
+    }
+    public void print(PrintStream ps, String prefix) {
+	ps.println(prefix + "APMPartition:");
+	printFields(ps, prefix);
     }
 
     public String toString() {

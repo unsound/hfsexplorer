@@ -44,4 +44,12 @@ public class HFSPlusExtentDescriptor {
  * 134217728 MiB
  * 131072 GiB
  * 128 TiB
+ *
+ * vid blocksize 32768:
+ * 1125899906842624 B
+ * 1099511627776 KiB
+ * 1073741824 MiB
+ * 1048576 GiB
+ * 1024 TiB
+ * 1 PiB
  */

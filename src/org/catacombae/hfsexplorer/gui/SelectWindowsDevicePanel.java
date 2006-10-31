@@ -31,19 +31,14 @@ public class SelectWindowsDevicePanel extends javax.swing.JPanel {
         selectDeviceButton = new javax.swing.JRadioButton();
         specifyDeviceNameButton = new javax.swing.JRadioButton();
         specifyDeviceNameField = new javax.swing.JTextField();
-        jComboBox1 = new javax.swing.JComboBox();
+        detectedDevicesCombo = new javax.swing.JComboBox();
+        detectedDevicesLabel = new javax.swing.JLabel();
+        loadButton = new javax.swing.JButton();
+        cancelButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jRadioButton3 = new javax.swing.JRadioButton();
-        jRadioButton4 = new javax.swing.JRadioButton();
-        jRadioButton5 = new javax.swing.JRadioButton();
-        jRadioButton6 = new javax.swing.JRadioButton();
-        jRadioButton7 = new javax.swing.JRadioButton();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
 
         selectDeviceButton.setSelected(true);
-        selectDeviceButton.setText("Select a detected device");
+        selectDeviceButton.setText("Select a device");
         selectDeviceButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         selectDeviceButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
@@ -52,36 +47,17 @@ public class SelectWindowsDevicePanel extends javax.swing.JPanel {
         specifyDeviceNameButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
         specifyDeviceNameField.setText("\\\\?\\");
+            specifyDeviceNameField.setEnabled(false);
 
-            jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Harddisk0", "Harddisk1", "Harddisk2", "Harddisk3" }));
+            detectedDevicesCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Harddisk0\\Partition1", "Harddisk0\\Partition2", "Harddisk1\\Partition1", "CdRom0", "CdRom1" }));
 
-            jLabel1.setText("Physical disk:");
+            detectedDevicesLabel.setText("Detected devices:");
 
-            jLabel2.setText("Partition:");
+            loadButton.setText("Load");
 
-            jRadioButton3.setText("Partition 1 (C:)");
-            jRadioButton3.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-            jRadioButton3.setMargin(new java.awt.Insets(0, 0, 0, 0));
+            cancelButton.setText("Cancel");
 
-            jRadioButton4.setText("Partition 2 (D:)");
-            jRadioButton4.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-            jRadioButton4.setMargin(new java.awt.Insets(0, 0, 0, 0));
-
-            jRadioButton5.setText("Partition 3 (unmapped)");
-            jRadioButton5.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-            jRadioButton5.setMargin(new java.awt.Insets(0, 0, 0, 0));
-
-            jRadioButton6.setText("Partition 4 (G:)");
-            jRadioButton6.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-            jRadioButton6.setMargin(new java.awt.Insets(0, 0, 0, 0));
-
-            jRadioButton7.setText("Entire drive");
-            jRadioButton7.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-            jRadioButton7.setMargin(new java.awt.Insets(0, 0, 0, 0));
-
-            jButton1.setText("Load");
-
-            jButton2.setText("Cancel");
+            jLabel1.setText("(CD-ROMs probably won't work)");
 
             org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
             this.setLayout(layout);
@@ -90,86 +66,55 @@ public class SelectWindowsDevicePanel extends javax.swing.JPanel {
                 .add(layout.createSequentialGroup()
                     .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                         .add(layout.createSequentialGroup()
-                            .add(27, 27, 27)
-                            .add(specifyDeviceNameField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 478, Short.MAX_VALUE))
-                        .add(layout.createSequentialGroup()
-                            .addContainerGap()
-                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                .add(selectDeviceButton)
-                                .add(specifyDeviceNameButton)
-                                .add(layout.createSequentialGroup()
-                                    .add(17, 17, 17)
-                                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                        .add(jLabel1)
-                                        .add(layout.createSequentialGroup()
-                                            .add(10, 10, 10)
-                                            .add(jLabel2)))
-                                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                        .add(jRadioButton7)
-                                        .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                        .add(jRadioButton3)
-                                        .add(jRadioButton4)
-                                        .add(jRadioButton5)
-                                        .add(jRadioButton6)))))
-                        .add(layout.createSequentialGroup()
-                            .addContainerGap()
-                            .add(jButton1)
+                            .add(detectedDevicesLabel)
                             .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                            .add(jButton2)))
+                            .add(detectedDevicesCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                            .add(jLabel1))
+                        .add(selectDeviceButton)
+                        .add(specifyDeviceNameButton)
+                        .add(layout.createSequentialGroup()
+                            .addContainerGap()
+                            .add(loadButton)
+                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                            .add(cancelButton))
+                        .add(layout.createSequentialGroup()
+                            .addContainerGap()
+                            .add(specifyDeviceNameField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 464, Short.MAX_VALUE)))
                     .addContainerGap())
             );
             layout.setVerticalGroup(
                 layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                 .add(layout.createSequentialGroup()
-                    .addContainerGap()
                     .add(selectDeviceButton)
-                    .add(4, 4, 4)
-                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                        .add(jLabel1)
-                        .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                     .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                        .add(jLabel2)
-                        .add(jRadioButton7))
+                        .add(detectedDevicesLabel)
+                        .add(detectedDevicesCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(jLabel1))
                     .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                    .add(jRadioButton3)
-                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                    .add(jRadioButton4)
-                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                    .add(jRadioButton5)
-                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                    .add(jRadioButton6)
-                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 126, Short.MAX_VALUE)
                     .add(specifyDeviceNameButton)
                     .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                     .add(specifyDeviceNameField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                     .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                        .add(jButton1)
-                        .add(jButton2))
-                    .add(61, 61, 61))
+                        .add(loadButton)
+                        .add(cancelButton)))
             );
         }// </editor-fold>//GEN-END:initComponents
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JComboBox jComboBox1;
+    public javax.swing.JButton cancelButton;
+    public javax.swing.JComboBox detectedDevicesCombo;
+    private javax.swing.JLabel detectedDevicesLabel;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JRadioButton jRadioButton3;
-    private javax.swing.JRadioButton jRadioButton4;
-    private javax.swing.JRadioButton jRadioButton5;
-    private javax.swing.JRadioButton jRadioButton6;
-    private javax.swing.JRadioButton jRadioButton7;
+    public javax.swing.JButton loadButton;
     private javax.swing.ButtonGroup partitionGroup;
-    private javax.swing.JRadioButton selectDeviceButton;
+    public javax.swing.JRadioButton selectDeviceButton;
     private javax.swing.ButtonGroup selectSpecifyGroup;
-    private javax.swing.JRadioButton specifyDeviceNameButton;
-    private javax.swing.JTextField specifyDeviceNameField;
+    public javax.swing.JRadioButton specifyDeviceNameButton;
+    public javax.swing.JTextField specifyDeviceNameField;
     // End of variables declaration//GEN-END:variables
     
 }

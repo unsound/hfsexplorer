@@ -12,6 +12,7 @@ public class HFSExplorer {
     }
     private static enum Operation {
 	BROWSE,
+	FRAGCHECK,
 	TEST;
 	
 	private String filename;
@@ -86,6 +87,8 @@ public class HFSExplorer {
 	}
 	if(operation == Operation.BROWSE)
 	    operationBrowse(operation, isoRaf, offset, length);
+	else if(operation == Operation.FRAGCHECK)
+	    operationFragCheck(operation, isoRaf, offset, length);
 	else if(operation == Operation.TEST) {
 	    byte[] currentBlock = new byte[512];
 	    isoRaf.seek(offset + 1024);
@@ -366,7 +369,7 @@ public class HFSExplorer {
 		    input = input.substring("extract ".length()).trim();
 		    try {
 			long nextID = Long.parseLong(input);
-			
+
 			HFSPlusCatalogLeafRecord selectedFileRecord = null;
 			HFSPlusCatalogFile selectedFile = null;
 			for(HFSPlusCatalogLeafRecord rec : recordsInDir) {
@@ -390,7 +393,7 @@ public class HFSExplorer {
 			    FileOutputStream dataOut = new FileOutputStream(dataForkFilename);
 			    print("Extracting data fork to file \"" + dataForkFilename + "\"...");
 			    try {
-				long bytesExtracted = fsView.extractDataForkToStream(selectedFile, dataOut);
+				long bytesExtracted = fsView.extractDataForkToStream(selectedFileRecord, dataOut);
 				println("extracted " + bytesExtracted + " bytes.");
 				dataOut.close();
 			    } catch(IOException ioe) {
@@ -403,7 +406,7 @@ public class HFSExplorer {
 			    FileOutputStream resourceOut = new FileOutputStream(resourceForkFilename);
 			    print("Extracting resource fork to file \"" + resourceForkFilename + "\"...");
 			    try {
-				long bytesExtracted = fsView.extractResourceForkToStream(selectedFile, resourceOut);
+				long bytesExtracted = fsView.extractResourceForkToStream(selectedFileRecord, resourceOut);
 				println("extracted " + bytesExtracted + " bytes.");
 				resourceOut.close();
 			    } catch(IOException ioe) {
@@ -549,6 +552,79 @@ public class HFSExplorer {
 	    println();
 	}
     }
+
+    private static void operationFragCheck(Operation op, LowLevelFile hfsFile, long fsOffset, long fsLength) {
+	println("Gathering information about the files on the volume...");
+	final int numberOfFilesToDisplay = 10;
+	ArrayList<Pair<HFSPlusCatalogLeafRecord, Integer>> mostFragmentedList = new ArrayList<Pair<HFSPlusCatalogLeafRecord, Integer>>(numberOfFilesToDisplay+1);
+	
+	/*
+	 * This is the deal:
+	 *   - Go to catalog file
+	 *   - Find root dir
+	 *   - Depth first search starting at root dir
+	 *     - When a file is found that has more fragments than mostFragmentedList.getLast(),
+	 *       let the file bubble upwards in the list until it is at the right position.
+	 *     - If list.size() > numberOfFilesToDisplay: do removeLast() until they match.
+	 */
+	
+	HFSFileSystemView fsView = new HFSFileSystemView(hfsFile, fsOffset);
+	HFSPlusCatalogLeafRecord rootRecord = fsView.getRoot();
+	HFSPlusCatalogLeafRecord currentDir = rootRecord;
+	recursiveFragmentSearch(fsView, rootRecord, mostFragmentedList, numberOfFilesToDisplay, options.verbose);
+	if(!options.verbose) println();
+	
+	println("Most fragmented files: ");
+	for(Pair<HFSPlusCatalogLeafRecord, Integer> phi : mostFragmentedList) {
+	    println(phi.b + " - \"" + phi.a.getKey().getNodeName() + "\"");
+	}
+    }
+    
+    private static void recursiveFragmentSearch(HFSFileSystemView fsView, HFSPlusCatalogLeafRecord currentDir, 
+						ArrayList<Pair<HFSPlusCatalogLeafRecord, Integer>> mostFragmentedList, 
+						final int listMaxLength, final boolean verbose) {
+	for(HFSPlusCatalogLeafRecord rec : fsView.listRecords(currentDir)) {
+	    HFSPlusCatalogLeafRecordData recData = rec.getData();
+	    if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
+	       recData instanceof HFSPlusCatalogFile) {
+		HFSPlusCatalogFile catFile = (HFSPlusCatalogFile)recData;
+		HFSPlusExtentDescriptor[] descs = fsView.getAllDataExtentDescriptors(rec);
+		mostFragmentedList.add(new Pair<HFSPlusCatalogLeafRecord, Integer>(rec, descs.length));
+		
+		// Let the new item bubble up to its position in the list
+		for(int i = mostFragmentedList.size()-1; i > 0; --i) {
+		    Pair<HFSPlusCatalogLeafRecord, Integer> lower = mostFragmentedList.get(i);
+		    Pair<HFSPlusCatalogLeafRecord, Integer> higher = mostFragmentedList.get(i-1);
+		    
+		    if(lower.b.intValue() > higher.b.intValue()) {
+			// Switch places.
+			mostFragmentedList.set(i-1, lower);
+			mostFragmentedList.set(i, higher);
+		    }
+		    else
+			break;
+		}
+		while(mostFragmentedList.size() > listMaxLength)
+		    mostFragmentedList.remove(mostFragmentedList.size()-1);
+	    }
+	    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
+		    recData instanceof HFSPlusCatalogFolder) {
+		HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder)recData;
+		if(verbose) println("  Processing folder \"" + rec.getKey().getNodeName().toString() + "\"");
+		else print(".");
+		recursiveFragmentSearch(fsView, rec, mostFragmentedList, listMaxLength, verbose);
+	    }
+	    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
+		    recData instanceof HFSPlusCatalogThread) {
+		HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
+	    }
+	    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE_THREAD &&
+		    recData instanceof HFSPlusCatalogThread) {
+		HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
+	    }
+	}
+    }
+    
     public static void printUsageInfo() {
 	// For measurment of the standard terminal width in fixed width environments:
 	// 79:  <------------------------------------------------------------------------------->
@@ -566,6 +642,7 @@ public class HFSExplorer {
 	println("  Verbs:");
 	println("    browse  Launches a mode where the user can browse the files in a HFS+ file");
 	println("            system.");
+	println("    chfrag  Lists the most fragmented files of the volume");
 	println("    test    Launches a test mode for extensive exploration of file system");
 	println("            structures. Only for debugging purposes.");
 	println();
@@ -613,12 +690,13 @@ public class HFSExplorer {
 		println("\"" + currentArg + "\" is not a valid parameter.");
 	}
 	// Now comes the verb
-	if(currentArg.equals("browse")) {
+	if(currentArg.equals("browse"))
 	    operation = Operation.BROWSE;
-	}
-	if(currentArg.equals("test")) {
+	else if(currentArg.equals("chfrag"))
+	    operation = Operation.FRAGCHECK;
+	else if(currentArg.equals("test"))
 	    operation = Operation.TEST;
-	}
+	
 	for(++i; i < length; ++i)
 	    operation.addArg(arguments[i]);
 	

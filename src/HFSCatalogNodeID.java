@@ -22,6 +22,7 @@ public class HFSCatalogNodeID {
     public static int length() { return 4; }
 
     public int toInt() { return Util.readIntBE(hfsCatalogNodeID); }
+    public long toLong() { return Util2.unsign(toInt()); }
     public String getDescription() {
 	/*
 	 * kHFSRootParentID            = 1,

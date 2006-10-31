@@ -1,0 +1,7 @@
+struct HFSPlusExtentKey {
+    UInt16              keyLength;
+    UInt8               forkType;
+    UInt8               pad;
+    HFSCatalogNodeID    fileID;
+    UInt32              startBlock;
+};

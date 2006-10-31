@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.io.PrintStream;
 
 public class ApplePartitionMap {
     private APMPartition[] partitions;
@@ -46,5 +47,17 @@ public class ApplePartitionMap {
 	for(int i = 0; i < partitions.length; ++i)
 	    copy[i] = partitions[i];
 	return copy;
+    }
+    
+    public void printFields(PrintStream ps, String prefix) {
+	for(int i = 0; i < partitions.length; ++i) {
+	    ps.println(prefix + " partitions[" + i + "]:");
+	    partitions[i].print(ps, prefix + "  ");
+	}
+    }
+
+    public void print(PrintStream ps, String prefix) {
+	ps.println("Apple Partition Map:");
+	printFields(ps, prefix);
     }
 }

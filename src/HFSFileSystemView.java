@@ -21,7 +21,7 @@ public class HFSFileSystemView {
      * - The volume header will not be reread every time, we will assume it to
      *   be static. Otherwise performance would probably be poor.
      */
-      
+    
     private final LowLevelFile hfsFile;
     private final long fsOffset;
     //private HFSPlusVolumeHeader volHeader;
@@ -96,6 +96,11 @@ public class HFSFileSystemView {
 	HFSPlusVolumeHeader header = getVolumeHeader();
 	long catalogFilePosition = Util2.unsign(header.getBlockSize())*Util2.unsign(header.getCatalogFile().getExtents().getExtentDescriptor(0).getStartBlock());
 	long catalogFileLength = Util2.unsign(header.getBlockSize())*Util2.unsign(header.getCatalogFile().getExtents().getExtentDescriptor(0).getBlockCount());
+	if(catalogFileLength != header.getCatalogFile().getLogicalSize()) {
+	    System.out.println("WARNING: Catalog file extends beyond first extent.");
+	    System.out.println("Extents:");
+	    header.getCatalogFile().print(System.out, " ");
+	}
 	hfsFile.seek(fsOffset + catalogFilePosition);
 	byte[] nodeDescriptorData = new byte[14];
 	if(hfsFile.read(nodeDescriptorData) != nodeDescriptorData.length)
@@ -178,15 +183,30 @@ public class HFSFileSystemView {
 	return collectFilesInDir(folderID, bthr.getRootNode(), hfsFile, fsOffset, header, bthr);
     }
 
-    public long extractDataForkToStream(HFSPlusCatalogFile file, OutputStream os) throws IOException {
-	HFSPlusForkData dataFork = file.getDataFork();
-	return extractForkToStream(dataFork, os);
+    public long extractDataForkToStream(HFSPlusCatalogLeafRecord fileRecord, OutputStream os) throws IOException {
+	HFSPlusCatalogLeafRecordData recData = fileRecord.getData();
+	if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
+	   recData instanceof HFSPlusCatalogFile) {
+	    HFSPlusCatalogFile catFile = (HFSPlusCatalogFile)recData;
+	    HFSPlusForkData dataFork = catFile.getDataFork();
+	    return extractForkToStream(dataFork, getAllDataExtentDescriptors(fileRecord), os);
+	}
+	else
+	    throw new IllegalArgumentException("fileRecord.getData() it not of type RECORD_TYPE_FILE");
     }
-    public long extractResourceForkToStream(HFSPlusCatalogFile file, OutputStream os) throws IOException {
-	HFSPlusForkData resFork = file.getResourceFork();
-	return extractForkToStream(resFork, os);
+    public long extractResourceForkToStream(HFSPlusCatalogLeafRecord fileRecord, OutputStream os) throws IOException {
+	HFSPlusCatalogLeafRecordData recData = fileRecord.getData();
+	if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
+	   recData instanceof HFSPlusCatalogFile) {
+	    HFSPlusCatalogFile catFile = (HFSPlusCatalogFile)recData;
+	    HFSPlusForkData resFork = catFile.getResourceFork();
+	    return extractForkToStream(resFork, getAllResourceExtentDescriptors(fileRecord), os);
+	}
+	else
+	    throw new IllegalArgumentException("fileRecord.getData() it not of type RECORD_TYPE_FILE");
     }
-    public long extractForkToStream(HFSPlusForkData forkData, OutputStream os) throws IOException {
+    public long extractForkToStream(HFSPlusForkData forkData, HFSPlusExtentDescriptor[] extentDescriptors,
+				    OutputStream os) throws IOException {
 	// Boring intialization... (read everything)
 	// Details of the catalog file should be moved to a catalog file view later
 	HFSPlusVolumeHeader header = getVolumeHeader();
@@ -203,48 +223,196 @@ public class HFSFileSystemView {
 	BTHeaderRec bthr = new BTHeaderRec(headerRec, 0);
 	// End of boring intialization... 
 	
-	int blockSize = header.getBlockSize(); // Okay, I should unsign this but.. seriously (:
-	long totalBytesRemaining = forkData.getLogicalSize();
-	HFSPlusExtentDescriptor[] descs = forkData.getExtents().getExtentDescriptors();
-	byte[] buffer = new byte[4096];
-	for(HFSPlusExtentDescriptor desc : descs) {
-	    if(totalBytesRemaining == 0)
-		break;
-	    desc.print(System.out, "");
-	    long startBlock = Util2.unsign(desc.getStartBlock());
-	    long blockCount = Util2.unsign(desc.getBlockCount());
-	    if(blockCount == 0)
-		continue;
-	    else {
-		if(totalBytesRemaining < 1)
-		    System.err.println("WTF! totalBytesRemaining == " + totalBytesRemaining + " and I'm trying to read? WHAT WAS _I_ THINKING?! DUUUH!!!"); // Yes I've been sitting here for too long...
-		hfsFile.seek(fsOffset + startBlock*blockSize);
+	if(false) { // Deprecated method
+	    int blockSize = header.getBlockSize(); // Okay, I should unsign this but.. seriously (:
+	    long totalBytesRemaining = forkData.getLogicalSize();
+	    HFSPlusExtentDescriptor[] descs = forkData.getExtents().getExtentDescriptors();
+	    byte[] buffer = new byte[4096];
+	    for(HFSPlusExtentDescriptor desc : descs) {
+		if(totalBytesRemaining == 0)
+		    break;
+		desc.print(System.out, "");
+		long startBlock = Util2.unsign(desc.getStartBlock());
+		long blockCount = Util2.unsign(desc.getBlockCount());
+		if(blockCount == 0)
+		    continue;
+		else {
+		    if(totalBytesRemaining < 1)
+			System.err.println("WTF! totalBytesRemaining == " + totalBytesRemaining + " and I'm trying to read? WHAT WAS _I_ THINKING?! DUUUH!!!"); // Yes I've been sitting here for too long...
+		    hfsFile.seek(fsOffset + startBlock*blockSize);
 		
-		long nrBytesToRead = blockCount*blockSize;
-		if(nrBytesToRead > totalBytesRemaining)
-		    nrBytesToRead = totalBytesRemaining;
+		    long nrBytesToRead = blockCount*blockSize;
+		    if(nrBytesToRead > totalBytesRemaining)
+			nrBytesToRead = totalBytesRemaining;
 		
-		long bytesRead = 0;
-		while(bytesRead < nrBytesToRead) {
-		    int currentBytesRead = hfsFile.read(buffer, 0, 
-							(nrBytesToRead-bytesRead < buffer.length?
-							 (int)(nrBytesToRead-bytesRead):buffer.length));
-		    if(currentBytesRead == -1)
-			throw new RuntimeException("Unexpectedly reached end of file!");
-		    else {
-			bytesRead += currentBytesRead;
-			os.write(buffer, 0, currentBytesRead);
+		    long bytesRead = 0;
+		    while(bytesRead < nrBytesToRead) {
+			int currentBytesRead = hfsFile.read(buffer, 0, 
+							    (nrBytesToRead-bytesRead < buffer.length?
+							     (int)(nrBytesToRead-bytesRead):buffer.length));
+			if(currentBytesRead == -1)
+			    throw new RuntimeException("Unexpectedly reached end of file!");
+			else {
+			    bytesRead += currentBytesRead;
+			    os.write(buffer, 0, currentBytesRead);
+			}
 		    }
-		}
 		
-		totalBytesRemaining -= bytesRead;
+		    totalBytesRemaining -= bytesRead;
+		}
 	    }
+	    if(totalBytesRemaining != 0)
+		System.err.println("WARNING: At end of extractForkToStream and totalBytesRemaining == " + totalBytesRemaining + " == not 0!");
+	    return forkData.getLogicalSize()-totalBytesRemaining;
 	}
-	if(totalBytesRemaining != 0)
-	    System.err.println("WARNING: At end of extractForkToStream and totalBytesRemaining == " + totalBytesRemaining + " == not 0!");
-	return forkData.getLogicalSize()-totalBytesRemaining;
+	else { // Use the new ForkFilter class instead.
+	    ForkFilter forkFilter = new ForkFilter(forkData, extentDescriptors, hfsFile, fsOffset, header.getBlockSize());
+	    long bytesToRead = forkData.getLogicalSize();
+	    byte[] buffer = new byte[4096];
+	    while(bytesToRead > 0) {
+		int bytesRead = forkFilter.read(buffer, 0, (bytesToRead < buffer.length ? (int)bytesToRead : buffer.length));
+		if(bytesRead < 0)
+		    break;
+		
+		os.write(buffer, 0, bytesRead);
+		bytesToRead -= bytesRead;
+	    }
+	    return forkData.getLogicalSize()-bytesToRead;
+	}
     }
     
+    public HFSPlusExtentLeafRecord getOverflowExtent(HFSPlusExtentKey key) {
+	// Boring intialization... (read everything)
+	// Details of the catalog file should be moved to a catalog file view later
+	// This is ugly code that repeats itself at the beginning of almost every method.
+	// Somebody kick me for doing this...
+	HFSPlusVolumeHeader header = getVolumeHeader();
+	long extentsFilePosition = Util2.unsign(header.getBlockSize())*Util2.unsign(header.getExtentsFile().getExtents().getExtentDescriptor(0).getStartBlock());
+	long extentsFileLength = Util2.unsign(header.getBlockSize())*Util2.unsign(header.getExtentsFile().getExtents().getExtentDescriptor(0).getBlockCount());
+	if(extentsFileLength != header.getExtentsFile().getLogicalSize()) {
+	    System.out.println("WARNING: Extents file extends beyond first extent.");
+	    System.out.println("Extents:");
+	    header.getExtentsFile().print(System.out, " ");
+	}
+	hfsFile.seek(fsOffset + extentsFilePosition);
+	byte[] nodeDescriptorData = new byte[14];
+	if(hfsFile.read(nodeDescriptorData) != nodeDescriptorData.length)
+	    System.out.println("ERROR: Did not read nodeDescriptor completely.");
+	BTNodeDescriptor btnd = new BTNodeDescriptor(nodeDescriptorData, 0);
+	
+	byte[] headerRec = new byte[BTHeaderRec.length()];
+	hfsFile.readFully(headerRec);
+	BTHeaderRec bthr = new BTHeaderRec(headerRec, 0);
+	// End of boring intialization... 
+	
+	int nodeSize = bthr.getNodeSize();
+	
+	int currentNodeNumber = bthr.getRootNode();
+	
+	// Search down through the layers of indices (O(log n) steps, where n is the size of the tree)
+	
+	byte[] currentNodeData = new byte[bthr.getNodeSize()];
+	hfsFile.seek(fsOffset + extentsFilePosition + Util2.unsign(currentNodeNumber)*Util2.unsign(bthr.getNodeSize()));
+	hfsFile.readFully(currentNodeData);
+	BTNodeDescriptor nodeDescriptor = new BTNodeDescriptor(currentNodeData, 0);
+	
+	while(nodeDescriptor.getKind() == BTNodeDescriptor.BT_INDEX_NODE) {
+	    BTIndexNode currentNode = new HFSPlusExtentIndexNode(currentNodeData, 0, bthr.getNodeSize());
+	    BTIndexRecord matchingRecord = findLEKey(currentNode, key);
+	    
+	    currentNodeNumber = matchingRecord.getIndex();
+	    hfsFile.seek(fsOffset + extentsFilePosition + Util2.unsign(currentNodeNumber)*Util2.unsign(bthr.getNodeSize()));
+	    hfsFile.readFully(currentNodeData);
+	    nodeDescriptor = new BTNodeDescriptor(currentNodeData, 0);
+	}
+	
+	// Leaf node reached. Find record.
+	if(nodeDescriptor.getKind() == BTNodeDescriptor.BT_LEAF_NODE) {
+	    HFSPlusExtentLeafNode leaf = new HFSPlusExtentLeafNode(currentNodeData, 0, bthr.getNodeSize());
+	    HFSPlusExtentLeafRecord[] recs = leaf.getLeafRecords();
+	    for(HFSPlusExtentLeafRecord rec : recs)
+		if(rec.getKey().compareTo(key) == 0)
+		    return rec;
+	    return null;
+	}
+	else
+	    throw new RuntimeException("Expected leaf node. Found other kind: " + 
+				       nodeDescriptor.getKind());
+    }
+    
+    public HFSPlusExtentRecord[] getAllExtentRecords(HFSPlusCatalogLeafRecord requestFile, byte forkType) {
+	HFSPlusCatalogLeafRecordData recData = requestFile.getData();
+	if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
+	   recData instanceof HFSPlusCatalogFile) {
+	    //int blockSize = getVolumeHeader().getBlockSize();
+	    HFSPlusCatalogFile catFile = (HFSPlusCatalogFile) recData;
+	    HFSPlusExtentRecord[] result;
+	    HFSPlusForkData forkData;
+	    if(forkType == HFSPlusExtentKey.DATA_FORK)
+		forkData = catFile.getDataFork();
+	    else if(forkType == HFSPlusExtentKey.RESOURCE_FORK)
+		forkData = catFile.getResourceFork();
+	    else
+		throw new IllegalArgumentException("Illegal fork type!");
+
+	    long basicExtentsBlockCount = 0;
+	    for(int i = 0; i < 8; ++i)
+		basicExtentsBlockCount += Util2.unsign(forkData.getExtents().getExtentDescriptor(i).getBlockCount());
+	    
+	    if(basicExtentsBlockCount == forkData.getTotalBlocks()) {
+		result = new HFSPlusExtentRecord[1];
+		result[0] = forkData.getExtents();
+	    }
+	    else if(basicExtentsBlockCount > forkData.getTotalBlocks())
+		throw new RuntimeException("Weird programming error. (basicExtentsBlockCount > forkData.getTotalBlocks()) (" + basicExtentsBlockCount + " > " + forkData.getTotalBlocks() + ")");
+	    else {
+		LinkedList<HFSPlusExtentRecord> resultList = new LinkedList<HFSPlusExtentRecord>();
+		resultList.add(forkData.getExtents());
+		long currentBlock = basicExtentsBlockCount;
+		
+		while(currentBlock < forkData.getTotalBlocks()) {
+		    // Construct key to find next extent record
+		    HFSPlusExtentKey extentKey = new HFSPlusExtentKey(forkType, catFile.getFileID(), (int)currentBlock);
+		    
+		    HFSPlusExtentLeafRecord currentRecord = getOverflowExtent(extentKey);
+		    if(currentRecord == null)
+			System.err.println("WARNING: currentRecord == null!!");
+		    HFSPlusExtentRecord currentRecordData = currentRecord.getRecordData();
+		    resultList.addLast(currentRecordData);
+		    for(int i = 0; i < 8; ++i)
+			currentBlock += Util2.unsign(currentRecordData.getExtentDescriptor(i).getBlockCount());
+		}
+		
+		result = resultList.toArray(new HFSPlusExtentRecord[resultList.size()]);
+	    }
+	    return result;
+	}
+	else
+	    throw new IllegalArgumentException("Not a file record!");
+    }
+    
+    public HFSPlusExtentDescriptor[] getAllExtentDescriptors(HFSPlusCatalogLeafRecord requestFile, byte forkType) {
+	HFSPlusExtentRecord[] records = getAllExtentRecords(requestFile, forkType);
+	LinkedList<HFSPlusExtentDescriptor> descTmp = new LinkedList<HFSPlusExtentDescriptor>();
+	mainLoop:
+	for(HFSPlusExtentRecord rec : records) {
+	    for(int i = 0; i < 8; ++i) {
+		HFSPlusExtentDescriptor desc = rec.getExtentDescriptor(i);
+		if(desc.getStartBlock() == 0 &&  desc.getBlockCount() == 0)
+		    break mainLoop;
+		else
+		    descTmp.addLast(desc);
+	    }
+	}
+	return descTmp.toArray(new HFSPlusExtentDescriptor[descTmp.size()]);
+    }
+    public HFSPlusExtentDescriptor[] getAllDataExtentDescriptors(HFSPlusCatalogLeafRecord requestFile) {
+	return getAllExtentDescriptors(requestFile, HFSPlusExtentKey.DATA_FORK);
+    }
+    public HFSPlusExtentDescriptor[] getAllResourceExtentDescriptors(HFSPlusCatalogLeafRecord requestFile) {
+	return getAllExtentDescriptors(requestFile, HFSPlusExtentKey.RESOURCE_FORK);
+    }
+
     // Utility methods
     private static HFSPlusCatalogLeafRecord[] collectFilesInDir(HFSCatalogNodeID dirID, int currentNodeNumber, 
 								LowLevelFile hfsFile, long fsOffset, 
@@ -333,6 +501,9 @@ public class HFSFileSystemView {
     }
     
     private static BTIndexRecord findLEKey(BTIndexNode indexNode, HFSCatalogNodeID nodeID, HFSUniStr255 searchString) {
+	return findLEKey(indexNode, new HFSPlusCatalogKey(nodeID, searchString));
+    }
+    private static BTIndexRecord findLEKey(BTIndexNode indexNode, BTKey searchKey) {
 	/* 
 	 * Algoritm:
 	 *   Key searchKey
@@ -341,10 +512,8 @@ public class HFSFileSystemView {
 	 *     If n.key <= searchKey && n.key > greatestMatchingKey
 	 *       greatestMatchingKey = n.key
 	 */
-	HFSPlusCatalogKey searchKey = new HFSPlusCatalogKey(nodeID, searchString);
-	//long unsignedNodeID = Util2.unsign(nodeID.toInt());
 	BTIndexRecord records[] = indexNode.getIndexRecords();
-	BTIndexRecord largestMatchingRecord = null;//records[0];
+	BTIndexRecord largestMatchingRecord = null;
 	for(int i = 0; i < records.length; ++i) {
 	    if(records[i].getKey().compareTo(searchKey) <= 0 && 
 	       (largestMatchingRecord == null || records[i].getKey().compareTo(largestMatchingRecord.getKey()) > 0)) {
