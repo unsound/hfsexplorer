@@ -1,6 +1,6 @@
 import org.catacombae.hfsexplorer.gui.FilesystemBrowserPanel;
 import java.util.*;
-import java.io.IOException;
+import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -10,6 +10,15 @@ import javax.swing.event.*;
 
 public class FileSystemBrowserWindow extends JFrame {
     
+    private static class RecordContainer {
+	private HFSPlusCatalogLeafRecord rec;
+	public RecordContainer(HFSPlusCatalogLeafRecord rec) {
+	    this.rec = rec;
+	}
+	public HFSPlusCatalogLeafRecord getRecord() { return rec; }
+	public String toString() { return rec.getKey().getNodeName().toString(); }
+    }
+    
     private FilesystemBrowserPanel fsbPanel;
     
     // Fast accessors for the corresponding variables in org.catacombae.hfsexplorer.gui.FilesystemBrowserPanel
@@ -17,6 +26,7 @@ public class FileSystemBrowserWindow extends JFrame {
     private JTree dirTree;
     private JTextField addressField;
     private JButton goButton;
+    private JButton extractButton;
     
     private final JFileChooser fileChooser = new JFileChooser();
     private final Vector<String> colNames = new Vector<String>();
@@ -57,10 +67,17 @@ public class FileSystemBrowserWindow extends JFrame {
 	dirTree = fsbPanel.dirTree;
 	addressField = fsbPanel.addressField;
 	goButton = fsbPanel.goButton;
-	
+	extractButton = fsbPanel.extractButton;
+
 	// UI Features for these are not implemented yet.
 	addressField.setEnabled(false);
 	goButton.setEnabled(false);
+	
+	extractButton.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    actionExtractToDir();
+		}
+	    });
 	
 	colNames.add("Name");
 	colNames.add("Size");
@@ -239,6 +256,25 @@ public class FileSystemBrowserWindow extends JFrame {
 		    }
 		}
 	    });
+	JMenuItem aboutItem = new JMenuItem("About..");
+	aboutItem.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent ae) {
+		    String message = "";
+		    message += "HFSExplorer " + HFSExplorer.VERSION + "\n";
+		    //message += "Build #" + BuildNumber.BUILD_NUMBER + "\n";
+		    message += HFSExplorer.COPYRIGHT + "\n";
+// 		    for(String notice : Main.NOTICES) {
+// 			message += notice + "\n";
+// 			// System.out.println("Message now: " + message);
+// 		    }
+		    message += "\n Operating system: " + System.getProperty("os.name") + " " + System.getProperty("os.version");
+		    message += "\n Architecture: " + System.getProperty("os.arch");
+		    message += "\n Virtual machine: " + System.getProperty("java.vm.vendor") + " " + 
+			System.getProperty("java.vm.name") + " "  + System.getProperty("java.vm.version");
+		    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, message, 
+						  "About", JOptionPane.INFORMATION_MESSAGE);
+		}
+	    });
 	
 	JMenu fileMenu = new JMenu("File");
 	if(loadFSFromDeviceItem != null)
@@ -246,8 +282,11 @@ public class FileSystemBrowserWindow extends JFrame {
 	if(loadFSFromDeviceWithAPMItem != null)
 	    fileMenu.add(loadFSFromDeviceWithAPMItem);
 	fileMenu.add(loadAPMFSFromFileItem);
+	JMenu helpMenu = new JMenu("Help");
+	helpMenu.add(aboutItem);
 	JMenuBar menuBar = new JMenuBar();
 	menuBar.add(fileMenu);
+	menuBar.add(helpMenu);
 	setJMenuBar(menuBar);
 	// /Menus
 	
@@ -258,6 +297,9 @@ public class FileSystemBrowserWindow extends JFrame {
     }
     
     public void loadFS(String filename, boolean readAPM, boolean readFromDevice) {
+	if(fsView != null) {
+	    fsView.getStream().close();
+	}
 	LowLevelFile fsFile = new WindowsLowLevelIO(filename);
 	int blockSize = 0x200; // == 512
 	int ddrBlockSize;
@@ -361,13 +403,13 @@ public class FileSystemBrowserWindow extends JFrame {
 	}
 	
 	for(HFSPlusCatalogLeafRecord rec : contents) {
-	    Vector<String> currentRow = new Vector<String>(4);
+	    Vector<Object> currentRow = new Vector<Object>(4);
 	    
 	    HFSPlusCatalogLeafRecordData recData = rec.getData();
 	    if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
 	       recData instanceof HFSPlusCatalogFile) {
 		HFSPlusCatalogFile catFile = (HFSPlusCatalogFile)recData;
-		currentRow.add(rec.getKey().getNodeName().toString());
+		currentRow.add(new RecordContainer(rec));
 		currentRow.add(catFile.getDataFork().getLogicalSize() + " B");
 		currentRow.add("File");
 		currentRow.add("" + catFile.getContentModDate());
@@ -375,7 +417,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
 		    recData instanceof HFSPlusCatalogFolder) {
 		HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder)recData;
-		currentRow.add(rec.getKey().getNodeName().toString());
+		currentRow.add(new RecordContainer(rec));
 		currentRow.add("");
 		currentRow.add("Folder");
 		currentRow.add("" + catFolder.getContentModDate());
@@ -393,6 +435,46 @@ public class FileSystemBrowserWindow extends JFrame {
 	    if(!currentRow.isEmpty())
 		tableModel.addRow(currentRow);
 	}
+    }
+
+    private void actionExtractToDir() {
+	int selectedRow = fileTable.getSelectedRow();
+	if(selectedRow == -1) {
+	    JOptionPane.showMessageDialog(this, "No file selected.",
+					  "Information", JOptionPane.INFORMATION_MESSAGE);
+	    return;
+	}
+	Object o = tableModel.getValueAt(selectedRow, 0);
+	HFSPlusCatalogLeafRecord rec;
+	HFSPlusCatalogLeafRecordData recData;
+	if(o instanceof RecordContainer && 
+	   (recData = (rec = ((RecordContainer)o).getRecord()).getData()).getRecordType() == 
+	   HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE && // This may be the weirdest statement I've written
+	   recData instanceof HFSPlusCatalogFile) {
+// 	    HFSPlusCatalogLeafRecord rec = ((RecordContainer)o).getRecord();
+// 	    if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
+// 	       recData instanceof HFSPlusCatalogFile) {
+	    fileChooser.setMultiSelectionEnabled(false);
+	    fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+	    if(fileChooser.showOpenDialog(FileSystemBrowserWindow.this) == JFileChooser.APPROVE_OPTION) {
+		try {
+		    String filename = rec.getKey().getNodeName().toString();
+		    File outFile = new File(fileChooser.getSelectedFile(), filename);
+		    FileOutputStream fos = new FileOutputStream(outFile);
+		    fsView.extractDataForkToStream(rec, fos);
+		    fos.close();
+		    JOptionPane.showMessageDialog(this, "The file was successfully extracted!\n",
+						  "Extraction complete!", JOptionPane.INFORMATION_MESSAGE);
+		} catch(Exception e) {
+		    e.printStackTrace();
+		    JOptionPane.showMessageDialog(this, e.toString() + ": " + e.getMessage(),
+						  "Error", JOptionPane.ERROR_MESSAGE);
+		}
+	    }
+	}
+	else 
+	    JOptionPane.showMessageDialog(this, "Unexpected data in table model.",
+					  "Error", JOptionPane.ERROR_MESSAGE);  
     }
     
     public static void main(String[] args) {

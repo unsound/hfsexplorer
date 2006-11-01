@@ -7,5 +7,5 @@ REM Found out the trick for wildcard expansion of
 REM spaced file names! (enclosed within "") Just 
 REM prepend \\.\\ (\\.\ really, but last \ needed for ")
 
-javac -cp %CLASSPATH% -sourcepath "%SOURCES_DIR%" -d "%BUILD_DIR%" \\.\\"%SOURCES_DIR%\*.java"
-javac -cp %CLASSPATH% -sourcepath "%SOURCES_DIR%" -d "%BUILD_DIR%" \\.\\"%SOURCES_DIR%\org\catacombae\hfsexplorer\gui\*.java"
+javac -cp %CLASSPATH% -sourcepath "%SOURCES_DIR%" -d "%BUILD_DIR%" -Xlint:unchecked \\.\\"%SOURCES_DIR%\*.java"
+javac -cp %CLASSPATH% -sourcepath "%SOURCES_DIR%" -d "%BUILD_DIR%" -Xlint:unchecked \\.\\"%SOURCES_DIR%\org\catacombae\hfsexplorer\gui\*.java"

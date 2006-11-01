@@ -707,11 +707,13 @@ public class HFSExplorer {
     public static HFSPlusCatalogLeafRecord[] collectFilesInDir(HFSCatalogNodeID dirID, int currentNodeNumber, WindowsLowLevelIO isoRaf, long offset, HFSPlusVolumeHeader header, BTHeaderRec bthr) {
 	// Try to list contents in specified dir
 	int requestedDir = dirID.toInt();
-	long catalogFilePosition = header.getBlockSize()*header.getCatalogFile().getExtents().getExtentDescriptor(0).getStartBlock();
+	//long catalogFilePosition = header.getBlockSize()*header.getCatalogFile().getExtents().getExtentDescriptor(0).getStartBlock();
+	ForkFilter forkFilter = new ForkFilter(header.getCatalogFile(), isoRaf, offset, header.getBlockSize());
 	
 	byte[] currentNodeData = new byte[bthr.getNodeSize()];
-	isoRaf.seek(offset + catalogFilePosition + Util2.unsign(currentNodeNumber)*bthr.getNodeSize());
-	isoRaf.readFully(currentNodeData);
+	//isoRaf.seek(offset + catalogFilePosition + Util2.unsign(currentNodeNumber)*bthr.getNodeSize());
+	forkFilter.seek(Util2.unsign(currentNodeNumber)*bthr.getNodeSize());
+	forkFilter.readFully(currentNodeData);
 	
 	BTNodeDescriptor nodeDescriptor = new BTNodeDescriptor(currentNodeData, 0);
 	if(nodeDescriptor.getKind() == BTNodeDescriptor.BT_INDEX_NODE) {
@@ -732,8 +734,10 @@ public class HFSExplorer {
 	    HFSPlusCatalogLeafNode currentNode = new HFSPlusCatalogLeafNode(currentNodeData, 0, Util2.unsign(bthr.getNodeSize()));
 	    return getChildrenTo(currentNode, dirID);
 	}
-	else
+	else {
+	    nodeDescriptor.print(System.err, "");
 	    throw new RuntimeException("Illegal type for node!");
+	}
     }
     
     public static BTIndexRecord findLEKey(BTIndexNode indexNode, int nodeID, String searchString) {

@@ -32,6 +32,8 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
         addressField = new javax.swing.JTextField();
         pathLabel = new javax.swing.JLabel();
         goButton = new javax.swing.JButton();
+        statusLabel = new javax.swing.JLabel();
+        extractButton = new javax.swing.JButton();
 
         treeTableSplit.setDividerLocation(150);
         treeTableSplit.setContinuousLayout(true);
@@ -69,33 +71,44 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
 
         goButton.setText("Go");
 
+        statusLabel.setText("Status text goes here");
+        statusLabel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
+
+        extractButton.setText("Extract");
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, treeTableSplit, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 580, Short.MAX_VALUE)
-                    .add(layout.createSequentialGroup()
-                        .add(pathLabel)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(addressField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 499, Short.MAX_VALUE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(goButton)))
+                .add(pathLabel)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(addressField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 503, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(goButton)
                 .addContainerGap())
+            .add(statusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 604, Short.MAX_VALUE)
+            .add(treeTableSplit, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 604, Short.MAX_VALUE)
+            .add(layout.createSequentialGroup()
+                .addContainerGap()
+                .add(extractButton)
+                .addContainerGap(527, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
+                .add(extractButton)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(pathLabel)
                     .add(goButton)
                     .add(addressField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(treeTableSplit, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 415, Short.MAX_VALUE)
-                .addContainerGap())
+                .add(treeTableSplit, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 377, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(statusLabel))
         );
     }// </editor-fold>//GEN-END:initComponents
     
@@ -104,10 +117,12 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
     public javax.swing.JTextField addressField;
     public javax.swing.JTree dirTree;
     private javax.swing.JScrollPane dirTreeScroller;
+    public javax.swing.JButton extractButton;
     public javax.swing.JTable fileTable;
     private javax.swing.JScrollPane fileTableScroller;
     public javax.swing.JButton goButton;
     private javax.swing.JLabel pathLabel;
+    public javax.swing.JLabel statusLabel;
     private javax.swing.JSplitPane treeTableSplit;
     // End of variables declaration//GEN-END:variables
     

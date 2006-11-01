@@ -84,6 +84,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
 	add(container, BorderLayout.CENTER);
 	pack();
 	setLocationRelativeTo(null);
+	setResizable(false);
     }
 
     public String getPathName() { return result; }
@@ -108,6 +109,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
 	 */
 	// 20 hard drives...
 	for(int i = 0; i < 20; ++i) {
+	    // 20 partitions each...
 	    for(int j = 0; j < 20; ++j) {
 		try {
 		    /* Should I add Partition0 to the list? It really means
