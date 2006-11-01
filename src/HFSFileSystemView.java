@@ -29,11 +29,7 @@ public class HFSFileSystemView {
 	public BTNodeDescriptor btnd;
 	public BTHeaderRec bthr;
 	
-	public InitProcedure(/*ForkFilter forkFilterFile, HFSPlusVolumeHeader header*/) {
-	    //this.header = getVolumeHeader();
-	    //long catalogFilePosition = header.getBlockSize()*header.getCatalogFile().getExtents().getExtentDescriptor(0).getStartBlock();
-	    //long catalogFileLength = header.getBlockSize()*header.getCatalogFile().getExtents().getExtentDescriptor(0).getBlockCount();
-	    //this.catalogFile = new ForkFilter(header.getCatalogFile(), hfsFile, fsOffset, header.getBlockSize());
+	public InitProcedure() {
 	    this.header = getVolumeHeader();
 	    this.forkFilterFile = getForkFilterFile(header);
 	    
@@ -66,32 +62,10 @@ public class HFSFileSystemView {
     
     /** Internal class. */
     private class ExtentsInitProcedure extends InitProcedure {
-// 	public HFSPlusVolumeHeader header;
 	public ForkFilter extentsFile;
-// 	public BTNodeDescriptor btnd;
-// 	public BTHeaderRec bthr;
 	
 	public ExtentsInitProcedure() {
-	    //super(new ForkFilter(header.getCatalogFile(), hfsFile, fsOffset, header.getBlockSize()));
 	    this.extentsFile = forkFilterFile;
-// 	    HFSPlusVolumeHeader header = getVolumeHeader();
-// // 	    long extentsFilePosition = Util2.unsign(header.getBlockSize())*Util2.unsign(header.getExtentsFile().getExtents().getExtentDescriptor(0).getStartBlock());
-// // 	    long extentsFileLength = Util2.unsign(header.getBlockSize())*Util2.unsign(header.getExtentsFile().getExtents().getExtentDescriptor(0).getBlockCount());
-// // 	    if(extentsFileLength != header.getExtentsFile().getLogicalSize()) {
-// // 		System.out.println("WARNING: Extents file extends beyond first extent.");
-// // 		System.out.println("Extents:");
-// // 		header.getExtentsFile().print(System.out, " ");
-// // 	    }
-// 	    this.extentsFile = new ForkFilter(header.getExtentsFile(), hfsFile, fsOffset, header.getBlockSize());
-// 	    hfsFile.seek(0);
-// 	    byte[] nodeDescriptorData = new byte[14];
-// 	    if(hfsFile.read(nodeDescriptorData) != nodeDescriptorData.length)
-// 		System.out.println("ERROR: Did not read nodeDescriptor completely.");
-// 	    BTNodeDescriptor btnd = new BTNodeDescriptor(nodeDescriptorData, 0);
-	    
-// 	    byte[] headerRec = new byte[BTHeaderRec.length()];
-// 	    hfsFile.readFully(headerRec);
-// 	    BTHeaderRec bthr = new BTHeaderRec(headerRec, 0);
 	}
 	
 	public ForkFilter getForkFilterFile(HFSPlusVolumeHeader header) {
@@ -101,7 +75,6 @@ public class HFSFileSystemView {
 
     private final LowLevelFile hfsFile;
     private final long fsOffset;
-    //private HFSPlusVolumeHeader volHeader;
     
     public HFSFileSystemView(LowLevelFile hfsFile, long fsOffset) {
 	this.hfsFile = hfsFile;
@@ -122,7 +95,6 @@ public class HFSFileSystemView {
     
     public HFSPlusCatalogLeafRecord getRoot() {
 	CatalogInitProcedure init = new CatalogInitProcedure();
-	//forkFilter.seek(Util2.unsign(currentNodeNumber)*bthr.getNodeSize());
 
 	// Search down through the layers of indices to the record with parentID 1.
 	HFSCatalogNodeID parentID = new HFSCatalogNodeID(1);
@@ -157,33 +129,10 @@ public class HFSFileSystemView {
     }
     
     public HFSPlusCatalogLeafRecord getRecord(HFSCatalogNodeID parentID, HFSUniStr255 nodeName) {
-	// Boring intialization... (read everything)
-	// Details of the catalog file should be moved to a catalog file view later
-	// This is ugly code that repeats itself at the beginning of almost every method.
-	// Somebody kick me for doing this...
-// 	HFSPlusVolumeHeader header = getVolumeHeader();
-// 	long catalogFilePosition = Util2.unsign(header.getBlockSize())*Util2.unsign(header.getCatalogFile().getExtents().getExtentDescriptor(0).getStartBlock());
-// 	long catalogFileLength = Util2.unsign(header.getBlockSize())*Util2.unsign(header.getCatalogFile().getExtents().getExtentDescriptor(0).getBlockCount());
-// 	if(catalogFileLength != header.getCatalogFile().getLogicalSize()) {
-// 	    System.out.println("WARNING: Catalog file extends beyond first extent.");
-// 	    System.out.println("Extents:");
-// 	    header.getCatalogFile().print(System.out, " ");
-// 	}
-// 	hfsFile.seek(fsOffset + catalogFilePosition);
-// 	byte[] nodeDescriptorData = new byte[14];
-// 	if(hfsFile.read(nodeDescriptorData) != nodeDescriptorData.length)
-// 	    System.out.println("ERROR: Did not read nodeDescriptor completely.");
-// 	BTNodeDescriptor btnd = new BTNodeDescriptor(nodeDescriptorData, 0);
-	
-// 	byte[] headerRec = new byte[BTHeaderRec.length()];
-// 	hfsFile.readFully(headerRec);
-// 	BTHeaderRec bthr = new BTHeaderRec(headerRec, 0);
-	// End of boring intialization... 
 	CatalogInitProcedure init = new CatalogInitProcedure();	
 	
 	int nodeSize = init.bthr.getNodeSize();
 	
-	//HFSCatalogNodeID dirID = id;
 	int currentNodeNumber = init.bthr.getRootNode();
 	
 	// Search down through the layers of indices (O(log n) steps, where n is the size of the tree)
@@ -203,7 +152,7 @@ public class HFSFileSystemView {
 	    nodeDescriptor = new BTNodeDescriptor(currentNodeData, 0);
 	}
 	
-	// Leaf node reached. Find record.)
+	// Leaf node reached. Find record.
 	if(nodeDescriptor.getKind() == BTNodeDescriptor.BT_LEAF_NODE) {
 	    HFSPlusCatalogLeafNode leaf = new HFSPlusCatalogLeafNode(currentNodeData, 0, init.bthr.getNodeSize());
 	    HFSPlusCatalogLeafRecord[] recs = leaf.getLeafRecords();
@@ -233,24 +182,7 @@ public class HFSFileSystemView {
     /** You really should use the method above to access folder listings. However, the folderID is all
 	that's really needed. */
     public HFSPlusCatalogLeafRecord[] listRecords(HFSCatalogNodeID folderID) {	
-	// Boring intialization... (read everything)
-	// Details of the catalog file should be moved to a catalog file view later
-// 	HFSPlusVolumeHeader header = getVolumeHeader();
-// 	long catalogFilePosition = header.getBlockSize()*header.getCatalogFile().getExtents().getExtentDescriptor(0).getStartBlock();
-// 	long catalogFileLength = header.getBlockSize()*header.getCatalogFile().getExtents().getExtentDescriptor(0).getBlockCount();
-// 	hfsFile.seek(fsOffset + catalogFilePosition);
-// 	byte[] nodeDescriptorData = new byte[14];
-// 	if(hfsFile.read(nodeDescriptorData) != nodeDescriptorData.length)
-// 	    System.out.println("ERROR: Did not read nodeDescriptor completely.");
-// 	BTNodeDescriptor btnd = new BTNodeDescriptor(nodeDescriptorData, 0);
-	
-// 	byte[] headerRec = new byte[BTHeaderRec.length()];
-// 	hfsFile.readFully(headerRec);
-// 	BTHeaderRec bthr = new BTHeaderRec(headerRec, 0);
-	// End of boring intialization... 
 	CatalogInitProcedure init = new CatalogInitProcedure();	
-	
-	
 	return collectFilesInDir(folderID, init.bthr.getRootNode(), hfsFile, fsOffset, init.header, init.bthr);
     }
 
@@ -278,25 +210,10 @@ public class HFSFileSystemView {
     }
     public long extractForkToStream(HFSPlusForkData forkData, HFSPlusExtentDescriptor[] extentDescriptors,
 				    OutputStream os) throws IOException {
-	// Boring intialization... (read everything)
-	// Details of the catalog file should be moved to a catalog file view later
-	HFSPlusVolumeHeader header = getVolumeHeader();
-	long catalogFilePosition = header.getBlockSize()*header.getCatalogFile().getExtents().getExtentDescriptor(0).getStartBlock();
-	long catalogFileLength = header.getBlockSize()*header.getCatalogFile().getExtents().getExtentDescriptor(0).getBlockCount();
-	hfsFile.seek(fsOffset + catalogFilePosition);
-	byte[] nodeDescriptorData = new byte[14];
-	if(hfsFile.read(nodeDescriptorData) != nodeDescriptorData.length)
-	    System.out.println("ERROR: Did not read nodeDescriptor completely.");
-	BTNodeDescriptor btnd = new BTNodeDescriptor(nodeDescriptorData, 0);
-	
-	byte[] headerRec = new byte[BTHeaderRec.length()];
-	hfsFile.readFully(headerRec);
-	BTHeaderRec bthr = new BTHeaderRec(headerRec, 0);
-	// End of boring intialization... 
 	CatalogInitProcedure init = new CatalogInitProcedure();	
 	
 	if(false) { // Deprecated method
-	    int blockSize = header.getBlockSize(); // Okay, I should unsign this but.. seriously (:
+	    int blockSize = init.header.getBlockSize(); // Okay, I should unsign this but.. seriously (:
 	    long totalBytesRemaining = forkData.getLogicalSize();
 	    HFSPlusExtentDescriptor[] descs = forkData.getExtents().getExtentDescriptors();
 	    byte[] buffer = new byte[4096];
@@ -338,7 +255,7 @@ public class HFSFileSystemView {
 	    return forkData.getLogicalSize()-totalBytesRemaining;
 	}
 	else { // Use the new ForkFilter class instead.
-	    ForkFilter forkFilter = new ForkFilter(forkData, extentDescriptors, hfsFile, fsOffset, header.getBlockSize());
+	    ForkFilter forkFilter = new ForkFilter(forkData, extentDescriptors, hfsFile, fsOffset, init.header.getBlockSize());
 	    long bytesToRead = forkData.getLogicalSize();
 	    byte[] buffer = new byte[4096];
 	    while(bytesToRead > 0) {
@@ -354,28 +271,6 @@ public class HFSFileSystemView {
     }
     
     public HFSPlusExtentLeafRecord getOverflowExtent(HFSPlusExtentKey key) {
-	// Boring intialization... (read everything)
-	// Details of the catalog file should be moved to a catalog file view later
-	// This is ugly code that repeats itself at the beginning of almost every method.
-	// Somebody kick me for doing this...
-// 	HFSPlusVolumeHeader header = getVolumeHeader();
-// 	long extentsFilePosition = Util2.unsign(header.getBlockSize())*Util2.unsign(header.getExtentsFile().getExtents().getExtentDescriptor(0).getStartBlock());
-// 	long extentsFileLength = Util2.unsign(header.getBlockSize())*Util2.unsign(header.getExtentsFile().getExtents().getExtentDescriptor(0).getBlockCount());
-// 	if(extentsFileLength != header.getExtentsFile().getLogicalSize()) {
-// 	    System.out.println("WARNING: Extents file extends beyond first extent.");
-// 	    System.out.println("Extents:");
-// 	    header.getExtentsFile().print(System.out, " ");
-// 	}
-// 	hfsFile.seek(fsOffset + extentsFilePosition);
-// 	byte[] nodeDescriptorData = new byte[14];
-// 	if(hfsFile.read(nodeDescriptorData) != nodeDescriptorData.length)
-// 	    System.out.println("ERROR: Did not read nodeDescriptor completely.");
-// 	BTNodeDescriptor btnd = new BTNodeDescriptor(nodeDescriptorData, 0);
-	
-// 	byte[] headerRec = new byte[BTHeaderRec.length()];
-// 	hfsFile.readFully(headerRec);
-// 	BTHeaderRec bthr = new BTHeaderRec(headerRec, 0);
-	// End of boring intialization... 
 	ExtentsInitProcedure init = new ExtentsInitProcedure();	
 	
 	int nodeSize = init.bthr.getNodeSize();
@@ -491,8 +386,6 @@ public class HFSFileSystemView {
 								LowLevelFile hfsFile, long fsOffset, 
 								HFSPlusVolumeHeader header, BTHeaderRec bthr) {
 	// Try to list contents in specified dir
-	int requestedDir = dirID.toInt();
-	//long catalogFilePosition = header.getBlockSize()*header.getCatalogFile().getExtents().getExtentDescriptor(0).getStartBlock();
 	ForkFilter catalogFile = new ForkFilter(header.getCatalogFile(), hfsFile, fsOffset, header.getBlockSize());
 	
 	byte[] currentNodeData = new byte[bthr.getNodeSize()];
@@ -546,10 +439,6 @@ public class HFSFileSystemView {
 	if(largestMatchingKey != null)
 	    result.addFirst(largestMatchingRecord);
 	return result.toArray(new BTIndexRecord[result.size()]);
-	
-	/*
-	  if exists in index node a value equal to the nodeID
-	 */
     }
     
     /**
