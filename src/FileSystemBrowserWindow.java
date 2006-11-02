@@ -231,6 +231,31 @@ public class FileSystemBrowserWindow extends JFrame {
 		    }
 		});
 	}
+	JMenuItem loadFSFromFileItem = new JMenuItem("Load file system from file");
+	loadFSFromFileItem.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent ae) {
+		    //JFileChooser fileChooser = new JFileChooser();
+		    fileChooser.setMultiSelectionEnabled(false);
+		    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		    if(fileChooser.showOpenDialog(FileSystemBrowserWindow.this) == 
+		       JFileChooser.APPROVE_OPTION) {
+			try {
+			    String pathName = fileChooser.getSelectedFile().getCanonicalPath();
+			    loadFS(pathName, false, false);
+			} catch(IOException ioe) {
+			    ioe.printStackTrace();
+			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+							  "Count not resolve pathname!",
+							  "Error", JOptionPane.ERROR_MESSAGE);
+			} catch(Exception e) {
+			    e.printStackTrace();
+			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+							  "Could not read contents of partition!",
+							  "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		    }
+		}
+	    });
 	JMenuItem loadAPMFSFromFileItem = new JMenuItem("Load file system from file with APM");
 	loadAPMFSFromFileItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
@@ -281,6 +306,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	    fileMenu.add(loadFSFromDeviceItem);
 	if(loadFSFromDeviceWithAPMItem != null)
 	    fileMenu.add(loadFSFromDeviceWithAPMItem);
+	fileMenu.add(loadFSFromFileItem);
 	fileMenu.add(loadAPMFSFromFileItem);
 	JMenu helpMenu = new JMenu("Help");
 	helpMenu.add(aboutItem);
