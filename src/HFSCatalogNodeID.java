@@ -9,7 +9,19 @@ public class HFSCatalogNodeID {
      * -----------------------------------------------------------
      * 0    4     UInt32            hfsCatalogNodeID
      */
-
+    
+    public static final HFSCatalogNodeID kHFSRootParentID            = new HFSCatalogNodeID(1);
+    public static final HFSCatalogNodeID kHFSRootFolderID            = new HFSCatalogNodeID(2);
+    public static final HFSCatalogNodeID kHFSExtentsFileID           = new HFSCatalogNodeID(3);
+    public static final HFSCatalogNodeID kHFSCatalogFileID           = new HFSCatalogNodeID(4);
+    public static final HFSCatalogNodeID kHFSBadBlockFileID          = new HFSCatalogNodeID(5);
+    public static final HFSCatalogNodeID kHFSAllocationFileID        = new HFSCatalogNodeID(6);
+    public static final HFSCatalogNodeID kHFSStartupFileID           = new HFSCatalogNodeID(7);
+    public static final HFSCatalogNodeID kHFSAttributesFileID        = new HFSCatalogNodeID(8);
+    public static final HFSCatalogNodeID kHFSRepairCatalogFileID     = new HFSCatalogNodeID(14);
+    public static final HFSCatalogNodeID kHFSBogusExtentFileID       = new HFSCatalogNodeID(15);
+    public static final HFSCatalogNodeID kHFSFirstUserCatalogNodeID  = new HFSCatalogNodeID(16);
+    
     private final byte[] hfsCatalogNodeID = new byte[4];
 	
     public HFSCatalogNodeID(byte[] data, int offset) {

@@ -24,7 +24,7 @@ public class HFSFileSystemView {
 
     /** Internal class. */
     private abstract class InitProcedure {
-	public HFSPlusVolumeHeader header;// = getVolumeHeader();
+	public HFSPlusVolumeHeader header;
 	public ForkFilter forkFilterFile;
 	public BTNodeDescriptor btnd;
 	public BTHeaderRec bthr;
@@ -56,7 +56,8 @@ public class HFSFileSystemView {
 	}
 	
 	public ForkFilter getForkFilterFile(HFSPlusVolumeHeader header) {
-	    return new ForkFilter(header.getCatalogFile(), hfsFile, fsOffset, header.getBlockSize());
+	    HFSPlusExtentDescriptor[] allCatalogFileDescriptors = getAllDataExtentDescriptors(HFSCatalogNodeID.kHFSCatalogFileID, header.getCatalogFile());
+	    return new ForkFilter(header.getCatalogFile(), allCatalogFileDescriptors, hfsFile, fsOffset, header.getBlockSize());
 	}
     }
     
@@ -314,7 +315,7 @@ public class HFSFileSystemView {
 	   recData instanceof HFSPlusCatalogFile) {
 	    //int blockSize = getVolumeHeader().getBlockSize();
 	    HFSPlusCatalogFile catFile = (HFSPlusCatalogFile) recData;
-	    HFSPlusExtentRecord[] result;
+	    //	    HFSPlusExtentRecord[] result;
 	    HFSPlusForkData forkData;
 	    if(forkType == HFSPlusExtentKey.DATA_FORK)
 		forkData = catFile.getDataFork();
@@ -322,45 +323,68 @@ public class HFSFileSystemView {
 		forkData = catFile.getResourceFork();
 	    else
 		throw new IllegalArgumentException("Illegal fork type!");
-
-	    long basicExtentsBlockCount = 0;
-	    for(int i = 0; i < 8; ++i)
-		basicExtentsBlockCount += Util2.unsign(forkData.getExtents().getExtentDescriptor(i).getBlockCount());
-	    
-	    if(basicExtentsBlockCount == forkData.getTotalBlocks()) {
-		result = new HFSPlusExtentRecord[1];
-		result[0] = forkData.getExtents();
-	    }
-	    else if(basicExtentsBlockCount > forkData.getTotalBlocks())
-		throw new RuntimeException("Weird programming error. (basicExtentsBlockCount > forkData.getTotalBlocks()) (" + basicExtentsBlockCount + " > " + forkData.getTotalBlocks() + ")");
-	    else {
-		LinkedList<HFSPlusExtentRecord> resultList = new LinkedList<HFSPlusExtentRecord>();
-		resultList.add(forkData.getExtents());
-		long currentBlock = basicExtentsBlockCount;
-		
-		while(currentBlock < forkData.getTotalBlocks()) {
-		    // Construct key to find next extent record
-		    HFSPlusExtentKey extentKey = new HFSPlusExtentKey(forkType, catFile.getFileID(), (int)currentBlock);
-		    
-		    HFSPlusExtentLeafRecord currentRecord = getOverflowExtent(extentKey);
-		    if(currentRecord == null)
-			System.err.println("WARNING: currentRecord == null!!");
-		    HFSPlusExtentRecord currentRecordData = currentRecord.getRecordData();
-		    resultList.addLast(currentRecordData);
-		    for(int i = 0; i < 8; ++i)
-			currentBlock += Util2.unsign(currentRecordData.getExtentDescriptor(i).getBlockCount());
-		}
-		
-		result = resultList.toArray(new HFSPlusExtentRecord[resultList.size()]);
-	    }
-	    return result;
+	    return getAllExtentRecords(catFile.getFileID(), forkData, forkType);
 	}
 	else
 	    throw new IllegalArgumentException("Not a file record!");
     }
-    
+
+    public HFSPlusExtentRecord[] getAllExtentRecords(HFSCatalogNodeID fileID, HFSPlusForkData forkData, byte forkType) {
+	//HFSPlusCatalogLeafRecordData recData = requestFile.getData();
+	//if(true) {
+// 	if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
+// 	   recData instanceof HFSPlusCatalogFile) {
+// 	    //int blockSize = getVolumeHeader().getBlockSize();
+// 	    HFSPlusCatalogFile catFile = (HFSPlusCatalogFile) recData;
+	HFSPlusExtentRecord[] result;
+// 	    HFSPlusForkData forkData;
+// 	    if(forkType == HFSPlusExtentKey.DATA_FORK)
+// 		forkData = catFile.getDataFork();
+// 	    else if(forkType == HFSPlusExtentKey.RESOURCE_FORK)
+// 		forkData = catFile.getResourceFork();
+// 	    else
+// 		throw new IllegalArgumentException("Illegal fork type!");
+
+	long basicExtentsBlockCount = 0;
+	for(int i = 0; i < 8; ++i)
+	    basicExtentsBlockCount += Util2.unsign(forkData.getExtents().getExtentDescriptor(i).getBlockCount());
+	    
+	if(basicExtentsBlockCount == forkData.getTotalBlocks()) {
+	    result = new HFSPlusExtentRecord[1];
+	    result[0] = forkData.getExtents();
+	}
+	else if(basicExtentsBlockCount > forkData.getTotalBlocks())
+	    throw new RuntimeException("Weird programming error. (basicExtentsBlockCount > forkData.getTotalBlocks()) (" + basicExtentsBlockCount + " > " + forkData.getTotalBlocks() + ")");
+	else {
+	    LinkedList<HFSPlusExtentRecord> resultList = new LinkedList<HFSPlusExtentRecord>();
+	    resultList.add(forkData.getExtents());
+	    long currentBlock = basicExtentsBlockCount;
+		
+	    while(currentBlock < forkData.getTotalBlocks()) {
+		// Construct key to find next extent record
+		HFSPlusExtentKey extentKey = new HFSPlusExtentKey(forkType, fileID, (int)currentBlock);
+		
+		HFSPlusExtentLeafRecord currentRecord = getOverflowExtent(extentKey);
+		if(currentRecord == null)
+		    System.err.println("WARNING: currentRecord == null!!");
+		HFSPlusExtentRecord currentRecordData = currentRecord.getRecordData();
+		resultList.addLast(currentRecordData);
+		for(int i = 0; i < 8; ++i)
+		    currentBlock += Util2.unsign(currentRecordData.getExtentDescriptor(i).getBlockCount());
+	    }
+		
+	    result = resultList.toArray(new HFSPlusExtentRecord[resultList.size()]);
+	}
+	return result;
+    }
     public HFSPlusExtentDescriptor[] getAllExtentDescriptors(HFSPlusCatalogLeafRecord requestFile, byte forkType) {
-	HFSPlusExtentRecord[] records = getAllExtentRecords(requestFile, forkType);
+	return getAllExtentDescriptors(getAllExtentRecords(requestFile, forkType));
+    }
+    public HFSPlusExtentDescriptor[] getAllExtentDescriptors(HFSCatalogNodeID fileID, HFSPlusForkData forkData, 
+							     byte forkType) {
+	return getAllExtentDescriptors(getAllExtentRecords(fileID, forkData, forkType));
+    }
+    protected HFSPlusExtentDescriptor[] getAllExtentDescriptors(HFSPlusExtentRecord[] records) { //
 	LinkedList<HFSPlusExtentDescriptor> descTmp = new LinkedList<HFSPlusExtentDescriptor>();
 	mainLoop:
 	for(HFSPlusExtentRecord rec : records) {
@@ -374,8 +398,14 @@ public class HFSFileSystemView {
 	}
 	return descTmp.toArray(new HFSPlusExtentDescriptor[descTmp.size()]);
     }
+    public HFSPlusExtentDescriptor[] getAllDataExtentDescriptors(HFSCatalogNodeID fileID, HFSPlusForkData forkData) {
+	return getAllExtentDescriptors(fileID, forkData, HFSPlusExtentKey.DATA_FORK);
+    }
     public HFSPlusExtentDescriptor[] getAllDataExtentDescriptors(HFSPlusCatalogLeafRecord requestFile) {
 	return getAllExtentDescriptors(requestFile, HFSPlusExtentKey.DATA_FORK);
+    }
+    public HFSPlusExtentDescriptor[] getAllResourceExtentDescriptors(HFSCatalogNodeID fileID, HFSPlusForkData forkData) {
+	return getAllExtentDescriptors(fileID, forkData, HFSPlusExtentKey.RESOURCE_FORK);
     }
     public HFSPlusExtentDescriptor[] getAllResourceExtentDescriptors(HFSPlusCatalogLeafRecord requestFile) {
 	return getAllExtentDescriptors(requestFile, HFSPlusExtentKey.RESOURCE_FORK);

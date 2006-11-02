@@ -41,7 +41,12 @@ public class HFSExplorer {
 	parseOptions(args, 0, args.length);
 	
 	//RandomAccessFile isoRaf = new RandomAccessFile(args[0], "r");
-	WindowsLowLevelIO isoRaf = new WindowsLowLevelIO(operation.getFilename());
+	LowLevelFile isoRaf;
+	if(System.getProperty("os.name").toLowerCase().startsWith("windows") &&
+	   System.getProperty("os.arch").toLowerCase().equals("x86"))
+	    isoRaf = new WindowsLowLevelIO(operation.getFilename());
+	else
+	    isoRaf = new RandomAccessLLF(operation.getFilename());
 	
 	long offset; // Offset in isoRaf where the file system starts
 	long length; // Length of the file system data
@@ -704,7 +709,7 @@ public class HFSExplorer {
 	//operation.setFilename(arguments[length-1]);
     }
     
-    public static HFSPlusCatalogLeafRecord[] collectFilesInDir(HFSCatalogNodeID dirID, int currentNodeNumber, WindowsLowLevelIO isoRaf, long offset, HFSPlusVolumeHeader header, BTHeaderRec bthr) {
+    public static HFSPlusCatalogLeafRecord[] collectFilesInDir(HFSCatalogNodeID dirID, int currentNodeNumber, LowLevelFile isoRaf, long offset, HFSPlusVolumeHeader header, BTHeaderRec bthr) {
 	// Try to list contents in specified dir
 	int requestedDir = dirID.toInt();
 	//long catalogFilePosition = header.getBlockSize()*header.getCatalogFile().getExtents().getExtentDescriptor(0).getStartBlock();

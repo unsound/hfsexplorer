@@ -300,7 +300,13 @@ public class FileSystemBrowserWindow extends JFrame {
 	if(fsView != null) {
 	    fsView.getStream().close();
 	}
-	LowLevelFile fsFile = new WindowsLowLevelIO(filename);
+	LowLevelFile fsFile;
+	if(System.getProperty("os.name").toLowerCase().startsWith("windows") &&
+	   System.getProperty("os.arch").toLowerCase().equals("x86"))
+	    fsFile = new WindowsLowLevelIO(filename);
+	else
+	    fsFile = new RandomAccessLLF(filename);
+	
 	int blockSize = 0x200; // == 512
 	int ddrBlockSize;
 	long fsOffset;
