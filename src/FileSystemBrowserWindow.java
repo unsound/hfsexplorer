@@ -444,7 +444,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		currentRow.add(new RecordContainer(rec));
 		currentRow.add(catFile.getDataFork().getLogicalSize() + " B");
 		currentRow.add("File");
-		currentRow.add("" + catFile.getContentModDate());
+		currentRow.add("" + catFile.getContentModDateAsDate());
 	    }
 	    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
 		    recData instanceof HFSPlusCatalogFolder) {
@@ -452,7 +452,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		currentRow.add(new RecordContainer(rec));
 		currentRow.add("");
 		currentRow.add("Folder");
-		currentRow.add("" + catFolder.getContentModDate());
+		currentRow.add("" + catFolder.getContentModDateAsDate());
 	    }
 	    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
 		    recData instanceof HFSPlusCatalogThread) {
