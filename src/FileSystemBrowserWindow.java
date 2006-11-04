@@ -1,6 +1,7 @@
 import org.catacombae.hfsexplorer.gui.FilesystemBrowserPanel;
 import java.util.*;
 import java.io.*;
+import java.text.DateFormat;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -444,7 +445,8 @@ public class FileSystemBrowserWindow extends JFrame {
 		currentRow.add(new RecordContainer(rec));
 		currentRow.add(catFile.getDataFork().getLogicalSize() + " B");
 		currentRow.add("File");
-		currentRow.add("" + catFile.getContentModDateAsDate());
+		DateFormat dti = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+		currentRow.add("" + dti.format(catFile.getContentModDateAsDate()));
 	    }
 	    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
 		    recData instanceof HFSPlusCatalogFolder) {
@@ -452,7 +454,8 @@ public class FileSystemBrowserWindow extends JFrame {
 		currentRow.add(new RecordContainer(rec));
 		currentRow.add("");
 		currentRow.add("Folder");
-		currentRow.add("" + catFolder.getContentModDateAsDate());
+		DateFormat dti = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+		currentRow.add("" + dti.format(catFolder.getContentModDateAsDate()));
 	    }
 	    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
 		    recData instanceof HFSPlusCatalogThread) {
