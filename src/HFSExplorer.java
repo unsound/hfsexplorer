@@ -95,6 +95,7 @@ public class HFSExplorer {
 	else if(operation == Operation.FRAGCHECK)
 	    operationFragCheck(operation, isoRaf, offset, length);
 	else if(operation == Operation.TEST) {
+	    System.out.println("Reading partition data starting at " + offset + "...");
 	    byte[] currentBlock = new byte[512];
 	    isoRaf.seek(offset + 1024);
 	    isoRaf.read(currentBlock);
