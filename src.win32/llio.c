@@ -4,7 +4,7 @@
 #include <windows.h>
 #include <winioctl.h>
 #include <tchar.h>
-#include "WindowsLowLevelIO.h"
+#include "org_catacombae_hfsexplorer_win32_WindowsLowLevelIO.h"
 #define DEBUG FALSE
 
 /* Ripped from the tutorial at "http://java.sun.com/docs/books/jni/html/".
@@ -68,7 +68,7 @@ HANDLE getHandle(JNIEnv *env, jbyteArray handleData) {
   }
 }
 
-JNIEXPORT jbyteArray JNICALL Java_WindowsLowLevelIO_open(JNIEnv *env, jclass cls, jstring str) {
+JNIEXPORT jbyteArray JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_open(JNIEnv *env, jclass cls, jstring str) {
   if(DEBUG) printf("Java_WindowsLowLevelIO_open called\n");
   if(str == NULL) { // Must check input, or we can crash the jvm.
     throwByName(env, "java/lang/NullPointerException", "Filename is null.");
@@ -115,7 +115,7 @@ JNIEXPORT jbyteArray JNICALL Java_WindowsLowLevelIO_open(JNIEnv *env, jclass cls
     return getHandleData(env, hnd);
   }
 }
-JNIEXPORT void JNICALL Java_WindowsLowLevelIO_seek(JNIEnv *env, jclass cls, jlong pos, jbyteArray handleData) {
+JNIEXPORT void JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_seek(JNIEnv *env, jclass cls, jlong pos, jbyteArray handleData) {
   if(DEBUG) printf("Java_WindowsLowLevelIO_seek called\n");
   HANDLE hnd = getHandle(env, handleData);
   LARGE_INTEGER oldFP = (LARGE_INTEGER)pos;
@@ -123,7 +123,7 @@ JNIEXPORT void JNICALL Java_WindowsLowLevelIO_seek(JNIEnv *env, jclass cls, jlon
   if(SetFilePointerEx(hnd, oldFP, &newFP, FILE_BEGIN) == FALSE)
     throwByName(env, "java/lang/RuntimeException", "Couldn't set file pointer.");
 }
-JNIEXPORT jint JNICALL Java_WindowsLowLevelIO_read(JNIEnv *env, jclass cls, jbyteArray data, 
+JNIEXPORT jint JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_read(JNIEnv *env, jclass cls, jbyteArray data, 
 						   jint offset, jint length, jbyteArray handleData) {
   //_tprintf(_T("Java_WindowsLowLevelIO_read called\n"));  
   if(DEBUG) printf("Java_WindowsLowLevelIO_read called\n");
@@ -143,21 +143,21 @@ JNIEXPORT jint JNICALL Java_WindowsLowLevelIO_read(JNIEnv *env, jclass cls, jbyt
   return bytesRead;
 }
 
-JNIEXPORT void JNICALL Java_WindowsLowLevelIO_close(JNIEnv *env, jclass cls, jbyteArray handleData) {
+JNIEXPORT void JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_close(JNIEnv *env, jclass cls, jbyteArray handleData) {
   HANDLE hnd = getHandle(env, handleData);
   if(CloseHandle(hnd) == FALSE) {
     throwByName(env, "java/lang/RuntimeException", "Could not close file.");
   }
 }
 
-JNIEXPORT void JNICALL Java_WindowsLowLevelIO_ejectMedia(JNIEnv *env, jclass cls, jbyteArray handleData) {
+JNIEXPORT void JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_ejectMedia(JNIEnv *env, jclass cls, jbyteArray handleData) {
   HANDLE hnd = getHandle(env, handleData);
   DWORD bytesReturned;
   if(DeviceIoControl(hnd, IOCTL_STORAGE_EJECT_MEDIA, NULL, 0, NULL, 0, &bytesReturned, NULL) == FALSE)
     throwByName(env, "java/lang/RuntimeException", "Could not eject media.");  
 }
 
-JNIEXPORT void JNICALL Java_WindowsLowLevelIO_loadMedia(JNIEnv *env, jclass cls, jbyteArray handleData) {
+JNIEXPORT void JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_loadMedia(JNIEnv *env, jclass cls, jbyteArray handleData) {
   HANDLE hnd = getHandle(env, handleData);
   DWORD bytesReturned;
   if(DeviceIoControl(hnd, IOCTL_STORAGE_LOAD_MEDIA, NULL, 0, NULL, 0, &bytesReturned, NULL) == FALSE)
@@ -170,7 +170,7 @@ JNIEXPORT void JNICALL Java_WindowsLowLevelIO_loadMedia(JNIEnv *env, jclass cls,
  * Method:    length
  * Signature: ([B)J
  */
-JNIEXPORT jlong JNICALL Java_WindowsLowLevelIO_length(JNIEnv *env, jclass cls, jbyteArray handleData) {
+JNIEXPORT jlong JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_length(JNIEnv *env, jclass cls, jbyteArray handleData) {
   HANDLE hnd = getHandle(env, handleData);
   LARGE_INTEGER length;
   if(GetFileSizeEx(hnd, &length) == FALSE) {
@@ -195,7 +195,7 @@ JNIEXPORT jlong JNICALL Java_WindowsLowLevelIO_length(JNIEnv *env, jclass cls, j
  * Method:    getFilePointer
  * Signature: ([B)J
  */
-JNIEXPORT jlong JNICALL Java_WindowsLowLevelIO_getFilePointer(JNIEnv *env, jclass cls, jbyteArray handleData) {
+JNIEXPORT jlong JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_getFilePointer(JNIEnv *env, jclass cls, jbyteArray handleData) {
   HANDLE hnd = getHandle(env, handleData);
   LARGE_INTEGER fp;
   //LARGE_INTEGER pos = (LONGLONG)0;
@@ -212,7 +212,7 @@ JNIEXPORT jlong JNICALL Java_WindowsLowLevelIO_getFilePointer(JNIEnv *env, jclas
  * Method:    getSectorSize
  * Signature: ([B)I
  */
-JNIEXPORT jint JNICALL Java_WindowsLowLevelIO_getSectorSize(JNIEnv *env, jclass cls, jbyteArray handleData) {
+JNIEXPORT jint JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_getSectorSize(JNIEnv *env, jclass cls, jbyteArray handleData) {
   HANDLE hnd = getHandle(env, handleData);
   DISK_GEOMETRY_EX geom;
   DWORD bytesReturned;
