@@ -107,7 +107,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	//Vector<Vector<String>> = new Vector<Vector<String>>();
 	tableModel = new DefaultTableModel(colNames, 0);
 	fileTable.setModel(tableModel);
-	fileTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+	fileTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 	fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 	fileTable.getColumnModel().getColumn(0).setPreferredWidth(180);
 	fileTable.getColumnModel().getColumn(1).setPreferredWidth(96);
@@ -366,6 +366,12 @@ public class FileSystemBrowserWindow extends JFrame {
 	    ApplePartitionMap apm = new ApplePartitionMap(fsFile, 0x200, ddr.getSbBlkSize());
 	    //apm.print(System.out, "");
 	    APMPartition[] partitions = apm.getPartitions();
+	    if(partitions.length == 0) {
+		JOptionPane.showMessageDialog(this, "Could not find an Apple Partition Map with any partitions inside.",
+					      "APM not found", JOptionPane.ERROR_MESSAGE);
+		return;
+	    }
+		
 	    Object selectedValue;
 	    while(true) {
 		selectedValue = JOptionPane.showInputDialog(this, "Select which partition to read", 
@@ -493,43 +499,66 @@ public class FileSystemBrowserWindow extends JFrame {
     }
 
     private void actionExtractToDir() {
-	int selectedRow = fileTable.getSelectedRow();
-	if(selectedRow == -1) {
+	int[] selectedRows = fileTable.getSelectedRows();
+	if(selectedRows.length == 0) {
 	    JOptionPane.showMessageDialog(this, "No file selected.",
 					  "Information", JOptionPane.INFORMATION_MESSAGE);
 	    return;
 	}
-	Object o = tableModel.getValueAt(selectedRow, 0);
-	HFSPlusCatalogLeafRecord rec;
-	HFSPlusCatalogLeafRecordData recData;
-	if(o instanceof RecordContainer && 
-	   (recData = (rec = ((RecordContainer)o).getRecord()).getData()).getRecordType() == 
-	   HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE && // This may be the weirdest statement I've written
-	   recData instanceof HFSPlusCatalogFile) {
-// 	    HFSPlusCatalogLeafRecord rec = ((RecordContainer)o).getRecord();
-// 	    if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
-// 	       recData instanceof HFSPlusCatalogFile) {
+	else {
 	    fileChooser.setMultiSelectionEnabled(false);
 	    fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-	    if(fileChooser.showOpenDialog(FileSystemBrowserWindow.this) == JFileChooser.APPROVE_OPTION) {
-		try {
-		    String filename = rec.getKey().getNodeName().toString();
-		    File outFile = new File(fileChooser.getSelectedFile(), filename);
-		    FileOutputStream fos = new FileOutputStream(outFile);
-		    fsView.extractDataForkToStream(rec, fos);
-		    fos.close();
-		    JOptionPane.showMessageDialog(this, "The file was successfully extracted!\n",
-						  "Extraction complete!", JOptionPane.INFORMATION_MESSAGE);
-		} catch(Exception e) {
-		    e.printStackTrace();
-		    JOptionPane.showMessageDialog(this, e.toString() + ": " + e.getMessage(),
-						  "Error", JOptionPane.ERROR_MESSAGE);
+	    if(fileChooser.showDialog(FileSystemBrowserWindow.this, "Extract here") == JFileChooser.APPROVE_OPTION) {
+		File outDir = fileChooser.getSelectedFile();
+		
+		for(int selectedRow : selectedRows) {
+		    Object o = tableModel.getValueAt(selectedRow, 0);
+		    HFSPlusCatalogLeafRecord rec;
+		    HFSPlusCatalogLeafRecordData recData;
+		    if(o instanceof RecordContainer) {
+			rec = ((RecordContainer)o).getRecord();
+			extract(rec, outDir);
+		    }
+		    else 
+			JOptionPane.showMessageDialog(this, "Unexpected data in table model. (Internal error, report to developer)",
+						      "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	    }
 	}
-	else 
-	    JOptionPane.showMessageDialog(this, "Unexpected data in table model.",
-					  "Error", JOptionPane.ERROR_MESSAGE);  
+    }
+    
+    private void extract(HFSPlusCatalogLeafRecord rec, File outDir) {
+	HFSPlusCatalogLeafRecordData recData = rec.getData();
+	if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
+	   recData instanceof HFSPlusCatalogFile) {
+	    try {
+		String filename = rec.getKey().getNodeName().toString();
+		File outFile = new File(outDir, filename);
+		FileOutputStream fos = new FileOutputStream(outFile);
+		fsView.extractDataForkToStream(rec, fos);
+		fos.close();
+		//JOptionPane.showMessageDialog(this, "The file was successfully extracted!\n",
+		//			  "Extraction complete!", JOptionPane.INFORMATION_MESSAGE);
+	    } catch(Exception e) {
+		e.printStackTrace();
+		JOptionPane.showMessageDialog(this, e.toString() + ": " + e.getMessage(),
+					      "Error", JOptionPane.ERROR_MESSAGE);
+	    }
+	}
+	else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
+		recData instanceof HFSPlusCatalogFolder) {
+	    HFSCatalogNodeID requestedID;
+	    HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder)recData;
+	    requestedID = catFolder.getFolderID();
+	    
+	    HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
+	    // We now have the contents of the requested directory
+	    File thisDir = new File(outDir, rec.getKey().getNodeName().toString());
+	    thisDir.mkdir();
+	    for(HFSPlusCatalogLeafRecord outRec : contents)
+		extract(outRec, thisDir);
+	    //populateNode(((DefaultMutableTreeNode2)obj), contents);
+	}
     }
     
     public static void main(String[] args) {
