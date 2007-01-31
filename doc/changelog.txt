@@ -1,0 +1,8 @@
+0.1a
+----
+- Made extraction of multiple files, as well as directory trees possible.
+- Fixed some uncaught exception when trying to read an Apple Partition Map when it isn't there.
+
+0.1
+---
+- First release
