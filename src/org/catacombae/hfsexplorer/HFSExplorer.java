@@ -668,7 +668,7 @@ public class HFSExplorer {
     }
     
     public static void printUsageInfo() {
-	// For measurment of the standard terminal width in fixed width environments:
+	// For measurement of the de facto standard terminal width in fixed width environments:
 	// 79:  <------------------------------------------------------------------------------->
 	println("HFSExplorer v" + VERSION);
 	println(COPYRIGHT);
@@ -684,7 +684,7 @@ public class HFSExplorer {
 	println("  Verbs:");
 	println("    browse  Launches a mode where the user can browse the files in a HFS+ file");
 	println("            system.");
-	println("    chfrag  Lists the most fragmented files of the volume");
+	println("    chfrag  Lists the 10 most fragmented files of the volume.");
 	println("    test    Launches a test mode for extensive exploration of file system");
 	println("            structures. Only for debugging purposes.");
 	println();
