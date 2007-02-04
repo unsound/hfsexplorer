@@ -1,7 +1,10 @@
-0.1a
+0.11
 ----
+- Fixed a very significant bug, sometimes leading to some files not being seen by HFSExplorer,
+  and sometimes leading to a complete crash.
 - Made extraction of multiple files, as well as directory trees possible.
 - Fixed some uncaught exception when trying to read an Apple Partition Map when it isn't there.
+- First release of source code.
 
 0.1
 ---
