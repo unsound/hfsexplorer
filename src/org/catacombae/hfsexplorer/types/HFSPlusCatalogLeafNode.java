@@ -29,7 +29,7 @@ public class HFSPlusCatalogLeafNode {
     
     public HFSPlusCatalogLeafNode(byte[] data, int offset, int nodeSize) {
 	nodeDescriptor = new BTNodeDescriptor(data, offset);
-	short[] offsets = new short[Util2.unsign(nodeDescriptor.getNumRecords())];
+	short[] offsets = new short[Util2.unsign(nodeDescriptor.getNumRecords())+1];
 	for(int i = 0; i < offsets.length; ++i) {
 	    offsets[i] = Util.readShortBE(data, offset+nodeSize-((i+1)*2));
 	}

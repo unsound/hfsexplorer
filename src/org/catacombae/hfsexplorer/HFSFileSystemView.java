@@ -295,6 +295,9 @@ public class HFSFileSystemView {
     }
     
     public HFSPlusExtentLeafRecord getOverflowExtent(HFSPlusExtentKey key) {
+	//System.out.println("getOverflowExtent(..)");
+	//System.err.println("my key:");
+	//key.printFields(System.err, "");
 	ExtentsInitProcedure init = new ExtentsInitProcedure();	
 	
 	int nodeSize = init.bthr.getNodeSize();
@@ -322,9 +325,17 @@ public class HFSFileSystemView {
 	if(nodeDescriptor.getKind() == BTNodeDescriptor.BT_LEAF_NODE) {
 	    HFSPlusExtentLeafNode leaf = new HFSPlusExtentLeafNode(currentNodeData, 0, init.bthr.getNodeSize());
 	    HFSPlusExtentLeafRecord[] recs = leaf.getLeafRecords();
-	    for(HFSPlusExtentLeafRecord rec : recs)
+	    for(HFSPlusExtentLeafRecord rec : recs) {
+		//rec.getKey().print(System.err, "");
 		if(rec.getKey().compareTo(key) == 0)
 		    return rec;
+	    }
+// 	    try {
+// 		java.io.FileOutputStream dataDump = new java.io.FileOutputStream("node_dump.dmp");
+// 		dataDump.write(currentNodeData);
+// 		dataDump.close();
+// 		System.err.println("A dump of the node has been written to node_dump.dmp");
+// 	    } catch(Exception e) { e.printStackTrace(); }
 	    return null;
 	}
 	else
@@ -379,11 +390,13 @@ public class HFSFileSystemView {
 	else if(basicExtentsBlockCount > forkData.getTotalBlocks())
 	    throw new RuntimeException("Weird programming error. (basicExtentsBlockCount > forkData.getTotalBlocks()) (" + basicExtentsBlockCount + " > " + forkData.getTotalBlocks() + ")");
 	else {
+	    //System.err.println("Reading overflow extent for file " + fileID.toString());
 	    LinkedList<HFSPlusExtentRecord> resultList = new LinkedList<HFSPlusExtentRecord>();
 	    resultList.add(forkData.getExtents());
 	    long currentBlock = basicExtentsBlockCount;
 		
 	    while(currentBlock < forkData.getTotalBlocks()) {
+		//System.err.println("  Reading 8 extents... (currentblock: " + currentBlock + " total: " + forkData.getTotalBlocks() + ")");
 		// Construct key to find next extent record
 		HFSPlusExtentKey extentKey = new HFSPlusExtentKey(forkType, fileID, (int)currentBlock);
 		
@@ -395,6 +408,7 @@ public class HFSFileSystemView {
 		for(int i = 0; i < 8; ++i)
 		    currentBlock += Util2.unsign(currentRecordData.getExtentDescriptor(i).getBlockCount());
 	    }
+	    //System.err.println("  Finished reading extents... (currentblock: " + currentBlock + " total: " + forkData.getTotalBlocks() + ")");
 		
 	    result = resultList.toArray(new HFSPlusExtentRecord[resultList.size()]);
 	}
@@ -435,9 +449,9 @@ public class HFSFileSystemView {
     }
 
     // Utility methods
-    private static HFSPlusCatalogLeafRecord[] collectFilesInDir(HFSCatalogNodeID dirID, int currentNodeNumber, 
-								LowLevelFile hfsFile, long fsOffset, 
-								HFSPlusVolumeHeader header, BTHeaderRec bthr) {
+    public static HFSPlusCatalogLeafRecord[] collectFilesInDir(HFSCatalogNodeID dirID, int currentNodeNumber, 
+							       LowLevelFile hfsFile, long fsOffset, 
+							       HFSPlusVolumeHeader header, BTHeaderRec bthr) {
 	// Try to list contents in specified dir
 	ForkFilter catalogFile = new ForkFilter(header.getCatalogFile(), hfsFile, fsOffset, header.getBlockSize());
 	
@@ -468,7 +482,7 @@ public class HFSFileSystemView {
 	    throw new RuntimeException("Illegal type for node! (" + nodeDescriptor.getKind() + ")");
     }
     
-    public static BTIndexRecord[] findLEChildKeys(BTIndexNode indexNode, HFSCatalogNodeID rootFolderID) {
+    private static BTIndexRecord[] findLEChildKeys(BTIndexNode indexNode, HFSCatalogNodeID rootFolderID) {
 	LinkedList<BTIndexRecord> result = new LinkedList<BTIndexRecord>();
 	BTIndexRecord records[] = indexNode.getIndexRecords();
 	BTIndexRecord largestMatchingRecord = null;//records[0];

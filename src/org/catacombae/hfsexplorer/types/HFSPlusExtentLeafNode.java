@@ -22,26 +22,35 @@ package org.catacombae.hfsexplorer.types;
 
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.Util2;
+import java.io.PrintStream;
 
 public class HFSPlusExtentLeafNode {
     protected BTNodeDescriptor nodeDescriptor;
     protected HFSPlusExtentLeafRecord[] leafRecords;
+    protected short[] leafRecordOffsets;
     
     public HFSPlusExtentLeafNode(byte[] data, int offset, int nodeSize) {
 	nodeDescriptor = new BTNodeDescriptor(data, offset);
-	short[] offsets = new short[Util2.unsign(nodeDescriptor.getNumRecords())];
-	for(int i = 0; i < offsets.length; ++i) {
-	    offsets[i] = Util.readShortBE(data, offset+nodeSize-((i+1)*2));
+	leafRecordOffsets = new short[Util2.unsign(nodeDescriptor.getNumRecords())+1]; // The last offset is offset to free space
+	for(int i = 0; i < leafRecordOffsets.length; ++i) {
+	    leafRecordOffsets[i] = Util.readShortBE(data, offset+nodeSize-((i+1)*2));
 	}
-	leafRecords = new HFSPlusExtentLeafRecord[offsets.length-1];
+	leafRecords = new HFSPlusExtentLeafRecord[leafRecordOffsets.length-1];
 	// we loop offsets.length-1 times, since last offset is offset to free space
 	for(int i = 0; i < leafRecords.length; ++i) {
-	    int currentOffset = Util2.unsign(offsets[i]);
+	    int currentOffset = Util2.unsign(leafRecordOffsets[i]);
 	    leafRecords[i] = new HFSPlusExtentLeafRecord(data, offset+currentOffset);
 	}
 	
     }
     
+    public short[] getLeafRecordOffsets() { 
+	short[] offsets = new short[leafRecordOffsets.length];
+	for(int i = 0; i < offsets.length; ++i) {
+	    offsets[i] = leafRecordOffsets[i];
+	}
+	return offsets;
+    }
     public BTNodeDescriptor getNodeDescriptor() { return nodeDescriptor; }
     public HFSPlusExtentLeafRecord getLeafRecord(int index) { return leafRecords[index]; }
     public HFSPlusExtentLeafRecord[] getLeafRecords() {
@@ -49,5 +58,19 @@ public class HFSPlusExtentLeafNode {
 	for(int i = 0; i < copy.length; ++i)
 	    copy[i] = leafRecords[i];
 	return copy;
+    }
+
+    public void printFields(PrintStream ps, String prefix) {
+	ps.println(prefix + " nodeDescriptor:");
+	nodeDescriptor.printFields(ps, prefix + "  ");
+	for(int i = 0; i < leafRecords.length; ++i) {
+	    ps.println(prefix + " leafRecords[" + i + "]:");
+	    leafRecords[i].printFields(ps, prefix + "  ");
+	}
+    }
+    
+    public void print(PrintStream ps, String prefix) {
+	ps.println(prefix + "HFSPlusExtentLeafNode:");
+	printFields(ps, prefix);
     }
 }

@@ -36,7 +36,7 @@
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="specifyDeviceNameField" pref="464" max="32767" attributes="0"/>
+                      <Component id="specifyDeviceNameField" pref="545" max="32767" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -148,7 +148,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
-        <Property name="text" type="java.lang.String" value="(CD-ROMs probably won&apos;t work)"/>
+        <Property name="text" type="java.lang.String" value="(hybrid CD-ROMs with both HFS+ and ISO filesystems won&apos;t work)"/>
       </Properties>
     </Component>
   </SubComponents>

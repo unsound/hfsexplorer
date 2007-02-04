@@ -28,8 +28,15 @@ import java.io.*;
 import java.math.BigInteger;
 
 public class HFSExplorer {
-    public static final String VERSION = "0.1";
-    public static final String COPYRIGHT = "Copyright (C) Erik Larsson 2006";
+    public static final String VERSION = "0.11";
+    public static final String COPYRIGHT = "Copyright \u00A9 Erik Larsson 2006-2007";
+    public static final String[] NOTICES = { "This program is distributed under the GNU General Public License version",
+					     "2 or later. See <http://www.gnu.org/copyleft/gpl.html> for the details.",
+					     "",
+					     "Libraries used:",
+					     "    swing-layout (https://swing-layout.dev.java.net/)",
+					     "        Copyright \u00A9 2005-2006 Sun Microsystems, Inc. Licensed under",
+					     "        the Lesser General Public License (http://www.gnu.org/licenses/lgpl.html)" };
     public static BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
     private static class Options {
 	public boolean readAPM = false;
@@ -119,7 +126,11 @@ public class HFSExplorer {
 	    operationBrowse(operation, isoRaf, offset, length);
 	else if(operation == Operation.FRAGCHECK)
 	    operationFragCheck(operation, isoRaf, offset, length);
-	else if(operation == Operation.TEST) {
+	else if(operation == Operation.TEST)
+	    operationTest(operation, isoRaf, offset, length);
+    }
+    
+    private static void operationTest(Operation operation, LowLevelFile isoRaf, long offset, long length) throws IOException {
 	    System.out.println("Reading partition data starting at " + offset + "...");
 	    byte[] currentBlock = new byte[512];
 	    isoRaf.seek(offset + 1024);
@@ -164,7 +175,7 @@ public class HFSExplorer {
 	    // collect all records belonging to directory 1 (= ls)
 	    System.out.println();
 	    System.out.println();
-	    HFSPlusCatalogLeafRecord[] f = collectFilesInDir(new HFSCatalogNodeID(1), bthr.getRootNode(), isoRaf, offset, header, bthr);
+	    HFSPlusCatalogLeafRecord[] f = HFSFileSystemView.collectFilesInDir(new HFSCatalogNodeID(1), bthr.getRootNode(), isoRaf, offset, header, bthr);
 	    System.out.println("Found " + f.length + " items in subroot.");
 	    for(HFSPlusCatalogLeafRecord rec : f) {
 		//rec.print(System.out, "  ");
@@ -175,7 +186,7 @@ public class HFSExplorer {
 		    HFSPlusCatalogFolder folderData = (HFSPlusCatalogFolder)data;
 		    System.out.println(" (dir, id: " + folderData.getFolderID().toInt() + ")");
 		    // Print contents of folder
-		    HFSPlusCatalogLeafRecord[] f2 = collectFilesInDir(folderData.getFolderID(), bthr.getRootNode(), isoRaf, offset, header, bthr);
+		    HFSPlusCatalogLeafRecord[] f2 = HFSFileSystemView.collectFilesInDir(folderData.getFolderID(), bthr.getRootNode(), isoRaf, offset, header, bthr);
 		    System.out.println("  Found " + f2.length + " items in " + rec.getKey().getNodeName().getUnicodeAsString() + ".");
 		    for(HFSPlusCatalogLeafRecord rec2 : f2)
 			System.out.println("    \"" + rec2.getKey().getNodeName() + "\"");
@@ -311,7 +322,7 @@ public class HFSExplorer {
 	    System.out.println("FP: " + isoRaf.getFilePointer() + " diff: " + (isoRaf.getFilePointer()-catalogFilePosition) + " (catalogFileLength: " + catalogFileLength + ")");
 	    System.out.println("bytesRead: " + bytesRead + " nodeSize: " + nodeSize + " number of nodes: " + (catalogFileLength / nodeSize));
 	    System.out.println("Nodes read: " + nodeNumber);
-	}
+	
     }
     
     public static void operationBrowse(Operation op, LowLevelFile hfsFile, long fsOffset, long fsLength) {
@@ -733,105 +744,6 @@ public class HFSExplorer {
 	
 	//System.out.println("SETTING FILENAME TO!! ::: " + arguments[length-1]);
 	//operation.setFilename(arguments[length-1]);
-    }
-    
-    public static HFSPlusCatalogLeafRecord[] collectFilesInDir(HFSCatalogNodeID dirID, int currentNodeNumber, LowLevelFile isoRaf, long offset, HFSPlusVolumeHeader header, BTHeaderRec bthr) {
-	// Try to list contents in specified dir
-	int requestedDir = dirID.toInt();
-	//long catalogFilePosition = header.getBlockSize()*header.getCatalogFile().getExtents().getExtentDescriptor(0).getStartBlock();
-	ForkFilter forkFilter = new ForkFilter(header.getCatalogFile(), isoRaf, offset, header.getBlockSize());
-	
-	byte[] currentNodeData = new byte[bthr.getNodeSize()];
-	//isoRaf.seek(offset + catalogFilePosition + Util2.unsign(currentNodeNumber)*bthr.getNodeSize());
-	forkFilter.seek(Util2.unsign(currentNodeNumber)*bthr.getNodeSize());
-	forkFilter.readFully(currentNodeData);
-	
-	BTNodeDescriptor nodeDescriptor = new BTNodeDescriptor(currentNodeData, 0);
-	if(nodeDescriptor.getKind() == BTNodeDescriptor.BT_INDEX_NODE) {
-	    BTIndexNode currentNode = new HFSPlusCatalogIndexNode(currentNodeData, 0, bthr.getNodeSize());
-	    BTIndexRecord[] matchingRecords = findLEChildKeys(currentNode, dirID);
-	    //System.out.println("Matching records: " + matchingRecords.length);
-	    
-	    LinkedList<HFSPlusCatalogLeafRecord> results = new LinkedList<HFSPlusCatalogLeafRecord>();
-	    for(BTIndexRecord bir : matchingRecords) {
-		HFSPlusCatalogLeafRecord[] partResult = collectFilesInDir(dirID, bir.getIndex(), isoRaf, 
-									  offset, header, bthr);
-		for(HFSPlusCatalogLeafRecord curRes : partResult)
-		    results.addLast(curRes);
-	    }
-	    return results.toArray(new HFSPlusCatalogLeafRecord[results.size()]);
-	}
-	else if(nodeDescriptor.getKind() == BTNodeDescriptor.BT_LEAF_NODE) {
-	    HFSPlusCatalogLeafNode currentNode = new HFSPlusCatalogLeafNode(currentNodeData, 0, Util2.unsign(bthr.getNodeSize()));
-	    return getChildrenTo(currentNode, dirID);
-	}
-	else {
-	    nodeDescriptor.print(System.err, "");
-	    throw new RuntimeException("Illegal type for node!");
-	}
-    }
-    
-    public static BTIndexRecord findLEKey(BTIndexNode indexNode, int nodeID, String searchString) {
-	/* 
-	 * Algoritm:
-	 *   Key searchKey
-	 *   Key greatestMatchingKey;
-	 *   For each n : records
-	 *     If n.key <= searchKey && n.key > greatestMatchingKey
-	 *       greatestMatchingKey = n.key
-	 */
-	HFSPlusCatalogKey searchKey = new HFSPlusCatalogKey(nodeID, searchString);
-	long unsignedNodeID = Util2.unsign(nodeID);
-	BTIndexRecord records[] = indexNode.getIndexRecords();
-	BTIndexRecord largestMatchingRecord = null;//records[0];
-	for(int i = 0; i < records.length; ++i) {
-	    if(records[i].getKey().compareTo(searchKey) <= 0 && 
-	       (largestMatchingRecord == null || records[i].getKey().compareTo(largestMatchingRecord.getKey()) > 0)) {
-		largestMatchingRecord = records[i];
-	    }
-	}
-	return largestMatchingRecord;
-    }
-    
-    public static BTIndexRecord[] findLEChildKeys(BTIndexNode indexNode, HFSCatalogNodeID rootFolderID) {
-	LinkedList<BTIndexRecord> result = new LinkedList<BTIndexRecord>();
-	BTIndexRecord records[] = indexNode.getIndexRecords();
-	BTIndexRecord largestMatchingRecord = null;//records[0];
-	HFSPlusCatalogKey largestMatchingKey = null;
-	for(int i = 0; i < records.length; ++i) {
-	    if(records[i].getKey() instanceof HFSPlusCatalogKey) {
-		HFSPlusCatalogKey key = (HFSPlusCatalogKey)records[i].getKey();
-		if(key.getParentID().toInt() < rootFolderID.toInt() && 
-		   (largestMatchingKey == null || 
-		    key.getParentID().toInt() > largestMatchingKey.getParentID().toInt())) {
-		    largestMatchingKey = key;
-		    largestMatchingRecord = records[i];
-		}
-		else if(key.getParentID().toInt() == rootFolderID.toInt())
-		    result.addLast(records[i]);
-	    }
-	    else
-		System.out.println("UNKNOWN KEY TYPE IN findLEChildKeys");
-	}
-	
-	if(largestMatchingKey != null)
-	    result.addFirst(largestMatchingRecord);
-	return result.toArray(new BTIndexRecord[result.size()]);
-	
-	/*
-	  if exists in index node a value equal to the nodeID
-	 */
-    }
-    
-    public static HFSPlusCatalogLeafRecord[] getChildrenTo(HFSPlusCatalogLeafNode leafNode, HFSCatalogNodeID nodeID) {
-	LinkedList<HFSPlusCatalogLeafRecord> children = new LinkedList<HFSPlusCatalogLeafRecord>();
-	HFSPlusCatalogLeafRecord[] records = leafNode.getLeafRecords();
-	for(int i = 0; i < records.length; ++i) {
-	    HFSPlusCatalogLeafRecord curRec = records[i];
-	    if(curRec.getKey().getParentID().toInt() == nodeID.toInt())
-		children.addLast(curRec);
-	}
-	return children.toArray(new HFSPlusCatalogLeafRecord[children.size()]);
     }
 
     public static HFSPlusCatalogFile findFileID(HFSPlusCatalogLeafNode leafNode, HFSCatalogNodeID nodeID) {

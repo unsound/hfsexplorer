@@ -119,7 +119,7 @@ public class HFSCatalogNodeID {
     }
     
     public void printFields(PrintStream ps, String prefix) {
-	ps.println(prefix + " hfsCatalogNodeID: " + toString() + " (" + getDescription());
+	ps.println(prefix + " hfsCatalogNodeID: " + toString() + " (" + getDescription() + ")");
     }
     
     public void print(PrintStream ps, String prefix) {

@@ -2,8 +2,8 @@
 setlocal
 pushd "%~dp0"
 
-set SOURCEFILES=..\src\*.java ..\src\org\catacombae\hfsexplorer\gui\*.java
-rem set CLASSPATH=..\lib\filedrop.jar;..\lib\swing
+set SOURCEFILES=..\src\org\catacombae\hfsexplorer\*.java ..\src\org\catacombae\hfsexplorer\apm\*.java ..\src\org\catacombae\hfsexplorer\gui\*.java ..\src\org\catacombae\hfsexplorer\testcode\*.java ..\src\org\catacombae\hfsexplorer\types\*.java ..\src\org\catacombae\hfsexplorer\win32\*.java
+set CLASSPATH=..\lib\swing-layout-1.0.1.jar
 
 rmdir /s /q doc.~
 mkdir doc.~

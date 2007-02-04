@@ -314,10 +314,10 @@ public class FileSystemBrowserWindow extends JFrame {
 		    message += "HFSExplorer " + HFSExplorer.VERSION + "\n";
 		    //message += "Build #" + BuildNumber.BUILD_NUMBER + "\n";
 		    message += HFSExplorer.COPYRIGHT + "\n";
-// 		    for(String notice : Main.NOTICES) {
-// 			message += notice + "\n";
-// 			// System.out.println("Message now: " + message);
-// 		    }
+ 		    for(String notice : HFSExplorer.NOTICES) {
+ 			message += notice + "\n";
+ 			// System.out.println("Message now: " + message);
+ 		    }
 		    message += "\n Operating system: " + System.getProperty("os.name") + " " + System.getProperty("os.version");
 		    message += "\n Architecture: " + System.getProperty("os.arch");
 		    message += "\n Virtual machine: " + System.getProperty("java.vm.vendor") + " " + 

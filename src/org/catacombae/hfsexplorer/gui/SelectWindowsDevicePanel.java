@@ -77,7 +77,7 @@ public class SelectWindowsDevicePanel extends javax.swing.JPanel {
 
             cancelButton.setText("Cancel");
 
-            jLabel1.setText("(CD-ROMs probably won't work)");
+            jLabel1.setText("(hybrid CD-ROMs with both HFS+ and ISO filesystems won't work)");
 
             org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
             this.setLayout(layout);
@@ -100,7 +100,7 @@ public class SelectWindowsDevicePanel extends javax.swing.JPanel {
                             .add(cancelButton))
                         .add(layout.createSequentialGroup()
                             .addContainerGap()
-                            .add(specifyDeviceNameField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 464, Short.MAX_VALUE)))
+                            .add(specifyDeviceNameField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 545, Short.MAX_VALUE)))
                     .addContainerGap())
             );
             layout.setVerticalGroup(
