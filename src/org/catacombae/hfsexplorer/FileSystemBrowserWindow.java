@@ -101,7 +101,10 @@ public class FileSystemBrowserWindow extends JFrame {
 	
 	extractButton.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-		    actionExtractToDir();
+		    if(fsView != null)
+			actionExtractToDir();
+		    else
+			JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "No file system loaded.", "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	    });
 	
@@ -307,7 +310,19 @@ public class FileSystemBrowserWindow extends JFrame {
 		    }
 		}
 	    });
-	JMenuItem aboutItem = new JMenuItem("About..");
+	JMenuItem fsInfoItem = new JMenuItem("File system info");
+	fsInfoItem.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent ae) {
+		    if(fsView != null) {
+			VolumeInfoWindow infoWindow = new VolumeInfoWindow();
+			infoWindow.setVisible(true);
+			infoWindow.setFields(fsView.getVolumeHeader());
+		    }
+		    else
+			JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "No file system loaded.", "Error", JOptionPane.ERROR_MESSAGE);
+		}		
+	    });
+	JMenuItem aboutItem = new JMenuItem("About...");
 	aboutItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
 		    String message = "";
@@ -334,10 +349,13 @@ public class FileSystemBrowserWindow extends JFrame {
 	    fileMenu.add(loadFSFromDeviceWithAPMItem);
 	fileMenu.add(loadFSFromFileItem);
 	fileMenu.add(loadAPMFSFromFileItem);
+	JMenu infoMenu = new JMenu("Info");
+	infoMenu.add(fsInfoItem);
 	JMenu helpMenu = new JMenu("Help");
 	helpMenu.add(aboutItem);
 	JMenuBar menuBar = new JMenuBar();
 	menuBar.add(fileMenu);
+	menuBar.add(infoMenu);
 	menuBar.add(helpMenu);
 	setJMenuBar(menuBar);
 	// /Menus
