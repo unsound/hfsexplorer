@@ -1,0 +1,7 @@
+struct JournalInfoBlock {
+    UInt32    flags;
+    UInt32    deviceSignature[8];
+    UInt64    offset;
+    UInt64    size;
+    UInt32    reserved[32];
+};

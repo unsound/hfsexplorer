@@ -22,6 +22,7 @@ package org.catacombae.hfsexplorer.types;
 
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.Util2;
+import java.util.Date;
 import java.io.*;
 
 public class HFSPlusVolumeHeader {
@@ -163,6 +164,28 @@ public class HFSPlusVolumeHeader {
     public HFSPlusForkData getCatalogFile()    { return catalogFile; } // 0x110
     public HFSPlusForkData getAttributesFile() { return attributesFile; } // 0x160
     public HFSPlusForkData getStartupFile()    { return startupFile; } // 0x1B0
+
+    public Date getCreateDateAsDate() {
+	return HFSPlusDate.toDate(getCreateDate());
+    }
+    public Date getModifyDateAsDate() {
+	return HFSPlusDate.toDate(getModifyDate());
+    }
+    public Date getBackupDateAsDate() {
+	return HFSPlusDate.toDate(getBackupDate());
+    }
+    public Date getCheckedDateAsDate() {
+	return HFSPlusDate.toDate(getCheckedDate());
+    }
+    
+    public boolean getAttributeVolumeHardwareLock()     { return ((getAttributes() >> 7) & 0x1) != 0; }
+    public boolean getAttributeVolumeUnmounted()        { return ((getAttributes() >> 8) & 0x1) != 0; }
+    public boolean getAttributeVolumeSparedBlocks()     { return ((getAttributes() >> 9) & 0x1) != 0; }
+    public boolean getAttributeVolumeNoCacheRequired()  { return ((getAttributes() >> 10) & 0x1) != 0; }
+    public boolean getAttributeBootVolumeInconsistent() { return ((getAttributes() >> 11) & 0x1) != 0; }
+    public boolean getAttributeCatalogNodeIDsReused()   { return ((getAttributes() >> 12) & 0x1) != 0; }
+    public boolean getAttributeVolumeJournaled()        { return ((getAttributes() >> 13) & 0x1) != 0; }
+    public boolean getAttributeVolumeSoftwareLock()     { return ((getAttributes() >> 15) & 0x1) != 0; }
 
     public void print(PrintStream ps, int pregap) {
 	String pregapString = "";

@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.3" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+  <AuxValues>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="2"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="flagsLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="21" pref="21" max="21" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="journalOnOtherDeviceBox" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="journalOnOtherDeviceLabel" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="journalInFSBox" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="journalInFSLabel" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="journalNeedInitBox" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="journalNeedInitLabel" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="journalOffsetLabel" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="journalOffsetField" pref="308" max="32767" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="journalSizeLabel" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="journalSizeField" pref="320" max="32767" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="deviceSignatureLabel" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="deviceSignatureField3" alignment="0" pref="288" max="32767" attributes="0"/>
+                          <Component id="deviceSignatureField0" alignment="0" pref="288" max="32767" attributes="0"/>
+                          <Component id="deviceSignatureField1" alignment="0" pref="288" max="32767" attributes="0"/>
+                          <Component id="deviceSignatureField2" alignment="0" pref="288" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="reservedLabel" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="reservedField0" alignment="0" pref="337" max="32767" attributes="0"/>
+                          <Component id="reservedField1" alignment="0" pref="337" max="32767" attributes="0"/>
+                          <Component id="reservedField2" alignment="0" pref="337" max="32767" attributes="0"/>
+                          <Component id="reservedField3" alignment="0" pref="337" max="32767" attributes="0"/>
+                          <Component id="reservedField4" alignment="0" pref="337" max="32767" attributes="0"/>
+                          <Component id="reservedField5" alignment="0" pref="337" max="32767" attributes="0"/>
+                          <Component id="reservedField6" alignment="0" pref="337" max="32767" attributes="0"/>
+                          <Component id="reservedField7" alignment="0" pref="337" max="32767" attributes="0"/>
+                          <Component id="reservedField8" alignment="0" pref="337" max="32767" attributes="0"/>
+                          <Component id="reservedField9" alignment="0" pref="337" max="32767" attributes="0"/>
+                          <Component id="reservedField10" alignment="0" pref="337" max="32767" attributes="0"/>
+                          <Component id="reservedField11" alignment="0" pref="337" max="32767" attributes="0"/>
+                          <Component id="reservedField12" alignment="0" pref="337" max="32767" attributes="0"/>
+                          <Component id="reservedField13" alignment="0" pref="337" max="32767" attributes="0"/>
+                          <Component id="reservedField14" alignment="0" pref="337" max="32767" attributes="0"/>
+                          <Component id="reservedField15" alignment="0" pref="337" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="flagsLabel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="journalInFSBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="journalInFSLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="journalOnOtherDeviceBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="journalOnOtherDeviceLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="journalNeedInitBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="journalNeedInitLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="deviceSignatureLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="deviceSignatureField0" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="deviceSignatureField1" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="deviceSignatureField2" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="deviceSignatureField3" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="journalOffsetLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="journalOffsetField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="journalSizeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="journalSizeField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="reservedLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="reservedField0" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="reservedField1" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="reservedField2" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="reservedField3" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="reservedField4" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="reservedField5" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="reservedField6" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="reservedField7" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="reservedField8" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="reservedField9" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="reservedField10" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="reservedField11" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="reservedField12" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="reservedField13" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="reservedField14" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="reservedField15" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Component class="javax.swing.JLabel" name="flagsLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Flags:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="journalInFSBox">
+      <Properties>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
+            <EmptyBorder bottom="0" left="0" right="0" top="0"/>
+          </Border>
+        </Property>
+        <Property name="enabled" type="boolean" value="false"/>
+        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+          <Insets value="[0, 0, 0, 0]"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="journalOnOtherDeviceBox">
+      <Properties>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
+            <EmptyBorder bottom="0" left="0" right="0" top="0"/>
+          </Border>
+        </Property>
+        <Property name="enabled" type="boolean" value="false"/>
+        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+          <Insets value="[0, 0, 0, 0]"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="journalNeedInitBox">
+      <Properties>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
+            <EmptyBorder bottom="0" left="0" right="0" top="0"/>
+          </Border>
+        </Property>
+        <Property name="enabled" type="boolean" value="false"/>
+        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+          <Insets value="[0, 0, 0, 0]"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="journalInFSLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Journal is located in file system"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="journalOnOtherDeviceLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Journal is located on other device"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="journalNeedInitLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Journal needs to be initialized"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="deviceSignatureLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Device signature:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="journalOffsetLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Journal offset:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="journalSizeLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Journal size:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="reservedLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Reserved:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="deviceSignatureField0">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="journalOffsetField">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="0x&#xd6;&#xd6;&#xd6;&#xd6;&#xd6;&#xd6;&#xd6;&#xd6;&#xd6;&#xd6;&#xd6;&#xd6;&#xd6;&#xd6;&#xd6;&#xd6;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="journalSizeField">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="0 B"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="reservedField0">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="deviceSignatureField1">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="deviceSignatureField2">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="deviceSignatureField3">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="reservedField1">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="reservedField2">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="reservedField3">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="reservedField4">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="reservedField5">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="reservedField6">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="reservedField7">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="reservedField8">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="reservedField9">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="reservedField10">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="reservedField11">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="reservedField12">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="reservedField13">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="reservedField14">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="reservedField15">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6; &#xd6;&#xd6;"/>
+      </Properties>
+    </Component>
+  </SubComponents>
+</Form>

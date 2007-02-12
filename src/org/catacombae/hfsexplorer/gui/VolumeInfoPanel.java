@@ -6,7 +6,10 @@
 
 package org.catacombae.hfsexplorer.gui;
 
+import org.catacombae.hfsexplorer.Util;
+import org.catacombae.hfsexplorer.Util2;
 import org.catacombae.hfsexplorer.types.HFSPlusVolumeHeader;
+import java.text.DateFormat;
 
 /**
  *
@@ -21,7 +24,7 @@ public class VolumeInfoPanel extends javax.swing.JPanel {
     
     public void setFields(HFSPlusVolumeHeader vh) {
         
-	volumeSignatureField.setText("" + vh.getSignature());
+	volumeSignatureField.setText("" + Util2.toASCIIString(vh.getSignature()));
 	fsVersionField.setText("" + vh.getVersion());
 	int attributes = vh.getAttributes();
 	hardwareLockBox.setSelected(((attributes >> 7) & 0x1) == 1);
@@ -32,31 +35,32 @@ public class VolumeInfoPanel extends javax.swing.JPanel {
 	idsReusedBox.setSelected(((attributes >> 12) & 0x1) == 1);
 	journaledBox.setSelected(((attributes >> 13) & 0x1) == 1);
 	softwareLockBox.setSelected(((attributes >> 15) & 0x1) == 1);
-	lastMountedField.setText("" + vh.getLastMountedVersion());
-	journalInfoField.setText("" + vh.getJournalInfoBlock());
-	dateCreatedField.setText("" + vh.getCreateDate());
-	dateModifyField.setText("" + vh.getModifyDate());
-	dateBackupField.setText("" + vh.getBackupDate());
-	dateCheckField.setText("" + vh.getCheckedDate());
+	lastMountedField.setText("" + Util2.toASCIIString(vh.getLastMountedVersion()));
+	journalInfoField.setText("0x" + Util.toHexStringBE(vh.getJournalInfoBlock()));
+	DateFormat dti = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+	dateCreatedField.setText("" + dti.format(vh.getCreateDateAsDate()));
+	dateModifyField.setText("" + dti.format(vh.getModifyDateAsDate()));
+	dateBackupField.setText("" + dti.format(vh.getBackupDateAsDate()));
+	dateCheckField.setText("" + dti.format(vh.getCheckedDateAsDate()));
 	fileCountField.setText("" + vh.getFileCount());
 	folderCountField.setText("" + vh.getFolderCount());
-	blockSizeField.setText("" + vh.getBlockSize());
+	blockSizeField.setText("" + vh.getBlockSize() + " B");
         numBlocksField.setText("" + vh.getTotalBlocks());
 	freeBlocksField.setText("" + vh.getFreeBlocks());
 	nextAllocationField.setText("" + vh.getNextAllocation());
-	resourceClumpField.setText("" + vh.getRsrcClumpSize());
-	dataClumpField.setText("" + vh.getDataClumpSize());
+	resourceClumpField.setText("" + vh.getRsrcClumpSize() + " B");
+	dataClumpField.setText("" + vh.getDataClumpSize() + " B");
 	nextCatalogIDField.setText("" + vh.getNextCatalogID());
 	writeCountField.setText("" + vh.getWriteCount());
-	encodingsBitmapField.setText("" + vh.getEncodingsBitmap());
+	encodingsBitmapField.setText("0x" + Util.toHexStringBE(vh.getEncodingsBitmap()));
 	int[] finderInfo = vh.getFinderInfo();
 	finderInfo1Field.setText("" + finderInfo[0]);
 	finderInfo2Field.setText("" + finderInfo[1]);
 	finderInfo3Field.setText("" + finderInfo[2]);
 	finderInfo4Field.setText("" + finderInfo[3]);
-	finderInfo5Field.setText("" + finderInfo[4]);
+	finderInfo5Field.setText("0x" + Util.toHexStringBE(finderInfo[4]));
 	finderInfo6Field.setText("" + finderInfo[5]);
-	finderInfo78Field.setText("" + finderInfo[6]);
+	finderInfo78Field.setText("0x" + Util.toHexStringBE(finderInfo[6]) + Util.toHexStringBE(finderInfo[7]));
 
     }
     

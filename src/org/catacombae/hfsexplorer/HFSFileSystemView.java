@@ -448,6 +448,20 @@ public class HFSFileSystemView {
 	return getAllExtentDescriptors(requestFile, HFSPlusExtentKey.RESOURCE_FORK);
     }
 
+    /** Returns the journal info block if a journal is present, null otherwise. */
+    public JournalInfoBlock getJournalInfoBlock() {
+	HFSPlusVolumeHeader vh = getVolumeHeader();
+	if(vh.getAttributeVolumeJournaled()) {
+	    long blockNumber = Util2.unsign(vh.getJournalInfoBlock());
+	    hfsFile.seek(fsOffset + blockNumber*vh.getBlockSize());
+	    byte[] data = new byte[JournalInfoBlock.getStructSize()];
+	    hfsFile.readFully(data);
+	    return new JournalInfoBlock(data, 0);
+	}
+	else
+	    return null;
+    }
+
     // Utility methods
     public static HFSPlusCatalogLeafRecord[] collectFilesInDir(HFSCatalogNodeID dirID, int currentNodeNumber, 
 							       LowLevelFile hfsFile, long fsOffset, 
@@ -578,4 +592,5 @@ public class HFSFileSystemView {
 	return null;
     }
     */
+    
 }

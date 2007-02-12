@@ -24,6 +24,7 @@ import org.catacombae.hfsexplorer.apm.*;
 import org.catacombae.hfsexplorer.types.*;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
 import org.catacombae.hfsexplorer.gui.FilesystemBrowserPanel;
+import org.catacombae.hfsexplorer.gui.JournalInfoBlockPanel;
 import java.util.*;
 import java.io.*;
 import java.text.DateFormat;
@@ -316,7 +317,10 @@ public class FileSystemBrowserWindow extends JFrame {
 		    if(fsView != null) {
 			VolumeInfoWindow infoWindow = new VolumeInfoWindow();
 			infoWindow.setVisible(true);
-			infoWindow.setFields(fsView.getVolumeHeader());
+			HFSPlusVolumeHeader vh = fsView.getVolumeHeader();
+			infoWindow.setVolumeFields(vh);
+			if(vh.getAttributeVolumeJournaled())
+			    infoWindow.setJournalFields(fsView.getJournalInfoBlock());
 		    }
 		    else
 			JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "No file system loaded.", "Error", JOptionPane.ERROR_MESSAGE);
