@@ -107,6 +107,9 @@ public class HFSPlusCatalogFile extends HFSPlusCatalogLeafRecordData {
     public HFSPlusForkData getDataFork() { return dataFork; }
     public HFSPlusForkData getResourceFork() { return resourceFork; }
     
+    public boolean getFileLockedFlag() { return (getFlags() & 0x1) != 0; }
+    public boolean getThreadExistsFlag() { return (getFlags() & 0x2) != 0; }
+    
     public Date getCreateDateAsDate() { return HFSPlusDate.toDate(getCreateDate()); }
     public Date getContentModDateAsDate() { return HFSPlusDate.toDate(getContentModDate()); }
     public Date getAttributeModDateAsDate() { return HFSPlusDate.toDate(getAttributeModDate()); }

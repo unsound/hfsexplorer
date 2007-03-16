@@ -49,6 +49,8 @@ public class Point {
     
     public short getV() { return Util.readShortBE(v); }
     public short getH() { return Util.readShortBE(h); }
+
+    public String toString() { return "(" + getV() + "," + getH() + ")"; }
     
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " v: " + getV());

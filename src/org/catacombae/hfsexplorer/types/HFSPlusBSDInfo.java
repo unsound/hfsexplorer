@@ -40,6 +40,22 @@ public class HFSPlusBSDInfo {
      * 10  2     UInt16  fileMode               
      * 12  4     UInt32  special                
      */
+    public static final byte MASK_ADMIN_ARCHIVED = 0x1;
+    public static final byte MASK_ADMIN_IMMUTABLE = 0x2;
+    public static final byte MASK_ADMIN_APPEND = 0x4;
+    public static final byte MASK_OWNER_NODUMP = 0x1;
+    public static final byte MASK_OWNER_IMMUTABLE = 0x2;
+    public static final byte MASK_OWNER_APPEND = 0x4;
+    public static final byte MASK_OWNER_OPAQUE = 0x8;
+    public static final byte MASK_FILETYPE_FIFO = 01;
+    public static final byte MASK_FILETYPE_CHARACTER_SPECIAL = 02;
+    public static final byte MASK_FILETYPE_DIRECTORY = 04;
+    public static final byte MASK_FILETYPE_BLOCK_SPECIAL = 06;
+    public static final byte MASK_FILETYPE_REGULAR = 010;
+    public static final byte MASK_FILETYPE_SYMBOLIC_LINK = 012;
+    public static final byte MASK_FILETYPE_SOCKET = 014;
+    public static final byte MASK_FILETYPE_WHITEOUT = 016;
+    
     
     private final byte[] ownerID = new byte[4];
     private final byte[] groupID = new byte[4];
@@ -65,6 +81,103 @@ public class HFSPlusBSDInfo {
     public byte getOwnerFlags() { return Util.readByteBE(ownerFlags); }
     public short getFileMode() { return Util.readShortBE(fileMode); }
     public int getSpecial() { return Util.readIntBE(special); }
+
+    public boolean getAdminArchivedFlag()  { return (getAdminFlags() & MASK_ADMIN_ARCHIVED)  != 0; }
+    public boolean getAdminImmutableFlag() { return (getAdminFlags() & MASK_ADMIN_IMMUTABLE) != 0; }
+    public boolean getAdminAppendFlag()    { return (getAdminFlags() & MASK_ADMIN_APPEND)    != 0; }
+    public boolean getOwnerNodumpFlag()    { return (getOwnerFlags() & MASK_OWNER_NODUMP)    != 0; }
+    public boolean getOwnerImmutableFlag() { return (getOwnerFlags() & MASK_OWNER_IMMUTABLE) != 0; }
+    public boolean getOwnerAppendFlag()    { return (getOwnerFlags() & MASK_OWNER_APPEND)    != 0; }
+    public boolean getOwnerOpaqueFlag()    { return (getOwnerFlags() & MASK_OWNER_OPAQUE)    != 0; }
+    
+    public byte getFileModeFileType() {
+	int type = (getFileMode() >> 12) & 017;
+	return (byte)type;
+    }
+    
+    public boolean getFileModeSetUserID()    { return ((getFileMode() >> 9) & 0x4) != 0; }
+    public boolean getFileModeSetGroupID()   { return ((getFileMode() >> 9) & 0x2) != 0; }
+    public boolean getFileModeSticky()       { return ((getFileMode() >> 9) & 0x1) != 0; }
+    public boolean getFileModeOwnerRead()    { return ((getFileMode() >> 6) & 0x4) != 0; }
+    public boolean getFileModeOwnerWrite()   { return ((getFileMode() >> 6) & 0x2) != 0; }
+    public boolean getFileModeOwnerExecute() { return ((getFileMode() >> 6) & 0x1) != 0; }
+    public boolean getFileModeGroupRead()    { return ((getFileMode() >> 3) & 0x4) != 0; }
+    public boolean getFileModeGroupWrite()   { return ((getFileMode() >> 3) & 0x2) != 0; }
+    public boolean getFileModeGroupExecute() { return ((getFileMode() >> 3) & 0x1) != 0; }
+    public boolean getFileModeOtherRead()    { return ((getFileMode() >> 0) & 0x4) != 0; }
+    public boolean getFileModeOtherWrite()   { return ((getFileMode() >> 0) & 0x2) != 0; }
+    public boolean getFileModeOtherExecute() { return ((getFileMode() >> 0) & 0x1) != 0; }
+    //public boolean getFileMode() {}
+    
+    public String getFileModeString() {
+	String result;
+	byte fileType = getFileModeFileType();
+	switch(fileType) {
+	case MASK_FILETYPE_FIFO:
+	    result = "p"; break;
+	case MASK_FILETYPE_CHARACTER_SPECIAL:
+	    result = "c"; break;
+	case MASK_FILETYPE_DIRECTORY:
+	    result = "d"; break;
+	case MASK_FILETYPE_BLOCK_SPECIAL:
+	    result = "b"; break;
+	case MASK_FILETYPE_REGULAR:
+	    result = "-"; break;
+	case MASK_FILETYPE_SYMBOLIC_LINK:
+	    result = "l"; break;
+	case MASK_FILETYPE_SOCKET:
+	    result = "s"; break;
+	case MASK_FILETYPE_WHITEOUT:
+	    result = "?"; break; // How does this appear in "ls -l" ? and what is it?
+	default:
+	    throw new RuntimeException("Unknown file type (read: " + fileType + " REGULAR: " + MASK_FILETYPE_REGULAR + " MODE: 0x" + Util.toHexStringBE(getFileMode()) + ")!");
+	}
+	
+	if(getFileModeOwnerRead()) result += "r"; else result += "-";
+	if(getFileModeOwnerWrite()) result += "w"; else result += "-";
+	if(getFileModeOwnerExecute()) {
+	    if(getFileModeSetUserID())
+		result += "s";
+	    else
+		result += "x";
+	}
+	else {
+	    if(getFileModeSetUserID())
+		result += "S";
+	    else
+		result += "-";
+	}
+	if(getFileModeGroupRead()) result += "r"; else result += "-";
+	if(getFileModeGroupWrite()) result += "w"; else result += "-";
+	if(getFileModeGroupExecute()) {
+	    if(getFileModeSetGroupID())
+		result += "s";
+	    else
+		result += "x";
+	}
+	else {
+	    if(getFileModeSetGroupID())
+		result += "S";
+	    else
+		result += "-";
+	}
+	if(getFileModeOtherRead()) result += "r"; else result += "-";
+	if(getFileModeOtherWrite()) result += "w"; else result += "-";
+	if(getFileModeOtherExecute()) {
+	    if(getFileModeSticky())
+		result += "t";
+	    else
+		result += "x";
+	}
+	else {
+	    if(getFileModeSticky())
+		result += "T";
+	    else
+		result += "-";
+	}
+
+	return result;
+    }
     
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " ownerID: " + getOwnerID());

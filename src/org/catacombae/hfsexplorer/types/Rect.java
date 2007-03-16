@@ -58,6 +58,8 @@ public class Rect {
     public short getBottom() { return Util.readShortBE(bottom); }
     public short getRight() { return Util.readShortBE(right); }
     
+    public String toString() { return "(" + getTop() + "," + getLeft() + "," + getBottom() + "," + getRight() + ")"; }
+    
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " top: " + getTop());
 	ps.println(prefix + " left: " + getLeft());

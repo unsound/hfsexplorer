@@ -40,6 +40,15 @@ public class Util {
 	}
 	return result;
     }
+    public static String toHexStringBE(short[] array) {
+	return toHexStringBE(array, 0, array.length);
+    }
+    public static String toHexStringBE(short[] array, int offset, int length) {
+	StringBuilder result = new StringBuilder();
+	for(short s : array)
+	    result.append(toHexStringBE(s));
+	return result.toString();
+    }
     public static String toHexStringBE(int[] array) {
 	return toHexStringBE(array, 0, array.length);
     }

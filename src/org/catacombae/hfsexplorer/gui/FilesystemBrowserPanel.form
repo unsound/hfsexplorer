@@ -3,6 +3,7 @@
 <Form version="1.3" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <AuxValues>
     <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="2"/>
     <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
@@ -11,21 +12,22 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="1" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="pathLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="addressField" pref="503" max="32767" attributes="0"/>
-              <EmptySpace min="-2" pref="61" max="-2" attributes="0"/>
+              <Component id="addressField" pref="554" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="goButton" min="-2" max="-2" attributes="0"/>
           </Group>
-          <Component id="statusLabel" alignment="0" pref="604" max="32767" attributes="0"/>
-          <Component id="treeTableSplit" alignment="0" pref="604" max="32767" attributes="0"/>
+          <Component id="statusLabel" alignment="0" pref="699" max="32767" attributes="0"/>
+          <Component id="treeTableSplit" alignment="0" pref="699" max="32767" attributes="0"/>
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="extractButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="472" max="32767" attributes="0"/>
-              <Component id="goButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
+              <Component id="infoButton" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="526" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -35,15 +37,16 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="extractButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="goButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="infoButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="pathLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="goButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="addressField" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="treeTableSplit" pref="381" max="32767" attributes="0"/>
+              <Component id="treeTableSplit" pref="377" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="statusLabel" min="-2" max="-2" attributes="0"/>
           </Group>
@@ -168,6 +171,14 @@
     <Component class="javax.swing.JButton" name="extractButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Extract"/>
+      </Properties>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
+      </AuxValues>
+    </Component>
+    <Component class="javax.swing.JButton" name="infoButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Info"/>
       </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>

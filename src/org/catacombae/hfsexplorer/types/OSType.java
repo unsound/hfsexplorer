@@ -40,6 +40,10 @@ public class OSType {
     }
     
     public FourCharCode getOSType() { return osType; }
+    
+    public String toString() {
+	return osType.getFourCharCodeAsString();
+    }
 
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " osType: ");

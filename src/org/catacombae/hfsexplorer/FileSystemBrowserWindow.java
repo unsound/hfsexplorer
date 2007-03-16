@@ -95,6 +95,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	addressField = fsbPanel.addressField;
 	goButton = fsbPanel.goButton;
 	extractButton = fsbPanel.extractButton;
+	JButton infoButton = fsbPanel.infoButton;
 
 	// UI Features for these are not implemented yet.
 	addressField.setEnabled(false);
@@ -104,6 +105,15 @@ public class FileSystemBrowserWindow extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 		    if(fsView != null)
 			actionExtractToDir();
+		    else
+			JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "No file system loaded.", "Error", JOptionPane.ERROR_MESSAGE);
+		}
+	    });
+	
+	infoButton.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    if(fsView != null)
+			actionGetInfo();
 		    else
 			JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "No file system loaded.", "Error", JOptionPane.ERROR_MESSAGE);
 		}
@@ -551,6 +561,52 @@ public class FileSystemBrowserWindow extends JFrame {
 						      "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	    }
+	}
+    }
+    
+    private void actionGetInfo() {
+	int[] selectedRows = fileTable.getSelectedRows();
+	if(selectedRows.length == 0) {
+	    JOptionPane.showMessageDialog(this, "No file selected.",
+					  "Information", JOptionPane.INFORMATION_MESSAGE);
+	    return;
+	}
+	else if (selectedRows.length == 1) {
+	    for(int selectedRow : selectedRows) {
+		Object o = tableModel.getValueAt(selectedRow, 0);
+		HFSPlusCatalogLeafRecord rec;
+		HFSPlusCatalogLeafRecordData recData;
+		if(o instanceof RecordContainer) {
+		    rec = ((RecordContainer)o).getRecord();
+		    recData = rec.getData();
+		    if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
+		       recData instanceof HFSPlusCatalogFile) {
+			HFSPlusCatalogFile file = (HFSPlusCatalogFile)recData;
+			FileInfoWindow fiw = new FileInfoWindow(rec.getKey().getNodeName().toString());
+			fiw.setFields(file);
+			fiw.setVisible(true);
+		    }
+		    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
+			    recData instanceof HFSPlusCatalogFolder) {
+			HFSPlusCatalogFolder folder = (HFSPlusCatalogFolder)recData;
+			FolderInfoWindow fiw = new FolderInfoWindow(rec.getKey().getNodeName().toString());
+			fiw.setFields(folder);
+			fiw.setVisible(true);
+		    }
+		    else
+			JOptionPane.showMessageDialog(this, "Only supported for files at the moment.", 
+						      "Error", JOptionPane.ERROR_MESSAGE);
+		}
+		else 
+		    JOptionPane.showMessageDialog(this, "Unexpected data in table model. (Internal error," +
+						  " report to developer)", "Error", JOptionPane.ERROR_MESSAGE);
+	    }
+	    
+	}
+	else {
+	    JOptionPane.showMessageDialog(this, "Please select one file at a time.",
+					  "Error", JOptionPane.ERROR_MESSAGE);
+	    return;
 	}
     }
     
