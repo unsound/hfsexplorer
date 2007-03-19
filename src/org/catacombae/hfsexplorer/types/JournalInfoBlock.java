@@ -32,7 +32,7 @@ public class JournalInfoBlock {
     private final byte[] reserved = new byte[4*32];
     
     public JournalInfoBlock(byte[] data, int offset) {
-	System.err.println("JournalInfoBlock. data.length=" + data.length);
+	//System.err.println("JournalInfoBlock. data.length=" + data.length);
 	System.arraycopy(data, offset+0, flags, 0, 4);
 	System.arraycopy(data, offset+4, deviceSignature, 0, 4*8);
 	System.arraycopy(data, offset+36, this.offset, 0, 8);

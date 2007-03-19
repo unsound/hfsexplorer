@@ -26,8 +26,8 @@ import java.io.OutputStream;
 import java.io.IOException;
 
 /** Provides a view over the data in an HFS Plus file system (HFS and HFSX future
-    support is planned), making data access easy.
-    Unrelated to javax.swing.jfilechooser.FileSystemView. */
+    support is planned), making data access easier.
+    (Unrelated to javax.swing.jfilechooser.FileSystemView) */
 
 public class HFSFileSystemView {
     /*
@@ -38,11 +38,6 @@ public class HFSFileSystemView {
      * I don't know why I'm doing it this way... It would probably limit no one
      * if I just assumed exclusive access, but I can write another class for
      * that, providing better performance.
-     */
-    /* old inaccurate text:
-     * However, some assumptions would have to be made.
-     * - The volume header will not be reread every time, we will assume it to
-     *   be static. Otherwise performance would probably be poor.
      */
 
     /** Internal class. */

@@ -27,8 +27,17 @@ public class FolderInfoWindow extends JFrame {
 	//tabs.addTab("Journal info", journalInfoPanelScroller);
 	add(tabs, BorderLayout.CENTER);
 	
+	infoPanelScroller.getVerticalScrollBar().setUnitIncrement(10);
+	
 	setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	pack();
+	int width = getSize().width;
+	int height = getSize().height;
+	int adjustedHeight = width + width/2;
+	//System.err.println("w: " + width + " h: " + height + " ah: " + adjustedHeight);
+	if(adjustedHeight < height)
+	    setSize(width, adjustedHeight);
+	
 	setLocationRelativeTo(null);
     }
     
