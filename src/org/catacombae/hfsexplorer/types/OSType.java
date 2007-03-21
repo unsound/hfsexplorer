@@ -33,7 +33,7 @@ public class OSType {
      * 0   4     FourCharCode  osType                 
      */
     
-    private static FourCharCode osType;
+    private FourCharCode osType;
     
     public OSType(byte[] data, int offset) {
 	osType = new FourCharCode(data, offset);
