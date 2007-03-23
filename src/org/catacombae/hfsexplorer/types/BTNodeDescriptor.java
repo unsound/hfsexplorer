@@ -59,10 +59,19 @@ public class BTNodeDescriptor {
 	System.arraycopy(data, offset+10, numRecords, 0, 2);
 	System.arraycopy(data, offset+12, reserved, 0, 2);
     }
+    /** Returns the node number of the next node of the same kind. 0 for the last node. */
     public int getFLink() { return Util.readIntBE(fLink); }
+    /** Returns the node number of the previous node of the same kind. 0 for the first node. */
     public int getBLink() { return Util.readIntBE(bLink); }
+    /** Returns one of BT_LEAF_NODE, BT_INDEX_NODE, BT_HEADER_NODE or BT_MAP_NODE if the data is correct. */
     public byte getKind() { return Util.readByteBE(kind); }
+    /**
+     * Returns the height of the subtree below this node. For leaf nodes, it is always 1,
+     * for index nodes it is one greater than the height of its children, and for the header
+     * node and map nodes, it is 0.
+     */
     public byte getHeight() { return Util.readByteBE(height); }
+    /** Returns the number of records contained in this node. */
     public short getNumRecords() { return Util.readShortBE(numRecords); }
     public short getReserved() { return Util.readShortBE(reserved); }
 

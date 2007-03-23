@@ -23,13 +23,14 @@ package org.catacombae.hfsexplorer.types;
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.Util2;
 
-public abstract class BTIndexNode {
-    protected final BTNodeDescriptor nodeDescriptor;
+public abstract class BTIndexNode extends BTNode {
+    //protected final BTNodeDescriptor nodeDescriptor;
     protected final BTIndexRecord[] records;
     protected final short[] offsets;
     
     protected BTIndexNode(byte[] data, int offset, int nodeSize) {
-	nodeDescriptor = new BTNodeDescriptor(data, offset);
+	//nodeDescriptor = new BTNodeDescriptor(data, offset);
+	super(data, offset, nodeSize);
 	offsets = new short[Util2.unsign(nodeDescriptor.getNumRecords())+1]; //Last one is free space index
 	for(int i = 0; i < offsets.length; ++i) {
 	    offsets[i] = Util.readShortBE(data, offset+nodeSize-((i+1)*2));
@@ -37,7 +38,7 @@ public abstract class BTIndexNode {
 	records = new BTIndexRecord[offsets.length-1];
     }
 
-    public BTNodeDescriptor getNodeDescriptor() { return nodeDescriptor; }
+    //public BTNodeDescriptor getNodeDescriptor() { return nodeDescriptor; }
     public BTIndexRecord getIndexRecord(int index) { return records[index]; }
     public BTIndexRecord[] getIndexRecords() {
 	BTIndexRecord[] copy = new BTIndexRecord[records.length];

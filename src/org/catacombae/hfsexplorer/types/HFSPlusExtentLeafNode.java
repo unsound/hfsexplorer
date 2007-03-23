@@ -24,13 +24,14 @@ import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.Util2;
 import java.io.PrintStream;
 
-public class HFSPlusExtentLeafNode {
-    protected BTNodeDescriptor nodeDescriptor;
+public class HFSPlusExtentLeafNode extends BTLeafNode {
+    //protected BTNodeDescriptor nodeDescriptor;
     protected HFSPlusExtentLeafRecord[] leafRecords;
     protected short[] leafRecordOffsets;
     
     public HFSPlusExtentLeafNode(byte[] data, int offset, int nodeSize) {
-	nodeDescriptor = new BTNodeDescriptor(data, offset);
+	//nodeDescriptor = new BTNodeDescriptor(data, offset);
+	super(data, offset, nodeSize);
 	leafRecordOffsets = new short[Util2.unsign(nodeDescriptor.getNumRecords())+1]; // The last offset is offset to free space
 	for(int i = 0; i < leafRecordOffsets.length; ++i) {
 	    leafRecordOffsets[i] = Util.readShortBE(data, offset+nodeSize-((i+1)*2));
@@ -51,7 +52,7 @@ public class HFSPlusExtentLeafNode {
 	}
 	return offsets;
     }
-    public BTNodeDescriptor getNodeDescriptor() { return nodeDescriptor; }
+    //public BTNodeDescriptor getNodeDescriptor() { return nodeDescriptor; }
     public HFSPlusExtentLeafRecord getLeafRecord(int index) { return leafRecords[index]; }
     public HFSPlusExtentLeafRecord[] getLeafRecords() {
 	HFSPlusExtentLeafRecord[] copy = new HFSPlusExtentLeafRecord[leafRecords.length];

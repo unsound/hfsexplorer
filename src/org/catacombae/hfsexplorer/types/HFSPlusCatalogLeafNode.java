@@ -23,12 +23,13 @@ package org.catacombae.hfsexplorer.types;
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.Util2;
 
-public class HFSPlusCatalogLeafNode {
-    protected BTNodeDescriptor nodeDescriptor;
+public class HFSPlusCatalogLeafNode extends BTLeafNode {
+    //protected BTNodeDescriptor nodeDescriptor;
     protected HFSPlusCatalogLeafRecord[] leafRecords;
     
     public HFSPlusCatalogLeafNode(byte[] data, int offset, int nodeSize) {
-	nodeDescriptor = new BTNodeDescriptor(data, offset);
+	//nodeDescriptor = new BTNodeDescriptor(data, offset);
+	super(data, offset, nodeSize);
 	short[] offsets = new short[Util2.unsign(nodeDescriptor.getNumRecords())+1];
 	for(int i = 0; i < offsets.length; ++i) {
 	    offsets[i] = Util.readShortBE(data, offset+nodeSize-((i+1)*2));
@@ -43,7 +44,7 @@ public class HFSPlusCatalogLeafNode {
 	
     }
     
-    public BTNodeDescriptor getNodeDescriptor() { return nodeDescriptor; }
+    //public BTNodeDescriptor getNodeDescriptor() { return nodeDescriptor; }
     public HFSPlusCatalogLeafRecord getLeafRecord(int index) { return leafRecords[index]; }
     public HFSPlusCatalogLeafRecord[] getLeafRecords() {
 	HFSPlusCatalogLeafRecord[] copy = new HFSPlusCatalogLeafRecord[leafRecords.length];

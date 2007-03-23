@@ -1,6 +1,8 @@
 package org.catacombae.hfsexplorer;
 
+//import org.catacombae.hfsexplorer.HFSFileSystemView;
 import org.catacombae.hfsexplorer.gui.VolumeInfoPanel;
+import org.catacombae.hfsexplorer.gui.CatalogInfoPanel;
 import org.catacombae.hfsexplorer.gui.JournalInfoPanel;
 import org.catacombae.hfsexplorer.types.HFSPlusVolumeHeader;
 import org.catacombae.hfsexplorer.types.JournalInfoBlock;
@@ -9,25 +11,31 @@ import javax.swing.*;
 
 public class VolumeInfoWindow extends JFrame {
     private JTabbedPane tabs;
-    private JScrollPane infoPanelScroller;
+    private JScrollPane volumeInfoPanelScroller;
+    private JScrollPane catalogInfoPanelScroller;
     private JScrollPane journalInfoPanelScroller;
-    private VolumeInfoPanel infoPanel;
+    private VolumeInfoPanel volumeInfoPanel;
+    private CatalogInfoPanel catalogInfoPanel;
     private JournalInfoPanel journalInfoPanel;
     
-    public VolumeInfoWindow() {
+    public VolumeInfoWindow(HFSFileSystemView fsView) {
 	super("File system info");
 	
 	tabs = new JTabbedPane();
-	infoPanel = new VolumeInfoPanel();
+	volumeInfoPanel = new VolumeInfoPanel();
+	catalogInfoPanel = new CatalogInfoPanel(fsView);
 	journalInfoPanel = new JournalInfoPanel();
 	
-	infoPanelScroller = new JScrollPane(infoPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+	volumeInfoPanelScroller = new JScrollPane(volumeInfoPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+	catalogInfoPanelScroller = new JScrollPane(catalogInfoPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 	journalInfoPanelScroller = new JScrollPane(journalInfoPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-	tabs.addTab("Volume info", infoPanelScroller);
+	tabs.addTab("Volume info", volumeInfoPanelScroller);
+	tabs.addTab("Catalog file info", catalogInfoPanelScroller);
 	tabs.addTab("Journal info", journalInfoPanelScroller);
 	add(tabs, BorderLayout.CENTER);
 	
-	infoPanelScroller.getVerticalScrollBar().setUnitIncrement(10);
+	volumeInfoPanelScroller.getVerticalScrollBar().setUnitIncrement(10);
+	catalogInfoPanelScroller.getVerticalScrollBar().setUnitIncrement(10);
 	journalInfoPanelScroller.getVerticalScrollBar().setUnitIncrement(10);
 
 	setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -43,7 +51,7 @@ public class VolumeInfoWindow extends JFrame {
      }
     
     public void setVolumeFields(HFSPlusVolumeHeader vh) {
-	infoPanel.setFields(vh);
+	volumeInfoPanel.setFields(vh);
     }
     public void setJournalFields(JournalInfoBlock jib) {
 	journalInfoPanel.setFields(jib);

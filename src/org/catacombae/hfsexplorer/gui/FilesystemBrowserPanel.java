@@ -54,6 +54,7 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
         goButton = new javax.swing.JButton();
         statusLabel = new javax.swing.JLabel();
         extractButton = new javax.swing.JButton();
+        backButton = new javax.swing.JButton();
         infoButton = new javax.swing.JButton();
 
         treeTableSplit.setDividerLocation(150);
@@ -70,7 +71,7 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
                 {null, null, null, null}
             },
             new String [] {
-                "Namn", "Storlek", "Typ", "Senast Šndrad"
+                "Namn", "Storlek", "Typ", "Senast ändrad"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -95,8 +96,14 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
         statusLabel.setText("Status text goes here");
         statusLabel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
 
+        extractButton.setIcon(new javax.swing.ImageIcon("resource/extract.png"));
         extractButton.setText("Extract");
 
+        backButton.setIcon(new javax.swing.ImageIcon("resource/back.png"));
+        backButton.setText("Back");
+        backButton.setEnabled(false);
+
+        infoButton.setIcon(new javax.swing.ImageIcon("resource/info.png"));
         infoButton.setText("Info");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
@@ -107,32 +114,36 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .add(pathLabel)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(addressField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 554, Short.MAX_VALUE)
+                .add(addressField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 598, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(goButton))
+                .add(goButton)
+                .addContainerGap())
             .add(statusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 699, Short.MAX_VALUE)
             .add(treeTableSplit, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 699, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
+                .add(backButton)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(extractButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(infoButton)
-                .addContainerGap(526, Short.MAX_VALUE))
+                .addContainerGap(502, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(backButton)
                     .add(extractButton)
                     .add(infoButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(pathLabel)
-                    .add(goButton)
-                    .add(addressField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(addressField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(goButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(treeTableSplit, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 377, Short.MAX_VALUE)
+                .add(treeTableSplit, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(statusLabel))
         );
@@ -141,11 +152,12 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JTextField addressField;
+    public javax.swing.JButton backButton;
     public javax.swing.JTree dirTree;
     private javax.swing.JScrollPane dirTreeScroller;
     public javax.swing.JButton extractButton;
     public javax.swing.JTable fileTable;
-    private javax.swing.JScrollPane fileTableScroller;
+    public javax.swing.JScrollPane fileTableScroller;
     public javax.swing.JButton goButton;
     public javax.swing.JButton infoButton;
     private javax.swing.JLabel pathLabel;

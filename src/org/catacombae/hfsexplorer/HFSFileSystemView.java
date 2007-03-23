@@ -133,7 +133,7 @@ public class HFSFileSystemView {
 	    nodeDescriptor = new BTNodeDescriptor(currentNodeData, 0);
 	}
 	
-	// Leaf node reached. Find record with parent id 1. (or whatever value is in the parentID var :) )
+	// Leaf node reached. Find record with parent id 1. (or whatever value is in the parentID variable :) )
 	if(nodeDescriptor.getKind() == BTNodeDescriptor.BT_LEAF_NODE) {
 	    HFSPlusCatalogLeafNode leaf = new HFSPlusCatalogLeafNode(currentNodeData, 0, init.bthr.getNodeSize());
 	    HFSPlusCatalogLeafRecord[] recs = leaf.getLeafRecords();
@@ -147,8 +147,41 @@ public class HFSFileSystemView {
 				       nodeDescriptor.getKind());
     }
     
+    /**
+     * Returns the requested node in the catalog file. If the requested node is not an index node, and not
+     * a leaf node, <code>null</code> is returned because they are the only ones that are implemented at
+     * the moment. Otherwise the returned BTNode object will be of subtype HFSPlusCatalogIndexNode or
+     * HFSPlusCatalogLeafNode.<br>
+     * Calling this method with a negative <code>nodeNumber</code> argument returns the root node.
+     * @param nodeNumber the node number inside the catalog file, or a negative value if we want the root
+     * @return the requested node if it exists and has type index node or leaf node, null otherwise
+     */
+    public BTNode getCatalogNode(int nodeNumber) {
+	CatalogInitProcedure init = new CatalogInitProcedure();
+
+	int currentNodeNumber;
+	if(nodeNumber < 0) // Means that we should get the root node
+	    currentNodeNumber = init.bthr.getRootNode();
+	else
+	    currentNodeNumber = nodeNumber;
+	
+	int nodeSize = init.bthr.getNodeSize();
+	
+	byte[] currentNodeData = new byte[init.bthr.getNodeSize()];
+	init.catalogFile.seek(Util2.unsign(currentNodeNumber)*Util2.unsign(init.bthr.getNodeSize()));
+	init.catalogFile.readFully(currentNodeData);
+	BTNodeDescriptor nodeDescriptor = new BTNodeDescriptor(currentNodeData, 0);
+	
+	if(nodeDescriptor.getKind() == BTNodeDescriptor.BT_INDEX_NODE)
+	    return new HFSPlusCatalogIndexNode(currentNodeData, 0, init.bthr.getNodeSize());
+	else if(nodeDescriptor.getKind() == BTNodeDescriptor.BT_LEAF_NODE)
+	    return new HFSPlusCatalogLeafNode(currentNodeData, 0, init.bthr.getNodeSize());
+	else
+	    return null;
+    }
+	
     public HFSPlusCatalogLeafRecord getRecord(HFSCatalogNodeID parentID, HFSUniStr255 nodeName) {
-	CatalogInitProcedure init = new CatalogInitProcedure();	
+	CatalogInitProcedure init = new CatalogInitProcedure();
 	
 	int nodeSize = init.bthr.getNodeSize();
 	

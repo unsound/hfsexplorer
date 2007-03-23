@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2006 Erik Larsson
+ * Copyright (C) 2007 Erik Larsson
  * 
  * All rights reserved.
  * 
@@ -20,15 +20,9 @@
 
 package org.catacombae.hfsexplorer.types;
 
-public abstract class BTNode {
-    protected final BTNodeDescriptor nodeDescriptor;
-    
-    public BTNode(byte[] data, int offset, int nodeSize) {
-	nodeDescriptor = new BTNodeDescriptor(data, offset);	
+public abstract class BTLeafNode extends BTNode {
+    // This one is open for future generalization
+    public BTLeafNode(byte[] data, int offset, int nodeSize) {
+	super(data, offset, nodeSize);
     }
-    
-    public BTNodeDescriptor getNodeDescriptor() {
-	return nodeDescriptor;
-    }
-//     BTRecord[] records;
 }

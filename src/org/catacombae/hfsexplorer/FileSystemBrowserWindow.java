@@ -81,8 +81,8 @@ public class FileSystemBrowserWindow extends JFrame {
 	}
     }
     
-    private static class DefaultMutableTreeNode2 extends DefaultMutableTreeNode {
-	public DefaultMutableTreeNode2(Object o) { super(o); }
+    public static class NoLeafMutableTreeNode extends DefaultMutableTreeNode {
+	public NoLeafMutableTreeNode(Object o) { super(o); }
 	/** Hack to avoid that JTree paints leaf nodes. We have no leafs, only dirs. */
 	public boolean isLeaf() { return false; }
     }
@@ -91,6 +91,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	super("HFSExplorer v" + HFSExplorer.VERSION);
 	fsbPanel = new FilesystemBrowserPanel();
 	fileTable = fsbPanel.fileTable;
+	final JScrollPane fileTableScroller = fsbPanel.fileTableScroller;
 	dirTree = fsbPanel.dirTree;
 	addressField = fsbPanel.addressField;
 	goButton = fsbPanel.goButton;
@@ -119,12 +120,25 @@ public class FileSystemBrowserWindow extends JFrame {
 		}
 	    });
 	
+	final Class recordContainerClass = new RecordContainer(null).getClass();
+	final Class objectClass = new Object().getClass();
 	colNames.add("Name");
 	colNames.add("Size");
 	colNames.add("Type");
 	colNames.add("Date Modified");
 	//Vector<Vector<String>> = new Vector<Vector<String>>();
-	tableModel = new DefaultTableModel(colNames, 0);
+	tableModel = new DefaultTableModel(colNames, 0)  {
+// 		public Class getColumnClass(int columnIndex) {
+// 		    if(columnIndex == 0)
+// 			return recordContainerClass;
+// 		    else
+// 			return super.getColumnClass(columnIndex);
+// 		}
+		public boolean isCellEditable(int rowIndex, int columnIndex) {
+		    return false;
+		}
+ 	    };
+	
 	fileTable.setModel(tableModel);
 	fileTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 	fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -132,27 +146,71 @@ public class FileSystemBrowserWindow extends JFrame {
 	fileTable.getColumnModel().getColumn(1).setPreferredWidth(96);
 	fileTable.getColumnModel().getColumn(2).setPreferredWidth(120);
 	fileTable.getColumnModel().getColumn(3).setPreferredWidth(120);
+	final TableCellRenderer objectRenderer = fileTable.getDefaultRenderer(objectClass);
+	fileTable.setDefaultRenderer(objectClass, new TableCellRenderer() {
+		private JLabel theOne = new JLabel();
+		private ImageIcon documentIcon = new ImageIcon("resource/emptydocument.png");
+		private ImageIcon folderIcon = new ImageIcon("resource/folder.png");
+		private ImageIcon emptyIcon = new ImageIcon("resource/nothing.png");
+		
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, final int row, final int column) {
+		    if(value instanceof RecordContainer) {
+			final Component objectComponent = objectRenderer.getTableCellRendererComponent(table, value, isSelected, false, row, column);			
+			final JLabel jl = theOne;
+			HFSPlusCatalogLeafRecord rec = ((RecordContainer)value).getRecord();
+			if(rec.getData().getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER)
+			    jl.setIcon(folderIcon);
+			else if(rec.getData().getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE)
+			    jl.setIcon(documentIcon);
+			else
+			    jl.setIcon(emptyIcon);
+			jl.setVisible(true);
+			//jl.setBackground(objectComponent.getBackground());
+// 			jl.addMouseListener(new MouseAdapter() {
+// 				public void mousePressed(MouseEvent me) {
+// 				    System.err.println("Action at (" + row + "," + column + ")");
+// 				}
+// 			    });
+			Component c = new Component() {
+				{
+				    jl.setSize(jl.getPreferredSize());
+				    jl.setLocation(0, 0);
+				    objectComponent.setSize(objectComponent.getPreferredSize());
+				    objectComponent.setLocation(jl.getWidth(), 0);
+// 				    System.err.println("Setting size to: " + (jl.getWidth()+objectComponent.getWidth()) + "," + Math.max(jl.getHeight(), objectComponent.getHeight()));
+				    setSize(jl.getWidth()+objectComponent.getWidth(), Math.max(jl.getHeight(), objectComponent.getHeight()));
+				}
+				public void paint(Graphics g) {
+// 				    if(row == 1) {
+// 					Color oldColor = g.getColor();
+// 					g.setColor(Color.BLACK);
+// 					g.fillRect(0,0,10,10);
+// 					g.setColor(oldColor);
+// 				    }
+				    jl.paint(g);
+				    int translatex = jl.getWidth();
+				    g.translate(translatex, 0);
+				    objectComponent.paint(g);
+				    g.translate(-translatex, 0);
+				}
+			    };
+			return c;
+		    }
+		    else
+			return objectRenderer.getTableCellRendererComponent(table, value, false, false, row, column);
+		}
+	    });
 	
-	DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode2("No file system loaded");
-// 	rootNode.add(new DefaultMutableTreeNode2("Barn1"));
-// 	rootNode.add(new DefaultMutableTreeNode2("Barn2"));
+	DefaultMutableTreeNode rootNode = new NoLeafMutableTreeNode("No file system loaded");
 	DefaultTreeModel model = new DefaultTreeModel(rootNode);
 	dirTree.setModel(model);
 
 	dirTree.addTreeSelectionListener(new TreeSelectionListener() {
 		public void valueChanged(TreeSelectionEvent e) {
-// 		    System.out.println("Value changed!");
-// 		    System.out.println("  path: " + e.getPath());
-// 		    System.out.println("  newLeadSelectionPath: " + e.getNewLeadSelectionPath());
-// 		    System.out.println("  oldLeadSelectionPath: " + e.getOldLeadSelectionPath());
-// 		    TreePath[] paths = e.getPaths();
-// 		    System.out.println("  getPaths().length: " + paths.length);
-// 		    for(int i = 0; i < paths.length; ++i)
-// 			System.out.println("  getPaths()[" + i + "]: " + paths[i]);
 		    TreePath tp = e.getPath();
 		    Object obj = tp.getLastPathComponent();
-		    if(obj instanceof DefaultMutableTreeNode2) {
-			Object obj2 = ((DefaultMutableTreeNode2)obj).getUserObject();
+		    if(obj instanceof NoLeafMutableTreeNode) {
+			Object obj2 = ((NoLeafMutableTreeNode)obj).getUserObject();
 			if(obj2 instanceof RecordNodeStorage) {
 			    HFSPlusCatalogLeafRecord rec = ((RecordNodeStorage)obj2).getRecord();
 			    HFSPlusCatalogLeafRecordData recData = rec.getData();
@@ -172,15 +230,15 @@ public class FileSystemBrowserWindow extends JFrame {
 			
 			    HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
 			    populateTable(contents);
+			    fileTableScroller.getVerticalScrollBar().setValue(0);
 			    
 			    StringBuilder path = new StringBuilder("/");
-			    Object[] userObjectPath = ((DefaultMutableTreeNode2)obj).getUserObjectPath();
+			    Object[] userObjectPath = ((NoLeafMutableTreeNode)obj).getUserObjectPath();
 			    for(int i = 1; i < userObjectPath.length; ++i) {
 				path.append(userObjectPath[i].toString());
 				path.append("/");
 			    }
-			    addressField.setText(path.toString());
- 
+			    addressField.setText(path.toString()); 
 			}
 		    }
 		}
@@ -191,8 +249,8 @@ public class FileSystemBrowserWindow extends JFrame {
 		    //System.out.println("Tree will expand!");
 		    TreePath tp = e.getPath();
 		    Object obj = tp.getLastPathComponent();
-		    if(obj instanceof DefaultMutableTreeNode2) {
-			Object obj2 = ((DefaultMutableTreeNode2)obj).getUserObject();
+		    if(obj instanceof NoLeafMutableTreeNode) {
+			Object obj2 = ((NoLeafMutableTreeNode)obj).getUserObject();
 			if(obj2 instanceof RecordNodeStorage) {
 			    HFSPlusCatalogLeafRecord rec = ((RecordNodeStorage)obj2).getRecord();
 			    HFSPlusCatalogLeafRecordData recData = rec.getData();
@@ -211,7 +269,7 @@ public class FileSystemBrowserWindow extends JFrame {
 				throw new RuntimeException("Invalid type.");
 			
 			    HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
-			    populateNode(((DefaultMutableTreeNode2)obj), contents);
+			    populateNode(((NoLeafMutableTreeNode)obj), contents);
 			}
 		    }
 		}
@@ -232,10 +290,6 @@ public class FileSystemBrowserWindow extends JFrame {
 											       "Load file system from device");
 			deviceDialog.setVisible(true);
 			String pathName = deviceDialog.getPathName();
-// 			String pathName = JOptionPane.showInputDialog(FileSystemBrowserWindow.this,
-// 								      "Enter the UNC path for the file system",
-// 								      "\\\\?\\GLOBALROOT\\Device\\Harddisk2\\Partition2");
-			//System.out.println("loadFS(" + pathName + ", false, true);");
 			try {
 			    if(pathName != null)
 				loadFS(pathName, false, true);
@@ -325,7 +379,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	fsInfoItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
 		    if(fsView != null) {
-			VolumeInfoWindow infoWindow = new VolumeInfoWindow();
+			VolumeInfoWindow infoWindow = new VolumeInfoWindow(fsView);
 			infoWindow.setVisible(true);
 			HFSPlusVolumeHeader vh = fsView.getVolumeHeader();
 			infoWindow.setVolumeFields(vh);
@@ -446,7 +500,7 @@ public class FileSystemBrowserWindow extends JFrame {
     }
 
     private void populateFilesystemGUI(HFSPlusCatalogLeafRecord[] contents) {
-	DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode2("/");
+	DefaultMutableTreeNode rootNode = new NoLeafMutableTreeNode("/");
 	populateNode(rootNode, contents);
 	DefaultTreeModel model = new DefaultTreeModel(rootNode);
 	dirTree.setModel(model);
@@ -470,7 +524,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
 		    recData instanceof HFSPlusCatalogFolder) {
 		HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder)recData;
-		rootNode.add(new DefaultMutableTreeNode2(new RecordNodeStorage(rec)));
+		rootNode.add(new NoLeafMutableTreeNode(new RecordNodeStorage(rec)));
 		if(!hasChildren) hasChildren = true;
 	    }
 	    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
@@ -485,12 +539,12 @@ public class FileSystemBrowserWindow extends JFrame {
 		fileThreads.addLast(rec);
 	    }
 	    else
-		System.out.println("WARNING: Encountered unexpected record type (" + recData.getRecordType() + ")");
+		System.err.println("WARNING: Encountered unexpected record type (" + recData.getRecordType() + ")");
 	}
 	if(hasChildren && !folderThreadSet)
-	    System.out.println("ERROR: Found no folder thread!");
+	    System.err.println("ERROR: Found no folder thread!");
 	if(!fileThreads.isEmpty())
-	    System.out.println("INFORMATION: Found " + fileThreads.size() + " file threads!");
+	    System.err.println("INFORMATION: Found " + fileThreads.size() + " file threads unexpectedly.");
     }
     
     public void populateTable(HFSPlusCatalogLeafRecord[] contents) {
@@ -506,7 +560,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	       recData instanceof HFSPlusCatalogFile) {
 		HFSPlusCatalogFile catFile = (HFSPlusCatalogFile)recData;
 		currentRow.add(new RecordContainer(rec));
-		currentRow.add(catFile.getDataFork().getLogicalSize() + " B");
+		currentRow.add(SpeedUnitUtils.bytesToBinaryUnit(catFile.getDataFork().getLogicalSize()));
 		currentRow.add("File");
 		DateFormat dti = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 		currentRow.add("" + dti.format(catFile.getContentModDateAsDate()));
@@ -640,7 +694,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	    thisDir.mkdir();
 	    for(HFSPlusCatalogLeafRecord outRec : contents)
 		extract(outRec, thisDir);
-	    //populateNode(((DefaultMutableTreeNode2)obj), contents);
+	    //populateNode(((NoLeafMutableTreeNode)obj), contents);
 	}
     }
     
@@ -655,6 +709,19 @@ public class FileSystemBrowserWindow extends JFrame {
 	catch(Exception e) {
 	    //It's ok. Non-critical.
 	}
-	new FileSystemBrowserWindow().setVisible(true);
+	FileSystemBrowserWindow fsbWindow = new FileSystemBrowserWindow();
+	fsbWindow.setVisible(true);
+	if(args.length > 0) {
+	    try {
+		String pathName = new File(args[0]).getCanonicalPath();
+		fsbWindow.loadFS(pathName, true, false);
+	    } catch(IOException ioe) {
+		ioe.printStackTrace();
+		String msg = ioe.toString();
+		for(StackTraceElement ste : ioe.getStackTrace())
+		    msg += "\n" + ste.toString();
+		JOptionPane.showMessageDialog(fsbWindow, msg, "Exception while loading file", JOptionPane.ERROR_MESSAGE);
+	    }
+	}
     }
 }
