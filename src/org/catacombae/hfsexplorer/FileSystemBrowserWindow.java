@@ -54,6 +54,11 @@ public class FileSystemBrowserWindow extends JFrame {
     private JTextField addressField;
     private JButton goButton;
     private JButton extractButton;
+    private JLabel statusLabel;
+    
+    // Focus timestamps (for determining what to extract)
+    private long fileTableLastFocus = 0;
+    private long dirTreeLastFocus = 0;
     
     private final JFileChooser fileChooser = new JFileChooser();
     private final Vector<String> colNames = new Vector<String>();
@@ -96,6 +101,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	addressField = fsbPanel.addressField;
 	goButton = fsbPanel.goButton;
 	extractButton = fsbPanel.extractButton;
+	statusLabel = fsbPanel.statusLabel;
 	JButton infoButton = fsbPanel.infoButton;
 
 	// UI Features for these are not implemented yet.
@@ -155,7 +161,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, final int row, final int column) {
 		    if(value instanceof RecordContainer) {
-			final Component objectComponent = objectRenderer.getTableCellRendererComponent(table, value, isSelected, false, row, column);			
+			final Component objectComponent = objectRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);			
 			final JLabel jl = theOne;
 			HFSPlusCatalogLeafRecord rec = ((RecordContainer)value).getRecord();
 			if(rec.getData().getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER)
@@ -198,6 +204,28 @@ public class FileSystemBrowserWindow extends JFrame {
 		    }
 		    else
 			return objectRenderer.getTableCellRendererComponent(table, value, false, false, row, column);
+		}
+	    });
+	fileTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+		private final java.text.DecimalFormat sizeFormat = new java.text.DecimalFormat("0.00");
+		public void valueChanged(ListSelectionEvent e) {
+		    //statusLabel.setText("Selection (" + e.getFirstIndex() + "-" + e.getLastIndex() + ") has changed. isAdjusting()==" + e.getValueIsAdjusting());
+		    int[] selection = fileTable.getSelectedRows();
+		    long selectionSize = 0;
+		    for(int selectedRow : selection) {
+			Object o = tableModel.getValueAt(selectedRow, 0);
+			HFSPlusCatalogLeafRecord rec;
+			HFSPlusCatalogLeafRecordData recData;
+			if(o instanceof RecordContainer) {
+			    rec = ((RecordContainer)o).getRecord();
+			    HFSPlusCatalogLeafRecordData data = rec.getData();
+			    if(data.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
+			       data instanceof HFSPlusCatalogFile)
+				selectionSize += ((HFSPlusCatalogFile)data).getDataFork().getLogicalSize();
+			}
+		    }
+		    String sizeString = (selectionSize >= 1024)?SpeedUnitUtils.bytesToBinaryUnit(selectionSize, sizeFormat):selectionSize + " bytes";
+		    statusLabel.setText(selection.length + ((selection.length==1)?" object":" objects") + " selected (" + sizeString + ")");
 		}
 	    });
 	
@@ -276,6 +304,24 @@ public class FileSystemBrowserWindow extends JFrame {
 		
 		public void treeWillCollapse(TreeExpansionEvent e) {}
 	    });
+	
+	// Focus monitoring
+	fileTable.addFocusListener(new FocusListener() {
+		public void focusGained(FocusEvent e) {
+		    //System.err.println("fileTable gained focus!");
+		    fileTableLastFocus = System.nanoTime();
+		}
+		public void focusLost(FocusEvent e) {}
+	    });
+	dirTree.addFocusListener(new FocusListener() {
+		public void focusGained(FocusEvent e) {
+		    //System.err.println("dirTree gained focus!");
+		    dirTreeLastFocus = System.nanoTime();
+		}
+		public void focusLost(FocusEvent e) {}
+	    });
+
+	
 	
 	// Menus
 	JMenuItem loadFSFromDeviceItem = null;
@@ -497,6 +543,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	HFSPlusCatalogLeafRecord rootRecord = fsView.getRoot();
 	HFSPlusCatalogLeafRecord[] rootContents = fsView.listRecords(rootRecord);
 	populateFilesystemGUI(rootContents);
+	statusLabel.setText("0 objects selected (0 bytes)");
     }
 
     private void populateFilesystemGUI(HFSPlusCatalogLeafRecord[] contents) {
@@ -590,29 +637,58 @@ public class FileSystemBrowserWindow extends JFrame {
     }
 
     private void actionExtractToDir() {
-	int[] selectedRows = fileTable.getSelectedRows();
-	if(selectedRows.length == 0) {
-	    JOptionPane.showMessageDialog(this, "No file selected.",
-					  "Information", JOptionPane.INFORMATION_MESSAGE);
-	    return;
-	}
-	else {
-	    fileChooser.setMultiSelectionEnabled(false);
-	    fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-	    if(fileChooser.showDialog(FileSystemBrowserWindow.this, "Extract here") == JFileChooser.APPROVE_OPTION) {
-		File outDir = fileChooser.getSelectedFile();
-		
-		for(int selectedRow : selectedRows) {
-		    Object o = tableModel.getValueAt(selectedRow, 0);
-		    HFSPlusCatalogLeafRecord rec;
-		    HFSPlusCatalogLeafRecordData recData;
-		    if(o instanceof RecordContainer) {
-			rec = ((RecordContainer)o).getRecord();
+	if(dirTreeLastFocus > fileTableLastFocus) {
+	    Object o = dirTree.getLastSelectedPathComponent();
+	    //System.err.println(o.toString());
+	    if(o == null) {
+		JOptionPane.showMessageDialog(this, "No file or folder selected.",
+					      "Information", JOptionPane.INFORMATION_MESSAGE);
+	    }
+	    else if(o instanceof DefaultMutableTreeNode) {
+		Object o2 = ((DefaultMutableTreeNode)o).getUserObject();
+		if(o2 instanceof RecordNodeStorage) {
+		    HFSPlusCatalogLeafRecord rec = ((RecordNodeStorage)o2).getRecord();
+		    //System.err.println(rec.toString());
+		    fileChooser.setMultiSelectionEnabled(false);
+		    fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		    if(fileChooser.showDialog(FileSystemBrowserWindow.this, "Extract here") == JFileChooser.APPROVE_OPTION) {
+			File outDir = fileChooser.getSelectedFile();
 			extract(rec, outDir);
 		    }
-		    else 
-			JOptionPane.showMessageDialog(this, "Unexpected data in table model. (Internal error, report to developer)",
-						      "Error", JOptionPane.ERROR_MESSAGE);
+		}
+		else
+		   JOptionPane.showMessageDialog(this, "Unexpected data in tree user object. (Internal error, report to developer)" + "\nClass: " + o.getClass().toString(),
+						 "Error", JOptionPane.ERROR_MESSAGE); 
+	    }
+	    else
+		JOptionPane.showMessageDialog(this, "Unexpected data in tree model. (Internal error, report to developer)" + "\nClass: " + o.getClass().toString(),
+					      "Error", JOptionPane.ERROR_MESSAGE);
+	}
+	else {
+	    int[] selectedRows = fileTable.getSelectedRows();
+	    if(selectedRows.length == 0) {
+		JOptionPane.showMessageDialog(this, "No file or folder selected.",
+					      "Information", JOptionPane.INFORMATION_MESSAGE);
+		return;
+	    }
+	    else {
+		fileChooser.setMultiSelectionEnabled(false);
+		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		if(fileChooser.showDialog(FileSystemBrowserWindow.this, "Extract here") == JFileChooser.APPROVE_OPTION) {
+		    File outDir = fileChooser.getSelectedFile();
+		
+		    for(int selectedRow : selectedRows) {
+			Object o = tableModel.getValueAt(selectedRow, 0);
+			HFSPlusCatalogLeafRecord rec;
+			HFSPlusCatalogLeafRecordData recData;
+			if(o instanceof RecordContainer) {
+			    rec = ((RecordContainer)o).getRecord();
+			    extract(rec, outDir);
+			}
+			else 
+			    JOptionPane.showMessageDialog(this, "Unexpected data in table model. (Internal error, report to developer)",
+							  "Error", JOptionPane.ERROR_MESSAGE);
+		    }
 		}
 	    }
 	}

@@ -8,6 +8,7 @@ package org.catacombae.hfsexplorer.gui;
 import static org.catacombae.hfsexplorer.FileSystemBrowserWindow.NoLeafMutableTreeNode;
 import org.catacombae.hfsexplorer.*;
 import org.catacombae.hfsexplorer.types.*;
+import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.tree.*;
@@ -79,7 +80,67 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
 		
 		public void treeWillCollapse(TreeExpansionEvent e) {}
 	    });
-
+            
+        //final JPanel infoPanel = new JPanel();
+        final JPanel leafPanel = new JPanel();
+        final FileInfoPanel fileInfoPanel = new FileInfoPanel();
+        final FolderInfoPanel folderInfoPanel = new FolderInfoPanel();
+        final CardLayout clRoot = new CardLayout();
+        final CardLayout clLeaf = new CardLayout();
+        leafPanel.setLayout(clLeaf);
+        leafPanel.add(new JLabel("INTERNAL ERROR!", SwingConstants.CENTER), "other");
+        leafPanel.add(new JLabel("Displaying file thread information is not yet supported.", SwingConstants.CENTER), "filethread");
+        leafPanel.add(new JLabel("Displaying folder thread information is not yet supported.", SwingConstants.CENTER), "folderthread");
+        JScrollPane fileInfoPanelScroller = new JScrollPane(fileInfoPanel);
+        fileInfoPanelScroller.getVerticalScrollBar().setUnitIncrement(5);
+        leafPanel.add(fileInfoPanelScroller, "file");
+        JScrollPane folderInfoPanelScroller = new JScrollPane(folderInfoPanel);
+        folderInfoPanelScroller.getVerticalScrollBar().setUnitIncrement(5);
+        leafPanel.add(folderInfoPanelScroller, "folder");
+        
+        infoPanel.setLayout(clRoot);
+        infoPanel.add(new JLabel("Index", SwingConstants.CENTER), "index");
+        infoPanel.add(leafPanel, "leaf");
+        //infoScroller.setViewportView(infoPanel);
+        
+        catalogTree.addTreeSelectionListener(new TreeSelectionListener() {
+            public void valueChanged(TreeSelectionEvent te) {
+               //System.err.println("Tree selection");
+               Object o = te.getPath().getLastPathComponent();
+               if(o instanceof DefaultMutableTreeNode) {
+                   Object o2 = ((DefaultMutableTreeNode)o).getUserObject();
+                   if(o2 instanceof BTNodeStorage) {
+                       clRoot.show(infoPanel, "index");
+                   }
+                   else if(o2 instanceof BTLeafStorage) {
+                       HFSPlusCatalogLeafRecord rec = ((BTLeafStorage)o2).getRecord();
+                       HFSPlusCatalogLeafRecordData data = rec.getData();
+                       if(data.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
+                          data instanceof HFSPlusCatalogFile) {
+                            fileInfoPanel.setFields((HFSPlusCatalogFile)data);
+                            clLeaf.show(leafPanel, "file");
+                       }
+                       else if(data.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
+                               data instanceof HFSPlusCatalogFolder) {
+                            folderInfoPanel.setFields((HFSPlusCatalogFolder)data);
+                            clLeaf.show(leafPanel, "folder");
+                       }
+                       else if(data.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE_THREAD)
+                           clLeaf.show(leafPanel, "filethread");
+                       else if(data.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD)
+                           clLeaf.show(leafPanel, "folderthread");
+                       else
+                           clLeaf.show(leafPanel, "other");
+                       clRoot.show(infoPanel, "leaf");
+                       
+                   }
+                   else
+                       System.err.println("WARNING: unknown type in catalog tree user object - " + o2.getClass().toString());
+               }
+               else
+                   System.err.println("WARNING: unknown type in catalog tree - " + o.getClass().toString());
+            }
+        });
     }
 
     public void expandNode(DefaultMutableTreeNode dmtn, BTNode node, HFSFileSystemView fsView) {
@@ -115,20 +176,34 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
         descriptionLabel = new javax.swing.JLabel();
         catalogTreeScroller = new javax.swing.JScrollPane();
         catalogTree = new javax.swing.JTree();
+        infoPanel = new javax.swing.JPanel();
 
         descriptionLabel.setText("View of the catalog file's B-tree:");
 
         catalogTreeScroller.setViewportView(catalogTree);
 
+        infoPanel.setPreferredSize(new java.awt.Dimension(100, 140));
+        org.jdesktop.layout.GroupLayout infoPanelLayout = new org.jdesktop.layout.GroupLayout(infoPanel);
+        infoPanel.setLayout(infoPanelLayout);
+        infoPanelLayout.setHorizontalGroup(
+            infoPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 354, Short.MAX_VALUE)
+        );
+        infoPanelLayout.setVerticalGroup(
+            infoPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 140, Short.MAX_VALUE)
+        );
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(catalogTreeScroller, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 364, Short.MAX_VALUE)
-                    .add(descriptionLabel))
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, infoPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 354, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, catalogTreeScroller, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 354, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, descriptionLabel))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -137,7 +212,9 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .add(descriptionLabel)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(catalogTreeScroller, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
+                .add(catalogTreeScroller, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 259, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(infoPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -147,6 +224,7 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
     public javax.swing.JTree catalogTree;
     private javax.swing.JScrollPane catalogTreeScroller;
     private javax.swing.JLabel descriptionLabel;
+    private javax.swing.JPanel infoPanel;
     // End of variables declaration//GEN-END:variables
     
 }

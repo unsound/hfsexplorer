@@ -36,9 +36,12 @@ public class SpeedUnitUtils {
     private static final long tera = mypow(10, 12);
     private static final long peta = mypow(10, 15);
     private static final long exa = mypow(10, 18);
-    private static final DecimalFormat unitFormatter = new DecimalFormat("0");
-
+    private static final DecimalFormat standardUnitFormatter = new DecimalFormat("0");
+    
     public static String bytesToBinaryUnit(long size) {
+	return bytesToBinaryUnit(size, standardUnitFormatter);
+    }
+    public static String bytesToBinaryUnit(long size, DecimalFormat unitFormatter) {
 	String result;
 
 	if(size >= exbibyte)
@@ -60,6 +63,9 @@ public class SpeedUnitUtils {
     }
     
     public static String bytesToBinaryUnit(double size) {
+	return bytesToBinaryUnit(size, standardUnitFormatter);
+    }
+    public static String bytesToBinaryUnit(double size, DecimalFormat unitFormatter) {
 	String result;
 
 	if(size >= exbibyte)
@@ -81,6 +87,9 @@ public class SpeedUnitUtils {
     }
     
     public static String bytesToDecimalBitUnit(long bytes) {
+	return bytesToDecimalBitUnit(bytes, standardUnitFormatter);
+    }
+    public static String bytesToDecimalBitUnit(long bytes, DecimalFormat unitFormatter) {
 	long bits = bytes*8;
 	String result;
 	if(bits >= exa)
@@ -101,6 +110,9 @@ public class SpeedUnitUtils {
     }
     
     public static String bytesToDecimalBitUnit(double bytes) {
+	return bytesToDecimalBitUnit(bytes, standardUnitFormatter);
+    }
+    public static String bytesToDecimalBitUnit(double bytes, DecimalFormat unitFormatter) {
 	double bits = bytes*8;
 	String result;
 	if(bits >= exa)

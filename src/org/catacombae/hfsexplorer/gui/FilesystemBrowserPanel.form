@@ -16,7 +16,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="pathLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="addressField" pref="598" max="32767" attributes="0"/>
+              <Component id="addressField" pref="574" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="goButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -50,7 +50,7 @@
                   <Component id="goButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="treeTableSplit" pref="365" max="32767" attributes="0"/>
+              <Component id="treeTableSplit" pref="359" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="statusLabel" min="-2" max="-2" attributes="0"/>
           </Group>
@@ -154,6 +154,9 @@
     </Component>
     <Component class="javax.swing.JButton" name="goButton">
       <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="2" name="resource/forward.png"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Go"/>
       </Properties>
       <AuxValues>
@@ -162,7 +165,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="statusLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Status text goes here"/>
+        <Property name="text" type="java.lang.String" value="No file system loaded"/>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.BevelBorderInfo">
             <BevelBorder bevelType="1"/>

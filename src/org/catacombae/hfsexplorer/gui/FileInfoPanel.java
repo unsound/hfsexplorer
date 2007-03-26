@@ -23,6 +23,7 @@ public class FileInfoPanel extends javax.swing.JPanel {
     public void setFields(HFSPlusCatalogFile cf) {
 	recordTypeField.setText("0x" + Util.toHexStringBE(cf.getRecordType()));
 	
+        //flagsDebugField.setText("0x" + Util.toHexStringBE(cf.getFlags()));
 	fileLockedBox.setSelected(cf.getFileLockedFlag());
 	threadExistsBox.setSelected(cf.getThreadExistsFlag());
 	
@@ -82,13 +83,13 @@ public class FileInfoPanel extends javax.swing.JPanel {
 	reserved2Field.setText("0x" + Util.toHexStringBE(cf.getReserved2()));
 	
 	HFSPlusForkData df = cf.getDataFork();
-	dataForkLogicalSizeField.setText("" + df.getLogicalSize() + " B");
-	dataForkClumpSizeField.setText("" + df.getClumpSize() + " B");
+	dataForkLogicalSizeField.setText("" + df.getLogicalSize() + " bytes");
+	dataForkClumpSizeField.setText("" + df.getClumpSize() + " bytes");
 	dataForkTotalBlocksField.setText("" + df.getTotalBlocks());
 
 	HFSPlusForkData rf = cf.getResourceFork();
-	resForkLogicalSizeField.setText("" + rf.getLogicalSize() + " B");
-	resForkClumpSizeField.setText("" + rf.getClumpSize() + " B");
+	resForkLogicalSizeField.setText("" + rf.getLogicalSize() + " bytes");
+	resForkClumpSizeField.setText("" + rf.getClumpSize() + " bytes");
 	resForkTotalBlocksField.setText("" + rf.getTotalBlocks());
     }
     
@@ -621,38 +622,10 @@ public class FileInfoPanel extends javax.swing.JPanel {
                         .add(jLabel4)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(fileIDField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(jLabel5)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(createDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 306, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(jLabel6)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(contentModifyDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(jLabel7)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(attributesModifyDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(jLabel8)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(accessDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(jLabel9)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(backupDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE))
                     .add(jLabel10)
                     .add(layout.createSequentialGroup()
                         .add(24, 24, 24)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(layout.createSequentialGroup()
-                                .add(jLabel12)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(permissionsGroupIDField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE))
-                            .add(layout.createSequentialGroup()
-                                .add(jLabel11)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(permissionsOwnerIDField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE))
                             .add(jLabel13)
                             .add(layout.createSequentialGroup()
                                 .add(21, 21, 21)
@@ -711,7 +684,15 @@ public class FileInfoPanel extends javax.swing.JPanel {
                             .add(layout.createSequentialGroup()
                                 .add(jLabel26)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(permissionsSpecialField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE))))
+                                .add(permissionsSpecialField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE))
+                            .add(layout.createSequentialGroup()
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(jLabel11)
+                                    .add(jLabel12))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(permissionsGroupIDField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
+                                    .add(permissionsOwnerIDField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)))))
                     .add(jLabel27)
                     .add(layout.createSequentialGroup()
                         .add(24, 24, 24)
@@ -851,7 +832,21 @@ public class FileInfoPanel extends javax.swing.JPanel {
                             .add(layout.createSequentialGroup()
                                 .add(jLabel61)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(resForkTotalBlocksField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE)))))
+                                .add(resForkTotalBlocksField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE))))
+                    .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jLabel7)
+                            .add(jLabel8)
+                            .add(jLabel9)
+                            .add(jLabel6)
+                            .add(jLabel5))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(createDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
+                            .add(contentModifyDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
+                            .add(backupDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
+                            .add(accessDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
+                            .add(attributesModifyDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -1089,7 +1084,7 @@ public class FileInfoPanel extends javax.swing.JPanel {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel61)
                     .add(resForkTotalBlocksField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     
