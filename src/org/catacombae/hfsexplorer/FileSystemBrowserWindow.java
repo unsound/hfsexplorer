@@ -132,6 +132,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	colNames.add("Size");
 	colNames.add("Type");
 	colNames.add("Date Modified");
+	colNames.add("");
 	//Vector<Vector<String>> = new Vector<Vector<String>>();
 	tableModel = new DefaultTableModel(colNames, 0)  {
 // 		public Class getColumnClass(int columnIndex) {
@@ -147,11 +148,13 @@ public class FileSystemBrowserWindow extends JFrame {
 	
 	fileTable.setModel(tableModel);
 	fileTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-	fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+	fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);//AUTO_RESIZE_OFF);
 	fileTable.getColumnModel().getColumn(0).setPreferredWidth(180);
 	fileTable.getColumnModel().getColumn(1).setPreferredWidth(96);
 	fileTable.getColumnModel().getColumn(2).setPreferredWidth(120);
 	fileTable.getColumnModel().getColumn(3).setPreferredWidth(120);
+	fileTable.getColumnModel().getColumn(4).setPreferredWidth(0);
+	fileTable.getColumnModel().getColumn(4).setMinWidth(0);
 	final TableCellRenderer objectRenderer = fileTable.getDefaultRenderer(objectClass);
 	fileTable.setDefaultRenderer(objectClass, new TableCellRenderer() {
 		private JLabel theOne = new JLabel();
@@ -611,6 +614,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		currentRow.add("File");
 		DateFormat dti = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 		currentRow.add("" + dti.format(catFile.getContentModDateAsDate()));
+		currentRow.add("");
 	    }
 	    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
 		    recData instanceof HFSPlusCatalogFolder) {
@@ -620,6 +624,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		currentRow.add("Folder");
 		DateFormat dti = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 		currentRow.add("" + dti.format(catFolder.getContentModDateAsDate()));
+		currentRow.add("");
 	    }
 	    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
 		    recData instanceof HFSPlusCatalogThread) {
