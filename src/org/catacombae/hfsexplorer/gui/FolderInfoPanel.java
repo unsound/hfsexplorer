@@ -1,3 +1,23 @@
+/*-
+ * Copyright (C) 2007 Erik Larsson
+ * 
+ * All rights reserved.
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+ */
+
 /*
  * FolderInfoPanel.java
  *
@@ -8,12 +28,14 @@ package org.catacombae.hfsexplorer.gui;
 import org.catacombae.hfsexplorer.types.*;
 import org.catacombae.hfsexplorer.Util;
 import java.awt.Color;
+import java.text.DateFormat;
 
 /**
  *
  * @author  erik
  */
 public class FolderInfoPanel extends javax.swing.JPanel {
+    private final DateFormat dti = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
     
     /** Creates new form FolderInfoPanel */
     public FolderInfoPanel() {
@@ -25,11 +47,11 @@ public class FolderInfoPanel extends javax.swing.JPanel {
 	flagsField.setText("0x" + Util.toHexStringBE(cf.getFlags()));
         valenceField.setText("" + cf.getValence());
 	folderIDField.setText(cf.getFolderID().toString());
-	createDateField.setText(cf.getCreateDateAsDate().toString());
-	contentModifyDateField.setText(cf.getContentModDateAsDate().toString());
-	attributesModifyDateField.setText(cf.getAttributeModDateAsDate().toString());
-        accessDateField.setText(cf.getAccessDateAsDate().toString());
-	backupDateField.setText(cf.getBackupDateAsDate().toString());
+	createDateField.setText(dti.format(cf.getCreateDateAsDate()));
+	contentModifyDateField.setText(dti.format(cf.getContentModDateAsDate()));
+	attributesModifyDateField.setText(dti.format(cf.getAttributeModDateAsDate()));
+        accessDateField.setText(dti.format(cf.getAccessDateAsDate()));
+	backupDateField.setText(dti.format(cf.getBackupDateAsDate()));
 	
 	HFSPlusBSDInfo bi = cf.getPermissions();
 	permissionsOwnerIDField.setText("" + bi.getOwnerID());

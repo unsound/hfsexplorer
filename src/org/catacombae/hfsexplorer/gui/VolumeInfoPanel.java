@@ -1,3 +1,23 @@
+/*-
+ * Copyright (C) 2007 Erik Larsson
+ * 
+ * All rights reserved.
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+ */
+
 /*
  * VolumeInfoPanel.java
  *
@@ -16,6 +36,7 @@ import java.text.DateFormat;
  * @author  erik
  */
 public class VolumeInfoPanel extends javax.swing.JPanel {
+    private final DateFormat dti = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
     
     /** Creates new form VolumeInfoPanel */
     public VolumeInfoPanel() {
@@ -37,19 +58,19 @@ public class VolumeInfoPanel extends javax.swing.JPanel {
 	softwareLockBox.setSelected(((attributes >> 15) & 0x1) == 1);
 	lastMountedField.setText("" + Util2.toASCIIString(vh.getLastMountedVersion()));
 	journalInfoField.setText("0x" + Util.toHexStringBE(vh.getJournalInfoBlock()));
-	DateFormat dti = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+	
 	dateCreatedField.setText("" + dti.format(vh.getCreateDateAsDate()));
 	dateModifyField.setText("" + dti.format(vh.getModifyDateAsDate()));
 	dateBackupField.setText("" + dti.format(vh.getBackupDateAsDate()));
 	dateCheckField.setText("" + dti.format(vh.getCheckedDateAsDate()));
 	fileCountField.setText("" + vh.getFileCount());
 	folderCountField.setText("" + vh.getFolderCount());
-	blockSizeField.setText("" + vh.getBlockSize() + " B");
+	blockSizeField.setText("" + vh.getBlockSize() + " bytes");
         numBlocksField.setText("" + vh.getTotalBlocks());
 	freeBlocksField.setText("" + vh.getFreeBlocks());
 	nextAllocationField.setText("" + vh.getNextAllocation());
-	resourceClumpField.setText("" + vh.getRsrcClumpSize() + " B");
-	dataClumpField.setText("" + vh.getDataClumpSize() + " B");
+	resourceClumpField.setText("" + vh.getRsrcClumpSize() + " bytes");
+	dataClumpField.setText("" + vh.getDataClumpSize() + " bytes");
 	nextCatalogIDField.setText("" + vh.getNextCatalogID());
 	writeCountField.setText("" + vh.getWriteCount());
 	encodingsBitmapField.setText("0x" + Util.toHexStringBE(vh.getEncodingsBitmap()));

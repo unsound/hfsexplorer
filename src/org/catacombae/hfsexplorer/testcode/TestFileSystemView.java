@@ -24,7 +24,7 @@
  * Created on den 29 oktober 2006, 10:16
  */
 
-package org.catacombae.hfsexplorer.gui;
+package org.catacombae.hfsexplorer.testcode;
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
 
