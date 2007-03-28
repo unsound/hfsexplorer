@@ -16,7 +16,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="pathLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="addressField" pref="574" max="32767" attributes="0"/>
+              <Component id="addressField" pref="598" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="goButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -129,7 +129,7 @@
                   </Table>
                 </Property>
                 <Property name="intercellSpacing" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[0, 0]"/>
+                  <Dimension value="[4, 0]"/>
                 </Property>
                 <Property name="showHorizontalLines" type="boolean" value="false"/>
                 <Property name="showVerticalLines" type="boolean" value="false"/>

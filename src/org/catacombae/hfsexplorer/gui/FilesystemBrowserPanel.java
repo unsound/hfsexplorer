@@ -82,7 +82,7 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
-        fileTable.setIntercellSpacing(new java.awt.Dimension(0, 0));
+        fileTable.setIntercellSpacing(new java.awt.Dimension(4, 0));
         fileTable.setShowHorizontalLines(false);
         fileTable.setShowVerticalLines(false);
         fileTableScroller.setViewportView(fileTable);
@@ -115,7 +115,7 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .add(pathLabel)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(addressField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
+                .add(addressField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 598, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(goButton)
                 .addContainerGap())

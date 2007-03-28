@@ -37,6 +37,10 @@ import javax.swing.event.*;
 
 public class FileSystemBrowserWindow extends JFrame {
     
+    private static class ObjectContainer<A> {
+	public A o;
+	public ObjectContainer(A o) { this.o = o; }
+    }
     private static class RecordContainer {
 	private HFSPlusCatalogLeafRecord rec;
 	public RecordContainer(HFSPlusCatalogLeafRecord rec) {
@@ -50,8 +54,10 @@ public class FileSystemBrowserWindow extends JFrame {
     
     // Fast accessors for the corresponding variables in org.catacombae.hfsexplorer.gui.FilesystemBrowserPanel
     private JTable fileTable;
+    private final JScrollPane fileTableScroller;
     private JTree dirTree;
     private JTextField addressField;
+    private JButton backButton;
     private JButton goButton;
     private JButton extractButton;
     private JLabel statusLabel;
@@ -59,6 +65,14 @@ public class FileSystemBrowserWindow extends JFrame {
     // Focus timestamps (for determining what to extract)
     private long fileTableLastFocus = 0;
     private long dirTreeLastFocus = 0;
+
+    // For determining the standard layout size of the columns in the table
+    private int totalColumnWidth = 0;
+
+    // Communication between adjustColumnsWidths and the column listener
+    private final boolean[] disableColumnListener = { false };
+    private final ObjectContainer<int[]> lastWidths = new ObjectContainer<int[]>(null);
+
     
     private final JFileChooser fileChooser = new JFileChooser();
     private final Vector<String> colNames = new Vector<String>();
@@ -96,17 +110,62 @@ public class FileSystemBrowserWindow extends JFrame {
 	super("HFSExplorer v" + HFSExplorer.VERSION);
 	fsbPanel = new FilesystemBrowserPanel();
 	fileTable = fsbPanel.fileTable;
-	final JScrollPane fileTableScroller = fsbPanel.fileTableScroller;
+	fileTableScroller = fsbPanel.fileTableScroller;
 	dirTree = fsbPanel.dirTree;
 	addressField = fsbPanel.addressField;
+	backButton = fsbPanel.backButton;
 	goButton = fsbPanel.goButton;
 	extractButton = fsbPanel.extractButton;
 	statusLabel = fsbPanel.statusLabel;
 	JButton infoButton = fsbPanel.infoButton;
 
 	// UI Features for these are not implemented yet.
+	backButton.setEnabled(false);
 	addressField.setEnabled(false);
 	goButton.setEnabled(false);
+
+	// DEBUG
+	backButton.setEnabled(true);
+	backButton.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    if(fileTable.getAutoResizeMode() == JTable.AUTO_RESIZE_OFF) {
+			System.out.println("Setting AUTO_RESIZE_LAST_COLUMN");
+			fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+		    }
+		    else {
+			System.out.println("Setting AUTO_RESIZE_OFF");
+			fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		    }
+		    fileTableScroller.invalidate();
+		    //fileTable.invalidate();
+		    //fileTable.validate();
+		    fileTableScroller.validate();
+		    
+		    int columnCount = fileTable.getColumnModel().getColumnCount();
+		    System.err.print("  Widths =");
+ 		    for(int i = 0; i < columnCount; ++i) {
+ 			System.err.print(" " + fileTable.getColumnModel().getColumn(i).getWidth());
+		    }
+		    System.out.println();		    
+		}
+	    });
+	goButton.setEnabled(true);
+	goButton.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    int columnCount = fileTable.getColumnModel().getColumnCount();
+		    System.err.print("  Widths =");
+ 		    for(int i = 0; i < columnCount; ++i) {
+ 			System.err.print(" " + fileTable.getColumnModel().getColumn(i).getWidth());
+		    }
+		    System.out.println();		    
+		}
+	    });
+// 	fileTable.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+// 		public void propertyChange(java.beans.PropertyChangeEvent pce) {
+// 		    System.out.println("Property changed!");
+// 		    //System.out.println("  " + pce.toString());
+// 		}
+// 	    });
 	
 	extractButton.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -148,16 +207,159 @@ public class FileSystemBrowserWindow extends JFrame {
 	
 	fileTable.setModel(tableModel);
 	fileTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-	fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);//AUTO_RESIZE_OFF);
+	// AUTO_RESIZE_SUBSEQUENT_COLUMNS AUTO_RESIZE_OFF AUTO_RESIZE_LAST_COLUMN
+	fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 	fileTable.getColumnModel().getColumn(0).setPreferredWidth(180);
 	fileTable.getColumnModel().getColumn(1).setPreferredWidth(96);
 	fileTable.getColumnModel().getColumn(2).setPreferredWidth(120);
 	fileTable.getColumnModel().getColumn(3).setPreferredWidth(120);
 	fileTable.getColumnModel().getColumn(4).setPreferredWidth(0);
+	totalColumnWidth = 180+96+120+120;
 	fileTable.getColumnModel().getColumn(4).setMinWidth(0);
+	fileTable.getColumnModel().getColumn(4).setResizable(false);
+
+	TableColumnModelListener columnListener = new TableColumnModelListener() {
+		private boolean locked = false;
+		private int[] w1 = null;
+		//public int[] lastWidths = null;
+		public void columnAdded(TableColumnModelEvent e) { /*System.out.println("columnAdded");*/ }
+		public void columnMarginChanged(ChangeEvent e) {
+		    if(disableColumnListener[0])
+			return;
+		    synchronized(this) {
+			if(!locked)
+			    locked = true;
+			else {
+// 			    System.err.println("    BOUNCING!");
+			    return;
+			}
+		    }
+// 		    System.err.print("columnMarginChanged");
+// 		    System.err.print("  Width diff:");
+ 		    int columnCount = fileTable.getColumnModel().getColumnCount();
+		    TableColumn lastColumn = fileTable.getColumnModel().getColumn(columnCount-1);
+		    if(lastWidths.o == null)
+			lastWidths.o = new int[columnCount];
+		    if(w1 == null || w1.length != columnCount)
+			w1 = new int[columnCount];
+		    int diffSum = 0;
+		    int currentWidth = 0;
+ 		    for(int i = 0; i < w1.length; ++i) {
+ 			w1[i] = fileTable.getColumnModel().getColumn(i).getWidth();
+			currentWidth += w1[i];
+			int diff = (w1[i] - lastWidths.o[i]);
+// 			System.err.print(" " + (w1[i] - lastWidths.o[i]));
+			if(i < w1.length-1)
+			    diffSum += diff;
+			
+		    }
+		    int lastDiff = (w1[columnCount-1] - lastWidths.o[columnCount-1]);
+// 		    System.err.print("  Diff sum: " + diffSum);
+// 		    System.err.println("  Last diff: " + (w1[columnCount-1] - lastWidths.o[columnCount-1]));
+		    if(lastDiff != -diffSum) {
+			int importantColsWidth = currentWidth - w1[columnCount-1];
+
+			//int newLastColumnWidth = lastWidths.o[columnCount-1] - diffSum;
+			int newLastColumnWidth = totalColumnWidth-importantColsWidth;
+			
+			int nextTotalWidth = importantColsWidth + newLastColumnWidth;
+// 			System.err.println("  totalColumnWidth=" + totalColumnWidth + " currentWidth=" + currentWidth + " nextTotalWidth=" + nextTotalWidth + " newLast..=" + newLastColumnWidth);
+			
+			if(newLastColumnWidth >= 0) {
+			    if((nextTotalWidth <= totalColumnWidth || diffSum > 0)) {
+				//if(currentWidth > totalColumnWidth)
+				
+// 				System.err.println("  (1)Adjusting last column from " + w1[columnCount-1] + " to " + newLastColumnWidth + "!");
+				
+				lastColumn.setPreferredWidth(newLastColumnWidth);
+				lastColumn.setWidth(newLastColumnWidth);
+				//fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+// 				System.err.println("  (1)Last column width: " + lastColumn.getWidth() + "  revalidating...");
+				fileTableScroller.invalidate();
+				fileTableScroller.validate();
+// 				System.err.println("  (1)Adjustment complete. Final last column width: " + lastColumn.getWidth());
+			    }
+// 			    else
+// 				System.err.println("  Outside bounds. Idling.");
+			}
+			else {
+			    if(lastColumn.getWidth() != 0) {
+				// System.err.println("  (2)Adjusting last column from " + w1[columnCount-1] + " to zero!");
+				lastColumn.setPreferredWidth(0);
+				lastColumn.setWidth(0);
+				//fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+// 				System.err.println("  (2)Last column width: " + lastColumn.getWidth() + "  revalidating...");
+				fileTableScroller.invalidate();
+				fileTableScroller.validate();
+// 				System.err.println("  (2)Adjustment complete. Final last column width: " + lastColumn.getWidth());
+			    }
+			}
+		    }
+
+		    
+ 		    for(int i = 0; i < w1.length; ++i) {
+ 			w1[i] = fileTable.getColumnModel().getColumn(i).getWidth();
+		    }
+		    int[] usedArray = lastWidths.o;
+		    lastWidths.o = w1;
+		    w1 = usedArray; // Switch arrays.
+		    
+		    
+// 		    for(int i = 0; i < w1.length; ++i)
+// 			w1[i] = fileTable.getColumnModel().getColumn(i).getPreferredWidth();
+// 		    i
+		    
+//  		    //System.err.println("Component resized");
+// 		    int columnCount = fileTable.getColumnModel().getColumnCount();
+// 		    int[] w1 = new int[columnCount];
+// 		    for(int i = 0; i < w1.length; ++i)
+// 			w1[i] = fileTable.getColumnModel().getColumn(i).getPreferredWidth();
+		    
+// 		    /*
+// 		    System.out.print("  Widths before =");
+// 		    for(int width : w1)
+// 			System.out.print(" " + width);
+// 		    System.out.println();
+// 		    */
+
+// 		    fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+// 		    fileTableScroller.invalidate();
+// 		    //fileTable.invalidate();
+// 		    //fileTable.validate();
+// 		    fileTableScroller.validate();
+// 		    int[] w2 = new int[columnCount];
+// 		    int newTotalWidth = 0;
+// 		    for(int i = 0; i < columnCount; ++i) {
+// 			w2[i] = fileTable.getColumnModel().getColumn(i).getWidth();
+// 			newTotalWidth += w2[i];
+// 		    }
+// 		    int newLastColumnWidth = newTotalWidth;
+// 		    for(int i = 0; i < w1.length-1; ++i)
+// 			newLastColumnWidth -= w1[i];
+// 		    if(newLastColumnWidth < 0)
+// 			newLastColumnWidth = 0;
+// 		    lastColumn.setPreferredWidth(newLastColumnWidth);
+// 		    fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+// 		    fileTableScroller.invalidate();
+// 		    fileTableScroller.validate();
+// 		    /*
+// 		    System.out.println("  Widths after =");
+// 		    for(int i = 0; i < columnCount; ++i)
+// 			System.out.print(" " + fileTable.getColumnModel().getColumn(i).getPreferredWidth());
+// 		    System.out.println();
+// 		    */
+		    synchronized(this) { locked = false; /*System.err.println();*/ }
+		}
+		public void columnMoved(TableColumnModelEvent e) { /*System.out.println("columnMoved");*/ }
+		public void columnRemoved(TableColumnModelEvent e) { /*System.out.println("columnRemoved");*/ }
+		public void columnSelectionChanged(ListSelectionEvent e) { /*System.out.println("columnSelectionChanged");*/ }
+	    };
+	fileTable.getColumnModel().addColumnModelListener(columnListener);
+	
 	final TableCellRenderer objectRenderer = fileTable.getDefaultRenderer(objectClass);
 	fileTable.setDefaultRenderer(objectClass, new TableCellRenderer() {
 		private JLabel theOne = new JLabel();
+		private JLabel theTwo = new JLabel("", SwingConstants.RIGHT);
 		private ImageIcon documentIcon = new ImageIcon("resource/emptydocument.png");
 		private ImageIcon folderIcon = new ImageIcon("resource/folder.png");
 		private ImageIcon emptyIcon = new ImageIcon("resource/nothing.png");
@@ -204,6 +406,10 @@ public class FileSystemBrowserWindow extends JFrame {
 				}
 			    };
 			return c;
+		    }
+		    else if(column == 1) {
+			theTwo.setText(value.toString());
+			return theTwo;
 		    }
 		    else
 			return objectRenderer.getTableCellRendererComponent(table, value, false, false, row, column);
@@ -313,6 +519,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		public void focusGained(FocusEvent e) {
 		    //System.err.println("fileTable gained focus!");
 		    fileTableLastFocus = System.nanoTime();
+		    //dirTree.clearSelection();
 		}
 		public void focusLost(FocusEvent e) {}
 	    });
@@ -320,10 +527,17 @@ public class FileSystemBrowserWindow extends JFrame {
 		public void focusGained(FocusEvent e) {
 		    //System.err.println("dirTree gained focus!");
 		    dirTreeLastFocus = System.nanoTime();
+		    //fileTable.clearSelection(); // I'm unsure whether this behaviour is desired
 		}
 		public void focusLost(FocusEvent e) {}
 	    });
-
+	
+ 	fileTableScroller.addComponentListener(new ComponentAdapter() {
+ 		public void componentResized(ComponentEvent e) {
+ 		    //System.err.println("Component resized");
+		    adjustTableWidth();
+		}
+ 	    });
 	
 	
 	// Menus
@@ -483,6 +697,51 @@ public class FileSystemBrowserWindow extends JFrame {
 	setLocationRelativeTo(null);
     }
     
+    private void adjustTableWidth() {
+	//System.err.println("adjustTableWidth()");
+	int columnCount = fileTable.getColumnModel().getColumnCount();
+	int[] w1 = new int[columnCount];
+	for(int i = 0; i < w1.length; ++i)
+	    w1[i] = fileTable.getColumnModel().getColumn(i).getPreferredWidth();
+		    
+// 	System.err.print("  Widths before =");
+// 	for(int width : w1)
+// 	    System.err.print(" " + width);
+// 	System.err.println();
+
+	disableColumnListener[0] = true;
+		    
+	fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+	fileTableScroller.invalidate();
+	//fileTable.invalidate();
+	//fileTable.validate();
+	fileTableScroller.validate();
+	int[] w2 = new int[columnCount];
+	int newTotalWidth = 0;
+	for(int i = 0; i < columnCount; ++i) {
+	    w2[i] = fileTable.getColumnModel().getColumn(i).getWidth();
+	    newTotalWidth += w2[i];
+	}
+	totalColumnWidth = newTotalWidth; // For telling marginChanged what size to adjust to
+// 	System.err.println("  totalColumnWidth=" + totalColumnWidth);
+	int newLastColumnWidth = newTotalWidth;
+	for(int i = 0; i < w1.length-1; ++i)
+	    newLastColumnWidth -= w1[i];
+	if(newLastColumnWidth < 0)
+	    newLastColumnWidth = 0;
+	fileTable.getColumnModel().getColumn(columnCount-1).setPreferredWidth(newLastColumnWidth);
+	fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+	fileTableScroller.invalidate();
+	fileTableScroller.validate();
+// 	System.err.print("  Widths after =");
+// 	for(int i = 0; i < columnCount; ++i)
+// 	    System.err.print(" " + fileTable.getColumnModel().getColumn(i).getPreferredWidth());
+// 	System.err.println();
+		    
+	lastWidths.o = null;
+	disableColumnListener[0] = false;
+    }
+    
     public void loadFS(String filename, boolean readAPM, boolean readFromDevice) {
 	if(fsView != null) {
 	    fsView.getStream().close();
@@ -547,6 +806,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	HFSPlusCatalogLeafRecord[] rootContents = fsView.listRecords(rootRecord);
 	populateFilesystemGUI(rootContents);
 	statusLabel.setText("0 objects selected (0 bytes)");
+	//adjustTableWidth();
     }
 
     private void populateFilesystemGUI(HFSPlusCatalogLeafRecord[] contents) {
@@ -598,6 +858,8 @@ public class FileSystemBrowserWindow extends JFrame {
     }
     
     public void populateTable(HFSPlusCatalogLeafRecord[] contents) {
+	//fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+	//fileTable.doLayout();
 	while(tableModel.getRowCount() > 0) {
 	    tableModel.removeRow(tableModel.getRowCount()-1);
 	}
@@ -638,7 +900,11 @@ public class FileSystemBrowserWindow extends JFrame {
 		System.out.println("WARNING: Encountered unexpected record type (" + recData.getRecordType() + ")");
 	    if(!currentRow.isEmpty())
 		tableModel.addRow(currentRow);
+	    
+	    
 	}
+	//fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+	adjustTableWidth();
     }
 
     private void actionExtractToDir() {
@@ -659,6 +925,8 @@ public class FileSystemBrowserWindow extends JFrame {
 		    if(fileChooser.showDialog(FileSystemBrowserWindow.this, "Extract here") == JFileChooser.APPROVE_OPTION) {
 			File outDir = fileChooser.getSelectedFile();
 			extract(rec, outDir);
+			JOptionPane.showMessageDialog(this, "Extraction finished.\n",
+						      "Information", JOptionPane.INFORMATION_MESSAGE);
 		    }
 		}
 		else
@@ -673,7 +941,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	    int[] selectedRows = fileTable.getSelectedRows();
 	    if(selectedRows.length == 0) {
 		JOptionPane.showMessageDialog(this, "No file or folder selected.",
-					      "Information", JOptionPane.INFORMATION_MESSAGE);
+					      "Error", JOptionPane.ERROR_MESSAGE);
 		return;
 	    }
 	    else {
@@ -694,6 +962,8 @@ public class FileSystemBrowserWindow extends JFrame {
 			    JOptionPane.showMessageDialog(this, "Unexpected data in table model. (Internal error, report to developer)",
 							  "Error", JOptionPane.ERROR_MESSAGE);
 		    }
+		    JOptionPane.showMessageDialog(this, "Extraction finished.\n",
+						  "Information", JOptionPane.INFORMATION_MESSAGE);
 		}
 	    }
 	}
@@ -749,17 +1019,23 @@ public class FileSystemBrowserWindow extends JFrame {
 	HFSPlusCatalogLeafRecordData recData = rec.getData();
 	if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
 	   recData instanceof HFSPlusCatalogFile) {
+	    String filename = rec.getKey().getNodeName().toString();
+	    File outFile = new File(outDir, filename);
 	    try {
-		String filename = rec.getKey().getNodeName().toString();
-		File outFile = new File(outDir, filename);
 		FileOutputStream fos = new FileOutputStream(outFile);
 		fsView.extractDataForkToStream(rec, fos);
 		fos.close();
 		//JOptionPane.showMessageDialog(this, "The file was successfully extracted!\n",
 		//			  "Extraction complete!", JOptionPane.INFORMATION_MESSAGE);
+	    } catch(FileNotFoundException fnfe) {
+		fnfe.printStackTrace();
+		JOptionPane.showMessageDialog(this, "Could not create file \"" + filename + "\" under:\n" +
+					      outDir.getAbsolutePath() + "\n" +
+					      "The file will be skipped.",
+					      "Error", JOptionPane.ERROR_MESSAGE);
 	    } catch(Exception e) {
 		e.printStackTrace();
-		JOptionPane.showMessageDialog(this, e.toString() + ": " + e.getMessage(),
+		JOptionPane.showMessageDialog(this, "An exception occurred:\n" + e.toString(),
 					      "Error", JOptionPane.ERROR_MESSAGE);
 	    }
 	}
@@ -772,9 +1048,14 @@ public class FileSystemBrowserWindow extends JFrame {
 	    HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
 	    // We now have the contents of the requested directory
 	    File thisDir = new File(outDir, rec.getKey().getNodeName().toString());
-	    thisDir.mkdir();
-	    for(HFSPlusCatalogLeafRecord outRec : contents)
-		extract(outRec, thisDir);
+	    if(thisDir.mkdir()) {
+		for(HFSPlusCatalogLeafRecord outRec : contents)
+		    extract(outRec, thisDir);
+	    }
+	    else
+		JOptionPane.showMessageDialog(this, "Could not create directory:\n" + thisDir.getAbsolutePath() +
+					      "\nAll files under this directory will be skipped.",
+					      "Error", JOptionPane.ERROR_MESSAGE);
 	    //populateNode(((NoLeafMutableTreeNode)obj), contents);
 	}
     }
