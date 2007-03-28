@@ -129,49 +129,6 @@ public class FileSystemBrowserWindow extends JFrame {
 	backButton.setEnabled(false);
 	addressField.setEnabled(false);
 	goButton.setEnabled(false);
-
-	// DEBUG
-	backButton.setEnabled(true);
-	backButton.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    if(fileTable.getAutoResizeMode() == JTable.AUTO_RESIZE_OFF) {
-			System.out.println("Setting AUTO_RESIZE_LAST_COLUMN");
-			fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-		    }
-		    else {
-			System.out.println("Setting AUTO_RESIZE_OFF");
-			fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		    }
-		    fileTableScroller.invalidate();
-		    //fileTable.invalidate();
-		    //fileTable.validate();
-		    fileTableScroller.validate();
-		    
-		    int columnCount = fileTable.getColumnModel().getColumnCount();
-		    System.err.print("  Widths =");
- 		    for(int i = 0; i < columnCount; ++i) {
- 			System.err.print(" " + fileTable.getColumnModel().getColumn(i).getWidth());
-		    }
-		    System.out.println();		    
-		}
-	    });
-	goButton.setEnabled(true);
-	goButton.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    int columnCount = fileTable.getColumnModel().getColumnCount();
-		    System.err.print("  Widths =");
- 		    for(int i = 0; i < columnCount; ++i) {
- 			System.err.print(" " + fileTable.getColumnModel().getColumn(i).getWidth());
-		    }
-		    System.out.println();		    
-		}
-	    });
-// 	fileTable.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-// 		public void propertyChange(java.beans.PropertyChangeEvent pce) {
-// 		    System.out.println("Property changed!");
-// 		    //System.out.println("  " + pce.toString());
-// 		}
-// 	    });
 	
 	extractButton.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -200,12 +157,6 @@ public class FileSystemBrowserWindow extends JFrame {
 	colNames.add("");
 	//Vector<Vector<String>> = new Vector<Vector<String>>();
 	tableModel = new DefaultTableModel(colNames, 0)  {
-// 		public Class getColumnClass(int columnIndex) {
-// 		    if(columnIndex == 0)
-// 			return recordContainerClass;
-// 		    else
-// 			return super.getColumnClass(columnIndex);
-// 		}
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
 		    return false;
 		}
@@ -310,50 +261,6 @@ public class FileSystemBrowserWindow extends JFrame {
 		    lastWidths.o = w1;
 		    w1 = usedArray; // Switch arrays.
 		    
-		    
-// 		    for(int i = 0; i < w1.length; ++i)
-// 			w1[i] = fileTable.getColumnModel().getColumn(i).getPreferredWidth();
-// 		    i
-		    
-//  		    //System.err.println("Component resized");
-// 		    int columnCount = fileTable.getColumnModel().getColumnCount();
-// 		    int[] w1 = new int[columnCount];
-// 		    for(int i = 0; i < w1.length; ++i)
-// 			w1[i] = fileTable.getColumnModel().getColumn(i).getPreferredWidth();
-		    
-// 		    /*
-// 		    System.out.print("  Widths before =");
-// 		    for(int width : w1)
-// 			System.out.print(" " + width);
-// 		    System.out.println();
-// 		    */
-
-// 		    fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-// 		    fileTableScroller.invalidate();
-// 		    //fileTable.invalidate();
-// 		    //fileTable.validate();
-// 		    fileTableScroller.validate();
-// 		    int[] w2 = new int[columnCount];
-// 		    int newTotalWidth = 0;
-// 		    for(int i = 0; i < columnCount; ++i) {
-// 			w2[i] = fileTable.getColumnModel().getColumn(i).getWidth();
-// 			newTotalWidth += w2[i];
-// 		    }
-// 		    int newLastColumnWidth = newTotalWidth;
-// 		    for(int i = 0; i < w1.length-1; ++i)
-// 			newLastColumnWidth -= w1[i];
-// 		    if(newLastColumnWidth < 0)
-// 			newLastColumnWidth = 0;
-// 		    lastColumn.setPreferredWidth(newLastColumnWidth);
-// 		    fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-// 		    fileTableScroller.invalidate();
-// 		    fileTableScroller.validate();
-// 		    /*
-// 		    System.out.println("  Widths after =");
-// 		    for(int i = 0; i < columnCount; ++i)
-// 			System.out.print(" " + fileTable.getColumnModel().getColumn(i).getPreferredWidth());
-// 		    System.out.println();
-// 		    */
 		    synchronized(this) { locked = false; /*System.err.println();*/ }
 		}
 		public void columnMoved(TableColumnModelEvent e) { /*System.out.println("columnMoved");*/ }
@@ -382,29 +289,16 @@ public class FileSystemBrowserWindow extends JFrame {
 			else
 			    jl.setIcon(emptyIcon);
 			jl.setVisible(true);
-			//jl.setBackground(objectComponent.getBackground());
-// 			jl.addMouseListener(new MouseAdapter() {
-// 				public void mousePressed(MouseEvent me) {
-// 				    System.err.println("Action at (" + row + "," + column + ")");
-// 				}
-// 			    });
 			Component c = new Component() {
 				{
 				    jl.setSize(jl.getPreferredSize());
 				    jl.setLocation(0, 0);
 				    objectComponent.setSize(objectComponent.getPreferredSize());
 				    objectComponent.setLocation(jl.getWidth(), 0);
-// 				    System.err.println("Setting size to: " + (jl.getWidth()+objectComponent.getWidth()) + "," + Math.max(jl.getHeight(), objectComponent.getHeight()));
 				    setSize(jl.getWidth()+objectComponent.getWidth(), Math.max(jl.getHeight(), objectComponent.getHeight()));
 				}
 				public void paint(Graphics g) {
-// 				    if(row == 1) {
-// 					Color oldColor = g.getColor();
-// 					g.setColor(Color.BLACK);
-// 					g.fillRect(0,0,10,10);
-// 					g.setColor(oldColor);
-// 				    }
-				    jl.paint(g);
+ 				    jl.paint(g);
 				    int translatex = jl.getWidth();
 				    g.translate(translatex, 0);
 				    objectComponent.paint(g);
@@ -581,7 +475,6 @@ public class FileSystemBrowserWindow extends JFrame {
 // 			String pathName = JOptionPane.showInputDialog(FileSystemBrowserWindow.this,
 // 								      "Enter the UNC path for the file system",
 // 								      "\\\\?\\GLOBALROOT\\Device\\Harddisk2\\Partition2");
-			//System.out.println("loadFS(" + pathName + ", false, true);");
 			try {
 			    if(pathName != null)
 				loadFS(pathName, true, true);
@@ -849,10 +742,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
 			recData instanceof HFSPlusCatalogThread) {
 		    HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
-// 		    if(rootNode.getUserObject() != null)
-// 			System.err.println("OVERWRITING USER OBJECT: " + rootNode.getUserObject());
 		    rootStorage.setThread(rec);
-		    //rootNode.setUserObject(new RecordNodeStorage(rec));
 		    if(!folderThreadSet) folderThreadSet = true;
 		}
 		else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE_THREAD &&
@@ -874,8 +764,6 @@ public class FileSystemBrowserWindow extends JFrame {
     }
     
     public void populateTable(HFSPlusCatalogLeafRecord[] contents) {
-	//fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-	//fileTable.doLayout();
 	while(tableModel.getRowCount() > 0) {
 	    tableModel.removeRow(tableModel.getRowCount()-1);
 	}
@@ -919,7 +807,6 @@ public class FileSystemBrowserWindow extends JFrame {
 	    
 	    
 	}
-	//fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 	adjustTableWidth();
     }
 
@@ -1072,11 +959,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		JOptionPane.showMessageDialog(this, "Could not create directory:\n" + thisDir.getAbsolutePath() +
 					      "\nAll files under this directory will be skipped.",
 					      "Error", JOptionPane.ERROR_MESSAGE);
-	    //populateNode(((NoLeafMutableTreeNode)obj), contents);
 	}
-// 	else {
-// 	    System.err.println("extract(): Wrong record type. type=" + recData.getRecordTypeAsString());
-// 	}
     }
     
     public static void main(String[] args) {
