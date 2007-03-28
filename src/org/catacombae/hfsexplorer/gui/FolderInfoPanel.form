@@ -142,7 +142,7 @@
                           <Component id="jLabel30" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace min="21" pref="21" max="21" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="userInfoFinderFlagsIsOnDeskBox" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
@@ -193,12 +193,13 @@
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="jLabel43" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <Group type="102" alignment="0" attributes="0">
+                                  <Group type="102" alignment="0" attributes="1">
                                       <Component id="jLabel34" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="userInfoFinderFlagsColorField" pref="271" max="32767" attributes="0"/>
+                                      <Component id="userInfoFinderFlagsColorField" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
+                              <EmptySpace pref="212" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel31" min="-2" max="-2" attributes="0"/>
@@ -1038,9 +1039,12 @@
       <Properties>
         <Property name="columns" type="int" value="4"/>
         <Property name="editable" type="boolean" value="false"/>
+        <Property name="horizontalAlignment" type="int" value="0"/>
         <Property name="text" type="java.lang.String" value="0888"/>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-          <Border info="null"/>
+          <Border info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
+            <LineBorder/>
+          </Border>
         </Property>
         <Property name="opaque" type="boolean" value="false"/>
       </Properties>

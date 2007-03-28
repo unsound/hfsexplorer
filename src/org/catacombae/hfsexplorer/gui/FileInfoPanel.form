@@ -18,7 +18,7 @@
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jLabel62" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="recordTypeField" pref="303" max="32767" attributes="0"/>
+                      <Component id="recordTypeField" pref="308" max="32767" attributes="0"/>
                   </Group>
                   <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
@@ -39,7 +39,7 @@
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jLabel63" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="reserved1Field" pref="313" max="32767" attributes="0"/>
+                      <Component id="reserved1Field" pref="315" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
@@ -100,7 +100,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel22" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="permissionsFileModeField" pref="292" max="32767" attributes="0"/>
+                              <Component id="permissionsFileModeField" pref="298" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace min="21" pref="21" max="21" attributes="0"/>
@@ -125,7 +125,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel26" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="permissionsSpecialField" pref="309" max="32767" attributes="0"/>
+                              <Component id="permissionsSpecialField" pref="310" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
@@ -134,8 +134,8 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="permissionsGroupIDField" alignment="0" pref="295" max="32767" attributes="0"/>
-                                  <Component id="permissionsOwnerIDField" alignment="0" pref="295" max="32767" attributes="0"/>
+                                  <Component id="permissionsGroupIDField" alignment="0" pref="297" max="32767" attributes="0"/>
+                                  <Component id="permissionsOwnerIDField" alignment="0" pref="297" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -148,16 +148,16 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel29" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="userInfoFileCreatorField" pref="283" max="32767" attributes="0"/>
+                              <Component id="userInfoFileCreatorField" pref="289" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel28" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="userInfoFileTypeField" pref="300" max="32767" attributes="0"/>
+                              <Component id="userInfoFileTypeField" pref="302" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace min="21" pref="21" max="21" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="userInfoFinderFlagsIsOnDeskBox" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
@@ -208,17 +208,18 @@
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="jLabel43" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <Group type="102" alignment="0" attributes="0">
+                                  <Group type="102" alignment="0" attributes="1">
                                       <Component id="jLabel34" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="userInfoFinderFlagsColorField" pref="290" max="32767" attributes="0"/>
+                                      <Component id="userInfoFinderFlagsColorField" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
+                              <EmptySpace pref="233" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel31" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="userInfoLocationField" pref="299" max="32767" attributes="0"/>
+                              <Component id="userInfoLocationField" pref="303" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel32" min="-2" max="-2" attributes="0"/>
@@ -235,7 +236,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel45" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="finderInfoReserved1Field" pref="289" max="32767" attributes="0"/>
+                              <Component id="finderInfoReserved1Field" pref="291" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace min="21" pref="21" max="21" attributes="0"/>
@@ -260,24 +261,24 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel50" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="finderInfoReserved2Field" pref="285" max="32767" attributes="0"/>
+                              <Component id="finderInfoReserved2Field" pref="288" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel51" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="finderInfoPutAwayFolderIDField" pref="239" max="32767" attributes="0"/>
+                              <Component id="finderInfoPutAwayFolderIDField" pref="253" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jLabel52" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="textEncodingField" pref="287" max="32767" attributes="0"/>
+                      <Component id="textEncodingField" pref="299" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jLabel53" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="reserved2Field" pref="313" max="32767" attributes="0"/>
+                      <Component id="reserved2Field" pref="315" max="32767" attributes="0"/>
                   </Group>
                   <Component id="jLabel54" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
@@ -286,17 +287,17 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel56" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="dataForkClumpSizeField" pref="283" max="32767" attributes="0"/>
+                              <Component id="dataForkClumpSizeField" pref="293" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel55" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="dataForkLogicalSizeField" pref="279" max="32767" attributes="0"/>
+                              <Component id="dataForkLogicalSizeField" pref="290" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel57" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="dataForkTotalBlocksField" pref="275" max="32767" attributes="0"/>
+                              <Component id="dataForkTotalBlocksField" pref="287" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -307,17 +308,17 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel60" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="resForkClumpSizeField" pref="283" max="32767" attributes="0"/>
+                              <Component id="resForkClumpSizeField" pref="293" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel59" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="resForkLogicalSizeField" pref="279" max="32767" attributes="0"/>
+                              <Component id="resForkLogicalSizeField" pref="290" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel61" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="resForkTotalBlocksField" pref="275" max="32767" attributes="0"/>
+                              <Component id="resForkTotalBlocksField" pref="287" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -331,11 +332,11 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="createDateField" alignment="0" pref="254" max="32767" attributes="0"/>
-                          <Component id="contentModifyDateField" alignment="0" pref="254" max="32767" attributes="0"/>
-                          <Component id="backupDateField" alignment="0" pref="254" max="32767" attributes="0"/>
-                          <Component id="accessDateField" alignment="0" pref="254" max="32767" attributes="0"/>
-                          <Component id="attributesModifyDateField" alignment="0" pref="254" max="32767" attributes="0"/>
+                          <Component id="createDateField" alignment="0" pref="276" max="32767" attributes="0"/>
+                          <Component id="contentModifyDateField" alignment="0" pref="276" max="32767" attributes="0"/>
+                          <Component id="backupDateField" alignment="0" pref="276" max="32767" attributes="0"/>
+                          <Component id="accessDateField" alignment="0" pref="276" max="32767" attributes="0"/>
+                          <Component id="attributesModifyDateField" alignment="0" pref="276" max="32767" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -1172,9 +1173,12 @@
       <Properties>
         <Property name="columns" type="int" value="4"/>
         <Property name="editable" type="boolean" value="false"/>
+        <Property name="horizontalAlignment" type="int" value="0"/>
         <Property name="text" type="java.lang.String" value="0888"/>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-          <Border info="null"/>
+          <Border info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
+            <LineBorder/>
+          </Border>
         </Property>
         <Property name="opaque" type="boolean" value="false"/>
       </Properties>

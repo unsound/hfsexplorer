@@ -36,6 +36,8 @@ import java.text.DateFormat;
  */
 public class FolderInfoPanel extends javax.swing.JPanel {
     private final DateFormat dti = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+    private Boolean originalOpaqueness = null;
+    private Color originalColor = null;
     
     /** Creates new form FolderInfoPanel */
     public FolderInfoPanel() {
@@ -73,8 +75,18 @@ public class FolderInfoPanel extends javax.swing.JPanel {
 	userInfoWindowBoundsField.setText(ui.getWindowBounds().toString());
         userInfoFinderFlagsIsOnDeskBox.setSelected(ui.getFinderFlagIsOnDesk());
 	int[] rgb = ui.getFinderFlagColorRGB();
-	if(rgb != null)
-	    userInfoFinderFlagsColorField.setForeground(new Color(rgb[0], rgb[1], rgb[2]));
+        if(originalOpaqueness == null)
+            originalOpaqueness = userInfoFinderFlagsColorField.isOpaque();
+        if(originalColor == null)
+            originalColor = userInfoFinderFlagsColorField.getBackground();
+	if(rgb != null) {
+            userInfoFinderFlagsColorField.setOpaque(true);
+	    userInfoFinderFlagsColorField.setBackground(new Color(rgb[0], rgb[1], rgb[2]));
+        }
+        else {
+            userInfoFinderFlagsColorField.setOpaque(originalOpaqueness);
+            userInfoFinderFlagsColorField.setBackground(originalColor);
+        }
 	userInfoFinderFlagsColorField.setText("" + ui.getFinderFlagColor());
 	userInfoFinderFlagsIsSharedBox.setSelected(ui.getFinderFlagIsShared());
 	userInfoFinderFlagsHasNoINITsBox.setSelected(ui.getFinderFlagHasNoINITs());
@@ -383,8 +395,9 @@ public class FolderInfoPanel extends javax.swing.JPanel {
 
         userInfoFinderFlagsColorField.setColumns(4);
         userInfoFinderFlagsColorField.setEditable(false);
+        userInfoFinderFlagsColorField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         userInfoFinderFlagsColorField.setText("0888");
-        userInfoFinderFlagsColorField.setBorder(null);
+        userInfoFinderFlagsColorField.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         userInfoFinderFlagsColorField.setOpaque(false);
 
         jLabel44.setText("Finder info:");
@@ -635,7 +648,7 @@ public class FolderInfoPanel extends javax.swing.JPanel {
                             .add(jLabel30)
                             .add(layout.createSequentialGroup()
                                 .add(21, 21, 21)
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
                                     .add(layout.createSequentialGroup()
                                         .add(userInfoFinderFlagsIsOnDeskBox)
                                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -679,7 +692,8 @@ public class FolderInfoPanel extends javax.swing.JPanel {
                                     .add(layout.createSequentialGroup()
                                         .add(jLabel34)
                                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(userInfoFinderFlagsColorField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE))))
+                                        .add(userInfoFinderFlagsColorField)))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 212, Short.MAX_VALUE))
                             .add(layout.createSequentialGroup()
                                 .add(jLabel31)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)

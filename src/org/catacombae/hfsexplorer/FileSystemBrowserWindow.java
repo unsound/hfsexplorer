@@ -80,23 +80,29 @@ public class FileSystemBrowserWindow extends JFrame {
     private HFSFileSystemView fsView;
     
     private static class RecordNodeStorage {
-	private HFSPlusCatalogLeafRecord record;
-	public RecordNodeStorage(HFSPlusCatalogLeafRecord record) {
-	    this.record = record;
-	    if(record.getData().getRecordType() != HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
-	       record.getData().getRecordType() != HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD)
+	private HFSPlusCatalogLeafRecord parentRecord;
+	private HFSPlusCatalogLeafRecord threadRecord = null;
+	public RecordNodeStorage(HFSPlusCatalogLeafRecord parentRecord) {
+	    this.parentRecord = parentRecord;
+	    if(parentRecord.getData().getRecordType() != HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER)
 		throw new IllegalArgumentException("Illegal type for record data.");
 	}
-	public HFSPlusCatalogLeafRecord getRecord() { return record; }
+	public HFSPlusCatalogLeafRecord getRecord() { return parentRecord; }
+	public HFSPlusCatalogLeafRecord getThread() { return threadRecord; }
+	public void setThread(HFSPlusCatalogLeafRecord threadRecord) {
+	    if(threadRecord.getData().getRecordType() != HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD)
+		throw new IllegalArgumentException("Illegal type for thread data.");
+	    this.threadRecord = threadRecord;
+	}
 	public String toString() {
-	    HFSPlusCatalogLeafRecordData recData = record.getData();
-	    if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER)
-		return record.getKey().getNodeName().toString();
-	    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
-		    recData instanceof HFSPlusCatalogThread)
-		return ((HFSPlusCatalogThread)recData).getNodeName().toString();
-	    else
-		throw new RuntimeException("Illegal type for record data. (Should NOT happen here!)");
+	    HFSPlusCatalogLeafRecordData recData = parentRecord.getData();
+// 	    if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER)
+		return parentRecord.getKey().getNodeName().toString();
+// 	    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
+// 		    recData instanceof HFSPlusCatalogThread)
+// 		return ((HFSPlusCatalogThread)recData).getNodeName().toString();
+// 	    else
+// 		throw new RuntimeException("Illegal type for record data. (Should NOT happen here!)");
 	}
     }
     
@@ -804,13 +810,13 @@ public class FileSystemBrowserWindow extends JFrame {
 	fsView = new HFSFileSystemView(fsFile, fsOffset);
 	HFSPlusCatalogLeafRecord rootRecord = fsView.getRoot();
 	HFSPlusCatalogLeafRecord[] rootContents = fsView.listRecords(rootRecord);
-	populateFilesystemGUI(rootContents);
+	populateFilesystemGUI(rootRecord, rootContents);
 	statusLabel.setText("0 objects selected (0 bytes)");
 	//adjustTableWidth();
     }
 
-    private void populateFilesystemGUI(HFSPlusCatalogLeafRecord[] contents) {
-	DefaultMutableTreeNode rootNode = new NoLeafMutableTreeNode("/");
+    private void populateFilesystemGUI(HFSPlusCatalogLeafRecord root, HFSPlusCatalogLeafRecord[] contents) {
+	DefaultMutableTreeNode rootNode = new NoLeafMutableTreeNode(new RecordNodeStorage(root));
 	populateNode(rootNode, contents);
 	DefaultTreeModel model = new DefaultTreeModel(rootNode);
 	dirTree.setModel(model);
@@ -821,40 +827,50 @@ public class FileSystemBrowserWindow extends JFrame {
     private void populateNode(DefaultMutableTreeNode rootNode, HFSPlusCatalogLeafRecord[] contents) {
 	boolean folderThreadSet = false;
 	boolean hasChildren = false;
-	LinkedList<HFSPlusCatalogLeafRecord> fileThreads = new LinkedList<HFSPlusCatalogLeafRecord>();
-	for(HFSPlusCatalogLeafRecord rec : contents) {
-	    Vector<String> currentRow = new Vector<String>(4);
-	    
-	    HFSPlusCatalogLeafRecordData recData = rec.getData();
-	    if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
-	       recData instanceof HFSPlusCatalogFile) {
-		HFSPlusCatalogFile catFile = (HFSPlusCatalogFile)recData;
-		if(!hasChildren) hasChildren = true;
+	Object o = rootNode.getUserObject();
+	if(o instanceof RecordNodeStorage) {
+	    RecordNodeStorage rootStorage = (RecordNodeStorage)o;
+	    LinkedList<HFSPlusCatalogLeafRecord> fileThreads = new LinkedList<HFSPlusCatalogLeafRecord>();
+	    for(HFSPlusCatalogLeafRecord rec : contents) {
+		Vector<String> currentRow = new Vector<String>(4);
+		
+		HFSPlusCatalogLeafRecordData recData = rec.getData();
+		if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
+		   recData instanceof HFSPlusCatalogFile) {
+		    HFSPlusCatalogFile catFile = (HFSPlusCatalogFile)recData;
+		    if(!hasChildren) hasChildren = true;
+		}
+		else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
+			recData instanceof HFSPlusCatalogFolder) {
+		    HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder)recData;
+		    rootNode.add(new NoLeafMutableTreeNode(new RecordNodeStorage(rec)));
+		    if(!hasChildren) hasChildren = true;
+		}
+		else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
+			recData instanceof HFSPlusCatalogThread) {
+		    HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
+// 		    if(rootNode.getUserObject() != null)
+// 			System.err.println("OVERWRITING USER OBJECT: " + rootNode.getUserObject());
+		    rootStorage.setThread(rec);
+		    //rootNode.setUserObject(new RecordNodeStorage(rec));
+		    if(!folderThreadSet) folderThreadSet = true;
+		}
+		else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE_THREAD &&
+			recData instanceof HFSPlusCatalogThread) {
+		    HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
+		    fileThreads.addLast(rec);
+		}
+		else
+		    System.err.println("WARNING: Encountered unexpected record type (" + recData.getRecordType() + ")");
 	    }
-	    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
-		    recData instanceof HFSPlusCatalogFolder) {
-		HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder)recData;
-		rootNode.add(new NoLeafMutableTreeNode(new RecordNodeStorage(rec)));
-		if(!hasChildren) hasChildren = true;
-	    }
-	    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
-		    recData instanceof HFSPlusCatalogThread) {
-		HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
-		rootNode.setUserObject(new RecordNodeStorage(rec));
-		if(!folderThreadSet) folderThreadSet = true;
-	    }
-	    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE_THREAD &&
-		    recData instanceof HFSPlusCatalogThread) {
-		HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
-		fileThreads.addLast(rec);
-	    }
-	    else
-		System.err.println("WARNING: Encountered unexpected record type (" + recData.getRecordType() + ")");
+	    if(hasChildren && !folderThreadSet)
+		System.err.println("ERROR: Found no folder thread!");
+	    if(!fileThreads.isEmpty())
+		System.err.println("INFORMATION: Found " + fileThreads.size() + " file threads unexpectedly.");
 	}
-	if(hasChildren && !folderThreadSet)
-	    System.err.println("ERROR: Found no folder thread!");
-	if(!fileThreads.isEmpty())
-	    System.err.println("INFORMATION: Found " + fileThreads.size() + " file threads unexpectedly.");
+	else
+	    JOptionPane.showMessageDialog(this, "Unexpected type in node user object. Type: " + o.getClass(),
+					  "Error", JOptionPane.ERROR_MESSAGE);
     }
     
     public void populateTable(HFSPlusCatalogLeafRecord[] contents) {
@@ -1058,6 +1074,9 @@ public class FileSystemBrowserWindow extends JFrame {
 					      "Error", JOptionPane.ERROR_MESSAGE);
 	    //populateNode(((NoLeafMutableTreeNode)obj), contents);
 	}
+// 	else {
+// 	    System.err.println("extract(): Wrong record type. type=" + recData.getRecordTypeAsString());
+// 	}
     }
     
     public static void main(String[] args) {

@@ -36,6 +36,8 @@ import java.text.DateFormat;
  */
 public class FileInfoPanel extends javax.swing.JPanel {
     private final DateFormat dti = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+    private Boolean originalOpaqueness = null;
+    private Color originalColor = null;
     
     /** Creates new form FileInfoPanel */
     public FileInfoPanel() {
@@ -78,8 +80,18 @@ public class FileInfoPanel extends javax.swing.JPanel {
 	userInfoFileCreatorField.setText("\"" + ui.getFileCreator().toString() + "\" (0x" + Util.toHexStringBE(ui.getFileCreator().getOSType().getFourCharCode()) + ")");
 	userInfoFinderFlagsIsOnDeskBox.setSelected(ui.getFinderFlagIsOnDesk());
 	int[] rgb = ui.getFinderFlagColorRGB();
-	if(rgb != null)
-	    userInfoFinderFlagsColorField.setForeground(new Color(rgb[0], rgb[1], rgb[2]));
+        if(originalOpaqueness == null)
+            originalOpaqueness = userInfoFinderFlagsColorField.isOpaque();
+        if(originalColor == null)
+            originalColor = userInfoFinderFlagsColorField.getBackground();
+	if(rgb != null) {
+            userInfoFinderFlagsColorField.setOpaque(true);
+	    userInfoFinderFlagsColorField.setBackground(new Color(rgb[0], rgb[1], rgb[2]));
+        }
+        else {
+            userInfoFinderFlagsColorField.setOpaque(originalOpaqueness);
+            userInfoFinderFlagsColorField.setBackground(originalColor);
+        }
 	userInfoFinderFlagsColorField.setText("" + ui.getFinderFlagColor());
 	userInfoFinderFlagsIsSharedBox.setSelected(ui.getFinderFlagIsShared());
 	userInfoFinderFlagsHasNoINITsBox.setSelected(ui.getFinderFlagHasNoINITs());
@@ -430,8 +442,9 @@ public class FileInfoPanel extends javax.swing.JPanel {
 
         userInfoFinderFlagsColorField.setColumns(4);
         userInfoFinderFlagsColorField.setEditable(false);
+        userInfoFinderFlagsColorField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         userInfoFinderFlagsColorField.setText("0888");
-        userInfoFinderFlagsColorField.setBorder(null);
+        userInfoFinderFlagsColorField.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         userInfoFinderFlagsColorField.setOpaque(false);
 
         jLabel44.setText("Finder info:");
@@ -623,7 +636,7 @@ public class FileInfoPanel extends javax.swing.JPanel {
                     .add(layout.createSequentialGroup()
                         .add(jLabel62)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(recordTypeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE))
+                        .add(recordTypeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE))
                     .add(jLabel1)
                     .add(layout.createSequentialGroup()
                         .add(21, 21, 21)
@@ -639,11 +652,11 @@ public class FileInfoPanel extends javax.swing.JPanel {
                     .add(layout.createSequentialGroup()
                         .add(jLabel63)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(reserved1Field, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE))
+                        .add(reserved1Field, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
                         .add(jLabel4)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(fileIDField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE))
+                        .add(fileIDField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE))
                     .add(jLabel10)
                     .add(layout.createSequentialGroup()
                         .add(24, 24, 24)
@@ -687,7 +700,7 @@ public class FileInfoPanel extends javax.swing.JPanel {
                             .add(layout.createSequentialGroup()
                                 .add(jLabel22)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(permissionsFileModeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE))
+                                .add(permissionsFileModeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE))
                             .add(layout.createSequentialGroup()
                                 .add(21, 21, 21)
                                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -706,15 +719,15 @@ public class FileInfoPanel extends javax.swing.JPanel {
                             .add(layout.createSequentialGroup()
                                 .add(jLabel26)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(permissionsSpecialField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE))
+                                .add(permissionsSpecialField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE))
                             .add(layout.createSequentialGroup()
                                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                                     .add(jLabel11)
                                     .add(jLabel12))
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(permissionsGroupIDField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
-                                    .add(permissionsOwnerIDField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)))))
+                                    .add(permissionsGroupIDField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
+                                    .add(permissionsOwnerIDField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)))))
                     .add(jLabel27)
                     .add(layout.createSequentialGroup()
                         .add(24, 24, 24)
@@ -723,14 +736,14 @@ public class FileInfoPanel extends javax.swing.JPanel {
                             .add(layout.createSequentialGroup()
                                 .add(jLabel29)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(userInfoFileCreatorField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE))
+                                .add(userInfoFileCreatorField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE))
                             .add(layout.createSequentialGroup()
                                 .add(jLabel28)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(userInfoFileTypeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE))
+                                .add(userInfoFileTypeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE))
                             .add(layout.createSequentialGroup()
                                 .add(21, 21, 21)
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
                                     .add(layout.createSequentialGroup()
                                         .add(userInfoFinderFlagsIsOnDeskBox)
                                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -774,15 +787,16 @@ public class FileInfoPanel extends javax.swing.JPanel {
                                     .add(layout.createSequentialGroup()
                                         .add(jLabel34)
                                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(userInfoFinderFlagsColorField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE))))
+                                        .add(userInfoFinderFlagsColorField)))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 233, Short.MAX_VALUE))
                             .add(layout.createSequentialGroup()
                                 .add(jLabel31)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(userInfoLocationField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE))
+                                .add(userInfoLocationField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE))
                             .add(layout.createSequentialGroup()
                                 .add(jLabel32)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(userInfoReservedField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE))))
+                                .add(userInfoReservedField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE))))
                     .add(jLabel44)
                     .add(layout.createSequentialGroup()
                         .add(24, 24, 24)
@@ -791,7 +805,7 @@ public class FileInfoPanel extends javax.swing.JPanel {
                             .add(layout.createSequentialGroup()
                                 .add(jLabel45)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(finderInfoReserved1Field, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 269, Short.MAX_VALUE))
+                                .add(finderInfoReserved1Field, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE))
                             .add(layout.createSequentialGroup()
                                 .add(21, 21, 21)
                                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -810,19 +824,19 @@ public class FileInfoPanel extends javax.swing.JPanel {
                             .add(layout.createSequentialGroup()
                                 .add(jLabel50)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(finderInfoReserved2Field, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE))
+                                .add(finderInfoReserved2Field, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE))
                             .add(layout.createSequentialGroup()
                                 .add(jLabel51)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(finderInfoPutAwayFolderIDField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 231, Short.MAX_VALUE))))
+                                .add(finderInfoPutAwayFolderIDField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 253, Short.MAX_VALUE))))
                     .add(layout.createSequentialGroup()
                         .add(jLabel52)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(textEncodingField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE))
+                        .add(textEncodingField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
                         .add(jLabel53)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(reserved2Field, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE))
+                        .add(reserved2Field, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE))
                     .add(jLabel54)
                     .add(layout.createSequentialGroup()
                         .add(24, 24, 24)
@@ -830,15 +844,15 @@ public class FileInfoPanel extends javax.swing.JPanel {
                             .add(layout.createSequentialGroup()
                                 .add(jLabel56)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(dataForkClumpSizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE))
+                                .add(dataForkClumpSizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE))
                             .add(layout.createSequentialGroup()
                                 .add(jLabel55)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(dataForkLogicalSizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 268, Short.MAX_VALUE))
+                                .add(dataForkLogicalSizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 290, Short.MAX_VALUE))
                             .add(layout.createSequentialGroup()
                                 .add(jLabel57)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(dataForkTotalBlocksField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE))))
+                                .add(dataForkTotalBlocksField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 287, Short.MAX_VALUE))))
                     .add(jLabel58)
                     .add(layout.createSequentialGroup()
                         .add(24, 24, 24)
@@ -846,15 +860,15 @@ public class FileInfoPanel extends javax.swing.JPanel {
                             .add(layout.createSequentialGroup()
                                 .add(jLabel60)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(resForkClumpSizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE))
+                                .add(resForkClumpSizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE))
                             .add(layout.createSequentialGroup()
                                 .add(jLabel59)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(resForkLogicalSizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 268, Short.MAX_VALUE))
+                                .add(resForkLogicalSizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 290, Short.MAX_VALUE))
                             .add(layout.createSequentialGroup()
                                 .add(jLabel61)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(resForkTotalBlocksField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE))))
+                                .add(resForkTotalBlocksField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 287, Short.MAX_VALUE))))
                     .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(jLabel7)
@@ -864,11 +878,11 @@ public class FileInfoPanel extends javax.swing.JPanel {
                             .add(jLabel5))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(createDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
-                            .add(contentModifyDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
-                            .add(backupDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
-                            .add(accessDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
-                            .add(attributesModifyDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE))))
+                            .add(createDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
+                            .add(contentModifyDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
+                            .add(backupDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
+                            .add(accessDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
+                            .add(attributesModifyDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -1106,7 +1120,7 @@ public class FileInfoPanel extends javax.swing.JPanel {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel61)
                     .add(resForkTotalBlocksField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     
