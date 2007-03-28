@@ -1,3 +1,19 @@
+0.15
+----
+- Major UI overhaul with a few icons, changed appearance of the file list. Many things left
+  to do though.
+- Added information dialogs for presenting information about the volume header, the catalog
+  file, detailed file and folder info, some minor info on the journal... (all in preparation
+  for future development work on write support)
+- Behavior change: Extract button now extracts the entry that was last in focus. If you
+  selected a folder in the left pane most recently, that folder will be extracted and not the
+  selection in the right pane (and vice versa).
+- Fixed a bug submitted by Gennadiy Bukhmatov related to the behavior of
+  org.catacombae.hfsexplorer.types.OSType.
+- Added a start script for Windows Vista, automatically bringing up the UAC dialog. It has not
+  been tested more than that, so please mail me about your experiences with Windows Vista.
+  Vista users may run "runfsb_vista.vbs"...
+
 0.11
 ----
 - Fixed a very significant bug, sometimes leading to some files not being seen by HFSExplorer,
