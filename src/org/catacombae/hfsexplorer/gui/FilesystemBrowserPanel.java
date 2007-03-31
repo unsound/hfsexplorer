@@ -25,12 +25,17 @@
  */
 
 package org.catacombae.hfsexplorer.gui;
+import javax.swing.*;
 
 /**
  *
  * @author  Erik
  */
 public class FilesystemBrowserPanel extends javax.swing.JPanel {
+    private static final ImageIcon FORWARD_ICON = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/forward.png"));
+    private static final ImageIcon EXTRACT_ICON = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/extract.png"));
+    private static final ImageIcon BACK_ICON = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/back.png"));
+    private static final ImageIcon INFO_ICON = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/info.png"));
     
     /** Creates new form FilesystemBrowserPanel */
     public FilesystemBrowserPanel() {
@@ -91,20 +96,20 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
 
         pathLabel.setText("Path:");
 
-        goButton.setIcon(new javax.swing.ImageIcon("resource/forward.png"));
+        goButton.setIcon(FORWARD_ICON);
         goButton.setText("Go");
 
         statusLabel.setText("No file system loaded");
         statusLabel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
 
-        extractButton.setIcon(new javax.swing.ImageIcon("resource/extract.png"));
+        extractButton.setIcon(EXTRACT_ICON);
         extractButton.setText("Extract");
 
-        backButton.setIcon(new javax.swing.ImageIcon("resource/back.png"));
+        backButton.setIcon(BACK_ICON);
         backButton.setText("Back");
         backButton.setEnabled(false);
 
-        infoButton.setIcon(new javax.swing.ImageIcon("resource/info.png"));
+        infoButton.setIcon(INFO_ICON);
         infoButton.setText("Info");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);

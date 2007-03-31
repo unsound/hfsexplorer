@@ -273,9 +273,9 @@ public class FileSystemBrowserWindow extends JFrame {
 	fileTable.setDefaultRenderer(objectClass, new TableCellRenderer() {
 		private JLabel theOne = new JLabel();
 		private JLabel theTwo = new JLabel("", SwingConstants.RIGHT);
-		private ImageIcon documentIcon = new ImageIcon("resource/emptydocument.png");
-		private ImageIcon folderIcon = new ImageIcon("resource/folder.png");
-		private ImageIcon emptyIcon = new ImageIcon("resource/nothing.png");
+		private ImageIcon documentIcon = new ImageIcon(ClassLoader.getSystemResource("res/emptydocument.png"));
+		private ImageIcon folderIcon = new ImageIcon(ClassLoader.getSystemResource("res/folder.png"));
+		private ImageIcon emptyIcon = new ImageIcon(ClassLoader.getSystemResource("res/nothing.png"));
 		
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, final int row, final int column) {
 		    if(value instanceof RecordContainer) {

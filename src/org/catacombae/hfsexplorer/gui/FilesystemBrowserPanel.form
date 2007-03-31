@@ -154,8 +154,8 @@
     </Component>
     <Component class="javax.swing.JButton" name="goButton">
       <Properties>
-        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="2" name="resource/forward.png"/>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="FORWARD_ICON" type="code"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Go"/>
       </Properties>
@@ -178,8 +178,8 @@
     </Component>
     <Component class="javax.swing.JButton" name="extractButton">
       <Properties>
-        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="2" name="resource/extract.png"/>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="EXTRACT_ICON" type="code"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Extract"/>
       </Properties>
@@ -189,8 +189,8 @@
     </Component>
     <Component class="javax.swing.JButton" name="backButton">
       <Properties>
-        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="2" name="resource/back.png"/>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="BACK_ICON" type="code"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Back"/>
         <Property name="enabled" type="boolean" value="false"/>
@@ -201,8 +201,8 @@
     </Component>
     <Component class="javax.swing.JButton" name="infoButton">
       <Properties>
-        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="2" name="resource/info.png"/>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="INFO_ICON" type="code"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Info"/>
       </Properties>

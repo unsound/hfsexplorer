@@ -8,10 +8,16 @@ set JARFILE=hfsx.jar
 set CLASSPATH="%~dp0build.~";"%~dp0\lib\swing-layout-1.0.1.jar"
 set SOURCES_DIR=%~dp0src
 set BUILD_DIR=%~dp0build.~
+set RESOURCE_SRC_DIR=%~dp0resource
+set RESOURCE_DST_DIR=%BUILD_DIR%\res
 
 echo Removing all class files...
 if exist "%BUILD_DIR%" rmdir /s /q "%BUILD_DIR%"
 mkdir "%BUILD_DIR%"
+
+echo Copying resources to classpath...
+mkdir "%RESOURCE_DST_DIR%"
+copy /y \\.\\"%RESOURCE_SRC_DIR%\*.png" "%RESOURCE_DST_DIR%" > NUL:
 
 REM Found out the trick for wildcard expansion of
 REM spaced file names! (enclosed within "") Just 
