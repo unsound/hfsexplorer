@@ -52,7 +52,7 @@ public class JournalInfoBlockPanel extends javax.swing.JPanel {
 	deviceSignatureField3.setText(Util.toHexStringBE(deviceSignature[6]) + Util.toHexStringBE(deviceSignature[7]));
 	
 	journalOffsetField.setText("0x" + Util.toHexStringBE(jib.getOffset()));
-	journalSizeField.setText(jib.getSize() + " B");
+	journalSizeField.setText(jib.getSize() + " bytes");
 	int[] reserved = jib.getReserved();
 	reservedField0.setText(Util.toHexStringBE(reserved[0]) + Util.toHexStringBE(reserved[1]));
 	reservedField1.setText(Util.toHexStringBE(reserved[2]) + Util.toHexStringBE(reserved[3]));

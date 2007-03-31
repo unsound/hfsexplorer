@@ -39,21 +39,21 @@
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="journalOffsetLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="journalOffsetField" pref="308" max="32767" attributes="0"/>
+                      <Component id="journalOffsetField" pref="316" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="journalSizeLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="journalSizeField" pref="320" max="32767" attributes="0"/>
+                      <Component id="journalSizeField" pref="327" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="deviceSignatureLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="deviceSignatureField3" alignment="0" pref="288" max="32767" attributes="0"/>
-                          <Component id="deviceSignatureField0" alignment="0" pref="288" max="32767" attributes="0"/>
-                          <Component id="deviceSignatureField1" alignment="0" pref="288" max="32767" attributes="0"/>
-                          <Component id="deviceSignatureField2" alignment="0" pref="288" max="32767" attributes="0"/>
+                          <Component id="deviceSignatureField3" alignment="0" pref="303" max="32767" attributes="0"/>
+                          <Component id="deviceSignatureField0" alignment="0" pref="303" max="32767" attributes="0"/>
+                          <Component id="deviceSignatureField1" alignment="0" pref="303" max="32767" attributes="0"/>
+                          <Component id="deviceSignatureField2" alignment="0" pref="303" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
