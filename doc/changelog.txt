@@ -1,3 +1,9 @@
+0.15.1
+------
+- Minor Windows Vista fix. The icons were not found when starting HFSExplorer with the
+  runfsb_vista.vbs script. Now the icons are included in the JAR file, so they should always
+  be available.
+
 0.15
 ----
 - Major UI overhaul with a few icons, changed appearance of the file list. Many things left
