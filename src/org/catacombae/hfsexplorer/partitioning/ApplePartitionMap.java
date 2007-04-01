@@ -26,7 +26,7 @@ import org.catacombae.hfsexplorer.LowLevelFile;
 import java.util.ArrayList;
 import java.io.PrintStream;
 
-public class ApplePartitionMap {
+public class ApplePartitionMap implements PartitionSystem {
     private APMPartition[] partitions;
     
     public ApplePartitionMap(LowLevelFile isoRaf, long pmOffset, int blockSize) {
@@ -43,7 +43,7 @@ public class ApplePartitionMap {
 	    if((currentBlock[0] & 0xFF) == 0x50 && 
 	       (currentBlock[1] & 0xFF) == 0x4D) { // new String(currentBlock, 0, 2, "ASCII").equals("PM")
 		//print("Partition " + i + ": ");
-		APMPartition p = new APMPartition(currentBlock, 0);
+		APMPartition p = new APMPartition(currentBlock, 0, blockSize);
 		partitionList.add(p);
 // 		if(options.verbose) {
 // 		    println();
@@ -71,7 +71,7 @@ public class ApplePartitionMap {
 	return partitions.length;
     }
     /** index must be between 0 and getNumPartitions()-1. */
-    public APMPartition getPartition(int index) {
+    public APMPartition getAPMPartition(int index) {
 	return partitions[index];
     }
     public APMPartition[] getPartitions() {
@@ -91,5 +91,9 @@ public class ApplePartitionMap {
     public void print(PrintStream ps, String prefix) {
 	ps.println("Apple Partition Map:");
 	printFields(ps, prefix);
+    }
+    
+    public Partition getPartition(int index) {
+	return getAPMPartition(index);
     }
 }

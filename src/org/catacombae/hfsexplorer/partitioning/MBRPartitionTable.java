@@ -20,43 +20,16 @@
 
 package org.catacombae.hfsexplorer.partitioning;
 import org.catacombae.hfsexplorer.Util;
+import java.io.PrintStream;
 
-public class MBRPartitionTable {
+public class MBRPartitionTable implements PartitionSystem {
+    /* Until I figure out a way to detect sector size, it will be 512... */
+    public static final int SECTOR_SIZE = 512;
+    
     public static final short MBR_SIGNATURE = 0x55AA;
     public static final int IBM_EXTENDED_DATA_OFFSET = 0x018A;
     public static final int DISK_SIGNATURE_OFFSET = 0x01B8;
     public static final int MBR_PARTITIONS_OFFSET = 0x01BE;
-    public static class MBRPartition {
-	protected static final byte PARTITION_NOT_BOOTABLE = 0x00;
-	protected static final byte PARTITION_BOOTABLE = (byte)0x80;
-	
-	private final byte[] status = new byte[1];
-	private final byte[] firstSector = new byte[3];
-	private final byte[] partitionType = new byte[1];
-	private final byte[] lastSector = new byte[3];
-	private final byte[] lbaFirstSector = new byte[4];
-	private final byte[] lbaPartitionLength = new byte[4];
-	/** <code>data</code> is assumed to be at least (<code>offset</code>+16) bytes in length. */
-	public MBRPartition(byte[] data, int offset) {
-	    System.arraycopy(data, offset+0, status, 0, 1);
-	    System.arraycopy(data, offset+1, firstSector, 0, 3);
-	    System.arraycopy(data, offset+4, partitionType, 0, 1);
-	    System.arraycopy(data, offset+5, lastSector, 0, 3);
-	    System.arraycopy(data, offset+8, lbaFirstSector, 0, 4);
-	    System.arraycopy(data, offset+12, lbaPartitionLength, 0, 4);
-	}
-	
-	public byte getStatus() { return Util.readByteLE(status); }
-	public byte[] getFirstSector() { return Util.createCopy(firstSector); }
-	public byte getPartitionType() { return Util.readByteLE(partitionType); }
-	public byte[] getLastSector() { return Util.createCopy(lastSector); }
-	public int getLBAFirstSector() { return Util.readIntLE(lbaFirstSector); }
-	public int getLBAPartitionLength() { return Util.readIntLE(lbaPartitionLength); }
-	public boolean isValid() {
-	    byte status = getStatus();
-	    return (status == PARTITION_NOT_BOOTABLE || status == PARTITION_BOOTABLE);
-	}
-    }
     /*
      * struct MBRPartitionTable
      * size: 512 bytes
@@ -90,7 +63,7 @@ public class MBRPartitionTable {
 	System.arraycopy(data, offset+IBM_EXTENDED_DATA_OFFSET+27, optIBMExtendedData4, 0, 9);
 	System.arraycopy(data, offset+DISK_SIGNATURE_OFFSET, optDiskSignature, 0, 4);
 	for(int i = 0; i < 4; ++i)
-	    partitions[i] = new MBRPartition(data, offset+MBR_PARTITIONS_OFFSET+i*16);
+	    partitions[i] = new MBRPartition(data, offset+MBR_PARTITIONS_OFFSET+i*16, SECTOR_SIZE);
 	System.arraycopy(data, offset+MBR_PARTITIONS_OFFSET+64, mbrSignature, 0, 2);
     }
     /** This is an optional field, and might contain unexpected and invalid data. */
@@ -124,5 +97,31 @@ public class MBRPartitionTable {
 	    else break; // we don't check the later ones
 	}
 	return num;
+    }
+    
+    public void printFields(PrintStream ps, String prefix) {
+	ps.println(prefix + " diskSignature: 0x" + Util.toHexStringBE(getOptionalDiskSignature()) + " (optional, and possibly incorrect)");
+	for(int i = 0; i < partitions.length; ++i) {
+	    ps.println(prefix + " partitions[" + i + "]:");
+	    if(partitions[i].isValid()) {
+		partitions[i].print(ps, prefix + "  ");
+	    }
+	    else
+		ps.println(prefix + "  [Invalid data]");
+	}
+	ps.println(prefix + " mbrSignature: 0x" + Util.toHexStringBE(getMBRSignature()));
+    }
+
+    public void print(PrintStream ps, String prefix) {
+	ps.println("MBRPartitionTable:");
+	printFields(ps, prefix);
+    }
+    
+    public Partition getPartition(int index) {
+	MBRPartition p = partitions[index];
+	if(p.isValid())
+	    return p;
+	else
+	    throw new ArrayIndexOutOfBoundsException(index);
     }
 }

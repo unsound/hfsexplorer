@@ -24,7 +24,7 @@ import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.Util2;
 import java.io.PrintStream;
 
-public class APMPartition {
+public class APMPartition extends Partition {
     /*
      * struct Partition
      * size: 512 bytes
@@ -71,7 +71,7 @@ public class APMPartition {
     private final byte[] pmProcessor = new byte[16];
     private final byte[] pmPad = new byte[2*188];
 	
-    public APMPartition(byte[] data, int offset) {
+    public APMPartition(byte[] data, int offset, int blockSize) {
 	System.arraycopy(data, offset+0, pmSig, 0, 2);
 	System.arraycopy(data, offset+2, pmSigPad, 0, 2);
 	System.arraycopy(data, offset+4, pmMapBlkCnt, 0, 4);
@@ -91,6 +91,11 @@ public class APMPartition {
 	System.arraycopy(data, offset+116, pmBootCksum, 0, 4);
 	System.arraycopy(data, offset+120, pmProcessor, 0, 16);
 	System.arraycopy(data, offset+136, pmPad, 0, 2*188);
+
+	// Added to make it work as subclass of Partition
+	startOffset = getPmPyPartStart()*blockSize;
+	length = getPmPartBlkCnt()*blockSize;
+	type = convertPartitionType(getPmParType());
     }
     public short getPmSig()        { return Util.readShortBE(pmSig); }
     public short getPmSigPad()     { return Util.readShortBE(pmSigPad); }
@@ -152,5 +157,32 @@ public class APMPartition {
 
     public String toString() {
 	return "\"" + getPmPartNameAsString() + "\" (" + getPmParTypeAsString() + ")";
+    }
+    
+    public PartitionType convertPartitionType(byte[] parTypeData) {
+	String typeString = Util.readNullTerminatedASCIIString(parTypeData);
+ 	if(typeString.equals("Apple_partition_map")) // Partition contains a partition map
+	    return PartitionType.APPLE_APM;
+ 	else if(typeString.equals("Apple_Driver")) // Partition contains a device driver
+	    return PartitionType.APPLE_DRIVER;
+ 	else if(typeString.equals("Apple_Driver43")) // Partition contains a SCSI Manager 4.3 device driver
+	    return PartitionType.APPLE_DRIVER43;
+ 	else if(typeString.equals("Apple_MFS")) // Partition uses the original Macintosh File System (64K ROM version)
+	    return PartitionType.APPLE_MFS;
+ 	else if(typeString.equals("Apple_HFS")) // Partition uses the Hierarchical File System (128K and later ROM versions)
+	    return PartitionType.APPLE_HFS;
+ 	else if(typeString.equals("Apple_HFSX")) // Partition uses HFSX. Presently, we report it as HFS+, and let the mounter decide.
+	    return PartitionType.APPLE_HFS;
+ 	else if(typeString.equals("Apple_Unix_SVR2")) // Partition uses the Unix file system
+	    return PartitionType.APPLE_UNIX_SVR2;
+ 	else if(typeString.equals("Apple_PRODOS")) // Partition uses the ProDOS file system
+	    return PartitionType.APPLE_PRODOS;
+ 	else if(typeString.equals("Apple_Free")) // Partition is unused
+	    return PartitionType.APPLE_FREE;
+ 	else if(typeString.equals("Apple_Scratch")) // Partition is empty
+	    return PartitionType.APPLE_SCRATCH;
+	else
+	    return PartitionType.UNKNOWN;
+		    
     }
 }

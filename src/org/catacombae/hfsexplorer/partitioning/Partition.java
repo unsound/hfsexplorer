@@ -20,11 +20,20 @@
 
 package org.catacombae.hfsexplorer.partitioning;
 
+/** A partition is a string of bytes. It is a substring of some larger string of bytes (usually representing a physical device
+    holding the data, such as a hard disk, a memory stick or an optical disc). A partition usually has metadata asssociated with
+    it, facilitating the interpretation of the data inside the partition. This simple abstraction produces three variables:
+    the start offset, the length of the partition and the partition type. While most partition systems specify their offsets
+    in sectors or blocks, the unit of this general partition will be one byte, so most implementations will need to convert from
+    the native sector number to an actual byte offset/length. */
 public class Partition {
+
     // Just listing the partition types that come to mind...
-    public static enum PartitionType  { APPLE_UFS, APPLE_HFS, APPLE_HFS_PLUS, APPLE_HFSX, 
-					 FAT12, FAT16, FAT32, NTFS, HPFS, 
-					 LINUX_SWAP, EXT2, EXT3, REISERFS, XFS, ZFS };
+    public static enum PartitionType {
+	APPLE_APM, APPLE_DRIVER, APPLE_DRIVER43, APPLE_MFS, APPLE_HFS, APPLE_UNIX_SVR2, APPLE_PRODOS, APPLE_FREE, APPLE_SCRATCH,  
+	    FAT12, FAT16, FAT32, NTFS, HPFS, DOS_EXTENDED,
+	    LINUX_SWAP, LINUX_NATIVE, XFS, ZFS,
+	    UNKNOWN };
     protected long startOffset;
     protected long length;
     protected PartitionType type;
@@ -36,7 +45,9 @@ public class Partition {
     }
     protected Partition() {} // Only for those that know what they're doing ;)
     
+    /** Returns the start offset in bytes. */
     public long getStartOffset() { return startOffset; }
+    /** Returns the length of the partition in bytes. */
     public long getLength() { return length; }
     public PartitionType getType() { return type; }
 }

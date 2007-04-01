@@ -53,20 +53,34 @@ public class PartitionSystemRecognizer {
 
 	// Look for GPT
 	// Let's assume that blocks are always 512 bytes in size with MBR and GPT. I don't know
-	// how to detect the actual block size...
+	// how to detect the actual block size (at least when reading from a file, otherwise I
+	// guess there are system specific ways)...
 	byte[] piece2 = new byte[512];
 	bitstream.seek(512);
 	bitstream.read(piece2);
 	GPTHeader gh = new GPTHeader(piece2, 0);
-	if(gh.isValid())
+	if(gh.isValid()) {
+	    bitstream.seek(0);
+	    GUIDPartitionTable gpt = new GUIDPartitionTable(bitstream, 0);
+	    for(GPTEntry ge : gpt.getEntries())
+		ge.print(System.err, "");
 	    return PartitionSystemType.GUID_PARTITION_TABLE;
+	}
 	
 	// Look for MBR
-	System.err.println("Looking for MBR");
+	//System.err.println("Looking for MBR");
 	MBRPartitionTable mpt = new MBRPartitionTable(piece1, 0);
-	if(mpt.isValid() && mpt.getPartitionCount() > 0)
+	if(mpt.isValid() && mpt.getPartitionCount() > 0) {
+// 	    System.err.println("MBR found with " + mpt.getPartitionCount() + " partitions:");
+// 	    int i = 0;
+// 	    for(MBRPartition mp : mpt.getPartitions()) {
+// 		System.err.println("  Partition " + (++i) + ":");
+// 		mp.print(System.err, "    ");
+// 	    }
+	    
 	    // Here we should look for extended partitions, BSD disk labels, LVM volumes etc.
 	    return PartitionSystemType.MASTER_BOOT_RECORD;
+	}
 	else if(mpt.isValid())
 	    System.err.println("STILL FUCKING VALID");
 	else

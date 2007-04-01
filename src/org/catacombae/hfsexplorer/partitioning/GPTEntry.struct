@@ -1,0 +1,8 @@
+struct GPTEntry {
+  byte[16]  partitionTypeGUID;
+  byte[16]  uniquePartitionGUID;
+  UInt64    startingLBA;
+  UInt64    endingLBA;
+  UInt64    attributeBits;
+  byte[72]  partitionName;
+};

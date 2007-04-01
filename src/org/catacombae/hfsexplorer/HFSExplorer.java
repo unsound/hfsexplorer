@@ -95,7 +95,7 @@ public class HFSExplorer {
 		signature[1] = currentBlock[1];
 		if(new String(signature, "ASCII").equals("PM")) {
 		    print("Partition " + i + ": ");
-		    APMPartition p = new APMPartition(currentBlock, 0);
+		    APMPartition p = new APMPartition(currentBlock, 0, 0x200);
 		    partitions.add(p);
 		    if(options.verbose) {
 			println();
