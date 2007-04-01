@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2006 Erik Larsson
+ * Copyright (C) 2006-2007 Erik Larsson
  * 
  * All rights reserved.
  * 
@@ -18,6 +18,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-package org.catacombae.hfsexplorer;
+package org.catacombae.hfsexplorer.partitioning;
 
-public class Util2 extends Util {} // Only here for compatibility reasons.
+/** Generalization of the features that a simple partitioning system should provide. */
+public interface PartitionSystem {
+    public int getPartitionCount();
+    public Partition getPartition(int index);
+}

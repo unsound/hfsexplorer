@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2006 Erik Larsson
+ * Copyright (C) 2006-2007 Erik Larsson
  * 
  * All rights reserved.
  * 
@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-package org.catacombae.hfsexplorer.apm;
+package org.catacombae.hfsexplorer.partitioning;
 
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.Util2;

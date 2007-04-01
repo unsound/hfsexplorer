@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2006 Erik Larsson
+ * Copyright (C) 2006-2007 Erik Larsson
  * 
  * All rights reserved.
  * 
@@ -18,6 +18,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-package org.catacombae.hfsexplorer;
+package org.catacombae.hfsexplorer.partitioning;
+import org.catacombae.hfsexplorer.Util;
 
-public class Util2 extends Util {} // Only here for compatibility reasons.
+public class GPTHeader {
+    private static final long GPT_SIGNATURE = 0x4546492050415254L;
+    private final byte[] signature = new byte[8];
+    
+    public GPTHeader(byte[] data, int offset) {
+	System.arraycopy(data, offset+0, signature, 0, 8);
+    }
+    
+    public long getSignature() { return Util.readLongBE(signature); }
+    
+    public boolean isValid() { return getSignature() == GPT_SIGNATURE; }
+}

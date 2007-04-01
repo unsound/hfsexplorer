@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2006 Erik Larsson
+ * Copyright (C) 2006-2007 Erik Larsson
  * 
  * All rights reserved.
  * 
@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-package org.catacombae.hfsexplorer.apm;
+package org.catacombae.hfsexplorer.partitioning;
 
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.Util2;
@@ -66,6 +66,13 @@ public class ApplePartitionMap {
 // 	//println("Parsing partition " + partNum + " (" + chosenPartition.getPmPartNameAsString().trim() + "/" + partitionType.trim() + ")");
 // 	offset = (chosenPartition.getPmPyPartStart()+chosenPartition.getPmLgDataStart())*0x200;
 // 	length = chosenPartition.getPmDataCnt()*0x200;
+    }
+    public int getPartitionCount() {
+	return partitions.length;
+    }
+    /** index must be between 0 and getNumPartitions()-1. */
+    public APMPartition getPartition(int index) {
+	return partitions[index];
     }
     public APMPartition[] getPartitions() {
 	APMPartition[] copy = new APMPartition[partitions.length];

@@ -36,9 +36,9 @@ buildhfsx() {
     return $?
 }
 
-buildhfsx_apm() {
-    echo "Building org.catacombae.hfsexplorer.apm..."
-    javac -cp $CLASSPATH -sourcepath $SOURCES_DIR -d $BUILD_DIR -Xlint:unchecked $SOURCES_DIR/org/catacombae/hfsexplorer/apm/*.java
+buildhfsx_partitioning() {
+    echo "Building org.catacombae.hfsexplorer.partitioning..."
+    javac -cp $CLASSPATH -sourcepath $SOURCES_DIR -d $BUILD_DIR -Xlint:unchecked $SOURCES_DIR/org/catacombae/hfsexplorer/partitioning/*.java
     return $?
 }
 
@@ -77,7 +77,7 @@ main() {
 	if [ "$?" == 0 ]; then
 	    buildhfsx
 	    if [ "$?" == 0 ]; then
-		buildhfsx_apm
+		buildhfsx_partitioning
 		if [ "$?" == 0 ]; then
 		    buildhfsx_gui
 		    if [ "$?" == 0 ]; then

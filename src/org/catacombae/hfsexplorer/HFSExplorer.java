@@ -20,7 +20,7 @@
 
 package org.catacombae.hfsexplorer;
 
-import org.catacombae.hfsexplorer.apm.*;
+import org.catacombae.hfsexplorer.partitioning.*;
 import org.catacombae.hfsexplorer.types.*;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
 import java.util.*;
