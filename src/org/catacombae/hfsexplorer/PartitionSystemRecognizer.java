@@ -62,11 +62,16 @@ public class PartitionSystemRecognizer {
 	    return PartitionSystemType.GUID_PARTITION_TABLE;
 	
 	// Look for MBR
+	System.err.println("Looking for MBR");
 	MBRPartitionTable mpt = new MBRPartitionTable(piece1, 0);
 	if(mpt.isValid() && mpt.getPartitionCount() > 0)
 	    // Here we should look for extended partitions, BSD disk labels, LVM volumes etc.
 	    return PartitionSystemType.MASTER_BOOT_RECORD;
-	
+	else if(mpt.isValid())
+	    System.err.println("STILL FUCKING VALID");
+	else
+	    System.out.println("NOT AT ALL VALID. Data:\n" + Util.byteArrayToHexString(piece1));
+
 	return PartitionSystemType.NONE_FOUND;
     }
     

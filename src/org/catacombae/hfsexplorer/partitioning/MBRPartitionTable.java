@@ -23,7 +23,9 @@ import org.catacombae.hfsexplorer.Util;
 
 public class MBRPartitionTable {
     public static final short MBR_SIGNATURE = 0x55AA;
-    public static final int PARTITION_INFO_OFFSET = 0x018A;
+    public static final int IBM_EXTENDED_DATA_OFFSET = 0x018A;
+    public static final int DISK_SIGNATURE_OFFSET = 0x01B8;
+    public static final int MBR_PARTITIONS_OFFSET = 0x01BE;
     public static class MBRPartition {
 	protected static final byte PARTITION_NOT_BOOTABLE = 0x00;
 	protected static final byte PARTITION_BOOTABLE = (byte)0x80;
@@ -55,6 +57,23 @@ public class MBRPartitionTable {
 	    return (status == PARTITION_NOT_BOOTABLE || status == PARTITION_BOOTABLE);
 	}
     }
+    /*
+     * struct MBRPartitionTable
+     * size: 512 bytes
+     *
+     * BP   Size  Type              Variable name        Description
+     * --------------------------------------------------------------
+     * 394  9     byte[9]           optIBMExtendedData1  
+     * 403  9     byte[9]           optIBMExtendedData2  
+     * 412  9     byte[9]           optIBMExtendedData3  
+     * 421  9     byte[9]           optIBMExtendedData4  
+     * ~~~~~~~~~~~~~~~~~~~~~~~~[Not continuous]~~~~~~~~~~~~~~~~~~~~~~
+     * 440  4     UInt32            optDiskSignature     
+     * ~~~~~~~~~~~~~~~~~~~~~~~~[Not continuous]~~~~~~~~~~~~~~~~~~~~~~
+     * 446  16*4  MBRPartition[4]   partitions           
+     * 510  2     UInt16            mbrSignature         
+     *
+     */
     private final byte[] optIBMExtendedData1 = new byte[9];
     private final byte[] optIBMExtendedData2 = new byte[9];
     private final byte[] optIBMExtendedData3 = new byte[9];
@@ -65,15 +84,14 @@ public class MBRPartitionTable {
     
     /** <code>data</code> is assumed to be at least (<code>offset</code>+512) bytes in length. */
     public MBRPartitionTable(byte[] data, int offset) {
-	offset += PARTITION_INFO_OFFSET;
-	System.arraycopy(data, offset+0, optIBMExtendedData1, 0, 9);
-	System.arraycopy(data, offset+9, optIBMExtendedData2, 0, 9);
-	System.arraycopy(data, offset+18, optIBMExtendedData3, 0, 9);
-	System.arraycopy(data, offset+27, optIBMExtendedData4, 0, 9);
-	System.arraycopy(data, offset+36, optDiskSignature, 0, 4);
+	System.arraycopy(data, offset+IBM_EXTENDED_DATA_OFFSET+0, optIBMExtendedData1, 0, 9);
+	System.arraycopy(data, offset+IBM_EXTENDED_DATA_OFFSET+9, optIBMExtendedData2, 0, 9);
+	System.arraycopy(data, offset+IBM_EXTENDED_DATA_OFFSET+18, optIBMExtendedData3, 0, 9);
+	System.arraycopy(data, offset+IBM_EXTENDED_DATA_OFFSET+27, optIBMExtendedData4, 0, 9);
+	System.arraycopy(data, offset+DISK_SIGNATURE_OFFSET, optDiskSignature, 0, 4);
 	for(int i = 0; i < 4; ++i)
-	    partitions[i] = new MBRPartition(data, offset+40+i*16);
-	System.arraycopy(data, offset+104, mbrSignature, 0, 2);
+	    partitions[i] = new MBRPartition(data, offset+MBR_PARTITIONS_OFFSET+i*16);
+	System.arraycopy(data, offset+MBR_PARTITIONS_OFFSET+64, mbrSignature, 0, 2);
     }
     /** This is an optional field, and might contain unexpected and invalid data. */
     public byte[] getOptionalIBMExtendedData1() { return Util.createCopy(optIBMExtendedData1); }
