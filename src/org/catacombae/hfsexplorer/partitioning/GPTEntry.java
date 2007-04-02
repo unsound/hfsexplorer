@@ -112,10 +112,46 @@ public class GPTEntry extends Partition {
     
     public byte[] getPartitionTypeGUID() { return Util.createCopy(partitionTypeGUID); }
     public byte[] getUniquePartitionGUID() { return Util.createCopy(uniquePartitionGUID); }
-    public long getStartingLBA() { return Util.readLongBE(startingLBA); }
-    public long getEndingLBA() { return Util.readLongBE(endingLBA); }
+    public long getStartingLBA() { return Util.readLongLE(startingLBA); }
+    public long getEndingLBA() { return Util.readLongLE(endingLBA); }
     public long getAttributeBits() { return Util.readLongBE(attributeBits); }
     public byte[] getPartitionName() { return Util.createCopy(partitionName); }
+    
+    public GPTPartitionType getPartitionTypeGUIDAsEnum() {
+	return GPTPartitionType.getType(Util.readLongBE(partitionTypeGUID, 0), Util.readLongBE(partitionTypeGUID, 8));
+    }
+    public String getPartitionNameAsString() {
+	// Find null terminator
+	int stringLength = 0;
+	for(int i = 0; i < partitionName.length; i += 2) {
+	    if(partitionName[i] == 0 && partitionName[i+1] == 0)
+		break;
+	    else
+		stringLength += 2;
+	}
+	return Util.readString(partitionName, 0, stringLength, "UTF-16LE");
+    }
+    
+    public String toString() {
+	return "\"" + getPartitionNameAsString() + "\" (" + getPartitionTypeGUIDAsEnum() + ")";
+    }
+
+    
+    public void printFields(PrintStream ps, String prefix) {
+	ps.println(prefix + " partitionTypeGUID: " + getGUIDAsString(getPartitionTypeGUID()));
+	ps.println(prefix + " uniquePartitionGUID: " + getGUIDAsString(getUniquePartitionGUID()));
+	ps.println(prefix + " startingLBA: " + getStartingLBA());
+	ps.println(prefix + " endingLBA: " + getEndingLBA());
+	ps.println(prefix + " attributeBits: " + getAttributeBits());
+	ps.println(prefix + " partitionName: " + getPartitionNameAsString());
+    }
+    
+    public void print(PrintStream ps, String prefix) {
+	ps.println(prefix + "GPTEntry:");
+	printFields(ps, prefix);
+    }
+    
+    // Utility methods
     
     public static String getGUIDAsString(byte[] guid) {
 	String res = "{";
@@ -125,23 +161,6 @@ public class GPTEntry extends Partition {
 	res += Util.byteArrayToHexString(guid, 8, 2) + "-";
 	res += Util.byteArrayToHexString(guid, 10, 6) + "}";
 	return res;
-    }
-    public GPTPartitionType getPartitionTypeGUIDAsEnum() {
-	return GPTPartitionType.getType(Util.readLongBE(partitionTypeGUID, 0), Util.readLongBE(partitionTypeGUID, 8));
-    }
-    
-    public void printFields(PrintStream ps, String prefix) {
-	ps.println(prefix + " partitionTypeGUID: " + getGUIDAsString(getPartitionTypeGUID()));
-	ps.println(prefix + " uniquePartitionGUID: " + getGUIDAsString(getUniquePartitionGUID()));
-	ps.println(prefix + " startingLBA: " + getStartingLBA());
-	ps.println(prefix + " endingLBA: " + getEndingLBA());
-	ps.println(prefix + " attributeBits: " + getAttributeBits());
-	ps.println(prefix + " partitionName: " + Util.toASCIIString(getPartitionName()));
-    }
-    
-    public void print(PrintStream ps, String prefix) {
-	ps.println(prefix + "GPTEntry:");
-	printFields(ps, prefix);
     }
     
     public static PartitionType convertPartitionType(GPTPartitionType gpt) {

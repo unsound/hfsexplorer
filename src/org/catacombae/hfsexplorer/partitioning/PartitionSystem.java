@@ -19,9 +19,17 @@
  */
 
 package org.catacombae.hfsexplorer.partitioning;
+import java.io.PrintStream;
 
 /** Generalization of the features that a simple partitioning system should provide. */
 public interface PartitionSystem {
     public int getPartitionCount();
     public Partition getPartition(int index);
+    public Partition[] getPartitions();
+    public String toString();
+    public String getLongName();
+    public String getShortName();
+    public void printFields(PrintStream ps, String prefix);
+    public void print(PrintStream ps, String prefix);
+
 }

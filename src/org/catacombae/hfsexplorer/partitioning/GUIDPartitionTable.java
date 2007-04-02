@@ -21,6 +21,7 @@
 package org.catacombae.hfsexplorer.partitioning;
 
 import org.catacombae.hfsexplorer.*;
+import java.io.PrintStream;
 
 public class GUIDPartitionTable implements PartitionSystem {
     private static final int BLOCK_SIZE = 512;
@@ -32,7 +33,7 @@ public class GUIDPartitionTable implements PartitionSystem {
 	llf.seek(offset+512);
 	llf.readFully(headerData);
 	header = new GPTHeader(headerData, 0);
-	header.print(System.err, "");
+	//header.print(System.err, "");
 	entries = new GPTEntry[header.getNumberOfPartitionEntries()];
 	byte[] currentEntryData = new byte[128];
 	for(int i = 0; i < entries.length; ++i) {
@@ -49,4 +50,24 @@ public class GUIDPartitionTable implements PartitionSystem {
     }
     public int getPartitionCount() { return entries.length; }
     public Partition getPartition(int index) { return entries[index]; }
+    public Partition[] getPartitions() {
+	return getEntries();
+    }
+    
+    public String getLongName() { return "GUID Partition Table"; }
+    public String getShortName() { return "GPT"; }
+
+    public void printFields(PrintStream ps, String prefix) {
+	ps.println(prefix + " header:");
+	header.print(ps, prefix + "  ");
+	for(int i = 0; i < entries.length; ++i) {
+	    ps.println(prefix + " entries[" + i + "]:");
+	    entries[i].print(ps, prefix + "  ");
+	}
+    }
+    
+    public void print(PrintStream ps, String prefix) {
+	ps.println(prefix + "GUIDPartitionTable:");
+	printFields(ps, prefix);
+    }
 }

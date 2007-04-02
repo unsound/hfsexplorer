@@ -19,6 +19,7 @@
  */
 
 package org.catacombae.hfsexplorer.partitioning;
+import java.io.PrintStream;
 
 /** A partition is a string of bytes. It is a substring of some larger string of bytes (usually representing a physical device
     holding the data, such as a hard disk, a memory stick or an optical disc). A partition usually has metadata asssociated with
@@ -26,7 +27,7 @@ package org.catacombae.hfsexplorer.partitioning;
     the start offset, the length of the partition and the partition type. While most partition systems specify their offsets
     in sectors or blocks, the unit of this general partition will be one byte, so most implementations will need to convert from
     the native sector number to an actual byte offset/length. */
-public class Partition {
+public abstract class Partition {
 
     // Just listing the partition types that come to mind...
     public static enum PartitionType {
@@ -50,4 +51,8 @@ public class Partition {
     /** Returns the length of the partition in bytes. */
     public long getLength() { return length; }
     public PartitionType getType() { return type; }
+
+    public abstract void printFields(PrintStream ps, String prefix);
+    public abstract void print(PrintStream ps, String prefix);
+
 }

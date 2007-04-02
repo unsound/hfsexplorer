@@ -124,4 +124,7 @@ public class MBRPartitionTable implements PartitionSystem {
 	else
 	    throw new ArrayIndexOutOfBoundsException(index);
     }
+    
+    public String getLongName() { return "Master Boot Record"; }
+    public String getShortName() { return "MBR"; }
 }

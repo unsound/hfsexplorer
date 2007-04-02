@@ -128,12 +128,21 @@ public class MBRPartition extends Partition {
     public int getLBAFirstSector() { return Util.readIntLE(lbaFirstSector); }
     public int getLBAPartitionLength() { return Util.readIntLE(lbaPartitionLength); }
     
+    public boolean isBootable() {
+	return getStatus() == PARTITION_BOOTABLE;
+    }
     public boolean isValid() {
 	byte status = getStatus();
 	return (status == PARTITION_NOT_BOOTABLE || status == PARTITION_BOOTABLE);
     }
     public MBRPartitionType getPartitionTypeAsEnum() {
 	return MBRPartitionType.getType(getPartitionType());
+    }
+    
+    public String toString() {
+	MBRPartitionType mpt = getPartitionTypeAsEnum();
+	return (isBootable()?"Bootable ":"") + "MBR Partition (" + mpt + 
+	    (mpt == MBRPartitionType.UNKNOWN_PARTITION_TYPE?"0x"+Util.toHexStringBE(getPartitionType()):"") + ")";
     }
     
     public void printFields(PrintStream ps, String prefix) {

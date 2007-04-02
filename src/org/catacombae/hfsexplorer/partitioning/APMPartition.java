@@ -93,8 +93,10 @@ public class APMPartition extends Partition {
 	System.arraycopy(data, offset+136, pmPad, 0, 2*188);
 
 	// Added to make it work as subclass of Partition
-	startOffset = getPmPyPartStart()*blockSize;
-	length = getPmPartBlkCnt()*blockSize;
+	//getPmPyPartStart()+selectedPartition.getPmLgDataStart())*blockSize;
+	//getPmDataCnt()*blockSize;
+	startOffset = (getPmPyPartStart()+getPmLgDataStart())*blockSize;
+	length = getPmDataCnt()*blockSize;
 	type = convertPartitionType(getPmParType());
     }
     public short getPmSig()        { return Util.readShortBE(pmSig); }

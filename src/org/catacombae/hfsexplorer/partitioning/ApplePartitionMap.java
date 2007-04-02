@@ -96,4 +96,6 @@ public class ApplePartitionMap implements PartitionSystem {
     public Partition getPartition(int index) {
 	return getAPMPartition(index);
     }
+    public String getLongName() { return "Apple Partition Map"; }
+    public String getShortName() { return "APM"; }
 }

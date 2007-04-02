@@ -60,10 +60,10 @@ public class PartitionSystemRecognizer {
 	bitstream.read(piece2);
 	GPTHeader gh = new GPTHeader(piece2, 0);
 	if(gh.isValid()) {
-	    bitstream.seek(0);
-	    GUIDPartitionTable gpt = new GUIDPartitionTable(bitstream, 0);
-	    for(GPTEntry ge : gpt.getEntries())
-		ge.print(System.err, "");
+// 	    bitstream.seek(0);
+// 	    GUIDPartitionTable gpt = new GUIDPartitionTable(bitstream, 0);
+// 	    for(GPTEntry ge : gpt.getEntries())
+// 		ge.print(System.err, "");
 	    return PartitionSystemType.GUID_PARTITION_TABLE;
 	}
 	
@@ -81,16 +81,35 @@ public class PartitionSystemRecognizer {
 	    // Here we should look for extended partitions, BSD disk labels, LVM volumes etc.
 	    return PartitionSystemType.MASTER_BOOT_RECORD;
 	}
-	else if(mpt.isValid())
-	    System.err.println("STILL FUCKING VALID");
-	else
-	    System.out.println("NOT AT ALL VALID. Data:\n" + Util.byteArrayToHexString(piece1));
 
 	return PartitionSystemType.NONE_FOUND;
     }
     
+    /** If none can be found, null is returned */
+    public PartitionSystem getPartitionSystem() {
+	PartitionSystemType type = detectPartitionSystem();
+	switch(type) {
+	case APPLE_PARTITION_MAP:
+	    byte[] ddrData = new byte[512];
+	    bitstream.seek(0);
+	    bitstream.readFully(ddrData);
+	    DriverDescriptorRecord ddr = new DriverDescriptorRecord(ddrData, 0);
+	    int blockSize = Util.unsign(ddr.getSbBlkSize());
+	    return new ApplePartitionMap(bitstream, blockSize*1, blockSize);
+	case GUID_PARTITION_TABLE:
+	    return new GUIDPartitionTable(bitstream, 0);
+	case MASTER_BOOT_RECORD:
+	    byte[] firstSector = new byte[512];
+	    bitstream.seek(0);
+	    bitstream.readFully(firstSector);
+	    return new MBRPartitionTable(firstSector, 0);
+	default:
+	    return null;
+	}
+    }
+    
     public static void main(String[] args) throws Exception {
 	LowLevelFile llf = new RandomAccessLLF(args[0]);
-	System.out.println(new PartitionSystemRecognizer(llf).detectPartitionSystem().toString());
+	new PartitionSystemRecognizer(llf).getPartitionSystem().print(System.out, "");
     }
 }

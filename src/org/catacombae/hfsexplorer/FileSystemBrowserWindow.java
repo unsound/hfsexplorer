@@ -442,7 +442,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	
 	// Menus
 	JMenuItem loadFSFromDeviceItem = null;
-	JMenuItem loadFSFromDeviceWithAPMItem = null;
+	//JMenuItem loadFSFromDeviceWithAPMItem = null;
 	if(System.getProperty("os.name").toLowerCase().startsWith("windows") &&
 	   System.getProperty("os.arch").toLowerCase().equals("x86")) {
 	    loadFSFromDeviceItem = new JMenuItem("Load file system from device");
@@ -464,29 +464,29 @@ public class FileSystemBrowserWindow extends JFrame {
 			}
 		    }
 		});
-	    loadFSFromDeviceWithAPMItem = new JMenuItem("Load file system from device with APM");
-	    loadFSFromDeviceWithAPMItem.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent ae) {
-			SelectWindowsDeviceDialog deviceDialog = new SelectWindowsDeviceDialog(FileSystemBrowserWindow.this,
-											       true,
-											       "Load file system from device with APM");
-			deviceDialog.setVisible(true);
-			String pathName = deviceDialog.getPathName();
-// 			String pathName = JOptionPane.showInputDialog(FileSystemBrowserWindow.this,
-// 								      "Enter the UNC path for the file system",
-// 								      "\\\\?\\GLOBALROOT\\Device\\Harddisk2\\Partition2");
-			try {
-			    if(pathName != null)
-				loadFS(pathName, true, true);
-			} catch(Exception e) {
-			    e.printStackTrace();
-			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-							  "Could not read contents of partition!",
-							  "Error", JOptionPane.ERROR_MESSAGE);
-			}
-		    }
-		});
-	}
+// 	    loadFSFromDeviceWithAPMItem = new JMenuItem("Load file system from device with APM");
+// 	    loadFSFromDeviceWithAPMItem.addActionListener(new ActionListener() {
+// 		    public void actionPerformed(ActionEvent ae) {
+// 			SelectWindowsDeviceDialog deviceDialog = new SelectWindowsDeviceDialog(FileSystemBrowserWindow.this,
+// 											       true,
+// 											       "Load file system from device with APM");
+// 			deviceDialog.setVisible(true);
+// 			String pathName = deviceDialog.getPathName();
+// // 			String pathName = JOptionPane.showInputDialog(FileSystemBrowserWindow.this,
+// // 								      "Enter the UNC path for the file system",
+// // 								      "\\\\?\\GLOBALROOT\\Device\\Harddisk2\\Partition2");
+// 			try {
+// 			    if(pathName != null)
+// 				loadFS(pathName, true, true);
+// 			} catch(Exception e) {
+// 			    e.printStackTrace();
+// 			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+// 							  "Could not read contents of partition!",
+// 							  "Error", JOptionPane.ERROR_MESSAGE);
+// 			}
+// 		    }
+// 		});
+ 	}
 	JMenuItem loadFSFromFileItem = new JMenuItem("Load file system from file");
 	loadFSFromFileItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
@@ -512,31 +512,31 @@ public class FileSystemBrowserWindow extends JFrame {
 		    }
 		}
 	    });
-	JMenuItem loadAPMFSFromFileItem = new JMenuItem("Load file system from file with APM");
-	loadAPMFSFromFileItem.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent ae) {
-		    //JFileChooser fileChooser = new JFileChooser();
-		    fileChooser.setMultiSelectionEnabled(false);
-		    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		    if(fileChooser.showOpenDialog(FileSystemBrowserWindow.this) == 
-		       JFileChooser.APPROVE_OPTION) {
-			try {
-			    String pathName = fileChooser.getSelectedFile().getCanonicalPath();
-			    loadFS(pathName, true, false);
-			} catch(IOException ioe) {
-			    ioe.printStackTrace();
-			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-							  "Count not resolve pathname!",
-							  "Error", JOptionPane.ERROR_MESSAGE);
-			} catch(Exception e) {
-			    e.printStackTrace();
-			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-							  "Could not read contents of partition!",
-							  "Error", JOptionPane.ERROR_MESSAGE);
-			}
-		    }
-		}
-	    });
+// 	JMenuItem loadAPMFSFromFileItem = new JMenuItem("Load file system from file with APM");
+// 	loadAPMFSFromFileItem.addActionListener(new ActionListener() {
+// 		public void actionPerformed(ActionEvent ae) {
+// 		    //JFileChooser fileChooser = new JFileChooser();
+// 		    fileChooser.setMultiSelectionEnabled(false);
+// 		    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+// 		    if(fileChooser.showOpenDialog(FileSystemBrowserWindow.this) == 
+// 		       JFileChooser.APPROVE_OPTION) {
+// 			try {
+// 			    String pathName = fileChooser.getSelectedFile().getCanonicalPath();
+// 			    loadFS(pathName, true, false);
+// 			} catch(IOException ioe) {
+// 			    ioe.printStackTrace();
+// 			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+// 							  "Count not resolve pathname!",
+// 							  "Error", JOptionPane.ERROR_MESSAGE);
+// 			} catch(Exception e) {
+// 			    e.printStackTrace();
+// 			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+// 							  "Could not read contents of partition!",
+// 							  "Error", JOptionPane.ERROR_MESSAGE);
+// 			}
+// 		    }
+// 		}
+// 	    });
 	JMenuItem fsInfoItem = new JMenuItem("File system info");
 	fsInfoItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
@@ -575,10 +575,10 @@ public class FileSystemBrowserWindow extends JFrame {
 	JMenu fileMenu = new JMenu("File");
 	if(loadFSFromDeviceItem != null)
 	    fileMenu.add(loadFSFromDeviceItem);
-	if(loadFSFromDeviceWithAPMItem != null)
-	    fileMenu.add(loadFSFromDeviceWithAPMItem);
+	//if(loadFSFromDeviceWithAPMItem != null)
+	//    fileMenu.add(loadFSFromDeviceWithAPMItem);
 	fileMenu.add(loadFSFromFileItem);
-	fileMenu.add(loadAPMFSFromFileItem);
+	//fileMenu.add(loadAPMFSFromFileItem);
 	JMenu infoMenu = new JMenu("Info");
 	infoMenu.add(fsInfoItem);
 	JMenu helpMenu = new JMenu("Help");
@@ -656,56 +656,68 @@ public class FileSystemBrowserWindow extends JFrame {
 	int ddrBlockSize;
 	long fsOffset;
 	long fsLength;
-	if(readAPM) {
-	    byte[] firstBlock = new byte[blockSize];
-	    fsFile.readFully(firstBlock);
-	    DriverDescriptorRecord ddr = new DriverDescriptorRecord(firstBlock, 0);
-	    //ddr.print(System.out, "");
-	    ApplePartitionMap apm = new ApplePartitionMap(fsFile, 0x200, ddr.getSbBlkSize());
-	    //apm.print(System.out, "");
-	    APMPartition[] partitions = apm.getPartitions();
+	
+	// Detect partition system
+	PartitionSystemRecognizer psRec = new PartitionSystemRecognizer(fsFile);
+	PartitionSystem partSys = psRec.getPartitionSystem();
+	if(partSys != null) {
+	    Partition[] partitions = partSys.getPartitions();
 	    if(partitions.length == 0) {
-		JOptionPane.showMessageDialog(this, "Could not find an Apple Partition Map with any partitions inside.",
-					      "APM not found", JOptionPane.ERROR_MESSAGE);
-		return;
+		// Proceed to detect file system
+		fsOffset = 0;
+		fsLength = fsFile.length();
 	    }
-		
-	    Object selectedValue;
-	    while(true) {
-		selectedValue = JOptionPane.showInputDialog(this, "Select which partition to read", 
-							    "Choose APM partition", JOptionPane.QUESTION_MESSAGE,
-							    null, partitions, partitions[0]);
-		if(selectedValue != null &&
-		   selectedValue instanceof APMPartition) {
-		    APMPartition selectedPartition = (APMPartition)selectedValue;
-		    String partitionType = selectedPartition.getPmParTypeAsString();
-		    if(selectedPartition.getPmParTypeAsString().trim().equals("Apple_HFS"))
-			break;
+	    else {
+		Object selectedValue;
+		while(true) {
+		    selectedValue = JOptionPane.showInputDialog(this, "Select which partition to read", 
+								"Choose " + partSys.getLongName() +" partition", 
+								JOptionPane.QUESTION_MESSAGE,
+								null, partitions, partitions[0]);
+		    if(selectedValue != null &&
+		       selectedValue instanceof Partition) {
+			Partition selectedPartition = (Partition)selectedValue;
+			if(selectedPartition.getType() == Partition.PartitionType.APPLE_HFS)
+			    break;
+			else
+			    JOptionPane.showMessageDialog(this, "Can't find handler for partition type \"" + selectedPartition.getType() +
+							  "\"", "Unknown partition type", JOptionPane.ERROR_MESSAGE);
+		    }
 		    else
-			JOptionPane.showMessageDialog(this, "Can't find handler for partition type \"" + partitionType + "\"",
-						      "Unknown partition type", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		if(selectedValue instanceof Partition) {
+		    Partition selectedPartition = (Partition)selectedValue;
+		    fsOffset = selectedPartition.getStartOffset();//getPmPyPartStart()+selectedPartition.getPmLgDataStart())*blockSize;
+		    fsLength = selectedPartition.getLength();//getPmDataCnt()*blockSize;
+		    System.err.println("DEBUG Selected partition:");
+		    selectedPartition.print(System.err, "  ");
 		}
 		else
-		    return;
+		    throw new RuntimeException("Impossible error!");
 	    }
-	    if(selectedValue instanceof APMPartition) {
-		APMPartition selectedPartition = (APMPartition)selectedValue;
-		fsOffset = (selectedPartition.getPmPyPartStart()+selectedPartition.getPmLgDataStart())*blockSize;
-		fsLength = selectedPartition.getPmDataCnt()*blockSize;
-	    }
-	    else
-		throw new RuntimeException("Impossible error!");
 	}
 	else {
 	    fsOffset = 0;
 	    fsLength = fsFile.length();
 	}
-	fsView = new HFSFileSystemView(fsFile, fsOffset);
-	HFSPlusCatalogLeafRecord rootRecord = fsView.getRoot();
-	HFSPlusCatalogLeafRecord[] rootContents = fsView.listRecords(rootRecord);
-	populateFilesystemGUI(rootRecord, rootContents);
-	statusLabel.setText("0 objects selected (0 bytes)");
-	//adjustTableWidth();
+
+	// Detect HFS file system
+	FileSystemRecognizer fsr = new FileSystemRecognizer(fsFile, fsOffset);
+	FileSystemRecognizer.FileSystemType fsType = fsr.detectFileSystem();
+	if(fsType == FileSystemRecognizer.FileSystemType.HFS_PLUS) {
+	    fsView = new HFSFileSystemView(fsFile, fsOffset);
+	    HFSPlusCatalogLeafRecord rootRecord = fsView.getRoot();
+	    HFSPlusCatalogLeafRecord[] rootContents = fsView.listRecords(rootRecord);
+	    populateFilesystemGUI(rootRecord, rootContents);
+	    statusLabel.setText("0 objects selected (0 bytes)");
+	    //adjustTableWidth();
+	}
+	else
+	    JOptionPane.showMessageDialog(this, "Invalid HFS type. Program supports (" + FileSystemRecognizer.FileSystemType.HFS_PLUS +
+					  "), detected type is (" + fsType + ").",
+					  "Unsupported file system type", JOptionPane.ERROR_MESSAGE);
+		    
     }
 
     private void populateFilesystemGUI(HFSPlusCatalogLeafRecord root, HFSPlusCatalogLeafRecord[] contents) {

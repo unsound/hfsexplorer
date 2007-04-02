@@ -402,17 +402,29 @@ public class Util {
 	return toASCIIString(data, 0, data.length);
     }
     public static String toASCIIString(byte[] data, int offset, int length) {
-	try {
-	    return new String(data, offset, length, "US-ASCII");
-	} catch(Exception e) {
-	    return null;
-	}
+	return readString(data, offset, length, "US-ASCII");
     }
     public static String toASCIIString(short i) {
 	return toASCIIString(Util.toByteArrayBE(i));
     }
     public static String toASCIIString(int i) {
 	return toASCIIString(Util.toByteArrayBE(i));
+    }
+    public static String readString(byte[] data, String encoding) {
+	return readString(data, 0, data.length, encoding);
+    }
+    public static String readString(byte[] data, int offset, int length, String encoding) {
+	try {
+	    return new String(data, offset, length, encoding);
+	} catch(Exception e) {
+	    return null;
+	}
+    }
+    public static String readString(short i, String encoding) {
+	return readString(Util.toByteArrayBE(i), encoding);
+    }
+    public static String readString(int i, String encoding) {
+	return readString(Util.toByteArrayBE(i), encoding);
     }
 
     public static String readNullTerminatedASCIIString(byte[] data) {
