@@ -2,10 +2,10 @@ HFSExplorer Changelog
 ---------------------
 
 
-0.16 (in progress)
+0.16
 ----
 - Added automatic detection of partition systems and file systems, so that the user no longer
-  needs to worry about whether it should choose to load with or without APM.
+  needs to worry about whether it should choose to load them with or without APM.
 - Added support for the MBR and GUID Partition Table partitioning schemes, making access to
   raw disk images or devices from Intel systems possible. (Not very tested, might be buggy...)
 - Added an "autodetect" button to the "Load file system from device" dialog (only for Windows

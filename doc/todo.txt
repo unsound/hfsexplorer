@@ -7,3 +7,5 @@ HFSExplorer TODO:
 - Implement a composition algorithm, that converts the decomposed name strings into
   standard Unicode ones.
 - Figure out how to remove the grey background in the table...
+- Make autodetect in windows dialog capable of autodetecting partitioning systems.
+  Otherwise iPod-users and users of Mac-formatted hard drives will suffer.
