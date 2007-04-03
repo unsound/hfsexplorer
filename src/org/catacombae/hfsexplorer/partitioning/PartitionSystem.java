@@ -23,9 +23,10 @@ import java.io.PrintStream;
 
 /** Generalization of the features that a simple partitioning system should provide. */
 public interface PartitionSystem {
-    public int getPartitionCount();
-    public Partition getPartition(int index);
-    public Partition[] getPartitions();
+    public int getUsedPartitionCount();
+    public Partition getPartitionEntry(int index);
+    public Partition[] getPartitionEntries();
+    public Partition[] getUsedPartitionEntries();
     public String toString();
     public String getLongName();
     public String getShortName();

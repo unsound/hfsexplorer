@@ -43,15 +43,15 @@ public class GPTEntry extends Partition {
      */
     private static final Hashtable<LongBuffer,GPTPartitionType> byteMap = new Hashtable<LongBuffer,GPTPartitionType>();
     public static enum GPTPartitionType {
-	PARTITION_TYPE_UNUSED_ENTRY             ((long)0x0000000000000000L, (long)0x0000000000000000L),
-	    PARTITION_TYPE_EFI_SYSTEM           ((long)0x28732AC11FF8D211L, (long)0xBA4B00A0C93EC93BL),
-	    PARTITION_TYPE_MICROSOFT_RESERVED   ((long)0x16E3C9E35C0BB84DL, (long)0x817DF92DF00215AEL),
-	    PARTITION_TYPE_PRIMARY_PARTITION    ((long)0xA2A0D0EBE5B93344L, (long)0x87C068B6B72699C7L),
-	    PARTITION_TYPE_LDM_METADATA         ((long)0xAAC808588F7EE042L, (long)0x85D2E1E90434CFB3L),
-	    PARTITION_TYPE_LDM_DATA             ((long)0xA0609BAF3114624FL, (long)0xBC683311714A69ADL),
-// 	    PARTITION_TYPE_APPLE_HFS            ((long)0x48465300000011AAL, (long)0xAA1100306543ECACL), //Wikipedia
-	    PARTITION_TYPE_APPLE_HFS            ((long)0x005346480000AA11L, (long)0xAA1100306543ECACL), //My disc..
-	    UNKNOWN_PARTITION_TYPE; // Returned when no known type can be matched
+	PARTITION_TYPE_UNUSED_ENTRY         ((long)0x0000000000000000L, (long)0x0000000000000000L),
+	PARTITION_TYPE_EFI_SYSTEM           ((long)0x28732AC11FF8D211L, (long)0xBA4B00A0C93EC93BL),
+	PARTITION_TYPE_MICROSOFT_RESERVED   ((long)0x16E3C9E35C0BB84DL, (long)0x817DF92DF00215AEL),
+	PARTITION_TYPE_PRIMARY_PARTITION    ((long)0xA2A0D0EBE5B93344L, (long)0x87C068B6B72699C7L),
+	PARTITION_TYPE_LDM_METADATA         ((long)0xAAC808588F7EE042L, (long)0x85D2E1E90434CFB3L),
+	PARTITION_TYPE_LDM_DATA             ((long)0xA0609BAF3114624FL, (long)0xBC683311714A69ADL),
+// 	PARTITION_TYPE_APPLE_HFS            ((long)0x48465300000011AAL, (long)0xAA1100306543ECACL), //Wikipedia
+	PARTITION_TYPE_APPLE_HFS            ((long)0x005346480000AA11L, (long)0xAA1100306543ECACL), //My disc..
+	UNKNOWN_PARTITION_TYPE; // Returned when no known type can be matched
 	
 	private long typeGUIDMsb;
 	private long typeGUIDLsb;
@@ -130,6 +130,10 @@ public class GPTEntry extends Partition {
 		stringLength += 2;
 	}
 	return Util.readString(partitionName, 0, stringLength, "UTF-16LE");
+    }
+    
+    public boolean isUsed() {
+	return getPartitionTypeGUIDAsEnum() != GPTPartitionType.PARTITION_TYPE_UNUSED_ENTRY;
     }
     
     public String toString() {

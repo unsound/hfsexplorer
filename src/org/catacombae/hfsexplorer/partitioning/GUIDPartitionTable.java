@@ -22,11 +22,14 @@ package org.catacombae.hfsexplorer.partitioning;
 
 import org.catacombae.hfsexplorer.*;
 import java.io.PrintStream;
+import java.util.LinkedList;
 
 public class GUIDPartitionTable implements PartitionSystem {
     private static final int BLOCK_SIZE = 512;
     private final GPTHeader header;
     private final GPTEntry[] entries;
+    
+    private final LinkedList<GPTEntry> tempList = new LinkedList<GPTEntry>();
     
     public GUIDPartitionTable(LowLevelFile llf, int offset) {
 	byte[] headerData = new byte[512];
@@ -48,11 +51,25 @@ public class GUIDPartitionTable implements PartitionSystem {
 	}
 	return result;
     }
-    public int getPartitionCount() { return entries.length; }
-    public Partition getPartition(int index) { return entries[index]; }
-    public Partition[] getPartitions() {
+    public int getUsedPartitionCount() {
+	int count = 0;
+	for(GPTEntry ge : entries) {
+	    if(ge.isUsed()) ++count;
+	}
+	return count;
+    }
+    public Partition getPartitionEntry(int index) { return entries[index]; }
+    public Partition[] getPartitionEntries() {
 	return getEntries();
     }
+    public Partition[] getUsedPartitionEntries() {
+	tempList.clear();
+	for(GPTEntry ge : entries) {
+	    if(ge.isUsed()) tempList.addLast(ge);
+	}
+	return tempList.toArray(new GPTEntry[tempList.size()]);
+    }
+   
     
     public String getLongName() { return "GUID Partition Table"; }
     public String getShortName() { return "GPT"; }

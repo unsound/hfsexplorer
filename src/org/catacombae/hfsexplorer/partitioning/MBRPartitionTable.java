@@ -21,6 +21,7 @@
 package org.catacombae.hfsexplorer.partitioning;
 import org.catacombae.hfsexplorer.Util;
 import java.io.PrintStream;
+import java.util.LinkedList;
 
 public class MBRPartitionTable implements PartitionSystem {
     /* Until I figure out a way to detect sector size, it will be 512... */
@@ -55,6 +56,8 @@ public class MBRPartitionTable implements PartitionSystem {
     private final MBRPartition[] partitions = new MBRPartition[4];
     private final byte[] mbrSignature = new byte[2];
     
+    private final LinkedList<Partition> tempList = new LinkedList<Partition>(); // getUsedPartitionEntries()
+    
     /** <code>data</code> is assumed to be at least (<code>offset</code>+512) bytes in length. */
     public MBRPartitionTable(byte[] data, int offset) {
 	System.arraycopy(data, offset+IBM_EXTENDED_DATA_OFFSET+0, optIBMExtendedData1, 0, 9);
@@ -84,21 +87,6 @@ public class MBRPartitionTable implements PartitionSystem {
     }
     public short getMBRSignature() { return Util.readShortBE(mbrSignature); }
     
-    public boolean isValid() {
-	return getMBRSignature() == MBR_SIGNATURE;
-	// More validity contraints could be added later... like that the partitions should be in order and
-	// that their lengths should be non negative and stay within device borders...
-    }
-    
-    public int getPartitionCount() {
-	int num = 0;
-	for(MBRPartition mp : getPartitions()) {
-	    if(mp.isValid()) ++num;
-	    else break; // we don't check the later ones
-	}
-	return num;
-    }
-    
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " diskSignature: 0x" + Util.toHexStringBE(getOptionalDiskSignature()) + " (optional, and possibly incorrect)");
 	for(int i = 0; i < partitions.length; ++i) {
@@ -117,7 +105,35 @@ public class MBRPartitionTable implements PartitionSystem {
 	printFields(ps, prefix);
     }
     
-    public Partition getPartition(int index) {
+    public boolean isValid() {
+	return (getMBRSignature() == MBR_SIGNATURE) && (getValidPartitionCount() == 4);
+	// More validity contraints could be added later... like that the partitions should be in order and
+	// that their lengths should be non negative and stay within device borders...
+    }
+    
+    public int getValidPartitionCount() {
+	int num = 0;
+	for(MBRPartition mp : getPartitions()) {
+	    if(mp.isValid()) ++num;
+	    //else break; // we don't check the later ones
+	}
+	return num;
+    }
+    
+    public int getUsedPartitionCount() {
+	int num = 0;
+	for(MBRPartition mp : getPartitions()) {
+	    if(mp.isUsed()) ++num;
+	    //else break; // we don't check the later ones
+	}
+	return num;
+    }
+    
+    public Partition[] getPartitionEntries() {
+	return getPartitions();
+    }
+    
+    public Partition getPartitionEntry(int index) {
 	MBRPartition p = partitions[index];
 	if(p.isValid())
 	    return p;
@@ -125,6 +141,15 @@ public class MBRPartitionTable implements PartitionSystem {
 	    throw new ArrayIndexOutOfBoundsException(index);
     }
     
+    public Partition[] getUsedPartitionEntries() {
+	tempList.clear();
+	for(MBRPartition mp : getPartitions()) {
+	    if(mp.isUsed()) tempList.addLast(mp);
+	    //else break; // we don't check the later ones
+	}
+	return tempList.toArray(new Partition[tempList.size()]);
+    }
+
     public String getLongName() { return "Master Boot Record"; }
     public String getShortName() { return "MBR"; }
 }

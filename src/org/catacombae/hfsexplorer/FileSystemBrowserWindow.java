@@ -96,13 +96,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	}
 	public String toString() {
 	    HFSPlusCatalogLeafRecordData recData = parentRecord.getData();
-// 	    if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER)
-		return parentRecord.getKey().getNodeName().toString();
-// 	    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
-// 		    recData instanceof HFSPlusCatalogThread)
-// 		return ((HFSPlusCatalogThread)recData).getNodeName().toString();
-// 	    else
-// 		throw new RuntimeException("Illegal type for record data. (Should NOT happen here!)");
+	    return parentRecord.getKey().getNodeName().toString();
 	}
     }
     
@@ -464,6 +458,7 @@ public class FileSystemBrowserWindow extends JFrame {
 			}
 		    }
 		});
+	    loadFSFromDeviceItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 // 	    loadFSFromDeviceWithAPMItem = new JMenuItem("Load file system from device with APM");
 // 	    loadFSFromDeviceWithAPMItem.addActionListener(new ActionListener() {
 // 		    public void actionPerformed(ActionEvent ae) {
@@ -512,6 +507,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		    }
 		}
 	    });
+	loadFSFromFileItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 // 	JMenuItem loadAPMFSFromFileItem = new JMenuItem("Load file system from file with APM");
 // 	loadAPMFSFromFileItem.addActionListener(new ActionListener() {
 // 		public void actionPerformed(ActionEvent ae) {
@@ -537,6 +533,13 @@ public class FileSystemBrowserWindow extends JFrame {
 // 		    }
 // 		}
 // 	    });
+	JMenuItem exitProgramItem = new JMenuItem("Exit");
+	exitProgramItem.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent ae) {
+		    exitApplication();
+		}
+	    });
+	exitProgramItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 	JMenuItem fsInfoItem = new JMenuItem("File system info");
 	fsInfoItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
@@ -552,6 +555,7 @@ public class FileSystemBrowserWindow extends JFrame {
 			JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "No file system loaded.", "Error", JOptionPane.ERROR_MESSAGE);
 		}		
 	    });
+	fsInfoItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 	JMenuItem aboutItem = new JMenuItem("About...");
 	aboutItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
@@ -579,6 +583,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	//    fileMenu.add(loadFSFromDeviceWithAPMItem);
 	fileMenu.add(loadFSFromFileItem);
 	//fileMenu.add(loadAPMFSFromFileItem);
+	fileMenu.add(exitProgramItem);
 	JMenu infoMenu = new JMenu("Info");
 	infoMenu.add(fsInfoItem);
 	JMenu helpMenu = new JMenu("Help");
@@ -590,10 +595,24 @@ public class FileSystemBrowserWindow extends JFrame {
 	setJMenuBar(menuBar);
 	// /Menus
 	
-	setDefaultCloseOperation(EXIT_ON_CLOSE);
+	addWindowListener(new WindowAdapter() {
+		public void windowClosing(WindowEvent we) {
+		    exitApplication();
+		}
+	    });
+
+	setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 	add(fsbPanel, BorderLayout.CENTER);
 	pack();
 	setLocationRelativeTo(null);
+    }
+    
+    private void exitApplication() {
+	setVisible(false);
+	if(fsView != null) {
+	    fsView.getStream().close();
+	}
+	System.exit(0);
     }
     
     private void adjustTableWidth() {
@@ -642,9 +661,6 @@ public class FileSystemBrowserWindow extends JFrame {
     }
     
     public void loadFS(String filename, boolean readAPM, boolean readFromDevice) {
-	if(fsView != null) {
-	    fsView.getStream().close();
-	}
 	LowLevelFile fsFile;
 	if(System.getProperty("os.name").toLowerCase().startsWith("windows") &&
 	   System.getProperty("os.arch").toLowerCase().equals("x86"))
@@ -661,7 +677,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	PartitionSystemRecognizer psRec = new PartitionSystemRecognizer(fsFile);
 	PartitionSystem partSys = psRec.getPartitionSystem();
 	if(partSys != null) {
-	    Partition[] partitions = partSys.getPartitions();
+	    Partition[] partitions = partSys.getUsedPartitionEntries();
 	    if(partitions.length == 0) {
 		// Proceed to detect file system
 		fsOffset = 0;
@@ -690,8 +706,8 @@ public class FileSystemBrowserWindow extends JFrame {
 		    Partition selectedPartition = (Partition)selectedValue;
 		    fsOffset = selectedPartition.getStartOffset();//getPmPyPartStart()+selectedPartition.getPmLgDataStart())*blockSize;
 		    fsLength = selectedPartition.getLength();//getPmDataCnt()*blockSize;
-		    System.err.println("DEBUG Selected partition:");
-		    selectedPartition.print(System.err, "  ");
+		    //System.err.println("DEBUG Selected partition:");
+		    //selectedPartition.print(System.err, "  ");
 		}
 		else
 		    throw new RuntimeException("Impossible error!");
@@ -706,6 +722,9 @@ public class FileSystemBrowserWindow extends JFrame {
 	FileSystemRecognizer fsr = new FileSystemRecognizer(fsFile, fsOffset);
 	FileSystemRecognizer.FileSystemType fsType = fsr.detectFileSystem();
 	if(fsType == FileSystemRecognizer.FileSystemType.HFS_PLUS) {
+	    if(fsView != null) {
+		fsView.getStream().close();
+	    }
 	    fsView = new HFSFileSystemView(fsFile, fsOffset);
 	    HFSPlusCatalogLeafRecord rootRecord = fsView.getRoot();
 	    HFSPlusCatalogLeafRecord[] rootContents = fsView.listRecords(rootRecord);

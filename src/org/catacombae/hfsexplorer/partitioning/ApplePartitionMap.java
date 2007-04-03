@@ -67,18 +67,21 @@ public class ApplePartitionMap implements PartitionSystem {
 // 	offset = (chosenPartition.getPmPyPartStart()+chosenPartition.getPmLgDataStart())*0x200;
 // 	length = chosenPartition.getPmDataCnt()*0x200;
     }
-    public int getPartitionCount() {
+    public int getUsedPartitionCount() {
 	return partitions.length;
     }
     /** index must be between 0 and getNumPartitions()-1. */
     public APMPartition getAPMPartition(int index) {
 	return partitions[index];
     }
-    public APMPartition[] getPartitions() {
+    public APMPartition[] getPartitionEntries() {
 	APMPartition[] copy = new APMPartition[partitions.length];
 	for(int i = 0; i < partitions.length; ++i)
 	    copy[i] = partitions[i];
 	return copy;
+    }
+    public Partition[] getUsedPartitionEntries() {
+	return getPartitionEntries();
     }
     
     public void printFields(PrintStream ps, String prefix) {
@@ -93,7 +96,7 @@ public class ApplePartitionMap implements PartitionSystem {
 	printFields(ps, prefix);
     }
     
-    public Partition getPartition(int index) {
+    public Partition getPartitionEntry(int index) {
 	return getAPMPartition(index);
     }
     public String getLongName() { return "Apple Partition Map"; }

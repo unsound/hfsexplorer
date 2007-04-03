@@ -46,7 +46,7 @@ public class PartitionSystemRecognizer {
 	    long numberOfBlocksOnDevice = Util.unsign(ddr.getSbBlkCount());
 	    //bitStream.seek(blockSize*1); // second block, first partition in list
 	    ApplePartitionMap apm = new ApplePartitionMap(bitstream, blockSize*1, blockSize);
-	    if(apm.getPartitionCount() > 0)
+	    if(apm.getUsedPartitionCount() > 0)
 		return PartitionSystemType.APPLE_PARTITION_MAP;
 	}
 
@@ -60,25 +60,14 @@ public class PartitionSystemRecognizer {
 	bitstream.read(piece2);
 	GPTHeader gh = new GPTHeader(piece2, 0);
 	if(gh.isValid()) {
-// 	    bitstream.seek(0);
-// 	    GUIDPartitionTable gpt = new GUIDPartitionTable(bitstream, 0);
-// 	    for(GPTEntry ge : gpt.getEntries())
-// 		ge.print(System.err, "");
 	    return PartitionSystemType.GUID_PARTITION_TABLE;
 	}
 	
 	// Look for MBR
-	//System.err.println("Looking for MBR");
 	MBRPartitionTable mpt = new MBRPartitionTable(piece1, 0);
-	if(mpt.isValid() && mpt.getPartitionCount() > 0) {
-// 	    System.err.println("MBR found with " + mpt.getPartitionCount() + " partitions:");
-// 	    int i = 0;
-// 	    for(MBRPartition mp : mpt.getPartitions()) {
-// 		System.err.println("  Partition " + (++i) + ":");
-// 		mp.print(System.err, "    ");
-// 	    }
+	if(mpt.isValid()) {
+	    // Here we should look for extended partitions, BSD disk labels, LVM volumes etc. TODO!
 	    
-	    // Here we should look for extended partitions, BSD disk labels, LVM volumes etc.
 	    return PartitionSystemType.MASTER_BOOT_RECORD;
 	}
 

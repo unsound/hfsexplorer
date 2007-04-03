@@ -51,29 +51,30 @@ public class MBRPartition extends Partition {
 	 * 0xEE GPT partition
 	 * 0xEF EFI System partition on an MBR disk
 	 */
+	PARTITION_TYPE_UNUSED               ((byte)0x00),
 	PARTITION_TYPE_FAT12                ((byte)0x01),
-	    PARTITION_TYPE_FAT16_SMALL          ((byte)0x04),
-	    PARTITION_TYPE_DOS_EXTENDED         ((byte)0x05),
-	    PARTITION_TYPE_FAT16_LARGE          ((byte)0x06),
-	    PARTITION_TYPE_NT_INSTALLABLE_FS    ((byte)0x07),
-	    PARTITION_TYPE_FAT32                ((byte)0x08),
-	    PARTITION_TYPE_FAT32_INT13HX        ((byte)0x0C),
-	    PARTITION_TYPE_FAT16_LARGE_INT13HX  ((byte)0x0E),
-	    PARTITION_TYPE_DOS_EXTENDED_INT13HX ((byte)0x0F),
-	    PARTITION_TYPE_EISA_OR_OEM          ((byte)0x12),
-	    PARTITION_TYPE_DYNAMIC_VOLUME       ((byte)0x42),
-	    PARTITION_TYPE_PM_HIBERNATION       ((byte)0x84),
-	    PARTITION_TYPE_NT_MULTIDISK_FAT16   ((byte)0x86),
-	    PARTITION_TYPE_NT_MULTIDISK_NTFS    ((byte)0x87),
-	    PARTITION_TYPE_LAPTOP_HIBERNATION   ((byte)0xA0),
-	    PARTITION_TYPE_DELL_OEM             ((byte)0xDE),
-	    PARTITION_TYPE_IBM_OEM              ((byte)0xFE),
-	    PARTITION_TYPE_GPT                  ((byte)0xEE),
-	    PARTITION_TYPE_EFI_SYSTEM_ON_MBR    ((byte)0xEF),
-	    PARTITION_TYPE_APPLE_UFS            ((byte)0xA8), // UFS in NeXT format (only slightly different)
-	    PARTITION_TYPE_APPLE_HFS            ((byte)0xAF), // Used for HFS, HFS+ and HFSX
-	    PARTITION_TYPE_LINUX_NATIVE         ((byte)0x83), // Used for reiserfs, ext2, ext3 and many more
-	    UNKNOWN_PARTITION_TYPE; // Returned when no known type can be matched
+	PARTITION_TYPE_FAT16_SMALL          ((byte)0x04),
+	PARTITION_TYPE_DOS_EXTENDED         ((byte)0x05),
+	PARTITION_TYPE_FAT16_LARGE          ((byte)0x06),
+	PARTITION_TYPE_NT_INSTALLABLE_FS    ((byte)0x07),
+	PARTITION_TYPE_FAT32                ((byte)0x08),
+	PARTITION_TYPE_FAT32_INT13HX        ((byte)0x0C),
+	PARTITION_TYPE_FAT16_LARGE_INT13HX  ((byte)0x0E),
+	PARTITION_TYPE_DOS_EXTENDED_INT13HX ((byte)0x0F),
+	PARTITION_TYPE_EISA_OR_OEM          ((byte)0x12),
+	PARTITION_TYPE_DYNAMIC_VOLUME       ((byte)0x42),
+	PARTITION_TYPE_PM_HIBERNATION       ((byte)0x84),
+	PARTITION_TYPE_NT_MULTIDISK_FAT16   ((byte)0x86),
+	PARTITION_TYPE_NT_MULTIDISK_NTFS    ((byte)0x87),
+	PARTITION_TYPE_LAPTOP_HIBERNATION   ((byte)0xA0),
+	PARTITION_TYPE_DELL_OEM             ((byte)0xDE),
+	PARTITION_TYPE_IBM_OEM              ((byte)0xFE),
+	PARTITION_TYPE_GPT                  ((byte)0xEE),
+	PARTITION_TYPE_EFI_SYSTEM_ON_MBR    ((byte)0xEF),
+	PARTITION_TYPE_APPLE_UFS            ((byte)0xA8), // UFS in NeXT format (only slightly different)
+	PARTITION_TYPE_APPLE_HFS            ((byte)0xAF), // Used for HFS, HFS+ and HFSX
+	PARTITION_TYPE_LINUX_NATIVE         ((byte)0x83), // Used for reiserfs, ext2, ext3 and many more
+	UNKNOWN_PARTITION_TYPE; // Returned when no known type can be matched
 	
 	private byte type;
 	
@@ -128,6 +129,10 @@ public class MBRPartition extends Partition {
     public int getLBAFirstSector() { return Util.readIntLE(lbaFirstSector); }
     public int getLBAPartitionLength() { return Util.readIntLE(lbaPartitionLength); }
     
+    public MBRPartitionType getPartitionTypeAsEnum() {
+	return MBRPartitionType.getType(getPartitionType());
+    }
+    
     public boolean isBootable() {
 	return getStatus() == PARTITION_BOOTABLE;
     }
@@ -135,14 +140,15 @@ public class MBRPartition extends Partition {
 	byte status = getStatus();
 	return (status == PARTITION_NOT_BOOTABLE || status == PARTITION_BOOTABLE);
     }
-    public MBRPartitionType getPartitionTypeAsEnum() {
-	return MBRPartitionType.getType(getPartitionType());
+    /** Returns true if isValid() evaluates to true, and partition type is not 0x00 (PARTITION_TYPE_UNUSED). */
+    public boolean isUsed() {
+	return isValid() && getPartitionTypeAsEnum() != MBRPartitionType.PARTITION_TYPE_UNUSED;
     }
     
     public String toString() {
 	MBRPartitionType mpt = getPartitionTypeAsEnum();
 	return (isBootable()?"Bootable ":"") + "MBR Partition (" + mpt + 
-	    (mpt == MBRPartitionType.UNKNOWN_PARTITION_TYPE?"0x"+Util.toHexStringBE(getPartitionType()):"") + ")";
+	    (mpt == MBRPartitionType.UNKNOWN_PARTITION_TYPE?" [0x"+Util.toHexStringBE(getPartitionType()):"") + "])";
     }
     
     public void printFields(PrintStream ps, String prefix) {
