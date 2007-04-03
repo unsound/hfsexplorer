@@ -1,0 +1,9 @@
+HFSExplorer TODO:
+
+- I need to figure out how to add actions to double-clicks and right-clicks in the
+  table and in the tree.
+- Figure out how to catch mouse clicks in a JTableHeader, so I can sort like
+  Windows Explorer does.
+- Implement a composition algorithm, that converts the decomposed name strings into
+  standard Unicode ones.
+- Figure out how to remove the grey background in the table...

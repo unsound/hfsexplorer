@@ -27,6 +27,7 @@ import org.catacombae.hfsexplorer.gui.FilesystemBrowserPanel;
 import org.catacombae.hfsexplorer.gui.JournalInfoBlockPanel;
 import java.util.*;
 import java.io.*;
+import java.net.URL;
 import java.text.DateFormat;
 import java.awt.*;
 import java.awt.event.*;
@@ -36,6 +37,10 @@ import javax.swing.table.*;
 import javax.swing.event.*;
 
 public class FileSystemBrowserWindow extends JFrame {
+    private static final String[] VERSION_INFO_DICTIONARY = {
+	"http://www.typhontools.cjb.net/hfsx/version.sdic.txt",
+	"http://hem.bredband.net/unsound/hfsx/version.sdic.txt"
+    };
     
     private static class ObjectContainer<A> {
 	public A o;
@@ -556,6 +561,53 @@ public class FileSystemBrowserWindow extends JFrame {
 		}		
 	    });
 	fsInfoItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+	JMenuItem checkUpdatesItem = new JMenuItem("Check for updates...");
+	checkUpdatesItem.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent ae) {
+		    InputStream infoDictStream = null;
+		    for(String s : VERSION_INFO_DICTIONARY) {
+			try {
+			    infoDictStream = new URL(s).openStream();
+			    SimpleDictionaryParser sdp = new SimpleDictionaryParser(infoDictStream);
+			    String dictVersion = sdp.getValue("Version");
+			    if(dictVersion != null && dictVersion.equals(HFSExplorer.VERSION))
+				JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+							      "There are no updates available.", 
+							      "Information", JOptionPane.INFORMATION_MESSAGE);
+			    else
+				JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+							      "There are updates available!\n" +
+							      "Latest version is: " + dictVersion, 
+							      "Information", JOptionPane.INFORMATION_MESSAGE);
+			    return;
+			}
+			catch(Exception e) {}
+		    }
+// 		    if(infoDictStream != null) {
+// 			try {
+// 			    SimpleDictionaryParser sdp = new SimpleDictionaryParser(infoDictStream);
+// 			    String dictVersion = sdp.getValue("Version");
+// 			    if(dictVersion != null && dictVersion.equals(HFSExplorer.VERSION))
+// 				JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+// 							      "There are no updates available.", 
+// 							      "Information", JOptionPane.INFORMATION_MESSAGE);
+// 			    else
+// 				JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+// 							      "There are updates available!\n" +
+// 							      "Latest version is: " + dictVersion, 
+// 							      "Information", JOptionPane.INFORMATION_MESSAGE);
+// 			} catch(Exception e) {
+// 			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+// 							  "Could not parse version file...", 
+// 							  "Error", JOptionPane.ERROR_MESSAGE);
+// 			}
+// 		    }
+// 		    else
+			JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+						      "Could not contact version URL.", 
+						      "Error", JOptionPane.ERROR_MESSAGE);
+		}
+	    });
 	JMenuItem aboutItem = new JMenuItem("About...");
 	aboutItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
@@ -587,6 +639,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	JMenu infoMenu = new JMenu("Info");
 	infoMenu.add(fsInfoItem);
 	JMenu helpMenu = new JMenu("Help");
+	helpMenu.add(checkUpdatesItem);
 	helpMenu.add(aboutItem);
 	JMenuBar menuBar = new JMenuBar();
 	menuBar.add(fileMenu);
@@ -852,15 +905,42 @@ public class FileSystemBrowserWindow extends JFrame {
 	    else if(o instanceof DefaultMutableTreeNode) {
 		Object o2 = ((DefaultMutableTreeNode)o).getUserObject();
 		if(o2 instanceof RecordNodeStorage) {
-		    HFSPlusCatalogLeafRecord rec = ((RecordNodeStorage)o2).getRecord();
+		    final HFSPlusCatalogLeafRecord rec = ((RecordNodeStorage)o2).getRecord();
 		    //System.err.println(rec.toString());
 		    fileChooser.setMultiSelectionEnabled(false);
 		    fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		    if(fileChooser.showDialog(FileSystemBrowserWindow.this, "Extract here") == JFileChooser.APPROVE_OPTION) {
-			File outDir = fileChooser.getSelectedFile();
-			extract(rec, outDir);
-			JOptionPane.showMessageDialog(this, "Extraction finished.\n",
-						      "Information", JOptionPane.INFORMATION_MESSAGE);
+			final File outDir = fileChooser.getSelectedFile();
+			final ExtractProgressDialog progress = new ExtractProgressDialog(this);
+			Runnable r = new Runnable() {
+				public void run() {
+				    progress.setDataSize(calculateDataForkSizeRecursive(rec));
+				    int errorCount = extract(rec, outDir, progress);
+				    if(!progress.cancelSignaled()) {
+					if(errorCount == 0)
+					    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+									  "Extraction finished.\n",
+									  "Information",
+									  JOptionPane.INFORMATION_MESSAGE);
+					else
+					    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+									  errorCount + " errors were encountered " +
+									  "during the extraction.\n",
+									  "Information",
+									  JOptionPane.WARNING_MESSAGE);
+				    }
+				    else
+					JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+								      "Extraction was aborted.\n" +
+								      "Please remove the extracted files " +
+								      "manually.\n",
+								      "Aborted extraction",
+								      JOptionPane.WARNING_MESSAGE);
+				    progress.setVisible(false);
+				}
+			    };
+			new Thread(r).start();
+			progress.setVisible(true);
 		    }
 		}
 		else
@@ -882,22 +962,57 @@ public class FileSystemBrowserWindow extends JFrame {
 		fileChooser.setMultiSelectionEnabled(false);
 		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		if(fileChooser.showDialog(FileSystemBrowserWindow.this, "Extract here") == JFileChooser.APPROVE_OPTION) {
-		    File outDir = fileChooser.getSelectedFile();
-		
-		    for(int selectedRow : selectedRows) {
+		    final File outDir = fileChooser.getSelectedFile();
+		    
+		    // Gather all selected records
+		    final HFSPlusCatalogLeafRecord[] selectedRecords = new HFSPlusCatalogLeafRecord[selectedRows.length];
+		    for(int i = 0; i < selectedRows.length; ++i) {
+			int selectedRow = selectedRows[i];
 			Object o = tableModel.getValueAt(selectedRow, 0);
 			HFSPlusCatalogLeafRecord rec;
 			HFSPlusCatalogLeafRecordData recData;
 			if(o instanceof RecordContainer) {
 			    rec = ((RecordContainer)o).getRecord();
-			    extract(rec, outDir);
+			    selectedRecords[i] = rec;
 			}
-			else 
+			else {
 			    JOptionPane.showMessageDialog(this, "Unexpected data in table model. (Internal error, report to developer)",
 							  "Error", JOptionPane.ERROR_MESSAGE);
+			    return;
+			}
 		    }
-		    JOptionPane.showMessageDialog(this, "Extraction finished.\n",
-						  "Information", JOptionPane.INFORMATION_MESSAGE);
+		    
+		    // Extract
+		    final ExtractProgressDialog progress = new ExtractProgressDialog(this);
+		    Runnable r = new Runnable() {
+			    public void run() {
+				progress.setDataSize(calculateDataForkSizeRecursive(selectedRecords));
+				int errorCount = extract(selectedRecords, outDir, progress);
+				if(!progress.cancelSignaled()) {
+				    if(errorCount == 0)
+					JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+								      "Extraction finished.\n",
+								      "Information",
+								      JOptionPane.INFORMATION_MESSAGE);
+				    else
+					JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+								      errorCount + " errors were encountered " +
+								      "during the extraction.\n",
+								      "Information",
+								      JOptionPane.WARNING_MESSAGE);
+				}
+				else
+				    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+								  "Extraction was aborted.\n" +
+								  "Please remove the extracted files " +
+								  "manually.\n",
+								  "Aborted extraction",
+								  JOptionPane.WARNING_MESSAGE);
+				progress.setVisible(false);
+			    }
+			};
+		    new Thread(r).start();
+		    progress.setVisible(true);
 		}
 	    }
 	}
@@ -949,11 +1064,35 @@ public class FileSystemBrowserWindow extends JFrame {
 	}
     }
     
-    private void extract(HFSPlusCatalogLeafRecord rec, File outDir) {
+    /** <code>progressDialog</code> may NOT be null. */
+    protected int extract(HFSPlusCatalogLeafRecord rec, File outDir, ExtractProgressDialog progressDialog) {
+	return extractRecursive(rec, outDir, progressDialog/*, 0.0, 1.0*/);
+    }
+    /** <code>progressDialog</code> may NOT be null. */
+    protected int extract(HFSPlusCatalogLeafRecord[] recs, File outDir, ExtractProgressDialog progressDialog) {
+	int errorCount = 0;
+// 	final double step = 1.0/recs.length;
+// 	double floor = 0.0;
+	for(HFSPlusCatalogLeafRecord rec : recs) {
+	    errorCount += extractRecursive(rec, outDir, progressDialog/*, floor, floor+step*/);
+	    //floor += step;
+	}
+	return errorCount;
+    }
+    private int extractRecursive(HFSPlusCatalogLeafRecord rec, File outDir, ExtractProgressDialog progressDialog/*, double fractionLowLimit, double fractionHighLimit*/) {
+	if(progressDialog.cancelSignaled()) {
+	    progressDialog.confirmCancel();
+	    return 0;
+	}
+	
+	int errorCount = 0;
 	HFSPlusCatalogLeafRecordData recData = rec.getData();
 	if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
 	   recData instanceof HFSPlusCatalogFile) {
 	    String filename = rec.getKey().getNodeName().toString();
+	    //System.out.println("file: \"" + filename + "\" range: " + fractionLowLimit + "-" + fractionHighLimit);
+	    progressDialog.updateCurrentFile(filename);
+	    //progressDialog.updateTotalProgress(fractionLowLimit);
 	    File outFile = new File(outDir, filename);
 	    try {
 		FileOutputStream fos = new FileOutputStream(outFile);
@@ -963,36 +1102,106 @@ public class FileSystemBrowserWindow extends JFrame {
 		//			  "Extraction complete!", JOptionPane.INFORMATION_MESSAGE);
 	    } catch(FileNotFoundException fnfe) {
 		fnfe.printStackTrace();
-		JOptionPane.showMessageDialog(this, "Could not create file \"" + filename + "\" under:\n" +
-					      outDir.getAbsolutePath() + "\n" +
-					      "The file will be skipped.",
-					      "Error", JOptionPane.ERROR_MESSAGE);
+		int reply = JOptionPane.showConfirmDialog(this, "Could not create file \"" + filename +
+							  "\" in folder:\n  " + outDir.getAbsolutePath() + "\n" +
+							  "Do you want to continue? (The file will be skipped)",
+							  "Error", JOptionPane.YES_NO_OPTION,
+							  JOptionPane.ERROR_MESSAGE);
+		if(reply == JOptionPane.NO_OPTION)
+		    progressDialog.signalCancel();
+		++errorCount;
+	    } catch(IOException ioe) {
+		String msg = ioe.getMessage();
+		int reply = JOptionPane.showConfirmDialog(this, "Could not write to file \"" + filename + 
+							  "\" under folder:\n  " + outDir.getAbsolutePath() +
+							  (msg!=null?"\nSystem message: \"" + msg + "\"":"") +
+							  "\nDo you want to continue?",
+							  "I/O Error", JOptionPane.YES_NO_OPTION,
+							  JOptionPane.ERROR_MESSAGE);
+		if(reply == JOptionPane.NO_OPTION)
+		    progressDialog.signalCancel();
+		++errorCount;
 	    } catch(Exception e) {
 		e.printStackTrace();
-		JOptionPane.showMessageDialog(this, "An exception occurred:\n" + e.toString(),
-					      "Error", JOptionPane.ERROR_MESSAGE);
+		String message = "An exception occurred while extracting \"" + filename + "\"!";
+		message += "\n  " + e.toString();
+		for(StackTraceElement ste : e.getStackTrace())
+		    message += "\n    " + ste.toString();
+		message += "\n\nThe file has probably not been extracted.";
+		int reply = JOptionPane.showConfirmDialog(this, message +
+							  "\nDo you want to continue with the extraction?",
+							  "Error", JOptionPane.YES_NO_OPTION,
+							  JOptionPane.ERROR_MESSAGE);
+		if(reply == JOptionPane.NO_OPTION)
+		    progressDialog.signalCancel();
+		++errorCount;
 	    }
+	    progressDialog.addDataProgress(((HFSPlusCatalogFile)recData).getDataFork().getLogicalSize());
 	}
 	else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
 		recData instanceof HFSPlusCatalogFolder) {
+	    String dirName = rec.getKey().getNodeName().toString();
+	    progressDialog.updateCurrentFile(dirName);
 	    HFSCatalogNodeID requestedID;
 	    HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder)recData;
 	    requestedID = catFolder.getFolderID();
 	    
 	    HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
+	    //System.out.println("folder: \"" + dirName + "\" valence: " + contents.length + " range: " + fractionLowLimit + "-" + fractionHighLimit);
 	    // We now have the contents of the requested directory
-	    File thisDir = new File(outDir, rec.getKey().getNodeName().toString());
+	    File thisDir = new File(outDir, dirName);
 	    if(thisDir.mkdir()) {
-		for(HFSPlusCatalogLeafRecord outRec : contents)
-		    extract(outRec, thisDir);
+// 		final double step = (fractionHighLimit-fractionLowLimit)/contents.length;
+// 		double floor = fractionLowLimit;
+		for(HFSPlusCatalogLeafRecord outRec : contents) {
+		    errorCount += extractRecursive(outRec, thisDir, progressDialog/*, floor, floor+step*/);
+// 		    floor += step;
+		}
 	    }
-	    else
-		JOptionPane.showMessageDialog(this, "Could not create directory:\n" + thisDir.getAbsolutePath() +
-					      "\nAll files under this directory will be skipped.",
-					      "Error", JOptionPane.ERROR_MESSAGE);
+	    else {
+		int reply = JOptionPane.showConfirmDialog(this, "Could not create directory:\n  " + 
+							  thisDir.getAbsolutePath() + "\nDo you want to " +
+							  "continue? (All files under this directory will be " +
+							  "skipped)", "Error", JOptionPane.YES_NO_OPTION,
+							  JOptionPane.ERROR_MESSAGE);
+		if(reply == JOptionPane.NO_OPTION)
+		    progressDialog.signalCancel();
+		++errorCount;
+	    }
 	}
+// 	else
+// 	    System.out.println("thread with range: " + fractionLowLimit + "-" + fractionHighLimit);
+	return errorCount;
     }
     
+    /** Calculates the complete data size of the trees represented by <code>recs</code>. */
+    protected long calculateDataForkSizeRecursive(HFSPlusCatalogLeafRecord[] recs) {
+	long totalSize = 0;
+	for(HFSPlusCatalogLeafRecord rec : recs)
+	    totalSize += calculateDataForkSizeRecursive(rec);
+	return totalSize;
+    }
+    /** Calculates the complete data size of the tree represented by <code>rec</code>. */
+    protected long calculateDataForkSizeRecursive(HFSPlusCatalogLeafRecord rec) {
+	HFSPlusCatalogLeafRecordData recData = rec.getData();
+	if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
+	   recData instanceof HFSPlusCatalogFile) {
+	    return ((HFSPlusCatalogFile)recData).getDataFork().getLogicalSize();
+	}
+	else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
+		recData instanceof HFSPlusCatalogFolder) {
+	    HFSCatalogNodeID requestedID = ((HFSPlusCatalogFolder)recData).getFolderID();
+	    HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
+	    long totalSize = 0;
+	    for(HFSPlusCatalogLeafRecord outRec : contents) {
+		totalSize += calculateDataForkSizeRecursive(outRec);
+	    }
+	    return totalSize;
+	}
+	else
+	    return 0;
+    }
+   
     public static void main(String[] args) {
        	try {
 	    javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());

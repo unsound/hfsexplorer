@@ -1,3 +1,20 @@
+HFSExplorer Changelog
+---------------------
+
+
+0.16 (in progress)
+----
+- Added automatic detection of partition systems and file systems, so that the user no longer
+  needs to worry about whether it should choose to load with or without APM.
+- Added support for the MBR and GUID Partition Table partitioning schemes, making access to
+  raw disk images or devices from Intel systems possible. (Not very tested, might be buggy...)
+- Added a progress dialog when extracting files, so that users get some info on what's going on.
+- Added keyboard shortcuts to menu items.
+- Behavior change: When the program encounters an exception while extracting files (for example
+  when the disk is full), the user can now choose to abort the entire extraction.
+- Fixed a bug leading to exceptions when failing to load a file system, requiring a restart
+  of the program.
+
 0.15.1
 ------
 - Minor Windows Vista fix. The icons were not found when starting HFSExplorer with the

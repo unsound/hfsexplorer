@@ -55,7 +55,9 @@ public class SelectWindowsDevicePanel extends javax.swing.JPanel {
         detectedDevicesLabel = new javax.swing.JLabel();
         loadButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
+        warningLabel = new javax.swing.JLabel();
+        autodetectButton = new javax.swing.JButton();
+        autodetectLabel = new javax.swing.JLabel();
 
         selectDeviceButton.setSelected(true);
         selectDeviceButton.setText("Select a device");
@@ -77,41 +79,52 @@ public class SelectWindowsDevicePanel extends javax.swing.JPanel {
 
             cancelButton.setText("Cancel");
 
-            jLabel1.setText("(hybrid CD-ROMs with both HFS+ and ISO filesystems won't work)");
+            warningLabel.setText("(hybrid CD-ROMs with both HFS+ and ISO filesystems won't work)");
+
+            autodetectButton.setText("Autodetect...");
+
+            autodetectLabel.setText("Automatically detects HFS+ partitions on your system");
 
             org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
             this.setLayout(layout);
             layout.setHorizontalGroup(
                 layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                 .add(layout.createSequentialGroup()
+                    .addContainerGap()
                     .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(layout.createSequentialGroup()
+                            .add(autodetectButton)
+                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                            .add(autodetectLabel))
                         .add(layout.createSequentialGroup()
                             .add(detectedDevicesLabel)
                             .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                             .add(detectedDevicesCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                            .add(jLabel1))
+                            .add(warningLabel))
                         .add(selectDeviceButton)
                         .add(specifyDeviceNameButton)
                         .add(layout.createSequentialGroup()
-                            .addContainerGap()
                             .add(loadButton)
                             .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                             .add(cancelButton))
-                        .add(layout.createSequentialGroup()
-                            .addContainerGap()
-                            .add(specifyDeviceNameField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 545, Short.MAX_VALUE)))
+                        .add(specifyDeviceNameField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 548, Short.MAX_VALUE))
                     .addContainerGap())
             );
             layout.setVerticalGroup(
                 layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                 .add(layout.createSequentialGroup()
+                    .addContainerGap()
+                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                        .add(autodetectButton)
+                        .add(autodetectLabel))
+                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                     .add(selectDeviceButton)
                     .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                     .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                         .add(detectedDevicesLabel)
                         .add(detectedDevicesCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(jLabel1))
+                        .add(warningLabel))
                     .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                     .add(specifyDeviceNameButton)
                     .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -119,22 +132,25 @@ public class SelectWindowsDevicePanel extends javax.swing.JPanel {
                     .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                     .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                         .add(loadButton)
-                        .add(cancelButton)))
+                        .add(cancelButton))
+                    .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             );
         }// </editor-fold>//GEN-END:initComponents
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    public javax.swing.JButton autodetectButton;
+    private javax.swing.JLabel autodetectLabel;
     public javax.swing.JButton cancelButton;
     public javax.swing.JComboBox detectedDevicesCombo;
     private javax.swing.JLabel detectedDevicesLabel;
-    private javax.swing.JLabel jLabel1;
     public javax.swing.JButton loadButton;
     private javax.swing.ButtonGroup partitionGroup;
     public javax.swing.JRadioButton selectDeviceButton;
     private javax.swing.ButtonGroup selectSpecifyGroup;
     public javax.swing.JRadioButton specifyDeviceNameButton;
     public javax.swing.JTextField specifyDeviceNameField;
+    private javax.swing.JLabel warningLabel;
     // End of variables declaration//GEN-END:variables
     
 }
