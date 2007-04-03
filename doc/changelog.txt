@@ -8,10 +8,13 @@ HFSExplorer Changelog
   needs to worry about whether it should choose to load with or without APM.
 - Added support for the MBR and GUID Partition Table partitioning schemes, making access to
   raw disk images or devices from Intel systems possible. (Not very tested, might be buggy...)
+- Added an "autodetect" button to the "Load file system from device" dialog (only for Windows
+  users), so that the user doesn't have to look for the correct device itself.
 - Added a progress dialog when extracting files, so that users get some info on what's going on.
 - Added keyboard shortcuts to menu items.
+- Added a menu item to check for newer versions of HFSExplorer.
 - Behavior change: When the program encounters an exception while extracting files (for example
-  when the disk is full), the user can now choose to abort the entire extraction.
+  when the disk is full), the user can now choose to abort the entire extraction, or continue.
 - Fixed a bug leading to exceptions when failing to load a file system, requiring a restart
   of the program.
 

@@ -152,8 +152,8 @@ JNIEXPORT jint JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_r
   DWORD bytesRead;
   //printf("Calling: ReadFile(0x%x, 0x%x, %d, 0x%x, NULL);\n", hnd, buffer, length, &bytesRead);
   if(ReadFile(hnd, buffer, length, &bytesRead, NULL) == FALSE) {
-    printf("bytesRead: %u\n", (int)bytesRead);
-    printf("GetLastError(): %u\n", (int)GetLastError());
+    //printf("bytesRead: %u\n", (int)bytesRead);
+    //printf("GetLastError(): %u\n", (int)GetLastError());
     throwByName(env, "java/lang/RuntimeException", "Couldn't read from file.");
     bytesRead = -1;
   }

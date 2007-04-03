@@ -155,8 +155,6 @@ public class SelectWindowsDeviceDialog extends JDialog {
 		    WindowsLowLevelIO curFile = new WindowsLowLevelIO(DEVICE_PREFIX + currentDevice);
 		    curFile.close();
 		    activeDeviceNames.addLast(currentDevice);
-		    //deviceCombo.addItem(currentDevice);
-		    //++numDevices;
 		} catch(Exception e) {}
 	    }
 	}
@@ -167,9 +165,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
 		String currentDevice = "CdRom"+i;
 		WindowsLowLevelIO curFile = new WindowsLowLevelIO(DEVICE_PREFIX + currentDevice);
 		curFile.close();
-		//deviceCombo.addItem(currentDevice);
 		activeDeviceNames.addLast(currentDevice);
-		//++numDevices;
 	    } catch(Exception e) {}
 	}
 	return activeDeviceNames.toArray(new String[activeDeviceNames.size()]);
@@ -184,22 +180,33 @@ public class SelectWindowsDeviceDialog extends JDialog {
 		    plainFileSystems.add(name);
 		llf.close();
 	    } catch(Exception e) {
-		System.out.println("INFO: Non-critical exception while detecting file systems: " + e.toString());
-// 		e.printStackTrace();
-// 		JOptionPane.showMessageDialog(this, "Exception while detecting file system for \"" +
-// 					      name + "\":\n" + e.toString(),
-// 					      "Exception", JOptionPane.ERROR_MESSAGE);
+		System.out.println("INFO: Non-critical exception while detecting file system at \"" + DEVICE_PREFIX + name + "\": " + e.toString());
 	    }
 	}
 	
-	if(plainFileSystems.size() > 0) {
+	if(plainFileSystems.size() > 1) {
 	    String[] devices = plainFileSystems.toArray(new String[plainFileSystems.size()]);
-	    Object selectedValue = JOptionPane.showInputDialog(this, "Please choose which file system to load:", 
-							       "Select device", 
+	    Object selectedValue = JOptionPane.showInputDialog(this, "Autodetection complete! Found " +
+							       plainFileSystems.size() + " HFS+ file systems.\n" +
+							       "Please choose which one to load:", 
+							       "Load HFS+ file system", 
 							       JOptionPane.QUESTION_MESSAGE,
 							       null, devices, devices[0]);
 	    if(selectedValue != null) {
 		result = DEVICE_PREFIX + selectedValue.toString();
+		setVisible(false);
+	    }
+	}
+	else if(plainFileSystems.size() > 0) {
+	    int res = JOptionPane.showConfirmDialog(this, "Autodetection complete! Found an " +
+						    "HFS+ file system at \"" + 
+						    plainFileSystems.getFirst() +"\".\n" +
+						    "Do you want to load it?", 
+						    "Load HFS+ file system",
+						    JOptionPane.YES_NO_OPTION,
+						    JOptionPane.QUESTION_MESSAGE);
+	    if(res == JOptionPane.YES_OPTION) {
+		result = DEVICE_PREFIX + plainFileSystems.getFirst();
 		setVisible(false);
 	    }
 	}
