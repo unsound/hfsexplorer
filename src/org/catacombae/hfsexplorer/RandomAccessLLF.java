@@ -32,7 +32,7 @@ public class RandomAccessLLF implements LowLevelFile {
     public void seek(long pos) {
 	try {
 	    raf.seek(pos);
-	} catch(IOException ioe) { throw new RuntimeException("pos=" + pos + "," + ioe.getMessage(), ioe); }
+	} catch(IOException ioe) { throw new RuntimeException("pos=" + pos + "," + ioe.toString(), ioe); }
     }
     public int read() {
 	try {
