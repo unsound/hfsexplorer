@@ -441,15 +441,16 @@ public class FileSystemBrowserWindow extends JFrame {
 	
 	// Menus
 	JMenuItem loadFSFromDeviceItem = null;
-	//JMenuItem loadFSFromDeviceWithAPMItem = null;
 	if(System.getProperty("os.name").toLowerCase().startsWith("windows") &&
 	   System.getProperty("os.arch").toLowerCase().equals("x86")) {
+	    // Only for Windows systems...
 	    loadFSFromDeviceItem = new JMenuItem("Load file system from device");
 	    loadFSFromDeviceItem.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent ae) {
-			SelectWindowsDeviceDialog deviceDialog = new SelectWindowsDeviceDialog(FileSystemBrowserWindow.this,
-											       true,
-											       "Load file system from device");
+			SelectWindowsDeviceDialog deviceDialog = 
+			    new SelectWindowsDeviceDialog(FileSystemBrowserWindow.this,
+							  true,
+							  "Load file system from device");
 			deviceDialog.setVisible(true);
 			String pathName = deviceDialog.getPathName();
 			try {
@@ -464,29 +465,8 @@ public class FileSystemBrowserWindow extends JFrame {
 		    }
 		});
 	    loadFSFromDeviceItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-// 	    loadFSFromDeviceWithAPMItem = new JMenuItem("Load file system from device with APM");
-// 	    loadFSFromDeviceWithAPMItem.addActionListener(new ActionListener() {
-// 		    public void actionPerformed(ActionEvent ae) {
-// 			SelectWindowsDeviceDialog deviceDialog = new SelectWindowsDeviceDialog(FileSystemBrowserWindow.this,
-// 											       true,
-// 											       "Load file system from device with APM");
-// 			deviceDialog.setVisible(true);
-// 			String pathName = deviceDialog.getPathName();
-// // 			String pathName = JOptionPane.showInputDialog(FileSystemBrowserWindow.this,
-// // 								      "Enter the UNC path for the file system",
-// // 								      "\\\\?\\GLOBALROOT\\Device\\Harddisk2\\Partition2");
-// 			try {
-// 			    if(pathName != null)
-// 				loadFS(pathName, true, true);
-// 			} catch(Exception e) {
-// 			    e.printStackTrace();
-// 			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-// 							  "Could not read contents of partition!",
-// 							  "Error", JOptionPane.ERROR_MESSAGE);
-// 			}
-// 		    }
-// 		});
  	}
+	
 	JMenuItem loadFSFromFileItem = new JMenuItem("Load file system from file");
 	loadFSFromFileItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
@@ -513,31 +493,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		}
 	    });
 	loadFSFromFileItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-// 	JMenuItem loadAPMFSFromFileItem = new JMenuItem("Load file system from file with APM");
-// 	loadAPMFSFromFileItem.addActionListener(new ActionListener() {
-// 		public void actionPerformed(ActionEvent ae) {
-// 		    //JFileChooser fileChooser = new JFileChooser();
-// 		    fileChooser.setMultiSelectionEnabled(false);
-// 		    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-// 		    if(fileChooser.showOpenDialog(FileSystemBrowserWindow.this) == 
-// 		       JFileChooser.APPROVE_OPTION) {
-// 			try {
-// 			    String pathName = fileChooser.getSelectedFile().getCanonicalPath();
-// 			    loadFS(pathName, true, false);
-// 			} catch(IOException ioe) {
-// 			    ioe.printStackTrace();
-// 			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-// 							  "Count not resolve pathname!",
-// 							  "Error", JOptionPane.ERROR_MESSAGE);
-// 			} catch(Exception e) {
-// 			    e.printStackTrace();
-// 			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-// 							  "Could not read contents of partition!",
-// 							  "Error", JOptionPane.ERROR_MESSAGE);
-// 			}
-// 		    }
-// 		}
-// 	    });
+	
 	JMenuItem exitProgramItem = new JMenuItem("Exit");
 	exitProgramItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
@@ -557,10 +513,12 @@ public class FileSystemBrowserWindow extends JFrame {
 			    infoWindow.setJournalFields(fsView.getJournalInfoBlock());
 		    }
 		    else
-			JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "No file system loaded.", "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "No file system loaded.",
+						      "Error", JOptionPane.ERROR_MESSAGE);
 		}		
 	    });
 	fsInfoItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+	
 	JMenuItem checkUpdatesItem = new JMenuItem("Check for updates...");
 	checkUpdatesItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
@@ -583,31 +541,12 @@ public class FileSystemBrowserWindow extends JFrame {
 			}
 			catch(Exception e) {}
 		    }
-// 		    if(infoDictStream != null) {
-// 			try {
-// 			    SimpleDictionaryParser sdp = new SimpleDictionaryParser(infoDictStream);
-// 			    String dictVersion = sdp.getValue("Version");
-// 			    if(dictVersion != null && dictVersion.equals(HFSExplorer.VERSION))
-// 				JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-// 							      "There are no updates available.", 
-// 							      "Information", JOptionPane.INFORMATION_MESSAGE);
-// 			    else
-// 				JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-// 							      "There are updates available!\n" +
-// 							      "Latest version is: " + dictVersion, 
-// 							      "Information", JOptionPane.INFORMATION_MESSAGE);
-// 			} catch(Exception e) {
-// 			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-// 							  "Could not parse version file...", 
-// 							  "Error", JOptionPane.ERROR_MESSAGE);
-// 			}
-// 		    }
-// 		    else
-			JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-						      "Could not contact version URL.", 
-						      "Error", JOptionPane.ERROR_MESSAGE);
+		    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+						  "Could not contact version URL.", 
+						  "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	    });
+	
 	JMenuItem aboutItem = new JMenuItem("About...");
 	aboutItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
@@ -631,10 +570,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	JMenu fileMenu = new JMenu("File");
 	if(loadFSFromDeviceItem != null)
 	    fileMenu.add(loadFSFromDeviceItem);
-	//if(loadFSFromDeviceWithAPMItem != null)
-	//    fileMenu.add(loadFSFromDeviceWithAPMItem);
 	fileMenu.add(loadFSFromFileItem);
-	//fileMenu.add(loadAPMFSFromFileItem);
 	fileMenu.add(exitProgramItem);
 	JMenu infoMenu = new JMenu("Info");
 	infoMenu.add(fsInfoItem);
