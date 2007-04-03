@@ -1,7 +1,6 @@
 HFSExplorer Changelog
 ---------------------
 
-
 0.16
 ----
 - Added automatic detection of partition systems and file systems, so that the user no longer
