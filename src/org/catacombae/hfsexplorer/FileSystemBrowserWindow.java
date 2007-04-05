@@ -37,6 +37,7 @@ import javax.swing.table.*;
 import javax.swing.event.*;
 
 public class FileSystemBrowserWindow extends JFrame {
+    private static final String TITLE_STRING = "HFSExplorer v" + HFSExplorer.VERSION;
     private static final String[] VERSION_INFO_DICTIONARY = {
 	"http://www.typhontools.cjb.net/hfsx/version.sdic.txt",
 	"http://hem.bredband.net/unsound/hfsx/version.sdic.txt"
@@ -112,7 +113,7 @@ public class FileSystemBrowserWindow extends JFrame {
     }
     
     public FileSystemBrowserWindow() {
-	super("HFSExplorer v" + HFSExplorer.VERSION);
+	super(TITLE_STRING);
 	fsbPanel = new FilesystemBrowserPanel();
 	fileTable = fsbPanel.fileTable;
 	fileTableScroller = fsbPanel.fileTableScroller;
@@ -444,7 +445,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	if(System.getProperty("os.name").toLowerCase().startsWith("windows") &&
 	   System.getProperty("os.arch").toLowerCase().equals("x86")) {
 	    // Only for Windows systems...
-	    loadFSFromDeviceItem = new JMenuItem("Load file system from device");
+	    loadFSFromDeviceItem = new JMenuItem("Load file system from device...");
 	    loadFSFromDeviceItem.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent ae) {
 			SelectWindowsDeviceDialog deviceDialog = 
@@ -455,7 +456,7 @@ public class FileSystemBrowserWindow extends JFrame {
 			String pathName = deviceDialog.getPathName();
 			try {
 			    if(pathName != null)
-				loadFS(pathName, false, true);
+				loadFS(new WindowsLowLevelIO(pathName), pathName);
 			} catch(Exception e) {
 			    e.printStackTrace();
 			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
@@ -467,7 +468,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	    loadFSFromDeviceItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
  	}
 	
-	JMenuItem loadFSFromFileItem = new JMenuItem("Load file system from file");
+	JMenuItem loadFSFromFileItem = new JMenuItem("Load file system from file...");
 	loadFSFromFileItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
 		    //JFileChooser fileChooser = new JFileChooser();
@@ -477,7 +478,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		       JFileChooser.APPROVE_OPTION) {
 			try {
 			    String pathName = fileChooser.getSelectedFile().getCanonicalPath();
-			    loadFS(pathName, false, false);
+			    loadFS(pathName);
 			} catch(IOException ioe) {
 			    ioe.printStackTrace();
 			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
@@ -493,6 +494,54 @@ public class FileSystemBrowserWindow extends JFrame {
 		}
 	    });
 	loadFSFromFileItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+	
+	JMenuItem openUDIFItem = new JMenuItem("Open UDIF disk image (.dmg)...");
+	openUDIFItem.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent ae) {
+		    //JFileChooser fileChooser = new JFileChooser();
+		    fileChooser.setMultiSelectionEnabled(false);
+		    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		    if(fileChooser.showOpenDialog(FileSystemBrowserWindow.this) == 
+		       JFileChooser.APPROVE_OPTION) {
+			try {
+			    File selectedFile = fileChooser.getSelectedFile();
+			    String pathName = selectedFile.getCanonicalPath();
+			    UDIFRandomAccessLLF stream = null;
+			    try {
+				stream = new UDIFRandomAccessLLF(pathName);
+			    }
+			    catch(Exception e) {
+				e.printStackTrace();
+				if(e.getMessage().startsWith("java.lang.RuntimeException: No handler for block type")) {
+				    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+								  "UDIF file contains unsupported block types!\n" +
+								  "(The file was probably created with BZIP2 or ADC " + 
+								  "compression, which is unsupported currently)",
+								  "Error", JOptionPane.ERROR_MESSAGE);
+				}
+				else {
+				    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+								  "UDIF file unsupported or damaged!",
+								  "Error", JOptionPane.ERROR_MESSAGE);
+				}
+			    }
+			    if(stream != null)
+				loadFS(stream, selectedFile.getName());
+			} catch(IOException ioe) {
+			    ioe.printStackTrace();
+			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+							  "Count not resolve pathname!",
+							  "Error", JOptionPane.ERROR_MESSAGE);
+			} catch(Exception e) {
+			    e.printStackTrace();
+			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+							  "Could not read contents of partition!",
+							  "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		    }
+		}
+	    });
+	openUDIFItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 	
 	JMenuItem exitProgramItem = new JMenuItem("Exit");
 	exitProgramItem.addActionListener(new ActionListener() {
@@ -528,14 +577,30 @@ public class FileSystemBrowserWindow extends JFrame {
 			    infoDictStream = new URL(s).openStream();
 			    SimpleDictionaryParser sdp = new SimpleDictionaryParser(infoDictStream);
 			    String dictVersion = sdp.getValue("Version");
-			    if(dictVersion != null && dictVersion.equals(HFSExplorer.VERSION))
-				JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-							      "There are no updates available.", 
-							      "Information", JOptionPane.INFORMATION_MESSAGE);
-			    else
+			    Boolean dictVersionIsHigher = null;
+			    char[] dictVersionArray = dictVersion.toCharArray();
+			    char[] myVersionArray = HFSExplorer.VERSION.toCharArray();
+			    int minArrayLength = Math.min(dictVersionArray.length, myVersionArray.length);
+			    for(int i = 0; i < minArrayLength; ++i) {
+				if(dictVersionArray[i] > myVersionArray[i]) {
+				    dictVersionIsHigher = true;
+				    break;
+				}
+				else if(dictVersionArray[i] < myVersionArray[i]) {
+				    dictVersionIsHigher = false;
+				    break;
+				}
+			    }
+			    if(dictVersionIsHigher == null)
+				dictVersionIsHigher = dictVersionArray.length > myVersionArray.length;
+			    if(dictVersionIsHigher)
 				JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
 							      "There are updates available!\n" +
 							      "Latest version is: " + dictVersion, 
+							      "Information", JOptionPane.INFORMATION_MESSAGE);
+			    else
+				JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+							      "There are no updates available.", 
 							      "Information", JOptionPane.INFORMATION_MESSAGE);
 			    return;
 			}
@@ -571,6 +636,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	if(loadFSFromDeviceItem != null)
 	    fileMenu.add(loadFSFromDeviceItem);
 	fileMenu.add(loadFSFromFileItem);
+	fileMenu.add(openUDIFItem);
 	fileMenu.add(exitProgramItem);
 	JMenu infoMenu = new JMenu("Info");
 	infoMenu.add(fsInfoItem);
@@ -649,13 +715,16 @@ public class FileSystemBrowserWindow extends JFrame {
 	disableColumnListener[0] = false;
     }
     
-    public void loadFS(String filename, boolean readAPM, boolean readFromDevice) {
+    public void loadFS(String filename) {
 	LowLevelFile fsFile;
 	if(System.getProperty("os.name").toLowerCase().startsWith("windows") &&
 	   System.getProperty("os.arch").toLowerCase().equals("x86"))
 	    fsFile = new WindowsLowLevelIO(filename);
 	else
 	    fsFile = new RandomAccessLLF(filename);
+	loadFS(fsFile, new File(filename).getName());
+    }
+    public void loadFS(LowLevelFile fsFile, String displayName) {
 	
 	int blockSize = 0x200; // == 512
 	int ddrBlockSize;
@@ -718,6 +787,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	    HFSPlusCatalogLeafRecord rootRecord = fsView.getRoot();
 	    HFSPlusCatalogLeafRecord[] rootContents = fsView.listRecords(rootRecord);
 	    populateFilesystemGUI(rootRecord, rootContents);
+	    setTitle(TITLE_STRING + " - [" + displayName + "]");
 	    statusLabel.setText("0 objects selected (0 bytes)");
 	    //adjustTableWidth();
 	}
@@ -1038,6 +1108,11 @@ public class FileSystemBrowserWindow extends JFrame {
 		//			  "Extraction complete!", JOptionPane.INFORMATION_MESSAGE);
 	    } catch(FileNotFoundException fnfe) {
 		fnfe.printStackTrace();
+		char[] filenameChars = filename.toCharArray();
+		System.out.println("Filename in hex (" + filenameChars.length + " UTF-16 characters):");
+		System.out.print("  0x");
+		for(char c : filenameChars) System.out.print(" " + Util.toHexStringBE(c));
+		System.out.println();
 		int reply = JOptionPane.showConfirmDialog(this, "Could not create file \"" + filename +
 							  "\" in folder:\n  " + outDir.getAbsolutePath() + "\n" +
 							  "Do you want to continue? (The file will be skipped)",
@@ -1154,7 +1229,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	if(args.length > 0) {
 	    try {
 		String pathName = new File(args[0]).getCanonicalPath();
-		fsbWindow.loadFS(pathName, true, false);
+		fsbWindow.loadFS(pathName);
 	    } catch(IOException ioe) {
 		ioe.printStackTrace();
 		String msg = ioe.toString();

@@ -1,5 +1,8 @@
 HFSExplorer TODO:
 
+- Make HFSExplorer display file or device name in title bar
+- Valence of a folder should be read immediatly after expansion so that the user
+  doesn't have to click it to see if it contains any children.
 - I need to figure out how to add actions to double-clicks and right-clicks in the
   table and in the tree.
 - Figure out how to catch mouse clicks in a JTableHeader, so I can sort like

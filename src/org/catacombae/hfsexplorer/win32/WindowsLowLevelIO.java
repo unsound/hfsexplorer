@@ -110,7 +110,7 @@ public class WindowsLowLevelIO implements org.catacombae.hfsexplorer.LowLevelFil
 	if(fileHandle != null) {
 	    int bytesRead = 0;
 	    while(bytesRead < length) {
-		int curBytesRead = read(data, bytesRead, length-bytesRead);
+		int curBytesRead = read(data, offset+bytesRead, length-bytesRead);
 		if(curBytesRead > 0) bytesRead += curBytesRead;
 		else 
 		    throw new RuntimeException("Couldn't read the entire length.");

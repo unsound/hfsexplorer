@@ -1,7 +1,7 @@
 #!/bin/sh
 
 SOURCEFILES="../src/org/catacombae/hfsexplorer/*.java ../src/org/catacombae/hfsexplorer/apm/*.java ../src/org/catacombae/hfsexplorer/gui/*.java ../src/org/catacombae/hfsexplorer/testcode/*.java ../src/org/catacombae/hfsexplorer/types/*.java ../src/org/catacombae/hfsexplorer/win32/*.java"
-CLASSPATH=../lib/swing-layout-1.0.1.jar
+CLASSPATH=../lib/swing-layout-1.0.1.jar:lib/hfsx_dmglib.jar
 
 
 rm -r ./doc.~
