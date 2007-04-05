@@ -1,6 +1,14 @@
 HFSExplorer Changelog
 ---------------------
 
+0.17 (pre)
+----
+- DMG UDIF file support! Most DMG files can now be read directly from within HFSExplorer (no
+  prior extraction needed), thanks to integrating code from DMGExtractor. It is all rather slow
+  at the moment (especially with compressed images), but expect performance enhancements in the
+  future when I implement smarter buffering/caching.
+- Title bar now shows which file is open.
+
 0.16
 ----
 - Added automatic detection of partition systems and file systems, so that the user no longer

@@ -1,6 +1,6 @@
 HFSExplorer TODO:
 
-- Make HFSExplorer display file or device name in title bar
+- All in bugs.txt
 - Valence of a folder should be read immediatly after expansion so that the user
   doesn't have to click it to see if it contains any children.
 - I need to figure out how to add actions to double-clicks and right-clicks in the
