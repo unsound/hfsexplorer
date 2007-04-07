@@ -1,12 +1,22 @@
 HFSExplorer Changelog
 ---------------------
 
-0.17 (pre)
+0.17
 ----
 - DMG UDIF file support! Most DMG files can now be read directly from within HFSExplorer (no
   prior extraction needed), thanks to integrating code from DMGExtractor. It is all rather slow
   at the moment (especially with compressed images), but expect performance enhancements in the
   future when I implement smarter buffering/caching.
+  What is known not to work are .dmg files with ADC or BZIP2 compression and encrypted images.
+  Additionally, any image that does not contain an HFS+ file system will obviously not work.
+- Created a launcher application for Windows, which automatically locates the Java Runtime
+  Environment and starts the application from an .exe file. This launcher might work poorly
+  with JREs from other vendors than Sun, so feedback is appreciated from those using non-Sun
+  Java Runtime Environments.
+- Made a NSIS installer package for Windows users, making it easy to install/uninstall the
+  application. The installer is able to create file associations with .dmg files.
+- Enabled the address field and "Go" button in HFSExplorer (after many releases where it has
+  been disabled, waiting for implementation).
 - Title bar now shows which file is open.
 
 0.16

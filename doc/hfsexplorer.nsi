@@ -18,6 +18,7 @@ SetCompressor bzip2
 !define MUI_ABORTWARNING
 !define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\modern-install.ico"
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
+!define MUI_COMPONENTSPAGE_NODESC
 
 ; Welcome page
 !insertmacro MUI_PAGE_WELCOME
@@ -49,6 +50,7 @@ var ICONS_GROUP
 ; Reserve files
 !insertmacro MUI_RESERVEFILE_INSTALLOPTIONS
 
+
 ; MUI end ------
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
@@ -58,15 +60,18 @@ ShowInstDetails show
 ShowUnInstDetails show
 ;LicenseForceSelection checkbox "Jag Godkänner"
 
+;InstType "Full"
 
 Section "HFSExplorer" SEC01
+  SectionIn RO ; Means that the section is read-only (can't be deselected by the user)
   SetOutPath "$INSTDIR"
   SetOverwrite ifnewer
   File "gpl.txt"
+  File "..\hfsexplorer.exe"
   File "..\llio.dll"
   File "..\runfsb.bat"
   File "..\runfsb.sh"
-  File "..\runfsb_debug.bat"
+  ;File "..\runfsb_debug.bat"
   File "..\runfsb_vista.vbs"
   File "..\hfsx.bat"
   File "..\hfsx.sh"
@@ -80,7 +85,8 @@ Section "HFSExplorer" SEC01
   CreateDirectory "$SMPROGRAMS\$ICONS_GROUP"
   ;CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Starta Matematikselet.lnk" "$INSTDIR\rungame.bat""%~dp0lib\swing-layout-1.0.1.jar"
   SetOutPath $INSTDIR
-  CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\HFSExplorer.lnk" "javaw.exe -classpath $INSTDIR\lib\hfsx.jar;$INSTDIR\lib\hfsx_dmglib.jar;$INSTDIR\lib\swing-layout-1.0.1.jar org.catacombae.hfsexplorer.FileSystemBrowserWindow"
+  CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\HFSExplorer.lnk" "$INSTDIR\hfsexplorer.exe"
+  CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Run HFSExplorer in Administrator mode.lnk" "$INSTDIR\hfsexplorer.exe" "-invokeuac"
   ;SetOutPath $INSTDIR\bin\changedb
   ;CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Ändra sökväg till databasen.lnk" "$INSTDIR\bin\changedb\changedb.exe"
   ;SetOutPath $INSTDIR\bin\levelconverter
@@ -89,16 +95,52 @@ Section "HFSExplorer" SEC01
   !insertmacro MUI_STARTMENU_WRITE_END
 SectionEnd
 
-;Section "Administrativa .bat-filer" SEC02
-;  SetOutPath "$INSTDIR"
-;  SetOverwrite ifnewer
-;  File /r "..\release\batfiles\*.bat"
-;SectionEnd
+Section "Register .dmg file association" SEC02
+  ;SectionIn 1
+  ;SetOutPath "$INSTDIR"
+  ;SetOverwrite ifnewer
+  ;File /r "..\release\batfiles\*.bat"
+  !define FILE_EXTENSION ".dmg"
+  !define PROGRAM_EXTENSION_ID "CatacombaeHFSExplorer.DMGFile"
+  !define WINDOWS_DESCRIPTION ".dmg Disk image"
+  !define ICON_FILE "$INSTDIR\hfsexplorer.exe,0"
+  !define OPEN_COMMAND '$INSTDIR\hfsexplorer.exe "%1"'
+  
+  !define Index "Line${__LINE__}"
+  ; Back up current extension mapping, if existent
+  ReadRegStr $1 HKCR "${FILE_EXTENSION}" ""                   ; Read current extension mapping
+  StrCmp $1 "" "${Index}-NoBackup"                          ; If there is none, jump to NoBackup
+  StrCmp $1 "${PROGRAM_EXTENSION_ID}" "${Index}-NoBackup"     ; If it exists, and is equal to this program's PROGRAM_EXTENSION_ID, also jump to NoBackup
+  WriteRegStr HKCR "${FILE_EXTENSION}" "backup_val" $1        ; Else, write its value to a new key, called 'backup_val'
+  
+  "${Index}-NoBackup:"
+  
+  ; Write our file extension mapping to registry
+  WriteRegStr HKCR "${FILE_EXTENSION}" "" "${PROGRAM_EXTENSION_ID}" ; Write mapping .dmg->CatacombaeHFSExplorer.DMGFile
+  ReadRegStr $0 HKCR "${PROGRAM_EXTENSION_ID}" ""                   ; Read current contents of CatacombaeHFSExplorer.DMGFile
+  StrCmp $0 "" 0 "${Index}-Skip"                                    ; If the key CatacombaeHFSExplorer.DMGFile does exist, jump to Skip
+  WriteRegStr HKCR "${PROGRAM_EXTENSION_ID}" "" "${WINDOWS_DESCRIPTION}"
+  WriteRegStr HKCR "${PROGRAM_EXTENSION_ID}\shell" "" "open"
+  WriteRegStr HKCR "${PROGRAM_EXTENSION_ID}\DefaultIcon" "" "${ICON_FILE}"
+  "${Index}-Skip:"
+  WriteRegStr HKCR "${PROGRAM_EXTENSION_ID}\shell\open\command" "" '${OPEN_COMMAND}'
+      ;WriteRegStr HKCR "OptionsFile\shell\edit" "" "Edit Options File"
+      ;WriteRegStr HKCR "OptionsFile\shell\edit\command" "" '$INSTDIR\execute.exe "%1"'
+
+  System::Call 'Shell32::SHChangeNotify(i 0x8000000, i 0, i 0, i 0)' ; Alert Windows that is has to update its file extension list.
+  !undef Index
+  !undef FILE_EXTENSION
+  !undef PROGRAM_EXTENSION_ID
+  !undef WINDOWS_DESCRIPTION
+  !undef ICON_FILE
+  !undef OPEN_COMMAND
+  ; Rest of script
+SectionEnd
 
 Section -AdditionalIcons
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
   WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
-  CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Catacombae Software Web Site.lnk" "$INSTDIR\${PRODUCT_NAME}.url"
+  CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Developer Web Site.lnk" "$INSTDIR\${PRODUCT_NAME}.url"
   CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk" "$INSTDIR\uninst.exe"
   !insertmacro MUI_STARTMENU_WRITE_END
 SectionEnd
@@ -113,10 +155,10 @@ Section -Post
 SectionEnd
 
 ; Section descriptions
-!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC01} "Contains everything."
+;!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+  ;!insertmacro MUI_DESCRIPTION_TEXT ${SEC01} "Contains everything."
   ;!insertmacro MUI_DESCRIPTION_TEXT ${SEC02} "Innehåller .bat-filer för att starta enskila program inom Matematikspelet, samt för att rensa databasen."
-!insertmacro MUI_FUNCTION_DESCRIPTION_END
+;!insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 Function un.onUninstSuccess
   HideWindow
@@ -129,17 +171,52 @@ Function un.onInit
 FunctionEnd
 
 Section Uninstall
+  ; Start of restoration of registry values
+  ; I should make these variables global or something... make them parameters of a function, if NSIS can do that...
+  !define FILE_EXTENSION ".dmg"
+  !define PROGRAM_EXTENSION_ID "CatacombaeHFSExplorer.DMGFile"
+  
+  ; Start of restore script
+  !define Index "Line${__LINE__}"
+  ReadRegStr $1 HKCR "${FILE_EXTENSION}" ""
+  StrCmp $1 "${PROGRAM_EXTENSION_ID}" 0 "${Index}-NoOwn" ; only do this if we own it
+
+  ReadRegStr $1 HKCR "${FILE_EXTENSION}" "backup_val"
+  StrCmp $1 "" 0 "${Index}-Restore" ; if backup="" then delete the whole key
+  DeleteRegKey HKCR "${FILE_EXTENSION}"
+  Goto "${Index}-NoOwn"
+  
+  "${Index}-Restore:"
+  WriteRegStr HKCR "${FILE_EXTENSION}" "" $1
+  DeleteRegValue HKCR "${FILE_EXTENSION}" "backup_val"
+
+  ; In any case, we WILL delete HKCR\CatacombaeHFSExplorer.DMGFile
+  "${Index}-NoOwn:"
+  DeleteRegKey HKCR "${PROGRAM_EXTENSION_ID}" ;Delete key with association settings
+  System::Call 'Shell32::SHChangeNotify(i 0x8000000, i 0, i 0, i 0)'
+
+  !undef Index
+  !undef FILE_EXTENSION
+  !undef PROGRAM_EXTENSION_ID
+  ; End of restore script
+  ; End of restoration of registry values
+  
+  
   !insertmacro MUI_STARTMENU_GETFOLDER "Application" $ICONS_GROUP
   Delete "$INSTDIR\${PRODUCT_NAME}.url"
   Delete "$INSTDIR\uninst.exe"
- 
-  Delete "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk"
-  Delete "$SMPROGRAMS\$ICONS_GROUP\Catacombae Software Web Site.lnk"
-  Delete "$SMPROGRAMS\$ICONS_GROUP\HFSExplorer.lnk"
 
+  Delete "$INSTDIR\lib\*.*"
+  RMDir "$INSTDIR\lib"
+  Delete "$INSTDIR\*.*"
+  RMDir "$INSTDIR"
+
+  Delete "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk"
+  Delete "$SMPROGRAMS\$ICONS_GROUP\Developer Web Site.lnk"
+  Delete "$SMPROGRAMS\$ICONS_GROUP\HFSExplorer.lnk"
+  Delete "$SMPROGRAMS\$ICONS_GROUP\Run HFSExplorer in Administrator mode.lnk"
   RMDir "$SMPROGRAMS\$ICONS_GROUP"
-  RMDir /r "$INSTDIR"
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
-  SetAutoClose true
+  SetAutoClose false
 SectionEnd

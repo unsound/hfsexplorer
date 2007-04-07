@@ -127,15 +127,16 @@ public class FileSystemBrowserWindow extends JFrame {
 
 	// UI Features for these are not implemented yet.
 	backButton.setEnabled(false);
-	addressField.setEnabled(false);
-	goButton.setEnabled(false);
+	//addressField.setEnabled(false);
+	//goButton.setEnabled(false);
 	
 	extractButton.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    if(fsView != null)
 			actionExtractToDir();
 		    else
-			JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "No file system loaded.", "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "No file system loaded.",
+						      "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	    });
 	
@@ -144,7 +145,28 @@ public class FileSystemBrowserWindow extends JFrame {
 		    if(fsView != null)
 			actionGetInfo();
 		    else
-			JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "No file system loaded.", "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "No file system loaded.",
+						      "Error", JOptionPane.ERROR_MESSAGE);
+		}
+	    });
+	goButton.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    if(fsView != null)
+			actionGotoDir();
+		    else
+			JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "No file system loaded.",
+						      "Error", JOptionPane.ERROR_MESSAGE);
+		}
+	    });
+	addressField.addKeyListener(new KeyAdapter() {
+		public void keyPressed(KeyEvent e) {
+		    if(fsView != null) {
+			if(e.getKeyCode() == KeyEvent.VK_ENTER)
+			    actionGotoDir();
+		    }
+		    else
+			JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "No file system loaded.",
+						      "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	    });
 	
@@ -341,6 +363,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	DefaultMutableTreeNode rootNode = new NoLeafMutableTreeNode("No file system loaded");
 	DefaultTreeModel model = new DefaultTreeModel(rootNode);
 	dirTree.setModel(model);
+	dirTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
 	dirTree.addTreeSelectionListener(new TreeSelectionListener() {
 		public void valueChanged(TreeSelectionEvent e) {
@@ -501,32 +524,38 @@ public class FileSystemBrowserWindow extends JFrame {
 		    //JFileChooser fileChooser = new JFileChooser();
 		    fileChooser.setMultiSelectionEnabled(false);
 		    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		    if(fileChooser.showOpenDialog(FileSystemBrowserWindow.this) == 
-		       JFileChooser.APPROVE_OPTION) {
+		    SimpleFileFilter sff = new SimpleFileFilter();
+		    sff.addExtension("dmg");
+		    sff.setDescription("Disk images");
+		    fileChooser.setFileFilter(sff);
+		    int res = fileChooser.showOpenDialog(FileSystemBrowserWindow.this);
+		    fileChooser.resetChoosableFileFilters();
+		    if(res == JFileChooser.APPROVE_OPTION) {
 			try {
 			    File selectedFile = fileChooser.getSelectedFile();
 			    String pathName = selectedFile.getCanonicalPath();
-			    UDIFRandomAccessLLF stream = null;
-			    try {
-				stream = new UDIFRandomAccessLLF(pathName);
-			    }
-			    catch(Exception e) {
-				e.printStackTrace();
-				if(e.getMessage().startsWith("java.lang.RuntimeException: No handler for block type")) {
-				    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-								  "UDIF file contains unsupported block types!\n" +
-								  "(The file was probably created with BZIP2 or ADC " + 
-								  "compression, which is unsupported currently)",
-								  "Error", JOptionPane.ERROR_MESSAGE);
-				}
-				else {
-				    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-								  "UDIF file unsupported or damaged!",
-								  "Error", JOptionPane.ERROR_MESSAGE);
-				}
-			    }
-			    if(stream != null)
-				loadFS(stream, selectedFile.getName());
+			    loadFSWithUDIFAutodetect(pathName);
+// 			    UDIFRandomAccessLLF stream = null;
+// 			    try {
+// 				stream = new UDIFRandomAccessLLF(pathName);
+// 			    }
+// 			    catch(Exception e) {
+// 				e.printStackTrace();
+// 				if(e.getMessage().startsWith("java.lang.RuntimeException: No handler for block type")) {
+// 				    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+// 								  "UDIF file contains unsupported block types!\n" +
+// 								  "(The file was probably created with BZIP2 or ADC " + 
+// 								  "compression, which is unsupported currently)",
+// 								  "Error", JOptionPane.ERROR_MESSAGE);
+// 				}
+// 				else {
+// 				    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+// 								  "UDIF file unsupported or damaged!",
+// 								  "Error", JOptionPane.ERROR_MESSAGE);
+// 				}
+// 			    }
+// 			    if(stream != null)
+// 				loadFS(stream, selectedFile.getName());
 			} catch(IOException ioe) {
 			    ioe.printStackTrace();
 			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
@@ -715,6 +744,48 @@ public class FileSystemBrowserWindow extends JFrame {
 	disableColumnListener[0] = false;
     }
     
+    public void loadFSWithUDIFAutodetect(String filename) {
+	LowLevelFile fsFile;
+	if(System.getProperty("os.name").toLowerCase().startsWith("windows") &&
+	   System.getProperty("os.arch").toLowerCase().equals("x86"))
+	    fsFile = new WindowsLowLevelIO(filename);
+	else
+	    fsFile = new RandomAccessLLF(filename);
+	
+	System.err.println("Trying to autodetect UDIF structure...");
+	if(UDIFRecognizer.isUDIF(fsFile)) {
+	    System.err.println("UDIF structure found! Creating stream...");
+	    UDIFRandomAccessLLF stream = null;
+	    try {
+		stream = new UDIFRandomAccessLLF(filename);
+	    }
+	    catch(Exception e) {
+		e.printStackTrace();
+		if(e.getMessage().startsWith("java.lang.RuntimeException: No handler for block type")) {
+		    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+						  "UDIF file contains unsupported block types!\n" +
+						  "(The file was probably created with BZIP2 or ADC " + 
+						  "compression, which is unsupported currently)",
+						  "Error", JOptionPane.ERROR_MESSAGE);
+		}
+		else {
+		    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+						  "UDIF file unsupported or damaged!",
+						  "Error", JOptionPane.ERROR_MESSAGE);
+		}
+		return;
+	    }
+	    if(stream != null) {
+		fsFile.close();
+		fsFile = stream;
+	    }
+	}
+	else {
+	    System.err.println("UDIF structure not found. Proceeding normally...");
+	}
+	
+	loadFS(fsFile, new File(filename).getName());
+    }
     public void loadFS(String filename) {
 	LowLevelFile fsFile;
 	if(System.getProperty("os.name").toLowerCase().startsWith("windows") &&
@@ -722,6 +793,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	    fsFile = new WindowsLowLevelIO(filename);
 	else
 	    fsFile = new RandomAccessLLF(filename);
+	
 	loadFS(fsFile, new File(filename).getName());
     }
     public void loadFS(LowLevelFile fsFile, String displayName) {
@@ -1025,49 +1097,149 @@ public class FileSystemBrowserWindow extends JFrame {
     }
     
     private void actionGetInfo() {
-	int[] selectedRows = fileTable.getSelectedRows();
-	if(selectedRows.length == 0) {
-	    JOptionPane.showMessageDialog(this, "No file selected.",
-					  "Information", JOptionPane.INFORMATION_MESSAGE);
-	    return;
-	}
-	else if (selectedRows.length == 1) {
-	    for(int selectedRow : selectedRows) {
-		Object o = tableModel.getValueAt(selectedRow, 0);
-		HFSPlusCatalogLeafRecord rec;
-		HFSPlusCatalogLeafRecordData recData;
-		if(o instanceof RecordContainer) {
-		    rec = ((RecordContainer)o).getRecord();
-		    recData = rec.getData();
-		    if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
-		       recData instanceof HFSPlusCatalogFile) {
-			HFSPlusCatalogFile file = (HFSPlusCatalogFile)recData;
-			FileInfoWindow fiw = new FileInfoWindow(rec.getKey().getNodeName().toString());
-			fiw.setFields(file);
-			fiw.setVisible(true);
-		    }
-		    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
-			    recData instanceof HFSPlusCatalogFolder) {
-			HFSPlusCatalogFolder folder = (HFSPlusCatalogFolder)recData;
-			FolderInfoWindow fiw = new FolderInfoWindow(rec.getKey().getNodeName().toString());
-			fiw.setFields(folder);
-			fiw.setVisible(true);
-		    }
-		    else
-			JOptionPane.showMessageDialog(this, "Only supported for files at the moment.", 
-						      "Error", JOptionPane.ERROR_MESSAGE);
-		}
-		else 
-		    JOptionPane.showMessageDialog(this, "Unexpected data in table model. (Internal error," +
-						  " report to developer)", "Error", JOptionPane.ERROR_MESSAGE);
+	HFSPlusCatalogLeafRecord rec = null;
+	if(dirTreeLastFocus > fileTableLastFocus) {
+	    Object o = dirTree.getLastSelectedPathComponent();
+	    //System.err.println(o.toString());
+	    if(o == null) {
+		JOptionPane.showMessageDialog(this, "No file or folder selected.",
+					      "Information", JOptionPane.INFORMATION_MESSAGE);
 	    }
-	    
+	    else if(o instanceof DefaultMutableTreeNode) {
+		Object o2 = ((DefaultMutableTreeNode)o).getUserObject();
+		if(o2 instanceof RecordNodeStorage)
+		    rec = ((RecordNodeStorage)o2).getRecord();
+		else 
+		    JOptionPane.showMessageDialog(this, "[actionGetInfo():Tree] Unexpected data in tree model. (Internal " +
+						  "error, report to developer)", "Error", JOptionPane.ERROR_MESSAGE);
+	    }
+	    else
+		JOptionPane.showMessageDialog(this, "[actionGetInfo():Tree] Unexpected tree node type! (Internal " +
+					      "error, report to developer)", "Error", JOptionPane.ERROR_MESSAGE);
 	}
 	else {
-	    JOptionPane.showMessageDialog(this, "Please select one file at a time.",
-					  "Error", JOptionPane.ERROR_MESSAGE);
-	    return;
+	    int[] selectedRows = fileTable.getSelectedRows();
+	    if(selectedRows.length == 0) {
+		JOptionPane.showMessageDialog(this, "No file selected.",
+					      "Information", JOptionPane.INFORMATION_MESSAGE);
+		return;
+	    }
+	    else if(selectedRows.length == 1) {
+		int selectedRow = selectedRows[0];
+		Object o = tableModel.getValueAt(selectedRow, 0);
+		if(o instanceof RecordContainer) {
+		    rec = ((RecordContainer)o).getRecord();
+		}
+		else 
+		    JOptionPane.showMessageDialog(this, "[actionGetInfo():Table] Unexpected data in table model. " + 
+						  "(Internal error, report to developer)",
+						  "Error", JOptionPane.ERROR_MESSAGE);
+	    }
+	    else {
+		JOptionPane.showMessageDialog(this, "Please select one file at a time.",
+					      "Error", JOptionPane.ERROR_MESSAGE);
+	    }
 	}
+
+	if(rec != null) {
+	    HFSPlusCatalogLeafRecordData recData = rec.getData();
+	    if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
+	       recData instanceof HFSPlusCatalogFile) {
+		HFSPlusCatalogFile file = (HFSPlusCatalogFile)recData;
+		FileInfoWindow fiw = new FileInfoWindow(rec.getKey().getNodeName().toString());
+		fiw.setFields(file);
+		fiw.setVisible(true);
+	    }
+	    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
+		    recData instanceof HFSPlusCatalogFolder) {
+		HFSPlusCatalogFolder folder = (HFSPlusCatalogFolder)recData;
+		FolderInfoWindow fiw = new FolderInfoWindow(rec.getKey().getNodeName().toString());
+		fiw.setFields(folder);
+		fiw.setVisible(true);
+	    }
+	    else
+		JOptionPane.showMessageDialog(this, "[actionGetInfo()] Record data has unexpected type (" +
+					      recData.getRecordType() + ").\nReport bug to developer.",
+					      "Error", JOptionPane.ERROR_MESSAGE);
+	}
+    }
+
+    private void actionGotoDir() {
+	String requestedPath = addressField.getText();
+	String[] components = requestedPath.split("/");
+	LinkedList<HFSPlusCatalogLeafRecord> recordPath = new LinkedList<HFSPlusCatalogLeafRecord>();
+	HFSPlusCatalogLeafRecord currentRecord = fsView.getRoot();
+	HFSPlusCatalogLeafRecordData currentRecordData = currentRecord.getData();
+	//recordPath.addLast(currentRecord);
+	for(String s : components) {
+	    if(!s.trim().equals("")) {
+		if(currentRecordData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
+		   currentRecordData instanceof HFSPlusCatalogFolder) {
+		    HFSPlusCatalogFolder folder = (HFSPlusCatalogFolder) currentRecordData;
+		    HFSPlusCatalogLeafRecord nextRecord = fsView.getRecord(folder.getFolderID(), new HFSUniStr255(s));
+		    
+		    if(nextRecord == null) {
+			currentRecord = null;
+			break;
+		    }
+		    else {
+			currentRecord = nextRecord;
+			currentRecordData = currentRecord.getData();
+			recordPath.addLast(currentRecord);
+		    }
+
+		}
+		else {
+		    currentRecord = null;
+		    break;
+		}
+	    }
+	}
+	
+	if(currentRecord == null)
+	    JOptionPane.showMessageDialog(this, "Path not found!", "Error", JOptionPane.ERROR_MESSAGE);
+	else if(currentRecordData.getRecordType() != HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER)
+	    JOptionPane.showMessageDialog(this, "Requested path points to a file. Can only browse folders...", "Error", JOptionPane.ERROR_MESSAGE);
+	else {
+	    Object root = dirTree.getModel().getRoot();
+	    DefaultMutableTreeNode rootNode;
+	    if(root instanceof DefaultMutableTreeNode)
+		rootNode = (DefaultMutableTreeNode)root;
+	    else
+		throw new RuntimeException("Invalid type in tree");
+	    TreePath treePath = new TreePath(rootNode);
+	    //System.out.println("Children:");
+	    
+	    for(HFSPlusCatalogLeafRecord rec : recordPath) {
+		DefaultMutableTreeNode rootNodeBefore = rootNode;
+		LinkedList<String> debug = new LinkedList<String>();
+		for(Enumeration e = rootNode.children() ; e.hasMoreElements() ;) {
+		    Object o = e.nextElement();
+		    if(o instanceof DefaultMutableTreeNode) {
+			DefaultMutableTreeNode currentNode = (DefaultMutableTreeNode)o;
+			Object o2 = currentNode.getUserObject();
+			debug.addLast(o2.toString());
+			if(o2.toString().equals(rec.getKey().getNodeName().toString())) {
+			    rootNode = currentNode;
+			    treePath = treePath.pathByAddingChild(rootNode);
+			    break;
+			}
+		    }
+		}
+		if(rootNode == rootNodeBefore) {
+		    System.err.println("Record string: \"" + rec.getKey().getNodeName().toString() + "\"");
+		    System.err.println("Contents:");
+		    for(String s : debug)
+			System.err.println("    " + s);
+		    throw new RuntimeException("!)/¤%/#)#");
+		}
+	    }
+	    
+	    dirTree.setSelectionPath(treePath);
+	    
+	    //JOptionPane.showMessageDialog(this, "Found path, and path is folder! :)\nRoot of the tree has class: " + root.getClass(), "YEA", JOptionPane.INFORMATION_MESSAGE);
+	}
+	
     }
     
     /** <code>progressDialog</code> may NOT be null. */
@@ -1229,13 +1401,19 @@ public class FileSystemBrowserWindow extends JFrame {
 	if(args.length > 0) {
 	    try {
 		String pathName = new File(args[0]).getCanonicalPath();
-		fsbWindow.loadFS(pathName);
-	    } catch(IOException ioe) {
-		ioe.printStackTrace();
-		String msg = ioe.toString();
-		for(StackTraceElement ste : ioe.getStackTrace())
-		    msg += "\n" + ste.toString();
-		JOptionPane.showMessageDialog(fsbWindow, msg, "Exception while loading file", JOptionPane.ERROR_MESSAGE);
+		fsbWindow.loadFSWithUDIFAutodetect(pathName);
+	    } catch(Exception ioe) {
+		if(ioe.getMessage().equals("Could not open file.")) {
+		    JOptionPane.showMessageDialog(fsbWindow, "Failed to open file:\n\"" + args[0] + "\"",
+						  "Error", JOptionPane.ERROR_MESSAGE);
+		}
+		else {
+		    ioe.printStackTrace();
+		    String msg = "Exception while loading file:\n" + "    \"" + args[0]  + "\"\n" + ioe.toString();
+		    for(StackTraceElement ste : ioe.getStackTrace())
+			msg += "\n" + ste.toString();
+		    JOptionPane.showMessageDialog(fsbWindow, msg, "Exception while loading file", JOptionPane.ERROR_MESSAGE);
+		}
 	    }
 	}
     }
