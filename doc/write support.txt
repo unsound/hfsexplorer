@@ -1,0 +1,45 @@
+Scenarios:
+
+1. Add a file to the file system
+   (Do all operations in memory and then write everything back to disk when all calculations
+    are completed, in a semi-atomic manner. The journal, if it exists, should be updated.)
+   - Obtain a HFSCatalogNodeID for the file ID.
+     - Get the next Catalog ID from the HFSPlusVolumeHeader and increment the value in the
+       volume header.
+     - If the Catalog ID has overflowed previously, I guess we need to look up new catalog
+       IDs in a different manner. Can be checked with getAttributeCatalogNodeIDsReused() in
+       HFSPlusVolumeHeader
+     - If the Catalog ID overflows with this increment, and CatalogNodeIDsReused is not set,
+       set it.
+   - Look up available blocks in the allocation file for each fork.
+     - We need to add functionality to the library for handling the allocation file online.
+       When enabling write mode, we should build some kind of data structure that holds
+       regions of unused blocks, so that we know exactly what we have to work with.
+     - Somehow, we will try to search for the smallest block that can hold our fork's data.
+       If no such block can be found (the file does not fit in any contigous free space),
+       take the largest free block and add it as the first extent. Subtract this extent's
+       length and loop again.
+       This is an intuitive algorithm, but it should be efficient...? (Consult OS
+       literature to get more ideas).
+   - Create a new HFSPlusCatalogLeafRecord with a HFSPlusCatalogFile as data.
+   - If the number of extents for one or both of the forks exceed 8, we need to create one
+     or many HFSPlusExtentLeafRecords for the fork.
+   - Insert the HFSPlusCatalogLeafRecord into the catalog file.
+     - Search your way out to the leaf node corresponding to the key of the newly created
+       file.
+     - If the leaf node is full:
+       Some kind of rebalancing needed. Work out the details later
+     - Else simply insert this record into the correct position in the leaf node.
+   - If we have HFSPlusExtentLeafRecords, add them in a similar manner.
+
+   - Now, repeat the above steps for the file thread, that HFS+ wants us to create. (Read
+     some more facts on this, because I can't really understand the need for file threads)
+     No allocation will be needed, no new ID is needed, and there are no forks whatsoever.
+     It should be really simple compared to the file record.
+   ------ Open file system for writing ------
+   - Commit all changes planned in memory in the following order (always check that the
+     value of the fields that we want to update is as we expect):
+     - Increment nextCatalogID in the volume header
+     - Mark selected allocation blocks as used in the allocation file
+     - Write changes to the catalog file
+     - Write changes, if any, to the extents overflow file
