@@ -469,7 +469,7 @@ public class Util {
     public static char[] readCharArrayBE(byte[] b) {
 	char[] result = new char[b.length/2];
 	for(int i = 0; i < result.length; ++i)
-	    result[i] = Util2.readCharBE(b, i*2);
+	    result[i] = Util.readCharBE(b, i*2);
 	return result;
     }
     public static short[] readShortArrayBE(byte[] b) {
