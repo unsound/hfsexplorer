@@ -1433,7 +1433,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	}
 	else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
 		recData instanceof HFSPlusCatalogFolder) {
-	    String dirName = rec.getKey().getNodeName().toString();
+	    String dirName = rec.getKey().getNodeName().getUnicodeAsComposedString(normalizationToolkit);
 	    progressDialog.updateCurrentFile(dirName);
 	    HFSCatalogNodeID requestedID;
 	    HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder)recData;
