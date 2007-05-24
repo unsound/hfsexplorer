@@ -54,11 +54,17 @@ public class FileSystemBrowserWindow extends JFrame {
     /** Aggregation class for storage in the first column of fileTable. */
     private static class RecordContainer {
 	private HFSPlusCatalogLeafRecord rec;
+	private String composedNodeName;
+	private RecordContainer() {}
 	public RecordContainer(HFSPlusCatalogLeafRecord rec) {
 	    this.rec = rec;
+	    rec.getKey();
+	    rec.getKey().getNodeName();
+	    rec.getKey().getNodeName().getUnicodeAsComposedString(normalizationToolkit);
+	    this.composedNodeName = rec.getKey().getNodeName().getUnicodeAsComposedString(normalizationToolkit);
 	}
 	public HFSPlusCatalogLeafRecord getRecord() { return rec; }
-	public String toString() { return rec.getKey().getNodeName().toString(); }
+	public String toString() { return composedNodeName; }
     }
     
     private FilesystemBrowserPanel fsbPanel;
@@ -89,14 +95,18 @@ public class FileSystemBrowserWindow extends JFrame {
     private final Vector<String> colNames = new Vector<String>();
     private final DefaultTableModel tableModel;
     private HFSFileSystemView fsView;
+    private static final UnicodeNormalizationToolkit normalizationToolkit = new UnicodeNormalizationToolkit();
     
     private static class RecordNodeStorage {
 	private HFSPlusCatalogLeafRecord parentRecord;
 	private HFSPlusCatalogLeafRecord threadRecord = null;
+	private String composedNodeName;
+
 	public RecordNodeStorage(HFSPlusCatalogLeafRecord parentRecord) {
 	    this.parentRecord = parentRecord;
 	    if(parentRecord.getData().getRecordType() != HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER)
 		throw new IllegalArgumentException("Illegal type for record data.");
+	    this.composedNodeName = parentRecord.getKey().getNodeName().getUnicodeAsComposedString(normalizationToolkit);
 	}
 	public HFSPlusCatalogLeafRecord getRecord() { return parentRecord; }
 	public HFSPlusCatalogLeafRecord getThread() { return threadRecord; }
@@ -106,8 +116,8 @@ public class FileSystemBrowserWindow extends JFrame {
 	    this.threadRecord = threadRecord;
 	}
 	public String toString() {
-	    HFSPlusCatalogLeafRecordData recData = parentRecord.getData();
-	    return parentRecord.getKey().getNodeName().toString();
+	    //HFSPlusCatalogLeafRecordData recData = parentRecord.getData();
+	    return composedNodeName;//parentRecord.getKey().getNodeName().getUnicodeAsComposedString(normalizationToolkit);
 	}
     }
     
@@ -175,7 +185,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		}
 	    });
 	
-	final Class recordContainerClass = new RecordContainer(null).getClass();
+	final Class recordContainerClass = new RecordContainer().getClass();
 	final Class objectClass = new Object().getClass();
 	colNames.add("Name");
 	colNames.add("Size");
@@ -388,19 +398,22 @@ public class FileSystemBrowserWindow extends JFrame {
 				    requestedID = rec.getKey().getParentID();
 				}
 				else {
-				    actionExtractToDir();
-// 				    UnicodeDecomposition ud = new UnicodeDecomposition();
-// 				    String filename = rec.getKey().getNodeName().toString();
-// 				    System.err.println("Decomposed (unmodified):     \"" + filename + "\"");
-// 				    System.err.print("Decomposed (unmodified) hex:");
-// 				    for(char c : filename.toCharArray()) System.err.print(" " + Util.toHexStringBE(c));
-// 				    System.err.println();
-// 				    String composedFilename = ud.compose(filename);
-// 				    System.err.println("Composed:                 \"" + composedFilename + "\"");
-// 				    System.err.print("Composed hex:            ");
-// 				    for(char c : composedFilename.toCharArray()) System.err.print(" " + Util.toHexStringBE(c));
-// 				    System.err.println();
-// 				    return;
+				    if(true)
+					actionExtractToDir();
+				    else { // Some normalization testcode, currently disabled.
+					UnicodeNormalizationToolkit ud = normalizationToolkit;
+					String filename = rec.getKey().getNodeName().toString();
+					System.err.println("Decomposed (unmodified):     \"" + filename + "\"");
+					System.err.print("Decomposed (unmodified) hex:");
+					for(char c : filename.toCharArray()) System.err.print(" " + Util.toHexStringBE(c));
+					System.err.println();
+					String composedFilename = ud.compose(filename);
+					System.err.println("Composed:                 \"" + composedFilename + "\"");
+					System.err.print("Composed hex:            ");
+					for(char c : composedFilename.toCharArray()) System.err.print(" " + Util.toHexStringBE(c));
+					System.err.println();
+				    }
+				    return;
 				}
 				
 				HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
@@ -1364,7 +1377,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	HFSPlusCatalogLeafRecordData recData = rec.getData();
 	if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
 	   recData instanceof HFSPlusCatalogFile) {
-	    String filename = rec.getKey().getNodeName().toString();
+	    String filename = rec.getKey().getNodeName().getUnicodeAsComposedString(normalizationToolkit);
 	    //System.out.println("file: \"" + filename + "\" range: " + fractionLowLimit + "-" + fractionHighLimit);
 	    progressDialog.updateCurrentFile(filename);
 	    //progressDialog.updateTotalProgress(fractionLowLimit);

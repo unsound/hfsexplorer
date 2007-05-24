@@ -29,7 +29,7 @@ import java.io.*;
  * Created from http://developer.apple.com/technotes/tn/tn1150table.html and verified against it.
  * Also including a Hangul decomposition algorithm from the Unicode Book.
  */
-public class UnicodeDecomposition {
+public class UnicodeNormalizationToolkit {
     private Map<Character, char[]> decompositionTable;
     private TrieNode compositionTrie;
     
@@ -132,15 +132,15 @@ public class UnicodeDecomposition {
 	public String toString() { return "{" + id + "} 0x" + Util.toHexStringBE(trig) + (replacementSequence == null?"":(" -> 0x" + Util.toHexStringBE(replacementSequence))); }
     }
 
-    public UnicodeDecomposition() {
+    public UnicodeNormalizationToolkit() {
 	this(new HashMap<Character, char[]>());
     }
     /** This method can be used in order to tune which Map implementation is used (default is HashMap). */
-    public UnicodeDecomposition(Map<Character, char[]> decompositionTable) {
+    public UnicodeNormalizationToolkit(Map<Character, char[]> decompositionTable) {
 	this.decompositionTable = decompositionTable;
 	buildDecompositionTable(decompositionTable);
 	this.compositionTrie = buildCompositionTrie(decompositionTable);
-	checkTrie(compositionTrie);
+	//checkTrie(compositionTrie);
     }
     
     /**
@@ -165,54 +165,45 @@ public class UnicodeDecomposition {
     }
     
     public String compose(String decomposedString) {
-	System.err.println("compose");
+	//System.err.println("compose");
 	StringBuilder sb = new StringBuilder();
 	LinkedList<TrieNode> matchSequence = new LinkedList<TrieNode>();
 	for(int i = 0; i < decomposedString.length(); ++i) {
-	    System.err.println("i = " + i);
-	    char baseChar = decomposedString.charAt(i);
-	    TrieNode tn = compositionTrie.getChild(baseChar);
-	    int charsRead = 1;
-	    char nextChar = baseChar;
+	    //System.err.println("i = " + i);
 	    char[] replacementSequence = null;
 	    matchSequence.clear();
-	    //System.err.print(" 0x" + Util.toHexStringBE(nextChar));
 
 	    /* First, we loop through the characters, starting at i, and matches characters in the
 	       trie until no more match is found. We push each node in a stack for later processing. */
-	    while(tn != null) {
-		matchSequence.addFirst(tn);
-		
-		if(i+charsRead < decomposedString.length()) {
-		    nextChar = decomposedString.charAt(i+charsRead);
-		    tn = tn.getChild(nextChar);
+	    TrieNode tn = compositionTrie;
+	    int charsRead = 0;
+	    while(tn != null && i+charsRead < decomposedString.length()) {
+		char current = decomposedString.charAt(i+charsRead);
+		tn = tn.getChild(current);
+		if(tn != null) {
+		    matchSequence.addFirst(tn);
 		    ++charsRead;
-		    //System.err.print(" -> 0x" + Util.toHexStringBE(nextChar));
 		}
-		else {
-		    ++charsRead;
-		    break;
-		}
+		//System.err.print(" -> 0x" + Util.toHexStringBE(nextChar));
 	    }
-	    --charsRead; 
 	    //System.err.println(" <BREAK>");
 	    
 	    /* To find the longest matching substring, we must loop from the back of the match
 	       sequence and find the first (last) TrieNode with a replacement sequence. We have
 	       conveniently arranged the match sequence in a LIFO manner, so we just have to loop. */
-	    System.err.print("  {read:" + charsRead + "}");
+	    //System.err.print("  {read:" + charsRead + "}");
 	    for(TrieNode cur : matchSequence) {
-		System.err.print(cur.toString() + " > "); 
+		//System.err.print(cur.toString() + " > "); 
 		if(cur.getReplacementSequence() != null) {
-		    System.err.println("<REPLACEMENT FOUND: " + Util.toHexStringBE(cur.getReplacementSequence()) + ">{read:" + charsRead + "}");
+		    //System.err.println("<REPLACEMENT FOUND: " + Util.toHexStringBE(cur.getReplacementSequence()) + ">{read:" + charsRead + "}");
 		    replacementSequence = cur.getReplacementSequence();
 		    break;
 		}
 		else
 		    --charsRead;
 	    }
-	    if(replacementSequence == null)
-		System.err.println("<NOTHING FOUND>{read:" + charsRead + "}");
+//  	    if(replacementSequence == null)
+//  		System.err.println("<NOTHING FOUND>{read:" + charsRead + "}");
 	    
 
 	    if(replacementSequence != null) {
@@ -220,7 +211,7 @@ public class UnicodeDecomposition {
 		i += charsRead - 1;
 	    }
 	    else
-		sb.append(baseChar);
+		sb.append(decomposedString.charAt(i));
 	}
 	return HangulDecomposition.composeHangul(sb.toString());
     }
@@ -256,7 +247,7 @@ public class UnicodeDecomposition {
      */
     public static void main(String[] args) throws IOException {
 	// Useage of TreeMap is essential to produce a sorted output.
-	UnicodeDecomposition ud = new UnicodeDecomposition(new TreeMap<Character, char[]>());
+	UnicodeNormalizationToolkit ud = new UnicodeNormalizationToolkit(new TreeMap<Character, char[]>());
 	PrintStream out = new PrintStream(new FileOutputStream(args[0]), true, "US-ASCII");
 	for(Map.Entry<Character, char[]> cur : ud.decompositionTable.entrySet()) {
 	    out.println("0x" + Util.toHexStringBE((short)cur.getKey().charValue()).toUpperCase());
