@@ -31,6 +31,7 @@ import java.io.*;
  */
 public class UnicodeDecomposition {
     private Map<Character, char[]> decompositionTable;
+    private TrieNode compositionTrie;
     
     /** This class encapsulates code copied from http://unicode.org/reports/tr15/#Hangul in order
 	to deal with Hangul decomposition algorithmically. No indication of any copyright issues.
@@ -56,6 +57,79 @@ public class UnicodeDecomposition {
 	    if (T != TBase) result.append((char)T);
 	    return result.toString();
 	}
+	public static String composeHangul(String source) {
+	    int len = source.length();
+	    if (len == 0) return "";
+	    StringBuffer result = new StringBuffer();
+	    char last = source.charAt(0);            // copy first char
+	    result.append(last);
+	    
+	    for (int i = 1; i < len; ++i) {
+		char ch = source.charAt(i);
+		
+		// 1. check to see if two current characters are L and V
+		
+		int LIndex = last - LBase;
+		if (0 <= LIndex && LIndex < LCount) {
+		    int VIndex = ch - VBase;
+		    if (0 <= VIndex && VIndex < VCount) {
+			
+			// make syllable of form LV
+			
+			last = (char)(SBase + (LIndex * VCount + VIndex) * TCount);
+			
+			result.setCharAt(result.length()-1, last); // reset last
+			continue; // discard ch
+		    }
+		}
+		
+		
+		// 2. check to see if two current characters are LV and T
+		
+		int SIndex = last - SBase;
+		if (0 <= SIndex && SIndex < SCount && (SIndex % TCount) == 0) {
+		    int TIndex = ch - TBase;
+		    if (0 < TIndex && TIndex < TCount) {
+			
+			// make syllable of form LVT
+			
+			last += TIndex;
+			result.setCharAt(result.length()-1, last); // reset last
+			continue; // discard ch
+		    }
+		}
+		// if neither case was true, just add the character
+		last = ch;
+		result.append(ch);
+	    }
+	    return result.toString();
+	}
+    }
+    
+    public static long nextID = 0;
+    public static class TrieNode {
+	private final Hashtable<Character, TrieNode> childNodes = new Hashtable<Character, TrieNode>();
+	private char[] replacementSequence = null;
+	private char trig;
+	private long id;
+	
+	public TrieNode(char trig) { this.trig = trig; this.id = nextID++; }
+	
+	public void addChild(char nextChar, TrieNode childNode) {
+	    childNodes.put(nextChar, childNode);
+	}
+	public TrieNode getChild(char nextChar) {
+	    return childNodes.get(nextChar);
+	}
+	public Collection<TrieNode> getChildren() {
+	    return childNodes.values();
+	}
+	public void setReplacementSequence(char[] seq) {
+	    this.replacementSequence = seq;
+	}
+	public char[] getReplacementSequence() { return replacementSequence; }
+
+	public String toString() { return "{" + id + "} 0x" + Util.toHexStringBE(trig) + (replacementSequence == null?"":(" -> 0x" + Util.toHexStringBE(replacementSequence))); }
     }
 
     public UnicodeDecomposition() {
@@ -65,6 +139,8 @@ public class UnicodeDecomposition {
     public UnicodeDecomposition(Map<Character, char[]> decompositionTable) {
 	this.decompositionTable = decompositionTable;
 	buildDecompositionTable(decompositionTable);
+	this.compositionTrie = buildCompositionTrie(decompositionTable);
+	checkTrie(compositionTrie);
     }
     
     /**
@@ -88,6 +164,89 @@ public class UnicodeDecomposition {
 	}
     }
     
+    public String compose(String decomposedString) {
+	System.err.println("compose");
+	StringBuilder sb = new StringBuilder();
+	LinkedList<TrieNode> matchSequence = new LinkedList<TrieNode>();
+	for(int i = 0; i < decomposedString.length(); ++i) {
+	    System.err.println("i = " + i);
+	    char baseChar = decomposedString.charAt(i);
+	    TrieNode tn = compositionTrie.getChild(baseChar);
+	    int charsRead = 1;
+	    char nextChar = baseChar;
+	    char[] replacementSequence = null;
+	    matchSequence.clear();
+	    //System.err.print(" 0x" + Util.toHexStringBE(nextChar));
+
+	    /* First, we loop through the characters, starting at i, and matches characters in the
+	       trie until no more match is found. We push each node in a stack for later processing. */
+	    while(tn != null) {
+		matchSequence.addFirst(tn);
+		
+		if(i+charsRead < decomposedString.length()) {
+		    nextChar = decomposedString.charAt(i+charsRead);
+		    tn = tn.getChild(nextChar);
+		    ++charsRead;
+		    //System.err.print(" -> 0x" + Util.toHexStringBE(nextChar));
+		}
+		else {
+		    ++charsRead;
+		    break;
+		}
+	    }
+	    --charsRead; 
+	    //System.err.println(" <BREAK>");
+	    
+	    /* To find the longest matching substring, we must loop from the back of the match
+	       sequence and find the first (last) TrieNode with a replacement sequence. We have
+	       conveniently arranged the match sequence in a LIFO manner, so we just have to loop. */
+	    System.err.print("  {read:" + charsRead + "}");
+	    for(TrieNode cur : matchSequence) {
+		System.err.print(cur.toString() + " > "); 
+		if(cur.getReplacementSequence() != null) {
+		    System.err.println("<REPLACEMENT FOUND: " + Util.toHexStringBE(cur.getReplacementSequence()) + ">{read:" + charsRead + "}");
+		    replacementSequence = cur.getReplacementSequence();
+		    break;
+		}
+		else
+		    --charsRead;
+	    }
+	    if(replacementSequence == null)
+		System.err.println("<NOTHING FOUND>{read:" + charsRead + "}");
+	    
+
+	    if(replacementSequence != null) {
+		sb.append(replacementSequence);
+		i += charsRead - 1;
+	    }
+	    else
+		sb.append(baseChar);
+	}
+	return HangulDecomposition.composeHangul(sb.toString());
+    }
+    
+    /** Throws a RuntimeException if the trie contains non-leaf nodes with replacement sequences. */
+    public void checkTrie(TrieNode root) {
+	checkTrie(root, "  ");
+    }
+    public void checkTrie(TrieNode root, String prefix) {
+	Collection<TrieNode> children = root.getChildren();
+	//if(children.size() > 0 && root.getReplacementSequence() != null)
+	    //throw new RuntimeException("Inconsistent trie.");
+	if(root.getReplacementSequence() != null) {
+	    System.err.print(prefix + root.toString());// + " -> 0x" + Util.toHexStringBE(root.getReplacementSequence()));
+	    if(children.size() > 0)
+		System.err.println(" <INCONSISTENCY!>");
+	    else
+		System.err.println();
+	}
+	else
+	    System.err.println(prefix + root.toString());
+	
+	for(TrieNode tn : children)
+	    checkTrie(tn, prefix + "  ");
+    }
+    
     /**
      * Test main method that takes an output file as args[0], and prints the decomposition
      * table to that file, in the same form as doc/decomposition_ref.txt (a cut and paste
@@ -108,6 +267,26 @@ public class UnicodeDecomposition {
 	    }
 	    out.println();
 	}
+    }
+
+    private static TrieNode buildCompositionTrie(Map<Character, char[]> decompositionTable) {
+	final TrieNode rootNode = new TrieNode('\0');
+	for(Map.Entry<Character, char[]> entry : decompositionTable.entrySet()) {
+	    char key = entry.getKey();
+	    char[] value = entry.getValue();
+	    
+	    TrieNode currentNode = rootNode;
+	    for(char c : value) {
+		TrieNode nextNode = currentNode.getChild(c);
+		if(nextNode == null) {
+		    nextNode = new TrieNode(c);
+		    currentNode.addChild(c, nextNode);
+		}
+		currentNode = nextNode;
+	    }
+	    currentNode.setReplacementSequence(new char[] { key });
+	}
+	return rootNode;
     }
     
     private static void buildDecompositionTable(Map<Character, char[]> decompositionTable) {

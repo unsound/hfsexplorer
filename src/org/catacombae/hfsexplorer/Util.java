@@ -41,13 +41,23 @@ public class Util {
 	}
 	return result;
     }
+    
+    public static String toHexStringBE(char[] array) {
+	return toHexStringBE(array, 0, array.length);
+    }
+    public static String toHexStringBE(char[] array, int offset, int length) {
+	StringBuilder result = new StringBuilder();
+	for(int i = offset; i < length; ++i)
+	    result.append(toHexStringBE(array[i]));
+	return result.toString();
+    }
     public static String toHexStringBE(short[] array) {
 	return toHexStringBE(array, 0, array.length);
     }
     public static String toHexStringBE(short[] array, int offset, int length) {
 	StringBuilder result = new StringBuilder();
-	for(short s : array)
-	    result.append(toHexStringBE(s));
+	for(int i = offset; i < length; ++i)
+	    result.append(toHexStringBE(array[i]));
 	return result.toString();
     }
     public static String toHexStringBE(int[] array) {
@@ -55,17 +65,19 @@ public class Util {
     }
     public static String toHexStringBE(int[] array, int offset, int length) {
 	StringBuilder result = new StringBuilder();
-	for(int i : array)
-	    result.append(toHexStringBE(i));
+	for(int i = offset; i < length; ++i)
+	    result.append(toHexStringBE(array[i]));
 	return result.toString();
     }
     
     public static String toHexStringLE(byte n) { return byteArrayToHexString(toByteArrayLE(n)); }
     public static String toHexStringLE(short n) { return byteArrayToHexString(toByteArrayLE(n)); }
+    public static String toHexStringLE(char n) { return byteArrayToHexString(toByteArrayLE(n)); }
     public static String toHexStringLE(int n) { return byteArrayToHexString(toByteArrayLE(n)); }
     public static String toHexStringLE(long n) { return byteArrayToHexString(toByteArrayLE(n)); }
     public static String toHexStringBE(byte n) { return byteArrayToHexString(toByteArrayBE(n)); }
     public static String toHexStringBE(short n) { return byteArrayToHexString(toByteArrayBE(n)); }
+    public static String toHexStringBE(char n) { return byteArrayToHexString(toByteArrayBE(n)); }
     public static String toHexStringBE(int n) { return byteArrayToHexString(toByteArrayBE(n)); }
     public static String toHexStringBE(long n) { return byteArrayToHexString(toByteArrayBE(n)); }
     
@@ -191,6 +203,12 @@ public class Util {
 	result[1] = (byte) ((s >> 8) & 0xFF);
 	return result;
     }
+    public static byte[] toByteArrayLE(char c) {
+	byte[] result = new byte[2];
+	result[0] = (byte) ((c >> 0) & 0xFF);
+	result[1] = (byte) ((c >> 8) & 0xFF);
+	return result;
+    }
     public static byte[] toByteArrayLE(int i) {
 	byte[] result = new byte[4];
 	result[0] = (byte) ((i >> 0) & 0xFF);
@@ -220,6 +238,12 @@ public class Util {
 	byte[] result = new byte[2];
 	result[0] = (byte) ((s >> 8) & 0xFF);
 	result[1] = (byte) ((s >> 0) & 0xFF);
+	return result;
+    }
+    public static byte[] toByteArrayBE(char c) {
+	byte[] result = new byte[2];
+	result[0] = (byte) ((c >> 8) & 0xFF);
+	result[1] = (byte) ((c >> 0) & 0xFF);
 	return result;
     }
     public static byte[] toByteArrayBE(int i) {
@@ -453,19 +477,6 @@ public class Util {
 		       (data[offset+1] & 0xFF) << 0);
     }
     
-    public static byte[] toByteArrayLE(char c) {
-	byte[] result = new byte[2];
-	result[0] = (byte) ((c >> 0) & 0xFF);
-	result[1] = (byte) ((c >> 8) & 0xFF);
-	return result;
-    }
-    public static byte[] toByteArrayBE(char c) {
-	byte[] result = new byte[2];
-	result[0] = (byte) ((c >> 8) & 0xFF);
-	result[1] = (byte) ((c >> 0) & 0xFF);
-	return result;
-    }
-
     public static char[] readCharArrayBE(byte[] b) {
 	char[] result = new char[b.length/2];
 	for(int i = 0; i < result.length; ++i)

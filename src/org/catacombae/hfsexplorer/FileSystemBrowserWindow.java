@@ -389,7 +389,18 @@ public class FileSystemBrowserWindow extends JFrame {
 				}
 				else {
 				    actionExtractToDir();
-				    return;
+// 				    UnicodeDecomposition ud = new UnicodeDecomposition();
+// 				    String filename = rec.getKey().getNodeName().toString();
+// 				    System.err.println("Decomposed (unmodified):     \"" + filename + "\"");
+// 				    System.err.print("Decomposed (unmodified) hex:");
+// 				    for(char c : filename.toCharArray()) System.err.print(" " + Util.toHexStringBE(c));
+// 				    System.err.println();
+// 				    String composedFilename = ud.compose(filename);
+// 				    System.err.println("Composed:                 \"" + composedFilename + "\"");
+// 				    System.err.print("Composed hex:            ");
+// 				    for(char c : composedFilename.toCharArray()) System.err.print(" " + Util.toHexStringBE(c));
+// 				    System.err.println();
+// 				    return;
 				}
 				
 				HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
