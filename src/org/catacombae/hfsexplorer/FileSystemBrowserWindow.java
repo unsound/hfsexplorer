@@ -29,7 +29,11 @@ import java.util.*;
 import java.io.*;
 import java.net.URL;
 import java.text.DateFormat;
-import java.awt.*;
+//import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Toolkit;
+import java.awt.Component;
+import java.awt.Graphics;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.tree.*;
@@ -47,6 +51,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	public A o;
 	public ObjectContainer(A o) { this.o = o; }
     }
+    /** Aggregation class for storage in the first column of fileTable. */
     private static class RecordContainer {
 	private HFSPlusCatalogLeafRecord rec;
 	public RecordContainer(HFSPlusCatalogLeafRecord rec) {
@@ -359,6 +364,65 @@ public class FileSystemBrowserWindow extends JFrame {
 		    statusLabel.setText(selection.length + ((selection.length==1)?" object":" objects") + " selected (" + sizeString + ")");
 		}
 	    });
+	fileTable.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    if(e.getClickCount() == 2) {
+			int row = fileTable.rowAtPoint(e.getPoint());
+			int col = fileTable.columnAtPoint(e.getPoint());
+			if(col == 0 && row >= 0) {
+			    //System.err.println("Double click at (" + row + "," + col + ")");
+			    Object colValue = fileTable.getModel().getValueAt(row, col);
+			    //System.err.println("  Value class: " + colValue.getClass());
+			    if(colValue instanceof RecordContainer) {
+				HFSPlusCatalogLeafRecord rec = ((RecordContainer)colValue).getRecord();
+				HFSPlusCatalogLeafRecordData recData = rec.getData();
+				HFSCatalogNodeID requestedID;
+				if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
+				   recData instanceof HFSPlusCatalogFolder) {
+				    HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder)recData;
+				    requestedID = catFolder.getFolderID();
+				}
+				else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
+					recData instanceof HFSPlusCatalogThread) {
+				    HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
+				    requestedID = rec.getKey().getParentID();
+				}
+				else {
+				    actionExtractToDir();
+				    return;
+				}
+				
+				HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
+				populateTable(contents);
+				fileTableScroller.getVerticalScrollBar().setValue(0);
+				
+				List<HFSPlusCatalogLeafRecord> path = fsView.getPathTo(requestedID);
+// 				System.err.println("Path:");
+// 				for(HFSPlusCatalogLeafRecord clf : path)
+// 				    clf.getKey().print(System.err, "  ");
+				
+				path.remove(0); // The first element will be the root, and setTreePath doesn't want the root
+				path.remove(path.size()-1); // The last element will be the thread record for the folder.
+				TreePath selectionPath = dirTree.getSelectionPath();
+				dirTree.expandPath(selectionPath);
+				setTreePath(path);
+				//TreePath selectionPath = dirTree.getSelectionPath();
+				//dirTree.expandPath(selectionPath);
+				selectionPath = dirTree.getSelectionPath();
+				Object[] userObjectPath = selectionPath.getPath();
+				StringBuilder pathString = new StringBuilder("/");
+				for(int i = 1; i < userObjectPath.length; ++i) {
+				    pathString.append(userObjectPath[i].toString());
+				    pathString.append("/");
+				}
+				addressField.setText(pathString.toString()); 
+			    }
+			    else
+				throw new RuntimeException("Invalid type in column 0 in fileTable!");
+			}
+		    }
+		}
+	    });
 	
 	DefaultMutableTreeNode rootNode = new NoLeafMutableTreeNode("No file system loaded");
 	DefaultTreeModel model = new DefaultTreeModel(rootNode);
@@ -529,7 +593,6 @@ public class FileSystemBrowserWindow extends JFrame {
 		    sff.setDescription("Disk images");
 		    fileChooser.setFileFilter(sff);
 		    int res = fileChooser.showOpenDialog(FileSystemBrowserWindow.this);
-		    fileChooser.resetChoosableFileFilters();
 		    if(res == JFileChooser.APPROVE_OPTION) {
 			try {
 			    File selectedFile = fileChooser.getSelectedFile();
@@ -568,6 +631,7 @@ public class FileSystemBrowserWindow extends JFrame {
 							  "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		    }
+		    fileChooser.resetChoosableFileFilters();
 		}
 	    });
 	openUDIFItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -815,11 +879,19 @@ public class FileSystemBrowserWindow extends JFrame {
 	    }
 	    else {
 		Object selectedValue;
+		int firstPreferredPartition = 0;
+		for(int i = 0; i < partitions.length; ++i) {
+		    Partition p = partitions[i];
+		    if(p.getType() == Partition.PartitionType.APPLE_HFS) {
+			firstPreferredPartition = i;
+			break;
+		    }
+		}
 		while(true) {
 		    selectedValue = JOptionPane.showInputDialog(this, "Select which partition to read", 
 								"Choose " + partSys.getLongName() +" partition", 
 								JOptionPane.QUESTION_MESSAGE,
-								null, partitions, partitions[0]);
+								null, partitions, partitions[firstPreferredPartition]);
 		    if(selectedValue != null &&
 		       selectedValue instanceof Partition) {
 			Partition selectedPartition = (Partition)selectedValue;
@@ -987,6 +1059,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		    //System.err.println(rec.toString());
 		    fileChooser.setMultiSelectionEnabled(false);
 		    fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		    fileChooser.setSelectedFiles(new File[0]);
 		    if(fileChooser.showDialog(FileSystemBrowserWindow.this, "Extract here") == JFileChooser.APPROVE_OPTION) {
 			final File outDir = fileChooser.getSelectedFile();
 			final ExtractProgressDialog progress = new ExtractProgressDialog(this);
@@ -1037,8 +1110,17 @@ public class FileSystemBrowserWindow extends JFrame {
 		return;
 	    }
 	    else {
+		// There is trouble with this approach in OS X... we don't get a proper DIRECTORIES_ONLY dialog. One idea is to use java.awt.FileDialog and see if it works better. (probably not)
+		//java.awt.FileDialog fd = new java.awt.FileDialog(FileSystemBrowserWindow.this, "Extract here", SAVE);
+		//File oldDir = fileChooser.getCurrentDirectory();
+		//JFileChooser fileChooser2 = new JFileChooser();
+		//fileChooser.setCurrentDirectory(oldDir);
 		fileChooser.setMultiSelectionEnabled(false);
 		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		//System.err.println("curdir: " + fileChooser.getCurrentDirectory());
+		//fileChooser.setSelectedFiles(new File[0]);
+		//fileChooser.setCurrentDirectory(fileChooser.getCurrentDirectory());
+
 		if(fileChooser.showDialog(FileSystemBrowserWindow.this, "Extract here") == JFileChooser.APPROVE_OPTION) {
 		    final File outDir = fileChooser.getSelectedFile();
 		    
@@ -1201,45 +1283,49 @@ public class FileSystemBrowserWindow extends JFrame {
 	else if(currentRecordData.getRecordType() != HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER)
 	    JOptionPane.showMessageDialog(this, "Requested path points to a file. Can only browse folders...", "Error", JOptionPane.ERROR_MESSAGE);
 	else {
-	    Object root = dirTree.getModel().getRoot();
-	    DefaultMutableTreeNode rootNode;
-	    if(root instanceof DefaultMutableTreeNode)
-		rootNode = (DefaultMutableTreeNode)root;
-	    else
-		throw new RuntimeException("Invalid type in tree");
-	    TreePath treePath = new TreePath(rootNode);
-	    //System.out.println("Children:");
-	    
-	    for(HFSPlusCatalogLeafRecord rec : recordPath) {
-		DefaultMutableTreeNode rootNodeBefore = rootNode;
-		LinkedList<String> debug = new LinkedList<String>();
-		for(Enumeration e = rootNode.children() ; e.hasMoreElements() ;) {
-		    Object o = e.nextElement();
-		    if(o instanceof DefaultMutableTreeNode) {
-			DefaultMutableTreeNode currentNode = (DefaultMutableTreeNode)o;
-			Object o2 = currentNode.getUserObject();
-			debug.addLast(o2.toString());
-			if(o2.toString().equals(rec.getKey().getNodeName().toString())) {
-			    rootNode = currentNode;
-			    treePath = treePath.pathByAddingChild(rootNode);
-			    break;
-			}
-		    }
-		}
-		if(rootNode == rootNodeBefore) {
-		    System.err.println("Record string: \"" + rec.getKey().getNodeName().toString() + "\"");
-		    System.err.println("Contents:");
-		    for(String s : debug)
-			System.err.println("    " + s);
-		    throw new RuntimeException("!)/¤%/#)#");
-		}
-	    }
-	    
-	    dirTree.setSelectionPath(treePath);
-	    
-	    //JOptionPane.showMessageDialog(this, "Found path, and path is folder! :)\nRoot of the tree has class: " + root.getClass(), "YEA", JOptionPane.INFORMATION_MESSAGE);
+	    setTreePath(recordPath);
 	}
 	
+    }
+
+    private void setTreePath(List<HFSPlusCatalogLeafRecord> recordPath) {
+	Object root = dirTree.getModel().getRoot();
+	DefaultMutableTreeNode rootNode;
+	if(root instanceof DefaultMutableTreeNode)
+	    rootNode = (DefaultMutableTreeNode)root;
+	else
+	    throw new RuntimeException("Invalid type in tree");
+	TreePath treePath = new TreePath(rootNode);
+	//System.out.println("Children:");
+	
+	for(HFSPlusCatalogLeafRecord rec : recordPath) {
+	    DefaultMutableTreeNode rootNodeBefore = rootNode;
+	    LinkedList<String> debug = new LinkedList<String>();
+	    for(Enumeration e = rootNode.children() ; e.hasMoreElements() ;) {
+		Object o = e.nextElement();
+		if(o instanceof DefaultMutableTreeNode) {
+		    DefaultMutableTreeNode currentNode = (DefaultMutableTreeNode)o;
+		    Object o2 = currentNode.getUserObject();
+		    debug.addLast(o2.toString());
+		    if(o2.toString().equals(rec.getKey().getNodeName().toString())) {
+			rootNode = currentNode;
+			treePath = treePath.pathByAddingChild(rootNode);
+			break;
+		    }
+		}
+	    }
+	    if(rootNode == rootNodeBefore) {
+		System.err.println("Record string: \"" + rec.getKey().getNodeName().toString() + "\"");
+		System.err.println("Contents:");
+		for(String s : debug)
+		    System.err.println("    " + s);
+		throw new RuntimeException("Could not find record in tree!");
+	    }
+	}
+	
+	dirTree.setSelectionPath(treePath);
+	
+	//JOptionPane.showMessageDialog(this, "Found path, and path is folder! :)\nRoot of the tree has class: " + root.getClass(), "YEA", JOptionPane.INFORMATION_MESSAGE);
     }
     
     /** <code>progressDialog</code> may NOT be null. */

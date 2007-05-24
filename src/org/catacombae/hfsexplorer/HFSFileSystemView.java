@@ -21,6 +21,7 @@
 package org.catacombae.hfsexplorer;
 
 import org.catacombae.hfsexplorer.types.*;
+import java.util.List;
 import java.util.LinkedList;
 import java.io.OutputStream;
 import java.io.IOException;
@@ -178,6 +179,36 @@ public class HFSFileSystemView {
 	    return new HFSPlusCatalogLeafNode(currentNodeData, 0, init.bthr.getNodeSize());
 	else
 	    return null;
+    }
+    public List<HFSPlusCatalogLeafRecord> getPathTo(HFSCatalogNodeID leafID) {
+	HFSPlusCatalogLeafRecord leafRec = getRecord(leafID, new HFSUniStr255(""));
+	if(leafRec != null)
+	    return getPathTo(leafRec);
+	else
+	    throw new RuntimeException("No folder thread found!");
+    }
+    public List<HFSPlusCatalogLeafRecord> getPathTo(HFSPlusCatalogLeafRecord leaf) {
+	LinkedList<HFSPlusCatalogLeafRecord> pathList = new LinkedList<HFSPlusCatalogLeafRecord>();
+	pathList.addLast(leaf);
+	HFSCatalogNodeID parentID = leaf.getKey().getParentID();
+	while(parentID.toLong() != 1) {
+	    HFSPlusCatalogLeafRecord parent = getRecord(parentID, new HFSUniStr255("")); // Look for the thread record associated with the parent dir
+	    if(parent == null)
+		throw new RuntimeException("No folder thread found!");
+	    HFSPlusCatalogLeafRecordData data = parent.getData();
+	    if(data.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
+	       data instanceof HFSPlusCatalogThread) {
+		HFSPlusCatalogThread threadData = (HFSPlusCatalogThread)data;
+		pathList.addFirst(getRecord(threadData.getParentID(), threadData.getNodeName()));
+		parentID = threadData.getParentID();
+	    }
+	    else if(data.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE_THREAD &&
+		    data instanceof HFSPlusCatalogThread)
+		throw new RuntimeException("Tried to get folder thread (" + parentID + ",\"\") but found a file thread!");
+	    else
+		throw new RuntimeException("Tried to get folder thread (" + parentID + ",\"\") but found a " + data.getClass() + "!");		
+	}
+	return pathList;
     }
 	
     public HFSPlusCatalogLeafRecord getRecord(HFSCatalogNodeID parentID, HFSUniStr255 nodeName) {

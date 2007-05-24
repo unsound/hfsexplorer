@@ -1,6 +1,13 @@
 HFSExplorer Changelog
 ---------------------
 
+0.18 (in progress)
+----
+- Fixed a bug in OS X, related to JFileChooser (all in all, JFileChooser seems very buggy in OS
+  X).
+- Implemented double-clicking in the right pane to browse a directory, or to extract a file.
+- Made the partition choosing dialog default to the first HFS partition found.
+
 0.17
 ----
 - DMG UDIF file support! Most DMG files can now be read directly from within HFSExplorer (no

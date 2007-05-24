@@ -47,6 +47,7 @@ public class HFSPlusBSDInfo {
     public static final byte MASK_OWNER_IMMUTABLE = 0x2;
     public static final byte MASK_OWNER_APPEND = 0x4;
     public static final byte MASK_OWNER_OPAQUE = 0x8;
+    public static final byte MASK_FILETYPE_UNDEFINED = 00;
     public static final byte MASK_FILETYPE_FIFO = 01;
     public static final byte MASK_FILETYPE_CHARACTER_SPECIAL = 02;
     public static final byte MASK_FILETYPE_DIRECTORY = 04;
@@ -113,6 +114,8 @@ public class HFSPlusBSDInfo {
 	String result;
 	byte fileType = getFileModeFileType();
 	switch(fileType) {
+	case MASK_FILETYPE_UNDEFINED: // This one appears at the root node (CNID 2) sometimes. dunno what it would look like in ls -l
+	    result = "?"; break;
 	case MASK_FILETYPE_FIFO:
 	    result = "p"; break;
 	case MASK_FILETYPE_CHARACTER_SPECIAL:
@@ -128,7 +131,7 @@ public class HFSPlusBSDInfo {
 	case MASK_FILETYPE_SOCKET:
 	    result = "s"; break;
 	case MASK_FILETYPE_WHITEOUT:
-	    result = "?"; break; // How does this appear in "ls -l" ? and what is it?
+	    result = "w"; break; // How does this appear in "ls -l" ? and what is it?
 	default:
 	    throw new RuntimeException("Unknown file type (read: " + fileType + " REGULAR: " + MASK_FILETYPE_REGULAR + " MODE: 0x" + Util.toHexStringBE(getFileMode()) + ")!");
 	}
