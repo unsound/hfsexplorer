@@ -215,6 +215,10 @@ public class UnicodeNormalizationToolkit {
 	}
 	return HangulDecomposition.composeHangul(sb.toString());
     }
+
+    public Map<Character, char[]> getDecompositionTable() {
+	return decompositionTable;
+    }
     
     /** Throws a RuntimeException if the trie contains non-leaf nodes with replacement sequences. */
     public void checkTrie(TrieNode root) {
