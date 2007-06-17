@@ -9,10 +9,10 @@ extern "C" {
 #endif
 /*
  * Class:     org_catacombae_hfsexplorer_win32_WindowsLowLevelIO
- * Method:    open
+ * Method:    openNative
  * Signature: (Ljava/lang/String;)[B
  */
-JNIEXPORT jbyteArray JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_open
+JNIEXPORT jbyteArray JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_openNative
   (JNIEnv *, jclass, jstring);
 
 /*

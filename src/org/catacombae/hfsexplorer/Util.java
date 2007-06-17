@@ -325,6 +325,15 @@ public class Util {
 	System.arraycopy(data, offset, copy, 0, length);
 	return copy;
     }
+    
+    public static void arrayCopy(byte[] source, byte[] dest, int destPos) {
+	if(dest.length-destPos < source.length)
+	    throw new RuntimeException("Destination array not large enough.");
+	System.arraycopy(source, 0, dest, 0, source.length);
+    }
+    public static void arrayCopy(byte[] source, byte[] dest) {
+	arrayCopy(source, dest, 0);
+    }
 
     public static boolean arraysEqual(boolean[] a, boolean[] b) {
 	if(a.length != b.length)

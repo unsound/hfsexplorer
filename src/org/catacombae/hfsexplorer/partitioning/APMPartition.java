@@ -24,7 +24,7 @@ import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.Util2;
 import java.io.PrintStream;
 
-public class APMPartition extends Partition {
+public class APMPartition implements Partition {
     /*
      * struct Partition
      * size: 512 bytes
@@ -70,7 +70,9 @@ public class APMPartition extends Partition {
     private final byte[] pmBootCksum = new byte[4];
     private final byte[] pmProcessor = new byte[16];
     private final byte[] pmPad = new byte[2*188];
-	
+    
+    private final int blockSize;
+    
     public APMPartition(byte[] data, int offset, int blockSize) {
 	System.arraycopy(data, offset+0, pmSig, 0, 2);
 	System.arraycopy(data, offset+2, pmSigPad, 0, 2);
@@ -91,14 +93,21 @@ public class APMPartition extends Partition {
 	System.arraycopy(data, offset+116, pmBootCksum, 0, 4);
 	System.arraycopy(data, offset+120, pmProcessor, 0, 16);
 	System.arraycopy(data, offset+136, pmPad, 0, 2*188);
-
+	
+	this.blockSize = blockSize;
+	
 	// Added to make it work as subclass of Partition
 	//getPmPyPartStart()+selectedPartition.getPmLgDataStart())*blockSize;
 	//getPmDataCnt()*blockSize;
-	startOffset = (getPmPyPartStart()+getPmLgDataStart())*blockSize;
-	length = getPmDataCnt()*blockSize;
-	type = convertPartitionType(getPmParType());
+// 	startOffset = (getPmPyPartStart()+getPmLgDataStart())*blockSize;
+// 	length = getPmDataCnt()*blockSize;
+// 	type = convertPartitionType(getPmParType());
     }
+    // Defined in Partition
+    public long getStartOffset() { return (getPmPyPartStart()+getPmLgDataStart())*blockSize; }
+    public long getLength() { return getPmDataCnt()*blockSize; }
+    public PartitionType getType() { return convertPartitionType(getPmParType()); }
+    
     public short getPmSig()        { return Util.readShortBE(pmSig); }
     public short getPmSigPad()     { return Util.readShortBE(pmSigPad); }
     public int getPmMapBlkCnt()    { return Util.readIntBE(pmMapBlkCnt); }

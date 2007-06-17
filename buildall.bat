@@ -33,6 +33,26 @@ javac -cp %CLASSPATH% -sourcepath "%SOURCES_DIR%" -d "%BUILD_DIR%" -Xlint:unchec
 set JAVAC_EXIT_CODE=%ERRORLEVEL%
 if not "%JAVAC_EXIT_CODE%"=="0" goto error
 
+echo Compiling org.catacombae.hfsexplorer.partitioning...
+javac -cp %CLASSPATH% -sourcepath "%SOURCES_DIR%" -d "%BUILD_DIR%" -Xlint:unchecked \\.\\"%SOURCES_DIR%\org\catacombae\hfsexplorer\partitioning\*.java"
+set JAVAC_EXIT_CODE=%ERRORLEVEL%
+if not "%JAVAC_EXIT_CODE%"=="0" goto error
+
+echo Compiling org.catacombae.hfsexplorer.testcode...
+javac -cp %CLASSPATH% -sourcepath "%SOURCES_DIR%" -d "%BUILD_DIR%" -Xlint:unchecked \\.\\"%SOURCES_DIR%\org\catacombae\hfsexplorer\testcode\*.java"
+set JAVAC_EXIT_CODE=%ERRORLEVEL%
+if not "%JAVAC_EXIT_CODE%"=="0" goto error
+
+echo Compiling org.catacombae.hfsexplorer.types...
+javac -cp %CLASSPATH% -sourcepath "%SOURCES_DIR%" -d "%BUILD_DIR%" -Xlint:unchecked \\.\\"%SOURCES_DIR%\org\catacombae\hfsexplorer\types\*.java"
+set JAVAC_EXIT_CODE=%ERRORLEVEL%
+if not "%JAVAC_EXIT_CODE%"=="0" goto error
+
+echo Compiling org.catacombae.hfsexplorer.win32...
+javac -cp %CLASSPATH% -sourcepath "%SOURCES_DIR%" -d "%BUILD_DIR%" -Xlint:unchecked \\.\\"%SOURCES_DIR%\org\catacombae\hfsexplorer\win32\*.java"
+set JAVAC_EXIT_CODE=%ERRORLEVEL%
+if not "%JAVAC_EXIT_CODE%"=="0" goto error
+
 echo Building jar-file...
 if not exist "%LIBRARY_PATH%" mkdir "%LIBRARY_PATH%"
 jar cvf "%LIBRARY_PATH%\%JARFILE%" -C "%BUILD_DIR%" . >NUL:

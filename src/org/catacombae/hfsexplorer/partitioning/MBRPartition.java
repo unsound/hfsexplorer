@@ -23,7 +23,7 @@ import org.catacombae.hfsexplorer.Util;
 import java.io.PrintStream;
 import java.util.Hashtable;
 
-public class MBRPartition extends Partition {
+public class MBRPartition implements Partition {
     protected static final byte PARTITION_NOT_BOOTABLE = (byte)0x00;
     protected static final byte PARTITION_BOOTABLE     = (byte)0x80;  
     
@@ -102,6 +102,9 @@ public class MBRPartition extends Partition {
     private final byte[] lastSector = new byte[3];
     private final byte[] lbaFirstSector = new byte[4];
     private final byte[] lbaPartitionLength = new byte[4];
+    
+    private final int sectorSize;
+    
     /** <code>data</code> is assumed to be at least (<code>offset</code>+16) bytes in length. */
     public MBRPartition(byte[] data, int offset, int sectorSize) {
 	System.arraycopy(data, offset+0, status, 0, 1);
@@ -111,12 +114,20 @@ public class MBRPartition extends Partition {
 	System.arraycopy(data, offset+8, lbaFirstSector, 0, 4);
 	System.arraycopy(data, offset+12, lbaPartitionLength, 0, 4);
 	
-	// Added to make it work as subclass of Partition
-	startOffset = getLBAFirstSector()*sectorSize;
-	length = getLBAPartitionLength()*sectorSize;
-	type = convertPartitionType(getPartitionTypeAsEnum());
+	this.sectorSize = sectorSize;
+	
+// 	// Added to make it work as subclass of Partition
+// 	startOffset = getLBAFirstSector()*sectorSize;
+// 	length = getLBAPartitionLength()*sectorSize;
+// 	type = convertPartitionType(getPartitionTypeAsEnum());
 
     }
+    
+    // Defined in Partition
+    public long getStartOffset() { return getLBAFirstSector()*sectorSize; }
+    public long getLength() { return getLBAPartitionLength()*sectorSize; }
+    public PartitionType getType() { return convertPartitionType(getPartitionTypeAsEnum()); }
+
 	
     public byte getStatus() { return Util.readByteLE(status); }
     /** The result is returned in CHS form. This representation is deprecated and cannot handle

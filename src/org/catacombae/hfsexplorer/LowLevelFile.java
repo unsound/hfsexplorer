@@ -20,7 +20,7 @@
 
 package org.catacombae.hfsexplorer;
 
-/* Designed to mimic RandomAccessFile. */
+/* Designed to mimic a subset of RandomAccessFile. */
 
 public interface LowLevelFile {
     public void seek(long pos);

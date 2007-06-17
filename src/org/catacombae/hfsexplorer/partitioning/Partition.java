@@ -27,7 +27,7 @@ import java.io.PrintStream;
     the start offset, the length of the partition and the partition type. While most partition systems specify their offsets
     in sectors or blocks, the unit of this general partition will be one byte, so most implementations will need to convert from
     the native sector number to an actual byte offset/length. */
-public abstract class Partition {
+public interface Partition {
 
     // Just listing the partition types that come to mind...
     public static enum PartitionType {
@@ -35,24 +35,24 @@ public abstract class Partition {
 	    FAT12, FAT16, FAT32, NTFS, HPFS, DOS_EXTENDED,
 	    LINUX_SWAP, LINUX_NATIVE, XFS, ZFS,
 	    UNKNOWN };
-    protected long startOffset;
-    protected long length;
-    protected PartitionType type;
+//     protected long startOffset;
+//     protected long length;
+//     protected PartitionType type;
     
-    public Partition(long startOffset, long length, PartitionType type) {
-	this.startOffset = startOffset;
-	this.length = length;
-	this.type = type;
-    }
-    protected Partition() {} // Only for those that know what they're doing ;)
+//     public Partition(long startOffset, long length, PartitionType type) {
+// 	this.startOffset = startOffset;
+// 	this.length = length;
+// 	this.type = type;
+//     }
+//     protected Partition() {} // Only for those that know what they're doing ;)
     
     /** Returns the start offset in bytes. */
-    public long getStartOffset() { return startOffset; }
+    public long getStartOffset();// { return startOffset; }
     /** Returns the length of the partition in bytes. */
-    public long getLength() { return length; }
-    public PartitionType getType() { return type; }
+    public long getLength();// { return length; }
+    public PartitionType getType();// { return type; }
 
-    public abstract void printFields(PrintStream ps, String prefix);
-    public abstract void print(PrintStream ps, String prefix);
+    public /*abstract*/ void printFields(PrintStream ps, String prefix);
+    public /*abstract*/ void print(PrintStream ps, String prefix);
 
 }

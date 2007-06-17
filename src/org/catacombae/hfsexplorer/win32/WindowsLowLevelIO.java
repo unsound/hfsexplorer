@@ -24,9 +24,9 @@ import org.catacombae.hfsexplorer.Util;
 import java.io.*;
 
 public class WindowsLowLevelIO implements org.catacombae.hfsexplorer.LowLevelFile {
-    private byte[] fileHandle;
-    private int sectorSize = 512; //Detect this later..
-    private long filePointer = 0;
+    protected byte[] fileHandle;
+    protected int sectorSize = 512; //Detect this later..
+    protected long filePointer = 0;
 
     static {
 	try {
@@ -158,18 +158,23 @@ public class WindowsLowLevelIO implements org.catacombae.hfsexplorer.LowLevelFil
 	    throw new RuntimeException("File closed!");
     }
     
-    private static native byte[] open(String filename);
-    private static native void seek(long pos, byte[] handle);
-    private static native int read(byte[] data, int pos, int len, byte[] handle);
-    private static native void close(byte[] handle);
-    private static native void ejectMedia(byte[] handle);
-    private static native void loadMedia(byte[] handle);
-    private static native long length(byte[] handle);
-    private static native long getFilePointer(byte[] handle);
-    private static native int getSectorSize(byte[] handle);
-//     private static native void getHandleType(byte[] handle);
-//     private static native void getDeviceLength(byte[] handle);
-//     private static native void getFileLength(byte[] handle);
+    protected byte[] open(String filename) {
+	//System.out.println("Java: WindowsLowLevelIO.open(" + filename + ");");
+	return openNative(filename);
+    }
+    
+    protected static native byte[] openNative(String filename);
+    protected static native void seek(long pos, byte[] handle);
+    protected static native int read(byte[] data, int pos, int len, byte[] handle);
+    protected static native void close(byte[] handle);
+    protected static native void ejectMedia(byte[] handle);
+    protected static native void loadMedia(byte[] handle);
+    protected static native long length(byte[] handle);
+    protected static native long getFilePointer(byte[] handle);
+    protected static native int getSectorSize(byte[] handle);
+//     protected static native void getHandleType(byte[] handle);
+//     protected static native void getDeviceLength(byte[] handle);
+//     protected static native void getFileLength(byte[] handle);
 
     public static void main(String[] args) {
 	BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
