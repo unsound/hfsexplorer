@@ -25,8 +25,8 @@ import org.catacombae.hfsexplorer.win32.*;
 import java.io.*;
 
 /**
- * This class is specifically written to repair my hard disk GPT table, which had become inconsistent with the
- * MBR table.
+ * This class was specifically written to repair my hard disk GPT table, which had become inconsistent with
+ * the MBR table.
  * <pre>
  * When I connected my drive to Windows and reformatted my HFS+ partition as NTFS, only the MBR entry was
  * changed by Windows (due to 32-bit Windows XP being incapable of dealing with GPT drives). So I had an
