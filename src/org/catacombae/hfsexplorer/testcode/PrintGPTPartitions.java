@@ -23,8 +23,8 @@ public class PrintGPTPartitions {
 	    
 	System.out.println("Length of file: " + llf.length());
 	GUIDPartitionTable gpt = new GUIDPartitionTable(llf, 0);
-	System.out.println("Calculated checksum for header: 0x" + Util.toHexStringBE(gpt.calculateHeaderChecksum()));
-	System.out.println("Calculated checksum for entries: 0x" + Util.toHexStringBE(gpt.calculateEntriesChecksum()));
+	System.out.println("Calculated checksum for header: 0x" + Util.toHexStringBE(gpt.calculatePrimaryHeaderChecksum()));
+	System.out.println("Calculated checksum for entries: 0x" + Util.toHexStringBE(gpt.calculatePrimaryEntriesChecksum()));
 	gpt.print(System.out, "");
 	System.out.println("Is this parititon table valid? " + gpt.isValid() + ".");
 	FileOutputStream debug = new FileOutputStream("gpt_table.debug");

@@ -35,6 +35,7 @@ import java.util.zip.CRC32;
  *   This also implies that the field crc32Checksum is different, as it is a checksum
  *   of the fields in the header (except for itself, which is regarded as zeroed in
  *   the calculation).
+ *   So: crc32Checksum, primaryLBA, backupLBA and partitionEntryLBA will differ.
  *   The two partition arrays though, are supposed to be completely identical.
  */
 public class GUIDPartitionTable implements PartitionSystem {
@@ -100,6 +101,9 @@ public class GUIDPartitionTable implements PartitionSystem {
 	return header;
     }
     
+    public GPTEntry getEntry(int index) {
+	return entries[index];
+    }
     public GPTEntry[] getEntries() {
 	GPTEntry[] result = new GPTEntry[entries.length];
 	for(int i = 0; i < result.length; ++i) {
@@ -127,19 +131,54 @@ public class GUIDPartitionTable implements PartitionSystem {
 	return tempList.toArray(new GPTEntry[tempList.size()]);
     }
     
-    /** Checks the validity of GUID Partition Table data. */
+    /** Checks the validity of GUID Partition Table data. Don't call this method too often,
+	because it does some allocations and wastes some CPU cycles due to lazy implementation. */
     public boolean isValid() {
-	return header.isValid() && 
-	    (header.getCRC32Checksum() == calculateHeaderChecksum()) &&
-	    (header.getPartitionEntryArrayCRC32() == calculateEntriesChecksum());
+	boolean primaryTableValid =
+	    header.isValid() && 
+	    (header.getCRC32Checksum() == calculatePrimaryHeaderChecksum()) &&
+	    (header.getPartitionEntryArrayCRC32() == calculatePrimaryEntriesChecksum());
+	
+	boolean backupTableValid =
+	    backupHeader.isValid() && 
+	    (backupHeader.getCRC32Checksum() == calculateBackupHeaderChecksum()) &&
+	    (backupHeader.getPartitionEntryArrayCRC32() == calculateBackupEntriesChecksum());
+	
+	boolean entryTablesEqual = true;
+	if(backupEntries.length != entries.length)
+	    entryTablesEqual = false;
+	else {
+	    for(int i = 0; i < entries.length; ++i) {
+		if(!entries[i].equals(backupEntries[i])) {
+		    entryTablesEqual = false;
+		    break;
+		}
+	    }
+	}
+	
+	boolean headersMatch =
+	    header.getPrimaryLBA() == backupHeader.getBackupLBA() &&
+	    header.getBackupLBA() == backupHeader.getPrimaryLBA();
+	
+	return primaryTableValid && backupTableValid && entryTablesEqual && headersMatch;
+
     }
     
-    public int calculateHeaderChecksum() {
+    public int calculatePrimaryHeaderChecksum() {
 	return header.calculateCRC32();
     }
-    public int calculateEntriesChecksum() {
+    public int calculatePrimaryEntriesChecksum() {
 	CRC32 checksum = new CRC32();
 	for(GPTEntry entry : entries)
+	    checksum.update(entry.getBytes());
+	return (int)(checksum.getValue() & 0xFFFFFFFF);
+    }
+    public int calculateBackupHeaderChecksum() {
+	return backupHeader.calculateCRC32();
+    }
+    public int calculateBackupEntriesChecksum() {
+	CRC32 checksum = new CRC32();
+	for(GPTEntry entry : backupEntries)
 	    checksum.update(entry.getBytes());
 	return (int)(checksum.getValue() & 0xFFFFFFFF);
     }
@@ -163,12 +202,18 @@ public class GUIDPartitionTable implements PartitionSystem {
 	printFields(ps, prefix);
     }
     
+    public long getPrimaryTableBytesOffset() { return 512; }
+    public long getBackupTableBytesOffset() { return backupHeader.getPartitionEntryLBA()*BLOCK_SIZE; }
+   
     /** Returns the data in the main table of the disk. (LBA1-LBAx) */
     public byte[] getPrimaryTableBytes() {
+	if(BLOCK_SIZE+GPTHeader.getSize() != BLOCK_SIZE*header.getPartitionEntryLBA())
+	    throw new RuntimeException("Primary header and primary entries are not coherent!");
+	
 	int offset = 0;
 	byte[] result = new byte[GPTHeader.getSize() + GPTEntry.getSize()*entries.length];
 	byte[] headerData = header.getBytes();
-	System.arraycopy(headerData, 0, result, offset, headerData.length);
+	System.arraycopy(headerData, 0, result, offset, GPTHeader.getSize());
 	offset += GPTHeader.getSize();
 	
 	for(GPTEntry ge : entries) {
@@ -180,7 +225,26 @@ public class GUIDPartitionTable implements PartitionSystem {
 	return result;
     }
     public byte[] getBackupTableBytes() {
-	return new byte[0];
+	long endOfBackupEntries =
+	    getBackupTableBytesOffset() +
+	    backupHeader.getNumberOfPartitionEntries()*backupHeader.getSizeOfPartitionEntry();
+	if(endOfBackupEntries != BLOCK_SIZE*backupHeader.getPrimaryLBA())
+	    throw new RuntimeException("Backup entries and backup header are not coherent!");
+	
+	int offset = 0;
+	byte[] result = new byte[GPTEntry.getSize()*entries.length + GPTHeader.getSize()];
+	
+	for(GPTEntry ge : backupEntries) {
+	    byte[] entryData = ge.getBytes();
+	    System.arraycopy(entryData, 0, result, offset, entryData.length);
+	    offset += GPTEntry.getSize();
+	}
+	
+	byte[] headerData = backupHeader.getBytes();
+	System.arraycopy(headerData, 0, result, offset, GPTHeader.getSize());
+	offset += GPTHeader.getSize();	
+	
+	return result;
     }
     
     public boolean equals(Object obj) {

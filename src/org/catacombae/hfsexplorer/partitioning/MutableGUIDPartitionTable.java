@@ -23,4 +23,11 @@ public class MutableGUIDPartitionTable extends GUIDPartitionTable {
 	    this.backupEntries[i] = this.mutableBackupEntries[i];
 	}
     }
+    
+    public MutableGPTHeader getMutablePrimaryHeader() { return mutableHeader; }
+    public MutableGPTHeader getMutableBackupHeader() { return mutableBackupHeader; }
+    public MutableGPTEntry getMutablePrimaryEntry(int index) { return mutableEntries[index]; }
+    public MutableGPTEntry getMutableBackupEntry(int index) { return mutableBackupEntries[index]; }
+    public MutableGPTEntry[] getMutablePrimaryEntries() { return mutableEntries; }
+    public MutableGPTEntry[] getMutableBackupEntries() { return mutableBackupEntries; }
 }
