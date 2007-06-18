@@ -42,53 +42,58 @@ public class GUIDPartitionTable implements PartitionSystem {
     protected final GPTHeader header;
     protected final GPTEntry[] entries;
     
-//     protected final GPTEntry[] backupEntries;
-//     protected final GPTHeader backupHeader;
-    
-//     protected final int headerChecksum;
-//     protected final int entriesChecksum;
+    protected final GPTEntry[] backupEntries;
+    protected final GPTHeader backupHeader;
     
     /** Method-private to getUsedPartitionEntries(). */
     private final LinkedList<GPTEntry> tempList = new LinkedList<GPTEntry>();
     
     public GUIDPartitionTable(LowLevelFile llf, int offset) {
-	//final int crcPos = 20;
+	// Common temporary storage variables
 	byte[] headerData = new byte[512];
-	llf.seek(offset+512);
-	llf.readFully(headerData, 0, 512);
+	byte[] currentEntryData = new byte[128];
+	
+	// 1. Read the primary header and table
+	llf.seek(offset+BLOCK_SIZE);
+	llf.readFully(headerData);
 	this.header = new GPTHeader(headerData, 0);
-// 	this.headerChecksum = header.calculateCRC32();
-// 	try { //Fuling
-// 	    java.io.FileOutputStream fos = new java.io.FileOutputStream("debug.gpt");
-// 	    fos.write(headerData);
-// 	    fos.close();
-// 	} catch(Exception e) { e.printStackTrace(); }
 
 	llf.seek(offset + header.getPartitionEntryLBA()*BLOCK_SIZE);
-	//CRC32FilterLLF checksumStream = new CRC32FilterLLF(llf);
 	this.entries = new GPTEntry[header.getNumberOfPartitionEntries()];
-	byte[] currentEntryData = new byte[128];
 	for(int i = 0; i < entries.length; ++i) {
 	    llf.readFully(currentEntryData);
 	    entries[i] = new GPTEntry(currentEntryData, 0, BLOCK_SIZE);
 	}
-// 	this.entriesChecksum = checksumStream.getChecksumValue();
+	
+	// 2. Read the backup header and table
+	llf.seek(offset+BLOCK_SIZE*header.getBackupLBA());
+	llf.readFully(headerData);
+	this.backupHeader = new GPTHeader(headerData, 0);
+
+	llf.seek(offset + backupHeader.getPartitionEntryLBA()*BLOCK_SIZE);
+	this.backupEntries = new GPTEntry[backupHeader.getNumberOfPartitionEntries()];
+	for(int i = 0; i < backupEntries.length; ++i) {
+	    llf.readFully(currentEntryData);
+	    backupEntries[i] = new GPTEntry(currentEntryData, 0, BLOCK_SIZE);
+	}
     }
-    public GUIDPartitionTable(GUIDPartitionTable source) {
+    protected GUIDPartitionTable(GUIDPartitionTable source) {
 	this.header = new GPTHeader(source.header);
 	this.entries = new GPTEntry[source.entries.length];
 	for(int i = 0; i < this.entries.length; ++i)
 	    this.entries[i] = new GPTEntry(source.entries[i]);
 	
-// 	this.headerChecksum = source.headerChecksum;
-// 	this.entriesChecksum = source.entriesChecksum;
+	this.backupHeader = new GPTHeader(source.backupHeader);
+	this.backupEntries = new GPTEntry[source.backupEntries.length];
+	for(int i = 0; i < this.backupEntries.length; ++i)
+	    this.backupEntries[i] = new GPTEntry(source.backupEntries[i]);
     }
     
-    protected GUIDPartitionTable(GPTHeader header, int numberOfEntries/*, int headerChecksum, int entriesChecksum*/) {
+    protected GUIDPartitionTable(GPTHeader header, GPTHeader backupHeader, int numberOfEntries/*, int headerChecksum, int entriesChecksum*/) {
 	this.header = header;
+	this.backupHeader = backupHeader;
 	this.entries = new GPTEntry[numberOfEntries];
-// 	this.headerChecksum = headerChecksum;
-//  	this.entriesChecksum = entriesChecksum;
+	this.backupEntries = new GPTEntry[numberOfEntries];
    }
     
     public GPTHeader getHeader() {

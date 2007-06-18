@@ -22,12 +22,16 @@ package org.catacombae.hfsexplorer;
 
 import java.io.*;
 
+/** This class wraps a java.io.RandomAccessFile (opened in read-only mode) and maps its operations
+    to the operations of LowLevelFile. */
 public class RandomAccessLLF implements LowLevelFile {
-    private RandomAccessFile raf;
+    protected RandomAccessFile raf;
     public RandomAccessLLF(String filename) {
 	try {
 	    this.raf = new RandomAccessFile(filename, "r");
 	} catch(Exception e) { throw new RuntimeException(e); }
+    }
+    protected RandomAccessLLF() {
     }
     public void seek(long pos) {
 	try {

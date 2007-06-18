@@ -3,7 +3,7 @@ import org.catacombae.hfsexplorer.LowLevelFile;
 import java.util.zip.CRC32;
 
 /** Updates a CRC32 checksum for each byte you read from the underlying stream.
-    Seeking does not reset the checksum, it is only the read methods and what
+    Seeking does not reset the checksum. It is only the read methods and what
     they return that alter the value of the checksum. */
 public class CRC32FilterLLF implements LowLevelFile {
     private LowLevelFile source;
