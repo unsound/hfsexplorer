@@ -52,9 +52,9 @@ public class ForkFilter implements LowLevelFile {
     private long lastLogicalPos; // The position in the fork where we stopped reading last time
     private long lastPhysicalPos; // The position in the fork where we stopped reading last time
     
-    public ForkFilter(HFSPlusForkData forkData, LowLevelFile sourceFile, long fsOffset, long blockSize) {
-	this(forkData, forkData.getExtents().getExtentDescriptors(), sourceFile, fsOffset, blockSize);
-    }
+//     public ForkFilter(HFSPlusForkData forkData, LowLevelFile sourceFile, long fsOffset, long blockSize) {
+// 	this(forkData, forkData.getExtents().getExtentDescriptors(), sourceFile, fsOffset, blockSize);
+//     }
     public ForkFilter(HFSPlusForkData forkData, HFSPlusExtentDescriptor[] extentDescriptors, 
 		      LowLevelFile sourceFile, long fsOffset, long blockSize) {
 	this.forkData = forkData;

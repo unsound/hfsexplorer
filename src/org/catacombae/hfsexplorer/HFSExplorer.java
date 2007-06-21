@@ -45,7 +45,8 @@ public class HFSExplorer {
     private static enum Operation {
 	BROWSE,
 	FRAGCHECK,
-	TEST;
+	TEST,
+	SYSTEMFILEINFO;
 	
 	private String filename;
 	private LinkedList<String> argsList = new LinkedList<String>();
@@ -128,6 +129,8 @@ public class HFSExplorer {
 	    operationFragCheck(operation, isoRaf, offset, length);
 	else if(operation == Operation.TEST)
 	    operationTest(operation, isoRaf, offset, length);
+	else if(operation == Operation.SYSTEMFILEINFO)
+	    operationSystemFileInfo(operation, isoRaf, offset, length);
     }
     
     private static void operationTest(Operation operation, LowLevelFile isoRaf, long offset, long length) throws IOException {
@@ -175,7 +178,11 @@ public class HFSExplorer {
 	    // collect all records belonging to directory 1 (= ls)
 	    System.out.println();
 	    System.out.println();
-	    HFSPlusCatalogLeafRecord[] f = HFSFileSystemView.collectFilesInDir(new HFSCatalogNodeID(1), bthr.getRootNode(), isoRaf, offset, header, bthr);
+	    ForkFilter catalogFile = new ForkFilter(header.getCatalogFile(),
+						    header.getCatalogFile().getExtents().getExtentDescriptors(),
+						    isoRaf, offset, header.getBlockSize());
+	    HFSPlusCatalogLeafRecord[] f = HFSFileSystemView.collectFilesInDir(new HFSCatalogNodeID(1), bthr.getRootNode(), isoRaf,
+									       offset, header, bthr, catalogFile);
 	    System.out.println("Found " + f.length + " items in subroot.");
 	    for(HFSPlusCatalogLeafRecord rec : f) {
 		//rec.print(System.out, "  ");
@@ -186,7 +193,7 @@ public class HFSExplorer {
 		    HFSPlusCatalogFolder folderData = (HFSPlusCatalogFolder)data;
 		    System.out.println(" (dir, id: " + folderData.getFolderID().toInt() + ")");
 		    // Print contents of folder
-		    HFSPlusCatalogLeafRecord[] f2 = HFSFileSystemView.collectFilesInDir(folderData.getFolderID(), bthr.getRootNode(), isoRaf, offset, header, bthr);
+		    HFSPlusCatalogLeafRecord[] f2 = HFSFileSystemView.collectFilesInDir(folderData.getFolderID(), bthr.getRootNode(), isoRaf, offset, header, bthr, catalogFile);
 		    System.out.println("  Found " + f2.length + " items in " + rec.getKey().getNodeName().getUnicodeAsString() + ".");
 		    for(HFSPlusCatalogLeafRecord rec2 : f2)
 			System.out.println("    \"" + rec2.getKey().getNodeName() + "\"");
@@ -667,6 +674,64 @@ public class HFSExplorer {
 	}
     }
     
+    private static void operationSystemFileInfo(Operation op, LowLevelFile hfsFile, long fsOffset, long fsLength) {
+	LowLevelFile oldHfsFile = hfsFile;
+// 	System.err.println("Opening hack UDIF file...");
+// 	hfsFile = new UDIFRandomAccessLLF("/Users/erik/documents.dmg");
+// 	System.err.println("Opened.");
+	HFSFileSystemView fsView = new HFSFileSystemView(hfsFile, fsOffset);
+	HFSPlusVolumeHeader header = fsView.getVolumeHeader();
+	int blockSize = header.getBlockSize();
+	
+	HFSCatalogNodeID[] ids = { HFSCatalogNodeID.kHFSAllocationFileID, HFSCatalogNodeID.kHFSExtentsFileID,
+				   HFSCatalogNodeID.kHFSCatalogFileID, HFSCatalogNodeID.kHFSAttributesFileID,
+				   HFSCatalogNodeID.kHFSStartupFileID  };
+	HFSPlusForkData[] intrestingFiles = { header.getAllocationFile(), header.getExtentsFile(), header.getCatalogFile(),
+					      header.getAttributesFile(), header.getStartupFile() };
+	for(HFSPlusForkData f : intrestingFiles) { f.print(System.out, ""); }
+	String[] labels = { "Allocation file", "Extents file", "Catalog file", "Attributes file", "Startup file" };
+// 	HFSPlusForkData allocationFile = header.getAllocationFile();
+// 	HFSPlusForkData extentsFile = header.getExtentsFile();
+// 	HFSPlusForkData catalogFile = header.getCatalogFile();
+// 	HFSPlusForkData attributesFile = header.getAttributesFile();
+// 	HFSPlusForkData File = header.getStartupFile();
+
+	//HFSPlusCatalogLeafRecord rootRecord = fsView.getRoot();
+	//HFSPlusCatalogLeafRecord currentDir = rootRecord;
+	
+	for(int i = 0; i < intrestingFiles.length; ++i) {
+	    System.out.println(labels[i] + ":");
+	    HFSPlusForkData currentFile = intrestingFiles[i];
+	    long basicExtentsBlockCount = 0;
+	    HFSPlusExtentDescriptor[] basicExtents = currentFile.getExtents().getExtentDescriptors();
+	    long numberOfExtents = 0;
+	    for(HFSPlusExtentDescriptor cur : basicExtents) {
+		if(cur.getStartBlock() == 0 && cur.getBlockCount() == 0)
+		    break;
+		else {
+		    basicExtentsBlockCount += Util.unsign(cur.getBlockCount());
+		    ++numberOfExtents;
+		}
+	    }
+	    
+	    if(basicExtentsBlockCount == currentFile.getTotalBlocks()) {
+		// All blocks are in basic extents
+		System.out.println("  Number of extents: " + numberOfExtents + " (all in basic)");
+	    }
+	    else {
+		HFSCatalogNodeID currentID = ids[i];
+		if(currentID == HFSCatalogNodeID.kHFSExtentsFileID) {
+		    System.out.println("  OVERFLOW IN EXTENTS OVERFLOW FILE!!");
+		}
+		else {
+		    long totalBlockCount = 0;
+		    HFSPlusExtentDescriptor[] allDescriptors = fsView.getAllDataExtentDescriptors(currentID, currentFile);
+		    System.out.println("  Number of extents: " + allDescriptors.length + " (overflowed)");
+		}
+	    }
+	}
+    }
+    
     public static void printUsageInfo() {
 	// For measurement of the de facto standard terminal width in fixed width environments:
 	// 79:  <------------------------------------------------------------------------------->
@@ -738,6 +803,8 @@ public class HFSExplorer {
 	    operation = Operation.FRAGCHECK;
 	else if(currentArg.equals("test"))
 	    operation = Operation.TEST;
+	else if(currentArg.equals("systemfileinfo"))
+	    operation = Operation.SYSTEMFILEINFO;
 	
 	for(++i; i < length; ++i)
 	    operation.addArg(arguments[i]);

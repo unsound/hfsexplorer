@@ -89,7 +89,8 @@ public class HFSFileSystemView {
 	}
 	
 	public ForkFilter getForkFilterFile(HFSPlusVolumeHeader header) {
-	    return new ForkFilter(header.getExtentsFile(), hfsFile, fsOffset, header.getBlockSize());
+	    return new ForkFilter(header.getExtentsFile(), header.getExtentsFile().getExtents().getExtentDescriptors(),
+				  hfsFile, fsOffset, header.getBlockSize());
 	}
     }
 
@@ -265,8 +266,9 @@ public class HFSFileSystemView {
     /** You really should use the method above to access folder listings. However, the folderID is all
 	that's really needed. */
     public HFSPlusCatalogLeafRecord[] listRecords(HFSCatalogNodeID folderID) {	
-	CatalogInitProcedure init = new CatalogInitProcedure();	
-	return collectFilesInDir(folderID, init.bthr.getRootNode(), hfsFile, fsOffset, init.header, init.bthr);
+	CatalogInitProcedure init = new CatalogInitProcedure();
+	final ForkFilter catalogFile = init.getForkFilterFile(init.header);
+	return collectFilesInDir(folderID, init.bthr.getRootNode(), hfsFile, fsOffset, init.header, init.bthr, catalogFile);
     }
 
     public long extractDataForkToStream(HFSPlusCatalogLeafRecord fileRecord, OutputStream os) throws IOException {
@@ -524,10 +526,14 @@ public class HFSFileSystemView {
     // Utility methods
     public static HFSPlusCatalogLeafRecord[] collectFilesInDir(HFSCatalogNodeID dirID, int currentNodeNumber, 
 							       LowLevelFile hfsFile, long fsOffset, 
-							       HFSPlusVolumeHeader header, BTHeaderRec bthr) {
+							       final HFSPlusVolumeHeader header, final BTHeaderRec bthr,
+							       final ForkFilter catalogFile) {
+	//final HFSPlusVolumeHeader header = init.header;
+	//final BTHeaderRec bthr = init.bthr;
 	// Try to list contents in specified dir
-	ForkFilter catalogFile = new ForkFilter(header.getCatalogFile(), hfsFile, fsOffset, header.getBlockSize());
-	
+	//HFSPlusForkData catalogFile = header.getCatalogFile();
+	//HFSPlusExtentDescriptor[] catalogExtents = getAllDataExtentDescriptors(HFSCatalogNodeID.kHFSCatalogFileID, catalogFile);
+		
 	byte[] currentNodeData = new byte[bthr.getNodeSize()];
 	catalogFile.seek(Util2.unsign(currentNodeNumber)*bthr.getNodeSize());
 	catalogFile.readFully(currentNodeData);
@@ -541,7 +547,7 @@ public class HFSFileSystemView {
 	    LinkedList<HFSPlusCatalogLeafRecord> results = new LinkedList<HFSPlusCatalogLeafRecord>();
 	    for(BTIndexRecord bir : matchingRecords) {
 		HFSPlusCatalogLeafRecord[] partResult = collectFilesInDir(dirID, bir.getIndex(), hfsFile, 
-									  fsOffset, header, bthr);
+									  fsOffset, header, bthr, catalogFile);
 		for(HFSPlusCatalogLeafRecord curRes : partResult)
 		    results.addLast(curRes);
 	    }
@@ -549,6 +555,7 @@ public class HFSFileSystemView {
 	}
 	else if(nodeDescriptor.getKind() == BTNodeDescriptor.BT_LEAF_NODE) {
 	    HFSPlusCatalogLeafNode currentNode = new HFSPlusCatalogLeafNode(currentNodeData, 0, Util2.unsign(bthr.getNodeSize()));
+	    
 	    return getChildrenTo(currentNode, dirID);
 	}
 	else
@@ -563,17 +570,16 @@ public class HFSFileSystemView {
 	for(int i = 0; i < records.length; ++i) {
 	    if(records[i].getKey() instanceof HFSPlusCatalogKey) {
 		HFSPlusCatalogKey key = (HFSPlusCatalogKey)records[i].getKey();
-		if(key.getParentID().toInt() < rootFolderID.toInt() && 
-		   (largestMatchingKey == null || 
-		    key.getParentID().toInt() > largestMatchingKey.getParentID().toInt())) {
+		if( key.getParentID().toLong() < rootFolderID.toLong() && 
+		    (largestMatchingKey == null || key.compareTo(largestMatchingKey) > 0) ) {
 		    largestMatchingKey = key;
 		    largestMatchingRecord = records[i];
 		}
-		else if(key.getParentID().toInt() == rootFolderID.toInt())
+		else if(key.getParentID().toLong() == rootFolderID.toLong())
 		    result.addLast(records[i]);
 	    }
 	    else
-		System.out.println("UNKNOWN KEY TYPE IN findLEChildKeys");
+		throw new RuntimeException("UNKNOWN KEY TYPE IN findLEChildKeys");
 	}
 	
 	if(largestMatchingKey != null)
