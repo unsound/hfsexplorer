@@ -10,6 +10,9 @@ HFSExplorer Changelog
   read them) so file info for the root node could not be displayed..
 - Implemented double-clicking in the right pane to browse a directory, or to extract a file.
 - Made the partition choosing dialog default to the first HFS partition found.
+- Fixed a serious bug leading to a lot of files not beeing seen by HFSExplorer (though I didn't
+  notice it myself). Had to do with how the algorithm that collected all files in a directory
+  worked.
 
 0.17
 ----
