@@ -13,6 +13,9 @@ HFSExplorer Changelog
 - Fixed a serious bug leading to a lot of files not beeing seen by HFSExplorer (though I didn't
   notice it myself). Had to do with how the algorithm that collected all files in a directory
   worked.
+- Huge rework of the libraries from DMGExtractor, due to a lot of wasted memory leading to
+  OutOfMemoryError for huge DMG files. Particulary the XML parser has been seriously
+  reconstructed.
 
 0.17
 ----
