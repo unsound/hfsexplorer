@@ -32,7 +32,13 @@ public class UDIFRandomAccessLLF implements LowLevelFile {
     private DmgRandomAccessStream raf;
     public UDIFRandomAccessLLF(String filename) {
 	try {
-	    this.raf = new DmgRandomAccessStream(new DmgFile(new RandomAccessFileStream(new RandomAccessFile(filename, "r"))));
+	    System.err.println("opening rafStream");
+	    RandomAccessFileStream rafStream = new RandomAccessFileStream(new RandomAccessFile(filename, "r"));
+	    System.err.println("opening dmgf");
+	    DmgFile dmgf = new DmgFile(rafStream);
+	    System.err.println("opening raf");
+	    this.raf = new DmgRandomAccessStream(dmgf);
+	    System.err.println("constructed");
 	} catch(Exception e) { throw new RuntimeException(e); }
     }
     public void seek(long pos) {

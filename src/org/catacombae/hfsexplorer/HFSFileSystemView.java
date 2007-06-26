@@ -614,7 +614,7 @@ public class HFSFileSystemView {
     }
     private static BTIndexRecord findLEKey(BTIndexNode indexNode, BTKey searchKey) {
 	/* 
-	 * Algoritm:
+	 * Algorithm:
 	 *   Key searchKey
 	 *   Key greatestMatchingKey;
 	 *   For each n : records
