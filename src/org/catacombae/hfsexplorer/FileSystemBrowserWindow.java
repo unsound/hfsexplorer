@@ -1506,12 +1506,16 @@ public class FileSystemBrowserWindow extends JFrame {
 	catch(Exception e) {
 	    //It's ok. Non-critical.
 	}
-	FileSystemBrowserWindow fsbWindow = new FileSystemBrowserWindow();
+	final FileSystemBrowserWindow fsbWindow = new FileSystemBrowserWindow();
 	fsbWindow.setVisible(true);
 	if(args.length > 0) {
 	    try {
-		String pathName = new File(args[0]).getCanonicalPath();
-		fsbWindow.loadFSWithUDIFAutodetect(pathName);
+		final String pathName = new File(args[0]).getCanonicalPath();
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+			    fsbWindow.loadFSWithUDIFAutodetect(pathName);
+			}
+		    });
 	    } catch(Exception ioe) {
 		if(ioe.getMessage().equals("Could not open file.")) {
 		    JOptionPane.showMessageDialog(fsbWindow, "Failed to open file:\n\"" + args[0] + "\"",

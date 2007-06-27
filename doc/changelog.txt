@@ -16,6 +16,8 @@ HFSExplorer Changelog
 - Huge rework of the libraries from DMGExtractor, due to a lot of wasted memory leading to
   OutOfMemoryError for huge DMG files. Particulary the XML parser has been seriously
   reconstructed.
+- UI is no longer active while the program loads a file at startup (could be confusing when
+  loading large files, where the user might have thought that no operation was in progress)
 
 0.17
 ----
