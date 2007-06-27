@@ -1,10 +1,14 @@
 2006-03-28
 ----------
-- One annoyance after today's work is that I still haven't found a way to properly make the table fit at startup. As soon
-  as you move a slider or change the size or position of anything it all fits in perfectly, but I can't seem to
-  programmatically make it that way at the start.
+- One annoyance after today's work is that I still haven't found a
+  way to properly make the table fit at startup. As soon as you move
+  a slider or change the size or position of anything it all fits in
+  perfectly, but I can't seem to programmatically make it that way
+  at the start.
 
 2006-06-27
 ----------
 - Discovered that the dates are incorrect... need to revise the date
   calculation mechanism...
+- Double-clicking a file in the right pane to enter a new directory
+  takes more time than clicking it in the left pane. Why?
