@@ -374,9 +374,16 @@ public class FileSystemBrowserWindow extends JFrame {
 		    statusLabel.setText(selection.length + ((selection.length==1)?" object":" objects") + " selected (" + sizeString + ")");
 		}
 	    });
+	fileTableScroller.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+		    int row = fileTable.rowAtPoint(e.getPoint());
+		    if(row == -1) // If we click outside the table, clear selection in table
+			fileTable.clearSelection();
+		}
+	    });
 	fileTable.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent e) {
-                    if(e.getClickCount() == 2) {
+		    if(e.getClickCount() == 2) {
 			int row = fileTable.rowAtPoint(e.getPoint());
 			int col = fileTable.columnAtPoint(e.getPoint());
 			if(col == 0 && row >= 0) {
@@ -840,9 +847,9 @@ public class FileSystemBrowserWindow extends JFrame {
 	else
 	    fsFile = new RandomAccessLLF(filename);
 	
-	System.err.println("Trying to autodetect UDIF structure...");
+	//System.err.println("Trying to autodetect UDIF structure...");
 	if(UDIFRecognizer.isUDIF(fsFile)) {
-	    System.err.println("UDIF structure found! Creating stream...");
+	    //System.err.println("UDIF structure found! Creating stream...");
 	    UDIFRandomAccessLLF stream = null;
 	    try {
 		stream = new UDIFRandomAccessLLF(filename);
