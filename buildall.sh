@@ -1,6 +1,7 @@
 #!/bin/sh
 
 error() {
+    decrement_buildnumber
     echo "There were errors..."
 }
 
@@ -15,6 +16,7 @@ LIBRARY_PATH=lib
 JARFILE=hfsx.jar
 RESOURCE_SRC_DIR=resource
 RESOURCE_DST_DIR=$BUILD_DIR/res
+BUILDENUM_CP=lib/buildenumerator.jar
 
 removeclassfiles() {
     echo "Removing all class files..."
@@ -28,6 +30,16 @@ copyresources() {
     mkdir $RESOURCE_DST_DIR
     cp $RESOURCE_SRC_DIR/*.png $RESOURCE_DST_DIR
     #copy /y \\.\\"%RESOURCE_SRC_DIR%\*.png" "%RESOURCE_DST_DIR%" > NUL:
+}
+
+increment_buildnumber() {
+    echo "Incrementing build number..."
+    java -cp $BUILDENUM_CP BuildEnumerator $SOURCES_DIR/org/catacombae/hfsexplorer/BuildNumber.java 1
+}
+
+decrement_buildnumber() {
+    echo "Decrementing build number..."
+    java -cp $BUILDENUM_CP BuildEnumerator $SOURCES_DIR/org/catacombae/hfsexplorer/BuildNumber.java -1
 }
 
 buildhfsx() {
@@ -71,6 +83,7 @@ buildjar() {
 }
 
 main() {
+    increment_buildnumber
     removeclassfiles
     if [ "$?" == 0 ]; then
 	copyresources
