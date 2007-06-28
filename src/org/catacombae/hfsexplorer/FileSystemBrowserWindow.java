@@ -1633,20 +1633,18 @@ public class FileSystemBrowserWindow extends JFrame {
     
     /** <code>progressDialog</code> may NOT be null. */
     protected int extract(HFSPlusCatalogLeafRecord rec, File outDir, ProgressMonitor progressDialog) {
-	return extractRecursive(rec, outDir, progressDialog/*, 0.0, 1.0*/);
+	return extractRecursive(rec, outDir, progressDialog, new ObjectContainer<Boolean>(false));
     }
     /** <code>progressDialog</code> may NOT be null. */
     protected int extract(HFSPlusCatalogLeafRecord[] recs, File outDir, ProgressMonitor progressDialog) {
 	int errorCount = 0;
-// 	final double step = 1.0/recs.length;
-// 	double floor = 0.0;
 	for(HFSPlusCatalogLeafRecord rec : recs) {
-	    errorCount += extractRecursive(rec, outDir, progressDialog/*, floor, floor+step*/);
-	    //floor += step;
+	    errorCount += extractRecursive(rec, outDir, progressDialog, new ObjectContainer<Boolean>(false));
 	}
 	return errorCount;
     }
-    private int extractRecursive(HFSPlusCatalogLeafRecord rec, File outDir, ProgressMonitor progressDialog/*, double fractionLowLimit, double fractionHighLimit*/) {
+    private int extractRecursive(HFSPlusCatalogLeafRecord rec, File outDir, ProgressMonitor progressDialog,
+				 ObjectContainer<Boolean> overwriteAll) {
 	if(progressDialog.cancelSignaled()) {
 	    progressDialog.confirmCancel();
 	    return 0;
@@ -1662,18 +1660,50 @@ public class FileSystemBrowserWindow extends JFrame {
 		progressDialog.updateCurrentFile(filename);
 		//progressDialog.updateTotalProgress(fractionLowLimit);
 		File outFile = new File(outDir, filename);
+		if(!overwriteAll.o && outFile.exists()) {
+		    String[] options = new String[] { "Overwrite", "Overwrite all", "Skip file and continue", "Rename file", "Cancel" };
+		    int reply = JOptionPane.showOptionDialog(this, "File:\n    \"" + outFile.getAbsolutePath() + "\"\n" +
+							     "already exists.",
+							     "Warning", JOptionPane.YES_NO_CANCEL_OPTION,
+							     JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+		    if(reply == 0);
+		    else if(reply == 1)
+			overwriteAll.o = true;
+		    else if(reply == 2) {
+			++errorCount;
+			break;
+		    }
+		    else if(reply == 3) {
+			Object selection = JOptionPane.showInputDialog(this, "Enter the new filename:", "Input filename",
+								       JOptionPane.PLAIN_MESSAGE, null, null, filename);
+			if(selection == null) {
+			    ++errorCount;
+			    progressDialog.signalCancel();
+			    break;
+			}
+			else {
+			    filename = selection.toString();
+			    continue;
+			}
+		    }
+		    else {
+			++errorCount;
+			progressDialog.signalCancel();
+			break;
+		    }			
+		}
 		try {
-		    try {
-			PrintStream p = System.out;
-			File f = outFile;
-			p.println("Printing some information about the output file: ");
-			p.println("f.getParent(): \"" + f.getParent() + "\"");
-			p.println("f.getName(): \"" + f.getName() + "\"");
-			p.println("f.getAbsolutePath(): \"" + f.getAbsolutePath() + "\"");
-			p.println("f.exists(): \"" + f.exists() + "\"");
-			p.println("f.getCanonicalPath(): \"" + f.getCanonicalPath() + "\"");
-			//p.println("f.getParent(): \"" + f.getParent() + "\"");
-		    } catch(Exception e) { e.printStackTrace(); }
+// 		    try {
+// 			PrintStream p = System.out;
+// 			File f = outFile;
+// 			p.println("Printing some information about the output file: ");
+// 			p.println("f.getParent(): \"" + f.getParent() + "\"");
+// 			p.println("f.getName(): \"" + f.getName() + "\"");
+// 			p.println("f.getAbsolutePath(): \"" + f.getAbsolutePath() + "\"");
+// 			p.println("f.exists(): \"" + f.exists() + "\"");
+// 			p.println("f.getCanonicalPath(): \"" + f.getCanonicalPath() + "\"");
+// 			//p.println("f.getParent(): \"" + f.getParent() + "\"");
+// 		    } catch(Exception e) { e.printStackTrace(); }
 
 		    try { outFile.getCanonicalPath(); } catch(Exception e) { throw new FileNotFoundException(); }
 		    
@@ -1709,8 +1739,16 @@ public class FileSystemBrowserWindow extends JFrame {
 			++errorCount;
 		    }
 		    else if(reply == 2) {
-			filename = JOptionPane.showInputDialog(this, "Enter the new filename:", filename);
-			continue;
+			Object selection = JOptionPane.showInputDialog(this, "Enter the new filename:", "Input filename",
+								       JOptionPane.PLAIN_MESSAGE, null, null, filename);
+			if(selection == null) {
+			    ++errorCount;
+			    progressDialog.signalCancel();
+			}
+			else {
+			    filename = selection.toString();
+			    continue;
+			}
 		    }
 		    else {
 			++errorCount;
@@ -1743,9 +1781,10 @@ public class FileSystemBrowserWindow extends JFrame {
 		    if(reply == JOptionPane.NO_OPTION)
 			progressDialog.signalCancel();
 		}
-		progressDialog.addDataProgress(((HFSPlusCatalogFile)recData).getDataFork().getLogicalSize());
 		break;
 	    }
+	    progressDialog.addDataProgress(((HFSPlusCatalogFile)recData).getDataFork().getLogicalSize());
+
 	}
 	else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
 		recData instanceof HFSPlusCatalogFolder) {
@@ -1759,11 +1798,24 @@ public class FileSystemBrowserWindow extends JFrame {
 	    //System.out.println("folder: \"" + dirName + "\" valence: " + contents.length + " range: " + fractionLowLimit + "-" + fractionHighLimit);
 	    // We now have the contents of the requested directory
 	    File thisDir = new File(outDir, dirName);
-	    if(thisDir.mkdir()) {
+	    if(!overwriteAll.o && thisDir.exists()) {
+		String[] options = new String[] { "Continue", "Cancel" };
+		int reply = JOptionPane.showOptionDialog(this, "Warning! Directory:\n    \"" + thisDir.getAbsolutePath() + "\"\n" +
+							 "already exists. Do you want to continue extracting to this directory?",
+							 "Warning", JOptionPane.YES_NO_CANCEL_OPTION,
+							 JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+		if(reply != 0) {
+		    ++errorCount;
+		    progressDialog.signalCancel();
+		    return errorCount;
+		}
+	    }
+
+	    if(thisDir.mkdir() || thisDir.exists()) {
 // 		final double step = (fractionHighLimit-fractionLowLimit)/contents.length;
 // 		double floor = fractionLowLimit;
 		for(HFSPlusCatalogLeafRecord outRec : contents) {
-		    errorCount += extractRecursive(outRec, thisDir, progressDialog/*, floor, floor+step*/);
+		    errorCount += extractRecursive(outRec, thisDir, progressDialog, overwriteAll);
 // 		    floor += step;
 		}
 	    }
