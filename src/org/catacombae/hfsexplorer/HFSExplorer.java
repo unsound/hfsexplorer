@@ -186,7 +186,7 @@ public class HFSExplorer {
 	    System.out.println("Found " + f.length + " items in subroot.");
 	    for(HFSPlusCatalogLeafRecord rec : f) {
 		//rec.print(System.out, "  ");
-		System.out.print("  \"" + rec.getKey().getNodeName().getUnicodeAsString() + "\"");
+		System.out.print("  \"" + rec.getKey().getNodeName().toString() + "\"");
 		HFSPlusCatalogLeafRecordData data = rec.getData();
 		if(data.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
 		   data instanceof HFSPlusCatalogFolder) {
@@ -194,7 +194,7 @@ public class HFSExplorer {
 		    System.out.println(" (dir, id: " + folderData.getFolderID().toInt() + ")");
 		    // Print contents of folder
 		    HFSPlusCatalogLeafRecord[] f2 = HFSFileSystemView.collectFilesInDir(folderData.getFolderID(), bthr.getRootNode(), isoRaf, offset, header, bthr, catalogFile);
-		    System.out.println("  Found " + f2.length + " items in " + rec.getKey().getNodeName().getUnicodeAsString() + ".");
+		    System.out.println("  Found " + f2.length + " items in " + rec.getKey().getNodeName().toString() + ".");
 		    for(HFSPlusCatalogLeafRecord rec2 : f2)
 			System.out.println("    \"" + rec2.getKey().getNodeName() + "\"");
 		    //System.out.println();
@@ -271,7 +271,7 @@ public class HFSExplorer {
 			    if(nodeDescriptor.getKind() == BTNodeDescriptor.BT_LEAF_NODE) {
 				System.out.println("  [" + nodeNumber + "]  Key: " + currentKey.getKeyLength() + 
 						   ", " + currentKey.getParentID().toString() +
-						   ", \"" + currentKey.getNodeName().getUnicodeAsString() + "\"");
+						   ", \"" + currentKey.getNodeName().toString() + "\"");
 				//currentKey.print(System.out, "  [" + nodeNumber + "]   ");
 				
 				short recordType = Util.readShortBE(currentNode, currentOffset+currentKey.length());
@@ -308,7 +308,7 @@ public class HFSExplorer {
 // 			    System.out.println("  [" + nodeNumber + "]  Remaining data for index: " + 
 // 					       ((Util2.unsign(offsets[i+1])-currentOffset)-
 // 						Util2.unsign(currentKey.length())) + " bytes");
-				System.out.println("  [" + nodeNumber + "]    \"" + currentKey.getNodeName().getUnicodeAsString() + "\" (parent: " + currentKey.getParentID() + ") -> " + Util2.unsign(Util.readIntBE(currentNode, currentOffset+currentKey.length())));
+				System.out.println("  [" + nodeNumber + "]    \"" + currentKey.getNodeName().toString() + "\" (parent: " + currentKey.getParentID() + ") -> " + Util2.unsign(Util.readIntBE(currentNode, currentOffset+currentKey.length())));
 			    }
 			}
 		    }

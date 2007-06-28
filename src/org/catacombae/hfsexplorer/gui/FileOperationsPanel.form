@@ -27,8 +27,8 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="sizeField" pref="130" max="32767" attributes="0"/>
-                          <Component id="filenameField" alignment="0" pref="130" max="32767" attributes="0"/>
+                          <Component id="sizeField" pref="275" max="32767" attributes="0"/>
+                          <Component id="filenameField" alignment="0" pref="275" max="32767" attributes="0"/>
                       </Group>
                   </Group>
               </Group>

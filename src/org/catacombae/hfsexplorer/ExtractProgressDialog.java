@@ -25,7 +25,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class ExtractProgressDialog extends JDialog {
+public class ExtractProgressDialog extends JDialog implements ProgressMonitor {
     private ExtractProgressPanel progressPanel;
     private JButton cancelButton;
 //     private ActionListener cancelListener = null;

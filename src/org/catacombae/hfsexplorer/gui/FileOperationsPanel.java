@@ -5,6 +5,7 @@
  */
 
 package org.catacombae.hfsexplorer.gui;
+import javax.swing.JDialog;
 import java.awt.event.ActionListener;
 
 /**
@@ -14,17 +15,22 @@ import java.awt.event.ActionListener;
 public class FileOperationsPanel extends javax.swing.JPanel {
     
     /** Creates new form FileOperationsPanel */
-    public FileOperationsPanel(String filename, long fileSize,
+    public FileOperationsPanel(JDialog dialog, String filename, long fileSize,
                                ActionListener openListener,
                                ActionListener saveListener) {
         initComponents();
         filenameField.setText(filename);
-        sizeField.setText("" + fileSize);
+        sizeField.setText("" + fileSize + " bytes");
         if(openListener != null) {
             openFileButton.addActionListener(openListener);
             openFileButton.setEnabled(true);
+            dialog.getRootPane().setDefaultButton(openFileButton);
+        }
+        else {
+            dialog.getRootPane().setDefaultButton(saveFileButton);
         }
         saveFileButton.addActionListener(saveListener);
+        
     }
     
     /** This method is called from within the constructor to
@@ -78,8 +84,8 @@ public class FileOperationsPanel extends javax.swing.JPanel {
                             .add(jLabel2))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(sizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
-                            .add(filenameField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE))))
+                            .add(sizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
+                            .add(filenameField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(

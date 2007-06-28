@@ -23,8 +23,8 @@ package org.catacombae.hfsexplorer;
 import org.catacombae.hfsexplorer.partitioning.*;
 import org.catacombae.hfsexplorer.types.*;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
-import org.catacombae.hfsexplorer.gui.FilesystemBrowserPanel;
-import org.catacombae.hfsexplorer.gui.JournalInfoBlockPanel;
+import org.catacombae.hfsexplorer.gui.*;
+import com.apple.eawt.*;
 import java.util.*;
 import java.io.*;
 import java.net.URL;
@@ -60,8 +60,8 @@ public class FileSystemBrowserWindow extends JFrame {
 	    this.rec = rec;
 	    rec.getKey();
 	    rec.getKey().getNodeName();
-	    rec.getKey().getNodeName().getUnicodeAsComposedString(normalizationToolkit);
-	    this.composedNodeName = rec.getKey().getNodeName().getUnicodeAsComposedString(normalizationToolkit);
+	    rec.getKey().getNodeName().getUnicodeAsComposedString();
+	    this.composedNodeName = rec.getKey().getNodeName().getUnicodeAsComposedString();
 	}
 	public HFSPlusCatalogLeafRecord getRecord() { return rec; }
 	public String toString() { return composedNodeName; }
@@ -89,13 +89,14 @@ public class FileSystemBrowserWindow extends JFrame {
     // Communication between adjustColumnsWidths and the column listener
     private final boolean[] disableColumnListener = { false };
     private final ObjectContainer<int[]> lastWidths = new ObjectContainer<int[]>(null);
-
+    
+    // For managing all files opened with the "open file" command
+    private final LinkedList<File> tempFiles = new LinkedList<File>();
     
     private final JFileChooser fileChooser = new JFileChooser();
     private final Vector<String> colNames = new Vector<String>();
     private final DefaultTableModel tableModel;
     private HFSFileSystemView fsView;
-    private static final UnicodeNormalizationToolkit normalizationToolkit = new UnicodeNormalizationToolkit();
     
     private static class RecordNodeStorage {
 	private HFSPlusCatalogLeafRecord parentRecord;
@@ -106,7 +107,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	    this.parentRecord = parentRecord;
 	    if(parentRecord.getData().getRecordType() != HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER)
 		throw new IllegalArgumentException("Illegal type for record data.");
-	    this.composedNodeName = parentRecord.getKey().getNodeName().getUnicodeAsComposedString(normalizationToolkit);
+	    this.composedNodeName = parentRecord.getKey().getNodeName().getUnicodeAsComposedString();
 	}
 	public HFSPlusCatalogLeafRecord getRecord() { return parentRecord; }
 	public HFSPlusCatalogLeafRecord getThread() { return threadRecord; }
@@ -117,7 +118,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	}
 	public String toString() {
 	    //HFSPlusCatalogLeafRecordData recData = parentRecord.getData();
-	    return composedNodeName;//parentRecord.getKey().getNodeName().getUnicodeAsComposedString(normalizationToolkit);
+	    return composedNodeName;//parentRecord.getKey().getNodeName().getUnicodeAsComposedString();
 	}
     }
     
@@ -383,7 +384,27 @@ public class FileSystemBrowserWindow extends JFrame {
 	    });
 	fileTable.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent e) {
-		    if(e.getClickCount() == 2) {
+		    if(e.getButton() == MouseEvent.BUTTON3) {
+			int row = fileTable.rowAtPoint(e.getPoint());
+			int col = fileTable.columnAtPoint(e.getPoint());
+			if(col == 0 && row >= 0) {
+			    // These lines are here because right-clicking doesn't change focus or selection
+			    fileTable.clearSelection();
+			    fileTable.changeSelection(row, col, false, false);
+			    fileTable.requestFocus();
+			    
+			    JPopupMenu jpm = new JPopupMenu();
+			    JMenuItem infoItem = new JMenuItem("Information");
+			    infoItem.addActionListener(new ActionListener() {
+				    public void actionPerformed(ActionEvent e) {
+					actionGetInfo();
+				    }
+				});
+			    jpm.add(infoItem);
+			    jpm.show(fileTable, e.getX(), e.getY());
+			}
+		    }
+		    else if(e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
 			int row = fileTable.rowAtPoint(e.getPoint());
 			int col = fileTable.columnAtPoint(e.getPoint());
 			if(col == 0 && row >= 0) {
@@ -404,11 +425,12 @@ public class FileSystemBrowserWindow extends JFrame {
 				    HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
 				    requestedID = rec.getKey().getParentID();
 				}
-				else {
+				else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
+					recData instanceof HFSPlusCatalogFile) {
 				    if(true)
-					actionExtractToDir();
+					actionDoubleClickFile(rec, (HFSPlusCatalogFile)recData);
 				    else { // Some normalization testcode, currently disabled.
-					UnicodeNormalizationToolkit ud = normalizationToolkit;
+					UnicodeNormalizationToolkit ud = UnicodeNormalizationToolkit.getDefaultInstance();
 					String filename = rec.getKey().getNodeName().toString();
 					System.err.println("Decomposed (unmodified):     \"" + filename + "\"");
 					System.err.print("Decomposed (unmodified) hex:");
@@ -422,6 +444,7 @@ public class FileSystemBrowserWindow extends JFrame {
 				    }
 				    return;
 				}
+				else throw new RuntimeException("recData instanceof " + recData.getClass().toString());
 				
 				HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
 				populateTable(contents);
@@ -455,11 +478,33 @@ public class FileSystemBrowserWindow extends JFrame {
 		}
 	    });
 	
+	dirTree.addMouseListener(new MouseAdapter() {
+		public void mouseClicked(MouseEvent e) {
+		    if(e.getButton() == MouseEvent.BUTTON3) {
+			TreePath tp = dirTree.getPathForLocation(e.getX(), e.getY());
+			if(tp != null) {
+			    dirTree.clearSelection();
+			    dirTree.setSelectionPath(tp);
+			    dirTree.requestFocus();
+			    
+			    JPopupMenu jpm = new JPopupMenu();
+			    JMenuItem infoItem = new JMenuItem("Information");
+			    infoItem.addActionListener(new ActionListener() {
+				    public void actionPerformed(ActionEvent e) {
+					actionGetInfo();
+				    }
+				});
+			    jpm.add(infoItem);
+			    jpm.show(dirTree, e.getX(), e.getY());
+			}
+		    }
+		}
+	    });
 	DefaultMutableTreeNode rootNode = new NoLeafMutableTreeNode("No file system loaded");
 	DefaultTreeModel model = new DefaultTreeModel(rootNode);
 	dirTree.setModel(model);
 	dirTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-
+	
 	dirTree.addTreeSelectionListener(new TreeSelectionListener() {
 		public void valueChanged(TreeSelectionEvent e) {
 		    TreePath tp = e.getPath();
@@ -667,13 +712,27 @@ public class FileSystemBrowserWindow extends JFrame {
 	    });
 	openUDIFItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 	
-	JMenuItem exitProgramItem = new JMenuItem("Exit");
-	exitProgramItem.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent ae) {
-		    exitApplication();
-		}
-	    });
-	exitProgramItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+	JMenuItem exitProgramItem = null;
+	if(!System.getProperty("os.name").toLowerCase().startsWith("mac os x")) {
+	    exitProgramItem = new JMenuItem("Exit");
+	    exitProgramItem.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent ae) {
+			exitApplication();
+		    }
+		});
+	    exitProgramItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q,
+								  Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        }
+        else {
+	    Application thisApplication = Application.getApplication();
+	    thisApplication.addApplicationListener(new ApplicationAdapter() {
+		    public void handleQuit(ApplicationEvent ae) {
+			exitApplication();
+			ae.setHandled(false); // Prevents the application from exiting in case exitApplication returns
+		    }
+                });
+        }
+    
 	JMenuItem fsInfoItem = new JMenuItem("File system info");
 	fsInfoItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
@@ -757,14 +816,15 @@ public class FileSystemBrowserWindow extends JFrame {
 	    });
 	
 	JMenu fileMenu = new JMenu("File");
+	JMenu infoMenu = new JMenu("Info");
+	JMenu helpMenu = new JMenu("Help");
 	if(loadFSFromDeviceItem != null)
 	    fileMenu.add(loadFSFromDeviceItem);
 	fileMenu.add(loadFSFromFileItem);
 	fileMenu.add(openUDIFItem);
-	fileMenu.add(exitProgramItem);
-	JMenu infoMenu = new JMenu("Info");
+	if(exitProgramItem != null)
+	    fileMenu.add(exitProgramItem);
 	infoMenu.add(fsInfoItem);
-	JMenu helpMenu = new JMenu("Help");
 	helpMenu.add(checkUpdatesItem);
 	helpMenu.add(aboutItem);
 	JMenuBar menuBar = new JMenuBar();
@@ -787,6 +847,37 @@ public class FileSystemBrowserWindow extends JFrame {
     }
     
     private void exitApplication() {
+	// Clean up temp files.
+	if(tempFiles.size() > 0) {
+	    long totalFileSize = 0;
+	    for(File tempFile : tempFiles)
+		totalFileSize += tempFile.length();
+	    int res = JOptionPane.showConfirmDialog(this, "You have " + tempFiles.size() + " temporary files with a total size of " + totalFileSize + " bytes in:\n    \"" +
+						    System.getProperty("java.io.tmpdir") + "\"\nDo you want to delete them now?",
+						    "Cleanup on program exit", JOptionPane.YES_NO_CANCEL_OPTION,
+						    JOptionPane.QUESTION_MESSAGE);
+	    if(res == JOptionPane.YES_OPTION) {
+		for(File tempFile : tempFiles) {
+		    if(!tempFile.exists()) continue;
+		    boolean delRes = tempFile.delete();
+		    while(!delRes) {
+			int res2 = JOptionPane.showConfirmDialog(this, "Could not delete file:\n    \"" +
+								 tempFile.getAbsolutePath() + "\"\nTry again?",
+								 "Could not delete file",
+								 JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
+			if(res2 == JOptionPane.YES_OPTION)
+			    delRes = tempFile.delete();
+			else if(res2 == JOptionPane.NO_OPTION)
+			    break;
+			else
+			    return;
+		    }
+		}
+	    }
+	    else if(res != JOptionPane.NO_OPTION)
+		return;
+	}
+	
 	setVisible(false);
 	if(fsView != null) {
 	    fsView.getStream().close();
@@ -1074,8 +1165,200 @@ public class FileSystemBrowserWindow extends JFrame {
 	}
 	adjustTableWidth();
     }
+    
+    /** Never returns null. If nothing is selected, a zero-length array is returned.
+	A RuntimeException may be thrown in case of an implementation error (i.e. should never happen), in which case
+	a detailed explanation is found through Exception.getMessage(). */
+    private HFSPlusCatalogLeafRecord[] getSelectedRecords() {
+	if(dirTreeLastFocus > fileTableLastFocus) {
+	    Object o = dirTree.getLastSelectedPathComponent();
+	    if(o == null) {
+		return new HFSPlusCatalogLeafRecord[0];
+	    }
+	    else if(o instanceof DefaultMutableTreeNode) {
+		Object o2 = ((DefaultMutableTreeNode)o).getUserObject();
+		if(o2 instanceof RecordNodeStorage)
+		    return new HFSPlusCatalogLeafRecord[] { ((RecordNodeStorage)o2).getRecord() };
+		else
+		    throw new RuntimeException("Unexpected data in tree user object. (Internal error, report to " +
+					       "developer)" + "\nClass: " + o.getClass().toString());
+	    }
+	    else {
+		throw new RuntimeException("Unexpected data in tree model. (Internal error, report to developer)" +
+					   "\nClass: " + o.getClass().toString());
+	    }
+	}
+	else {
+	    int[] selectedRows = fileTable.getSelectedRows();
+	    if(selectedRows.length == 0) {
+		return new HFSPlusCatalogLeafRecord[0];
+	    }
+	    else {
+		final HFSPlusCatalogLeafRecord[] selectedRecords = new HFSPlusCatalogLeafRecord[selectedRows.length];
+		for(int i = 0; i < selectedRows.length; ++i) {
+		    int selectedRow = selectedRows[i];
+		    Object o = tableModel.getValueAt(selectedRow, 0);
+		    HFSPlusCatalogLeafRecord rec;
+		    HFSPlusCatalogLeafRecordData recData;
+		    if(o instanceof RecordContainer) {
+			rec = ((RecordContainer)o).getRecord();
+			selectedRecords[i] = rec;
+		    }
+		    else {
+			throw new RuntimeException("Unexpected data in table model. (Internal error, report to developer)" +
+						   "\nClass: " + o.getClass().toString());
+		    }
+		}
+		return selectedRecords;
+	    }
+	}
+    }
+    
+    private void actionDoubleClickFile(final HFSPlusCatalogLeafRecord rec, HFSPlusCatalogFile file) {
+	final JDialog fopFrame = new JDialog(this, rec.getKey().getNodeName().toString(), true);
+	fopFrame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+	
+	ActionListener alOpen = null;
+	String[] command = null;
+	if(System.getProperty("os.name").toLowerCase().startsWith("windows")) {
+	    System.err.println("Windows detected.");
+	    command = new String[] { rec.getKey().getNodeName().toString() };
+	}
+	else if(System.getProperty("os.name").toLowerCase().startsWith("mac os x")) {
+	    System.err.println("OS X detected");
+	    command = new String[] { "open", rec.getKey().getNodeName().toString() };
+	}
+	
+	if(command != null) {
+	    final String[] finalCommand = command;
+	    alOpen = new ActionListener() {
+		    public void actionPerformed(ActionEvent ae) {
+			File tempDir = new File(System.getProperty("java.io.tmpdir"));
+			if(extract(rec, tempDir, NullProgressMonitor.getInstance()) == 0) {
+			    tempFiles.add(new File(tempDir, rec.getKey().getNodeName().toString()));
+			    try {
+				System.err.print("Trying to execute:");
+				for(String s : finalCommand)
+				    System.err.print(" \"" + s + "\"");
+				System.err.println(" in directory \"" + tempDir + "\"");
+				Process p = Runtime.getRuntime().exec(finalCommand, null, tempDir);
+// 				System.err.println("\nError stream:");
+// 				InputStream is = p.getErrorStream();
+// 				//BufferedReader bufErr = new BufferedReader(new InputStreamReader(is));
+// 				int cur = is.read();
+// 				while(cur >= 0) {
+// 				    System.err.print((char)(cur & 0xFF));
+// 				    cur = is.read();
+// 				}
+// 				is.close();
+// 				System.err.println("\nOutput stream:");
+// 				is = p.getInputStream();
+// 				cur = is.read();
+// 				while(cur >= 0) {
+// 				    System.err.print((char)(cur & 0xFF));
+// 				    cur = is.read();
+// 				}
+// 				is.close();
+// 				int exitCode = p.waitFor();
+// 				if(exitCode != 0) {
+// 				    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "Open failed! Exit code: " +
+// 								  exitCode + "", "Error", JOptionPane.ERROR_MESSAGE);
+// 				}
+// 				else
+				fopFrame.dispose();//setVisible(false);
+			    } catch(Exception e) {
+				String stackTrace = "";
+				for(StackTraceElement ste : e.getStackTrace()) stackTrace += ste.toString() + "\n";
+				JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "Open failed. Exception caught:\n" +
+							      stackTrace,
+							      "Error", JOptionPane.ERROR_MESSAGE);
+			    }
+			}
+			else
+			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+							  "Error while extracting file to temp dir.",
+							  "Error", JOptionPane.ERROR_MESSAGE);
+		    }
+		};
+	}
+	
+	ActionListener alSave = new ActionListener() {
+		public void actionPerformed(ActionEvent ae) {
+		    actionExtractToDir();
+		    fopFrame.dispose();//setVisible(false);
+		}
+	    };
+	FileOperationsPanel fop = new FileOperationsPanel(fopFrame, rec.getKey().getNodeName().toString(),
+							  file.getDataFork().getLogicalSize(),
+							  alOpen, alSave);
+	fopFrame.add(fop, BorderLayout.CENTER);
+	fopFrame.pack();
+	fopFrame.setLocationRelativeTo(null);
+	fopFrame.setVisible(true);
+    }
 
     private void actionExtractToDir() {
+	try {
+	    final HFSPlusCatalogLeafRecord[] selection = getSelectedRecords();
+	    if(selection.length > 0) {
+		fileChooser.setMultiSelectionEnabled(false);
+		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		fileChooser.setSelectedFiles(new File[0]);
+		if(fileChooser.showDialog(FileSystemBrowserWindow.this, "Extract here") == JFileChooser.APPROVE_OPTION) {
+		    final File outDir = fileChooser.getSelectedFile();
+		    final ExtractProgressDialog progress = new ExtractProgressDialog(this);
+		    Runnable r = new Runnable() {
+			    public void run() {
+				progress.setDataSize(calculateDataForkSizeRecursive(selection));
+				int errorCount = extract(selection, outDir, progress);
+				if(!progress.cancelSignaled()) {
+				    if(errorCount == 0)
+					JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+								      "Extraction finished.\n",
+								      "Information",
+								      JOptionPane.INFORMATION_MESSAGE);
+				    else
+					JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+								      errorCount + " errors were encountered " +
+								      "during the extraction.\n",
+								      "Information",
+								      JOptionPane.WARNING_MESSAGE);
+				}
+				else
+				    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+								  "Extraction was aborted.\n" +
+								  "Please remove the extracted files " +
+								  "manually.\n",
+								  "Aborted extraction",
+								  JOptionPane.WARNING_MESSAGE);
+				progress.setVisible(false);
+			    }
+			};
+		    new Thread(r).start();
+		    progress.setVisible(true);
+		}
+	    }
+	    else if(selection.length == 0) {
+		JOptionPane.showMessageDialog(this, "No file or folder selected.",
+					      "Information", JOptionPane.INFORMATION_MESSAGE);
+	    }
+	    else throw new RuntimeException("wtf?");
+	} catch(RuntimeException re) {
+	    JOptionPane.showMessageDialog(this, re.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+	}
+	// There is trouble with this approach in OS X... we don't get a proper DIRECTORIES_ONLY dialog. One idea is to use java.awt.FileDialog and see if it works better. (probably not)
+	//java.awt.FileDialog fd = new java.awt.FileDialog(FileSystemBrowserWindow.this, "Extract here", SAVE);
+	//File oldDir = fileChooser.getCurrentDirectory();
+	//JFileChooser fileChooser2 = new JFileChooser();
+	//fileChooser.setCurrentDirectory(oldDir);
+	//fileChooser.setMultiSelectionEnabled(false);
+	//fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+	//System.err.println("curdir: " + fileChooser.getCurrentDirectory());
+	//fileChooser.setSelectedFiles(new File[0]);
+	//fileChooser.setCurrentDirectory(fileChooser.getCurrentDirectory());
+    }
+    
+    private void old_actionExtractToDir() {
 	if(dirTreeLastFocus > fileTableLastFocus) {
 	    Object o = dirTree.getLastSelectedPathComponent();
 	    //System.err.println(o.toString());
@@ -1360,11 +1643,11 @@ public class FileSystemBrowserWindow extends JFrame {
     }
     
     /** <code>progressDialog</code> may NOT be null. */
-    protected int extract(HFSPlusCatalogLeafRecord rec, File outDir, ExtractProgressDialog progressDialog) {
+    protected int extract(HFSPlusCatalogLeafRecord rec, File outDir, ProgressMonitor progressDialog) {
 	return extractRecursive(rec, outDir, progressDialog/*, 0.0, 1.0*/);
     }
     /** <code>progressDialog</code> may NOT be null. */
-    protected int extract(HFSPlusCatalogLeafRecord[] recs, File outDir, ExtractProgressDialog progressDialog) {
+    protected int extract(HFSPlusCatalogLeafRecord[] recs, File outDir, ProgressMonitor progressDialog) {
 	int errorCount = 0;
 // 	final double step = 1.0/recs.length;
 // 	double floor = 0.0;
@@ -1374,7 +1657,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	}
 	return errorCount;
     }
-    private int extractRecursive(HFSPlusCatalogLeafRecord rec, File outDir, ExtractProgressDialog progressDialog/*, double fractionLowLimit, double fractionHighLimit*/) {
+    private int extractRecursive(HFSPlusCatalogLeafRecord rec, File outDir, ProgressMonitor progressDialog/*, double fractionLowLimit, double fractionHighLimit*/) {
 	if(progressDialog.cancelSignaled()) {
 	    progressDialog.confirmCancel();
 	    return 0;
@@ -1384,7 +1667,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	HFSPlusCatalogLeafRecordData recData = rec.getData();
 	if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
 	   recData instanceof HFSPlusCatalogFile) {
-	    String filename = rec.getKey().getNodeName().getUnicodeAsComposedString(normalizationToolkit);
+	    String filename = rec.getKey().getNodeName().getUnicodeAsComposedString();
 	    //System.out.println("file: \"" + filename + "\" range: " + fractionLowLimit + "-" + fractionHighLimit);
 	    progressDialog.updateCurrentFile(filename);
 	    //progressDialog.updateTotalProgress(fractionLowLimit);
@@ -1440,7 +1723,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	}
 	else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
 		recData instanceof HFSPlusCatalogFolder) {
-	    String dirName = rec.getKey().getNodeName().getUnicodeAsComposedString(normalizationToolkit);
+	    String dirName = rec.getKey().getNodeName().getUnicodeAsComposedString();
 	    progressDialog.updateCurrentFile(dirName);
 	    HFSCatalogNodeID requestedID;
 	    HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder)recData;

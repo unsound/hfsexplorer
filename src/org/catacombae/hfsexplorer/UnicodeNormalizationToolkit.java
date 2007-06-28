@@ -30,13 +30,15 @@ import java.io.*;
  * Also including a Hangul decomposition algorithm from the Unicode Book.
  */
 public class UnicodeNormalizationToolkit {
+    private static final UnicodeNormalizationToolkit defaultInstance = new UnicodeNormalizationToolkit();
+    
     private Map<Character, char[]> decompositionTable;
     private TrieNode compositionTrie;
     
     /** This class encapsulates code copied from http://unicode.org/reports/tr15/#Hangul in order
 	to deal with Hangul decomposition algorithmically. No indication of any copyright issues.
 	The same algorithm is presented in section 3.11 of the Unicode standard 3.0.*/
-    public static class HangulDecomposition {
+    private static class HangulDecomposition {
 	static final int
 	    SBase = 0xAC00, LBase = 0x1100, VBase = 0x1161, TBase = 0x11A7,
 	    LCount = 19, VCount = 21, TCount = 28,
@@ -106,8 +108,8 @@ public class UnicodeNormalizationToolkit {
 	}
     }
     
-    public static long nextID = 0;
-    public static class TrieNode {
+    private static long nextID = 0;
+    private static class TrieNode {
 	private final Hashtable<Character, TrieNode> childNodes = new Hashtable<Character, TrieNode>();
 	private char[] replacementSequence = null;
 	private char trig;
@@ -129,18 +131,28 @@ public class UnicodeNormalizationToolkit {
 	}
 	public char[] getReplacementSequence() { return replacementSequence; }
 
-	public String toString() { return "{" + id + "} 0x" + Util.toHexStringBE(trig) + (replacementSequence == null?"":(" -> 0x" + Util.toHexStringBE(replacementSequence))); }
+	public String toString() {
+	    return "{" + id + "} 0x" + Util.toHexStringBE(trig) +
+		(replacementSequence == null?"":(" -> 0x" + Util.toHexStringBE(replacementSequence)));
+	}
     }
 
-    public UnicodeNormalizationToolkit() {
+    private UnicodeNormalizationToolkit() {
 	this(new HashMap<Character, char[]>());
     }
     /** This method can be used in order to tune which Map implementation is used (default is HashMap). */
-    public UnicodeNormalizationToolkit(Map<Character, char[]> decompositionTable) {
+    private UnicodeNormalizationToolkit(Map<Character, char[]> decompositionTable) {
 	this.decompositionTable = decompositionTable;
 	buildDecompositionTable(decompositionTable);
 	this.compositionTrie = buildCompositionTrie(decompositionTable);
 	//checkTrie(compositionTrie);
+    }
+    
+    public static UnicodeNormalizationToolkit getDefaultInstance() {
+	return defaultInstance;
+    }
+    public static UnicodeNormalizationToolkit getCustomInstance(Map<Character, char[]> decompositionTable) {
+	return new UnicodeNormalizationToolkit(decompositionTable);
     }
     
     /**
@@ -221,10 +233,10 @@ public class UnicodeNormalizationToolkit {
     }
     
     /** Throws a RuntimeException if the trie contains non-leaf nodes with replacement sequences. */
-    public void checkTrie(TrieNode root) {
+    private void checkTrie(TrieNode root) {
 	checkTrie(root, "  ");
     }
-    public void checkTrie(TrieNode root, String prefix) {
+    private void checkTrie(TrieNode root, String prefix) {
 	Collection<TrieNode> children = root.getChildren();
 	//if(children.size() > 0 && root.getReplacementSequence() != null)
 	    //throw new RuntimeException("Inconsistent trie.");

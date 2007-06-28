@@ -57,10 +57,18 @@ public class HFSUniStr255 {
     public int length() { return 2+unicode.length; }
     
     public short getLength() { return Util.readShortBE(length); }
+    
+    /** This is a char for char representation of what data is in the actual file system. The string will
+	(if the filesystem is valid) be in decomposed form, as the HFS+ volume format requires. */
     public char[] getUnicode() { return Util2.readCharArrayBE(unicode); }
-    public String getUnicodeAsString() { return new String(getUnicode()); }
-    public String getUnicodeAsComposedString(UnicodeNormalizationToolkit toolkit) {
-	return toolkit.compose(getUnicodeAsString());
+    
+    /** A simple conversion of the decomposed string from getUnicode() into a String object. */
+    public String getUnicodeAsDecomposedString() { return new String(getUnicode()); }
+    
+    /** Returns a composed string that will differ from the decomposed string whenever the decomposed
+	string contains decomposed characters. In these cases it will be shorter than the decomposed string */
+    public String getUnicodeAsComposedString() {
+	return UnicodeNormalizationToolkit.getDefaultInstance().compose(getUnicodeAsDecomposedString());
     }
     
     public byte[] getData() {
@@ -72,7 +80,8 @@ public class HFSUniStr255 {
     
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " length: " + Util2.unsign(getLength()));
-	ps.println(prefix + " unicode: \"" + getUnicodeAsString() + "\"");
+	ps.println(prefix + " unicode (decomposed): \"" + getUnicodeAsDecomposedString() + "\"");
+	ps.println(prefix + "           (composed): \"" + getUnicodeAsComposedString() + "\"");
     }
     
     public void print(PrintStream ps, String prefix) {
@@ -81,6 +90,6 @@ public class HFSUniStr255 {
     }
 
     public String toString() {
-	return getUnicodeAsString();
+	return getUnicodeAsComposedString();
     }
 }

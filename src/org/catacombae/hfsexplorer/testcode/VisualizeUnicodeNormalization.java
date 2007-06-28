@@ -13,7 +13,7 @@ public class VisualizeUnicodeNormalization extends JFrame {
 	mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 	mainPanelScroller.getVerticalScrollBar().setUnitIncrement(20);
 	
-	UnicodeNormalizationToolkit unt = new UnicodeNormalizationToolkit();
+	UnicodeNormalizationToolkit unt = UnicodeNormalizationToolkit.getDefaultInstance();
 	Map<Character, char[]> table = unt.getDecompositionTable();
 	
 	StringBuilder sb = new StringBuilder();

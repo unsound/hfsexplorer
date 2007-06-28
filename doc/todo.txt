@@ -3,12 +3,8 @@ HFSExplorer TODO:
 - All in bugs.txt
 - Valence of a folder should be read immediatly after expansion so that the user
   doesn't have to click it to see if it contains any children.
-- I need to figure out how to add actions to double-clicks and right-clicks in the
-  table and in the tree.
 - Figure out how to catch mouse clicks in a JTableHeader, so I can sort like
   Windows Explorer does.
-- Implement a composition algorithm, that converts the decomposed name strings into
-  standard Unicode ones.
 - Figure out how to remove the grey background in the table...
 - Make autodetect in windows dialog capable of autodetecting partitioning systems.
   Otherwise iPod-users and users of Mac-formatted hard drives will suffer.
@@ -16,3 +12,6 @@ HFSExplorer TODO:
   internal console window, in case we start HFSExplorer without a text console.
 - Create an indeterminate progress monitor window for when opening DMG files
   (reading their structures) takes a long time.
+- Add an option to rename a file if its filename can't be created in the current
+  operating system. Also add a "skip all" option to supress further such messages,
+  and an "auto-rename" option, if an algorithm can be found for that.
