@@ -797,8 +797,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	aboutItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
 		    String message = "";
-		    message += "HFSExplorer " + HFSExplorer.VERSION + "\n";
-		    //message += "Build #" + BuildNumber.BUILD_NUMBER + "\n";
+		    message += "HFSExplorer " + HFSExplorer.VERSION + " Build #" + BuildNumber.BUILD_NUMBER + "\n";
 		    message += HFSExplorer.COPYRIGHT + "\n";
  		    for(String notice : HFSExplorer.NOTICES) {
  			message += notice + "\n";

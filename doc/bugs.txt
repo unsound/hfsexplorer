@@ -13,16 +13,3 @@
   UPDATE: Can't reproduce this bug, everything seems fine.
 - Double-clicking a file in the right pane to enter a new directory
   takes more time than clicking it in the left pane. Why?
-
-2007-06-28
-----------
-- When creating a file in the extract process, HFSExplorer does not
-  check if the created file is in the right directory. If a file
-  contains characters like '/' or '\', the OS might interpret it as
-  a directory containing a file, and that directory will then be
-  created. Basically File.getName() and File.getParent() will show
-  if this condition is met.
-  Example: a file in an HFS+ FS is called "AdobeCS3\Clean.log".
-  When it is extracted to a Windows system, a directory called
-  "AdobeCS3" will be created with a file in it called "Clean.log".
-  	 

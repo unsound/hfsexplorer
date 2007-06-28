@@ -738,7 +738,7 @@ public class HFSExplorer {
     public static void printUsageInfo() {
 	// For measurement of the de facto standard terminal width in fixed width environments:
 	// 79:  <------------------------------------------------------------------------------->
-	println("HFSExplorer v" + VERSION);
+	println("HFSExplorer v" + VERSION + " Build #" + BuildNumber.BUILD_NUMBER);
 	println(COPYRIGHT);
 	println("  displays information about an HFS filesystem.");
 	println("  usage: java HFSExplorer [common options] <verb> [verb options] <file/device>");
