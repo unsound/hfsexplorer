@@ -1662,6 +1662,8 @@ public class FileSystemBrowserWindow extends JFrame {
 	    //progressDialog.updateTotalProgress(fractionLowLimit);
 	    File outFile = new File(outDir, filename);
 	    try {
+		if(!outFile.getParentFile().equals(outDir) || !outFile.getName().equals(filename))
+		    throw new FileNotFoundException();
 		FileOutputStream fos = new FileOutputStream(outFile);
 		fsView.extractDataForkToStream(rec, fos);
 		fos.close();
@@ -1674,12 +1676,31 @@ public class FileSystemBrowserWindow extends JFrame {
 		System.out.print("  0x");
 		for(char c : filenameChars) System.out.print(" " + Util.toHexStringBE(c));
 		System.out.println();
-		int reply = JOptionPane.showConfirmDialog(this, "Could not create file \"" + filename +
-							  "\" in folder:\n  " + outDir.getAbsolutePath() + "\n" +
-							  "Do you want to continue? (The file will be skipped)",
-							  "Error", JOptionPane.YES_NO_OPTION,
-							  JOptionPane.ERROR_MESSAGE);
-		if(reply == JOptionPane.NO_OPTION)
+
+		String[] options = new String[] { "Yes", "No", "Rename" };
+// 		JOptionPane jop = new JOptionPane("Could not create file \"" + filename +
+// 						  "\" in folder:\n  " + outDir.getAbsolutePath() + "\n" +
+// 						  "Do you want to continue? (The file will be skipped)",
+// 						  JOptionPane.ERROR_MESSAGE, JOptionPane.DEFAULT_OPTION,
+// 						  options, options[0]);
+// 		jop.createDialog(this, "Error");
+// 		int reply = JOptionPane.showConfirmDialog(this, "Could not create file \"" + filename +
+// 							  "\" in folder:\n  " + outDir.getAbsolutePath() + "\n" +
+// 							  "Do you want to continue? (The file will be skipped)",
+// 							  "Error", JOptionPane.YES_NO_OPTION,
+// 							  JOptionPane.ERROR_MESSAGE);
+		int reply = JOptionPane.showOptionDialog(this, "Could not create file \"" + filename +
+							 "\" in folder:\n  " + outDir.getAbsolutePath() + "\n" +
+							 "Do you want to continue? (The file will be skipped)",
+							 "Error", JOptionPane.YES_NO_CANCEL_OPTION,
+							 JOptionPane.ERROR_MESSAGE, null, options, options[0]);
+		System.out.println("New optionDialog returned: " + reply);
+		System.out.println("YES_OPTION: \"" + JOptionPane.YES_OPTION + "\"");
+		System.out.println("NO_OPTION: \"" + JOptionPane.NO_OPTION + "\"");
+		System.out.println("CANCEL_OPTION: \"" + JOptionPane.CANCEL_OPTION + "\"");
+		System.out.println("CLOSED_OPTION: \"" + JOptionPane.CLOSED_OPTION + "\"");
+		//System.out.println("_OPTION: \"" + JOptionPane._OPTION + "\"");
+		//if(reply == JOptionPane.NO_OPTION)
 		    progressDialog.signalCancel();
 		++errorCount;
 	    } catch(IOException ioe) {

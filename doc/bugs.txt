@@ -8,8 +8,9 @@
 
 2007-06-27
 ----------
-- Discovered that the dates are incorrect... need to revise the date
-  calculation mechanism...
+- INVALID? Discovered that the dates are incorrect... need to
+  revise the date calculation mechanism...
+  UPDATE: Can't reproduce this bug, everything seems fine.
 - Double-clicking a file in the right pane to enter a new directory
   takes more time than clicking it in the left pane. Why?
 
