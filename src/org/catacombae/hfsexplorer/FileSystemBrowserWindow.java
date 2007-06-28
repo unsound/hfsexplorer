@@ -1347,139 +1347,139 @@ public class FileSystemBrowserWindow extends JFrame {
 	//fileChooser.setCurrentDirectory(fileChooser.getCurrentDirectory());
     }
     
-    private void old_actionExtractToDir() {
-	if(dirTreeLastFocus > fileTableLastFocus) {
-	    Object o = dirTree.getLastSelectedPathComponent();
-	    //System.err.println(o.toString());
-	    if(o == null) {
-		JOptionPane.showMessageDialog(this, "No file or folder selected.",
-					      "Information", JOptionPane.INFORMATION_MESSAGE);
-	    }
-	    else if(o instanceof DefaultMutableTreeNode) {
-		Object o2 = ((DefaultMutableTreeNode)o).getUserObject();
-		if(o2 instanceof RecordNodeStorage) {
-		    final HFSPlusCatalogLeafRecord rec = ((RecordNodeStorage)o2).getRecord();
-		    //System.err.println(rec.toString());
-		    fileChooser.setMultiSelectionEnabled(false);
-		    fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		    fileChooser.setSelectedFiles(new File[0]);
-		    if(fileChooser.showDialog(FileSystemBrowserWindow.this, "Extract here") == JFileChooser.APPROVE_OPTION) {
-			final File outDir = fileChooser.getSelectedFile();
-			final ExtractProgressDialog progress = new ExtractProgressDialog(this);
-			Runnable r = new Runnable() {
-				public void run() {
-				    progress.setDataSize(calculateDataForkSizeRecursive(rec));
-				    int errorCount = extract(rec, outDir, progress);
-				    if(!progress.cancelSignaled()) {
-					if(errorCount == 0)
-					    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-									  "Extraction finished.\n",
-									  "Information",
-									  JOptionPane.INFORMATION_MESSAGE);
-					else
-					    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-									  errorCount + " errors were encountered " +
-									  "during the extraction.\n",
-									  "Information",
-									  JOptionPane.WARNING_MESSAGE);
-				    }
-				    else
-					JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-								      "Extraction was aborted.\n" +
-								      "Please remove the extracted files " +
-								      "manually.\n",
-								      "Aborted extraction",
-								      JOptionPane.WARNING_MESSAGE);
-				    progress.setVisible(false);
-				}
-			    };
-			new Thread(r).start();
-			progress.setVisible(true);
-		    }
-		}
-		else
-		   JOptionPane.showMessageDialog(this, "Unexpected data in tree user object. (Internal error, report to developer)" + "\nClass: " + o.getClass().toString(),
-						 "Error", JOptionPane.ERROR_MESSAGE); 
-	    }
-	    else
-		JOptionPane.showMessageDialog(this, "Unexpected data in tree model. (Internal error, report to developer)" + "\nClass: " + o.getClass().toString(),
-					      "Error", JOptionPane.ERROR_MESSAGE);
-	}
-	else {
-	    int[] selectedRows = fileTable.getSelectedRows();
-	    if(selectedRows.length == 0) {
-		JOptionPane.showMessageDialog(this, "No file or folder selected.",
-					      "Error", JOptionPane.ERROR_MESSAGE);
-		return;
-	    }
-	    else {
-		// There is trouble with this approach in OS X... we don't get a proper DIRECTORIES_ONLY dialog. One idea is to use java.awt.FileDialog and see if it works better. (probably not)
-		//java.awt.FileDialog fd = new java.awt.FileDialog(FileSystemBrowserWindow.this, "Extract here", SAVE);
-		//File oldDir = fileChooser.getCurrentDirectory();
-		//JFileChooser fileChooser2 = new JFileChooser();
-		//fileChooser.setCurrentDirectory(oldDir);
-		fileChooser.setMultiSelectionEnabled(false);
-		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		//System.err.println("curdir: " + fileChooser.getCurrentDirectory());
-		//fileChooser.setSelectedFiles(new File[0]);
-		//fileChooser.setCurrentDirectory(fileChooser.getCurrentDirectory());
+//     private void old_actionExtractToDir() {
+// 	if(dirTreeLastFocus > fileTableLastFocus) {
+// 	    Object o = dirTree.getLastSelectedPathComponent();
+// 	    //System.err.println(o.toString());
+// 	    if(o == null) {
+// 		JOptionPane.showMessageDialog(this, "No file or folder selected.",
+// 					      "Information", JOptionPane.INFORMATION_MESSAGE);
+// 	    }
+// 	    else if(o instanceof DefaultMutableTreeNode) {
+// 		Object o2 = ((DefaultMutableTreeNode)o).getUserObject();
+// 		if(o2 instanceof RecordNodeStorage) {
+// 		    final HFSPlusCatalogLeafRecord rec = ((RecordNodeStorage)o2).getRecord();
+// 		    //System.err.println(rec.toString());
+// 		    fileChooser.setMultiSelectionEnabled(false);
+// 		    fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+// 		    fileChooser.setSelectedFiles(new File[0]);
+// 		    if(fileChooser.showDialog(FileSystemBrowserWindow.this, "Extract here") == JFileChooser.APPROVE_OPTION) {
+// 			final File outDir = fileChooser.getSelectedFile();
+// 			final ExtractProgressDialog progress = new ExtractProgressDialog(this);
+// 			Runnable r = new Runnable() {
+// 				public void run() {
+// 				    progress.setDataSize(calculateDataForkSizeRecursive(rec));
+// 				    int errorCount = extract(rec, outDir, progress);
+// 				    if(!progress.cancelSignaled()) {
+// 					if(errorCount == 0)
+// 					    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+// 									  "Extraction finished.\n",
+// 									  "Information",
+// 									  JOptionPane.INFORMATION_MESSAGE);
+// 					else
+// 					    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+// 									  errorCount + " errors were encountered " +
+// 									  "during the extraction.\n",
+// 									  "Information",
+// 									  JOptionPane.WARNING_MESSAGE);
+// 				    }
+// 				    else
+// 					JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+// 								      "Extraction was aborted.\n" +
+// 								      "Please remove the extracted files " +
+// 								      "manually.\n",
+// 								      "Aborted extraction",
+// 								      JOptionPane.WARNING_MESSAGE);
+// 				    progress.setVisible(false);
+// 				}
+// 			    };
+// 			new Thread(r).start();
+// 			progress.setVisible(true);
+// 		    }
+// 		}
+// 		else
+// 		   JOptionPane.showMessageDialog(this, "Unexpected data in tree user object. (Internal error, report to developer)" + "\nClass: " + o.getClass().toString(),
+// 						 "Error", JOptionPane.ERROR_MESSAGE); 
+// 	    }
+// 	    else
+// 		JOptionPane.showMessageDialog(this, "Unexpected data in tree model. (Internal error, report to developer)" + "\nClass: " + o.getClass().toString(),
+// 					      "Error", JOptionPane.ERROR_MESSAGE);
+// 	}
+// 	else {
+// 	    int[] selectedRows = fileTable.getSelectedRows();
+// 	    if(selectedRows.length == 0) {
+// 		JOptionPane.showMessageDialog(this, "No file or folder selected.",
+// 					      "Error", JOptionPane.ERROR_MESSAGE);
+// 		return;
+// 	    }
+// 	    else {
+// 		// There is trouble with this approach in OS X... we don't get a proper DIRECTORIES_ONLY dialog. One idea is to use java.awt.FileDialog and see if it works better. (probably not)
+// 		//java.awt.FileDialog fd = new java.awt.FileDialog(FileSystemBrowserWindow.this, "Extract here", SAVE);
+// 		//File oldDir = fileChooser.getCurrentDirectory();
+// 		//JFileChooser fileChooser2 = new JFileChooser();
+// 		//fileChooser.setCurrentDirectory(oldDir);
+// 		fileChooser.setMultiSelectionEnabled(false);
+// 		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+// 		//System.err.println("curdir: " + fileChooser.getCurrentDirectory());
+// 		//fileChooser.setSelectedFiles(new File[0]);
+// 		//fileChooser.setCurrentDirectory(fileChooser.getCurrentDirectory());
 
-		if(fileChooser.showDialog(FileSystemBrowserWindow.this, "Extract here") == JFileChooser.APPROVE_OPTION) {
-		    final File outDir = fileChooser.getSelectedFile();
+// 		if(fileChooser.showDialog(FileSystemBrowserWindow.this, "Extract here") == JFileChooser.APPROVE_OPTION) {
+// 		    final File outDir = fileChooser.getSelectedFile();
 		    
-		    // Gather all selected records
-		    final HFSPlusCatalogLeafRecord[] selectedRecords = new HFSPlusCatalogLeafRecord[selectedRows.length];
-		    for(int i = 0; i < selectedRows.length; ++i) {
-			int selectedRow = selectedRows[i];
-			Object o = tableModel.getValueAt(selectedRow, 0);
-			HFSPlusCatalogLeafRecord rec;
-			HFSPlusCatalogLeafRecordData recData;
-			if(o instanceof RecordContainer) {
-			    rec = ((RecordContainer)o).getRecord();
-			    selectedRecords[i] = rec;
-			}
-			else {
-			    JOptionPane.showMessageDialog(this, "Unexpected data in table model. (Internal error, report to developer)",
-							  "Error", JOptionPane.ERROR_MESSAGE);
-			    return;
-			}
-		    }
+// 		    // Gather all selected records
+// 		    final HFSPlusCatalogLeafRecord[] selectedRecords = new HFSPlusCatalogLeafRecord[selectedRows.length];
+// 		    for(int i = 0; i < selectedRows.length; ++i) {
+// 			int selectedRow = selectedRows[i];
+// 			Object o = tableModel.getValueAt(selectedRow, 0);
+// 			HFSPlusCatalogLeafRecord rec;
+// 			HFSPlusCatalogLeafRecordData recData;
+// 			if(o instanceof RecordContainer) {
+// 			    rec = ((RecordContainer)o).getRecord();
+// 			    selectedRecords[i] = rec;
+// 			}
+// 			else {
+// 			    JOptionPane.showMessageDialog(this, "Unexpected data in table model. (Internal error, report to developer)",
+// 							  "Error", JOptionPane.ERROR_MESSAGE);
+// 			    return;
+// 			}
+// 		    }
 		    
-		    // Extract
-		    final ExtractProgressDialog progress = new ExtractProgressDialog(this);
-		    Runnable r = new Runnable() {
-			    public void run() {
-				progress.setDataSize(calculateDataForkSizeRecursive(selectedRecords));
-				int errorCount = extract(selectedRecords, outDir, progress);
-				if(!progress.cancelSignaled()) {
-				    if(errorCount == 0)
-					JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-								      "Extraction finished.\n",
-								      "Information",
-								      JOptionPane.INFORMATION_MESSAGE);
-				    else
-					JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-								      errorCount + " errors were encountered " +
-								      "during the extraction.\n",
-								      "Information",
-								      JOptionPane.WARNING_MESSAGE);
-				}
-				else
-				    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-								  "Extraction was aborted.\n" +
-								  "Please remove the extracted files " +
-								  "manually.\n",
-								  "Aborted extraction",
-								  JOptionPane.WARNING_MESSAGE);
-				progress.setVisible(false);
-			    }
-			};
-		    new Thread(r).start();
-		    progress.setVisible(true);
-		}
-	    }
-	}
-    }
+// 		    // Extract
+// 		    final ExtractProgressDialog progress = new ExtractProgressDialog(this);
+// 		    Runnable r = new Runnable() {
+// 			    public void run() {
+// 				progress.setDataSize(calculateDataForkSizeRecursive(selectedRecords));
+// 				int errorCount = extract(selectedRecords, outDir, progress);
+// 				if(!progress.cancelSignaled()) {
+// 				    if(errorCount == 0)
+// 					JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+// 								      "Extraction finished.\n",
+// 								      "Information",
+// 								      JOptionPane.INFORMATION_MESSAGE);
+// 				    else
+// 					JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+// 								      errorCount + " errors were encountered " +
+// 								      "during the extraction.\n",
+// 								      "Information",
+// 								      JOptionPane.WARNING_MESSAGE);
+// 				}
+// 				else
+// 				    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+// 								  "Extraction was aborted.\n" +
+// 								  "Please remove the extracted files " +
+// 								  "manually.\n",
+// 								  "Aborted extraction",
+// 								  JOptionPane.WARNING_MESSAGE);
+// 				progress.setVisible(false);
+// 			    }
+// 			};
+// 		    new Thread(r).start();
+// 		    progress.setVisible(true);
+// 		}
+// 	    }
+// 	}
+//     }
     
     private void actionGetInfo() {
 	HFSPlusCatalogLeafRecord rec = null;
@@ -1657,79 +1657,95 @@ public class FileSystemBrowserWindow extends JFrame {
 	if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
 	   recData instanceof HFSPlusCatalogFile) {
 	    String filename = rec.getKey().getNodeName().getUnicodeAsComposedString();
-	    //System.out.println("file: \"" + filename + "\" range: " + fractionLowLimit + "-" + fractionHighLimit);
-	    progressDialog.updateCurrentFile(filename);
-	    //progressDialog.updateTotalProgress(fractionLowLimit);
-	    File outFile = new File(outDir, filename);
-	    try {
-		if(!outFile.getParentFile().equals(outDir) || !outFile.getName().equals(filename))
-		    throw new FileNotFoundException();
-		FileOutputStream fos = new FileOutputStream(outFile);
-		fsView.extractDataForkToStream(rec, fos);
-		fos.close();
-		//JOptionPane.showMessageDialog(this, "The file was successfully extracted!\n",
-		//			  "Extraction complete!", JOptionPane.INFORMATION_MESSAGE);
-	    } catch(FileNotFoundException fnfe) {
-		fnfe.printStackTrace();
-		char[] filenameChars = filename.toCharArray();
-		System.out.println("Filename in hex (" + filenameChars.length + " UTF-16 characters):");
-		System.out.print("  0x");
-		for(char c : filenameChars) System.out.print(" " + Util.toHexStringBE(c));
-		System.out.println();
+	    while(true) {
+		//System.out.println("file: \"" + filename + "\" range: " + fractionLowLimit + "-" + fractionHighLimit);
+		progressDialog.updateCurrentFile(filename);
+		//progressDialog.updateTotalProgress(fractionLowLimit);
+		File outFile = new File(outDir, filename);
+		try {
+		    try {
+			PrintStream p = System.out;
+			File f = outFile;
+			p.println("Printing some information about the output file: ");
+			p.println("f.getParent(): \"" + f.getParent() + "\"");
+			p.println("f.getName(): \"" + f.getName() + "\"");
+			p.println("f.getAbsolutePath(): \"" + f.getAbsolutePath() + "\"");
+			p.println("f.exists(): \"" + f.exists() + "\"");
+			p.println("f.getCanonicalPath(): \"" + f.getCanonicalPath() + "\"");
+			//p.println("f.getParent(): \"" + f.getParent() + "\"");
+		    } catch(Exception e) { e.printStackTrace(); }
 
-		String[] options = new String[] { "Yes", "No", "Rename" };
-// 		JOptionPane jop = new JOptionPane("Could not create file \"" + filename +
-// 						  "\" in folder:\n  " + outDir.getAbsolutePath() + "\n" +
-// 						  "Do you want to continue? (The file will be skipped)",
-// 						  JOptionPane.ERROR_MESSAGE, JOptionPane.DEFAULT_OPTION,
-// 						  options, options[0]);
-// 		jop.createDialog(this, "Error");
-// 		int reply = JOptionPane.showConfirmDialog(this, "Could not create file \"" + filename +
-// 							  "\" in folder:\n  " + outDir.getAbsolutePath() + "\n" +
-// 							  "Do you want to continue? (The file will be skipped)",
-// 							  "Error", JOptionPane.YES_NO_OPTION,
-// 							  JOptionPane.ERROR_MESSAGE);
-		int reply = JOptionPane.showOptionDialog(this, "Could not create file \"" + filename +
-							 "\" in folder:\n  " + outDir.getAbsolutePath() + "\n" +
-							 "Do you want to continue? (The file will be skipped)",
-							 "Error", JOptionPane.YES_NO_CANCEL_OPTION,
-							 JOptionPane.ERROR_MESSAGE, null, options, options[0]);
-		System.out.println("New optionDialog returned: " + reply);
-		System.out.println("YES_OPTION: \"" + JOptionPane.YES_OPTION + "\"");
-		System.out.println("NO_OPTION: \"" + JOptionPane.NO_OPTION + "\"");
-		System.out.println("CANCEL_OPTION: \"" + JOptionPane.CANCEL_OPTION + "\"");
-		System.out.println("CLOSED_OPTION: \"" + JOptionPane.CLOSED_OPTION + "\"");
-		//System.out.println("_OPTION: \"" + JOptionPane._OPTION + "\"");
-		//if(reply == JOptionPane.NO_OPTION)
-		    progressDialog.signalCancel();
-		++errorCount;
-	    } catch(IOException ioe) {
-		String msg = ioe.getMessage();
-		int reply = JOptionPane.showConfirmDialog(this, "Could not write to file \"" + filename + 
-							  "\" under folder:\n  " + outDir.getAbsolutePath() +
-							  (msg!=null?"\nSystem message: \"" + msg + "\"":"") +
-							  "\nDo you want to continue?",
-							  "I/O Error", JOptionPane.YES_NO_OPTION,
-							  JOptionPane.ERROR_MESSAGE);
-		if(reply == JOptionPane.NO_OPTION)
-		    progressDialog.signalCancel();
-		++errorCount;
-	    } catch(Exception e) {
-		e.printStackTrace();
-		String message = "An exception occurred while extracting \"" + filename + "\"!";
-		message += "\n  " + e.toString();
-		for(StackTraceElement ste : e.getStackTrace())
-		    message += "\n    " + ste.toString();
-		message += "\n\nThe file has probably not been extracted.";
-		int reply = JOptionPane.showConfirmDialog(this, message +
-							  "\nDo you want to continue with the extraction?",
-							  "Error", JOptionPane.YES_NO_OPTION,
-							  JOptionPane.ERROR_MESSAGE);
-		if(reply == JOptionPane.NO_OPTION)
-		    progressDialog.signalCancel();
-		++errorCount;
+		    try { outFile.getCanonicalPath(); } catch(Exception e) { throw new FileNotFoundException(); }
+		    
+		    if(!outFile.getParentFile().equals(outDir) || !outFile.getName().equals(filename))
+			throw new FileNotFoundException();
+		    FileOutputStream fos = new FileOutputStream(outFile);
+		    fsView.extractDataForkToStream(rec, fos);
+		    fos.close();
+		    //JOptionPane.showMessageDialog(this, "The file was successfully extracted!\n",
+		    //			  "Extraction complete!", JOptionPane.INFORMATION_MESSAGE);
+		} catch(FileNotFoundException fnfe) {
+		    fnfe.printStackTrace();
+		    char[] filenameChars = filename.toCharArray();
+		    System.out.println("Filename in hex (" + filenameChars.length + " UTF-16 characters):");
+		    System.out.print("  0x");
+		    for(char c : filenameChars) System.out.print(" " + Util.toHexStringBE(c));
+		    System.out.println();
+		    
+		    String[] options = new String[] { "Skip file and continue", "Cancel", "Rename file" };
+		    int reply = JOptionPane.showOptionDialog(this, "Could not create file \"" + filename +
+							     "\" in folder:\n  " + outDir.getAbsolutePath() + "\n" //+
+							     /*"Do you want to continue? (The file will be skipped)"*/,
+							     "Error", JOptionPane.YES_NO_CANCEL_OPTION,
+							     JOptionPane.ERROR_MESSAGE, null, options, options[0]);
+// 		    System.out.println("New optionDialog returned: " + reply);
+// 		    System.out.println("YES_OPTION: \"" + JOptionPane.YES_OPTION + "\"");
+// 		    System.out.println("NO_OPTION: \"" + JOptionPane.NO_OPTION + "\"");
+// 		    System.out.println("CANCEL_OPTION: \"" + JOptionPane.CANCEL_OPTION + "\"");
+// 		    System.out.println("CLOSED_OPTION: \"" + JOptionPane.CLOSED_OPTION + "\"");
+		    //System.out.println("_OPTION: \"" + JOptionPane._OPTION + "\"");
+		    
+		    if(reply == 0) {
+			++errorCount;
+		    }
+		    else if(reply == 2) {
+			filename = JOptionPane.showInputDialog(this, "Enter the new filename:", filename);
+			continue;
+		    }
+		    else {
+			++errorCount;
+			progressDialog.signalCancel();
+		    }
+		    
+		} catch(IOException ioe) {
+		    String msg = ioe.getMessage();
+		    int reply = JOptionPane.showConfirmDialog(this, "Could not write to file \"" + filename + 
+							      "\" under folder:\n  " + outDir.getAbsolutePath() +
+							      (msg!=null?"\nSystem message: \"" + msg + "\"":"") +
+							      "\nDo you want to continue?",
+							      "I/O Error", JOptionPane.YES_NO_OPTION,
+							      JOptionPane.ERROR_MESSAGE);
+		    ++errorCount;
+		    if(reply == JOptionPane.NO_OPTION)
+			progressDialog.signalCancel();
+		} catch(Exception e) {
+		    e.printStackTrace();
+		    String message = "An exception occurred while extracting \"" + filename + "\"!";
+		    message += "\n  " + e.toString();
+		    for(StackTraceElement ste : e.getStackTrace())
+			message += "\n    " + ste.toString();
+		    message += "\n\nThe file has probably not been extracted.";
+		    int reply = JOptionPane.showConfirmDialog(this, message +
+							      "\nDo you want to continue with the extraction?",
+							      "Error", JOptionPane.YES_NO_OPTION,
+							      JOptionPane.ERROR_MESSAGE);
+		    ++errorCount;
+		    if(reply == JOptionPane.NO_OPTION)
+			progressDialog.signalCancel();
+		}
+		progressDialog.addDataProgress(((HFSPlusCatalogFile)recData).getDataFork().getLogicalSize());
+		break;
 	    }
-	    progressDialog.addDataProgress(((HFSPlusCatalogFile)recData).getDataFork().getLogicalSize());
 	}
 	else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
 		recData instanceof HFSPlusCatalogFolder) {
