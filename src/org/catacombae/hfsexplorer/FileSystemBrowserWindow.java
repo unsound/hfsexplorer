@@ -24,7 +24,6 @@ import org.catacombae.hfsexplorer.partitioning.*;
 import org.catacombae.hfsexplorer.types.*;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
 import org.catacombae.hfsexplorer.gui.*;
-import com.apple.eawt.*;
 import java.util.*;
 import java.io.*;
 import java.net.URL;
@@ -724,13 +723,12 @@ public class FileSystemBrowserWindow extends JFrame {
 								  Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         }
         else {
-	    Application thisApplication = Application.getApplication();
-	    thisApplication.addApplicationListener(new ApplicationAdapter() {
-		    public void handleQuit(ApplicationEvent ae) {
+	    MacSpecific.registerQuitHandler(new MacSpecific.QuitHandler() {
+		    public boolean acceptQuit() {
 			exitApplication();
-			ae.setHandled(false); // Prevents the application from exiting in case exitApplication returns
+			return false;
 		    }
-                });
+		});
         }
     
 	JMenuItem fsInfoItem = new JMenuItem("File system info");
@@ -1219,56 +1217,47 @@ public class FileSystemBrowserWindow extends JFrame {
 	fopFrame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 	
 	ActionListener alOpen = null;
-	String[] command = null;
-	if(System.getProperty("os.name").toLowerCase().startsWith("windows")) {
-	    System.err.println("Windows detected.");
-	    command = new String[] { rec.getKey().getNodeName().toString() };
+	if(System.getProperty("java.vm.version").compareTo("1.6") >= 0 && Java6Specific.canOpen()) {
+	    //System.err.println("Java 1.6 detected.");
+	    alOpen = new ActionListener() {
+		    public void actionPerformed(ActionEvent ae) {
+			File tempDir = new File(System.getProperty("java.io.tmpdir"));
+			if(extract(rec, tempDir, NullProgressMonitor.getInstance()) == 0) {
+			    File extractedFile = new File(tempDir, rec.getKey().getNodeName().toString());
+			    tempFiles.add(new File(tempDir, rec.getKey().getNodeName().toString()));
+			    try {
+				Java6Specific.openFile(extractedFile);
+				fopFrame.dispose();
+			    } catch(Exception e) {
+				String stackTrace = e.toString() + "\n";
+				for(StackTraceElement ste : e.getStackTrace()) stackTrace += "    " + ste.toString() + "\n";
+				JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "Open failed. Exception caught:\n" +
+							      stackTrace,
+							      "Error", JOptionPane.ERROR_MESSAGE);
+			    }
+			}
+		    }
+		};
+	    
 	}
 	else if(System.getProperty("os.name").toLowerCase().startsWith("mac os x")) {
-	    System.err.println("OS X detected");
-	    command = new String[] { "open", rec.getKey().getNodeName().toString() };
-	}
-	
-	if(command != null) {
-	    final String[] finalCommand = command;
+	    //System.err.println("OS X detected");
+	    final String[] finalCommand = new String[] { "open", rec.getKey().getNodeName().toString() };
 	    alOpen = new ActionListener() {
 		    public void actionPerformed(ActionEvent ae) {
 			File tempDir = new File(System.getProperty("java.io.tmpdir"));
 			if(extract(rec, tempDir, NullProgressMonitor.getInstance()) == 0) {
 			    tempFiles.add(new File(tempDir, rec.getKey().getNodeName().toString()));
 			    try {
-				System.err.print("Trying to execute:");
-				for(String s : finalCommand)
-				    System.err.print(" \"" + s + "\"");
-				System.err.println(" in directory \"" + tempDir + "\"");
+// 				System.err.print("Trying to execute:");
+// 				for(String s : finalCommand)
+// 				    System.err.print(" \"" + s + "\"");
+// 				System.err.println(" in directory \"" + tempDir + "\"");
 				Process p = Runtime.getRuntime().exec(finalCommand, null, tempDir);
-// 				System.err.println("\nError stream:");
-// 				InputStream is = p.getErrorStream();
-// 				//BufferedReader bufErr = new BufferedReader(new InputStreamReader(is));
-// 				int cur = is.read();
-// 				while(cur >= 0) {
-// 				    System.err.print((char)(cur & 0xFF));
-// 				    cur = is.read();
-// 				}
-// 				is.close();
-// 				System.err.println("\nOutput stream:");
-// 				is = p.getInputStream();
-// 				cur = is.read();
-// 				while(cur >= 0) {
-// 				    System.err.print((char)(cur & 0xFF));
-// 				    cur = is.read();
-// 				}
-// 				is.close();
-// 				int exitCode = p.waitFor();
-// 				if(exitCode != 0) {
-// 				    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "Open failed! Exit code: " +
-// 								  exitCode + "", "Error", JOptionPane.ERROR_MESSAGE);
-// 				}
-// 				else
-				fopFrame.dispose();//setVisible(false);
+				fopFrame.dispose();
 			    } catch(Exception e) {
-				String stackTrace = "";
-				for(StackTraceElement ste : e.getStackTrace()) stackTrace += ste.toString() + "\n";
+				String stackTrace = e.toString() + "\n";
+				for(StackTraceElement ste : e.getStackTrace()) stackTrace += "    " + ste.toString() + "\n";
 				JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "Open failed. Exception caught:\n" +
 							      stackTrace,
 							      "Error", JOptionPane.ERROR_MESSAGE);
@@ -1285,7 +1274,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	ActionListener alSave = new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
 		    actionExtractToDir();
-		    fopFrame.dispose();//setVisible(false);
+		    fopFrame.dispose();
 		}
 	    };
 	FileOperationsPanel fop = new FileOperationsPanel(fopFrame, rec.getKey().getNodeName().toString(),

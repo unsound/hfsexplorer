@@ -5,7 +5,7 @@ pushd %~dp0
 
 set LIBRARY_PATH=%~dp0lib
 set JARFILE=hfsx.jar
-set CLASSPATH="%~dp0build.~";"%~dp0lib\swing-layout-1.0.1.jar";"%~dp0lib\hfsx_dmglib.jar":"%~dp0lib\MRJToolkitStubs.zip"
+set CLASSPATH="%~dp0build.~";"%~dp0lib\swing-layout-1.0.1.jar";"%~dp0lib\hfsx_dmglib.jar";"%~dp0lib\AppleJavaExtensions.jar";"%~dp0lib\java_awt_Desktop.jar"
 set SOURCES_DIR=%~dp0src
 set BUILD_DIR=%~dp0build.~
 set RESOURCE_SRC_DIR=%~dp0resource

@@ -30,13 +30,16 @@ import java.math.BigInteger;
 public class HFSExplorer {
     public static final String VERSION = "0.18pre";
     public static final String COPYRIGHT = "Copyright \u00A9 Erik Larsson 2006-2007";
-    public static final String[] NOTICES = { "This program is distributed under the GNU General Public License version",
-					     "2 or later. See <http://www.gnu.org/copyleft/gpl.html> for the details.",
+    public static final String[] NOTICES = { "This program is distributed under the GNU General Public License version 2.",
+					     "See <http://www.gnu.org/copyleft/gpl.html> for the details.",
 					     "",
 					     "Libraries used:",
-					     "    swing-layout (https://swing-layout.dev.java.net/)",
+					     "    swing-layout <https://swing-layout.dev.java.net/>",
 					     "        Copyright \u00A9 2005-2006 Sun Microsystems, Inc. Licensed under",
-					     "        the Lesser General Public License (http://www.gnu.org/licenses/lgpl.html)" };
+					     "        the Lesser General Public License.",
+					     "        See <http://www.gnu.org/licenses/lgpl.html> for the details.",
+					     "    iHarder Base64 encoder/decoder <http://iharder.sourceforge.net>",
+					     "        Public domain software." };
     public static BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
     private static class Options {
 	public boolean readAPM = false;
