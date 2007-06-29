@@ -11,6 +11,8 @@ HFSExplorer Changelog
   (thanks to Mark Wainwright for the valuable test case)
 - Implemented a Unicode composition algorithm, for those who have been experiencing strange
   filenames whenever there are accents and umlauts in them. (thanks to Wolf Mc Even for info)
+- Improved repsonsiveness and usefulness for the progress dialog displayed when extracting
+  files from the file system.
 - Improved efficiency when reading UDIF disk images (.dmg files). (In some cases probably up to
   a million times faster... ;> ) 
 - Implemented double-clicking in the right pane to browse a directory, or to extract (or open),
