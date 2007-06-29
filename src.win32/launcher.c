@@ -78,7 +78,8 @@
 #include <windows.h>
 #include <tchar.h>
 
-#define START_CLASS_PKGSYNTAX "org.catacombae.hfsexplorer.FileSystemBrowserWindow"
+#define FIRSTARG "-dbgconsole"
+#define START_CLASS_PKGSYNTAX "org.catacombae.hfsexplorer.FileSystemBrowserWindow " FIRSTARG
 #define START_CLASS           "org/catacombae/hfsexplorer/FileSystemBrowserWindow"
 #define USER_CLASSPATH        "lib\\hfsx.jar;lib\\swing-layout-1.0.1.jar;lib\\hfsx_dmglib.jar"
 static int classpathComponentCount = 3;
@@ -546,12 +547,16 @@ int main(int original_argc, char** original_argv) {
 	  DEBUG(_T("    - got String class\n"));
 	
 	  // Create array to hold args
-	  jarray argsArray = (*env)->NewObjectArray(env, argc-1, stringClass, NULL);
+	  jarray argsArray = (*env)->NewObjectArray(env, argc, stringClass, NULL);
 	  DEBUG(_T("    - created args array\n"));
 	  if(argsArray != NULL) {
-	    int i;
-	    for(i = 1; i < argc; ++i) {
-	      _TCHAR *cur = argv[i];
+	    int newi;
+	    for(newi = 0; newi < argc; ++newi) {
+	      _TCHAR *cur;
+	      if(newi == 0) //hack
+		cur = _T(FIRSTARG);
+	      else
+		cur = argv[newi];
 	      int curLength = _tcslen(cur);
 	      WCHAR *wcCur = NULL;
 	      int wcCurLength = -1;
@@ -588,14 +593,14 @@ int main(int original_argc, char** original_argv) {
 		  utf8String[utf8StringLength] = '\0';
 		  fprintf(stderr, "UTF-8 string as ASCII: \"%s\"\n", utf8String);
 		  jstring cur = (*env)->NewStringUTF(env, utf8String);
-		  (*env)->SetObjectArrayElement(env, argsArray, i-1, cur);
+		  (*env)->SetObjectArrayElement(env, argsArray, newi, cur);
 		}
 		else
-		  DEBUG(_T("Failed to convert wcCur (argv[%d]) to UTF-8!\n"), i);
+		  DEBUG(_T("Failed to convert wcCur (argv[%d]) to UTF-8!\n"), newi);
 		free(utf8String);
 	      }
 	      else
-		DEBUG(_T("Failed to convert argv[%d] to WCHAR!\n"), i);
+		DEBUG(_T("Failed to convert argv[%d] to WCHAR!\n"), newi);
 	      free(wcCur);
 	    }
 	  

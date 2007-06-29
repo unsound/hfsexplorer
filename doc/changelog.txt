@@ -1,25 +1,29 @@
 HFSExplorer Changelog
 ---------------------
 
-0.18 (in progress)
+0.18
 ----
-- Fixed a bug in OS X, related to JFileChooser (all in all, JFileChooser seems very buggy in OS
-  X).
-- Fixed a non critical bug with HFSPlusBSDInfo. Apparently some root nodes (CNID 2) have a
-  special value for "file mode", 0x0, not mentioned in POSIX and such specs (not that I have
-  read them) so file info for the root node could not be displayed..
-- Implemented double-clicking in the right pane to browse a directory, or to extract a file.
+- Huge rework of the libraries from DMGExtractor, due to a lot of wasted memory leading to
+  OutOfMemoryError for huge DMG files. Particulary the XML parser has been seriously
+  reconstructed. Tested with an 11 GiB compressed/25 GiB uncompressed UDIF disk image.
+- Fixed a serious bug leading to a lot of files not beeing seen by HFSExplorer (though I didn't
+  notice it myself). Had to do with the algorithm that collected all files in a directory.
+- Improved efficiency when reading UDIF disk images (.dmg files). (In some cases probably up to
+  a million times faster... ;> ) 
+- Implemented double-clicking in the right pane to browse a directory, or to extract (or open),
+  a file.
 - Implemented right-clicking in the left and right pane for bringing up a popup menu. Currently
   the only option is "Information", which brings up the info window.
 - Made the partition choosing dialog default to the first HFS partition found.
-- Fixed a serious bug leading to a lot of files not beeing seen by HFSExplorer (though I didn't
-  notice it myself). Had to do with how the algorithm that collected all files in a directory
-  worked.
-- Huge rework of the libraries from DMGExtractor, due to a lot of wasted memory leading to
-  OutOfMemoryError for huge DMG files. Particulary the XML parser has been seriously
-  reconstructed.
+- Fixed a bug when running the application in OS X, related to JFileChooser (all in all,
+  JFileChooser seems very buggy in OS X).
+- Fixed a non critical bug with HFSPlusBSDInfo. Apparently some root nodes (CNID 2) have a
+  special value for "file mode", 0x0, not mentioned in POSIX and such specs (not that I have
+  read them, but I assume...) so file info for the root node could not be displayed..
 - UI is no longer active while the program loads a file at startup (could be confusing when
   loading large files, where the user might have thought that no operation was in progress)
+- Added a debug console window where all the output from System.out and System.err goes when
+  the application is running in pure windowed mode.
 
 0.17
 ----

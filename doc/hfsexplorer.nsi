@@ -2,7 +2,7 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "HFSExplorer"
-!define PRODUCT_VERSION "0.17"
+!define PRODUCT_VERSION "0.18"
 !define PRODUCT_PUBLISHER "Catacombae Software"
 !define PRODUCT_WEB_SITE "http://hem.bredband.net/catacombae/"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -66,19 +66,18 @@ Section "HFSExplorer" SEC01
   SectionIn RO ; Means that the section is read-only (can't be deselected by the user)
   SetOutPath "$INSTDIR"
   SetOverwrite ifnewer
-  File "gpl.txt"
-  File "..\hfsexplorer.exe"
-  File "..\llio.dll"
-  File "..\runfsb.bat"
-  File "..\runfsb.sh"
-  ;File "..\runfsb_debug.bat"
-  File "..\runfsb_vista.vbs"
-  File "..\hfsx.bat"
-  File "..\hfsx.sh"
+  File "..\dist\gpl.txt"
+  File "..\dist\hfsexplorer.exe"
+  File "..\dist\llio.dll"
+  File "..\dist\runfsb.bat"
+  File "..\dist\runfsb.sh"
+  File "..\dist\runfsb_vista.vbs"
+  File "..\dist\hfsx.bat"
+  File "..\dist\hfsx.sh"
+  File "..\dist\dmg.ico"
   SetOutPath "$INSTDIR\lib"
   SetOverwrite ifnewer
-  ;File /r "..\release\release\*.*"
-  File "..\lib\*.jar"
+  File "..\dist\lib\*.jar"
 
   ; Shortcuts
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
@@ -103,7 +102,7 @@ Section "Register .dmg file association" SEC02
   !define FILE_EXTENSION ".dmg"
   !define PROGRAM_EXTENSION_ID "CatacombaeHFSExplorer.DMGFile"
   !define WINDOWS_DESCRIPTION ".dmg Disk image"
-  !define ICON_FILE "$INSTDIR\hfsexplorer.exe,0"
+  !define ICON_FILE "$INSTDIR\dmg.ico,0"
   !define OPEN_COMMAND '$INSTDIR\hfsexplorer.exe "%1"'
   
   !define Index "Line${__LINE__}"

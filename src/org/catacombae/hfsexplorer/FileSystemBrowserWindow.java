@@ -128,6 +128,9 @@ public class FileSystemBrowserWindow extends JFrame {
     }
     
     public FileSystemBrowserWindow() {
+	this(null);
+    }
+    public FileSystemBrowserWindow(final DebugConsoleWindow dcw) {
 	super(TITLE_STRING);
 	fsbPanel = new FilesystemBrowserPanel();
 	fileTable = fsbPanel.fileTable;
@@ -711,6 +714,17 @@ public class FileSystemBrowserWindow extends JFrame {
 	    });
 	openUDIFItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 	
+	JMenuItem debugConsoleItem = null;
+	if(dcw != null) {
+	    debugConsoleItem = new JMenuItem("Debug console");
+	    debugConsoleItem.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent ae) {
+			dcw.setVisible(true);
+		    }
+		});
+	    
+	}
+	
 	JMenuItem exitProgramItem = null;
 	if(!System.getProperty("os.name").toLowerCase().startsWith("mac os x")) {
 	    exitProgramItem = new JMenuItem("Exit");
@@ -819,6 +833,8 @@ public class FileSystemBrowserWindow extends JFrame {
 	    fileMenu.add(loadFSFromDeviceItem);
 	fileMenu.add(loadFSFromFileItem);
 	fileMenu.add(openUDIFItem);
+	if(debugConsoleItem != null)
+	    fileMenu.add(debugConsoleItem);
 	if(exitProgramItem != null)
 	    fileMenu.add(exitProgramItem);
 	infoMenu.add(fsInfoItem);
@@ -1874,11 +1890,24 @@ public class FileSystemBrowserWindow extends JFrame {
 	catch(Exception e) {
 	    //It's ok. Non-critical.
 	}
-	final FileSystemBrowserWindow fsbWindow = new FileSystemBrowserWindow();
+	int parsedArgs = 0;
+	final FileSystemBrowserWindow fsbWindow;
+	if(args.length > 0 && args[0].equals("-dbgconsole")) {
+	    DebugConsoleWindow dcw = new DebugConsoleWindow();
+	    System.setOut(new PrintStream(dcw.debugStream));
+	    System.setErr(new PrintStream(dcw.debugStream));
+	    fsbWindow = new FileSystemBrowserWindow(dcw);
+	    ++parsedArgs;
+	}	    
+	else
+	    fsbWindow = new FileSystemBrowserWindow();
+	
 	fsbWindow.setVisible(true);
-	if(args.length > 0) {
+	
+	if(args.length > parsedArgs) {
+	    String filename = args[parsedArgs];
 	    try {
-		final String pathName = new File(args[0]).getCanonicalPath();
+		final String pathName = new File(filename).getCanonicalPath();
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 			    fsbWindow.loadFSWithUDIFAutodetect(pathName);
@@ -1886,12 +1915,12 @@ public class FileSystemBrowserWindow extends JFrame {
 		    });
 	    } catch(Exception ioe) {
 		if(ioe.getMessage().equals("Could not open file.")) {
-		    JOptionPane.showMessageDialog(fsbWindow, "Failed to open file:\n\"" + args[0] + "\"",
+		    JOptionPane.showMessageDialog(fsbWindow, "Failed to open file:\n\"" + filename + "\"",
 						  "Error", JOptionPane.ERROR_MESSAGE);
 		}
 		else {
 		    ioe.printStackTrace();
-		    String msg = "Exception while loading file:\n" + "    \"" + args[0]  + "\"\n" + ioe.toString();
+		    String msg = "Exception while loading file:\n" + "    \"" + filename  + "\"\n" + ioe.toString();
 		    for(StackTraceElement ste : ioe.getStackTrace())
 			msg += "\n" + ste.toString();
 		    JOptionPane.showMessageDialog(fsbWindow, msg, "Exception while loading file", JOptionPane.ERROR_MESSAGE);
