@@ -1,9 +1,9 @@
 !SimpleDictionary: 1.0
 AppName: HFSExplorer
-Version: 0.17
-Build: 17
-Date: 2007-04-07
-Installer: http://hem.bredband.net/unsound/hfsx/hfsxsetup0.17.exe
-Binary: http://hem.bredband.net/unsound/hfsx/HFSExplorer0.17.zip
-Source: http://hem.bredband.net/unsound/hfsx/HFSExplorer0.17_src.zip
+Version: 0.18
+Build: 225
+Date: 2007-06-29
+Installer: http://hem.bredband.net/unsound/hfsx/hfsxsetup0.18.exe
+Binary: http://hem.bredband.net/unsound/hfsx/HFSExplorer0.18.zip
+Source: http://hem.bredband.net/unsound/hfsx/HFSExplorer0.18_src.zip
 Changelog: http://hem.bredband.net/unsound/hfsx/changelog.txt

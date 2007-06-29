@@ -1731,9 +1731,10 @@ public class FileSystemBrowserWindow extends JFrame {
 		    //JOptionPane.showMessageDialog(this, "The file was successfully extracted!\n",
 		    //			  "Extraction complete!", JOptionPane.INFORMATION_MESSAGE);
 		} catch(FileNotFoundException fnfe) {
+		    System.err.println("Could not create file \"" + outFile + "\". The following exception was thrown:");
 		    fnfe.printStackTrace();
 		    char[] filenameChars = filename.toCharArray();
-		    System.out.println("Filename in hex (" + filenameChars.length + " UTF-16 characters):");
+		    System.out.println("Filename in hex (" + filenameChars.length + " UTF-16BE units):");
 		    System.out.print("  0x");
 		    for(char c : filenameChars) System.out.print(" " + Util.toHexStringBE(c));
 		    System.out.println();
@@ -1772,6 +1773,8 @@ public class FileSystemBrowserWindow extends JFrame {
 		    }
 		    
 		} catch(IOException ioe) {
+ 		    System.err.println("Received I/O exception when trying to write to file \"" + outFile + "\":");
+ 		    ioe.printStackTrace();
 		    String msg = ioe.getMessage();
 		    int reply = JOptionPane.showConfirmDialog(this, "Could not write to file \"" + filename + 
 							      "\" under folder:\n  " + outDir.getAbsolutePath() +

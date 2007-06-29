@@ -34,7 +34,8 @@ import java.text.DecimalFormat;
  * @author  Erik
  */
 public class ExtractProgressPanel extends javax.swing.JPanel {
-    private DecimalFormat progressFormatter = new DecimalFormat("0.0");
+    private final DecimalFormat progressFormatter = new DecimalFormat("0.0");
+    private final DecimalFormat fileSizeFormatter = new DecimalFormat("0.00");
     /** Creates new form ExtractProgressPanel */
     public ExtractProgressPanel() {
         initComponents();
@@ -62,7 +63,7 @@ public class ExtractProgressPanel extends javax.swing.JPanel {
     public void updateCurrentFile(final String filename, final long fileSize) {
 	SwingUtilities.invokeLater(new Runnable() {
 		public void run() {
-		    currentFilenameLabel.setText("Extracting: " + filename +  " (" + SpeedUnitUtils.bytesToBinaryUnit(fileSize) + ")");
+		    currentFilenameLabel.setText("Extracting: " + filename +  " (" + SpeedUnitUtils.bytesToBinaryUnit(fileSize, fileSizeFormatter) + ")");
 		}});
     }
     

@@ -24,6 +24,7 @@ import org.catacombae.hfsexplorer.gui.ExtractProgressPanel;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.text.DecimalFormat;
 
 public class ExtractProgressDialog extends JDialog implements ProgressMonitor {
     private ExtractProgressPanel progressPanel;
@@ -32,6 +33,7 @@ public class ExtractProgressDialog extends JDialog implements ProgressMonitor {
     private boolean cancelSignaled = false;
     private long completedSize = 0;
     private long totalSize = -1;
+    private DecimalFormat sizeFormatter = new DecimalFormat("0.00");
 
     public ExtractProgressDialog(Frame owner) {
 	this(owner, true);
@@ -92,8 +94,8 @@ public class ExtractProgressDialog extends JDialog implements ProgressMonitor {
     }
     public void addDataProgress(long dataSize) {
 	completedSize += dataSize;
-	String message = SpeedUnitUtils.bytesToBinaryUnit(completedSize) + "/" +
-	    SpeedUnitUtils.bytesToBinaryUnit(totalSize);
+	String message = SpeedUnitUtils.bytesToBinaryUnit(completedSize, sizeFormatter) + "/" +
+	    SpeedUnitUtils.bytesToBinaryUnit(totalSize, sizeFormatter);
 	updateTotalProgress(((double)completedSize)/totalSize, message);
     }
 }
