@@ -4,8 +4,9 @@ setlocal
 pushd %~dp0
 
 set LIBRARY_PATH=%~dp0lib
-set JARFILE=hfsx.jar
-set CLASSPATH="%~dp0build.~";"%~dp0lib\swing-layout-1.0.1.jar";"%~dp0lib\hfsx_dmglib.jar";"%~dp0lib\AppleJavaExtensions.jar";"%~dp0lib\java_awt_Desktop.jar"
+set JARFILE_PATH=%~dp0build\lib
+set JARFILENAME=hfsx.jar
+set CLASSPATH="%~dp0build.~";"%~dp0dist\lib\swing-layout-1.0.1.jar";"%~dp0dist\lib\hfsx_dmglib.jar";"%~dp0lib\AppleJavaExtensions.jar";"%~dp0lib\java_awt_Desktop.jar"
 set SOURCES_DIR=%~dp0src
 set BUILD_DIR=%~dp0build.~
 set RESOURCE_SRC_DIR=%~dp0resource
@@ -58,8 +59,8 @@ set JAVAC_EXIT_CODE=%ERRORLEVEL%
 if not "%JAVAC_EXIT_CODE%"=="0" goto error
 
 echo Building jar-file...
-if not exist "%LIBRARY_PATH%" mkdir "%LIBRARY_PATH%"
-jar cvf "%LIBRARY_PATH%\%JARFILE%" -C "%BUILD_DIR%" . >NUL:
+if not exist "%JARFILE_PATH%" mkdir "%JARFILE_PATH%"
+jar cvf "%JARFILE_PATH%\%JARFILENAME%" -C "%BUILD_DIR%" . >NUL:
 if "%ERRORLEVEL%"=="0" (echo Done!) else echo Problems while building jar-file...
 
 goto end

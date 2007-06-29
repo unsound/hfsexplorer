@@ -1653,10 +1653,11 @@ public class FileSystemBrowserWindow extends JFrame {
 	HFSPlusCatalogLeafRecordData recData = rec.getData();
 	if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
 	   recData instanceof HFSPlusCatalogFile) {
+	    HFSPlusCatalogFile catFile = (HFSPlusCatalogFile)recData;
 	    String filename = rec.getKey().getNodeName().getUnicodeAsComposedString();
 	    while(true) {
 		//System.out.println("file: \"" + filename + "\" range: " + fractionLowLimit + "-" + fractionHighLimit);
-		progressDialog.updateCurrentFile(filename);
+		progressDialog.updateCurrentFile(filename, catFile.getDataFork().getLogicalSize());
 		//progressDialog.updateTotalProgress(fractionLowLimit);
 		File outFile = new File(outDir, filename);
 		if(!overwriteAll.o && outFile.exists()) {
@@ -1709,7 +1710,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		    if(!outFile.getParentFile().equals(outDir) || !outFile.getName().equals(filename))
 			throw new FileNotFoundException();
 		    FileOutputStream fos = new FileOutputStream(outFile);
-		    fsView.extractDataForkToStream(rec, fos);
+		    fsView.extractDataForkToStream(rec, fos, progressDialog);
 		    fos.close();
 		    //JOptionPane.showMessageDialog(this, "The file was successfully extracted!\n",
 		    //			  "Extraction complete!", JOptionPane.INFORMATION_MESSAGE);
@@ -1782,13 +1783,13 @@ public class FileSystemBrowserWindow extends JFrame {
 		}
 		break;
 	    }
-	    progressDialog.addDataProgress(((HFSPlusCatalogFile)recData).getDataFork().getLogicalSize());
+	    //progressDialog.addDataProgress(((HFSPlusCatalogFile)recData).getDataFork().getLogicalSize());
 
 	}
 	else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
 		recData instanceof HFSPlusCatalogFolder) {
 	    String dirName = rec.getKey().getNodeName().getUnicodeAsComposedString();
-	    progressDialog.updateCurrentFile(dirName);
+	    progressDialog.updateCurrentDir(dirName);
 	    HFSCatalogNodeID requestedID;
 	    HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder)recData;
 	    requestedID = catFolder.getFolderID();

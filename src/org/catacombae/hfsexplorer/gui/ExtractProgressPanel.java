@@ -25,6 +25,7 @@
  */
 
 package org.catacombae.hfsexplorer.gui;
+import org.catacombae.hfsexplorer.*;
 import javax.swing.SwingUtilities;
 import java.text.DecimalFormat;
 
@@ -51,10 +52,17 @@ public class ExtractProgressPanel extends javax.swing.JPanel {
 		}});
     }
     
-    public void updateCurrentFile(final String filename) {
+    public void updateCurrentDir(final String dirname) {
 	SwingUtilities.invokeLater(new Runnable() {
 		public void run() {
-		    currentFilenameLabel.setText("Extracting: " + filename);
+		    currentFilenameLabel.setText("Extracting: " + dirname);
+		}});
+    }
+
+    public void updateCurrentFile(final String filename, final long fileSize) {
+	SwingUtilities.invokeLater(new Runnable() {
+		public void run() {
+		    currentFilenameLabel.setText("Extracting: " + filename +  " (" + SpeedUnitUtils.bytesToBinaryUnit(fileSize) + ")");
 		}});
     }
     

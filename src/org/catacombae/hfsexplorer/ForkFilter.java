@@ -68,20 +68,6 @@ public class ForkFilter implements LowLevelFile {
     }
 
     public void seek(long pos) {
-	/*
-	long offset = fsOffset;
-	HFSPlusExtentDescriptor[] extents = forkData.getExtents().getExtentDescriptors();
-	for(HFSPlusExtentDescriptor cur : extents) {
-	    long currentExtentLength = Util2.unsign(cur.getBlockCount())*blockSize
-	    if(pos >= currentExtentLength)
-		pos -= currentExtentLength;
-	    else {
-		offset += Util2.unsign(cur.getStartBlock())*blockSize;
-		break;
-	    }
-	}
-	sourceFile.seek(offset);
-	*/
 	logicalPosition = pos;
     }
     public int read() {
@@ -99,8 +85,10 @@ public class ForkFilter implements LowLevelFile {
 	long bytesToSkip = logicalPosition;
 	int extIndex;
 	long currentExtentLength;
-	HFSPlusExtentDescriptor[] extents = extentDescriptors;//forkData.getExtents().getExtentDescriptors();
+	HFSPlusExtentDescriptor[] extents = extentDescriptors;
 	
+	// Skip all extents whose range is located before the requested position (logicalPosition)
+	//System.out.print("ForkFilter.read: skipping extents...");
 	for(extIndex = 0; extIndex < extents.length; ++extIndex) {
 	    HFSPlusExtentDescriptor cur = extents[extIndex];
 	    currentExtentLength = Util2.unsign(cur.getBlockCount())*blockSize;
@@ -108,22 +96,30 @@ public class ForkFilter implements LowLevelFile {
 		if(extIndex < extents.length-1)
 		    bytesToSkip -= currentExtentLength;
 		else
-		    throw new RuntimeException("Reading from position outside basic 8 extents not yet implemented.");
+		    throw new RuntimeException("Extent out of bounds!");
 	    }
 	    else {
 		offset = fsOffset + Util2.unsign(cur.getStartBlock())*blockSize + bytesToSkip;
 		break;
 	    }
 	}
+	//System.out.println("done. skipped " + extIndex + " extents.");
 		
-	if(logicalPosition != lastLogicalPos)
+	if(logicalPosition != lastLogicalPos) {
+	    //System.out.print("ForkFilter.read: (1)seeking to " + offset + "...");
 	    sourceFile.seek(offset); // Seek to the correct position
-	else if(sourceFile.getFilePointer() != lastPhysicalPos)
+	    //System.out.println("done.");
+	}
+	else if(sourceFile.getFilePointer() != lastPhysicalPos) {
+	    //System.out.print("ForkFilter.read: (2)seeking to " + offset + "...");
 	    sourceFile.seek(lastPhysicalPos);
+	    //System.out.println("done.");
+	}
 	
 	int bytesLeftToRead = len;
 	// Start reading. Extent by extent if needed.
 	for(; extIndex < extents.length; ++extIndex) {
+	    //System.out.println("ForkFilter.read: reading extent " + extIndex + ".");
 	    HFSPlusExtentDescriptor cur = extents[extIndex];
 
 	    long bytesInExtent = Util2.unsign(cur.getBlockCount())*blockSize - bytesToSkip;

@@ -27,7 +27,8 @@ public class NullProgressMonitor implements ProgressMonitor {
     public static NullProgressMonitor getInstance() { return instance; }
     
     public void updateTotalProgress(double fraction, String message) {}
-    public void updateCurrentFile(String filename) {}
+    public void updateCurrentDir(String dirname) {}
+    public void updateCurrentFile(String filename, long fileSize) {}
     public void signalCancel() {}
     public boolean cancelSignaled() { return false; }
     public void confirmCancel() {}

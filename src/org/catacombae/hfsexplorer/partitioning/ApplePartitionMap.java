@@ -31,18 +31,20 @@ public class ApplePartitionMap implements PartitionSystem {
     
     public ApplePartitionMap(LowLevelFile isoRaf, long pmOffset, int blockSize) {
 	isoRaf.seek(pmOffset);
-	byte[] currentBlock = new byte[512]; // This is not an actual device block. It's always 512 bytes.
+	//System.err.println("Seek to " + pmOffset);
+	byte[] currentBlock = new byte[/*512*/blockSize];
 // 	byte[] signature = new byte[2];
 	//APMPartition p = new APMPartition(isoRaf);
 	ArrayList<APMPartition> partitionList = new ArrayList<APMPartition>();
 	//for(int i = 0; i < 20; ++i) {
+	//int i = 0;
 	while(true) { // Loop while the signature is correct ("PM")
 	    isoRaf.readFully(currentBlock);
 // 	    signature[0] = currentBlock[0];
 // 	    signature[1] = currentBlock[1];
 	    if((currentBlock[0] & 0xFF) == 0x50 && 
 	       (currentBlock[1] & 0xFF) == 0x4D) { // new String(currentBlock, 0, 2, "ASCII").equals("PM")
-		//print("Partition " + i + ": ");
+		//System.err.println("Partition " + i++ + ": ");
 		APMPartition p = new APMPartition(currentBlock, 0, blockSize);
 		partitionList.add(p);
 // 		if(options.verbose) {

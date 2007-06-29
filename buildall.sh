@@ -9,10 +9,11 @@ jobCompleted() {
     echo "Done!"
 }
 
-CLASSPATH=build.~:lib/swing-layout-1.0.1.jar:lib/hfsx_dmglib.jar:lib/java_awt_Desktop.jar
+CLASSPATH=build.~:lib/dist/swing-layout-1.0.1.jar:lib/dist/hfsx_dmglib.jar:lib/java_awt_Desktop.jar
 SOURCES_DIR=src
 BUILD_DIR=build.~
 LIBRARY_PATH=lib
+JARFILE_DIR=dist/lib
 JARFILE=hfsx.jar
 RESOURCE_SRC_DIR=resource
 RESOURCE_DST_DIR=$BUILD_DIR/res
@@ -74,11 +75,11 @@ buildhfsx_types() {
 
 buildjar() {
     echo "Building jar-file..."
-    if [ ! -d "$LIBRARY_PATH" ]; then # if not exists $LIBRARY_PATH...
+    if [ ! -d "$JARFILE_DIR" ]; then # if not exists $LIBRARY_PATH...
 	echo "Making library path"
-    	mkdir $LIBRARY_PATH
+    	mkdir $JARFILE_DIR
     fi
-    jar cf $LIBRARY_PATH/$JARFILE -C $BUILD_DIR .
+    jar cf $JARFILE_DIR/$JARFILE -C $BUILD_DIR .
     return $?
 }
 

@@ -64,8 +64,11 @@ public class ExtractProgressDialog extends JDialog implements ProgressMonitor {
 	progressPanel.updateTotalProgress(fraction, message);
     }
     
-    public void updateCurrentFile(String filename) {
-	progressPanel.updateCurrentFile(filename);
+    public void updateCurrentDir(String dirname) {
+	progressPanel.updateCurrentDir(dirname);
+    }
+    public void updateCurrentFile(String filename, long fileSize) {
+	progressPanel.updateCurrentFile(filename, fileSize);
     }
     
     public synchronized void signalCancel() {
