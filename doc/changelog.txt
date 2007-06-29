@@ -8,6 +8,9 @@ HFSExplorer Changelog
   reconstructed. Tested with an 11 GiB compressed/25 GiB uncompressed UDIF disk image.
 - Fixed a serious bug leading to a lot of files not beeing seen by HFSExplorer (though I didn't
   notice it myself). Had to do with the algorithm that collected all files in a directory.
+  (thanks to Mark Wainwright for the valuable test case)
+- Implemented a Unicode composition algorithm, for those who have been experiencing strange
+  filenames whenever there are accents and umlauts in them. (thanks to Wolf Mc Even for info)
 - Improved efficiency when reading UDIF disk images (.dmg files). (In some cases probably up to
   a million times faster... ;> ) 
 - Implemented double-clicking in the right pane to browse a directory, or to extract (or open),
@@ -24,6 +27,8 @@ HFSExplorer Changelog
   loading large files, where the user might have thought that no operation was in progress)
 - Added a debug console window where all the output from System.out and System.err goes when
   the application is running in pure windowed mode.
+- Added icons for .dmg files in Windows Explorer. (for source material, thanks to the original
+  creator of the icon for GParted, whoever that is...)
 
 0.17
 ----
