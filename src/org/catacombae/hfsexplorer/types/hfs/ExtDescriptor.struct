@@ -1,0 +1,4 @@
+struct ExtDescriptor {
+	UInt16 	xdrStABN; 	first allocation block
+	UInt16 	xdrNumABlks; 	number of allocation blocks
+};

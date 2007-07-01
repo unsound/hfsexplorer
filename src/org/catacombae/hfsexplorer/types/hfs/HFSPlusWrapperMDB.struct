@@ -1,0 +1,32 @@
+struct HFSPlusWrapperMDB {
+	UInt16 		drSigWord; 	volume signature
+	UInt32 		drCrDate; 	date and time of volume creation
+	UInt32 		drLsMod; 	date and time of last modification
+	UInt16 		drAtrb; 	volume attributes
+	UInt16 		drNmFls; 	number of files in root directory
+	UInt16 		drVBMSt; 	first block of volume bitmap
+	UInt16 		drAllocPtr; 	start of next allocation search
+	UInt16 		drNmAlBlks; 	number of allocation blocks in volume
+	UInt32 		drAlBlkSiz; 	size (in bytes) of allocation blocks
+	UInt32 		drClpSiz; 	default clump size
+	UInt16 		drAlBlSt; 	first allocation block in volume
+	UInt32 		drNxtCNID; 	next unused catalog node ID
+	UInt16 		drFreeBks; 	number of unused allocation blocks
+	UInt8		drVNLength;	length of volume name
+	Char   		drVN[27]; 	volume name
+	UInt32 		drVolBkUp; 	date and time of last backup
+	UInt16 		drVSeqNum; 	volume backup sequence number
+	UInt32 		drWrCnt; 	volume write count
+	UInt32 		drXTClpSiz; 	clump size for extents overflow file
+	UInt32 		drCTClpSiz; 	clump size for catalog file
+	UInt16 		drNmRtDirs; 	number of directories in root directory
+	UInt32 		drFilCnt; 	number of files in volume
+	UInt32 		drDirCnt; 	number of directories in volume
+	UInt32 		drFndrInfo[8]; 	information used by the Finder
+	UInt16 		drEmbedSigWord;	HFS+ Wrapper specific: Must always be 'H+'
+	ExtDescriptor	drEmbedExtent;	HFS+ Wrapper specific: The extent containing the HFS+ volume
+	UInt32 		drXTFlSize; 	size of extents overflow file
+	ExtDataRec 	drXTExtRec; 	extent record for extents overflow file
+	UInt32 		drCTFlSize; 	size of catalog file
+	ExtDataRec 	drCTExtRec; 	extent record for catalog file
+};
