@@ -22,6 +22,7 @@ package org.catacombae.hfsexplorer;
 
 import org.catacombae.hfsexplorer.partitioning.*;
 import org.catacombae.hfsexplorer.types.*;
+import org.catacombae.hfsexplorer.types.hfs.*;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
 import org.catacombae.hfsexplorer.gui.*;
 import java.util.*;
@@ -620,14 +621,23 @@ public class FileSystemBrowserWindow extends JFrame {
 			deviceDialog.setVisible(true);
 			String pathName = deviceDialog.getPathName();
 			try {
-			    if(pathName != null)
-				loadFS(new WindowsLowLevelIO(pathName), pathName);
+			    WindowsLowLevelIO io = new WindowsLowLevelIO(pathName);
+			    try {
+				if(pathName != null)
+				    loadFS(io, pathName);
+			    }
+			    catch(Exception e) {
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+							      "Could not read contents of partition!",
+							      "Error", JOptionPane.ERROR_MESSAGE);
+			    }
 			} catch(Exception e) {
 			    e.printStackTrace();
 			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-							  "Could not read contents of partition!",
+							  "Could not open file!",
 							  "Error", JOptionPane.ERROR_MESSAGE);
-			}
+			}			    
 		    }
 		});
 	    loadFSFromDeviceItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -945,45 +955,52 @@ public class FileSystemBrowserWindow extends JFrame {
     
     public void loadFSWithUDIFAutodetect(String filename) {
 	LowLevelFile fsFile;
-	if(System.getProperty("os.name").toLowerCase().startsWith("windows") &&
-	   System.getProperty("os.arch").toLowerCase().equals("x86"))
-	    fsFile = new WindowsLowLevelIO(filename);
-	else
-	    fsFile = new RandomAccessLLF(filename);
-	
-	//System.err.println("Trying to autodetect UDIF structure...");
-	if(UDIFRecognizer.isUDIF(fsFile)) {
-	    //System.err.println("UDIF structure found! Creating stream...");
-	    UDIFRandomAccessLLF stream = null;
-	    try {
-		stream = new UDIFRandomAccessLLF(filename);
-	    }
-	    catch(Exception e) {
-		e.printStackTrace();
-		if(e.getMessage().startsWith("java.lang.RuntimeException: No handler for block type")) {
-		    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-						  "UDIF file contains unsupported block types!\n" +
-						  "(The file was probably created with BZIP2 or ADC " + 
-						  "compression, which is unsupported currently)",
-						  "Error", JOptionPane.ERROR_MESSAGE);
+	try {
+	    if(System.getProperty("os.name").toLowerCase().startsWith("windows") &&
+	       System.getProperty("os.arch").toLowerCase().equals("x86"))
+		fsFile = new WindowsLowLevelIO(filename);
+	    else
+		fsFile = new RandomAccessLLF(filename);
+	    
+	    //System.err.println("Trying to autodetect UDIF structure...");
+	    if(UDIFRecognizer.isUDIF(fsFile)) {
+		//System.err.println("UDIF structure found! Creating stream...");
+		UDIFRandomAccessLLF stream = null;
+		try {
+		    stream = new UDIFRandomAccessLLF(filename);
 		}
-		else {
-		    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-						  "UDIF file unsupported or damaged!",
-						  "Error", JOptionPane.ERROR_MESSAGE);
+		catch(Exception e) {
+		    e.printStackTrace();
+		    if(e.getMessage().startsWith("java.lang.RuntimeException: No handler for block type")) {
+			JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+						      "UDIF file contains unsupported block types!\n" +
+						      "(The file was probably created with BZIP2 or ADC " + 
+						      "compression, which is unsupported currently)",
+						      "Error", JOptionPane.ERROR_MESSAGE);
+		    }
+		    else {
+			JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+						      "UDIF file unsupported or damaged!",
+						      "Error", JOptionPane.ERROR_MESSAGE);
+		    }
+		    return;
 		}
-		return;
+		if(stream != null) {
+		    fsFile.close();
+		    fsFile = stream;
+		}
 	    }
-	    if(stream != null) {
-		fsFile.close();
-		fsFile = stream;
+	    else {
+		System.err.println("UDIF structure not found. Proceeding normally...");
 	    }
+	    
+	    loadFS(fsFile, new File(filename).getName());
+	} catch(Exception e) {
+	    System.err.println("Could not open file! Exception thrown:");
+	    e.printStackTrace();
+	    JOptionPane.showMessageDialog(this, "Could not open file:\n    \"" + filename + "\"",
+					  "Error", JOptionPane.ERROR_MESSAGE);
 	}
-	else {
-	    System.err.println("UDIF structure not found. Proceeding normally...");
-	}
-	
-	loadFS(fsFile, new File(filename).getName());
     }
     public void loadFS(String filename) {
 	LowLevelFile fsFile;
@@ -1058,6 +1075,21 @@ public class FileSystemBrowserWindow extends JFrame {
 	// Detect HFS file system
 	FileSystemRecognizer fsr = new FileSystemRecognizer(fsFile, fsOffset);
 	FileSystemRecognizer.FileSystemType fsType = fsr.detectFileSystem();
+	if(fsType == FileSystemRecognizer.FileSystemType.HFS_WRAPPED_HFS_PLUS) {
+	    System.out.println("Found a wrapped HFS+ volume.");
+	    byte[] mdbData = new byte[HFSPlusWrapperMDB.STRUCTSIZE];
+	    fsFile.seek(fsOffset + 1024);
+	    fsFile.read(mdbData);
+	    HFSPlusWrapperMDB mdb = new HFSPlusWrapperMDB(mdbData, 0);
+	    ExtDescriptor xd = mdb.getDrEmbedExtent();
+	    int hfsBlockSize = mdb.getDrAlBlkSiz();
+	    System.out.println("old fsOffset: " + fsOffset);
+	    fsOffset += mdb.getDrAlBlSt()*512 + xd.getXdrStABN()*hfsBlockSize; // Lovely method names...
+	    System.out.println("new fsOffset: " + fsOffset);
+	    // redetect with adjusted fsOffset
+	    fsr = new FileSystemRecognizer(fsFile, fsOffset);
+	    fsType = fsr.detectFileSystem();
+	}
 	if(fsType == FileSystemRecognizer.FileSystemType.HFS_PLUS) {
 	    if(fsView != null) {
 		fsView.getStream().close();
@@ -1071,8 +1103,10 @@ public class FileSystemBrowserWindow extends JFrame {
 	    //adjustTableWidth();
 	}
 	else
-	    JOptionPane.showMessageDialog(this, "Invalid HFS type. Program supports (" + FileSystemRecognizer.FileSystemType.HFS_PLUS +
-					  "), detected type is (" + fsType + ").",
+	    JOptionPane.showMessageDialog(this, "Invalid HFS type.\nProgram supports (" +
+					  FileSystemRecognizer.FileSystemType.HFS_PLUS + ", " +
+					  FileSystemRecognizer.FileSystemType.HFS_WRAPPED_HFS_PLUS +
+					  ").\nDetected type is (" + fsType + ").",
 					  "Unsupported file system type", JOptionPane.ERROR_MESSAGE);
 		    
     }
@@ -1361,141 +1395,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	//fileChooser.setSelectedFiles(new File[0]);
 	//fileChooser.setCurrentDirectory(fileChooser.getCurrentDirectory());
     }
-    
-//     private void old_actionExtractToDir() {
-// 	if(dirTreeLastFocus > fileTableLastFocus) {
-// 	    Object o = dirTree.getLastSelectedPathComponent();
-// 	    //System.err.println(o.toString());
-// 	    if(o == null) {
-// 		JOptionPane.showMessageDialog(this, "No file or folder selected.",
-// 					      "Information", JOptionPane.INFORMATION_MESSAGE);
-// 	    }
-// 	    else if(o instanceof DefaultMutableTreeNode) {
-// 		Object o2 = ((DefaultMutableTreeNode)o).getUserObject();
-// 		if(o2 instanceof RecordNodeStorage) {
-// 		    final HFSPlusCatalogLeafRecord rec = ((RecordNodeStorage)o2).getRecord();
-// 		    //System.err.println(rec.toString());
-// 		    fileChooser.setMultiSelectionEnabled(false);
-// 		    fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-// 		    fileChooser.setSelectedFiles(new File[0]);
-// 		    if(fileChooser.showDialog(FileSystemBrowserWindow.this, "Extract here") == JFileChooser.APPROVE_OPTION) {
-// 			final File outDir = fileChooser.getSelectedFile();
-// 			final ExtractProgressDialog progress = new ExtractProgressDialog(this);
-// 			Runnable r = new Runnable() {
-// 				public void run() {
-// 				    progress.setDataSize(calculateDataForkSizeRecursive(rec));
-// 				    int errorCount = extract(rec, outDir, progress);
-// 				    if(!progress.cancelSignaled()) {
-// 					if(errorCount == 0)
-// 					    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-// 									  "Extraction finished.\n",
-// 									  "Information",
-// 									  JOptionPane.INFORMATION_MESSAGE);
-// 					else
-// 					    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-// 									  errorCount + " errors were encountered " +
-// 									  "during the extraction.\n",
-// 									  "Information",
-// 									  JOptionPane.WARNING_MESSAGE);
-// 				    }
-// 				    else
-// 					JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-// 								      "Extraction was aborted.\n" +
-// 								      "Please remove the extracted files " +
-// 								      "manually.\n",
-// 								      "Aborted extraction",
-// 								      JOptionPane.WARNING_MESSAGE);
-// 				    progress.setVisible(false);
-// 				}
-// 			    };
-// 			new Thread(r).start();
-// 			progress.setVisible(true);
-// 		    }
-// 		}
-// 		else
-// 		   JOptionPane.showMessageDialog(this, "Unexpected data in tree user object. (Internal error, report to developer)" + "\nClass: " + o.getClass().toString(),
-// 						 "Error", JOptionPane.ERROR_MESSAGE); 
-// 	    }
-// 	    else
-// 		JOptionPane.showMessageDialog(this, "Unexpected data in tree model. (Internal error, report to developer)" + "\nClass: " + o.getClass().toString(),
-// 					      "Error", JOptionPane.ERROR_MESSAGE);
-// 	}
-// 	else {
-// 	    int[] selectedRows = fileTable.getSelectedRows();
-// 	    if(selectedRows.length == 0) {
-// 		JOptionPane.showMessageDialog(this, "No file or folder selected.",
-// 					      "Error", JOptionPane.ERROR_MESSAGE);
-// 		return;
-// 	    }
-// 	    else {
-// 		// There is trouble with this approach in OS X... we don't get a proper DIRECTORIES_ONLY dialog. One idea is to use java.awt.FileDialog and see if it works better. (probably not)
-// 		//java.awt.FileDialog fd = new java.awt.FileDialog(FileSystemBrowserWindow.this, "Extract here", SAVE);
-// 		//File oldDir = fileChooser.getCurrentDirectory();
-// 		//JFileChooser fileChooser2 = new JFileChooser();
-// 		//fileChooser.setCurrentDirectory(oldDir);
-// 		fileChooser.setMultiSelectionEnabled(false);
-// 		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-// 		//System.err.println("curdir: " + fileChooser.getCurrentDirectory());
-// 		//fileChooser.setSelectedFiles(new File[0]);
-// 		//fileChooser.setCurrentDirectory(fileChooser.getCurrentDirectory());
-
-// 		if(fileChooser.showDialog(FileSystemBrowserWindow.this, "Extract here") == JFileChooser.APPROVE_OPTION) {
-// 		    final File outDir = fileChooser.getSelectedFile();
-		    
-// 		    // Gather all selected records
-// 		    final HFSPlusCatalogLeafRecord[] selectedRecords = new HFSPlusCatalogLeafRecord[selectedRows.length];
-// 		    for(int i = 0; i < selectedRows.length; ++i) {
-// 			int selectedRow = selectedRows[i];
-// 			Object o = tableModel.getValueAt(selectedRow, 0);
-// 			HFSPlusCatalogLeafRecord rec;
-// 			HFSPlusCatalogLeafRecordData recData;
-// 			if(o instanceof RecordContainer) {
-// 			    rec = ((RecordContainer)o).getRecord();
-// 			    selectedRecords[i] = rec;
-// 			}
-// 			else {
-// 			    JOptionPane.showMessageDialog(this, "Unexpected data in table model. (Internal error, report to developer)",
-// 							  "Error", JOptionPane.ERROR_MESSAGE);
-// 			    return;
-// 			}
-// 		    }
-		    
-// 		    // Extract
-// 		    final ExtractProgressDialog progress = new ExtractProgressDialog(this);
-// 		    Runnable r = new Runnable() {
-// 			    public void run() {
-// 				progress.setDataSize(calculateDataForkSizeRecursive(selectedRecords));
-// 				int errorCount = extract(selectedRecords, outDir, progress);
-// 				if(!progress.cancelSignaled()) {
-// 				    if(errorCount == 0)
-// 					JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-// 								      "Extraction finished.\n",
-// 								      "Information",
-// 								      JOptionPane.INFORMATION_MESSAGE);
-// 				    else
-// 					JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-// 								      errorCount + " errors were encountered " +
-// 								      "during the extraction.\n",
-// 								      "Information",
-// 								      JOptionPane.WARNING_MESSAGE);
-// 				}
-// 				else
-// 				    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-// 								  "Extraction was aborted.\n" +
-// 								  "Please remove the extracted files " +
-// 								  "manually.\n",
-// 								  "Aborted extraction",
-// 								  JOptionPane.WARNING_MESSAGE);
-// 				progress.setVisible(false);
-// 			    }
-// 			};
-// 		    new Thread(r).start();
-// 		    progress.setVisible(true);
-// 		}
-// 	    }
-// 	}
-//     }
-    
+        
     private void actionGetInfo() {
 	HFSPlusCatalogLeafRecord rec = null;
 	if(dirTreeLastFocus > fileTableLastFocus) {

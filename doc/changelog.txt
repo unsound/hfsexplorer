@@ -1,6 +1,12 @@
 HFSExplorer Changelog
 ---------------------
 
+0.18.1
+------
+- Implemented support for wrapped HFS+ volumes. (HFS+ volumes wrapped inside HFS volumes, as in
+  http://developer.apple.com/technotes/tn/tn1150.html#HFSWrapper)
+- Fixed a minor bug where the user wasn't notified when a file could not be opened.
+
 0.18
 ----
 - Huge rework of the libraries from DMGExtractor, due to a lot of wasted memory leading to

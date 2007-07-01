@@ -95,13 +95,6 @@ public class APMPartition implements Partition {
 	System.arraycopy(data, offset+136, pmPad, 0, 2*188);
 	
 	this.blockSize = blockSize;
-	
-	// Added to make it work as subclass of Partition
-	//getPmPyPartStart()+selectedPartition.getPmLgDataStart())*blockSize;
-	//getPmDataCnt()*blockSize;
-// 	startOffset = (getPmPyPartStart()+getPmLgDataStart())*blockSize;
-// 	length = getPmDataCnt()*blockSize;
-// 	type = convertPartitionType(getPmParType());
     }
     // Defined in Partition
     public long getStartOffset() { return (getPmPyPartStart()+getPmLgDataStart())*blockSize; }
