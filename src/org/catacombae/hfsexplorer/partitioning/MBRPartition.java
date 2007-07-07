@@ -96,31 +96,39 @@ public class MBRPartition implements Partition {
 		return UNKNOWN_PARTITION_TYPE;
 	}
     }
-    private final byte[] status = new byte[1];
-    private final byte[] firstSector = new byte[3];
-    private final byte[] partitionType = new byte[1];
-    private final byte[] lastSector = new byte[3];
-    private final byte[] lbaFirstSector = new byte[4];
-    private final byte[] lbaPartitionLength = new byte[4];
+    protected final byte[] status = new byte[1];
+    protected final byte[] firstSector = new byte[3];
+    protected final byte[] partitionType = new byte[1];
+    protected final byte[] lastSector = new byte[3];
+    protected final byte[] lbaFirstSector = new byte[4];
+    protected final byte[] lbaPartitionLength = new byte[4];
     
     private final int sectorSize;
     
     /** <code>data</code> is assumed to be at least (<code>offset</code>+16) bytes in length. */
     public MBRPartition(byte[] data, int offset, int sectorSize) {
+	this(sectorSize);
 	System.arraycopy(data, offset+0, status, 0, 1);
 	System.arraycopy(data, offset+1, firstSector, 0, 3);
 	System.arraycopy(data, offset+4, partitionType, 0, 1);
 	System.arraycopy(data, offset+5, lastSector, 0, 3);
 	System.arraycopy(data, offset+8, lbaFirstSector, 0, 4);
 	System.arraycopy(data, offset+12, lbaPartitionLength, 0, 4);
-	
+    }
+    protected MBRPartition(int sectorSize) {
 	this.sectorSize = sectorSize;
-	
-// 	// Added to make it work as subclass of Partition
-// 	startOffset = getLBAFirstSector()*sectorSize;
-// 	length = getLBAPartitionLength()*sectorSize;
-// 	type = convertPartitionType(getPartitionTypeAsEnum());
-
+    }
+    public MBRPartition(MBRPartition source) {
+	this(source, source.sectorSize);
+    }
+    public MBRPartition(MBRPartition source, int sectorSize) {
+	this(sectorSize);
+	System.arraycopy(source.status, 0, status, 0, 1);
+	System.arraycopy(source.firstSector, 0, firstSector, 0, 3);
+	System.arraycopy(source.partitionType, 0, partitionType, 0, 1);
+	System.arraycopy(source.lastSector, 0, lastSector, 0, 3);
+	System.arraycopy(source.lbaFirstSector, 0, lbaFirstSector, 0, 4);
+	System.arraycopy(source.lbaPartitionLength, 0, lbaPartitionLength, 0, 4);	
     }
     
     // Defined in Partition
@@ -148,6 +156,27 @@ public class MBRPartition implements Partition {
 	return getStatus() == PARTITION_BOOTABLE;
     }
     public boolean isValid() {
+	/* Calculate the coefficients numHead and numSec.
+	 * (C*numHead*numSec) + (H*numSec) + (S-1) = LBA.
+	 * 
+	 * Say that we have c1, h1, s1 and lba1, as well as c2, h2, s2, lba2.
+	 */
+	int beginLBA = getLBAFirstSector();
+	byte[] beginCHS = getFirstSector();
+	int beginS = beginCHS[1] & 0x3F;
+	int beginH = beginCHS[0];
+	int beginC = ((beginCHS[1] & 0xC0) >> 6) * 0xFF + beginCHS[2];
+
+	int endLBA = beginLBA + getLBAPartitionLength() - 1;
+	byte[] endCHS = getLastSector();
+	int endS = endCHS[1] & 0x3F;
+	int endH = endCHS[0];
+	int endC = ((endCHS[1] & 0xC0) >> 6) * 0xFF + endCHS[2];
+	
+	
+	
+	
+	
 	byte status = getStatus();
 	return (status == PARTITION_NOT_BOOTABLE || status == PARTITION_BOOTABLE);
     }
@@ -226,5 +255,20 @@ public class MBRPartition implements Partition {
 	default:
 	    return PartitionType.UNKNOWN;
 	}
-    }		    
+    }
+    
+    public byte[] getBytes() {
+	byte[] result = new byte[16];
+	int i = 0;
+	System.arraycopy(status, 0, result, i, status.length); i += status.length;
+	System.arraycopy(firstSector, 0, result, i, firstSector.length); i += firstSector.length;
+	System.arraycopy(partitionType, 0, result, i, partitionType.length); i += partitionType.length;
+	System.arraycopy(lastSector, 0, result, i, lastSector.length); i += lastSector.length;
+	System.arraycopy(lbaFirstSector, 0, result, i, lbaFirstSector.length); i += lbaFirstSector.length;
+	System.arraycopy(lbaPartitionLength, 0, result, i, lbaPartitionLength.length); i += lbaPartitionLength.length;
+   	
+	if(i != result.length)
+	    throw new RuntimeException("Internal error!");
+	return result;
+    }
 }

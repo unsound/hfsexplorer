@@ -29,7 +29,7 @@ public class MBRPartitionTable implements PartitionSystem {
     
     public static final short MBR_SIGNATURE = 0x55AA;
     public static final int IBM_EXTENDED_DATA_OFFSET = 0x018A;
-    public static final int DISK_SIGNATURE_OFFSET = 0x01B8;
+    public static final int OPTIONAL_DISK_SIGNATURE_OFFSET = 0x01B8;
     public static final int MBR_PARTITIONS_OFFSET = 0x01BE;
     /*
      * struct MBRPartitionTable
@@ -37,38 +37,63 @@ public class MBRPartitionTable implements PartitionSystem {
      *
      * BP   Size  Type              Variable name        Description
      * --------------------------------------------------------------
-     * 394  9     byte[9]           optIBMExtendedData1  
-     * 403  9     byte[9]           optIBMExtendedData2  
-     * 412  9     byte[9]           optIBMExtendedData3  
-     * 421  9     byte[9]           optIBMExtendedData4  
-     * ~~~~~~~~~~~~~~~~~~~~~~~~[Not continuous]~~~~~~~~~~~~~~~~~~~~~~
-     * 440  4     UInt32            optDiskSignature     
-     * ~~~~~~~~~~~~~~~~~~~~~~~~[Not continuous]~~~~~~~~~~~~~~~~~~~~~~
-     * 446  16*4  MBRPartition[4]   partitions           
-     * 510  2     UInt16            mbrSignature         
+     * 0    394   byte[394]         reserved1            possibly executable code
+     * 394  9     byte[9]           optIBMExtendedData1  either part of the executable code, or IBM extended data
+     * 403  9     byte[9]           optIBMExtendedData2  either part of the executable code, or IBM extended data
+     * 412  9     byte[9]           optIBMExtendedData3  either part of the executable code, or IBM extended data
+     * 421  9     byte[9]           optIBMExtendedData4  either part of the executable code, or IBM extended data
+     * 430  10    byte[10]          reserved2            possibly executable code
+     * 440  4     UInt32            optDiskSignature     either part of the executable code, or IBM extended data
+     * 444  2     byte[2]           reserved3            possibly executable code
+     * 446  16*4  MBRPartition[4]   partitions           the MBR partition table
+     * 510  2     UInt16            mbrSignature         signature that should always be present
      *
      */
-    private final byte[] optIBMExtendedData1 = new byte[9];
-    private final byte[] optIBMExtendedData2 = new byte[9];
-    private final byte[] optIBMExtendedData3 = new byte[9];
-    private final byte[] optIBMExtendedData4 = new byte[9];
-    private final byte[] optDiskSignature = new byte[4];
-    private final MBRPartition[] partitions = new MBRPartition[4];
-    private final byte[] mbrSignature = new byte[2];
+    protected final byte[] reserved1 = new byte[394];
+    protected final byte[] optIBMExtendedData1 = new byte[9];
+    protected final byte[] optIBMExtendedData2 = new byte[9];
+    protected final byte[] optIBMExtendedData3 = new byte[9];
+    protected final byte[] optIBMExtendedData4 = new byte[9];
+    protected final byte[] reserved2 = new byte[10];
+    protected final byte[] optDiskSignature = new byte[4];
+    protected final byte[] reserved3 = new byte[2];
+    protected final MBRPartition[] partitions = new MBRPartition[4];
+    protected final byte[] mbrSignature = new byte[2];
     
     private final LinkedList<Partition> tempList = new LinkedList<Partition>(); // getUsedPartitionEntries()
     
     /** <code>data</code> is assumed to be at least (<code>offset</code>+512) bytes in length. */
     public MBRPartitionTable(byte[] data, int offset) {
+	System.arraycopy(data, 0, reserved1, 0, reserved1.length);
 	System.arraycopy(data, offset+IBM_EXTENDED_DATA_OFFSET+0, optIBMExtendedData1, 0, 9);
 	System.arraycopy(data, offset+IBM_EXTENDED_DATA_OFFSET+9, optIBMExtendedData2, 0, 9);
 	System.arraycopy(data, offset+IBM_EXTENDED_DATA_OFFSET+18, optIBMExtendedData3, 0, 9);
 	System.arraycopy(data, offset+IBM_EXTENDED_DATA_OFFSET+27, optIBMExtendedData4, 0, 9);
-	System.arraycopy(data, offset+DISK_SIGNATURE_OFFSET, optDiskSignature, 0, 4);
+	System.arraycopy(data, 0, reserved2, 0, reserved2.length);
+	System.arraycopy(data, offset+OPTIONAL_DISK_SIGNATURE_OFFSET, optDiskSignature, 0, 4);
+	System.arraycopy(data, 0, reserved3, 0, reserved3.length);
 	for(int i = 0; i < 4; ++i)
 	    partitions[i] = new MBRPartition(data, offset+MBR_PARTITIONS_OFFSET+i*16, SECTOR_SIZE);
 	System.arraycopy(data, offset+MBR_PARTITIONS_OFFSET+64, mbrSignature, 0, 2);
+	
+	if(!Util.arraysEqual(getBytes(), data))
+	    throw new RuntimeException("Internal error!");
     }
+    
+    public MBRPartitionTable(MBRPartitionTable source) {
+	System.arraycopy(source.reserved1, 0, reserved1, 0, reserved1.length);
+	System.arraycopy(source.optIBMExtendedData1, 0, optIBMExtendedData1, 0, optIBMExtendedData1.length);
+	System.arraycopy(source.optIBMExtendedData2, 0, optIBMExtendedData2, 0, optIBMExtendedData2.length);
+	System.arraycopy(source.optIBMExtendedData3, 0, optIBMExtendedData3, 0, optIBMExtendedData3.length);
+	System.arraycopy(source.optIBMExtendedData4, 0, optIBMExtendedData4, 0, optIBMExtendedData4.length);
+	System.arraycopy(source.reserved2, 0, reserved2, 0, reserved2.length);
+	System.arraycopy(source.optDiskSignature, 0, optDiskSignature, 0, optDiskSignature.length);
+	System.arraycopy(source.reserved3, 0, reserved3, 0, reserved3.length);
+	for(int i = 0; i < 4; ++i)
+	    partitions[i] = new MBRPartition(source.partitions[i]);
+	System.arraycopy(source.mbrSignature, 0, mbrSignature, 0, mbrSignature.length);
+    }
+    
     /** This is an optional field, and might contain unexpected and invalid data. */
     public byte[] getOptionalIBMExtendedData1() { return Util.createCopy(optIBMExtendedData1); }
     /** This is an optional field, and might contain unexpected and invalid data. */
@@ -152,4 +177,26 @@ public class MBRPartitionTable implements PartitionSystem {
 
     public String getLongName() { return "Master Boot Record"; }
     public String getShortName() { return "MBR"; }
+
+    public byte[] getBytes() {
+	byte[] result = new byte[512];
+	int i = 0;
+	System.arraycopy(reserved1, 0, result, i, reserved1.length); i += reserved1.length;
+	System.arraycopy(optIBMExtendedData1, 0, result, i, optIBMExtendedData1.length); i += optIBMExtendedData1.length;
+	System.arraycopy(optIBMExtendedData2, 0, result, i, optIBMExtendedData2.length); i += optIBMExtendedData2.length;
+	System.arraycopy(optIBMExtendedData3, 0, result, i, optIBMExtendedData3.length); i += optIBMExtendedData3.length;
+	System.arraycopy(optIBMExtendedData4, 0, result, i, optIBMExtendedData4.length); i += optIBMExtendedData4.length;
+	System.arraycopy(reserved2, 0, result, i, reserved2.length); i += reserved2.length;
+	System.arraycopy(optDiskSignature, 0, result, i, optDiskSignature.length); i += optDiskSignature.length;
+	System.arraycopy(reserved3, 0, result, i, reserved3.length); i += reserved3.length;
+	for(int j = 0; j < partitions.length; ++j) {
+	    byte[] curData = partitions[j].getBytes();
+	    System.arraycopy(curData, 0, result, i, curData.length); i += curData.length;
+	}
+	System.arraycopy(mbrSignature, 0, result, i, mbrSignature.length); i += mbrSignature.length;
+	
+	if(i != result.length)
+	    throw new RuntimeException("Internal error!");
+	return result;
+    }
 }

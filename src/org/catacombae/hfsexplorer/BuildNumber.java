@@ -22,6 +22,6 @@ package org.catacombae.hfsexplorer;
 
 public class BuildNumber {
     //[BuildEnumerator:Opening] WARNING: The following lines are managed by an external program. Do NOT change.
-    public static final long BUILD_NUMBER = 235L;
+    public static final long BUILD_NUMBER = 239L;
     //[BuildEnumerator:Closing] The lines managed by an external program end here.
 }

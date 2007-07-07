@@ -163,19 +163,13 @@ public class GPTEntry implements Partition {
     private final int blockSize;
     
     public GPTEntry(byte[] data, int offset, int blockSize) {
+	this(blockSize);
 	System.arraycopy(data, offset+0, partitionTypeGUID, 0, 16);
 	System.arraycopy(data, offset+16, uniquePartitionGUID, 0, 16);
 	System.arraycopy(data, offset+32, startingLBA, 0, 8);
 	System.arraycopy(data, offset+40, endingLBA, 0, 8);
 	System.arraycopy(data, offset+48, attributeBits, 0, 8);
 	System.arraycopy(data, offset+56, partitionName, 0, 72);
-	
-	this.blockSize = blockSize;
-	
-// 	// Added to make it work as subclass of Partition
-// 	startOffset = getStartingLBA()*blockSize;
-// 	length = getEndingLBA()*blockSize - startOffset;
-// 	type = convertPartitionType(getPartitionTypeGUIDAsEnum());
     }
     
     protected GPTEntry(int blockSize) { this.blockSize = blockSize; }
