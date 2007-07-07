@@ -26,8 +26,8 @@ import java.io.*;
 
 /**
  * <pre>
- * Slightly altered version of RepairMyGPTPlease. This time I wanted to sync the MBR values for the table to
- * match the GPT values, as Windows altered this data during reformatting. (I might have done it myself)
+ * I'm thinking of creating a better sync program (that works) in this class, but right now, it's just
+ * a code copy from the sequel.
  * </pre>
  */
 
@@ -41,7 +41,7 @@ public class GPTToMBRSync {
 	else
 	    llf = new WritableRandomAccessLLF(args[0]);
 	
-	final GUIDPartitionTable originalGpt = new GUIDPartitionTable(llf, 0);
+	final MBRPartitionTable originalGpt = new MBRPartitionTable(llf, 0);
 	MutableGUIDPartitionTable gpt = new MutableGUIDPartitionTable(originalGpt);
 
 	if(originalGpt.isValid() && gpt.isValid()) {
