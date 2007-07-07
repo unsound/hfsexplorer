@@ -33,8 +33,8 @@ public class MutableGPTEntry extends GPTEntry {
     
     public void setPartitionTypeGUID(byte[] data, int off) { copyData(data, off, partitionTypeGUID); }
     public void setUniquePartitionGUID(byte[] data, int off) { copyData(data, off, uniquePartitionGUID); }
-    public void setStartingLBA(long i) { Util.arrayCopy(Util.toByteArrayBE(i), startingLBA); }
-    public void setEndingLBA(long i) { Util.arrayCopy(Util.toByteArrayBE(i), endingLBA); }
+    public void setStartingLBA(long i) { Util.arrayCopy(Util.toByteArrayLE(i), startingLBA); }
+    public void setEndingLBA(long i) { Util.arrayCopy(Util.toByteArrayLE(i), endingLBA); }
     public void setAttributeBits(long i) { Util.arrayCopy(Util.toByteArrayBE(i), attributeBits); }
     public void setPartitionName(byte[] data, int off) { copyData(data, off, partitionName); }
     
