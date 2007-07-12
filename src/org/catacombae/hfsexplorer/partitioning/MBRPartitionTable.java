@@ -94,6 +94,8 @@ public class MBRPartitionTable implements PartitionSystem {
 	System.arraycopy(source.mbrSignature, 0, mbrSignature, 0, mbrSignature.length);
     }
     
+    public static int getStructSize() { return 512; }
+    
     /** This is an optional field, and might contain unexpected and invalid data. */
     public byte[] getOptionalIBMExtendedData1() { return Util.createCopy(optIBMExtendedData1); }
     /** This is an optional field, and might contain unexpected and invalid data. */

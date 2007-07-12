@@ -18,6 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
+// THIS CODE IS UNFINISHED!
+
 package org.catacombae.hfsexplorer.testcode;
 import org.catacombae.hfsexplorer.*;
 import org.catacombae.hfsexplorer.partitioning.*;
@@ -32,6 +34,7 @@ import java.io.*;
  */
 
 public class GPTToMBRSync {
+    /*
     private static BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
     public static void main(String[] args) throws Exception {
 	long runTimeStamp = System.currentTimeMillis();
@@ -41,8 +44,15 @@ public class GPTToMBRSync {
 	else
 	    llf = new WritableRandomAccessLLF(args[0]);
 	
-	final MBRPartitionTable originalGpt = new MBRPartitionTable(llf, 0);
-	MutableGUIDPartitionTable gpt = new MutableGUIDPartitionTable(originalGpt);
+	byte[] mbrData = new byte[MBRPartitionTable.getStructSize()];
+	llf.seek(0);
+	if(llf.read(mbrData) != mbrData.length) {
+	    System.err.println("Could not read all MBR data.");
+	    System.exit(1);
+	}
+	
+	final MBRPartitionTable originalGpt = new MBRPartitionTable(mbrData, 0);
+	MutableMBRPartitionTable gpt = new MutableMBRPartitionTable(originalGpt);
 
 	if(originalGpt.isValid() && gpt.isValid()) {
 	    final int blockSize = 512;
@@ -74,7 +84,7 @@ public class GPTToMBRSync {
 	    backupFile2.close();
 	    System.out.println("done!");
 	    	
-	    /* Now we want to change the size of the second partition to match the MBR value. */
+	    // Now we want to change the size of the second partition to match the MBR value.
 	    MBRPartitionTable mbrStruct = new MBRPartitionTable(mbr, 0);
 	    System.out.print("Checking if the MBR is valid...");
 	    if(!mbrStruct.isValid()) {
@@ -202,5 +212,5 @@ public class GPTToMBRSync {
 	    System.out.println("Could not proceed! Detected an invalid GUID Partition Table on disk.");
 	llf.close();
     }
-    
+    */
 }
