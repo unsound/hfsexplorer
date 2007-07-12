@@ -18,7 +18,7 @@ rm -r $TEMPDIR/lib/CVS
 echo "Building zip file..."
 cd $TEMPDIR
 rm ../releases/current.zip
-zip -9 ../releases/current.zip *
+zip -9 -r ../releases/current.zip *
 cd ..
 
 echo "Done! Zip file generated in releases/current.zip"
