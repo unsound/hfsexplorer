@@ -620,24 +620,23 @@ public class FileSystemBrowserWindow extends JFrame {
 							  "Load file system from device");
 			deviceDialog.setVisible(true);
 			String pathName = deviceDialog.getPathName();
-			try {
-			    WindowsLowLevelIO io = new WindowsLowLevelIO(pathName);
+			if(pathName != null) {
 			    try {
-				if(pathName != null)
-				    loadFS(io, pathName);
-			    }
-			    catch(Exception e) {
+				WindowsLowLevelIO io = new WindowsLowLevelIO(pathName);
+				try { loadFS(io, pathName); }
+				catch(Exception e) {
+				    e.printStackTrace();
+				    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+								  "Could not read contents of partition!",
+								  "Error", JOptionPane.ERROR_MESSAGE);
+				}
+			    } catch(Exception e) {
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-							      "Could not read contents of partition!",
+							      "Could not open file!",
 							      "Error", JOptionPane.ERROR_MESSAGE);
 			    }
-			} catch(Exception e) {
-			    e.printStackTrace();
-			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-							  "Could not open file!",
-							  "Error", JOptionPane.ERROR_MESSAGE);
-			}			    
+			}
 		    }
 		});
 	    loadFSFromDeviceItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -1076,16 +1075,16 @@ public class FileSystemBrowserWindow extends JFrame {
 	FileSystemRecognizer fsr = new FileSystemRecognizer(fsFile, fsOffset);
 	FileSystemRecognizer.FileSystemType fsType = fsr.detectFileSystem();
 	if(fsType == FileSystemRecognizer.FileSystemType.HFS_WRAPPED_HFS_PLUS) {
-	    System.out.println("Found a wrapped HFS+ volume.");
+	    //System.out.println("Found a wrapped HFS+ volume.");
 	    byte[] mdbData = new byte[HFSPlusWrapperMDB.STRUCTSIZE];
 	    fsFile.seek(fsOffset + 1024);
 	    fsFile.read(mdbData);
 	    HFSPlusWrapperMDB mdb = new HFSPlusWrapperMDB(mdbData, 0);
 	    ExtDescriptor xd = mdb.getDrEmbedExtent();
 	    int hfsBlockSize = mdb.getDrAlBlkSiz();
-	    System.out.println("old fsOffset: " + fsOffset);
+	    //System.out.println("old fsOffset: " + fsOffset);
 	    fsOffset += mdb.getDrAlBlSt()*512 + xd.getXdrStABN()*hfsBlockSize; // Lovely method names...
-	    System.out.println("new fsOffset: " + fsOffset);
+	    //System.out.println("new fsOffset: " + fsOffset);
 	    // redetect with adjusted fsOffset
 	    fsr = new FileSystemRecognizer(fsFile, fsOffset);
 	    fsType = fsr.detectFileSystem();
