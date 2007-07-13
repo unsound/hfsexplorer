@@ -132,8 +132,8 @@ public class MBRPartition implements Partition {
     }
     
     // Defined in Partition
-    public long getStartOffset() { return getLBAFirstSector()*sectorSize; }
-    public long getLength() { return getLBAPartitionLength()*sectorSize; }
+    public long getStartOffset() { return Util.unsign(getLBAFirstSector())*sectorSize; }
+    public long getLength() { return Util.unsign(getLBAPartitionLength())*sectorSize; }
     public PartitionType getType() { return convertPartitionType(getPartitionTypeAsEnum()); }
 
 	

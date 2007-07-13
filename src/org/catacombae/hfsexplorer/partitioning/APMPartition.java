@@ -97,8 +97,9 @@ public class APMPartition implements Partition {
 	this.blockSize = blockSize;
     }
     // Defined in Partition
-    public long getStartOffset() { return (getPmPyPartStart()+getPmLgDataStart())*blockSize; }
-    public long getLength() { return getPmDataCnt()*blockSize; }
+    public long getStartOffset() { return ( Util.unsign(getPmPyPartStart())+
+					    Util.unsign(getPmLgDataStart()) )*blockSize; }
+    public long getLength() { return Util.unsign(getPmDataCnt())*blockSize; }
     public PartitionType getType() { return convertPartitionType(getPmParType()); }
     
     public short getPmSig()        { return Util.readShortBE(pmSig); }
@@ -153,6 +154,10 @@ public class APMPartition implements Partition {
     
     public void printFields(PrintStream ps, String prefix) {
 	printPartitionInfo(ps, prefix + " ");
+	ps.println(prefix + " Partition methods: ");
+	ps.println(prefix + "  getStartOffset(): " + getStartOffset());
+	ps.println(prefix + "  getLength(): " + getLength());
+	ps.println(prefix + "  getType(): " + getType());
     }
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "APMPartition:");

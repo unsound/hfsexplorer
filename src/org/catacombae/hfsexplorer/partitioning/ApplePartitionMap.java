@@ -20,9 +20,7 @@
 
 package org.catacombae.hfsexplorer.partitioning;
 
-import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.Util2;
-import org.catacombae.hfsexplorer.LowLevelFile;
+import org.catacombae.hfsexplorer.*;
 import java.util.ArrayList;
 import java.io.PrintStream;
 
@@ -35,6 +33,27 @@ public class ApplePartitionMap implements PartitionSystem {
 	ArrayList<APMPartition> partitionList = new ArrayList<APMPartition>();
 	while(true) { // Loop while the signature is correct ("PM")
 	    isoRaf.readFully(currentBlock);
+	    if((currentBlock[0] & 0xFF) == 0x50 && 
+	       (currentBlock[1] & 0xFF) == 0x4D) {
+		APMPartition p = new APMPartition(currentBlock, 0, blockSize);
+		partitionList.add(p);
+// 		if(options.verbose) {
+// 		    println();
+// 		    p.printPartitionInfo(System.out);
+// 		}
+// 		else
+// 		    println("\"" + p.getPmPartNameAsString() + "\" (" + p.getPmParTypeAsString() + ")");
+	    }
+	    else break;
+	}
+	partitions = partitionList.toArray(new APMPartition[partitionList.size()]);
+    }
+    
+    public ApplePartitionMap(byte[] data, int off, int blockSize) {
+	byte[] currentBlock = new byte[blockSize];
+	ArrayList<APMPartition> partitionList = new ArrayList<APMPartition>();
+	while(true) { // Loop while the signature is correct ("PM")
+	    System.arraycopy(data, off, currentBlock, 0, currentBlock.length); off += currentBlock.length;
 	    if((currentBlock[0] & 0xFF) == 0x50 && 
 	       (currentBlock[1] & 0xFF) == 0x4D) {
 		APMPartition p = new APMPartition(currentBlock, 0, blockSize);
@@ -84,4 +103,20 @@ public class ApplePartitionMap implements PartitionSystem {
     }
     public String getLongName() { return "Apple Partition Map"; }
     public String getShortName() { return "APM"; }
+    
+    /** This main method prints the fields of the DDR and APM in the file specified in args[0], offset 0. */
+    public static void main(String[] args) {
+	RandomAccessLLF fin = new RandomAccessLLF(args[0]);
+	byte[] curBlock = new byte[DriverDescriptorRecord.length()];
+	
+	if(fin.read(curBlock) != curBlock.length) throw new RuntimeException("Could not read all...");
+	DriverDescriptorRecord ddr = new DriverDescriptorRecord(curBlock, 0);
+	ddr.print(System.out, "");
+
+	final int blockSize = ddr.getSbBlkSize();
+	curBlock = new byte[blockSize];
+	
+	ApplePartitionMap apm = new ApplePartitionMap(fin, blockSize, blockSize);
+	apm.print(System.out, "");
+    }
 }
