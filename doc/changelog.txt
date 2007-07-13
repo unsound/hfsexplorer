@@ -1,6 +1,10 @@
 HFSExplorer Changelog
 ---------------------
 
+0.18.2
+------
+- Bugfix: HFSExplorer now works with large Apple Partition Map and MBR partitioned drives.
+
 0.18.1
 ------
 - Implemented support for wrapped HFS+ volumes (HFS+ volumes wrapped inside HFS volumes, as in
