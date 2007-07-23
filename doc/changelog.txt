@@ -3,7 +3,9 @@ HFSExplorer Changelog
 
 0.18.2
 ------
+- Bugfix/feature: Windows autodetect button now handles APM partitioned drives/CDs as well.
 - Bugfix: HFSExplorer now works with large Apple Partition Map and MBR partitioned drives.
+- Bugfix: Update check now checks for build number instead of version number.
 
 0.18.1
 ------
