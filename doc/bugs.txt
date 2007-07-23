@@ -13,3 +13,9 @@
   UPDATE: Can't reproduce this bug, everything seems fine.
 - Double-clicking a file in the right pane to enter a new directory
   takes more time than clicking it in the left pane. Why?
+
+2007-07-23
+----------
+- When opening files with java.awt.Desktop.open, and the file
+  doesn't have a valid file association, an ugly exception is thrown
+  to the user. This should be made more pretty.
