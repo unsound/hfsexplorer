@@ -148,7 +148,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
 	 * a native method for reading the contents of the device
 	 * tree, I'll just make up names for 20 harddrives, with
 	 * 20 partitions in each and check for existence.
-	 * Have more than 20 harddrives? You're out of luck. ;)
+	 * You have more than 20 harddrives? You're out of luck. ;)
 	 */
 	// 20 hard drives...
 	for(int i = 0; i < 20; ++i) {
@@ -195,34 +195,51 @@ public class SelectWindowsDeviceDialog extends JDialog {
 	// Look for file systems that sit inside partition systems unsupported by Windows.
 	for(int i = 0; i < detectedDeviceNames.length; ++i) {
 	    String name = detectedDeviceNames[i];
-	    if(name.endsWith("Partition0") &&
-	       !(i+1 < detectedDeviceNames.length && detectedDeviceNames[i+1].endsWith("Partition1"))) {
+// 	    System.out.println("Checking if \"" + name + "\" might be an unsupported partition system...");
+// 	    System.out.println("  name.startsWith(\"CdRom\") == " + name.startsWith(DEVICE_PREFIX + "CdRom"));
+// 	    System.out.println("  name.endsWith(\"Partition0\") == " + name.endsWith("Partition0"));
+	    
+	    if(name.startsWith("CdRom") ||
+	       (name.endsWith("Partition0") &&
+		!(i+1 < detectedDeviceNames.length && detectedDeviceNames[i+1].endsWith("Partition1"))) ) {
 		// We have an unidentifed partition system at "name"
-		LowLevelFile llf = new WindowsLowLevelIO(DEVICE_PREFIX + name);
-		PartitionSystemRecognizer psr = new PartitionSystemRecognizer(llf);
-		PartitionSystemRecognizer.PartitionSystemType pst = psr.detectPartitionSystem();
-		if(pst == PartitionSystemRecognizer.PartitionSystemType.APPLE_PARTITION_MAP) {
-		    DriverDescriptorRecord ddr = new DriverDescriptorRecord(llf, 0);
-		    if(ddr.isSignatureValid()) {
-			ApplePartitionMap apm = new ApplePartitionMap(llf, 0, ddr.getSbBlkSize());
-			Partition[] parts = apm.getUsedPartitionEntries();
-			for(int j = 0; j < parts.length; ++j) {
-			    Partition part = parts[j];
-			    if(part.getType() == Partition.PartitionType.APPLE_HFS) {
-				FileSystemRecognizer fsr = new FileSystemRecognizer(llf, part.getStartOffset());
-				if(fsr.detectFileSystem() == FileSystemRecognizer.FileSystemType.HFS_PLUS) {
-				    embeddedFileSystems.add(new String[] { "APM", name, j + "" });
+// 		System.out.println("TRUE!");
+		try {
+		    LowLevelFile llf = new WindowsLowLevelIO(DEVICE_PREFIX + name);
+		    PartitionSystemRecognizer psr = new PartitionSystemRecognizer(llf);
+		    PartitionSystemRecognizer.PartitionSystemType pst = psr.detectPartitionSystem();
+		    if(pst == PartitionSystemRecognizer.PartitionSystemType.APPLE_PARTITION_MAP) {
+// 			System.out.println("Detected APM... reading ddr");
+			DriverDescriptorRecord ddr = new DriverDescriptorRecord(llf, 0);
+			if(ddr.isSignatureValid()) {
+// 			    System.out.println("valid ddr");
+// 			    ddr.print(System.out, "  ");
+			    ApplePartitionMap apm = new ApplePartitionMap(llf, ddr.getSbBlkSize()*1, ddr.getSbBlkSize());
+			    Partition[] parts = apm.getUsedPartitionEntries();
+			    for(int j = 0; j < parts.length; ++j) {
+// 				System.out.println("Looping partition " + j);
+				Partition part = parts[j];
+				if(part.getType() == Partition.PartitionType.APPLE_HFS) {
+				    FileSystemRecognizer fsr = new FileSystemRecognizer(llf, part.getStartOffset());
+				    if(fsr.detectFileSystem() == FileSystemRecognizer.FileSystemType.HFS_PLUS) {
+					embeddedFileSystems.add(new String[] { "APM", name, j + "" });
+				    }
 				}
 			    }
 			}
+// 			else System.out.println("invalid ddr");
 		    }
+		    else if(pst == PartitionSystemRecognizer.PartitionSystemType.GUID_PARTITION_TABLE) {}
+		    else if(pst == PartitionSystemRecognizer.PartitionSystemType.MASTER_BOOT_RECORD) {}
 		    
+		    llf.close();
+		} catch(Exception e) {
+		    System.out.println("INFO: Non-critical exception while detecting partition system at \"" +
+				       DEVICE_PREFIX + name + "\": " + e.toString());
 		}
-		else if(pst == PartitionSystemRecognizer.PartitionSystemType.GUID_PARTITION_TABLE) {}
-		else if(pst == PartitionSystemRecognizer.PartitionSystemType.MASTER_BOOT_RECORD) {}
-		
-		llf.close();
 	    }
+// 	    else
+// 		System.out.println("FALSE");
 	}
 	
 	if(plainFileSystems.size() >= 1 || embeddedFileSystems.size() >= 1) {
@@ -252,7 +269,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
 			break;
 		    }
 		}
-		if(selectedIndex != -1) {
+		if(selectedIndex == -1) {
 		    throw new RuntimeException("Internal error!");
 		}
 		else {
@@ -266,10 +283,11 @@ public class SelectWindowsDeviceDialog extends JDialog {
 			if(embeddedInfo[0].equals("APM")) {
 			    LowLevelFile llf = new WindowsLowLevelIO(DEVICE_PREFIX + embeddedInfo[1]);
 			    DriverDescriptorRecord ddr = new DriverDescriptorRecord(llf, 0);
-			    ApplePartitionMap apm = new ApplePartitionMap(llf, 0, ddr.getSbBlkSize());
+			    ApplePartitionMap apm = new ApplePartitionMap(llf, ddr.getSbBlkSize()*1, ddr.getSbBlkSize());
 			    Partition p = apm.getPartitionEntry(Integer.parseInt(embeddedInfo[2]));
 			    resultCreatePath = DEVICE_PREFIX + selectedValue.toString();
 			    result = new ConcatenatedFile(llf, p.getStartOffset(), p.getLength());
+			    setVisible(false);
 			}
 			else if(embeddedInfo[0].equals("GPT")) {}
 			else if(embeddedInfo[0].equals("MBR")) {}
