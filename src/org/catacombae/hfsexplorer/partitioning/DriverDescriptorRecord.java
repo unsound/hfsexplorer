@@ -69,7 +69,10 @@ public class DriverDescriptorRecord {
 	System.arraycopy(data, offset+10, reserved2, 0, 2);
 	System.arraycopy(data, offset+12, reserved3, 0, 4);
 	System.arraycopy(data, offset+16, sbDrvrCount, 0, 2);
-	entries = new DriverDescriptorEntry[getSbDrvrCount()];
+	int numEntries = Util.unsign(getSbDrvrCount());
+	if(numEntries > 31) // BUGFIX: Stucture size does not allow for more than 31 values
+	    numEntries = 31;
+	entries = new DriverDescriptorEntry[numEntries];
 	int i;
 	for(i = 0; i < entries.length; ++i)
 	    entries[i] = new DriverDescriptorEntry(data, offset+18 + DriverDescriptorEntry.length()*i);
@@ -100,7 +103,7 @@ public class DriverDescriptorRecord {
     public short getReserved2() { return Util.readShortBE(reserved2); }
     /** Reserved. */
     public int getReserved3() { return Util.readIntBE(reserved3); }
-    /** Number of driver descriptor entries. */
+    /** Number of driver descriptor entries. Won't be more than 31 in a valid structure. */
     public short getSbDrvrCount() { return Util.readShortBE(sbDrvrCount); }
     public DriverDescriptorEntry[] getDriverDecriptorEntries() {
 	DriverDescriptorEntry[] result = new DriverDescriptorEntry[entries.length];

@@ -55,28 +55,42 @@ public class GUIDPartitionTable implements PartitionSystem {
 	byte[] currentEntryData = new byte[128];
 	
 	// 1. Read the primary header and table
-	llf.seek(offset+BLOCK_SIZE);
+	llf.seek(offset+BLOCK_SIZE); // BLOCK_SIZE is added to skip the first block, the (dummy) MBR
 	llf.readFully(headerData);
 	this.header = new GPTHeader(headerData, 0);
+	
+	if(header.isValid()) { // Before we use any values from the header, we must check its validity
+	    llf.seek(offset + header.getPartitionEntryLBA()*BLOCK_SIZE);
+	    this.entries = new GPTEntry[header.getNumberOfPartitionEntries()];
+	    for(int i = 0; i < entries.length; ++i) {
+		llf.readFully(currentEntryData);
+		entries[i] = new GPTEntry(currentEntryData, 0, BLOCK_SIZE);
+	    }
 
-	llf.seek(offset + header.getPartitionEntryLBA()*BLOCK_SIZE);
-	this.entries = new GPTEntry[header.getNumberOfPartitionEntries()];
-	for(int i = 0; i < entries.length; ++i) {
-	    llf.readFully(currentEntryData);
-	    entries[i] = new GPTEntry(currentEntryData, 0, BLOCK_SIZE);
+	    // 2. Read the backup header and table
+	    llf.seek(offset+BLOCK_SIZE*header.getBackupLBA());
+	    llf.readFully(headerData);
+	    this.backupHeader = new GPTHeader(headerData, 0);
+	    
+	    if(backupHeader.isValid()) { // Before we use any values from the backup header, we must check its validity
+		llf.seek(offset + backupHeader.getPartitionEntryLBA()*BLOCK_SIZE);
+		this.backupEntries = new GPTEntry[backupHeader.getNumberOfPartitionEntries()];
+		for(int i = 0; i < backupEntries.length; ++i) {
+		    llf.readFully(currentEntryData);
+		    backupEntries[i] = new GPTEntry(currentEntryData, 0, BLOCK_SIZE);
+		}
+	    }
+	    else
+		this.backupEntries = new GPTEntry[0];
+ 	}
+	else {
+	    // If header is invalid, we don't attempt to read any partitions, and place dummy values as members
+	    // Note: Make sure that the dummy values won't evaluate as "valid" (would be very unlikely but...)
+	    this.entries = new GPTEntry[0];
+	    this.backupHeader = new GPTHeader(new byte[GPTHeader.getSize()], 0);
+	    this.backupEntries = new GPTEntry[0];
 	}
 	
-	// 2. Read the backup header and table
-	llf.seek(offset+BLOCK_SIZE*header.getBackupLBA());
-	llf.readFully(headerData);
-	this.backupHeader = new GPTHeader(headerData, 0);
-
-	llf.seek(offset + backupHeader.getPartitionEntryLBA()*BLOCK_SIZE);
-	this.backupEntries = new GPTEntry[backupHeader.getNumberOfPartitionEntries()];
-	for(int i = 0; i < backupEntries.length; ++i) {
-	    llf.readFully(currentEntryData);
-	    backupEntries[i] = new GPTEntry(currentEntryData, 0, BLOCK_SIZE);
-	}
     }
     protected GUIDPartitionTable(GUIDPartitionTable source) {
 	this.header = new GPTHeader(source.header);

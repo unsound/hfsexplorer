@@ -31,9 +31,9 @@ public class ApplePartitionMap implements PartitionSystem {
 	isoRaf.seek(pmOffset);
 	byte[] currentBlock = new byte[/*512*/blockSize];
 	ArrayList<APMPartition> partitionList = new ArrayList<APMPartition>();
-	while(true) { // Loop while the signature is correct ("PM")
+	while(isoRaf.length() > isoRaf.getFilePointer()+currentBlock.length) { // Loop while we have data left in the file
 	    isoRaf.readFully(currentBlock);
-	    if((currentBlock[0] & 0xFF) == 0x50 && 
+	    if((currentBlock[0] & 0xFF) == 0x50 && // Checks for signature "PM"
 	       (currentBlock[1] & 0xFF) == 0x4D) {
 		APMPartition p = new APMPartition(currentBlock, 0, blockSize);
 		partitionList.add(p);
@@ -52,9 +52,9 @@ public class ApplePartitionMap implements PartitionSystem {
     public ApplePartitionMap(byte[] data, int off, int blockSize) {
 	byte[] currentBlock = new byte[blockSize];
 	ArrayList<APMPartition> partitionList = new ArrayList<APMPartition>();
-	while(true) { // Loop while the signature is correct ("PM")
+	while(data.length > off+currentBlock.length) { // Loop while we have data left in the array
 	    System.arraycopy(data, off, currentBlock, 0, currentBlock.length); off += currentBlock.length;
-	    if((currentBlock[0] & 0xFF) == 0x50 && 
+	    if((currentBlock[0] & 0xFF) == 0x50 && // Checks for signature "PM"
 	       (currentBlock[1] & 0xFF) == 0x4D) {
 		APMPartition p = new APMPartition(currentBlock, 0, blockSize);
 		partitionList.add(p);
