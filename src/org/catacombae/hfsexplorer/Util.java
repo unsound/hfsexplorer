@@ -334,73 +334,101 @@ public class Util {
     public static void arrayCopy(byte[] source, byte[] dest) {
 	arrayCopy(source, dest, 0);
     }
-
+    
     public static boolean arraysEqual(boolean[] a, boolean[] b) {
-	if(a.length != b.length)
+	return arrayRegionsEqual(a, 0, a.length, b, 0, b.length);
+    }
+    public static boolean arrayRegionsEqual(boolean[] a, int aoff, int alen,
+					    boolean[] b, int boff, int blen) {
+	if(alen != blen)
 	    return false;
 	else {
-	    for(int i = 0; i < a.length; ++i)
-		if(a[i] != b[i])
+	    for(int i = 0; i < alen; ++i)
+		if(a[aoff+i] != b[boff+i])
 		    return false;
 	    return true;
 	}
     }
     public static boolean arraysEqual(byte[] a, byte[] b) {
-	if(a.length != b.length)
+	return arrayRegionsEqual(a, 0, a.length, b, 0, b.length);
+    }
+    public static boolean arrayRegionsEqual(byte[] a, int aoff, int alen,
+					    byte[] b, int boff, int blen) {
+	if(a.length != blen)
 	    return false;
 	else {
-	    for(int i = 0; i < a.length; ++i)
-		if(a[i] != b[i])
+	    for(int i = 0; i < alen; ++i)
+		if(a[aoff+i] != b[boff+i])
 		    return false;
 	    return true;
 	}
     }
     public static boolean arraysEqual(char[] a, char[] b) {
-	if(a.length != b.length)
+	return arrayRegionsEqual(a, 0, a.length, b, 0, b.length);
+    }
+    public static boolean arrayRegionsEqual(char[] a, int aoff, int alen,
+					    char[] b, int boff, int blen) {
+	if(alen != blen)
 	    return false;
 	else {
-	    for(int i = 0; i < a.length; ++i)
-		if(a[i] != b[i])
+	    for(int i = 0; i < alen; ++i)
+		if(a[aoff+i] != b[boff+i])
 		    return false;
 	    return true;
 	}
     }
     public static boolean arraysEqual(short[] a, short[] b) {
-	if(a.length != b.length)
+	return arrayRegionsEqual(a, 0, a.length, b, 0, b.length);
+    }
+    public static boolean arrayRegionsEqual(short[] a, int aoff, int alen,
+					    short[] b, int boff, int blen) {
+	if(alen != blen)
 	    return false;
 	else {
-	    for(int i = 0; i < a.length; ++i)
-		if(a[i] != b[i])
+	    for(int i = 0; i < alen; ++i)
+		if(a[aoff+i] != b[boff+i])
 		    return false;
 	    return true;
 	}
     }
     public static boolean arraysEqual(int[] a, int[] b) {
-	if(a.length != b.length)
+	return arrayRegionsEqual(a, 0, a.length, b, 0, b.length);
+    }
+    public static boolean arrayRegionsEqual(int[] a, int aoff, int alen,
+					    int[] b, int boff, int blen) {
+	if(alen != blen)
 	    return false;
 	else {
-	    for(int i = 0; i < a.length; ++i)
-		if(a[i] != b[i])
+	    for(int i = 0; i < alen; ++i)
+		if(a[aoff+i] != b[boff+i])
 		    return false;
 	    return true;
 	}
     }
     public static boolean arraysEqual(long[] a, long[] b) {
-	if(a.length != b.length)
+	return arrayRegionsEqual(a, 0, a.length, b, 0, b.length);
+    }
+    public static boolean arrayRegionsEqual(long[] a, int aoff, int alen,
+					    long[] b, int boff, int blen) {
+	if(alen != blen)
 	    return false;
 	else {
-	    for(int i = 0; i < a.length; ++i)
-		if(a[i] != b[i])
+	    for(int i = 0; i < alen; ++i)
+		if(a[aoff+i] != b[boff+i])
 		    return false;
 	    return true;
 	}
     }
     public static boolean arraysEqual(Object[] a, Object[] b) {
-	if(a.length != b.length)
+	return arrayRegionsEqual(a, 0, a.length, b, 0, b.length);
+    }
+    public static boolean arrayRegionsEqual(Object[] a, int aoff, int alen,
+					    Object[] b, int boff, int blen) {
+	if(alen != blen)
 	    return false;
 	else {
-	    for(int i = 0; i < a.length; ++i)
-		if(!a[i].equals(b[i]))
+	    for(int i = 0; i < alen; ++i)
+		if(!a[aoff+i].equals(b[boff+i]))
 		    return false;
 	    return true;
 	}

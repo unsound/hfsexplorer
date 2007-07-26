@@ -69,15 +69,20 @@ public class MBRPartitionTable implements PartitionSystem {
 	System.arraycopy(data, offset+IBM_EXTENDED_DATA_OFFSET+9, optIBMExtendedData2, 0, 9);
 	System.arraycopy(data, offset+IBM_EXTENDED_DATA_OFFSET+18, optIBMExtendedData3, 0, 9);
 	System.arraycopy(data, offset+IBM_EXTENDED_DATA_OFFSET+27, optIBMExtendedData4, 0, 9);
-	System.arraycopy(data, 0, reserved2, 0, reserved2.length);
+	System.arraycopy(data, 430, reserved2, 0, reserved2.length);
 	System.arraycopy(data, offset+OPTIONAL_DISK_SIGNATURE_OFFSET, optDiskSignature, 0, 4);
-	System.arraycopy(data, 0, reserved3, 0, reserved3.length);
+	System.arraycopy(data, 444, reserved3, 0, reserved3.length);
 	for(int i = 0; i < 4; ++i)
 	    partitions[i] = new MBRPartition(data, offset+MBR_PARTITIONS_OFFSET+i*16, SECTOR_SIZE);
 	System.arraycopy(data, offset+MBR_PARTITIONS_OFFSET+64, mbrSignature, 0, 2);
 	
-	if(!Util.arraysEqual(getBytes(), data))
+	if(!Util.arrayRegionsEqual(getBytes(), 0, getStructSize(), data, offset, getStructSize())) {
+	    System.out.println("Original byte string:");
+	    System.out.println(Util.byteArrayToHexString(data, offset, getStructSize()));
+	    System.out.println("Regenerated version:");
+	    System.out.println(Util.byteArrayToHexString(getBytes()));
 	    throw new RuntimeException("Internal error!");
+	}
     }
     
     public MBRPartitionTable(MBRPartitionTable source) {
