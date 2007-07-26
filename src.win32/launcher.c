@@ -60,6 +60,7 @@
  * - Make the launcher Unicode compatible, and build it for
  *   Unicode. Otherwise it will not be able to handle argments
  *   which specify paths with unicode characters in them.
+ *   2007-07-26: This has already been done, right?
  * - Try to find a way to execute java(w).exe in the context of the
  *   current process (i.e. same process id and name). I want it to
  *   look nice.
@@ -277,24 +278,32 @@ static int createExternalJavaProcess(int argc, _TCHAR **argv) {
   DEBUG(_T("createExternalJavaProcess()\n"));
   STARTUPINFO si;
   PROCESS_INFORMATION pi;
+  //DEBUG(_T("  zeroing memory..."));
   ZeroMemory( &si, sizeof(si) );
   si.cb = sizeof(si);
   ZeroMemory( &pi, sizeof(pi) );
 
+  //DEBUG(_T("  creating base command lines...\n"));
   TCHAR *szCmdline1 = _T("javaw.exe -classpath " USER_CLASSPATH " " START_CLASS_PKGSYNTAX);
   TCHAR *szCmdline2 = _T("java.exe -classpath " USER_CLASSPATH " " START_CLASS_PKGSYNTAX);
   int lenSzCmdline1 = _tcslen(szCmdline1);
   int lenSzCmdline2 = _tcslen(szCmdline2);
-
+  //DEBUG(_T("  scCmdline1[len: %d]=\"%s\"\n"), lenSzCmdline1, szCmdline1);
+  //DEBUG(_T("  scCmdline2[len: %d]=\"%s\"\n"), lenSzCmdline2, szCmdline2);
+  
   /* copy the contents of argv into new strings */
+  //DEBUG(_T("  copying the contents of argc into new strings...\n"));
   int i;
-  int newArgStringSize = 0;
+  int newArgStringSize = sizeof(_TCHAR); // For the null terminator;
   for(i = 1; i < argc; ++i)
     newArgStringSize += (_tcslen(argv[i]) + 3)*sizeof(_TCHAR); // +3 for two "-characters and one whitespace
-  
+
+  //DEBUG(_T("  allocating memory for new string... (%d bytes)\n"), newArgStringSize);
   _TCHAR *newArgString = malloc(newArgStringSize);
   int ptr = 0;
+  //DEBUG(_T("  copying args...\n"));
   for(i = 1; i < argc; ++i) {
+    //DEBUG(_T("    argv[%d]...\n"), i);
     _TCHAR* cur = argv[i];
     int curlen = _tcslen(cur);
     _tcscpy(newArgString+ptr, _T(" \""));
@@ -304,23 +313,34 @@ static int createExternalJavaProcess(int argc, _TCHAR **argv) {
     _tcscpy(newArgString+ptr, _T("\""));
     ptr += 1;
   }
+  if(ptr != (newArgStringSize/sizeof(_TCHAR))-1)
+    DEBUG(_T("INTERNAL ERROR! newArgString has been incorrectly copied! ptr=%d newArgStringSize=%d\n"), ptr, newArgStringSize);
+  _tcscpy(newArgString+ptr, _T("\0")); ++ptr; // Important! This is a bug fix. No null terminator = chaos.
   
+  //DEBUG(_T("  concatentating first string into true command line...\n"));
+
   _TCHAR *szTrueCmdline1 = malloc(lenSzCmdline1*sizeof(_TCHAR) + newArgStringSize);
   _tcscpy(szTrueCmdline1, szCmdline1);
   _tcscpy(szTrueCmdline1+lenSzCmdline1, newArgString);
+  DEBUG(_T("szTrueCmdline1=\"%s\"\n"), szTrueCmdline1);
+
+  //DEBUG(_T("  concatentating second string into true command line...\n"));
+  //DEBUG(_T("  malloc(%d)...\n"), (lenSzCmdline2*sizeof(_TCHAR) + newArgStringSize));
   _TCHAR *szTrueCmdline2 = malloc(lenSzCmdline2*sizeof(_TCHAR) + newArgStringSize);
+  //DEBUG(_T("  _tcscopy 1...\n"));
   _tcscpy(szTrueCmdline2, szCmdline2);
+  //DEBUG(_T("  _tcscopy 2...\n"));
   _tcscpy(szTrueCmdline2+lenSzCmdline2, newArgString);
-  
+
+  //DEBUG(_T("  freeing newArgString...\n"));
   free(newArgString);
   
-  DEBUG(_T("szTrueCmdline1=%s\n"), szTrueCmdline1);
-  DEBUG(_T("szTrueCmdline2=%s\n"), szTrueCmdline2);
+  DEBUG(_T("szTrueCmdline2=\"%s\"\n"), szTrueCmdline2);
   //MessageBox(NULL, szTrueCmdline1, _T("szTrueCmdline1"), MB_OK);
   //MessageBox(NULL, szTrueCmdline2, _T("szTrueCmdline2"), MB_OK);
   
   DEBUG(_T("trying with first process (javaw.exe)\n"));
-  // This is PATHETIC. A simpler API please, MS.. null null false null 0 null bla bla
+  // This is PATHETIC. A simpler API please, MS.. null null false null 0 null bla bla unreadable
   if(!CreateProcess(NULL, szTrueCmdline1, 
 		    NULL, NULL, FALSE, CREATE_UNICODE_ENVIRONMENT, NULL, NULL, &si, &pi)) {
     // Reset si and pi in case CreateProcess did something with them
