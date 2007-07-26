@@ -116,7 +116,10 @@ public class DriverDescriptorRecord {
     /** Returns a String representation of the device signature. */
     public String getSbSigAsString() { return Util2.toASCIIString(sbSig); }
     
-    public boolean isSignatureValid() { return getSbSig() == DDR_SIGNATURE; }
+    public boolean isValid() {
+	int driverCount = Util.unsign(getSbDrvrCount());
+	return getSbSig() == DDR_SIGNATURE && driverCount <= 31 && entries.length == driverCount;
+    }
     
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " sbSig: \"" + getSbSigAsString() + "\"");

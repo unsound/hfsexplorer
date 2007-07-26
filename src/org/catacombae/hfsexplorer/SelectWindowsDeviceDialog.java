@@ -211,7 +211,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
 		    if(pst == PartitionSystemRecognizer.PartitionSystemType.APPLE_PARTITION_MAP) {
 // 			System.out.println("Detected APM... reading ddr");
 			DriverDescriptorRecord ddr = new DriverDescriptorRecord(llf, 0);
-			if(ddr.isSignatureValid()) {
+			if(ddr.isValid()) {
 // 			    System.out.println("valid ddr");
 // 			    ddr.print(System.out, "  ");
 			    ApplePartitionMap apm = new ApplePartitionMap(llf, ddr.getSbBlkSize()*1, ddr.getSbBlkSize());

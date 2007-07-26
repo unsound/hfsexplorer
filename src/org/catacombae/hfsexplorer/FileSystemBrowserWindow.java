@@ -622,19 +622,12 @@ public class FileSystemBrowserWindow extends JFrame {
 			LowLevelFile io = deviceDialog.getPartitionStream();
 			String pathName = deviceDialog.getPathName();
 			if(io != null) {
-			    try {
-				//WindowsLowLevelIO io = new WindowsLowLevelIO(pathName);
-				try { loadFS(io, pathName); }
-				catch(Exception e) {
-				    e.printStackTrace();
-				    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-								  "Could not read contents of partition!",
-								  "Error", JOptionPane.ERROR_MESSAGE);
-				}
-			    } catch(Exception e) {
+			    try { loadFS(io, pathName); }
+			    catch(Exception e) {
+				System.err.print("INFO: Non-critical exception when trying to load file system from \"" + pathName + "\": ");
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-							      "Could not open file!",
+							      "Could not find any file system on device!",
 							      "Error", JOptionPane.ERROR_MESSAGE);
 			    }
 			}

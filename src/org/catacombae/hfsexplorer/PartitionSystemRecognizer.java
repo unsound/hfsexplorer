@@ -41,7 +41,7 @@ public class PartitionSystemRecognizer {
 	
 	// Look for APM
 	DriverDescriptorRecord ddr = new DriverDescriptorRecord(piece1, 0);
-	if(ddr.isSignatureValid()) {
+	if(ddr.isValid()) {
 	    int blockSize = Util.unsign(ddr.getSbBlkSize());
 	    long numberOfBlocksOnDevice = Util.unsign(ddr.getSbBlkCount());
 	    //bitStream.seek(blockSize*1); // second block, first partition in list
@@ -74,7 +74,8 @@ public class PartitionSystemRecognizer {
 	return PartitionSystemType.NONE_FOUND;
     }
     
-    /** If none can be found, null is returned */
+    /** If none can be found, null is returned. If the underlying file can't be read, a
+	RuntimeException is thrown. */
     public PartitionSystem getPartitionSystem() {
 	PartitionSystemType type = detectPartitionSystem();
 	switch(type) {

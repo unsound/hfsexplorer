@@ -188,7 +188,7 @@ public class MBRPartition implements Partition {
     public String toString() {
 	MBRPartitionType mpt = getPartitionTypeAsEnum();
 	return (isBootable()?"Bootable ":"") + "MBR Partition (" + mpt + 
-	    (mpt == MBRPartitionType.UNKNOWN_PARTITION_TYPE?" [0x"+Util.toHexStringBE(getPartitionType()):"") + "])";
+	    (mpt == MBRPartitionType.UNKNOWN_PARTITION_TYPE?" [0x"+Util.toHexStringBE(getPartitionType())+"]":"") + ")";
     }
     
     public void printFields(PrintStream ps, String prefix) {
