@@ -76,13 +76,8 @@ public class MBRPartitionTable implements PartitionSystem {
 	    partitions[i] = new MBRPartition(data, offset+MBR_PARTITIONS_OFFSET+i*16, SECTOR_SIZE);
 	System.arraycopy(data, offset+MBR_PARTITIONS_OFFSET+64, mbrSignature, 0, 2);
 	
-	if(!Util.arrayRegionsEqual(getBytes(), 0, getStructSize(), data, offset, getStructSize())) {
-	    System.out.println("Original byte string:");
-	    System.out.println(Util.byteArrayToHexString(data, offset, getStructSize()));
-	    System.out.println("Regenerated version:");
-	    System.out.println(Util.byteArrayToHexString(getBytes()));
+	if(!Util.arrayRegionsEqual(getBytes(), 0, getStructSize(), data, offset, getStructSize()))
 	    throw new RuntimeException("Internal error!");
-	}
     }
     
     public MBRPartitionTable(MBRPartitionTable source) {
