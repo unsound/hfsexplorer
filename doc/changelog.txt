@@ -1,6 +1,14 @@
 HFSExplorer Changelog
 ---------------------
 
+0.18.3
+------
+- Bugfix: Parsing of Driver Descriptor Records and GUID Partition Tables could bail out for
+  unexpected values when detecting partition systems, leading to exceptions when trying to
+  load file systems.
+- Bugfix: The launcher, hfsexplorer.exe, had a bug leading to access violation and crash
+  under some circumstances due to a non null-terminated string being generated.
+
 0.18.2
 ------
 - Bugfix/feature: Windows autodetect button now handles APM partitioned drives/CDs as well.
