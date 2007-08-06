@@ -1,6 +1,12 @@
 HFSExplorer Changelog
 ---------------------
 
+0.19
+----
+- Feature: Experimental support for HFSX formatted volumes (Mac OS Extended with case
+  sensitive filenames). Feedback is appreciated for those with HFSX volumes.
+- Bugfix: Annoying GUI behavior when extracting files with long file names.
+
 0.18.3
 ------
 - Bugfix: Parsing of Driver Descriptor Records and GUID Partition Tables could bail out for
