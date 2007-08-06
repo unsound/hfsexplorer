@@ -458,6 +458,20 @@ public class Util {
 	return ((data >>> bitNumber) & 0x1) == 0x1;
     }
 
+    public static int unsignedArrayCompare(char[] a, char[] b) {
+	return unsignedArrayCompare(a, 0, a.length, b, 0, b.length);
+    }
+    public static int unsignedArrayCompare(char[] a, int aoff, int alen, char[] b, int boff, int blen) {
+	int compareLen = Math.max(alen, blen);
+	for(int i = 0; i < compareLen; ++i) {
+	    int curA = a[aoff+i] & 0xFFFF; // Unsigned char values represented as int
+	    int curB = b[boff+i] & 0xFFFF;
+	    if(curA != curB)
+		return curA - curB;
+	}
+	return alen-blen; // The shortest array gets higher priority
+    }
+
     // All below is from Util2 (got tired of having two Util classes...)
     public static String toASCIIString(byte[] data) {
 	return toASCIIString(data, 0, data.length);

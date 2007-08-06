@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2006 Erik Larsson
+ * Copyright (C) 2007 Erik Larsson
  * 
  * All rights reserved.
  * 
@@ -18,10 +18,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-package org.catacombae.hfsexplorer;
+package org.catacombae.hfsexplorer.types;
 
-public class BuildNumber {
-    //[BuildEnumerator:Opening] WARNING: The following lines are managed by an external program. Do NOT change.
-    public static final long BUILD_NUMBER = 279L;
-    //[BuildEnumerator:Closing] The lines managed by an external program end here.
+public class HFSXCatalogLeafNode extends HFSPlusCatalogLeafNode {
+    public HFSXCatalogLeafNode(byte[] data, int offset, int nodeSize, BTHeaderRec catalogHeaderRec) {
+	super(data, offset, nodeSize, catalogHeaderRec);
+    }
 }

@@ -49,6 +49,11 @@ public class BTHeaderRec {
      * 42  4*16  UInt32[16]  reserved3                            
      */
     
+    /** Case folding (case-insensitive). Possible return value from getKeyCompareType(). */
+    public static final byte kHFSCaseFolding = (byte)0xCF;
+    /** Binary compare (case-sensitive). Possible return value from getKeyCompareType(). */
+    public static final byte kHFSBinaryCompare = (byte)0xBC;
+    
     private final byte[] treeDepth = new byte[2];
     private final byte[] rootNode = new byte[4];
     private final byte[] leafRecords = new byte[4];
@@ -95,6 +100,9 @@ public class BTHeaderRec {
     public short getReserved1() { return Util.readShortBE(reserved1); }
     public int getClumpSize() { return Util.readIntBE(clumpSize); }
     public byte getBtreeType() { return Util.readByteBE(btreeType); }
+    /** Specifies what type of key compare algorithm to use. For HFS+ volumes, this field is to be treated as reserved. 
+	For HFSX (at least version 5) volumes, the value of this field will be one of the constants
+	<code>kHFSCaseFolding</code> or <code>kHFSBinaryCompare</code> defined as static constants of this class. */
     public byte getKeyCompareType() { return Util.readByteBE(keyCompareType); }
     public int getAttributes() { return Util.readIntBE(attributes); }
     public int[] getReserved3() { return Util2.readIntArrayBE(reserved3); }

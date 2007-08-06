@@ -184,7 +184,7 @@ public class HFSExplorer {
 	    ForkFilter catalogFile = new ForkFilter(header.getCatalogFile(),
 						    header.getCatalogFile().getExtents().getExtentDescriptors(),
 						    isoRaf, offset, header.getBlockSize());
-	    HFSPlusCatalogLeafRecord[] f = HFSFileSystemView.collectFilesInDir(new HFSCatalogNodeID(1), bthr.getRootNode(), isoRaf,
+	    HFSPlusCatalogLeafRecord[] f = HFSPlusFileSystemView.collectFilesInDir(new HFSCatalogNodeID(1), bthr.getRootNode(), isoRaf,
 									       offset, header, bthr, catalogFile);
 	    System.out.println("Found " + f.length + " items in subroot.");
 	    for(HFSPlusCatalogLeafRecord rec : f) {
@@ -196,7 +196,7 @@ public class HFSExplorer {
 		    HFSPlusCatalogFolder folderData = (HFSPlusCatalogFolder)data;
 		    System.out.println(" (dir, id: " + folderData.getFolderID().toInt() + ")");
 		    // Print contents of folder
-		    HFSPlusCatalogLeafRecord[] f2 = HFSFileSystemView.collectFilesInDir(folderData.getFolderID(), bthr.getRootNode(), isoRaf, offset, header, bthr, catalogFile);
+		    HFSPlusCatalogLeafRecord[] f2 = HFSPlusFileSystemView.collectFilesInDir(folderData.getFolderID(), bthr.getRootNode(), isoRaf, offset, header, bthr, catalogFile);
 		    System.out.println("  Found " + f2.length + " items in " + rec.getKey().getNodeName().toString() + ".");
 		    for(HFSPlusCatalogLeafRecord rec2 : f2)
 			System.out.println("    \"" + rec2.getKey().getNodeName() + "\"");
@@ -336,7 +336,7 @@ public class HFSExplorer {
     }
     
     public static void operationBrowse(Operation op, LowLevelFile hfsFile, long fsOffset, long fsLength) {
-	HFSFileSystemView fsView = new HFSFileSystemView(hfsFile, fsOffset);
+	HFSPlusFileSystemView fsView = new HFSPlusFileSystemView(hfsFile, fsOffset);
 	HFSPlusCatalogLeafRecord rootRecord = fsView.getRoot();
 	HFSPlusCatalogLeafRecord currentDir = rootRecord;
 	//HFSCatalogNodeID = new HFSCatalogNodeID(1); //rootRecord.getFolderID();
@@ -620,7 +620,7 @@ public class HFSExplorer {
 	 *     - If list.size() > numberOfFilesToDisplay: do removeLast() until they match.
 	 */
 	
-	HFSFileSystemView fsView = new HFSFileSystemView(hfsFile, fsOffset);
+	HFSPlusFileSystemView fsView = new HFSPlusFileSystemView(hfsFile, fsOffset);
 	HFSPlusCatalogLeafRecord rootRecord = fsView.getRoot();
 	HFSPlusCatalogLeafRecord currentDir = rootRecord;
 	recursiveFragmentSearch(fsView, rootRecord, mostFragmentedList, numberOfFilesToDisplay, options.verbose);
@@ -632,7 +632,7 @@ public class HFSExplorer {
 	}
     }
     
-    private static void recursiveFragmentSearch(HFSFileSystemView fsView, HFSPlusCatalogLeafRecord currentDir, 
+    private static void recursiveFragmentSearch(HFSPlusFileSystemView fsView, HFSPlusCatalogLeafRecord currentDir, 
 						ArrayList<Pair<HFSPlusCatalogLeafRecord, Integer>> mostFragmentedList, 
 						final int listMaxLength, final boolean verbose) {
 	for(HFSPlusCatalogLeafRecord rec : fsView.listRecords(currentDir)) {
@@ -682,7 +682,7 @@ public class HFSExplorer {
 // 	System.err.println("Opening hack UDIF file...");
 // 	hfsFile = new UDIFRandomAccessLLF("/Users/erik/documents.dmg");
 // 	System.err.println("Opened.");
-	HFSFileSystemView fsView = new HFSFileSystemView(hfsFile, fsOffset);
+	HFSPlusFileSystemView fsView = new HFSPlusFileSystemView(hfsFile, fsOffset);
 	HFSPlusVolumeHeader header = fsView.getVolumeHeader();
 	int blockSize = header.getBlockSize();
 	

@@ -28,6 +28,9 @@ public class HFSPlusCatalogLeafNode extends BTLeafNode {
     protected HFSPlusCatalogLeafRecord[] leafRecords;
     
     public HFSPlusCatalogLeafNode(byte[] data, int offset, int nodeSize) {
+	this(data, offset, nodeSize, null);
+    }
+    protected HFSPlusCatalogLeafNode(byte[] data, int offset, int nodeSize, BTHeaderRec catalogHeaderRec) {
 	//nodeDescriptor = new BTNodeDescriptor(data, offset);
 	super(data, offset, nodeSize);
 	short[] offsets = new short[Util2.unsign(nodeDescriptor.getNumRecords())+1];
@@ -39,7 +42,10 @@ public class HFSPlusCatalogLeafNode extends BTLeafNode {
 	for(int i = 0; i < leafRecords.length; ++i) {
 	    int currentOffset = Util2.unsign(offsets[i]);
 	    //HFSPlusCatalogKey currentKey = new HFSPlusCatalogKey(currentNode, offset+currentOffset);
-	    leafRecords[i] = new HFSPlusCatalogLeafRecord(data, offset+currentOffset);
+	    if(catalogHeaderRec == null)
+		leafRecords[i] = new HFSPlusCatalogLeafRecord(data, offset+currentOffset);
+	    else
+		leafRecords[i] = new HFSXCatalogLeafRecord(data, offset+currentOffset, catalogHeaderRec);
 	}
 	
     }

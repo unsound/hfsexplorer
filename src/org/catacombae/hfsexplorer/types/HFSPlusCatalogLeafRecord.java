@@ -30,11 +30,18 @@ public class HFSPlusCatalogLeafRecord {
     public static final int HFS_PLUS_FOLDER_THREAD_RECORD = 0x0003;
     public static final int HFS_PLUS_FILE_THREAD_RECORD = 0x0004;
     
-    private HFSPlusCatalogKey key;
-    private HFSPlusCatalogLeafRecordData recordData;
+    protected final HFSPlusCatalogKey key;
+    protected final HFSPlusCatalogLeafRecordData recordData;
     
     public HFSPlusCatalogLeafRecord(byte[] data, int offset) {
-	key = new HFSPlusCatalogKey(data, offset);
+	this(data, offset, null);
+    }
+    protected HFSPlusCatalogLeafRecord(byte[] data, int offset, BTHeaderRec catalogHeaderRec) {
+	if(catalogHeaderRec == null)
+	    key = new HFSPlusCatalogKey(data, offset);
+	else
+	    key = new HFSXCatalogKey(data, offset, catalogHeaderRec);
+	
 	short recordType = Util.readShortBE(data, offset+key.length());
 	if(recordType == HFS_PLUS_FOLDER_RECORD)
 	    recordData = new HFSPlusCatalogFolder(data, offset+key.length());

@@ -20,7 +20,7 @@
 
 package org.catacombae.hfsexplorer;
 
-//import org.catacombae.hfsexplorer.HFSFileSystemView;
+//import org.catacombae.hfsexplorer.HFSPlusFileSystemView;
 import org.catacombae.hfsexplorer.gui.VolumeInfoPanel;
 import org.catacombae.hfsexplorer.gui.CatalogInfoPanel;
 import org.catacombae.hfsexplorer.gui.JournalInfoPanel;
@@ -38,7 +38,7 @@ public class VolumeInfoWindow extends JFrame {
     private CatalogInfoPanel catalogInfoPanel;
     private JournalInfoPanel journalInfoPanel;
     
-    public VolumeInfoWindow(HFSFileSystemView fsView) {
+    public VolumeInfoWindow(HFSPlusFileSystemView fsView) {
 	super("File system info");
 	
 	tabs = new JTabbedPane();

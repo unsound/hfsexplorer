@@ -96,7 +96,7 @@ public class FileSystemBrowserWindow extends JFrame {
     private final JFileChooser fileChooser = new JFileChooser();
     private final Vector<String> colNames = new Vector<String>();
     private final DefaultTableModel tableModel;
-    private HFSFileSystemView fsView;
+    private HFSPlusFileSystemView fsView;
     
     private static class RecordNodeStorage {
 	private HFSPlusCatalogLeafRecord parentRecord;
@@ -1097,11 +1097,15 @@ public class FileSystemBrowserWindow extends JFrame {
 	    fsr = new FileSystemRecognizer(fsFile, fsOffset);
 	    fsType = fsr.detectFileSystem();
 	}
-	if(fsType == FileSystemRecognizer.FileSystemType.HFS_PLUS) {
+	if(fsType == FileSystemRecognizer.FileSystemType.HFS_PLUS ||
+	   fsType == FileSystemRecognizer.FileSystemType.HFSX) {
 	    if(fsView != null) {
 		fsView.getStream().close();
 	    }
-	    fsView = new HFSFileSystemView(fsFile, fsOffset);
+	    if(fsType == FileSystemRecognizer.FileSystemType.HFS_PLUS)
+		fsView = new HFSPlusFileSystemView(fsFile, fsOffset);
+	    else
+		fsView = new HFSXFileSystemView(fsFile, fsOffset);
 	    HFSPlusCatalogLeafRecord rootRecord = fsView.getRoot();
 	    HFSPlusCatalogLeafRecord[] rootContents = fsView.listRecords(rootRecord);
 	    populateFilesystemGUI(rootRecord, rootContents);
@@ -1110,10 +1114,11 @@ public class FileSystemBrowserWindow extends JFrame {
 	    //adjustTableWidth();
 	}
 	else
-	    JOptionPane.showMessageDialog(this, "Invalid HFS type.\nProgram supports (" +
-					  FileSystemRecognizer.FileSystemType.HFS_PLUS + ", " +
-					  FileSystemRecognizer.FileSystemType.HFS_WRAPPED_HFS_PLUS +
-					  ").\nDetected type is (" + fsType + ").",
+	    JOptionPane.showMessageDialog(this, "Invalid HFS type.\nProgram supports:\n" +
+					  "    " + FileSystemRecognizer.FileSystemType.HFS_PLUS + "\n" +
+					  "    " + FileSystemRecognizer.FileSystemType.HFSX + "\n" +
+					  "    " + FileSystemRecognizer.FileSystemType.HFS_WRAPPED_HFS_PLUS + "\n" +
+					  "\nDetected type is (" + fsType + ").",
 					  "Unsupported file system type", JOptionPane.ERROR_MESSAGE);
 		    
     }

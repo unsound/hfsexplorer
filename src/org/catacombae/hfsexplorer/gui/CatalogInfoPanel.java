@@ -61,7 +61,7 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
     }
     
     /** Creates new form CatalogInfoPanel */
-    public CatalogInfoPanel(final HFSFileSystemView fsView) {
+    public CatalogInfoPanel(final HFSPlusFileSystemView fsView) {
         initComponents();
 	
 	JTree dirTree = catalogTree;
@@ -176,7 +176,7 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
         });
     }
 
-    public void expandNode(DefaultMutableTreeNode dmtn, BTNode node, HFSFileSystemView fsView) {
+    public void expandNode(DefaultMutableTreeNode dmtn, BTNode node, HFSPlusFileSystemView fsView) {
 	if(node instanceof HFSPlusCatalogIndexNode) {
 	    BTIndexRecord[] recs = ((HFSPlusCatalogIndexNode)node).getIndexRecords();
 	    for(BTIndexRecord rec : recs) {
