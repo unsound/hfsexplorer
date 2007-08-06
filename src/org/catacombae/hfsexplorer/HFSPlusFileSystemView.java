@@ -338,51 +338,6 @@ public class HFSPlusFileSystemView {
     public long extractForkToStream(HFSPlusForkData forkData, HFSPlusExtentDescriptor[] extentDescriptors,
 				    OutputStream os, ProgressMonitor pm) throws IOException {
 	CatalogInitProcedure init = new CatalogInitProcedure();	
-	
-// 	if(false) { // Deprecated method
-// 	    int blockSize = init.header.getBlockSize(); // Okay, I should unsign this but.. seriously (:
-// 	    long totalBytesRemaining = forkData.getLogicalSize();
-// 	    HFSPlusExtentDescriptor[] descs = forkData.getExtents().getExtentDescriptors();
-// 	    byte[] buffer = new byte[4096];
-// 	    for(HFSPlusExtentDescriptor desc : descs) {
-// 		if(totalBytesRemaining == 0)
-// 		    break;
-// 		desc.print(System.out, "");
-// 		long startBlock = Util2.unsign(desc.getStartBlock());
-// 		long blockCount = Util2.unsign(desc.getBlockCount());
-// 		if(blockCount == 0)
-// 		    continue;
-// 		else {
-// 		    if(totalBytesRemaining < 1)
-// 			System.err.println("WTF! totalBytesRemaining == " + totalBytesRemaining + " and I'm trying to read? WHAT WAS _I_ THINKING?! DUUUH!!!"); // Yes I've been sitting here for too long...
-// 		    hfsFile.seek(fsOffset + startBlock*blockSize);
-		    
-// 		    long nrBytesToRead = blockCount*blockSize;
-// 		    if(nrBytesToRead > totalBytesRemaining)
-// 			nrBytesToRead = totalBytesRemaining;
-		
-// 		    long bytesRead = 0;
-// 		    while(bytesRead < nrBytesToRead) {
-// 			int currentBytesRead = hfsFile.read(buffer, 0, 
-// 							    (nrBytesToRead-bytesRead < buffer.length?
-// 							     (int)(nrBytesToRead-bytesRead):buffer.length));
-// 			if(currentBytesRead < 0)
-// 			    throw new RuntimeException("Unexpectedly reached end of file!");
-// 			else {
-// 			    bytesRead += currentBytesRead;
-// 			    pm.addDataProgress(currentBytesRead);
-// 			    os.write(buffer, 0, currentBytesRead);
-// 			}
-// 		    }
-		
-// 		    totalBytesRemaining -= bytesRead;
-// 		}
-// 	    }
-// 	    if(totalBytesRemaining != 0)
-// 		System.err.println("WARNING: At end of extractForkToStream and totalBytesRemaining == " + totalBytesRemaining + " == not 0!");
-// 	    return forkData.getLogicalSize()-totalBytesRemaining;
-// 	}
-// 	else { // Use the new ForkFilter class instead.
 	ForkFilter forkFilter = new ForkFilter(forkData, extentDescriptors, hfsFile, fsOffset, init.header.getBlockSize());
 	long bytesToRead = forkData.getLogicalSize();
 	byte[] buffer = new byte[4096];
@@ -473,20 +428,7 @@ public class HFSPlusFileSystemView {
     }
 
     public HFSPlusExtentRecord[] getAllExtentRecords(HFSCatalogNodeID fileID, HFSPlusForkData forkData, byte forkType) {
-	//HFSPlusCatalogLeafRecordData recData = requestFile.getData();
-	//if(true) {
-// 	if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
-// 	   recData instanceof HFSPlusCatalogFile) {
-// 	    //int blockSize = getVolumeHeader().getBlockSize();
-// 	    HFSPlusCatalogFile catFile = (HFSPlusCatalogFile) recData;
 	HFSPlusExtentRecord[] result;
-// 	    HFSPlusForkData forkData;
-// 	    if(forkType == HFSPlusExtentKey.DATA_FORK)
-// 		forkData = catFile.getDataFork();
-// 	    else if(forkType == HFSPlusExtentKey.RESOURCE_FORK)
-// 		forkData = catFile.getResourceFork();
-// 	    else
-// 		throw new IllegalArgumentException("Illegal fork type!");
 
 	long basicExtentsBlockCount = 0;
 	for(int i = 0; i < 8; ++i)
@@ -570,21 +512,6 @@ public class HFSPlusFileSystemView {
 	else
 	    return null;
     }
-    
-//     /** Should be used instead of a simple <code>new HFSPlusCatalogIndexNode(...)</code> to cope with HFS+/HFSX
-// 	differences. */
-//     public HFSPlusCatalogIndexNode newCatalogIndexNode(byte[] data, int offset, int nodeSize, BTHeaderRec bthr) {
-// 	return new HFSPlusCatalogIndexNode(data, offset, nodeSize, bthr);
-//     }
-//     public HFSPlusCatalogKey newCatalogKey(HFSCatalogNodeID nodeID, HFSUniStr255 searchString, BTHeaderRec bthr) {
-// 	return new HFSPlusCatalogKey(nodeID, searchString);
-//     }
-//     public HFSPlusCatalogLeafNode newCatalogLeafNode(byte[] data, int offset, int nodeSize, BTHeaderRec bthr) {
-// 	return new HFSPlusCatalogLeafNode(data, offset, nodeSize);
-//     }
-//     public HFSPlusCatalogLeafRecord newCatalogLeafRecord(byte[] data, int offset, BTHeaderRec bthr) {
-// 	return new HFSPlusCatalogLeafRecord(data, offset);
-//     }
     
     // Utility methods
     
@@ -676,9 +603,6 @@ public class HFSPlusFileSystemView {
 	return null;
     }
     
-//     private static BTIndexRecord findLEKey(BTIndexNode indexNode, HFSCatalogNodeID nodeID, HFSUniStr255 searchString) {
-// 	return findLEKey(indexNode, new HFSPlusCatalogKey(nodeID, searchString));
-//     }
     private static BTIndexRecord findLEKey(BTIndexNode indexNode, BTKey searchKey) {
 	/* 
 	 * Algorithm:

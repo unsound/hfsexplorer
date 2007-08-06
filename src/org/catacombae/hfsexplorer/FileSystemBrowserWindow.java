@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2006 Erik Larsson
+ * Copyright (C) 2006-2007 Erik Larsson
  * 
  * All rights reserved.
  * 
