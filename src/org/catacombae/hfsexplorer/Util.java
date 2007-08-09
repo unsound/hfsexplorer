@@ -462,7 +462,7 @@ public class Util {
 	return unsignedArrayCompare(a, 0, a.length, b, 0, b.length);
     }
     public static int unsignedArrayCompare(char[] a, int aoff, int alen, char[] b, int boff, int blen) {
-	int compareLen = Math.max(alen, blen);
+	int compareLen = Math.min(alen, blen);
 	for(int i = 0; i < compareLen; ++i) {
 	    int curA = a[aoff+i] & 0xFFFF; // Unsigned char values represented as int
 	    int curB = b[boff+i] & 0xFFFF;
