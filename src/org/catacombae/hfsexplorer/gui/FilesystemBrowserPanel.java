@@ -40,6 +40,7 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
     /** Creates new form FilesystemBrowserPanel */
     public FilesystemBrowserPanel() {
         initComponents();
+	fileTableScroller.getViewport().setBackground(fileTable.getBackground()); // To remove the grey area below the actual table
     }
     
     /** This method is called from within the constructor to

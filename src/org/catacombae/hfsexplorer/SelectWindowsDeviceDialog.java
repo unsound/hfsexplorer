@@ -185,7 +185,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
 	    try {
 		LowLevelFile llf = new WindowsLowLevelIO(DEVICE_PREFIX + name);
 		FileSystemRecognizer fsr = new FileSystemRecognizer(llf, 0);
-		if(fsr.detectFileSystem() == FileSystemRecognizer.FileSystemType.HFS_PLUS)
+		if(fsr.isTypeSupported(fsr.detectFileSystem()))
 		    plainFileSystems.add(name);
 		llf.close();
 	    } catch(Exception e) {
@@ -221,7 +221,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
 				Partition part = parts[j];
 				if(part.getType() == Partition.PartitionType.APPLE_HFS) {
 				    FileSystemRecognizer fsr = new FileSystemRecognizer(llf, part.getStartOffset());
-				    if(fsr.detectFileSystem() == FileSystemRecognizer.FileSystemType.HFS_PLUS) {
+				    if(fsr.isTypeSupported(fsr.detectFileSystem())) {
 					embeddedFileSystems.add(new String[] { "APM", name, j + "" });
 				    }
 				}

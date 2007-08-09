@@ -29,6 +29,11 @@ public class FileSystemRecognizer {
     
     public static enum FileSystemType { MFS, HFS, HFS_PLUS, HFS_WRAPPED_HFS_PLUS, HFSX, UNKNOWN };
     
+    /** Change this array to tell the program which types it supports. */
+    public static final FileSystemType[] supportedTypes = { FileSystemType.HFS_PLUS,
+							    FileSystemType.HFS_WRAPPED_HFS_PLUS,
+							    FileSystemType.HFSX };
+    
     private LowLevelFile bitstream;
     private long offset;
     public FileSystemRecognizer(LowLevelFile bitstream, long offset) {
@@ -55,5 +60,17 @@ public class FileSystemRecognizer {
 	case SIGNATURE_HFSX: return FileSystemType.HFSX;
 	default: return FileSystemType.UNKNOWN;
 	}
+    }
+    
+    public boolean isTypeSupported(FileSystemType fst) {
+	for(FileSystemType cur : supportedTypes)
+	    if(cur == fst) return true;
+	return false;
+    }
+    
+    public FileSystemType[] getSupportedTypes() {
+	FileSystemType[] res = new FileSystemType[supportedTypes.length];
+	System.arraycopy(supportedTypes, 0, res, 0, supportedTypes.length);
+	return res;
     }
 }

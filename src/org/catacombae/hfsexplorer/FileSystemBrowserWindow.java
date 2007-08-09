@@ -627,7 +627,7 @@ public class FileSystemBrowserWindow extends JFrame {
 				System.err.print("INFO: Non-critical exception when trying to load file system from \"" + pathName + "\": ");
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-							      "Could not find any file system on device!",
+							      "Could not find any file systems on device!",
 							      "Error", JOptionPane.ERROR_MESSAGE);
 			    }
 			}
@@ -1289,6 +1289,10 @@ public class FileSystemBrowserWindow extends JFrame {
 			    try {
 				Java6Specific.openFile(extractedFile);
 				fopFrame.dispose();
+			    } catch(IOException e) {
+                                JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "Could not find a handler to open the file with.\n" +
+                                                              "The file remains in\n    \"" + tempDir + "\"\nuntil you exit the program.",
+							      "Error", JOptionPane.ERROR_MESSAGE);
 			    } catch(Exception e) {
 				String stackTrace = e.toString() + "\n";
 				for(StackTraceElement ste : e.getStackTrace()) stackTrace += "    " + ste.toString() + "\n";
