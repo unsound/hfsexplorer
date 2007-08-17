@@ -293,8 +293,8 @@ public class HFSPlusFileSystemView {
 	else
 	    throw new RuntimeException("Invalid input (not a folder record).");
     }
-    /** You really should use the method above to access folder listings. However, the folderID is all
-	that's really needed. */
+    /** You should use the method above to access folder listings. However, the folderID is really all
+	that's needed, but make sure it's a folder ID and not a file ID, or something bad will happen. */
     public HFSPlusCatalogLeafRecord[] listRecords(HFSCatalogNodeID folderID) {	
 	CatalogInitProcedure init = new CatalogInitProcedure();
 	final ForkFilter catalogFile = init.getForkFilterFile(init.header);

@@ -96,6 +96,7 @@ public class APMPartition implements Partition {
 	
 	this.blockSize = blockSize;
     }
+    public static int structSize() { return 512; }
     // Defined in Partition
     public long getStartOffset() { return ( Util.unsign(getPmPyPartStart())+
 					    Util.unsign(getPmLgDataStart()) )*blockSize; }
@@ -150,6 +151,35 @@ public class APMPartition implements Partition {
 	ps.println(prefix + "pmBootCksum: " + getPmBootCksum());
 	ps.println(prefix + "pmProcessor: \"" + getPmProcessorAsString() + "\"");
 	ps.println(prefix + "pmPad: " + getPmPad());
+    }
+    
+    public byte[] getData() {
+	byte[] result = new byte[structSize()];
+	int offset = 0;
+	System.arraycopy(pmSig, 0, result, offset, pmSig.length); offset += pmSig.length;
+	System.arraycopy(pmSigPad, 0, result, offset, pmSigPad.length); offset += pmSigPad.length;
+	System.arraycopy(pmMapBlkCnt, 0, result, offset, pmMapBlkCnt.length); offset += pmMapBlkCnt.length;
+	System.arraycopy(pmPyPartStart, 0, result, offset, pmPyPartStart.length); offset += pmPyPartStart.length;
+	System.arraycopy(pmPartBlkCnt, 0, result, offset, pmPartBlkCnt.length); offset += pmPartBlkCnt.length;
+	System.arraycopy(pmPartName, 0, result, offset, pmPartName.length); offset += pmPartName.length;
+	System.arraycopy(pmParType, 0, result, offset, pmParType.length); offset += pmParType.length;
+	System.arraycopy(pmLgDataStart, 0, result, offset, pmLgDataStart.length); offset += pmLgDataStart.length;
+	System.arraycopy(pmDataCnt, 0, result, offset, pmDataCnt.length); offset += pmDataCnt.length;
+	System.arraycopy(pmPartStatus, 0, result, offset, pmPartStatus.length); offset += pmPartStatus.length;
+	System.arraycopy(pmLgBootStart, 0, result, offset, pmLgBootStart.length); offset += pmLgBootStart.length;
+	System.arraycopy(pmBootSize, 0, result, offset, pmBootSize.length); offset += pmBootSize.length;
+	System.arraycopy(pmBootAddr, 0, result, offset, pmBootAddr.length); offset += pmBootAddr.length;
+	System.arraycopy(pmBootAddr2, 0, result, offset, pmBootAddr2.length); offset += pmBootAddr2.length;
+	System.arraycopy(pmBootEntry, 0, result, offset, pmBootEntry.length); offset += pmBootEntry.length;
+	System.arraycopy(pmBootEntry2, 0, result, offset, pmBootEntry2.length); offset += pmBootEntry2.length;
+	System.arraycopy(pmBootCksum, 0, result, offset, pmBootCksum.length); offset += pmBootCksum.length;
+	System.arraycopy(pmProcessor, 0, result, offset, pmProcessor.length); offset += pmProcessor.length;
+	System.arraycopy(pmPad, 0, result, offset, pmPad.length); offset += pmPad.length;
+	//System.arraycopy(, 0, result, offset, .length); offset += .length;
+	if(offset != result.length)
+	    throw new RuntimeException("Internal miscalculation...");
+	else
+	    return result;
     }
     
     public void printFields(PrintStream ps, String prefix) {

@@ -86,6 +86,20 @@ public class ApplePartitionMap implements PartitionSystem {
 	return getPartitionEntries();
     }
     
+    public byte[] getData() {
+	byte[] result = new byte[partitions.length*APMPartition.structSize()];
+	int offset = 0;
+	for(APMPartition ap : partitions) {
+	    byte[] tmp = ap.getData();
+	    System.arraycopy(tmp, 0, result, offset, tmp.length); offset += tmp.length;
+	}
+	//System.arraycopy(, 0, result, offset, .length); offset += .length;
+	if(offset != result.length)
+	    throw new RuntimeException("Internal miscalculation...");
+	else
+	    return result;
+    }
+    
     public void printFields(PrintStream ps, String prefix) {
 	for(int i = 0; i < partitions.length; ++i) {
 	    ps.println(prefix + " partitions[" + i + "]:");

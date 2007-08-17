@@ -121,6 +121,28 @@ public class DriverDescriptorRecord {
 	return getSbSig() == DDR_SIGNATURE && driverCount <= 31 && entries.length == driverCount;
     }
     
+    public byte[] getData() {
+	byte[] result = new byte[length()];
+	int offset = 0;
+	System.arraycopy(sbSig, 0, result, offset, sbSig.length); offset += sbSig.length;
+	System.arraycopy(sbBlkSize, 0, result, offset, sbBlkSize.length); offset += sbBlkSize.length;
+	System.arraycopy(sbBlkCount, 0, result, offset, sbBlkCount.length); offset += sbBlkCount.length;
+	System.arraycopy(reserved1, 0, result, offset, reserved1.length); offset += reserved1.length;
+	System.arraycopy(reserved2, 0, result, offset, reserved2.length); offset += reserved2.length;
+	System.arraycopy(reserved3, 0, result, offset, reserved3.length); offset += reserved3.length;
+	System.arraycopy(sbDrvrCount, 0, result, offset, sbDrvrCount.length); offset += sbDrvrCount.length;
+	for(DriverDescriptorEntry dde : entries) {
+	    byte[] tmp = dde.getData();
+	    System.arraycopy(tmp, 0, result, offset, tmp.length); offset += tmp.length;
+	}
+	System.arraycopy(ddPad, 0, result, offset, ddPad.length); offset += ddPad.length;
+	//System.arraycopy(, 0, result, offset, .length); offset += .length;
+	if(offset != length())
+	    throw new RuntimeException("Internal miscalculation...");
+	else
+	    return result;
+    }
+    
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " sbSig: \"" + getSbSigAsString() + "\"");
 	ps.println(prefix + " sbBlkSize: " + getSbBlkSize());

@@ -221,8 +221,8 @@ public class GUIDPartitionTable implements PartitionSystem {
    
     /** Returns the data in the main table of the disk. (LBA1-LBAx) */
     public byte[] getPrimaryTableBytes() {
-	if(BLOCK_SIZE+GPTHeader.getSize() != BLOCK_SIZE*header.getPartitionEntryLBA())
-	    throw new RuntimeException("Primary header and primary entries are not coherent!");
+// 	if(BLOCK_SIZE+GPTHeader.getSize() != BLOCK_SIZE*header.getPartitionEntryLBA())
+// 	    throw new RuntimeException("Primary header and primary entries are not coherent!");
 	
 	int offset = 0;
 	byte[] result = new byte[GPTHeader.getSize() + GPTEntry.getSize()*entries.length];
@@ -239,11 +239,11 @@ public class GUIDPartitionTable implements PartitionSystem {
 	return result;
     }
     public byte[] getBackupTableBytes() {
-	long endOfBackupEntries =
-	    getBackupTableBytesOffset() +
-	    backupHeader.getNumberOfPartitionEntries()*backupHeader.getSizeOfPartitionEntry();
-	if(endOfBackupEntries != BLOCK_SIZE*backupHeader.getPrimaryLBA())
-	    throw new RuntimeException("Backup entries and backup header are not coherent!");
+// 	long endOfBackupEntries =
+// 	    getBackupTableBytesOffset() +
+// 	    backupHeader.getNumberOfPartitionEntries()*backupHeader.getSizeOfPartitionEntry();
+// 	if(endOfBackupEntries != BLOCK_SIZE*backupHeader.getPrimaryLBA())
+// 	    throw new RuntimeException("Backup entries and backup header are not coherent! endOfBackupEntries=" + endOfBackupEntries + " backupHeader.getPrimaryLBA()=" + backupHeader.getPrimaryLBA());
 	
 	int offset = 0;
 	byte[] result = new byte[GPTEntry.getSize()*entries.length + GPTHeader.getSize()];

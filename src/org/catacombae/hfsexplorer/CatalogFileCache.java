@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2006 Erik Larsson
+ * Copyright (C) 2007 Erik Larsson
  * 
  * All rights reserved.
  * 
@@ -20,8 +20,19 @@
 
 package org.catacombae.hfsexplorer;
 
-public class BuildNumber {
-    //[BuildEnumerator:Opening] WARNING: The following lines are managed by an external program. Do NOT change.
-    public static final long BUILD_NUMBER = 297L;
-    //[BuildEnumerator:Closing] The lines managed by an external program end here.
+import org.catacombae.hfsexplorer.types.*;
+import java.util.*;
+
+/**
+ * Convenience class to hold copies of the catalog file's data.
+ */
+class CatalogFileCache {
+    private HashMap<Integer, BTNode> cacheMap = new HashMap<Integer, BTNode>();
+    
+    public void put(int nodeNumber, BTNode node) {
+	cacheMap.put(nodeNumber, node);
+    }
+    public BTNode get(int nodeNumber) {
+	return cacheMap.get(nodeNumber);
+    }
 }

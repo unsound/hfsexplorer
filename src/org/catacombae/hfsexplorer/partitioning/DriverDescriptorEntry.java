@@ -54,6 +54,17 @@ public class DriverDescriptorEntry {
     public short getDdSize() { return Util.readShortBE(ddSize); }
     public short getDdType() { return Util.readShortBE(ddType); }
     
+    public byte[] getData() {
+	byte[] result = new byte[length()];
+	int offset = 0;
+	System.arraycopy(ddBlock, 0, result, offset, ddBlock.length); offset += ddBlock.length;
+	System.arraycopy(ddSize, 0, result, offset, ddSize.length); offset += ddSize.length;
+	System.arraycopy(ddType, 0, result, offset, ddType.length); offset += ddType.length;
+	if(offset != length())
+	    throw new RuntimeException("Internal miscalculation...");
+	else
+	    return result;
+    }
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " ddBlock: " + getDdBlock());
 	ps.println(prefix + " ddSize: " + getDdSize());
