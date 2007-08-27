@@ -404,6 +404,13 @@ public class FileSystemBrowserWindow extends JFrame {
 				    }
 				});
 			    jpm.add(infoItem);
+			    JMenuItem resExtractItem = new JMenuItem("Extract resource fork");
+			    resExtractItem.addActionListener(new ActionListener() {
+				    public void actionPerformed(ActionEvent e) {
+					actionExtractToDir(true);
+				    }
+				});
+			    jpm.add(resExtractItem);
 			    jpm.show(fileTable, e.getX(), e.getY());
 			}
 		    }
@@ -1350,8 +1357,11 @@ public class FileSystemBrowserWindow extends JFrame {
 	fopFrame.setLocationRelativeTo(null);
 	fopFrame.setVisible(true);
     }
-
+    
     private void actionExtractToDir() {
+	actionExtractToDir(false);
+    }
+    private void actionExtractToDir(final boolean resourceFork) {
 	try {
 	    final HFSPlusCatalogLeafRecord[] selection = getSelectedRecords();
 	    if(selection.length > 0) {
@@ -1363,8 +1373,12 @@ public class FileSystemBrowserWindow extends JFrame {
 		    final ExtractProgressDialog progress = new ExtractProgressDialog(this);
 		    Runnable r = new Runnable() {
 			    public void run() {
-				progress.setDataSize(calculateDataForkSizeRecursive(selection));
-				int errorCount = extract(selection, outDir, progress);
+				if(!resourceFork)
+				    progress.setDataSize(calculateDataForkSizeRecursive(selection));
+				else
+				    progress.setDataSize(calculateResourceForkSizeRecursive(selection));
+				
+				int errorCount = extract(selection, outDir, progress, resourceFork);
 				if(!progress.cancelSignaled()) {
 				    if(errorCount == 0)
 					JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
@@ -1564,18 +1578,26 @@ public class FileSystemBrowserWindow extends JFrame {
     
     /** <code>progressDialog</code> may NOT be null. */
     protected int extract(HFSPlusCatalogLeafRecord rec, File outDir, ProgressMonitor progressDialog) {
-	return extractRecursive(rec, outDir, progressDialog, new ObjectContainer<Boolean>(false));
+	return extract(rec, outDir, progressDialog, false);
+    }
+    /** <code>progressDialog</code> may NOT be null. */
+    protected int extract(HFSPlusCatalogLeafRecord rec, File outDir, ProgressMonitor progressDialog, boolean resourceFork) {
+	return extractRecursive(rec, outDir, progressDialog, new ObjectContainer<Boolean>(false), resourceFork);
     }
     /** <code>progressDialog</code> may NOT be null. */
     protected int extract(HFSPlusCatalogLeafRecord[] recs, File outDir, ProgressMonitor progressDialog) {
+	return extract(recs, outDir, progressDialog, false);
+    }
+    /** <code>progressDialog</code> may NOT be null. */
+    protected int extract(HFSPlusCatalogLeafRecord[] recs, File outDir, ProgressMonitor progressDialog, boolean resourceFork) {
 	int errorCount = 0;
 	for(HFSPlusCatalogLeafRecord rec : recs) {
-	    errorCount += extractRecursive(rec, outDir, progressDialog, new ObjectContainer<Boolean>(false));
+	    errorCount += extractRecursive(rec, outDir, progressDialog, new ObjectContainer<Boolean>(false), resourceFork);
 	}
 	return errorCount;
     }
     private int extractRecursive(HFSPlusCatalogLeafRecord rec, File outDir, ProgressMonitor progressDialog,
-				 ObjectContainer<Boolean> overwriteAll) {
+				 ObjectContainer<Boolean> overwriteAll, boolean resourceFork) {
 	if(progressDialog.cancelSignaled()) {
 	    progressDialog.confirmCancel();
 	    return 0;
@@ -1587,11 +1609,16 @@ public class FileSystemBrowserWindow extends JFrame {
 	   recData instanceof HFSPlusCatalogFile) {
 	    HFSPlusCatalogFile catFile = (HFSPlusCatalogFile)recData;
 	    String filename = rec.getKey().getNodeName().getUnicodeAsComposedString();
+	    if(resourceFork) filename = "._" + filename; // Special syntax for resource forks in foreign file systems
 	    while(true) {
 		//System.out.println("file: \"" + filename + "\" range: " + fractionLowLimit + "-" + fractionHighLimit);
-		progressDialog.updateCurrentFile(filename, catFile.getDataFork().getLogicalSize());
+		if(!resourceFork)
+		    progressDialog.updateCurrentFile(filename, catFile.getDataFork().getLogicalSize());
+		else
+		    progressDialog.updateCurrentFile(filename, catFile.getResourceFork().getLogicalSize());
 		//progressDialog.updateTotalProgress(fractionLowLimit);
 		File outFile = new File(outDir, filename);
+
 		if(!overwriteAll.o && outFile.exists()) {
 		    String[] options = new String[] { "Overwrite", "Overwrite all", "Skip file and continue", "Rename file", "Cancel" };
 		    int reply = JOptionPane.showOptionDialog(this, "File:\n    \"" + outFile.getAbsolutePath() + "\"\n" +
@@ -1642,7 +1669,10 @@ public class FileSystemBrowserWindow extends JFrame {
 		    if(!outFile.getParentFile().equals(outDir) || !outFile.getName().equals(filename))
 			throw new FileNotFoundException();
 		    FileOutputStream fos = new FileOutputStream(outFile);
-		    fsView.extractDataForkToStream(rec, fos, progressDialog);
+		    if(!resourceFork)
+			fsView.extractDataForkToStream(rec, fos, progressDialog);
+		    else
+			fsView.extractResourceForkToStream(rec, fos, progressDialog);
 		    fos.close();
 		    //JOptionPane.showMessageDialog(this, "The file was successfully extracted!\n",
 		    //			  "Extraction complete!", JOptionPane.INFORMATION_MESSAGE);
@@ -1656,7 +1686,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		    System.out.println();
 		    
 		    String[] options = new String[] { "Skip file and continue", "Cancel", "Rename file" };
-		    int reply = JOptionPane.showOptionDialog(this, "Could not create file \"" + filename +
+		    int reply = JOptionPane.showOptionDialog(this, "Could not create file \"" + outFile +
 							     "\" in folder:\n  " + outDir.getAbsolutePath() + "\n" //+
 							     /*"Do you want to continue? (The file will be skipped)"*/,
 							     "Error", JOptionPane.YES_NO_CANCEL_OPTION,
@@ -1750,7 +1780,7 @@ public class FileSystemBrowserWindow extends JFrame {
 // 		final double step = (fractionHighLimit-fractionLowLimit)/contents.length;
 // 		double floor = fractionLowLimit;
 		for(HFSPlusCatalogLeafRecord outRec : contents) {
-		    errorCount += extractRecursive(outRec, thisDir, progressDialog, overwriteAll);
+		    errorCount += extractRecursive(outRec, thisDir, progressDialog, overwriteAll, resourceFork);
 // 		    floor += step;
 		}
 	    }
@@ -1770,19 +1800,34 @@ public class FileSystemBrowserWindow extends JFrame {
 	return errorCount;
     }
     
-    /** Calculates the complete data size of the trees represented by <code>recs</code>. */
     protected long calculateDataForkSizeRecursive(HFSPlusCatalogLeafRecord[] recs) {
+	return calculateForkSizeRecursive(recs, false);
+    }
+    protected long calculateDataForkSizeRecursive(HFSPlusCatalogLeafRecord rec) {
+	return calculateForkSizeRecursive(rec, false);	
+    }
+    protected long calculateResourceForkSizeRecursive(HFSPlusCatalogLeafRecord[] recs) {
+	return calculateForkSizeRecursive(recs, true);
+    }
+    protected long calculateResourceForkSizeRecursive(HFSPlusCatalogLeafRecord rec) {
+	return calculateForkSizeRecursive(rec, true);
+    }
+    /** Calculates the complete size of the trees represented by <code>recs</code>. */
+    protected long calculateForkSizeRecursive(HFSPlusCatalogLeafRecord[] recs, boolean resourceFork) {
 	long totalSize = 0;
 	for(HFSPlusCatalogLeafRecord rec : recs)
-	    totalSize += calculateDataForkSizeRecursive(rec);
+	    totalSize += calculateForkSizeRecursive(rec, resourceFork);
 	return totalSize;
     }
-    /** Calculates the complete data size of the tree represented by <code>rec</code>. */
-    protected long calculateDataForkSizeRecursive(HFSPlusCatalogLeafRecord rec) {
+    /** Calculates the complete size of the tree represented by <code>rec</code>. */
+    protected long calculateForkSizeRecursive(HFSPlusCatalogLeafRecord rec, boolean resourceFork) {
 	HFSPlusCatalogLeafRecordData recData = rec.getData();
 	if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
 	   recData instanceof HFSPlusCatalogFile) {
-	    return ((HFSPlusCatalogFile)recData).getDataFork().getLogicalSize();
+	    if(!resourceFork)
+		return ((HFSPlusCatalogFile)recData).getDataFork().getLogicalSize();
+	    else
+		return ((HFSPlusCatalogFile)recData).getResourceFork().getLogicalSize();
 	}
 	else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
 		recData instanceof HFSPlusCatalogFolder) {
@@ -1790,7 +1835,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	    HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
 	    long totalSize = 0;
 	    for(HFSPlusCatalogLeafRecord outRec : contents) {
-		totalSize += calculateDataForkSizeRecursive(outRec);
+		totalSize += calculateForkSizeRecursive(outRec, resourceFork);
 	    }
 	    return totalSize;
 	}
