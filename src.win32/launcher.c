@@ -57,10 +57,6 @@
 
 /*
  * TODO!
- * - Make the launcher Unicode compatible, and build it for
- *   Unicode. Otherwise it will not be able to handle argments
- *   which specify paths with unicode characters in them.
- *   2007-07-26: This has already been done, right?
  * - Try to find a way to execute java(w).exe in the context of the
  *   current process (i.e. same process id and name). I want it to
  *   look nice.
@@ -82,9 +78,9 @@
 #define FIRSTARG "-dbgconsole"
 #define START_CLASS_PKGSYNTAX "org.catacombae.hfsexplorer.FileSystemBrowserWindow " FIRSTARG
 #define START_CLASS           "org/catacombae/hfsexplorer/FileSystemBrowserWindow"
-#define USER_CLASSPATH        "lib\\hfsx.jar;lib\\swing-layout-1.0.1.jar;lib\\hfsx_dmglib.jar"
-static int classpathComponentCount = 3;
-static _TCHAR *classpathComponents[3] = { _T("lib\\hfsx.jar"), _T("lib\\swing-layout-1.0.1.jar"), _T("lib\\hfsx_dmglib.jar") };
+#define USER_CLASSPATH        "lib\\hfsx.jar;lib\\swing-layout-1.0.1.jar;lib\\hfsx_dmglib.jar;lib\\apache-ant-1.7.0-bzip2.jar;lib\\iharder-base64.jar"
+static int classpathComponentCount = 5;
+static _TCHAR *classpathComponents[5] = { _T("lib\\hfsx.jar"), _T("lib\\swing-layout-1.0.1.jar"), _T("lib\\hfsx_dmglib.jar"), _T("lib\\apache-ant-1.7.0-bzip2.jar"), _T("lib\\iharder-base64.jar") };
 static _TCHAR *classpathString = NULL; // Set by calling resolveClasspath()
 
 #define FALSE 0

@@ -1,1 +1,1 @@
-@java -cp "%~dp0dist\lib\hfsx.jar";"%~dp0dist\lib\swing-layout-1.0.1.jar";"%~dp0dist\lib\hfsx_dmglib.jar" org.catacombae.hfsexplorer.%1 %2 %3 %4 %5 %6 %7 %8 %9
+@java -cp "%~dp0dist\lib\hfsx.jar";"%~dp0dist\lib\swing-layout-1.0.1.jar";"%~dp0dist\lib\hfsx_dmglib.jar";"%~dp0lib\apache-ant-1.7.0-bzip2.jar";"%~dp0lib\iharder-base64.jar" org.catacombae.hfsexplorer.%1 %2 %3 %4 %5 %6 %7 %8 %9
