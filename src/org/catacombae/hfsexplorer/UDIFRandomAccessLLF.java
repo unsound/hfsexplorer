@@ -20,7 +20,7 @@
 
 package org.catacombae.hfsexplorer;
 
-import org.catacombae.dmgx.*;
+import org.catacombae.udif.*;
 import org.catacombae.io.*;
 import java.io.*;
 
@@ -29,15 +29,15 @@ import java.io.*;
  * HFSExplorer.
  */
 public class UDIFRandomAccessLLF implements LowLevelFile {
-    private DmgRandomAccessStream raf;
+    private UDIFRandomAccessStream raf;
     public UDIFRandomAccessLLF(String filename) {
 	try {
 	    //System.err.println("opening rafStream");
 	    RandomAccessFileStream rafStream = new RandomAccessFileStream(new RandomAccessFile(filename, "r"));
 	    //System.err.println("opening dmgf");
-	    DmgFile dmgf = new DmgFile(rafStream);
+	    UDIFFile dmgf = new UDIFFile(rafStream);
 	    //System.err.println("opening raf");
-	    this.raf = new DmgRandomAccessStream(dmgf);
+	    this.raf = new UDIFRandomAccessStream(dmgf);
 	    //System.err.println("constructed");
 	} catch(Exception e) { throw new RuntimeException(e); }
     }
