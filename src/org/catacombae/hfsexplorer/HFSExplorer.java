@@ -1,21 +1,18 @@
 /*-
  * Copyright (C) 2006-2007 Erik Larsson
  * 
- * All rights reserved.
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.catacombae.hfsexplorer;
@@ -30,7 +27,7 @@ import java.math.BigInteger;
 public class HFSExplorer {
     public static final String VERSION = "0.19pre";
     public static final String COPYRIGHT = "Copyright \u00A9 Erik Larsson 2006-2007";
-    public static final String[] NOTICES = { "This program is distributed under the GNU General Public License version 2.",
+    public static final String[] NOTICES = { "This program is distributed under the GNU General Public License version 3.",
 					     "See <http://www.gnu.org/copyleft/gpl.html> for the details.",
 					     "",
 					     "Libraries used:",
@@ -39,7 +36,11 @@ public class HFSExplorer {
 					     "        the Lesser General Public License.",
 					     "        See <http://www.gnu.org/licenses/lgpl.html> for the details.",
 					     "    iHarder Base64 encoder/decoder <http://iharder.sourceforge.net>",
-					     "        Public domain software." };
+					     "        Public domain software.",
+					     "    Apache Ant bzip2 library <http://ant.apache.org/>",
+					     "        Copyright \u00A9 the Apache Software Foundation (ASF). Licensed",
+					     "        under the Apache License, Version 2.0.",
+					     "        See <http://www.apache.org/licenses/LICENSE-2.0> for the details." };
     public static BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
     private static class Options {
 	public boolean readAPM = false;
