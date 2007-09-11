@@ -6,6 +6,7 @@ HFSExplorer Changelog
 - Feature: Experimental support for HFSX formatted volumes (Mac OS Extended with case
   sensitive filenames). Feedback is appreciated for those with HFSX volumes.
 - Bugfix: Annoying GUI behavior when extracting files with long file names.
+- Cosmetic fix: Background is now consistently white in the file list pane.
 
 0.18.3
 ------
