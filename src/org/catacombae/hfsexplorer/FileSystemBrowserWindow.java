@@ -1371,9 +1371,9 @@ public class FileSystemBrowserWindow extends JFrame {
 		    Runnable r = new Runnable() {
 			    public void run() {
 				if(!resourceFork)
-				    progress.setDataSize(calculateDataForkSizeRecursive(selection));
+				    progress.setDataSize(fsView.calculateDataForkSizeRecursive(selection));
 				else
-				    progress.setDataSize(calculateResourceForkSizeRecursive(selection));
+				    progress.setDataSize(fsView.calculateResourceForkSizeRecursive(selection));
 				
 				int errorCount = extract(selection, outDir, progress, resourceFork);
 				if(!progress.cancelSignaled()) {
@@ -1661,6 +1661,7 @@ public class FileSystemBrowserWindow extends JFrame {
 // 			//p.println("f.getParent(): \"" + f.getParent() + "\"");
 // 		    } catch(Exception e) { e.printStackTrace(); }
 
+		    // Test that outFile is valid.
 		    try { outFile.getCanonicalPath(); } catch(Exception e) { throw new FileNotFoundException(); }
 		    
 		    if(!outFile.getParentFile().equals(outDir) || !outFile.getName().equals(filename))
@@ -1674,7 +1675,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		    //JOptionPane.showMessageDialog(this, "The file was successfully extracted!\n",
 		    //			  "Extraction complete!", JOptionPane.INFORMATION_MESSAGE);
 		} catch(FileNotFoundException fnfe) {
-		    System.err.println("Could not create file \"" + outFile + "\". The following exception was thrown:");
+		    System.out.println("Could not create file \"" + outFile + "\". The following exception was thrown:");
 		    fnfe.printStackTrace();
 		    char[] filenameChars = filename.toCharArray();
 		    System.out.println("Filename in hex (" + filenameChars.length + " UTF-16BE units):");
@@ -1797,49 +1798,6 @@ public class FileSystemBrowserWindow extends JFrame {
 	return errorCount;
     }
     
-    protected long calculateDataForkSizeRecursive(HFSPlusCatalogLeafRecord[] recs) {
-	return calculateForkSizeRecursive(recs, false);
-    }
-    protected long calculateDataForkSizeRecursive(HFSPlusCatalogLeafRecord rec) {
-	return calculateForkSizeRecursive(rec, false);	
-    }
-    protected long calculateResourceForkSizeRecursive(HFSPlusCatalogLeafRecord[] recs) {
-	return calculateForkSizeRecursive(recs, true);
-    }
-    protected long calculateResourceForkSizeRecursive(HFSPlusCatalogLeafRecord rec) {
-	return calculateForkSizeRecursive(rec, true);
-    }
-    /** Calculates the complete size of the trees represented by <code>recs</code>. */
-    protected long calculateForkSizeRecursive(HFSPlusCatalogLeafRecord[] recs, boolean resourceFork) {
-	long totalSize = 0;
-	for(HFSPlusCatalogLeafRecord rec : recs)
-	    totalSize += calculateForkSizeRecursive(rec, resourceFork);
-	return totalSize;
-    }
-    /** Calculates the complete size of the tree represented by <code>rec</code>. */
-    protected long calculateForkSizeRecursive(HFSPlusCatalogLeafRecord rec, boolean resourceFork) {
-	HFSPlusCatalogLeafRecordData recData = rec.getData();
-	if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
-	   recData instanceof HFSPlusCatalogFile) {
-	    if(!resourceFork)
-		return ((HFSPlusCatalogFile)recData).getDataFork().getLogicalSize();
-	    else
-		return ((HFSPlusCatalogFile)recData).getResourceFork().getLogicalSize();
-	}
-	else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
-		recData instanceof HFSPlusCatalogFolder) {
-	    HFSCatalogNodeID requestedID = ((HFSPlusCatalogFolder)recData).getFolderID();
-	    HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
-	    long totalSize = 0;
-	    for(HFSPlusCatalogLeafRecord outRec : contents) {
-		totalSize += calculateForkSizeRecursive(outRec, resourceFork);
-	    }
-	    return totalSize;
-	}
-	else
-	    return 0;
-    }
-   
     public static void main(String[] args) {
        	try {
 	    javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());

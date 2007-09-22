@@ -19,8 +19,12 @@ package org.catacombae.hfsexplorer;
 
 import org.catacombae.hfsexplorer.types.*;
 
+/**
+ * Extension to support HFSX file systems. Designed to modify as little
+ * as possible to avoid code duplication.
+ */
 public class HFSXFileSystemView extends HFSPlusFileSystemView {
-    protected static final CatalogOperations hfsxOps = new CatalogOperations() {
+    protected static final CatalogOperations HFSX_OPERATIONS = new CatalogOperations() {
 	    public HFSPlusCatalogIndexNode newCatalogIndexNode(byte[] data, int offset, int nodeSize, BTHeaderRec bthr) {
 		return new HFSXCatalogIndexNode(data, offset, nodeSize, bthr);
 	    }
@@ -36,6 +40,6 @@ public class HFSXFileSystemView extends HFSPlusFileSystemView {
   	};
 
     public HFSXFileSystemView(LowLevelFile hfsFile, long fsOffset) {
-	super(hfsFile, fsOffset, hfsxOps);
+	super(hfsFile, fsOffset, HFSX_OPERATIONS);
     }
 }

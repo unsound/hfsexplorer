@@ -40,6 +40,10 @@ public class HFSPlusFileSystemView {
      * Note: It has been shown that this approach has actually made it possible
      * to track changes in a live filesystem, for example when opening
      * /dev/disk0s2 in superuser mode in OS X.
+     *
+     * 2007-09-18: We now assume block size to be static. This can't possibly be
+     *             a problem... ever. Variable staticBlockSize contains the
+     *             block size.
      */
 
     /** Internal class. */
@@ -76,8 +80,10 @@ public class HFSPlusFileSystemView {
 	}
 	
 	public ForkFilter getForkFilterFile(HFSPlusVolumeHeader header) {
-	    HFSPlusExtentDescriptor[] allCatalogFileDescriptors = getAllDataExtentDescriptors(HFSCatalogNodeID.kHFSCatalogFileID, header.getCatalogFile());
-	    return new ForkFilter(header.getCatalogFile(), allCatalogFileDescriptors, hfsFile, fsOffset, header.getBlockSize());
+	    HFSPlusExtentDescriptor[] allCatalogFileDescriptors =
+		getAllDataExtentDescriptors(HFSCatalogNodeID.kHFSCatalogFileID, header.getCatalogFile());
+	    return new ForkFilter(header.getCatalogFile(), allCatalogFileDescriptors,
+				  hfsFile, fsOffset, staticBlockSize);
 	}
     }
     
@@ -90,8 +96,9 @@ public class HFSPlusFileSystemView {
 	}
 	
 	public ForkFilter getForkFilterFile(HFSPlusVolumeHeader header) {
-	    return new ForkFilter(header.getExtentsFile(), header.getExtentsFile().getExtents().getExtentDescriptors(),
-				  hfsFile, fsOffset, header.getBlockSize());
+	    return new ForkFilter(header.getExtentsFile(),
+				  header.getExtentsFile().getExtents().getExtentDescriptors(),
+				  hfsFile, fsOffset, staticBlockSize);
 	}
     }
     
@@ -101,7 +108,7 @@ public class HFSPlusFileSystemView {
 	public HFSPlusCatalogLeafNode newCatalogLeafNode(byte[] data, int offset, int nodeSize, BTHeaderRec bthr);
 	public HFSPlusCatalogLeafRecord newCatalogLeafRecord(byte[] data, int offset, BTHeaderRec bthr);
     }
-    protected static final CatalogOperations hfsPlusOps = new CatalogOperations() {
+    protected static final CatalogOperations HFS_PLUS_OPERATIONS = new CatalogOperations() {
 	    public HFSPlusCatalogIndexNode newCatalogIndexNode(byte[] data, int offset, int nodeSize, BTHeaderRec bthr) {
 		return new HFSPlusCatalogIndexNode(data, offset, nodeSize);
 	    }
@@ -119,14 +126,16 @@ public class HFSPlusFileSystemView {
     private final LowLevelFile hfsFile;
     private final long fsOffset;
     protected final CatalogOperations catOps;
+    private final long staticBlockSize;
     
     public HFSPlusFileSystemView(LowLevelFile hfsFile, long fsOffset) {
-	this(hfsFile, fsOffset, hfsPlusOps);
+	this(hfsFile, fsOffset, HFS_PLUS_OPERATIONS);
     }
     protected HFSPlusFileSystemView(LowLevelFile hfsFile, long fsOffset, CatalogOperations ops) {
 	this.hfsFile = hfsFile;
 	this.fsOffset = fsOffset;
 	this.catOps = ops;
+	this.staticBlockSize = Util.unsign(getVolumeHeader().getBlockSize());
     }
     
     public LowLevelFile getStream() {
@@ -134,7 +143,7 @@ public class HFSPlusFileSystemView {
     }
     
     public HFSPlusVolumeHeader getVolumeHeader() {
-	byte[] currentBlock = new byte[512]; // Could be made a global var? (war?)
+	byte[] currentBlock = new byte[512]; // Could be made a global var? (thread war?)
 	hfsFile.seek(fsOffset + 1024);
 	hfsFile.read(currentBlock);
 	return new HFSPlusVolumeHeader(currentBlock);
@@ -334,8 +343,8 @@ public class HFSPlusFileSystemView {
     }
     public long extractForkToStream(HFSPlusForkData forkData, HFSPlusExtentDescriptor[] extentDescriptors,
 				    OutputStream os, ProgressMonitor pm) throws IOException {
-	CatalogInitProcedure init = new CatalogInitProcedure();	
-	ForkFilter forkFilter = new ForkFilter(forkData, extentDescriptors, hfsFile, fsOffset, init.header.getBlockSize());
+	ForkFilter forkFilter = new ForkFilter(forkData, extentDescriptors, hfsFile, fsOffset,
+					       staticBlockSize);
 	long bytesToRead = forkData.getLogicalSize();
 	byte[] buffer = new byte[4096];
 	while(bytesToRead > 0) {
@@ -501,7 +510,7 @@ public class HFSPlusFileSystemView {
 	HFSPlusVolumeHeader vh = getVolumeHeader();
 	if(vh.getAttributeVolumeJournaled()) {
 	    long blockNumber = Util2.unsign(vh.getJournalInfoBlock());
-	    hfsFile.seek(fsOffset + blockNumber*vh.getBlockSize());
+	    hfsFile.seek(fsOffset + blockNumber*staticBlockSize);
 	    byte[] data = new byte[JournalInfoBlock.getStructSize()];
 	    hfsFile.readFully(data);
 	    return new JournalInfoBlock(data, 0);
@@ -512,18 +521,24 @@ public class HFSPlusFileSystemView {
     
     // Utility methods
     
-    /** HACK! Legacy convenience method for HFS+ only use. DON'T USE THIS METHOD FROM WITHIN THIS CLASS. IN FACT,
-	DON'T USE IT AT ALL. */
+    /** HACK! Legacy convenience method for HFS+ only use. DON'T USE THIS METHOD FROM WITHIN THIS CLASS.
+	IN FACT, DON'T USE IT AT ALL.
+	@deprecated */
     public static HFSPlusCatalogLeafRecord[] collectFilesInDir(HFSCatalogNodeID dirID, int currentNodeNumber, 
 							       LowLevelFile hfsFile, long fsOffset, 
-							       final HFSPlusVolumeHeader header, final BTHeaderRec bthr,
+							       final HFSPlusVolumeHeader header,
+							       final BTHeaderRec bthr,
 							       final ForkFilter catalogFile) {
-	return collectFilesInDir(dirID, currentNodeNumber, hfsFile, fsOffset, header, bthr, catalogFile, hfsPlusOps);
+	
+	return collectFilesInDir(dirID, currentNodeNumber, hfsFile, fsOffset, 
+				 header, bthr, catalogFile, HFS_PLUS_OPERATIONS);
     }
-    public static HFSPlusCatalogLeafRecord[] collectFilesInDir(HFSCatalogNodeID dirID, int currentNodeNumber, 
-							       LowLevelFile hfsFile, long fsOffset, 
-							       final HFSPlusVolumeHeader header, final BTHeaderRec bthr,
-							       final ForkFilter catalogFile, final CatalogOperations catOps) {
+    private static HFSPlusCatalogLeafRecord[] collectFilesInDir(HFSCatalogNodeID dirID, int currentNodeNumber, 
+								LowLevelFile hfsFile, long fsOffset, 
+								final HFSPlusVolumeHeader header,
+								final BTHeaderRec bthr,
+								final ForkFilter catalogFile,
+								final CatalogOperations catOps) {
 		
 	byte[] currentNodeData = new byte[bthr.getNodeSize()];
 	catalogFile.seek(Util2.unsign(currentNodeNumber)*bthr.getNodeSize());
@@ -645,5 +660,49 @@ public class HFSPlusFileSystemView {
 	return null;
     }
     */
+    
+    protected long calculateDataForkSizeRecursive(HFSPlusCatalogLeafRecord[] recs) {
+	return calculateForkSizeRecursive(recs, false);
+    }
+    protected long calculateDataForkSizeRecursive(HFSPlusCatalogLeafRecord rec) {
+	return calculateForkSizeRecursive(rec, false);	
+    }
+    protected long calculateResourceForkSizeRecursive(HFSPlusCatalogLeafRecord[] recs) {
+	return calculateForkSizeRecursive(recs, true);
+    }
+    protected long calculateResourceForkSizeRecursive(HFSPlusCatalogLeafRecord rec) {
+	return calculateForkSizeRecursive(rec, true);
+    }
+    /** Calculates the complete size of the trees represented by <code>recs</code>. */
+    protected long calculateForkSizeRecursive(HFSPlusCatalogLeafRecord[] recs, boolean resourceFork) {
+	long totalSize = 0;
+	for(HFSPlusCatalogLeafRecord rec : recs)
+	    totalSize += calculateForkSizeRecursive(rec, resourceFork);
+	return totalSize;
+    }
+    /** Calculates the complete size of the tree represented by <code>rec</code>. */
+    protected long calculateForkSizeRecursive(HFSPlusCatalogLeafRecord rec, boolean resourceFork) {
+	HFSPlusCatalogLeafRecordData recData = rec.getData();
+	if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
+	   recData instanceof HFSPlusCatalogFile) {
+	    if(!resourceFork)
+		return ((HFSPlusCatalogFile)recData).getDataFork().getLogicalSize();
+	    else
+		return ((HFSPlusCatalogFile)recData).getResourceFork().getLogicalSize();
+	}
+	else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
+		recData instanceof HFSPlusCatalogFolder) {
+	    HFSCatalogNodeID requestedID = ((HFSPlusCatalogFolder)recData).getFolderID();
+	    HFSPlusCatalogLeafRecord[] contents = listRecords(requestedID);
+	    long totalSize = 0;
+	    for(HFSPlusCatalogLeafRecord outRec : contents) {
+		totalSize += calculateForkSizeRecursive(outRec, resourceFork);
+	    }
+	    return totalSize;
+	}
+	else
+	    return 0;
+    }
+   
     
 }
