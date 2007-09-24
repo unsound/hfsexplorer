@@ -25,10 +25,10 @@ public class PrintGPTPartitions {
     public static void main(String[] args) throws Exception {
 	LowLevelFile llf;
 	if(System.getProperty("os.name").toLowerCase().startsWith("windows")) {
-	    llf = new WritableWin32File(args[0]);
+	    llf = new WindowsLowLevelIO(args[0]);
 	}
 	else {
-	    llf = new WritableRandomAccessLLF(args[0]);
+	    llf = new RandomAccessLLF(args[0]);
 	}
 	byte[] referencetable = new byte[16896];
 	llf.seek(512);

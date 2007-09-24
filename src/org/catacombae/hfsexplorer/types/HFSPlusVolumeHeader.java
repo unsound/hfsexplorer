@@ -19,10 +19,11 @@ package org.catacombae.hfsexplorer.types;
 
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.Util2;
+import org.catacombae.csjc.MutableStruct;
 import java.util.Date;
 import java.io.*;
 
-public class HFSPlusVolumeHeader {
+public class HFSPlusVolumeHeader extends MutableStruct {
     public static final short SIGNATURE_HFS_PLUS = 0x482B;
     public static final short SIGNATURE_HFSX = 0x4858;
     /* 
