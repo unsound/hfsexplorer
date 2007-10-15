@@ -1,0 +1,213 @@
+/*-
+ * Copyright (C) 2007 Erik Larsson
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package org.catacombae.hfsexplorer;
+
+import java.util.*;
+
+public class BlockCachingLLF extends FilterLLF {
+    /*
+     * Keep track of the access count for every (?) block. The <itemCount> blocks with the highest
+     * access count are kept in the cache.
+     * This means that when we determine if a block should go in the cache or not, we need to find
+     * the cache block with the lowest access count.
+     *
+     * Blocks in the cache are kept on basis of their access count, except for one block which is
+     * the history block. In the future the implementation should allow for tuning how many of the
+     * cache blocks are history blocks.
+     */
+    
+    /** Block size. */
+    private final int blockSize;
+    
+    /** The logical file pointer. */
+    private long virtualFP;
+    
+    /** Hashtable mapping block numbers to BlockStore objects. Every block that has ever been
+	accessed will get an entry here, which leads to uncontrollable memory allocation up to
+	a maximum of length()/blockSize entries. TODO: Think out a smarter solution with a space
+	limited data structure. */
+    private final HashMap<Long, BlockStore> blockMap = new HashMap<Long, BlockStore>();
+
+    /** Holds the cache items. One entry in the array is reserved for the previously read block,
+	regardless of its access count, so that subsequent sequential reads won't suffer if
+	accessCount isn't high enough. */
+    private final BlockStore[] cache;
+    
+    /** Set when the close method is called. Prohibits further access. */
+    private boolean closed = false;
+    
+    private static class BlockStore/* implements Comparable<LongContainer>*/ {
+	public long accessCount = 0;
+	public final long blockNumber;
+	/** Might be null at any time when the data is out of the cache. */
+	public byte[] data = null;
+	
+	public BlockStore(long blockNumber) {
+	    this.blockNumber = blockNumber;
+	}
+    }
+			    
+    public BlockCachingLLF(LowLevelFile backing, int blockSize, int itemCount) {
+	super(backing);
+	if(backing == null)
+	    throw new IllegalArgumentException("backing can not be null");
+	if(blockSize <= 0)
+	    throw new IllegalArgumentException("blockSize must be positive and non-zero");
+	if(itemCount < 1)
+	    throw new IllegalArgumentException("itemCount must be at least 1");
+	
+	this.blockSize = blockSize;
+	this.cache = new BlockStore[itemCount-1];
+    }
+    public void seek(long pos) {
+	if(closed) throw new RuntimeException("File is closed.");
+	virtualFP = pos;
+    }
+    public int read() {
+	// Generic read() method
+	byte[] b = new byte[1];
+	int res = read(b, 0, 1);
+	if(res == 1)
+	    return b[0] & 0xFF;
+	else
+	    return -1;
+    }
+    public int read(byte[] data) {
+	// Generic read(byte[]) method
+	return read(data, 0, data.length);
+    }
+    public int read(final byte[] data, final int pos, final int len) {
+	if(closed) throw new RuntimeException("File is closed.");
+	System.err.println("BlockCachingLLF.read(data, " + pos + ", " + len + ");");
+	//long fp = getFilePointer();
+	int bytesProcessed = 0;
+	while(bytesProcessed < len) {
+	    byte[] blockData = getCachedBlock(virtualFP);
+	    int posInBlock = (int)(virtualFP - (virtualFP/blockSize)*blockSize); // Will deviate from fp with at most blockSize bytes, so int
+	    int bytesLeftInBlock = blockData.length-posInBlock;
+	    int bytesLeftInTransfer = len-bytesProcessed;
+	    int bytesToCopy = (bytesLeftInTransfer < bytesLeftInBlock ? bytesLeftInTransfer : bytesLeftInBlock);
+	    System.arraycopy(blockData, posInBlock, data, pos+bytesProcessed, bytesToCopy);
+	    bytesProcessed += bytesToCopy;
+	    virtualFP += bytesToCopy;
+	}
+	
+	return bytesProcessed;
+    }
+    public void readFully(byte[] data) {
+	// Generic readFully(byte[]) method
+	readFully(data, 0, data.length);
+    }
+
+    public void readFully(byte[] data, int offset, int length) {
+	// Generic readFully(byte[], int, int) method
+	int bytesRead = 0;
+	while(bytesRead < length) {
+	    int curBytesRead = read(data, offset+bytesRead, length-bytesRead);
+	    if(curBytesRead > 0) bytesRead += curBytesRead;
+	    else 
+		throw new RuntimeException("Couldn't read the entire length.");
+	}
+    }
+    public long length() {
+	if(closed) throw new RuntimeException("File is closed.");
+	return backingStore.length();
+    }
+    public long getFilePointer() {
+	if(closed) throw new RuntimeException("File is closed.");
+	return virtualFP;
+    }
+    public void close() {
+	closed = true;
+	backingStore.close();
+    }
+    
+    /**
+     * If the block is present in the cache, return it immediately. Otherwise
+     * read the block from the backing store, put it the backing store
+     */
+    private byte[] getCachedBlock(long filePointer) {
+	final long blockNumber = filePointer / blockSize;
+	
+	// 1. Increment access count
+	BlockStore cur = blockMap.get(blockNumber);
+	if(cur == null) {
+	    cur = new BlockStore(blockNumber);
+	    blockMap.put(blockNumber, cur);
+	}
+	++cur.accessCount;
+	
+	// 2. Get the data
+	if(cur.data != null) {
+	    System.err.println("  HIT at block number " + blockNumber + "!");
+	    // 2.1 Just return the data that's in the cache
+	    return cur.data;
+	}
+	else { // If we get here, cur is not present in the cache. (It only has data if it's present in the cache)
+	    System.err.println("  MISS at block number " + blockNumber + "!");
+	    // 2.2 Fetch data from backing store and put in cache IF it has a high enough access count.
+	    // (We should maintain a "last accessed" block as well)
+	    
+	    // Throw out the last entry (if any) from the cache and fetch its data array.
+	    // Also remove its data array. If it is a standard sized array, we can reuse it and save the garbage
+	    // collector and heap allocator some work.
+	    BlockStore lastCacheEntry = cache[cache.length-1];
+	    cache[cache.length-1] = null;
+	    byte[] recoveredData = null;
+	    if(lastCacheEntry != null) {
+		recoveredData = lastCacheEntry.data;
+		lastCacheEntry.data = null; // Stole your array.
+		if(recoveredData == null)
+		    throw new RuntimeException("Entry in cache had a null array, which should never happen!");
+	    }
+	    
+	    
+	    // Read data from backing store
+	    long blockPos = blockNumber*blockSize;
+	    long remainingSize = length()-blockPos;
+	    int dataSize = (int)(remainingSize < blockSize ? remainingSize : blockSize);
+	    byte[] data;
+	    if(recoveredData != null && dataSize == recoveredData.length)
+		data = recoveredData;
+	    else // Will only happen if (1) cache isn't full or (2) if we are dealing with the last block
+		data = new byte[dataSize];
+	    backingStore.seek(blockPos);
+	    backingStore.read(data, 0, data.length);
+	    
+	    
+	    // Place cur in the cache and make sure it goes to the right position. Time is O(cache.length)
+	    cur.data = data; 
+	    cache[cache.length-1] = cur;
+	    bubbleIntoPosition(cache, cache.length-1);
+	    
+	    return cur.data;
+	}
+    }
+    
+    private static void bubbleIntoPosition(BlockStore[] array, int startIndex) {
+	for(int i = startIndex; i >= 1; --i) {
+	    BlockStore low = array[i];
+	    BlockStore high = array[i-1];
+	    if(high == null || low.accessCount > high.accessCount) {
+		// Switch places
+		array[i] = high;
+		array[i-1] = low;
+	    }
+	}
+    }
+}

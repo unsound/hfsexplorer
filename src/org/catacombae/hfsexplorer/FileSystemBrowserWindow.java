@@ -1370,33 +1370,39 @@ public class FileSystemBrowserWindow extends JFrame {
 		    final ExtractProgressDialog progress = new ExtractProgressDialog(this);
 		    Runnable r = new Runnable() {
 			    public void run() {
-				if(!resourceFork)
-				    progress.setDataSize(fsView.calculateDataForkSizeRecursive(selection));
-				else
-				    progress.setDataSize(fsView.calculateResourceForkSizeRecursive(selection));
-				
-				int errorCount = extract(selection, outDir, progress, resourceFork);
-				if(!progress.cancelSignaled()) {
-				    if(errorCount == 0)
-					JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-								      "Extraction finished.\n",
-								      "Information",
-								      JOptionPane.INFORMATION_MESSAGE);
+				fsView.retainCatalogFile(); // Cache the catalog file to speed up operations
+				try {
+				    if(!resourceFork)
+					progress.setDataSize(fsView.calculateDataForkSizeRecursive(selection));
+				    else
+					progress.setDataSize(fsView.calculateResourceForkSizeRecursive(selection));
+				    
+				    int errorCount = extract(selection, outDir, progress, resourceFork);
+				    if(!progress.cancelSignaled()) {
+					if(errorCount == 0)
+					    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+									  "Extraction finished.\n",
+									  "Information",
+									  JOptionPane.INFORMATION_MESSAGE);
+					else
+					    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+									  errorCount + " errors were encountered " +
+									  "during the extraction.\n",
+									  "Information",
+									  JOptionPane.WARNING_MESSAGE);
+				    }
 				    else
 					JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-								      errorCount + " errors were encountered " +
-								      "during the extraction.\n",
-								      "Information",
+								      "Extraction was aborted.\n" +
+								      "Please remove the extracted files " +
+								      "manually.\n",
+								      "Aborted extraction",
 								      JOptionPane.WARNING_MESSAGE);
+				    progress.setVisible(false);
 				}
-				else
-				    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-								  "Extraction was aborted.\n" +
-								  "Please remove the extracted files " +
-								  "manually.\n",
-								  "Aborted extraction",
-								  JOptionPane.WARNING_MESSAGE);
-				progress.setVisible(false);
+				finally {
+				    fsView.releaseCatalogFile(); // Always release memory
+				}
 			    }
 			};
 		    new Thread(r).start();

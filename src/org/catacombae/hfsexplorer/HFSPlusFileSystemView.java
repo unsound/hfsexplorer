@@ -48,10 +48,10 @@ public class HFSPlusFileSystemView {
 
     /** Internal class. */
     private abstract class InitProcedure {
-	public HFSPlusVolumeHeader header;
-	public ForkFilter forkFilterFile;
-	public BTNodeDescriptor btnd;
-	public BTHeaderRec bthr;
+	public final HFSPlusVolumeHeader header;
+	public final LowLevelFile forkFilterFile;
+	public final BTNodeDescriptor btnd;
+	public final BTHeaderRec bthr;
 	
 	public InitProcedure() {
 	    this.header = getVolumeHeader();
@@ -68,18 +68,20 @@ public class HFSPlusFileSystemView {
 	    this.bthr = new BTHeaderRec(headerRec, 0);
 	    
 	}
-	public abstract ForkFilter getForkFilterFile(HFSPlusVolumeHeader header);
+	protected abstract LowLevelFile getForkFilterFile(HFSPlusVolumeHeader header);
     }
     
     /** Internal class. */
     private class CatalogInitProcedure extends InitProcedure {
-	public ForkFilter catalogFile;
+	public LowLevelFile catalogFile;
 	
 	public CatalogInitProcedure() {
 	    this.catalogFile = forkFilterFile;
 	}
 	
-	public ForkFilter getForkFilterFile(HFSPlusVolumeHeader header) {
+	protected LowLevelFile getForkFilterFile(HFSPlusVolumeHeader header) {
+	    if(catalogCache != null)
+		return catalogCache;
 	    HFSPlusExtentDescriptor[] allCatalogFileDescriptors =
 		getAllDataExtentDescriptors(HFSCatalogNodeID.kHFSCatalogFileID, header.getCatalogFile());
 	    return new ForkFilter(header.getCatalogFile(), allCatalogFileDescriptors,
@@ -89,13 +91,13 @@ public class HFSPlusFileSystemView {
     
     /** Internal class. */
     private class ExtentsInitProcedure extends InitProcedure {
-	public ForkFilter extentsFile;
+	public LowLevelFile extentsFile;
 	
 	public ExtentsInitProcedure() {
 	    this.extentsFile = forkFilterFile;
 	}
 	
-	public ForkFilter getForkFilterFile(HFSPlusVolumeHeader header) {
+	protected LowLevelFile getForkFilterFile(HFSPlusVolumeHeader header) {
 	    return new ForkFilter(header.getExtentsFile(),
 				  header.getExtentsFile().getExtents().getExtentDescriptors(),
 				  hfsFile, fsOffset, staticBlockSize);
@@ -128,6 +130,9 @@ public class HFSPlusFileSystemView {
     protected final CatalogOperations catOps;
     private final long staticBlockSize;
     
+    // Variables for reading cached files.
+    private BlockCachingLLF catalogCache = null;
+    
     public HFSPlusFileSystemView(LowLevelFile hfsFile, long fsOffset) {
 	this(hfsFile, fsOffset, HFS_PLUS_OPERATIONS);
     }
@@ -136,6 +141,18 @@ public class HFSPlusFileSystemView {
 	this.fsOffset = fsOffset;
 	this.catOps = ops;
 	this.staticBlockSize = Util.unsign(getVolumeHeader().getBlockSize());
+    }
+    
+    /** Switches to cached mode for reading the catalog file. */
+    public void retainCatalogFile() {
+	CatalogInitProcedure init = new CatalogInitProcedure();
+	LowLevelFile ff = init.forkFilterFile;
+	catalogCache = new BlockCachingLLF(ff, 4096, 10);
+    }
+    
+    /** Disables cached mode for reading the catalog file. */
+    public void releaseCatalogFile() {
+	catalogCache = null;
     }
     
     public LowLevelFile getStream() {
@@ -303,7 +320,7 @@ public class HFSPlusFileSystemView {
 	that's needed, but make sure it's a folder ID and not a file ID, or something bad will happen. */
     public HFSPlusCatalogLeafRecord[] listRecords(HFSCatalogNodeID folderID) {	
 	CatalogInitProcedure init = new CatalogInitProcedure();
-	final ForkFilter catalogFile = init.getForkFilterFile(init.header);
+	final LowLevelFile catalogFile = init.forkFilterFile;
 	return collectFilesInDir(folderID, init.bthr.getRootNode(), hfsFile, fsOffset, init.header, init.bthr, catalogFile, catOps);
     }
 
@@ -528,7 +545,7 @@ public class HFSPlusFileSystemView {
 							       LowLevelFile hfsFile, long fsOffset, 
 							       final HFSPlusVolumeHeader header,
 							       final BTHeaderRec bthr,
-							       final ForkFilter catalogFile) {
+							       final LowLevelFile catalogFile) {
 	
 	return collectFilesInDir(dirID, currentNodeNumber, hfsFile, fsOffset, 
 				 header, bthr, catalogFile, HFS_PLUS_OPERATIONS);
@@ -537,7 +554,7 @@ public class HFSPlusFileSystemView {
 								LowLevelFile hfsFile, long fsOffset, 
 								final HFSPlusVolumeHeader header,
 								final BTHeaderRec bthr,
-								final ForkFilter catalogFile,
+								final LowLevelFile catalogFile,
 								final CatalogOperations catOps) {
 		
 	byte[] currentNodeData = new byte[bthr.getNodeSize()];
