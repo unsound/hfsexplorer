@@ -1370,7 +1370,8 @@ public class FileSystemBrowserWindow extends JFrame {
 		    final ExtractProgressDialog progress = new ExtractProgressDialog(this);
 		    Runnable r = new Runnable() {
 			    public void run() {
-				fsView.retainCatalogFile(); // Cache the catalog file to speed up operations
+				//fsView.retainCatalogFile(); // Cache the catalog file to speed up operations
+				fsView.enableFileSystemCache();
 				try {
 				    if(!resourceFork)
 					progress.setDataSize(fsView.calculateDataForkSizeRecursive(selection));
@@ -1401,7 +1402,8 @@ public class FileSystemBrowserWindow extends JFrame {
 				    progress.setVisible(false);
 				}
 				finally {
-				    fsView.releaseCatalogFile(); // Always release memory
+				    fsView.disableFileSystemCache();
+				    //fsView.releaseCatalogFile(); // Always release memory
 				}
 			    }
 			};

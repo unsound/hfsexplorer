@@ -125,7 +125,8 @@ public class HFSPlusFileSystemView {
 	    }
   	};
 
-    private final LowLevelFile hfsFile;
+    private LowLevelFile hfsFile;
+    private final LowLevelFile backingFile;
     private final long fsOffset;
     protected final CatalogOperations catOps;
     private final long staticBlockSize;
@@ -138,16 +139,27 @@ public class HFSPlusFileSystemView {
     }
     protected HFSPlusFileSystemView(LowLevelFile hfsFile, long fsOffset, CatalogOperations ops) {
 	this.hfsFile = hfsFile;
+	this.backingFile = hfsFile;
 	this.fsOffset = fsOffset;
 	this.catOps = ops;
 	this.staticBlockSize = Util.unsign(getVolumeHeader().getBlockSize());
+    }
+    public void enableFileSystemCache() {
+	enableFileSystemCache(256*1024, 64); // 64 pages of 256 KiB each is the default setting
+    }
+    public void enableFileSystemCache(int blockSize, int blocksInCache) {
+	hfsFile = new BlockCachingLLF(hfsFile, blockSize, blocksInCache);
+    }
+    public void disableFileSystemCache() {
+	hfsFile = backingFile;
     }
     
     /** Switches to cached mode for reading the catalog file. */
     public void retainCatalogFile() {
 	CatalogInitProcedure init = new CatalogInitProcedure();
 	LowLevelFile ff = init.forkFilterFile;
-	catalogCache = new BlockCachingLLF(ff, 4096, 10);
+	catalogCache = new BlockCachingLLF(ff, 512*1024, 32); // 512 KiB blocks, 32 of them
+	catalogCache.preloadBlocks();
     }
     
     /** Disables cached mode for reading the catalog file. */

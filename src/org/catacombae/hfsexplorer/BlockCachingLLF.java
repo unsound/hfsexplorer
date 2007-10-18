@@ -37,6 +37,9 @@ public class BlockCachingLLF extends FilterLLF {
     /** The logical file pointer. */
     private long virtualFP;
     
+    /** Length of the file. If the length of the underlying file should change, this one doesn't. */
+    private final long virtualLength;
+    
     /** Hashtable mapping block numbers to BlockStore objects. Every block that has ever been
 	accessed will get an entry here, which leads to uncontrollable memory allocation up to
 	a maximum of length()/blockSize entries. TODO: Think out a smarter solution with a space
@@ -62,21 +65,31 @@ public class BlockCachingLLF extends FilterLLF {
 	}
     }
 			    
-    public BlockCachingLLF(LowLevelFile backing, int blockSize, int itemCount) {
+    public BlockCachingLLF(LowLevelFile backing, int blockSize, int maxItemCount) {
 	super(backing);
 	if(backing == null)
 	    throw new IllegalArgumentException("backing can not be null");
 	if(blockSize <= 0)
 	    throw new IllegalArgumentException("blockSize must be positive and non-zero");
-	if(itemCount < 1)
-	    throw new IllegalArgumentException("itemCount must be at least 1");
+	if(maxItemCount < 1)
+	    throw new IllegalArgumentException("maxItemCount must be at least 1");
 	
 	this.blockSize = blockSize;
-	this.cache = new BlockStore[itemCount-1];
+	this.virtualLength = backing.length(); // Immutable
+	int actualItemCount = maxItemCount;
+	System.err.println("BlockCachingLLF created. virtualLength: " + virtualLength + " maxItemCount*blockSize: " + (maxItemCount*blockSize));
+	if(actualItemCount*blockSize > virtualLength) {
+	    actualItemCount = (int)( virtualLength/blockSize - ((virtualLength%blockSize == 0) ? 1 : 0) );
+	    System.err.println("Adjusted actualItemCount to " + actualItemCount);
+	}
+	this.cache = new BlockStore[actualItemCount];
     }
     public void seek(long pos) {
 	if(closed) throw new RuntimeException("File is closed.");
-	virtualFP = pos;
+	if(pos < virtualLength && pos >= 0)
+	    virtualFP = pos;
+	else
+	    throw new IllegalArgumentException("pos out of range (pos=" + pos + ")");
     }
     public int read() {
 	// Generic read() method
@@ -93,7 +106,7 @@ public class BlockCachingLLF extends FilterLLF {
     }
     public int read(final byte[] data, final int pos, final int len) {
 	if(closed) throw new RuntimeException("File is closed.");
-	System.err.println("BlockCachingLLF.read(data, " + pos + ", " + len + ");");
+	System.out.println("BlockCachingLLF.read(data, " + pos + ", " + len + ");");
 	//long fp = getFilePointer();
 	int bytesProcessed = 0;
 	while(bytesProcessed < len) {
@@ -126,7 +139,7 @@ public class BlockCachingLLF extends FilterLLF {
     }
     public long length() {
 	if(closed) throw new RuntimeException("File is closed.");
-	return backingStore.length();
+	return virtualLength;
     }
     public long getFilePointer() {
 	if(closed) throw new RuntimeException("File is closed.");
@@ -154,12 +167,12 @@ public class BlockCachingLLF extends FilterLLF {
 	
 	// 2. Get the data
 	if(cur.data != null) {
-	    System.err.println("  HIT at block number " + blockNumber + "!");
+	    System.out.println("  HIT at block number " + blockNumber + "!");
 	    // 2.1 Just return the data that's in the cache
 	    return cur.data;
 	}
 	else { // If we get here, cur is not present in the cache. (It only has data if it's present in the cache)
-	    System.err.println("  MISS at block number " + blockNumber + "!");
+	    System.out.println("  MISS at block number " + blockNumber + "!");
 	    // 2.2 Fetch data from backing store and put in cache IF it has a high enough access count.
 	    // (We should maintain a "last accessed" block as well)
 	    
@@ -186,6 +199,7 @@ public class BlockCachingLLF extends FilterLLF {
 		data = recoveredData;
 	    else // Will only happen if (1) cache isn't full or (2) if we are dealing with the last block
 		data = new byte[dataSize];
+	    //System.err.println("  Seeking to " + blockPos + " (block number: " + blockNumber + ", blockSize: " + blockSize + ", data.length: " + data.length + ")");
 	    backingStore.seek(blockPos);
 	    backingStore.read(data, 0, data.length);
 	    
@@ -208,6 +222,18 @@ public class BlockCachingLLF extends FilterLLF {
 		array[i] = high;
 		array[i-1] = low;
 	    }
+	}
+    }
+    
+    /** Loads as much data as possible into memory starting at position 0. */
+    public void preloadBlocks() {
+	preloadBlocks(0, cache.length);
+    }
+    /** Not exposed as public interface because the outside might not know how many blocks there are. */
+    private void preloadBlocks(int startBlock, int blockCount) {
+	for(int i = 0; i < blockCount; ++i) {
+	    System.err.println("Preloading block " + (startBlock+i) + "...");
+	    getCachedBlock((startBlock+i)*blockSize);
 	}
     }
 }
