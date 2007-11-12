@@ -224,10 +224,9 @@ public class BlockCachingLLF extends FilterLLF {
 	for(int i = startIndex; i >= 1; --i) {
 	    BlockStore low = array[i];
 	    BlockStore high = array[i-1];
-	    long highAge = timestamp - high.lastAccessTime;
 	    if(high == null || // Array has not been filled
 	       low.accessCount > high.accessCount || // The access count of the new item is greater than the old one's
-	       highAge >= TIME_TO_KEEP_IN_CACHE) { // The old one is too old to be kept in cache
+	       (timestamp - high.lastAccessTime) >= TIME_TO_KEEP_IN_CACHE) { // The old one is too old to be kept in cache
 		// Switch places
 		array[i] = high;
 		array[i-1] = low;
