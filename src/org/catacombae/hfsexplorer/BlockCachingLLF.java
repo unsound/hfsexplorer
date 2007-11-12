@@ -31,6 +31,10 @@ public class BlockCachingLLF extends FilterLLF {
      * cache blocks are history blocks.
      */
     
+    /** The maximum age of an entry in the cache. When an entry's last accessed time has passed
+	this age, it is thrown out, regardless of its access count. Unit: milliseconds. */
+    private static final long TIME_TO_KEEP_IN_CACHE = 5000;
+    
     /** Block size. */
     private final int blockSize;
     
@@ -56,8 +60,9 @@ public class BlockCachingLLF extends FilterLLF {
     
     private static class BlockStore/* implements Comparable<LongContainer>*/ {
 	public long accessCount = 0;
+	public long lastAccessTime = Long.MAX_VALUE;
 	public final long blockNumber;
-	/** Might be null at any time when the data is out of the cache. */
+	/** Might be null at any time when the data is thrown out of the cache. */
 	public byte[] data = null;
 	
 	public BlockStore(long blockNumber) {
@@ -157,13 +162,14 @@ public class BlockCachingLLF extends FilterLLF {
     private byte[] getCachedBlock(long filePointer) {
 	final long blockNumber = filePointer / blockSize;
 	
-	// 1. Increment access count
+	// 1. Increment access count and access time
 	BlockStore cur = blockMap.get(blockNumber);
 	if(cur == null) {
 	    cur = new BlockStore(blockNumber);
 	    blockMap.put(blockNumber, cur);
 	}
 	++cur.accessCount;
+	cur.lastAccessTime = System.currentTimeMillis();
 	
 	// 2. Get the data
 	if(cur.data != null) {
@@ -214,10 +220,14 @@ public class BlockCachingLLF extends FilterLLF {
     }
     
     private static void bubbleIntoPosition(BlockStore[] array, int startIndex) {
+	long timestamp = System.currentTimeMillis();
 	for(int i = startIndex; i >= 1; --i) {
 	    BlockStore low = array[i];
 	    BlockStore high = array[i-1];
-	    if(high == null || low.accessCount > high.accessCount) {
+	    long highAge = timestamp - high.lastAccessTime;
+	    if(high == null || // Array has not been filled
+	       low.accessCount > high.accessCount || // The access count of the new item is greater than the old one's
+	       highAge >= TIME_TO_KEEP_IN_CACHE) { // The old one is too old to be kept in cache
 		// Switch places
 		array[i] = high;
 		array[i-1] = low;

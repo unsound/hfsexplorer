@@ -5,8 +5,12 @@ HFSExplorer Changelog
 ----
 - Feature: Experimental support for HFSX formatted volumes (Mac OS Extended with case
   sensitive filenames). Feedback is appreciated for those with HFSX volumes.
+- Feature: Caching layer when doing a batch file copy operation. This makes copying from
+  CDs and DVDs a lot faster.
+- Feature: bzip2 compressed UDIF .dmg files can now be opened.
 - Bugfix: Annoying GUI behavior when extracting files with long file names.
 - Cosmetic fix: Background is now consistently white in the file list pane.
+- License change: GPL version 2 to GPL version 3.
 
 0.18.3
 ------
