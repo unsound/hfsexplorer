@@ -143,12 +143,14 @@ public class HFSPlusFileSystemView {
 	this.fsOffset = fsOffset;
 	this.catOps = ops;
 	this.staticBlockSize = Util.unsign(getVolumeHeader().getBlockSize());
+	
+	enableFileSystemCache();
     }
     public void enableFileSystemCache() {
 	enableFileSystemCache(256*1024, 64); // 64 pages of 256 KiB each is the default setting
     }
     public void enableFileSystemCache(int blockSize, int blocksInCache) {
-	hfsFile = new BlockCachingLLF(hfsFile, blockSize, blocksInCache);
+	hfsFile = new BlockCachingLLF(backingFile, blockSize, blocksInCache);
     }
     public void disableFileSystemCache() {
 	hfsFile = backingFile;

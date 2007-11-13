@@ -227,6 +227,8 @@ public class BlockCachingLLF extends FilterLLF {
 	    if(high == null || // Array has not been filled
 	       low.accessCount > high.accessCount || // The access count of the new item is greater than the old one's
 	       (timestamp - high.lastAccessTime) >= TIME_TO_KEEP_IN_CACHE) { // The old one is too old to be kept in cache
+		if(!(high == null || low.accessCount > high.accessCount))
+		    System.out.println("Moving down a block in cache because of age! Age=" + (timestamp - high.lastAccessTime));
 		// Switch places
 		array[i] = high;
 		array[i-1] = low;

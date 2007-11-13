@@ -1371,7 +1371,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		    Runnable r = new Runnable() {
 			    public void run() {
 				//fsView.retainCatalogFile(); // Cache the catalog file to speed up operations
-				fsView.enableFileSystemCache();
+				//fsView.enableFileSystemCache();
 				try {
 				    if(!resourceFork)
 					progress.setDataSize(fsView.calculateDataForkSizeRecursive(selection));
@@ -1402,7 +1402,7 @@ public class FileSystemBrowserWindow extends JFrame {
 				    progress.setVisible(false);
 				}
 				finally {
-				    fsView.disableFileSystemCache();
+				    //fsView.disableFileSystemCache();
 				    //fsView.releaseCatalogFile(); // Always release memory
 				}
 			    }
