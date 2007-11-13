@@ -827,6 +827,16 @@ public class FileSystemBrowserWindow extends JFrame {
 						  "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	    });
+
+	final JCheckBoxMenuItem toggleCachingItem = new JCheckBoxMenuItem("File system caching enabled");
+	toggleCachingItem.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent ae) {
+		    if(toggleCachingItem.getState())
+			;// Sätt på caching...
+		    else
+			;
+		}
+	    });
 	
 	JMenuItem aboutItem = new JMenuItem("About...");
 	aboutItem.addActionListener(new ActionListener() {
@@ -848,7 +858,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	    });
 	
 	JMenu fileMenu = new JMenu("File");
-	JMenu infoMenu = new JMenu("Info");
+	JMenu infoMenu = new JMenu("Tools");
 	JMenu helpMenu = new JMenu("Help");
 	if(loadFSFromDeviceItem != null)
 	    fileMenu.add(loadFSFromDeviceItem);
@@ -859,6 +869,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	if(exitProgramItem != null)
 	    fileMenu.add(exitProgramItem);
 	infoMenu.add(fsInfoItem);
+	infoMenu.add(toggleCachingItem);
 	helpMenu.add(checkUpdatesItem);
 	helpMenu.add(aboutItem);
 	JMenuBar menuBar = new JMenuBar();
