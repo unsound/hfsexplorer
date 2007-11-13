@@ -111,7 +111,7 @@ public class BlockCachingLLF extends FilterLLF {
     }
     public int read(final byte[] data, final int pos, final int len) {
 	if(closed) throw new RuntimeException("File is closed.");
-	System.out.println("BlockCachingLLF.read(data, " + pos + ", " + len + ");");
+	//System.out.println("BlockCachingLLF.read(data, " + pos + ", " + len + ");");
 	//long fp = getFilePointer();
 	int bytesProcessed = 0;
 	while(bytesProcessed < len) {
@@ -173,12 +173,12 @@ public class BlockCachingLLF extends FilterLLF {
 	
 	// 2. Get the data
 	if(cur.data != null) {
-	    System.out.println("  HIT at block number " + blockNumber + "!");
+	    //System.out.println("  HIT at block number " + blockNumber + "!");
 	    // 2.1 Just return the data that's in the cache
 	    return cur.data;
 	}
 	else { // If we get here, cur is not present in the cache. (It only has data if it's present in the cache)
-	    System.out.println("  MISS at block number " + blockNumber + "!");
+	    //System.out.println("  MISS at block number " + blockNumber + "!");
 	    // 2.2 Fetch data from backing store and put in cache IF it has a high enough access count.
 	    // (We should maintain a "last accessed" block as well)
 	    
