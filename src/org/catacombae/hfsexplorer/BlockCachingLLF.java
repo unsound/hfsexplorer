@@ -33,7 +33,7 @@ public class BlockCachingLLF extends FilterLLF {
     
     /** The maximum age of an entry in the cache. When an entry's last accessed time has passed
 	this age, it is thrown out, regardless of its access count. Unit: milliseconds. */
-    private static final long TIME_TO_KEEP_IN_CACHE = 5000;
+    private static final long TIME_TO_KEEP_IN_CACHE = 5000; // Tune this later
     
     /** Block size. */
     private final int blockSize;
@@ -227,8 +227,10 @@ public class BlockCachingLLF extends FilterLLF {
 	    if(high == null || // Array has not been filled
 	       low.accessCount > high.accessCount || // The access count of the new item is greater than the old one's
 	       (timestamp - high.lastAccessTime) >= TIME_TO_KEEP_IN_CACHE) { // The old one is too old to be kept in cache
+		/* //DEBUG
 		if(!(high == null || low.accessCount > high.accessCount))
 		    System.out.println("Moving down a block in cache because of age! Age=" + (timestamp - high.lastAccessTime));
+		*/
 		// Switch places
 		array[i] = high;
 		array[i-1] = low;

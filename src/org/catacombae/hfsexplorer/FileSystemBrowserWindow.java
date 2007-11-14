@@ -75,6 +75,7 @@ public class FileSystemBrowserWindow extends JFrame {
     private JButton goButton;
     private JButton extractButton;
     private JLabel statusLabel;
+    private final JCheckBoxMenuItem toggleCachingItem;
     
     // Focus timestamps (for determining what to extract)
     private long fileTableLastFocus = 0;
@@ -683,27 +684,6 @@ public class FileSystemBrowserWindow extends JFrame {
 			    File selectedFile = fileChooser.getSelectedFile();
 			    String pathName = selectedFile.getCanonicalPath();
 			    loadFSWithUDIFAutodetect(pathName);
-// 			    UDIFRandomAccessLLF stream = null;
-// 			    try {
-// 				stream = new UDIFRandomAccessLLF(pathName);
-// 			    }
-// 			    catch(Exception e) {
-// 				e.printStackTrace();
-// 				if(e.getMessage().startsWith("java.lang.RuntimeException: No handler for block type")) {
-// 				    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-// 								  "UDIF file contains unsupported block types!\n" +
-// 								  "(The file was probably created with BZIP2 or ADC " + 
-// 								  "compression, which is unsupported currently)",
-// 								  "Error", JOptionPane.ERROR_MESSAGE);
-// 				}
-// 				else {
-// 				    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-// 								  "UDIF file unsupported or damaged!",
-// 								  "Error", JOptionPane.ERROR_MESSAGE);
-// 				}
-// 			    }
-// 			    if(stream != null)
-// 				loadFS(stream, selectedFile.getName());
 			} catch(IOException ioe) {
 			    ioe.printStackTrace();
 			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
@@ -828,13 +808,22 @@ public class FileSystemBrowserWindow extends JFrame {
 		}
 	    });
 
-	final JCheckBoxMenuItem toggleCachingItem = new JCheckBoxMenuItem("File system caching enabled");
+	toggleCachingItem = new JCheckBoxMenuItem("Use file system caching");
+	toggleCachingItem.setState(true);
 	toggleCachingItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
-		    if(toggleCachingItem.getState())
-			;// Sätt på caching...
-		    else
-			;
+		    if(fsView != null) {
+			if(toggleCachingItem.getState()) {
+			    System.out.print("Enabling caching...");
+			    fsView.enableFileSystemCaching();
+			    System.out.println("done!");
+			}
+			else {
+			    System.out.print("Disabling caching...");
+			    fsView.disableFileSystemCaching();
+			    System.out.println("done!");
+			}
+		    }
 		}
 	    });
 	
@@ -1118,9 +1107,9 @@ public class FileSystemBrowserWindow extends JFrame {
 		fsView.getStream().close();
 	    }
 	    if(fsType == FileSystemRecognizer.FileSystemType.HFS_PLUS)
-		fsView = new HFSPlusFileSystemView(fsFile, fsOffset);
+		fsView = new HFSPlusFileSystemView(fsFile, fsOffset, toggleCachingItem.getState());
 	    else
-		fsView = new HFSXFileSystemView(fsFile, fsOffset);
+		fsView = new HFSXFileSystemView(fsFile, fsOffset, toggleCachingItem.getState());
 	    HFSPlusCatalogLeafRecord rootRecord = fsView.getRoot();
 	    HFSPlusCatalogLeafRecord[] rootContents = fsView.listRecords(rootRecord);
 	    populateFilesystemGUI(rootRecord, rootContents);

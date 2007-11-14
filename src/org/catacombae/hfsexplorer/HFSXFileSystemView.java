@@ -39,7 +39,7 @@ public class HFSXFileSystemView extends HFSPlusFileSystemView {
 	    }
   	};
 
-    public HFSXFileSystemView(LowLevelFile hfsFile, long fsOffset) {
-	super(hfsFile, fsOffset, HFSX_OPERATIONS);
+    public HFSXFileSystemView(LowLevelFile hfsFile, long fsOffset, boolean cachingEnabled) {
+	super(hfsFile, fsOffset, HFSX_OPERATIONS, cachingEnabled);
     }
 }

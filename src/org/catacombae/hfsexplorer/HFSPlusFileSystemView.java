@@ -135,24 +135,31 @@ public class HFSPlusFileSystemView {
     private BlockCachingLLF catalogCache = null;
     
     public HFSPlusFileSystemView(LowLevelFile hfsFile, long fsOffset) {
-	this(hfsFile, fsOffset, HFS_PLUS_OPERATIONS);
+	this(hfsFile, fsOffset, HFS_PLUS_OPERATIONS, false);
     }
-    protected HFSPlusFileSystemView(LowLevelFile hfsFile, long fsOffset, CatalogOperations ops) {
+    public HFSPlusFileSystemView(LowLevelFile hfsFile, long fsOffset, boolean cachingEnabled) {
+	this(hfsFile, fsOffset, HFS_PLUS_OPERATIONS, cachingEnabled);
+    }
+    protected HFSPlusFileSystemView(LowLevelFile hfsFile, long fsOffset, CatalogOperations ops, boolean cachingEnabled) {
 	this.hfsFile = hfsFile;
 	this.backingFile = hfsFile;
 	this.fsOffset = fsOffset;
 	this.catOps = ops;
 	this.staticBlockSize = Util.unsign(getVolumeHeader().getBlockSize());
 	
-	enableFileSystemCache();
+	if(cachingEnabled)
+	    enableFileSystemCaching();
     }
-    public void enableFileSystemCache() {
-	enableFileSystemCache(256*1024, 64); // 64 pages of 256 KiB each is the default setting
+    public boolean isFileSystemCachingEnabled() {
+	return hfsFile != backingFile && backingFile instanceof BlockCachingLLF;
     }
-    public void enableFileSystemCache(int blockSize, int blocksInCache) {
+    public void enableFileSystemCaching() {
+	enableFileSystemCaching(256*1024, 64); // 64 pages of 256 KiB each is the default setting
+    }
+    public void enableFileSystemCaching(int blockSize, int blocksInCache) {
 	hfsFile = new BlockCachingLLF(backingFile, blockSize, blocksInCache);
     }
-    public void disableFileSystemCache() {
+    public void disableFileSystemCaching() {
 	hfsFile = backingFile;
     }
     
