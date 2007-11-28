@@ -113,8 +113,8 @@ public class GPTEntry implements Partition {
 	PARTITION_TYPE_APPLE_HFS            ((long)0x005346480000AA11L, (long)0xAA1100306543ECACL),
 	UNKNOWN_PARTITION_TYPE; // Returned when no known type can be matched
 	
-	private long typeGUIDMsb;
-	private long typeGUIDLsb;
+	private Long typeGUIDMsb;
+	private Long typeGUIDLsb;
 	
 	private GPTPartitionType(long typeGUIDMsb, long typeGUIDLsb) {
 	    this.typeGUIDMsb = typeGUIDMsb;
@@ -122,8 +122,8 @@ public class GPTEntry implements Partition {
 	    byteMap.put(LongBuffer.wrap(new long[] { typeGUIDMsb, typeGUIDLsb }), this);
 	}
 	private GPTPartitionType() {
-	    this.typeGUIDMsb = -1;
-	    this.typeGUIDLsb = -1;
+	    this.typeGUIDMsb = null;
+	    this.typeGUIDLsb = null;
 	}
 		
 	public static GPTPartitionType getType(long typeGUIDMsb, long typeGUIDLsb) {
@@ -132,6 +132,21 @@ public class GPTEntry implements Partition {
 		return type;
 	    else
 		return UNKNOWN_PARTITION_TYPE;
+	}
+
+	public byte[] getBytes() {
+	    if(typeGUIDMsb == null && typeGUIDLsb == null) {
+		byte[] result = new byte[16];
+		for(int i = 0; i < 8; ++i) {
+		    result[i] = (byte)((typeGUIDMsb >> ((7-i)*8)) & 0xFF);
+		}
+		for(int i = 0; i < 8; ++i) {
+		    result[8+i] = (byte)((typeGUIDLsb >> ((7-i)*8)) & 0xFF);
+		}
+		return result;
+	    }
+	    else
+		return null;
 	}
     }
     
