@@ -1309,6 +1309,35 @@ public class FileSystemBrowserWindow extends JFrame {
 		};
 	    
 	}
+	else if(System.getProperty("os.name").toLowerCase().startsWith("windows")) {
+	    //System.err.println("Windows detected");
+	    final String[] finalCommand = new String[] { "cmd.exe", "/c", "start", "", rec.getKey().getNodeName().toString() };
+	    alOpen = new ActionListener() {
+		    public void actionPerformed(ActionEvent ae) {
+			File tempDir = new File(System.getProperty("java.io.tmpdir"));
+			if(extract(rec, tempDir, NullProgressMonitor.getInstance()) == 0) {
+			    tempFiles.add(new File(tempDir, rec.getKey().getNodeName().toString()));
+			    try {
+// 				System.err.print("Trying to execute:");
+// 				for(String s : finalCommand)
+// 				    System.err.print(" \"" + s + "\"");
+// 				System.err.println(" in directory \"" + tempDir + "\"");
+				Process p = Runtime.getRuntime().exec(finalCommand, null, tempDir);
+				fopFrame.dispose();
+			    } catch(Exception e) {
+				String stackTrace = e.toString() + "\n";
+				for(StackTraceElement ste : e.getStackTrace()) stackTrace += "    " + ste.toString() + "\n";
+				JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "Open failed. Exception caught:\n" +
+							      stackTrace,
+							      "Error", JOptionPane.ERROR_MESSAGE);
+			    }
+			}
+			else
+			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+							  "Error while extracting file to temp dir.",
+							  "Error", JOptionPane.ERROR_MESSAGE);
+		    }
+		};
 	else if(System.getProperty("os.name").toLowerCase().startsWith("mac os x")) {
 	    //System.err.println("OS X detected");
 	    final String[] finalCommand = new String[] { "open", rec.getKey().getNodeName().toString() };
