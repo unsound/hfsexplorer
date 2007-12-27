@@ -26,7 +26,7 @@ public class FileSystemRecognizer {
     
     public static enum FileSystemType { MFS, HFS, HFS_PLUS, HFS_WRAPPED_HFS_PLUS, HFSX, UNKNOWN };
     
-    /** Change this array to tell the program which types it supports. */
+    /** Change this array to tell the recognizer which types HFSExplorer supports. */
     public static final FileSystemType[] supportedTypes = { FileSystemType.HFS_PLUS,
 							    FileSystemType.HFS_WRAPPED_HFS_PLUS,
 							    FileSystemType.HFSX };
@@ -38,25 +38,40 @@ public class FileSystemRecognizer {
 	this.offset = offset;
     }
     
+    /**
+     * Detects one of the following file systems:
+     * <ul>
+     * <li>HFS+</li>
+     * <li>HFSX</li>
+     * <li>HFS</li>
+     * <li>HFS+ wrapped inside a HFS file system</li>
+     * <li>MFS</li>
+     * </ul>
+     * NOTE: This method should never ever throw an exception, and instead just returns UNKNOWN.
+     */
     public FileSystemType detectFileSystem() {
-	bitstream.seek(offset+1024);
-	byte[] signatureData = new byte[2];
-	bitstream.readFully(signatureData);
-	short signature = Util.readShortBE(signatureData);
-	switch(signature) {
-	case SIGNATURE_MFS: return FileSystemType.MFS;
-	case SIGNATURE_HFS:
-	    bitstream.seek(offset+1024+124);
+	try {
+	    bitstream.seek(offset+1024);
+	    byte[] signatureData = new byte[2];
 	    bitstream.readFully(signatureData);
-	    short embeddedSignature = Util.readShortBE(signatureData);
-	    if(embeddedSignature == SIGNATURE_HFS_PLUS)
-		return FileSystemType.HFS_WRAPPED_HFS_PLUS;
-	    else
-		return FileSystemType.HFS;
-	case SIGNATURE_HFS_PLUS: return FileSystemType.HFS_PLUS;
-	case SIGNATURE_HFSX: return FileSystemType.HFSX;
-	default: return FileSystemType.UNKNOWN;
-	}
+	    short signature = Util.readShortBE(signatureData);
+	    switch(signature) {
+	    case SIGNATURE_MFS: return FileSystemType.MFS;
+	    case SIGNATURE_HFS:
+		try {
+		    bitstream.seek(offset+1024+124);
+		    bitstream.readFully(signatureData);
+		    short embeddedSignature = Util.readShortBE(signatureData);
+		    if(embeddedSignature == SIGNATURE_HFS_PLUS)
+			return FileSystemType.HFS_WRAPPED_HFS_PLUS;
+		    else
+			return FileSystemType.HFS;
+		} catch(Exception e) { return FileSystemType.HFS; }
+	    case SIGNATURE_HFS_PLUS: return FileSystemType.HFS_PLUS;
+	    case SIGNATURE_HFSX: return FileSystemType.HFSX;
+	    default: return FileSystemType.UNKNOWN;
+	    }
+	} catch(Exception e) { return FileSystemType.UNKNOWN; }
     }
     
     public boolean isTypeSupported(FileSystemType fst) {

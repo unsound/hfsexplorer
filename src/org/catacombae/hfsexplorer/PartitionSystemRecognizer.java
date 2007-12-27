@@ -31,43 +31,79 @@ public class PartitionSystemRecognizer {
 	this.bitstream = bitstream;
     }
     
+    /**
+     * Detects one of the following partition systems:
+     * <ul>
+     * <li>Apple Partition Map</li>
+     * <li>Master Boot Record</li>
+     * <li>GUID Partition Table</li>
+     * </ul>
+     * NOTE: This method will never ever throw an exception.
+     * When no partition system can be found, or an exception is thrown that makes
+     * detecting partition systems impossible, PartitionSystemType.NONE_FOUND is returned. 
+     */
     public PartitionSystemType detectPartitionSystem() {
-	bitstream.seek(0);
-	byte[] piece1 = new byte[512];
-	bitstream.readFully(piece1);
-	
-	// Look for APM
-	DriverDescriptorRecord ddr = new DriverDescriptorRecord(piece1, 0);
-	if(ddr.isValid()) {
-	    int blockSize = Util.unsign(ddr.getSbBlkSize());
-	    long numberOfBlocksOnDevice = Util.unsign(ddr.getSbBlkCount());
-	    //bitStream.seek(blockSize*1); // second block, first partition in list
-	    ApplePartitionMap apm = new ApplePartitionMap(bitstream, blockSize*1, blockSize);
-	    if(apm.getUsedPartitionCount() > 0)
-		return PartitionSystemType.APPLE_PARTITION_MAP;
-	}
-
-
-	// Look for GPT
-	// Let's assume that blocks are always 512 bytes in size with MBR and GPT. I don't know
-	// how to detect the actual block size (at least when reading from a file, otherwise I
-	// guess there are system specific ways)...
-	byte[] piece2 = new byte[512];
-	bitstream.seek(512);
-	bitstream.read(piece2);
-	GPTHeader gh = new GPTHeader(piece2, 0);
-	if(gh.isValid()) {
-	    return PartitionSystemType.GUID_PARTITION_TABLE;
-	}
-	
-	// Look for MBR
-	MBRPartitionTable mpt = new MBRPartitionTable(piece1, 0);
-	if(mpt.isValid()) {
-	    // Here we should look for extended partitions, BSD disk labels, LVM volumes etc. TODO!
+	try {
+	    // First we read the blocks that we will use to determine partition systems into memory.
+	    byte[] piece1 = null;
+	    byte[] piece2 = null;
+	    try {
+		bitstream.seek(0);
+		piece1 = new byte[512];
+		bitstream.readFully(piece1);
+	    } catch(Exception e) { piece1 = null; }
+	    try {
+		bitstream.seek(512);
+		piece2 = new byte[512];
+		bitstream.readFully(piece2);
+	    } catch(Exception e) { piece2 = null; }
 	    
-	    return PartitionSystemType.MASTER_BOOT_RECORD;
-	}
-
+	    if(piece1 != null) {
+		try {
+		    // Look for APM
+		    DriverDescriptorRecord ddr = new DriverDescriptorRecord(piece1, 0);
+		    if(ddr.isValid()) {
+			int blockSize = Util.unsign(ddr.getSbBlkSize());
+			long numberOfBlocksOnDevice = Util.unsign(ddr.getSbBlkCount());
+			//bitStream.seek(blockSize*1); // second block, first partition in list
+			ApplePartitionMap apm = new ApplePartitionMap(bitstream, blockSize*1, blockSize);
+			if(apm.getUsedPartitionCount() > 0)
+			    return PartitionSystemType.APPLE_PARTITION_MAP;
+		    }
+		} catch(Exception e) {}
+	    }
+	    
+	    if(piece2 != null) {
+		try {
+		    // Look for GPT
+		    // Let's assume that blocks are always 512 bytes in size with MBR and GPT. I don't know
+		    // how to detect the actual block size (at least when reading from a file, otherwise I
+		    // guess there are system specific ways)...
+		    byte[] piece2 = new byte[512];
+		    bitstream.seek(512);
+		    bitstream.read(piece2);
+		    GPTHeader gh = new GPTHeader(piece2, 0);
+		    if(gh.isValid()) {
+			return PartitionSystemType.GUID_PARTITION_TABLE;
+		    }
+		} catch(Exception e) {}
+	    }
+	    
+	    if(piece1 != null) {
+		try {
+		    // Look for MBR (always after looking for GPT, because both may be present,
+		    // in which case GPT has higher priority)
+		    MBRPartitionTable mpt = new MBRPartitionTable(piece1, 0);
+		    if(mpt.isValid()) {
+			// Here we should look for extended partitions, BSD disk labels, LVM volumes etc. TODO!
+			
+			return PartitionSystemType.MASTER_BOOT_RECORD;
+		    }
+		} catch(Exception e) {}
+	    }
+	} catch(Exception e) {}
+	
+	// If we haven't returned by now, then no partition system could be found...
 	return PartitionSystemType.NONE_FOUND;
     }
     
