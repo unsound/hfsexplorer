@@ -29,48 +29,58 @@ import org.catacombae.hfsexplorer.types.HFSPlusVolumeHeader;
 import java.text.DateFormat;
 
 /**
- *
- * @author  erik
+ * A panel for displaying the values in a HFSPlusVolumeHeader in a good looking
+ * way.
+ * @author  Erik Larsson, erik82@kth.se
  */
 public class VolumeInfoPanel extends javax.swing.JPanel {
-    private final DateFormat dti = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+    private final DateFormat dti =
+            DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
     
     /** Creates new form VolumeInfoPanel */
     public VolumeInfoPanel() {
         initComponents();
     }
     
+    /**
+     * Sets the fields of this VolumeInfoPanel to the values in the structure
+     * <code>vh</code>.
+     * @param vh the structure containing the values to set.
+     */
     public void setFields(HFSPlusVolumeHeader vh) {
+	signatureField.setText("" + Util2.toASCIIString(vh.getSignature()));
+	versionField.setText("" + vh.getVersion());
         
-	volumeSignatureField.setText("" + Util2.toASCIIString(vh.getSignature()));
-	fsVersionField.setText("" + vh.getVersion());
-	int attributes = vh.getAttributes();
-	hardwareLockBox.setSelected(((attributes >> 7) & 0x1) == 1);
-	volumeUnmountedBox.setSelected(((attributes >> 8) & 0x1) == 1);
-	sparedBlocksBox.setSelected(((attributes >> 9) & 0x1) == 1);
-	noCacheBox.setSelected(((attributes >> 10) & 0x1) == 1);
-	volumeInconsistentBox.setSelected(((attributes >> 11) & 0x1) == 1);
-	idsReusedBox.setSelected(((attributes >> 12) & 0x1) == 1);
-	journaledBox.setSelected(((attributes >> 13) & 0x1) == 1);
-	softwareLockBox.setSelected(((attributes >> 15) & 0x1) == 1);
-	lastMountedField.setText("" + Util2.toASCIIString(vh.getLastMountedVersion()));
-	journalInfoField.setText("0x" + Util.toHexStringBE(vh.getJournalInfoBlock()));
-	
-	dateCreatedField.setText("" + dti.format(vh.getCreateDateAsDate()));
-	dateModifyField.setText("" + dti.format(vh.getModifyDateAsDate()));
-	dateBackupField.setText("" + dti.format(vh.getBackupDateAsDate()));
-	dateCheckField.setText("" + dti.format(vh.getCheckedDateAsDate()));
+	hardwareLockBox.setSelected(vh.getAttributeVolumeHardwareLock());
+	volumeUnmountedBox.setSelected(vh.getAttributeVolumeUnmounted());
+	sparedBlocksBox.setSelected(vh.getAttributeVolumeSparedBlocks());
+	noCacheBox.setSelected(vh.getAttributeVolumeNoCacheRequired());
+	volumeInconsistentBox.setSelected(
+                vh.getAttributeBootVolumeInconsistent());
+	idsReusedBox.setSelected(vh.getAttributeCatalogNodeIDsReused());
+	journaledBox.setSelected(vh.getAttributeVolumeJournaled());
+	softwareLockBox.setSelected(vh.getAttributeVolumeSoftwareLock());
+        
+	lastMountedVersionField.setText("" +
+                Util2.toASCIIString(vh.getLastMountedVersion()));
+	journalInfoBlockField.setText("0x" +
+                Util.toHexStringBE(vh.getJournalInfoBlock()));
+	createDateField.setText("" + dti.format(vh.getCreateDateAsDate()));
+	modifyDateField.setText("" + dti.format(vh.getModifyDateAsDate()));
+	backupDateField.setText("" + dti.format(vh.getBackupDateAsDate()));
+	checkedDateField.setText("" + dti.format(vh.getCheckedDateAsDate()));
 	fileCountField.setText("" + vh.getFileCount());
 	folderCountField.setText("" + vh.getFolderCount());
 	blockSizeField.setText("" + vh.getBlockSize() + " bytes");
-        numBlocksField.setText("" + vh.getTotalBlocks());
+        totalBlocksField.setText("" + vh.getTotalBlocks());
 	freeBlocksField.setText("" + vh.getFreeBlocks());
 	nextAllocationField.setText("" + vh.getNextAllocation());
-	resourceClumpField.setText("" + vh.getRsrcClumpSize() + " bytes");
-	dataClumpField.setText("" + vh.getDataClumpSize() + " bytes");
+	rsrcClumpSizeField.setText("" + vh.getRsrcClumpSize() + " bytes");
+	dataClumpSizeField.setText("" + vh.getDataClumpSize() + " bytes");
 	nextCatalogIDField.setText("" + vh.getNextCatalogID());
 	writeCountField.setText("" + vh.getWriteCount());
-	encodingsBitmapField.setText("0x" + Util.toHexStringBE(vh.getEncodingsBitmap()));
+	encodingsBitmapField.setText("0x" +
+                Util.toHexStringBE(vh.getEncodingsBitmap()));
 	int[] finderInfo = vh.getFinderInfo();
 	finderInfo1Field.setText("" + finderInfo[0]);
 	finderInfo2Field.setText("" + finderInfo[1]);
@@ -78,8 +88,8 @@ public class VolumeInfoPanel extends javax.swing.JPanel {
 	finderInfo4Field.setText("" + finderInfo[3]);
 	finderInfo5Field.setText("0x" + Util.toHexStringBE(finderInfo[4]));
 	finderInfo6Field.setText("" + finderInfo[5]);
-	finderInfo78Field.setText("0x" + Util.toHexStringBE(finderInfo[6]) + Util.toHexStringBE(finderInfo[7]));
-
+	finderInfo78Field.setText("0x" + Util.toHexStringBE(finderInfo[6]) +
+                Util.toHexStringBE(finderInfo[7]));
     }
     
     /** This method is called from within the constructor to
@@ -87,218 +97,287 @@ public class VolumeInfoPanel extends javax.swing.JPanel {
      * WARNING: Do NOT modify this code. The content of this method is
      * always regenerated by the Form Editor.
      */
-    // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        sparedBlocksBox = new javax.swing.JCheckBox();
-        volumeUnmountedBox = new javax.swing.JCheckBox();
+
+        signatureLabel = new javax.swing.JLabel();
+        signatureField = new javax.swing.JTextField();
+        versionLabel = new javax.swing.JLabel();
+        versionField = new javax.swing.JTextField();
+        attributesSectionLabel = new javax.swing.JLabel();
         hardwareLockBox = new javax.swing.JCheckBox();
+        hardwareLockLabel = new javax.swing.JLabel();
+        volumeUnmountedBox = new javax.swing.JCheckBox();
+        volumeUnmountedLabel = new javax.swing.JLabel();
+        sparedBlocksBox = new javax.swing.JCheckBox();
+        sparedBlocksLabel = new javax.swing.JLabel();
         noCacheBox = new javax.swing.JCheckBox();
+        noCacheLabel = new javax.swing.JLabel();
         volumeInconsistentBox = new javax.swing.JCheckBox();
+        volumeInconsistentLabel = new javax.swing.JLabel();
         idsReusedBox = new javax.swing.JCheckBox();
+        idsReusedLabel = new javax.swing.JLabel();
         journaledBox = new javax.swing.JCheckBox();
+        journaledLabel = new javax.swing.JLabel();
         softwareLockBox = new javax.swing.JCheckBox();
-        volumeSignatureField = new javax.swing.JLabel();
-        fsVersionField = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
-        jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
-        jLabel14 = new javax.swing.JLabel();
-        jLabel15 = new javax.swing.JLabel();
-        jLabel16 = new javax.swing.JLabel();
-        jLabel17 = new javax.swing.JLabel();
-        jLabel18 = new javax.swing.JLabel();
-        jLabel19 = new javax.swing.JLabel();
-        jLabel20 = new javax.swing.JLabel();
-        jLabel21 = new javax.swing.JLabel();
-        jLabel22 = new javax.swing.JLabel();
-        encodingsBitmapField = new javax.swing.JLabel();
-        jLabel24 = new javax.swing.JLabel();
-        jLabel25 = new javax.swing.JLabel();
-        jLabel26 = new javax.swing.JLabel();
-        jLabel27 = new javax.swing.JLabel();
-        jLabel28 = new javax.swing.JLabel();
-        jLabel29 = new javax.swing.JLabel();
-        jLabel30 = new javax.swing.JLabel();
-        jLabel31 = new javax.swing.JLabel();
-        lastMountedField = new javax.swing.JLabel();
-        journalInfoField = new javax.swing.JLabel();
-        dateCreatedField = new javax.swing.JLabel();
-        dateModifyField = new javax.swing.JLabel();
-        dateBackupField = new javax.swing.JLabel();
-        dateCheckField = new javax.swing.JLabel();
-        fileCountField = new javax.swing.JLabel();
-        folderCountField = new javax.swing.JLabel();
-        blockSizeField = new javax.swing.JLabel();
-        numBlocksField = new javax.swing.JLabel();
-        freeBlocksField = new javax.swing.JLabel();
-        nextAllocationField = new javax.swing.JLabel();
-        resourceClumpField = new javax.swing.JLabel();
-        dataClumpField = new javax.swing.JLabel();
-        nextCatalogIDField = new javax.swing.JLabel();
-        writeCountField = new javax.swing.JLabel();
-        finderInfo1Field = new javax.swing.JLabel();
-        finderInfo2Field = new javax.swing.JLabel();
-        finderInfo3Field = new javax.swing.JLabel();
-        finderInfo4Field = new javax.swing.JLabel();
-        finderInfo5Field = new javax.swing.JLabel();
-        finderInfo6Field = new javax.swing.JLabel();
-        finderInfo78Field = new javax.swing.JLabel();
+        softwareLockLabel = new javax.swing.JLabel();
+        lastMountedVersionLabel = new javax.swing.JLabel();
+        lastMountedVersionField = new javax.swing.JTextField();
+        journalInfoBlockLabel = new javax.swing.JLabel();
+        journalInfoBlockField = new javax.swing.JTextField();
+        createDateLabel = new javax.swing.JLabel();
+        createDateField = new javax.swing.JTextField();
+        modifyDateLabel = new javax.swing.JLabel();
+        modifyDateField = new javax.swing.JTextField();
+        backupDateLabel = new javax.swing.JLabel();
+        backupDateField = new javax.swing.JTextField();
+        checkedDateLabel = new javax.swing.JLabel();
+        checkedDateField = new javax.swing.JTextField();
+        fileCountLabel = new javax.swing.JLabel();
+        fileCountField = new javax.swing.JTextField();
+        folderCountLabel = new javax.swing.JLabel();
+        folderCountField = new javax.swing.JTextField();
+        blockSizeLabel = new javax.swing.JLabel();
+        blockSizeField = new javax.swing.JTextField();
+        totalBlocksLabel = new javax.swing.JLabel();
+        totalBlocksField = new javax.swing.JTextField();
+        freeBlocksLabel = new javax.swing.JLabel();
+        freeBlocksField = new javax.swing.JTextField();
+        nextAllocationLabel = new javax.swing.JLabel();
+        nextAllocationField = new javax.swing.JTextField();
+        rsrcClumpSizeLabel = new javax.swing.JLabel();
+        rsrcClumpSizeField = new javax.swing.JTextField();
+        dataClumpSizeLabel = new javax.swing.JLabel();
+        dataClumpSizeField = new javax.swing.JTextField();
+        nextCatalogIDLabel = new javax.swing.JLabel();
+        nextCatalogIDField = new javax.swing.JTextField();
+        writeCountLabel = new javax.swing.JLabel();
+        writeCountField = new javax.swing.JTextField();
+        encodingsBitmapLabel = new javax.swing.JLabel();
+        encodingsBitmapField = new javax.swing.JTextField();
+        finderInfoSectionLabel = new javax.swing.JLabel();
+        finderInfo1Label = new javax.swing.JLabel();
+        finderInfo2Label = new javax.swing.JLabel();
+        finderInfo3Label = new javax.swing.JLabel();
+        finderInfo4Label = new javax.swing.JLabel();
+        finderInfo5Label = new javax.swing.JLabel();
+        finderInfo6Label = new javax.swing.JLabel();
+        finderInfo78Label = new javax.swing.JLabel();
+        finderInfo1Field = new javax.swing.JTextField();
+        finderInfo2Field = new javax.swing.JTextField();
+        finderInfo3Field = new javax.swing.JTextField();
+        finderInfo4Field = new javax.swing.JTextField();
+        finderInfo5Field = new javax.swing.JTextField();
+        finderInfo6Field = new javax.swing.JTextField();
+        finderInfo78Field = new javax.swing.JTextField();
 
-        jLabel1.setText("Volume signature:");
+        signatureLabel.setText("Volume signature:");
 
-        jLabel2.setText("File system version:");
+        signatureField.setEditable(false);
+        signatureField.setText("jTextField18");
+        signatureField.setBorder(null);
 
-        jLabel3.setText("Attributes:");
+        versionLabel.setText("File system version:");
 
-        sparedBlocksBox.setText("Volume spared blocks");
-        sparedBlocksBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        sparedBlocksBox.setEnabled(false);
-        sparedBlocksBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        versionField.setEditable(false);
+        versionField.setText("jTextField19");
+        versionField.setBorder(null);
 
-        volumeUnmountedBox.setText("Volume unmounted");
-        volumeUnmountedBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        volumeUnmountedBox.setEnabled(false);
-        volumeUnmountedBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        attributesSectionLabel.setText("Attributes:");
 
-        hardwareLockBox.setText("Volume hardware lock");
         hardwareLockBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         hardwareLockBox.setEnabled(false);
         hardwareLockBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
-        noCacheBox.setText("No cache required");
+        hardwareLockLabel.setText("Volume hardware lock");
+
+        volumeUnmountedBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        volumeUnmountedBox.setEnabled(false);
+        volumeUnmountedBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
+
+        volumeUnmountedLabel.setText("Volume unmounted");
+
+        sparedBlocksBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        sparedBlocksBox.setEnabled(false);
+        sparedBlocksBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
+
+        sparedBlocksLabel.setText("Volume spared blocks");
+
         noCacheBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         noCacheBox.setEnabled(false);
         noCacheBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
-        volumeInconsistentBox.setText("Boot volume inconsistent");
+        noCacheLabel.setText("No cache required");
+
         volumeInconsistentBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         volumeInconsistentBox.setEnabled(false);
         volumeInconsistentBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
-        idsReusedBox.setText("Catalog node IDs reused");
+        volumeInconsistentLabel.setText("Boot volume inconsistent");
+
         idsReusedBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         idsReusedBox.setEnabled(false);
         idsReusedBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
-        journaledBox.setText("Volume journaled");
+        idsReusedLabel.setText("Catalog node IDs reused");
+
         journaledBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         journaledBox.setEnabled(false);
         journaledBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
-        softwareLockBox.setText("Volume software lock");
+        journaledLabel.setText("Volume journaled");
+
         softwareLockBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         softwareLockBox.setEnabled(false);
         softwareLockBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
-        volumeSignatureField.setText("jLabel4");
+        softwareLockLabel.setText("Volume software lock");
 
-        fsVersionField.setText("jLabel5");
+        lastMountedVersionLabel.setText("Last mounted version:");
 
-        jLabel6.setText("Last mounted version:");
+        lastMountedVersionField.setEditable(false);
+        lastMountedVersionField.setText("jTextField1");
+        lastMountedVersionField.setBorder(null);
 
-        jLabel7.setText("Journal info block ID:");
+        journalInfoBlockLabel.setText("Journal info block ID:");
 
-        jLabel8.setText("Date created:");
+        journalInfoBlockField.setEditable(false);
+        journalInfoBlockField.setText("jTextField2");
+        journalInfoBlockField.setBorder(null);
 
-        jLabel9.setText("Date last modified:");
+        createDateLabel.setText("Date created:");
 
-        jLabel10.setText("Date last backuped:");
+        createDateField.setEditable(false);
+        createDateField.setText("jTextField3");
+        createDateField.setBorder(null);
 
-        jLabel11.setText("Date last checked:");
+        modifyDateLabel.setText("Date last modified:");
 
-        jLabel12.setText("File count:");
+        modifyDateField.setEditable(false);
+        modifyDateField.setText("jTextField4");
+        modifyDateField.setBorder(null);
 
-        jLabel13.setText("Folder count:");
+        backupDateLabel.setText("Date last backuped:");
 
-        jLabel14.setText("Block size:");
+        backupDateField.setEditable(false);
+        backupDateField.setText("jTextField5");
+        backupDateField.setBorder(null);
 
-        jLabel15.setText("Number of blocks:");
+        checkedDateLabel.setText("Date last checked:");
 
-        jLabel16.setText("Number of free blocks:");
+        checkedDateField.setEditable(false);
+        checkedDateField.setText("jTextField6");
+        checkedDateField.setBorder(null);
 
-        jLabel17.setText("Start of next allocation search:");
+        fileCountLabel.setText("File count:");
 
-        jLabel18.setText("Resource fork default clump size:");
+        fileCountField.setEditable(false);
+        fileCountField.setText("jTextField7");
+        fileCountField.setBorder(null);
 
-        jLabel19.setText("Data fork default clump size:");
+        folderCountLabel.setText("Folder count:");
 
-        jLabel20.setText("Next unused catalog ID:");
+        folderCountField.setEditable(false);
+        folderCountField.setText("jTextField8");
+        folderCountField.setBorder(null);
 
-        jLabel21.setText("Write count:");
+        blockSizeLabel.setText("Block size:");
 
-        jLabel22.setText("Encodings bitmap:");
+        blockSizeField.setEditable(false);
+        blockSizeField.setText("jTextField9");
+        blockSizeField.setBorder(null);
 
-        encodingsBitmapField.setText("0x\u00d6\u00d6\u00d6\u00d6\u00d6\u00d6\u00d6\u00d6\u00d6\u00d6\u00d6\u00d6\u00d6\u00d6\u00d6\u00d6");
+        totalBlocksLabel.setText("Number of blocks:");
 
-        jLabel24.setText("Finder info:");
+        totalBlocksField.setEditable(false);
+        totalBlocksField.setText("jTextField10");
+        totalBlocksField.setBorder(null);
 
-        jLabel25.setText("System folder ID:");
+        freeBlocksLabel.setText("Number of free blocks:");
 
-        jLabel26.setText("Startup application parent folder ID:");
+        freeBlocksField.setEditable(false);
+        freeBlocksField.setText("jTextField11");
+        freeBlocksField.setBorder(null);
 
-        jLabel27.setText("Folder ID to display at mount:");
+        nextAllocationLabel.setText("Start of next allocation search:");
 
-        jLabel28.setText("Legacy Mac OS system folder ID:");
+        nextAllocationField.setEditable(false);
+        nextAllocationField.setText("jTextField12");
+        nextAllocationField.setBorder(null);
 
-        jLabel29.setText("Reserved:");
+        rsrcClumpSizeLabel.setText("Resource fork default clump size:");
 
-        jLabel30.setText("Mac OS X system folder ID:");
+        rsrcClumpSizeField.setEditable(false);
+        rsrcClumpSizeField.setText("jTextField13");
+        rsrcClumpSizeField.setBorder(null);
 
-        jLabel31.setText("Unique volume identifier:");
+        dataClumpSizeLabel.setText("Data fork default clump size:");
 
-        lastMountedField.setText("jLabel32");
+        dataClumpSizeField.setEditable(false);
+        dataClumpSizeField.setText("jTextField14");
+        dataClumpSizeField.setBorder(null);
 
-        journalInfoField.setText("jLabel34");
+        nextCatalogIDLabel.setText("Next unused catalog ID:");
 
-        dateCreatedField.setText("jLabel35");
+        nextCatalogIDField.setEditable(false);
+        nextCatalogIDField.setText("jTextField15");
+        nextCatalogIDField.setBorder(null);
 
-        dateModifyField.setText("jLabel36");
+        writeCountLabel.setText("Write count:");
 
-        dateBackupField.setText("jLabel37");
+        writeCountField.setEditable(false);
+        writeCountField.setText("jTextField16");
+        writeCountField.setBorder(null);
 
-        dateCheckField.setText("jLabel38");
+        encodingsBitmapLabel.setText("Encodings bitmap:");
 
-        fileCountField.setText("jLabel39");
+        encodingsBitmapField.setEditable(false);
+        encodingsBitmapField.setText("jTextField17");
+        encodingsBitmapField.setBorder(null);
 
-        folderCountField.setText("jLabel40");
+        finderInfoSectionLabel.setText("Finder info:");
 
-        blockSizeField.setText("jLabel41");
+        finderInfo1Label.setText("System folder ID:");
 
-        numBlocksField.setText("jLabel42");
+        finderInfo2Label.setText("Startup application parent folder ID:");
 
-        freeBlocksField.setText("jLabel43");
+        finderInfo3Label.setText("Folder ID to display at mount:");
 
-        nextAllocationField.setText("jLabel44");
+        finderInfo4Label.setText("Legacy Mac OS system folder ID:");
 
-        resourceClumpField.setText("jLabel45");
+        finderInfo5Label.setText("Reserved:");
 
-        dataClumpField.setText("jLabel46");
+        finderInfo6Label.setText("Mac OS X system folder ID:");
 
-        nextCatalogIDField.setText("jLabel47");
+        finderInfo78Label.setText("Unique volume identifier:");
 
-        writeCountField.setText("jLabel48");
+        finderInfo1Field.setEditable(false);
+        finderInfo1Field.setText("jTextField1");
+        finderInfo1Field.setBorder(null);
 
-        finderInfo1Field.setText("jLabel49");
+        finderInfo2Field.setEditable(false);
+        finderInfo2Field.setText("jTextField2");
+        finderInfo2Field.setBorder(null);
 
-        finderInfo2Field.setText("jLabel50");
+        finderInfo3Field.setEditable(false);
+        finderInfo3Field.setText("jTextField3");
+        finderInfo3Field.setBorder(null);
 
-        finderInfo3Field.setText("jLabel51");
+        finderInfo4Field.setEditable(false);
+        finderInfo4Field.setText("jTextField4");
+        finderInfo4Field.setBorder(null);
 
-        finderInfo4Field.setText("jLabel52");
+        finderInfo5Field.setEditable(false);
+        finderInfo5Field.setText("jTextField5");
+        finderInfo5Field.setBorder(null);
 
-        finderInfo5Field.setText("0x\u00d6\u00d6\u00d6\u00d6\u00d6\u00d6\u00d6\u00d6");
+        finderInfo6Field.setEditable(false);
+        finderInfo6Field.setText("jTextField6");
+        finderInfo6Field.setBorder(null);
 
-        finderInfo6Field.setText("jLabel53");
-
-        finderInfo78Field.setText("jLabel54");
+        finderInfo78Field.setEditable(false);
+        finderInfo78Field.setText("jTextField7");
+        finderInfo78Field.setBorder(null);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -308,128 +387,148 @@ public class VolumeInfoPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
-                        .add(jLabel1)
+                        .add(signatureLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(volumeSignatureField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE))
+                        .add(signatureField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 292, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
-                        .add(jLabel2)
+                        .add(versionLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(fsVersionField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE))
-                    .add(jLabel3)
+                        .add(versionField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE))
+                    .add(attributesSectionLabel)
                     .add(layout.createSequentialGroup()
                         .add(24, 24, 24)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(hardwareLockBox)
-                            .add(noCacheBox)
-                            .add(volumeInconsistentBox)
-                            .add(idsReusedBox)
-                            .add(journaledBox)
-                            .add(softwareLockBox)
+                            .add(layout.createSequentialGroup()
+                                .add(hardwareLockBox)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(hardwareLockLabel))
+                            .add(layout.createSequentialGroup()
+                                .add(noCacheBox)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(noCacheLabel))
+                            .add(layout.createSequentialGroup()
+                                .add(volumeInconsistentBox)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(volumeInconsistentLabel))
+                            .add(layout.createSequentialGroup()
+                                .add(idsReusedBox)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(idsReusedLabel))
+                            .add(layout.createSequentialGroup()
+                                .add(journaledBox)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(journaledLabel))
+                            .add(layout.createSequentialGroup()
+                                .add(softwareLockBox)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(softwareLockLabel))
                             .add(layout.createSequentialGroup()
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(volumeUnmountedBox)
-                                    .add(sparedBlocksBox)))))
+                                    .add(layout.createSequentialGroup()
+                                        .add(volumeUnmountedBox)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(volumeUnmountedLabel))
+                                    .add(layout.createSequentialGroup()
+                                        .add(sparedBlocksBox)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(sparedBlocksLabel))))))
                     .add(layout.createSequentialGroup()
-                        .add(jLabel6)
+                        .add(lastMountedVersionLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(lastMountedField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE))
+                        .add(lastMountedVersionField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
-                        .add(jLabel7)
+                        .add(journalInfoBlockLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(journalInfoField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 252, Short.MAX_VALUE))
+                        .add(journalInfoBlockField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
-                        .add(jLabel8)
+                        .add(fileCountLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(dateCreatedField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE))
+                        .add(fileCountField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
-                        .add(jLabel9)
+                        .add(folderCountLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(dateModifyField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE))
+                        .add(folderCountField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
-                        .add(jLabel10)
+                        .add(blockSizeLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(dateBackupField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE))
+                        .add(blockSizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
-                        .add(jLabel11)
+                        .add(totalBlocksLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(dateCheckField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE))
+                        .add(totalBlocksField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 292, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
-                        .add(jLabel12)
+                        .add(freeBlocksLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(fileCountField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE))
+                        .add(freeBlocksField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 269, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
-                        .add(jLabel13)
+                        .add(nextAllocationLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(folderCountField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE))
+                        .add(nextAllocationField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
-                        .add(jLabel14)
+                        .add(rsrcClumpSizeLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(blockSizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE))
+                        .add(rsrcClumpSizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
-                        .add(jLabel15)
+                        .add(dataClumpSizeLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(numBlocksField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 269, Short.MAX_VALUE))
+                        .add(dataClumpSizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 241, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
-                        .add(jLabel16)
+                        .add(nextCatalogIDLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(freeBlocksField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 241, Short.MAX_VALUE))
+                        .add(nextCatalogIDField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
-                        .add(jLabel17)
+                        .add(writeCountLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(nextAllocationField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 193, Short.MAX_VALUE))
+                        .add(writeCountField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
-                        .add(jLabel18)
+                        .add(encodingsBitmapLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(resourceClumpField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(jLabel19)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(dataClumpField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 203, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(jLabel20)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(nextCatalogIDField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(jLabel21)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(writeCountField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(jLabel22)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(encodingsBitmapField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 269, Short.MAX_VALUE))
-                    .add(jLabel24)
+                        .add(encodingsBitmapField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE))
+                    .add(finderInfoSectionLabel)
                     .add(layout.createSequentialGroup()
                         .add(24, 24, 24)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(layout.createSequentialGroup()
-                                .add(jLabel26)
+                                .add(finderInfo2Label)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(finderInfo2Field, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE))
+                                .add(finderInfo2Field, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE))
                             .add(layout.createSequentialGroup()
-                                .add(jLabel25)
+                                .add(finderInfo1Label)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(finderInfo1Field, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE))
+                                .add(finderInfo1Field, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE))
                             .add(layout.createSequentialGroup()
-                                .add(jLabel27)
+                                .add(finderInfo3Label)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(finderInfo3Field, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE))
+                                .add(finderInfo3Field, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 211, Short.MAX_VALUE))
                             .add(layout.createSequentialGroup()
-                                .add(jLabel28)
+                                .add(finderInfo4Label)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(finderInfo4Field, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE))
+                                .add(finderInfo4Field, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE))
                             .add(layout.createSequentialGroup()
-                                .add(jLabel29)
+                                .add(finderInfo5Label)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(finderInfo5Field, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE))
+                                .add(finderInfo5Field, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE))
                             .add(layout.createSequentialGroup()
-                                .add(jLabel30)
+                                .add(finderInfo6Label)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(finderInfo6Field, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE))
+                                .add(finderInfo6Field, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 223, Short.MAX_VALUE))
                             .add(layout.createSequentialGroup()
-                                .add(jLabel31)
+                                .add(finderInfo78Label)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(finderInfo78Field, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 203, Short.MAX_VALUE)))))
+                                .add(finderInfo78Field, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE))))
+                    .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(backupDateLabel)
+                            .add(modifyDateLabel)
+                            .add(createDateLabel)
+                            .add(checkedDateLabel))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(checkedDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)
+                            .add(createDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)
+                            .add(modifyDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)
+                            .add(backupDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -437,196 +536,220 @@ public class VolumeInfoPanel extends javax.swing.JPanel {
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel1)
-                    .add(volumeSignatureField))
+                    .add(signatureLabel)
+                    .add(signatureField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel2)
-                    .add(fsVersionField))
+                    .add(versionLabel)
+                    .add(versionField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jLabel3)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(hardwareLockBox)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(volumeUnmountedBox)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(sparedBlocksBox)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(noCacheBox)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(volumeInconsistentBox)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(idsReusedBox)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(journaledBox)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(softwareLockBox)
+                .add(attributesSectionLabel)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel6)
-                    .add(lastMountedField))
+                    .add(hardwareLockBox)
+                    .add(hardwareLockLabel))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel7)
-                    .add(journalInfoField))
+                    .add(volumeUnmountedBox)
+                    .add(volumeUnmountedLabel))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel8)
-                    .add(dateCreatedField))
+                    .add(sparedBlocksBox)
+                    .add(sparedBlocksLabel))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel9)
-                    .add(dateModifyField))
+                    .add(noCacheBox)
+                    .add(noCacheLabel))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel10)
-                    .add(dateBackupField))
+                    .add(volumeInconsistentBox)
+                    .add(volumeInconsistentLabel))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel11)
-                    .add(dateCheckField))
+                    .add(idsReusedBox)
+                    .add(idsReusedLabel))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel12)
-                    .add(fileCountField))
+                    .add(journaledBox)
+                    .add(journaledLabel))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel13)
-                    .add(folderCountField))
+                    .add(softwareLockBox)
+                    .add(softwareLockLabel))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel14)
-                    .add(blockSizeField))
+                    .add(lastMountedVersionLabel)
+                    .add(lastMountedVersionField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel15)
-                    .add(numBlocksField))
+                    .add(journalInfoBlockLabel)
+                    .add(journalInfoBlockField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel16)
-                    .add(freeBlocksField))
+                    .add(createDateLabel)
+                    .add(createDateField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel17)
-                    .add(nextAllocationField))
+                    .add(modifyDateLabel)
+                    .add(modifyDateField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel18)
-                    .add(resourceClumpField))
+                    .add(backupDateLabel)
+                    .add(backupDateField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel19)
-                    .add(dataClumpField))
+                    .add(checkedDateLabel)
+                    .add(checkedDateField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel20)
-                    .add(nextCatalogIDField))
+                    .add(fileCountLabel)
+                    .add(fileCountField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel21)
-                    .add(writeCountField))
+                    .add(folderCountLabel)
+                    .add(folderCountField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel22)
-                    .add(encodingsBitmapField))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jLabel24)
+                    .add(blockSizeLabel)
+                    .add(blockSizeField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel25)
-                    .add(finderInfo1Field))
+                    .add(totalBlocksLabel)
+                    .add(totalBlocksField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel26)
-                    .add(finderInfo2Field))
+                    .add(freeBlocksLabel)
+                    .add(freeBlocksField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel27)
-                    .add(finderInfo3Field))
+                    .add(nextAllocationLabel)
+                    .add(nextAllocationField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel28)
-                    .add(finderInfo4Field))
+                    .add(rsrcClumpSizeLabel)
+                    .add(rsrcClumpSizeField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel29)
-                    .add(finderInfo5Field))
+                    .add(dataClumpSizeLabel)
+                    .add(dataClumpSizeField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel30)
-                    .add(finderInfo6Field))
+                    .add(nextCatalogIDLabel)
+                    .add(nextCatalogIDField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel31)
-                    .add(finderInfo78Field))
+                    .add(writeCountLabel)
+                    .add(writeCountField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(encodingsBitmapLabel)
+                    .add(encodingsBitmapField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(finderInfoSectionLabel)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(finderInfo1Label)
+                    .add(finderInfo1Field, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(finderInfo2Label)
+                    .add(finderInfo2Field, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(finderInfo3Label)
+                    .add(finderInfo3Field, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(finderInfo4Label)
+                    .add(finderInfo4Field, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(finderInfo5Label)
+                    .add(finderInfo5Field, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(finderInfo6Label)
+                    .add(finderInfo6Field, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(finderInfo78Label)
+                    .add(finderInfo78Field, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel blockSizeField;
-    private javax.swing.JLabel dataClumpField;
-    private javax.swing.JLabel dateBackupField;
-    private javax.swing.JLabel dateCheckField;
-    private javax.swing.JLabel dateCreatedField;
-    private javax.swing.JLabel dateModifyField;
-    private javax.swing.JLabel encodingsBitmapField;
-    private javax.swing.JLabel fileCountField;
-    private javax.swing.JLabel finderInfo1Field;
-    private javax.swing.JLabel finderInfo2Field;
-    private javax.swing.JLabel finderInfo3Field;
-    private javax.swing.JLabel finderInfo4Field;
-    private javax.swing.JLabel finderInfo5Field;
-    private javax.swing.JLabel finderInfo6Field;
-    private javax.swing.JLabel finderInfo78Field;
-    private javax.swing.JLabel folderCountField;
-    private javax.swing.JLabel freeBlocksField;
-    private javax.swing.JLabel fsVersionField;
+    private javax.swing.JLabel attributesSectionLabel;
+    private javax.swing.JTextField backupDateField;
+    private javax.swing.JLabel backupDateLabel;
+    private javax.swing.JTextField blockSizeField;
+    private javax.swing.JLabel blockSizeLabel;
+    private javax.swing.JTextField checkedDateField;
+    private javax.swing.JLabel checkedDateLabel;
+    private javax.swing.JTextField createDateField;
+    private javax.swing.JLabel createDateLabel;
+    private javax.swing.JTextField dataClumpSizeField;
+    private javax.swing.JLabel dataClumpSizeLabel;
+    private javax.swing.JTextField encodingsBitmapField;
+    private javax.swing.JLabel encodingsBitmapLabel;
+    private javax.swing.JTextField fileCountField;
+    private javax.swing.JLabel fileCountLabel;
+    private javax.swing.JTextField finderInfo1Field;
+    private javax.swing.JLabel finderInfo1Label;
+    private javax.swing.JTextField finderInfo2Field;
+    private javax.swing.JLabel finderInfo2Label;
+    private javax.swing.JTextField finderInfo3Field;
+    private javax.swing.JLabel finderInfo3Label;
+    private javax.swing.JTextField finderInfo4Field;
+    private javax.swing.JLabel finderInfo4Label;
+    private javax.swing.JTextField finderInfo5Field;
+    private javax.swing.JLabel finderInfo5Label;
+    private javax.swing.JTextField finderInfo6Field;
+    private javax.swing.JLabel finderInfo6Label;
+    private javax.swing.JTextField finderInfo78Field;
+    private javax.swing.JLabel finderInfo78Label;
+    private javax.swing.JLabel finderInfoSectionLabel;
+    private javax.swing.JTextField folderCountField;
+    private javax.swing.JLabel folderCountLabel;
+    private javax.swing.JTextField freeBlocksField;
+    private javax.swing.JLabel freeBlocksLabel;
     private javax.swing.JCheckBox hardwareLockBox;
+    private javax.swing.JLabel hardwareLockLabel;
     private javax.swing.JCheckBox idsReusedBox;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
-    private javax.swing.JLabel jLabel15;
-    private javax.swing.JLabel jLabel16;
-    private javax.swing.JLabel jLabel17;
-    private javax.swing.JLabel jLabel18;
-    private javax.swing.JLabel jLabel19;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel20;
-    private javax.swing.JLabel jLabel21;
-    private javax.swing.JLabel jLabel22;
-    private javax.swing.JLabel jLabel24;
-    private javax.swing.JLabel jLabel25;
-    private javax.swing.JLabel jLabel26;
-    private javax.swing.JLabel jLabel27;
-    private javax.swing.JLabel jLabel28;
-    private javax.swing.JLabel jLabel29;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel30;
-    private javax.swing.JLabel jLabel31;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JLabel journalInfoField;
+    private javax.swing.JLabel idsReusedLabel;
+    private javax.swing.JTextField journalInfoBlockField;
+    private javax.swing.JLabel journalInfoBlockLabel;
     private javax.swing.JCheckBox journaledBox;
-    private javax.swing.JLabel lastMountedField;
-    private javax.swing.JLabel nextAllocationField;
-    private javax.swing.JLabel nextCatalogIDField;
+    private javax.swing.JLabel journaledLabel;
+    private javax.swing.JTextField lastMountedVersionField;
+    private javax.swing.JLabel lastMountedVersionLabel;
+    private javax.swing.JTextField modifyDateField;
+    private javax.swing.JLabel modifyDateLabel;
+    private javax.swing.JTextField nextAllocationField;
+    private javax.swing.JLabel nextAllocationLabel;
+    private javax.swing.JTextField nextCatalogIDField;
+    private javax.swing.JLabel nextCatalogIDLabel;
     private javax.swing.JCheckBox noCacheBox;
-    private javax.swing.JLabel numBlocksField;
-    private javax.swing.JLabel resourceClumpField;
+    private javax.swing.JLabel noCacheLabel;
+    private javax.swing.JTextField rsrcClumpSizeField;
+    private javax.swing.JLabel rsrcClumpSizeLabel;
+    private javax.swing.JTextField signatureField;
+    private javax.swing.JLabel signatureLabel;
     private javax.swing.JCheckBox softwareLockBox;
+    private javax.swing.JLabel softwareLockLabel;
     private javax.swing.JCheckBox sparedBlocksBox;
+    private javax.swing.JLabel sparedBlocksLabel;
+    private javax.swing.JTextField totalBlocksField;
+    private javax.swing.JLabel totalBlocksLabel;
+    private javax.swing.JTextField versionField;
+    private javax.swing.JLabel versionLabel;
     private javax.swing.JCheckBox volumeInconsistentBox;
-    private javax.swing.JLabel volumeSignatureField;
+    private javax.swing.JLabel volumeInconsistentLabel;
     private javax.swing.JCheckBox volumeUnmountedBox;
-    private javax.swing.JLabel writeCountField;
+    private javax.swing.JLabel volumeUnmountedLabel;
+    private javax.swing.JTextField writeCountField;
+    private javax.swing.JLabel writeCountLabel;
     // End of variables declaration//GEN-END:variables
     
 }
