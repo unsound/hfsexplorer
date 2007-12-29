@@ -147,10 +147,11 @@ public class SelectWindowsDeviceDialog extends JDialog {
 	 * 20 partitions in each and check for existence.
 	 * You have more than 20 harddrives? You're out of luck. ;)
 	 */
-	// 20 hard drives...
-	for(int i = 0; i < 20; ++i) {
-	    // 20 partitions each...
-	    for(int j = 0; j < 20; ++j) {
+	// 20 hard drives minimum...
+	for(int i = 0; true; ++i) {
+            boolean anyFound = false;
+	    // 20 partitions each minimum...
+	    for(int j = 0; true; ++j) {
 		try {
 		    /* Should I add Partition0 to the list? It really means
 		     * "the whole drive". Partition1 is the first partition... */
@@ -158,25 +159,37 @@ public class SelectWindowsDeviceDialog extends JDialog {
 		    WindowsLowLevelIO curFile = new WindowsLowLevelIO(DEVICE_PREFIX + currentDevice);
 		    curFile.close();
 		    activeDeviceNames.addLast(currentDevice);
-		} catch(Exception e) {}
+                    anyFound = true;
+		} catch(Exception e) {
+                    if(j >= 20)
+                        break;
+                }
 	    }
+            if(!anyFound && i >= 20)
+               break;
 	}
 
-	// ...and 20 CD-ROMs
-	for(int i = 0; i < 20; ++i) {
+	// ...and 20 CD-ROMs minimum
+	for(int i = 0; true; ++i) {
 	    try {
 		String currentDevice = "CdRom"+i;
 		WindowsLowLevelIO curFile = new WindowsLowLevelIO(DEVICE_PREFIX + currentDevice);
 		curFile.close();
 		activeDeviceNames.addLast(currentDevice);
-	    } catch(Exception e) {}
+            }
+            catch(Exception e) {
+                if(i >= 20) {
+                    break;
+                }
+            }
 	}
 	return activeDeviceNames.toArray(new String[activeDeviceNames.size()]);
     }
     protected void autodetectFilesystems() {
 	LinkedList<String> plainFileSystems = new LinkedList<String>();
 	LinkedList<String[]> embeddedFileSystems = new LinkedList<String[]>();
-	
+	String skipPrefix = null;
+        
 	// Look for file systems that sit inside partition systems unsupported by Windows.
 	for(int i = 0; i < detectedDeviceNames.length; ++i) {
 	    String name = detectedDeviceNames[i];
@@ -191,48 +204,64 @@ public class SelectWindowsDeviceDialog extends JDialog {
 	    */
 		// We have an unidentifed partition system at "name"
 // 		System.out.println("TRUE!");
+            if(skipPrefix != null && name.startsWith(skipPrefix))
+                continue;
+            else
+                skipPrefix = null;
+            
 	    LowLevelFile llf = null;
 	    try {
 		llf = new WindowsLowLevelIO(DEVICE_PREFIX + name);
 		PartitionSystemRecognizer psr = new PartitionSystemRecognizer(llf);
 		PartitionSystemRecognizer.PartitionSystemType pst = psr.detectPartitionSystem();
-		if(pst == PartitionSystemRecognizer.PartitionSystemType.APPLE_PARTITION_MAP) {
-		    DriverDescriptorRecord ddr = new DriverDescriptorRecord(llf, 0);
-		    if(ddr.isValid()) {
-			ApplePartitionMap apm = new ApplePartitionMap(llf, ddr.getSbBlkSize()*1, ddr.getSbBlkSize());
-			Partition[] parts = apm.getUsedPartitionEntries();
-			for(int j = 0; j < parts.length; ++j) {
-			    Partition part = parts[j];
-			    if(part.getType() == Partition.PartitionType.APPLE_HFS) {
-				FileSystemRecognizer fsr = new FileSystemRecognizer(llf, part.getStartOffset());
-				if(fsr.isTypeSupported(fsr.detectFileSystem())) {
-				    embeddedFileSystems.add(new String[] { "APM", name, j + "" });
-				}
-			    }
-			}
-		    }
-		}
-		else if(pst == PartitionSystemRecognizer.PartitionSystemType.GUID_PARTITION_TABLE) {
-		    GUIDPartitionTable gpt = new GUIDPartitionTable(llf, 0);
-		    Partition[] parts = gpt.getUsedPartitionEntries();
-		    for(int j = 0; j < parts.length; ++j) {
-			Partition part = parts[j];
-			if(part.getType() == Partition.PartitionType.APPLE_HFS) {
-			    FileSystemRecognizer fsr = new FileSystemRecognizer(llf, part.getStartOffset());
-			    if(fsr.isTypeSupported(fsr.detectFileSystem())) {
-				embeddedFileSystems.add(new String[] { "GPT", name, j + "" });
-			    }
-			}
-		    }			
-		}
+                
+                boolean fileSystemFound = false;
+                if(pst == PartitionSystemRecognizer.PartitionSystemType.APPLE_PARTITION_MAP) {
+                    DriverDescriptorRecord ddr = new DriverDescriptorRecord(llf, 0);
+                    if(ddr.isValid()) {
+                        ApplePartitionMap apm = new ApplePartitionMap(llf, ddr.getSbBlkSize() * 1, ddr.getSbBlkSize());
+                        Partition[] parts = apm.getUsedPartitionEntries();
+                        for(int j = 0; j < parts.length; ++j) {
+                            Partition part = parts[j];
+                            if(part.getType() == Partition.PartitionType.APPLE_HFS) {
+                                FileSystemRecognizer fsr = new FileSystemRecognizer(llf, part.getStartOffset());
+                                if(fsr.isTypeSupported(fsr.detectFileSystem())) {
+                                    fileSystemFound = true;
+                                    embeddedFileSystems.add(new String[]{"APM", name, j + ""});
+                                }
+                            }
+                        }
+                    }
+                }
+                else if(pst == PartitionSystemRecognizer.PartitionSystemType.GUID_PARTITION_TABLE) {
+                    GUIDPartitionTable gpt = new GUIDPartitionTable(llf, 0);
+                    if(gpt.isValid()) {
+                        Partition[] parts = gpt.getUsedPartitionEntries();
+                        for(int j = 0; j < parts.length; ++j) {
+                            Partition part = parts[j];
+                            if(part.getType() == Partition.PartitionType.APPLE_HFS) {
+                                FileSystemRecognizer fsr = new FileSystemRecognizer(llf, part.getStartOffset());
+                                if(fsr.isTypeSupported(fsr.detectFileSystem())) {
+                                    fileSystemFound = true;
+                                    embeddedFileSystems.add(new String[]{"GPT", name, j + ""});
+                                }
+                            }
+                        }
+                    }
+                }
 		/* detection of MBR partitions are deliberately handed over to Windows because we haven't implemented
 		   support for common schemes such as extended partitions... Windows simply does it better. */
 		//else if(pst == PartitionSystemRecognizer.PartitionSystemType.MASTER_BOOT_RECORD) {}
-		else {
+		if(!fileSystemFound) {
 		    FileSystemRecognizer fsr = new FileSystemRecognizer(llf, 0);
 		    if(fsr.isTypeSupported(fsr.detectFileSystem()))
 			plainFileSystems.add(name);
 		}
+                /* If we found file systems in embedded partition systems,
+                 * ignore windows-detected partitions if the embedded partition
+                 * system is at Partition0. */
+                else if(name.endsWith("Partition0"))
+                    skipPrefix = name.substring(0, name.length()-1);
 		llf.close();
 	    } catch(Exception e) {
 		System.out.println("INFO: Non-critical exception while detecting partition system at \"" +
@@ -293,8 +322,17 @@ public class SelectWindowsDeviceDialog extends JDialog {
 			    result = new ConcatenatedFile(llf, p.getStartOffset(), p.getLength());
 			    setVisible(false);
 			}
-			else if(embeddedInfo[0].equals("GPT")) {}
-			else if(embeddedInfo[0].equals("MBR")) {}
+			else if(embeddedInfo[0].equals("GPT")) {
+                            LowLevelFile llf = new WindowsLowLevelIO(DEVICE_PREFIX + embeddedInfo[1]);
+			    GUIDPartitionTable gpt = new GUIDPartitionTable(llf, 0);
+			    Partition p = gpt.getPartitionEntry(Integer.parseInt(embeddedInfo[2]));
+			    resultCreatePath = DEVICE_PREFIX + selectedValue.toString();
+			    result = new ConcatenatedFile(llf, p.getStartOffset(), p.getLength());
+			    setVisible(false);
+                        }
+                        else
+                            throw new RuntimeException("Unexpected partition system: " + embeddedInfo[0]);
+			//else if(embeddedInfo[0].equals("MBR")) {}
 		    }
 		    else {
 			resultCreatePath = DEVICE_PREFIX + selectedValue.toString();

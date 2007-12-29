@@ -1338,6 +1338,7 @@ public class FileSystemBrowserWindow extends JFrame {
 							  "Error", JOptionPane.ERROR_MESSAGE);
 		    }
 		};
+	}
 	else if(System.getProperty("os.name").toLowerCase().startsWith("mac os x")) {
 	    //System.err.println("OS X detected");
 	    final String[] finalCommand = new String[] { "open", rec.getKey().getNodeName().toString() };

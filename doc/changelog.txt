@@ -3,7 +3,14 @@ HFSExplorer Changelog
 
 current
 -------
-- Made the Volume info panel a bit more detailed and replaced JLabels with JTextFields.
+- Bugfix/feature: GPT tables are now explicitly included in the Autodetect scan in the
+  Windows dialog "Load file system from device". If you have a broken MBR but a valid
+  GPT, the GPT partitions will be automatically detected.
+- Added support for more than 20 partitions per drive, more than 20 drives and more than
+  20 CD-ROMs in "Load file system from device" dialog (what's the point with limitations,
+  really? ;>).
+- Made the Volume info panel a bit more detailed and replaced JLabels with JTextFields so
+  information easily can be marked up.
 
 0.19
 ----
