@@ -26,6 +26,7 @@ package org.catacombae.hfsexplorer.gui;
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.Util2;
 import org.catacombae.hfsexplorer.types.HFSPlusVolumeHeader;
+import org.catacombae.hfsexplorer.types.HFSPlusForkData;
 import java.text.DateFormat;
 
 /**
@@ -90,6 +91,42 @@ public class VolumeInfoPanel extends javax.swing.JPanel {
 	finderInfo6Field.setText("" + finderInfo[5]);
 	finderInfo78Field.setText("0x" + Util.toHexStringBE(finderInfo[6]) +
                 Util.toHexStringBE(finderInfo[7]));
+        
+        // Allocation file fields
+        HFSPlusForkData allocationFileData = vh.getAllocationFile();
+        allocationFileLogicalSizeField.setText(allocationFileData.getLogicalSize() + " bytes");
+        allocationFileClumpSizeField.setText(allocationFileData.getClumpSize() + " bytes");
+        allocationFileTotalBlocksField.setText("" + allocationFileData.getTotalBlocks());
+        allocationFileBasicExtentCountField.setText("" + allocationFileData.getExtents().getNumExtentsInUse());
+        
+        // Extents file fields
+        HFSPlusForkData extentsFileData = vh.getExtentsFile();
+        extentsFileLogicalSizeField.setText(extentsFileData.getLogicalSize() + " bytes");
+        extentsFileClumpSizeField.setText(extentsFileData.getClumpSize() + " bytes");
+        extentsFileTotalBlocksField.setText("" + extentsFileData.getTotalBlocks());
+        extentsFileBasicExtentCountField.setText("" + extentsFileData.getExtents().getNumExtentsInUse());
+        
+        // Catalog file fields
+        HFSPlusForkData catalogFileData = vh.getCatalogFile();
+        catalogFileLogicalSizeField.setText(catalogFileData.getLogicalSize() + " bytes");
+        catalogFileClumpSizeField.setText(catalogFileData.getClumpSize() + " bytes");
+        catalogFileTotalBlocksField.setText("" + catalogFileData.getTotalBlocks());
+        catalogFileBasicExtentCountField.setText("" + catalogFileData.getExtents().getNumExtentsInUse());
+        
+        // Attributes file fields
+        HFSPlusForkData attributesFileData = vh.getAttributesFile();
+        attributesFileLogicalSizeField.setText(attributesFileData.getLogicalSize() + " bytes");
+        attributesFileClumpSizeField.setText(attributesFileData.getClumpSize() + " bytes");
+        attributesFileTotalBlocksField.setText("" + attributesFileData.getTotalBlocks());
+        attributesFileBasicExtentCountField.setText("" + attributesFileData.getExtents().getNumExtentsInUse());
+        
+        // Startup file fields
+        HFSPlusForkData startupFileData = vh.getStartupFile();
+        startupFileLogicalSizeField.setText(startupFileData.getLogicalSize() + " bytes");
+        startupFileClumpSizeField.setText(startupFileData.getClumpSize() + " bytes");
+        startupFileTotalBlocksField.setText("" + startupFileData.getTotalBlocks());
+        startupFileBasicExtentCountField.setText("" + startupFileData.getExtents().getNumExtentsInUse());
+        
     }
     
     /** This method is called from within the constructor to
@@ -170,6 +207,51 @@ public class VolumeInfoPanel extends javax.swing.JPanel {
         finderInfo5Field = new javax.swing.JTextField();
         finderInfo6Field = new javax.swing.JTextField();
         finderInfo78Field = new javax.swing.JTextField();
+        allocationFileSectionLabel = new javax.swing.JLabel();
+        allocationFileLogicalSizeLabel = new javax.swing.JLabel();
+        allocationFileClumpSizeLabel = new javax.swing.JLabel();
+        allocationFileTotalBlocksLabel = new javax.swing.JLabel();
+        allocationFileLogicalSizeField = new javax.swing.JTextField();
+        allocationFileClumpSizeField = new javax.swing.JTextField();
+        allocationFileTotalBlocksField = new javax.swing.JTextField();
+        allocationFileBasicExtentCountField = new javax.swing.JTextField();
+        allocationFileBasicExtentCountLabel = new javax.swing.JLabel();
+        extentsFileSectionLabel = new javax.swing.JLabel();
+        extentsFileLogicalSizeLabel = new javax.swing.JLabel();
+        extentsFileLogicalSizeField = new javax.swing.JTextField();
+        extentsFileClumpSizeLabel = new javax.swing.JLabel();
+        extentsFileClumpSizeField = new javax.swing.JTextField();
+        extentsFileTotalBlocksLabel = new javax.swing.JLabel();
+        extentsFileTotalBlocksField = new javax.swing.JTextField();
+        extentsFileBasicExtentCountLabel = new javax.swing.JLabel();
+        extentsFileBasicExtentCountField = new javax.swing.JTextField();
+        catalogFileSectionLabel = new javax.swing.JLabel();
+        catalogFileLogicalSizeLabel = new javax.swing.JLabel();
+        catalogFileLogicalSizeField = new javax.swing.JTextField();
+        catalogFileClumpSizeLabel = new javax.swing.JLabel();
+        catalogFileClumpSizeField = new javax.swing.JTextField();
+        catalogFileTotalBlocksLabel = new javax.swing.JLabel();
+        catalogFileTotalBlocksField = new javax.swing.JTextField();
+        catalogFileBasicExtentCountLabel = new javax.swing.JLabel();
+        catalogFileBasicExtentCountField = new javax.swing.JTextField();
+        attributesFileSectionLabel = new javax.swing.JLabel();
+        attributesFileLogicalSizeLabel = new javax.swing.JLabel();
+        attributesFileLogicalSizeField = new javax.swing.JTextField();
+        attributesFileClumpSizeLabel = new javax.swing.JLabel();
+        attributesFileClumpSizeField = new javax.swing.JTextField();
+        attributesFileTotalBlocksLabel = new javax.swing.JLabel();
+        attributesFileTotalBlocksField = new javax.swing.JTextField();
+        attributesFileBasicExtentCountLabel = new javax.swing.JLabel();
+        attributesFileBasicExtentCountField = new javax.swing.JTextField();
+        startupFileSectionLabel = new javax.swing.JLabel();
+        startupFileLogicalSizeLabel = new javax.swing.JLabel();
+        startupFileLogicalSizeField = new javax.swing.JTextField();
+        startupFileClumpSizeLabel = new javax.swing.JLabel();
+        startupFileClumpSizeField = new javax.swing.JTextField();
+        startupFileTotalBlocksLabel = new javax.swing.JLabel();
+        startupFileTotalBlocksField = new javax.swing.JTextField();
+        startupFileBasicExtentCountLabel = new javax.swing.JLabel();
+        startupFileBasicExtentCountField = new javax.swing.JTextField();
 
         signatureLabel.setText("Volume signature:");
 
@@ -379,6 +461,137 @@ public class VolumeInfoPanel extends javax.swing.JPanel {
         finderInfo78Field.setText("jTextField7");
         finderInfo78Field.setBorder(null);
 
+        allocationFileSectionLabel.setText("Allocation file:");
+
+        allocationFileLogicalSizeLabel.setText("Logical size:");
+
+        allocationFileClumpSizeLabel.setText("Clump size:");
+
+        allocationFileTotalBlocksLabel.setText("Total blocks:");
+
+        allocationFileLogicalSizeField.setEditable(false);
+        allocationFileLogicalSizeField.setText("jTextField1");
+        allocationFileLogicalSizeField.setBorder(null);
+
+        allocationFileClumpSizeField.setEditable(false);
+        allocationFileClumpSizeField.setText("jTextField2");
+        allocationFileClumpSizeField.setBorder(null);
+
+        allocationFileTotalBlocksField.setEditable(false);
+        allocationFileTotalBlocksField.setText("jTextField3");
+        allocationFileTotalBlocksField.setBorder(null);
+
+        allocationFileBasicExtentCountField.setEditable(false);
+        allocationFileBasicExtentCountField.setText("jTextField1");
+        allocationFileBasicExtentCountField.setAutoscrolls(false);
+        allocationFileBasicExtentCountField.setBorder(null);
+
+        allocationFileBasicExtentCountLabel.setText("Number of basic extents:");
+
+        extentsFileSectionLabel.setText("Extents file:");
+
+        extentsFileLogicalSizeLabel.setText("Logical size:");
+
+        extentsFileLogicalSizeField.setEditable(false);
+        extentsFileLogicalSizeField.setText("jTextField1");
+        extentsFileLogicalSizeField.setBorder(null);
+
+        extentsFileClumpSizeLabel.setText("Clump size:");
+
+        extentsFileClumpSizeField.setEditable(false);
+        extentsFileClumpSizeField.setText("jTextField2");
+        extentsFileClumpSizeField.setBorder(null);
+
+        extentsFileTotalBlocksLabel.setText("Total blocks:");
+
+        extentsFileTotalBlocksField.setEditable(false);
+        extentsFileTotalBlocksField.setText("jTextField3");
+        extentsFileTotalBlocksField.setBorder(null);
+
+        extentsFileBasicExtentCountLabel.setText("Number of basic extents:");
+
+        extentsFileBasicExtentCountField.setEditable(false);
+        extentsFileBasicExtentCountField.setText("jTextField1");
+        extentsFileBasicExtentCountField.setBorder(null);
+
+        catalogFileSectionLabel.setText("Catalog file:");
+
+        catalogFileLogicalSizeLabel.setText("Logical size:");
+
+        catalogFileLogicalSizeField.setEditable(false);
+        catalogFileLogicalSizeField.setText("jTextField1");
+        catalogFileLogicalSizeField.setBorder(null);
+
+        catalogFileClumpSizeLabel.setText("Clump size:");
+
+        catalogFileClumpSizeField.setEditable(false);
+        catalogFileClumpSizeField.setText("jTextField2");
+        catalogFileClumpSizeField.setBorder(null);
+
+        catalogFileTotalBlocksLabel.setText("Total blocks:");
+
+        catalogFileTotalBlocksField.setEditable(false);
+        catalogFileTotalBlocksField.setText("jTextField3");
+        catalogFileTotalBlocksField.setBorder(null);
+
+        catalogFileBasicExtentCountLabel.setText("Number of basic extents:");
+
+        catalogFileBasicExtentCountField.setEditable(false);
+        catalogFileBasicExtentCountField.setText("jTextField1");
+        catalogFileBasicExtentCountField.setBorder(null);
+
+        attributesFileSectionLabel.setText("Attributes file:");
+
+        attributesFileLogicalSizeLabel.setText("Logical size:");
+
+        attributesFileLogicalSizeField.setEditable(false);
+        attributesFileLogicalSizeField.setText("jTextField1");
+        attributesFileLogicalSizeField.setBorder(null);
+
+        attributesFileClumpSizeLabel.setText("Clump size:");
+
+        attributesFileClumpSizeField.setEditable(false);
+        attributesFileClumpSizeField.setText("jTextField2");
+        attributesFileClumpSizeField.setBorder(null);
+
+        attributesFileTotalBlocksLabel.setText("Total blocks:");
+
+        attributesFileTotalBlocksField.setEditable(false);
+        attributesFileTotalBlocksField.setText("jTextField3");
+        attributesFileTotalBlocksField.setBorder(null);
+
+        attributesFileBasicExtentCountLabel.setText("Number of basic extents:");
+
+        attributesFileBasicExtentCountField.setEditable(false);
+        attributesFileBasicExtentCountField.setText("jTextField1");
+        attributesFileBasicExtentCountField.setBorder(null);
+
+        startupFileSectionLabel.setText("Startup file:");
+
+        startupFileLogicalSizeLabel.setText("Logical size:");
+
+        startupFileLogicalSizeField.setEditable(false);
+        startupFileLogicalSizeField.setText("jTextField1");
+        startupFileLogicalSizeField.setBorder(null);
+
+        startupFileClumpSizeLabel.setText("Clump size:");
+
+        startupFileClumpSizeField.setEditable(false);
+        startupFileClumpSizeField.setText("jTextField2");
+        startupFileClumpSizeField.setBorder(null);
+
+        startupFileTotalBlocksLabel.setText("Total blocks:");
+
+        startupFileTotalBlocksField.setEditable(false);
+        startupFileTotalBlocksField.setText("jTextField3");
+        startupFileTotalBlocksField.setBorder(null);
+
+        startupFileBasicExtentCountLabel.setText("Number of basic extents:");
+
+        startupFileBasicExtentCountField.setEditable(false);
+        startupFileBasicExtentCountField.setText("jTextField1");
+        startupFileBasicExtentCountField.setBorder(null);
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -528,7 +741,107 @@ public class VolumeInfoPanel extends javax.swing.JPanel {
                             .add(checkedDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)
                             .add(createDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)
                             .add(modifyDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)
-                            .add(backupDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE))))
+                            .add(backupDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)))
+                    .add(allocationFileSectionLabel)
+                    .add(layout.createSequentialGroup()
+                        .add(10, 10, 10)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(layout.createSequentialGroup()
+                                .add(allocationFileClumpSizeLabel)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(allocationFileClumpSizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE))
+                            .add(layout.createSequentialGroup()
+                                .add(allocationFileLogicalSizeLabel)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(allocationFileLogicalSizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE))
+                            .add(layout.createSequentialGroup()
+                                .add(allocationFileTotalBlocksLabel)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(allocationFileTotalBlocksField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE))
+                            .add(layout.createSequentialGroup()
+                                .add(allocationFileBasicExtentCountLabel)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(allocationFileBasicExtentCountField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE))))
+                    .add(extentsFileSectionLabel)
+                    .add(layout.createSequentialGroup()
+                        .add(10, 10, 10)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(layout.createSequentialGroup()
+                                .add(extentsFileClumpSizeLabel)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(extentsFileClumpSizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE))
+                            .add(layout.createSequentialGroup()
+                                .add(extentsFileLogicalSizeLabel)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(extentsFileLogicalSizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE))
+                            .add(layout.createSequentialGroup()
+                                .add(extentsFileTotalBlocksLabel)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(extentsFileTotalBlocksField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE))
+                            .add(layout.createSequentialGroup()
+                                .add(extentsFileBasicExtentCountLabel)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(extentsFileBasicExtentCountField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE))))
+                    .add(catalogFileSectionLabel)
+                    .add(layout.createSequentialGroup()
+                        .add(10, 10, 10)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(layout.createSequentialGroup()
+                                .add(catalogFileClumpSizeLabel)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(catalogFileClumpSizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE))
+                            .add(layout.createSequentialGroup()
+                                .add(catalogFileLogicalSizeLabel)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(catalogFileLogicalSizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE))
+                            .add(layout.createSequentialGroup()
+                                .add(catalogFileTotalBlocksLabel)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(catalogFileTotalBlocksField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE))
+                            .add(layout.createSequentialGroup()
+                                .add(catalogFileBasicExtentCountLabel)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(catalogFileBasicExtentCountField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE))))
+                    .add(attributesFileSectionLabel)
+                    .add(layout.createSequentialGroup()
+                        .add(10, 10, 10)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(layout.createSequentialGroup()
+                                .add(attributesFileClumpSizeLabel)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(attributesFileClumpSizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE))
+                            .add(layout.createSequentialGroup()
+                                .add(attributesFileLogicalSizeLabel)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(attributesFileLogicalSizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE))
+                            .add(layout.createSequentialGroup()
+                                .add(attributesFileTotalBlocksLabel)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(attributesFileTotalBlocksField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE))
+                            .add(layout.createSequentialGroup()
+                                .add(attributesFileBasicExtentCountLabel)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(attributesFileBasicExtentCountField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE))))
+                    .add(startupFileSectionLabel)
+                    .add(layout.createSequentialGroup()
+                        .add(10, 10, 10)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(layout.createSequentialGroup()
+                                .add(startupFileClumpSizeLabel)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(startupFileClumpSizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE))
+                            .add(layout.createSequentialGroup()
+                                .add(startupFileLogicalSizeLabel)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(startupFileLogicalSizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE))
+                            .add(layout.createSequentialGroup()
+                                .add(startupFileTotalBlocksLabel)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(startupFileTotalBlocksField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE))
+                            .add(layout.createSequentialGroup()
+                                .add(startupFileBasicExtentCountLabel)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(startupFileBasicExtentCountField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -674,17 +987,134 @@ public class VolumeInfoPanel extends javax.swing.JPanel {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(finderInfo78Label)
                     .add(finderInfo78Field, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(allocationFileSectionLabel)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(allocationFileLogicalSizeLabel)
+                    .add(allocationFileLogicalSizeField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(allocationFileClumpSizeLabel)
+                    .add(allocationFileClumpSizeField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(allocationFileTotalBlocksLabel)
+                    .add(allocationFileTotalBlocksField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(allocationFileBasicExtentCountLabel)
+                    .add(allocationFileBasicExtentCountField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(extentsFileSectionLabel)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(extentsFileLogicalSizeLabel)
+                    .add(extentsFileLogicalSizeField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(extentsFileClumpSizeLabel)
+                    .add(extentsFileClumpSizeField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(extentsFileTotalBlocksLabel)
+                    .add(extentsFileTotalBlocksField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(extentsFileBasicExtentCountLabel)
+                    .add(extentsFileBasicExtentCountField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(catalogFileSectionLabel)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(catalogFileLogicalSizeLabel)
+                    .add(catalogFileLogicalSizeField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(catalogFileClumpSizeLabel)
+                    .add(catalogFileClumpSizeField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(catalogFileTotalBlocksLabel)
+                    .add(catalogFileTotalBlocksField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(catalogFileBasicExtentCountLabel)
+                    .add(catalogFileBasicExtentCountField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(attributesFileSectionLabel)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(attributesFileLogicalSizeLabel)
+                    .add(attributesFileLogicalSizeField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(attributesFileClumpSizeLabel)
+                    .add(attributesFileClumpSizeField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(attributesFileTotalBlocksLabel)
+                    .add(attributesFileTotalBlocksField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(attributesFileBasicExtentCountLabel)
+                    .add(attributesFileBasicExtentCountField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(startupFileSectionLabel)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(startupFileLogicalSizeLabel)
+                    .add(startupFileLogicalSizeField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(startupFileClumpSizeLabel)
+                    .add(startupFileClumpSizeField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(startupFileTotalBlocksLabel)
+                    .add(startupFileTotalBlocksField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(startupFileBasicExtentCountLabel)
+                    .add(startupFileBasicExtentCountField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField allocationFileBasicExtentCountField;
+    private javax.swing.JLabel allocationFileBasicExtentCountLabel;
+    private javax.swing.JTextField allocationFileClumpSizeField;
+    private javax.swing.JLabel allocationFileClumpSizeLabel;
+    private javax.swing.JTextField allocationFileLogicalSizeField;
+    private javax.swing.JLabel allocationFileLogicalSizeLabel;
+    private javax.swing.JLabel allocationFileSectionLabel;
+    private javax.swing.JTextField allocationFileTotalBlocksField;
+    private javax.swing.JLabel allocationFileTotalBlocksLabel;
+    private javax.swing.JTextField attributesFileBasicExtentCountField;
+    private javax.swing.JLabel attributesFileBasicExtentCountLabel;
+    private javax.swing.JTextField attributesFileClumpSizeField;
+    private javax.swing.JLabel attributesFileClumpSizeLabel;
+    private javax.swing.JTextField attributesFileLogicalSizeField;
+    private javax.swing.JLabel attributesFileLogicalSizeLabel;
+    private javax.swing.JLabel attributesFileSectionLabel;
+    private javax.swing.JTextField attributesFileTotalBlocksField;
+    private javax.swing.JLabel attributesFileTotalBlocksLabel;
     private javax.swing.JLabel attributesSectionLabel;
     private javax.swing.JTextField backupDateField;
     private javax.swing.JLabel backupDateLabel;
     private javax.swing.JTextField blockSizeField;
     private javax.swing.JLabel blockSizeLabel;
+    private javax.swing.JTextField catalogFileBasicExtentCountField;
+    private javax.swing.JLabel catalogFileBasicExtentCountLabel;
+    private javax.swing.JTextField catalogFileClumpSizeField;
+    private javax.swing.JLabel catalogFileClumpSizeLabel;
+    private javax.swing.JTextField catalogFileLogicalSizeField;
+    private javax.swing.JLabel catalogFileLogicalSizeLabel;
+    private javax.swing.JLabel catalogFileSectionLabel;
+    private javax.swing.JTextField catalogFileTotalBlocksField;
+    private javax.swing.JLabel catalogFileTotalBlocksLabel;
     private javax.swing.JTextField checkedDateField;
     private javax.swing.JLabel checkedDateLabel;
     private javax.swing.JTextField createDateField;
@@ -693,6 +1123,15 @@ public class VolumeInfoPanel extends javax.swing.JPanel {
     private javax.swing.JLabel dataClumpSizeLabel;
     private javax.swing.JTextField encodingsBitmapField;
     private javax.swing.JLabel encodingsBitmapLabel;
+    private javax.swing.JTextField extentsFileBasicExtentCountField;
+    private javax.swing.JLabel extentsFileBasicExtentCountLabel;
+    private javax.swing.JTextField extentsFileClumpSizeField;
+    private javax.swing.JLabel extentsFileClumpSizeLabel;
+    private javax.swing.JTextField extentsFileLogicalSizeField;
+    private javax.swing.JLabel extentsFileLogicalSizeLabel;
+    private javax.swing.JLabel extentsFileSectionLabel;
+    private javax.swing.JTextField extentsFileTotalBlocksField;
+    private javax.swing.JLabel extentsFileTotalBlocksLabel;
     private javax.swing.JTextField fileCountField;
     private javax.swing.JLabel fileCountLabel;
     private javax.swing.JTextField finderInfo1Field;
@@ -740,6 +1179,15 @@ public class VolumeInfoPanel extends javax.swing.JPanel {
     private javax.swing.JLabel softwareLockLabel;
     private javax.swing.JCheckBox sparedBlocksBox;
     private javax.swing.JLabel sparedBlocksLabel;
+    private javax.swing.JTextField startupFileBasicExtentCountField;
+    private javax.swing.JLabel startupFileBasicExtentCountLabel;
+    private javax.swing.JTextField startupFileClumpSizeField;
+    private javax.swing.JLabel startupFileClumpSizeLabel;
+    private javax.swing.JTextField startupFileLogicalSizeField;
+    private javax.swing.JLabel startupFileLogicalSizeLabel;
+    private javax.swing.JLabel startupFileSectionLabel;
+    private javax.swing.JTextField startupFileTotalBlocksField;
+    private javax.swing.JLabel startupFileTotalBlocksLabel;
     private javax.swing.JTextField totalBlocksField;
     private javax.swing.JLabel totalBlocksLabel;
     private javax.swing.JTextField versionField;

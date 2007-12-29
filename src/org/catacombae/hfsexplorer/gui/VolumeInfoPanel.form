@@ -15,7 +15,7 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
+          <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
@@ -200,6 +200,136 @@
                           <Component id="backupDateField" alignment="0" pref="282" max="32767" attributes="0"/>
                       </Group>
                   </Group>
+                  <Component id="allocationFileSectionLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="10" pref="10" max="10" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="allocationFileClumpSizeLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="allocationFileClumpSizeField" pref="314" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="allocationFileLogicalSizeLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="allocationFileLogicalSizeField" pref="311" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="allocationFileTotalBlocksLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="allocationFileTotalBlocksField" pref="308" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="allocationFileBasicExtentCountLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="allocationFileBasicExtentCountField" pref="247" max="32767" attributes="0"/>
+                          </Group>
+                      </Group>
+                  </Group>
+                  <Component id="extentsFileSectionLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="10" pref="10" max="10" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="extentsFileClumpSizeLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="extentsFileClumpSizeField" pref="314" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="extentsFileLogicalSizeLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="extentsFileLogicalSizeField" pref="311" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="extentsFileTotalBlocksLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="extentsFileTotalBlocksField" pref="308" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="extentsFileBasicExtentCountLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="extentsFileBasicExtentCountField" pref="247" max="32767" attributes="0"/>
+                          </Group>
+                      </Group>
+                  </Group>
+                  <Component id="catalogFileSectionLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="10" pref="10" max="10" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="catalogFileClumpSizeLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="catalogFileClumpSizeField" pref="314" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="catalogFileLogicalSizeLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="catalogFileLogicalSizeField" pref="311" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="catalogFileTotalBlocksLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="catalogFileTotalBlocksField" pref="308" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="catalogFileBasicExtentCountLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="catalogFileBasicExtentCountField" pref="247" max="32767" attributes="0"/>
+                          </Group>
+                      </Group>
+                  </Group>
+                  <Component id="attributesFileSectionLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="10" pref="10" max="10" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="attributesFileClumpSizeLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="attributesFileClumpSizeField" pref="314" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="attributesFileLogicalSizeLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="attributesFileLogicalSizeField" pref="311" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="attributesFileTotalBlocksLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="attributesFileTotalBlocksField" pref="308" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="attributesFileBasicExtentCountLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="attributesFileBasicExtentCountField" pref="247" max="32767" attributes="0"/>
+                          </Group>
+                      </Group>
+                  </Group>
+                  <Component id="startupFileSectionLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="10" pref="10" max="10" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="startupFileClumpSizeLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="startupFileClumpSizeField" pref="314" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="startupFileLogicalSizeLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="startupFileLogicalSizeField" pref="311" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="startupFileTotalBlocksLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="startupFileTotalBlocksField" pref="308" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="startupFileBasicExtentCountLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="startupFileBasicExtentCountField" pref="247" max="32767" attributes="0"/>
+                          </Group>
+                      </Group>
+                  </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -381,6 +511,116 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="finderInfo78Label" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="finderInfo78Field" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="allocationFileSectionLabel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="allocationFileLogicalSizeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="allocationFileLogicalSizeField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="allocationFileClumpSizeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="allocationFileClumpSizeField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="allocationFileTotalBlocksLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="allocationFileTotalBlocksField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="allocationFileBasicExtentCountLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="allocationFileBasicExtentCountField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="extentsFileSectionLabel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="extentsFileLogicalSizeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="extentsFileLogicalSizeField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="extentsFileClumpSizeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="extentsFileClumpSizeField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="extentsFileTotalBlocksLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="extentsFileTotalBlocksField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="extentsFileBasicExtentCountLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="extentsFileBasicExtentCountField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="catalogFileSectionLabel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="catalogFileLogicalSizeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="catalogFileLogicalSizeField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="catalogFileClumpSizeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="catalogFileClumpSizeField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="catalogFileTotalBlocksLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="catalogFileTotalBlocksField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="catalogFileBasicExtentCountLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="catalogFileBasicExtentCountField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="attributesFileSectionLabel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="attributesFileLogicalSizeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="attributesFileLogicalSizeField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="attributesFileClumpSizeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="attributesFileClumpSizeField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="attributesFileTotalBlocksLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="attributesFileTotalBlocksField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="attributesFileBasicExtentCountLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="attributesFileBasicExtentCountField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="startupFileSectionLabel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="startupFileLogicalSizeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="startupFileLogicalSizeField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="startupFileClumpSizeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="startupFileClumpSizeField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="startupFileTotalBlocksLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="startupFileTotalBlocksField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="startupFileBasicExtentCountLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="startupFileBasicExtentCountField" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -901,6 +1141,312 @@
       <Properties>
         <Property name="editable" type="boolean" value="false"/>
         <Property name="text" type="java.lang.String" value="jTextField7"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="allocationFileSectionLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Allocation file:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="allocationFileLogicalSizeLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Logical size:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="allocationFileClumpSizeLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Clump size:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="allocationFileTotalBlocksLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Total blocks:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="allocationFileLogicalSizeField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="text" type="java.lang.String" value="jTextField1"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="allocationFileClumpSizeField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="text" type="java.lang.String" value="jTextField2"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="allocationFileTotalBlocksField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="text" type="java.lang.String" value="jTextField3"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="allocationFileBasicExtentCountField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="text" type="java.lang.String" value="jTextField1"/>
+        <Property name="autoscrolls" type="boolean" value="false"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="allocationFileBasicExtentCountLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Number of basic extents:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="extentsFileSectionLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Extents file:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="extentsFileLogicalSizeLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Logical size:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="extentsFileLogicalSizeField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="text" type="java.lang.String" value="jTextField1"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="extentsFileClumpSizeLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Clump size:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="extentsFileClumpSizeField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="text" type="java.lang.String" value="jTextField2"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="extentsFileTotalBlocksLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Total blocks:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="extentsFileTotalBlocksField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="text" type="java.lang.String" value="jTextField3"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="extentsFileBasicExtentCountLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Number of basic extents:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="extentsFileBasicExtentCountField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="text" type="java.lang.String" value="jTextField1"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="catalogFileSectionLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Catalog file:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="catalogFileLogicalSizeLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Logical size:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="catalogFileLogicalSizeField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="text" type="java.lang.String" value="jTextField1"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="catalogFileClumpSizeLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Clump size:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="catalogFileClumpSizeField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="text" type="java.lang.String" value="jTextField2"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="catalogFileTotalBlocksLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Total blocks:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="catalogFileTotalBlocksField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="text" type="java.lang.String" value="jTextField3"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="catalogFileBasicExtentCountLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Number of basic extents:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="catalogFileBasicExtentCountField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="text" type="java.lang.String" value="jTextField1"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="attributesFileSectionLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Attributes file:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="attributesFileLogicalSizeLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Logical size:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="attributesFileLogicalSizeField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="text" type="java.lang.String" value="jTextField1"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="attributesFileClumpSizeLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Clump size:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="attributesFileClumpSizeField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="text" type="java.lang.String" value="jTextField2"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="attributesFileTotalBlocksLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Total blocks:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="attributesFileTotalBlocksField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="text" type="java.lang.String" value="jTextField3"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="attributesFileBasicExtentCountLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Number of basic extents:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="attributesFileBasicExtentCountField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="text" type="java.lang.String" value="jTextField1"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="startupFileSectionLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Startup file:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="startupFileLogicalSizeLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Logical size:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="startupFileLogicalSizeField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="text" type="java.lang.String" value="jTextField1"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="startupFileClumpSizeLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Clump size:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="startupFileClumpSizeField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="text" type="java.lang.String" value="jTextField2"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="startupFileTotalBlocksLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Total blocks:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="startupFileTotalBlocksField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="text" type="java.lang.String" value="jTextField3"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="startupFileBasicExtentCountLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Number of basic extents:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="startupFileBasicExtentCountField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="text" type="java.lang.String" value="jTextField1"/>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="null"/>
         </Property>

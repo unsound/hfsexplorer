@@ -44,6 +44,22 @@ public class HFSPlusExtentRecord {
 	    arrayCopy[i] = array[i];
 	return arrayCopy;
     }
+    
+    /**
+     * Returns the number of extents that are in use, i.e. non-zero block count
+     * and start block.
+     * @return the number of extents that are in use.
+     */
+    public int getNumExtentsInUse() {
+        for(int i = 0; i < array.length; ++i) {
+            HFSPlusExtentDescriptor cur = array[i];
+            if(cur.getBlockCount() == 0 &&
+               cur.getStartBlock() == 0) {
+                return i;
+            }
+        }
+        return array.length;
+    }
 	
     public void print(PrintStream ps, int pregap) {
 	String pregapString = "";
