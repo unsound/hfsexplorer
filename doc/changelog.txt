@@ -1,6 +1,10 @@
 HFSExplorer Changelog
 ---------------------
 
+current
+-------
+- Made the Volume info panel a bit more detailed and replaced JLabels with JTextFields.
+
 0.19
 ----
 - Feature: Experimental support for HFSX formatted volumes (Mac OS Extended with case
