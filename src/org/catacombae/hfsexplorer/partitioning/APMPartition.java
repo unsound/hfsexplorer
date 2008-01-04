@@ -125,6 +125,16 @@ public class APMPartition implements Partition {
     public String getPmParTypeAsString() { return Util2.readNullTerminatedASCIIString(pmParType); }
     public String getPmProcessorAsString() { return Util2.readNullTerminatedASCIIString(pmProcessor); }
     
+    public boolean isValid() {
+        // Signature check
+        int pmSig = getPmSig() & 0xFFFF;
+        if(pmSig != 0x504D && // Signature "PM", in ASCII
+           pmSig != 0x5453) // Older signature, but still supported.
+            return false;
+        
+        return true;
+    }
+    
     public void printPartitionInfo(PrintStream ps) {
 	printPartitionInfo(ps, "");
     }

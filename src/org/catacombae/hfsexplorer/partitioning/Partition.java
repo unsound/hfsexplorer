@@ -50,11 +50,17 @@ public interface Partition {
     
     /** Returns the start offset in bytes. */
     public long getStartOffset();// { return startOffset; }
+    
     /** Returns the length of the partition in bytes. */
     public long getLength();// { return length; }
+    
+    /** Returns the type of the partition. */
     public PartitionType getType();// { return type; }
-
+    
+    /** Prints the values of the fields of this partition. */
     public /*abstract*/ void printFields(PrintStream ps, String prefix);
+    
+    /** Prints the type name followed by the values of its fields. */
     public /*abstract*/ void print(PrintStream ps, String prefix);
 
 }

@@ -30,17 +30,9 @@ public class ApplePartitionMap implements PartitionSystem {
 	ArrayList<APMPartition> partitionList = new ArrayList<APMPartition>();
 	while(isoRaf.length() > isoRaf.getFilePointer()+currentBlock.length) { // Loop while we have data left in the file
 	    isoRaf.readFully(currentBlock);
-	    if((currentBlock[0] & 0xFF) == 0x50 && // Checks for signature "PM"
-	       (currentBlock[1] & 0xFF) == 0x4D) {
-		APMPartition p = new APMPartition(currentBlock, 0, blockSize);
+            APMPartition p = new APMPartition(currentBlock, 0, blockSize);
+            if(p.isValid())
 		partitionList.add(p);
-// 		if(options.verbose) {
-// 		    println();
-// 		    p.printPartitionInfo(System.out);
-// 		}
-// 		else
-// 		    println("\"" + p.getPmPartNameAsString() + "\" (" + p.getPmParTypeAsString() + ")");
-	    }
 	    else break;
 	}
 	partitions = partitionList.toArray(new APMPartition[partitionList.size()]);
@@ -50,22 +42,28 @@ public class ApplePartitionMap implements PartitionSystem {
 	byte[] currentBlock = new byte[blockSize];
 	ArrayList<APMPartition> partitionList = new ArrayList<APMPartition>();
 	while(data.length > off+currentBlock.length) { // Loop while we have data left in the array
-	    System.arraycopy(data, off, currentBlock, 0, currentBlock.length); off += currentBlock.length;
-	    if((currentBlock[0] & 0xFF) == 0x50 && // Checks for signature "PM"
-	       (currentBlock[1] & 0xFF) == 0x4D) {
-		APMPartition p = new APMPartition(currentBlock, 0, blockSize);
+	    System.arraycopy(data, off, currentBlock, 0, currentBlock.length);
+            off += currentBlock.length;
+            APMPartition p = new APMPartition(currentBlock, 0, blockSize);
+            if(p.isValid())
 		partitionList.add(p);
-// 		if(options.verbose) {
-// 		    println();
-// 		    p.printPartitionInfo(System.out);
-// 		}
-// 		else
-// 		    println("\"" + p.getPmPartNameAsString() + "\" (" + p.getPmParTypeAsString() + ")");
-	    }
 	    else break;
 	}
 	partitions = partitionList.toArray(new APMPartition[partitionList.size()]);
     }
+
+    public boolean isValid() {
+        if(partitions.length > 0) {
+            for(APMPartition p : partitions) {
+                if(!p.isValid())
+                    return false;
+            }
+            return true;
+        }
+        else // An empty partition system is really not a partition system.
+            return false;
+    }
+
     public int getUsedPartitionCount() {
 	return partitions.length;
     }

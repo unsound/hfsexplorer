@@ -20,6 +20,7 @@ import java.io.PrintStream;
 
 /** Generalization of the features that a simple partitioning system should provide. */
 public interface PartitionSystem {
+    public boolean isValid();
     public int getUsedPartitionCount();
     public Partition getPartitionEntry(int index);
     public Partition[] getPartitionEntries();

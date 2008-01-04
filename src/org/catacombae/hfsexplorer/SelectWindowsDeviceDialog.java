@@ -187,12 +187,12 @@ public class SelectWindowsDeviceDialog extends JDialog {
     }
     protected void autodetectFilesystems() {
 	LinkedList<String> plainFileSystems = new LinkedList<String>();
-	LinkedList<String[]> embeddedFileSystems = new LinkedList<String[]>();
-	String skipPrefix = null;
+	LinkedList<EmbeddedPartitionEntry> embeddedFileSystems = new LinkedList<EmbeddedPartitionEntry>();
+	//String skipPrefix = null;
         
 	// Look for file systems that sit inside partition systems unsupported by Windows.
 	for(int i = 0; i < detectedDeviceNames.length; ++i) {
-	    String name = detectedDeviceNames[i];
+	    String deviceName = detectedDeviceNames[i];
 // 	    System.out.println("Checking if \"" + name + "\" might be an unsupported partition system...");
 // 	    System.out.println("  name.startsWith(\"CdRom\") == " + name.startsWith(DEVICE_PREFIX + "CdRom"));
 // 	    System.out.println("  name.endsWith(\"Partition0\") == " + name.endsWith("Partition0"));
@@ -204,14 +204,14 @@ public class SelectWindowsDeviceDialog extends JDialog {
 	    */
 		// We have an unidentifed partition system at "name"
 // 		System.out.println("TRUE!");
-            if(skipPrefix != null && name.startsWith(skipPrefix))
-                continue;
-            else
-                skipPrefix = null;
+            //if(skipPrefix != null && deviceName.startsWith(skipPrefix))
+            //    continue;
+            //else
+            //    skipPrefix = null;
             
 	    LowLevelFile llf = null;
 	    try {
-		llf = new WindowsLowLevelIO(DEVICE_PREFIX + name);
+		llf = new WindowsLowLevelIO(DEVICE_PREFIX + deviceName);
 		PartitionSystemRecognizer psr = new PartitionSystemRecognizer(llf);
 		PartitionSystemRecognizer.PartitionSystemType pst = psr.detectPartitionSystem();
                 
@@ -227,7 +227,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
                                 FileSystemRecognizer fsr = new FileSystemRecognizer(llf, part.getStartOffset());
                                 if(fsr.isTypeSupported(fsr.detectFileSystem())) {
                                     fileSystemFound = true;
-                                    embeddedFileSystems.add(new String[]{"APM", name, j + ""});
+                                    embeddedFileSystems.add(new EmbeddedPartitionEntry(deviceName, j, part));
                                 }
                             }
                         }
@@ -243,7 +243,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
                                 FileSystemRecognizer fsr = new FileSystemRecognizer(llf, part.getStartOffset());
                                 if(fsr.isTypeSupported(fsr.detectFileSystem())) {
                                     fileSystemFound = true;
-                                    embeddedFileSystems.add(new String[]{"GPT", name, j + ""});
+                                    embeddedFileSystems.add(new EmbeddedPartitionEntry(deviceName, j, part));
                                 }
                             }
                         }
@@ -255,21 +255,21 @@ public class SelectWindowsDeviceDialog extends JDialog {
 		if(!fileSystemFound) {
 		    FileSystemRecognizer fsr = new FileSystemRecognizer(llf, 0);
 		    if(fsr.isTypeSupported(fsr.detectFileSystem()))
-			plainFileSystems.add(name);
+			plainFileSystems.add(deviceName);
 		}
                 /* If we found file systems in embedded partition systems,
                  * ignore windows-detected partitions if the embedded partition
                  * system is at Partition0. */
-                else if(name.endsWith("Partition0"))
-                    skipPrefix = name.substring(0, name.length()-1);
+                //else if(deviceName.endsWith("Partition0"))
+                //    skipPrefix = deviceName.substring(0, deviceName.length()-1);
 		llf.close();
 	    } catch(Exception e) {
 		System.out.println("INFO: Non-critical exception while detecting partition system at \"" +
-				   DEVICE_PREFIX + name + "\": " + e.toString());
+				   DEVICE_PREFIX + deviceName + "\": " + e.toString());
 		if(llf != null) {
 		    FileSystemRecognizer fsr = new FileSystemRecognizer(llf, 0);
 		    if(fsr.isTypeSupported(fsr.detectFileSystem()))
-			plainFileSystems.add(name);
+			plainFileSystems.add(deviceName);
 		    llf.close();
 		}
 	    }
@@ -279,8 +279,9 @@ public class SelectWindowsDeviceDialog extends JDialog {
 	    String[] plainStrings = plainFileSystems.toArray(new String[plainFileSystems.size()]);
 	    String[] embeddedStrings = new String[embeddedFileSystems.size()];
 	    int i = 0;
-	    for(String[] cur : embeddedFileSystems)
-		embeddedStrings[i++] = cur[1] + "[" + cur[0] + ":Partition" + cur[2] + "]";
+	    for(EmbeddedPartitionEntry cur : embeddedFileSystems) {
+		embeddedStrings[i++] = cur.toString();
+            }
 	    
 	    String[] allOptions = new String[plainStrings.length+embeddedStrings.length];
 	    for(i = 0; i < plainStrings.length; ++i)
@@ -309,30 +310,31 @@ public class SelectWindowsDeviceDialog extends JDialog {
 		    if(selectedIndex >= plainStrings.length) {
 			// We have an embedded FS
 			selectedIndex -= plainStrings.length;
-			String[] embeddedInfo = embeddedFileSystems.get(selectedIndex);
+			EmbeddedPartitionEntry embeddedInfo = embeddedFileSystems.get(selectedIndex);
 			if(embeddedInfo == null)
 			    throw new RuntimeException("Internal error again.");
 			
-			if(embeddedInfo[0].equals("APM")) {
-			    LowLevelFile llf = new WindowsLowLevelIO(DEVICE_PREFIX + embeddedInfo[1]);
+			if(embeddedInfo.partition instanceof APMPartition) {
+			    LowLevelFile llf = new WindowsLowLevelIO(DEVICE_PREFIX + embeddedInfo.deviceName);
 			    DriverDescriptorRecord ddr = new DriverDescriptorRecord(llf, 0);
 			    ApplePartitionMap apm = new ApplePartitionMap(llf, ddr.getSbBlkSize()*1, ddr.getSbBlkSize());
-			    Partition p = apm.getPartitionEntry(Integer.parseInt(embeddedInfo[2]));
+			    Partition p = apm.getPartitionEntry((int)embeddedInfo.partitionNumber);
 			    resultCreatePath = DEVICE_PREFIX + selectedValue.toString();
 			    result = new ConcatenatedFile(llf, p.getStartOffset(), p.getLength());
 			    setVisible(false);
 			}
-			else if(embeddedInfo[0].equals("GPT")) {
-                            LowLevelFile llf = new WindowsLowLevelIO(DEVICE_PREFIX + embeddedInfo[1]);
+			else if(embeddedInfo.partition instanceof GPTEntry) {
+                            LowLevelFile llf = new WindowsLowLevelIO(DEVICE_PREFIX + embeddedInfo.deviceName);
 			    GUIDPartitionTable gpt = new GUIDPartitionTable(llf, 0);
-			    Partition p = gpt.getPartitionEntry(Integer.parseInt(embeddedInfo[2]));
+			    Partition p = gpt.getPartitionEntry((int)embeddedInfo.partitionNumber);
 			    resultCreatePath = DEVICE_PREFIX + selectedValue.toString();
 			    result = new ConcatenatedFile(llf, p.getStartOffset(), p.getLength());
 			    setVisible(false);
                         }
+			//else if(embeddedInfo.partition instanceof MBRPartition) {}
                         else
-                            throw new RuntimeException("Unexpected partition system: " + embeddedInfo[0]);
-			//else if(embeddedInfo[0].equals("MBR")) {}
+                            throw new RuntimeException("Unexpected partition system: " +
+                                    embeddedInfo.partition.getClass());
 		    }
 		    else {
 			resultCreatePath = DEVICE_PREFIX + selectedValue.toString();
@@ -358,5 +360,35 @@ public class SelectWindowsDeviceDialog extends JDialog {
 	else
 	    JOptionPane.showMessageDialog(this, "No HFS+ file systems found...",
 					  "Result", JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    private static final class EmbeddedPartitionEntry {
+        public final String deviceName;
+        public final long partitionNumber;
+        public final Partition partition;
+        
+        public EmbeddedPartitionEntry(String deviceName, long partitionNumber,
+                Partition partition) {
+            this.deviceName = deviceName;
+            this.partitionNumber = partitionNumber;
+            this.partition = partition;
+        }
+        
+        private String getPartitionSystemString() {
+            if(partition instanceof APMPartition)
+                return "APM";
+            else if(partition instanceof GPTEntry)
+                return "GPT";
+            else if(partition instanceof MBRPartition)
+                return "MBR";
+            else
+                return "Unknown partition system";
+        }
+        
+        @Override
+        public String toString() {
+            return deviceName + "[" + getPartitionSystemString() + ":Partition" +
+                    partitionNumber + "]";
+        }
     }
 }
