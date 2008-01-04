@@ -17,6 +17,7 @@
 
 package org.catacombae.hfsexplorer.partitioning;
 
+import org.catacombae.hfsexplorer.io.LowLevelFile;
 import org.catacombae.hfsexplorer.*;
 import java.io.PrintStream;
 import java.util.LinkedList;
@@ -258,6 +259,7 @@ public class GUIDPartitionTable implements PartitionSystem {
 	return result;
     }
     
+    @Override
     public boolean equals(Object obj) {
 	if(obj instanceof GUIDPartitionTable) {
 	    GUIDPartitionTable gpt = (GUIDPartitionTable)obj;

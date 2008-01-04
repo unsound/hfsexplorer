@@ -17,6 +17,8 @@
 
 package org.catacombae.hfsexplorer;
 
+import org.catacombae.hfsexplorer.io.LowLevelFile;
+
 /** This class just detects if the file system is of type HFS, HFS+ or HFSX. */
 public class FileSystemRecognizer {
     private static final short SIGNATURE_MFS =      (short)0xD2D7; // Extreme legacy... won't be used

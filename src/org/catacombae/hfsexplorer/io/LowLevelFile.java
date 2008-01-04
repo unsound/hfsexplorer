@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2007 Erik Larsson
+ * Copyright (C) 2006 Erik Larsson
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,12 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer;
+package org.catacombae.hfsexplorer.io;
 
-/* Designed to mimic a subset of RandomAccessFile. (But without the IOExceptions... we throw RuntimeExceptions instead) */
+/* Designed to mimic a subset of RandomAccessFile. */
 
-public interface WritableLowLevelFile extends LowLevelFile {
-    public void write(byte[] b);
-    public void write(byte[] b, int off, int len);
-    public void write(int b);
+public interface LowLevelFile {
+    public void seek(long pos);
+    public int read();
+    public int read(byte[] data);
+    public int read(byte[] data, int pos, int len);
+    public void readFully(byte[] data);
+    public void readFully(byte[] data, int offset, int length);
+    public long length();
+    public long getFilePointer();
+    public void close();
 }

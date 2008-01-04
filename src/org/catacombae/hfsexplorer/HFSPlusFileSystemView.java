@@ -17,6 +17,8 @@
 
 package org.catacombae.hfsexplorer;
 
+import org.catacombae.hfsexplorer.io.BlockCachingLLF;
+import org.catacombae.hfsexplorer.io.LowLevelFile;
 import org.catacombae.hfsexplorer.types.*;
 import java.util.List;
 import java.util.LinkedList;

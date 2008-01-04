@@ -16,6 +16,8 @@
  */
 
 package org.catacombae.hfsexplorer.testcode;
+import org.catacombae.hfsexplorer.io.RandomAccessLLF;
+import org.catacombae.hfsexplorer.io.LowLevelFile;
 import org.catacombae.hfsexplorer.*;
 import org.catacombae.hfsexplorer.partitioning.*;
 import org.catacombae.hfsexplorer.win32.*;

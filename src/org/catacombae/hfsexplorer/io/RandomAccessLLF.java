@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2006-2007 Erik Larsson
+ * Copyright (C) 2006 Erik Larsson
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,28 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer;
+package org.catacombae.hfsexplorer.io;
 
-import org.catacombae.udif.*;
-import org.catacombae.io.*;
 import java.io.*;
 
-/**
- * This class acts as the bridge between the libraries of DMGExtractor and
- * HFSExplorer.
- */
-public class UDIFRandomAccessLLF implements LowLevelFile {
-    private UDIFRandomAccessStream raf;
-    public UDIFRandomAccessLLF(String filename) {
+/** This class wraps a java.io.RandomAccessFile (opened in read-only mode) and maps its operations
+    to the operations of LowLevelFile. */
+public class RandomAccessLLF implements LowLevelFile {
+    protected RandomAccessFile raf;
+    public RandomAccessLLF(String filename) {
 	try {
-	    //System.err.println("opening rafStream");
-	    RandomAccessFileStream rafStream = new RandomAccessFileStream(new RandomAccessFile(filename, "r"));
-	    //System.err.println("opening dmgf");
-	    UDIFFile dmgf = new UDIFFile(rafStream);
-	    //System.err.println("opening raf");
-	    this.raf = new UDIFRandomAccessStream(dmgf);
-	    //System.err.println("constructed");
+	    this.raf = new RandomAccessFile(filename, "r");
 	} catch(Exception e) { throw new RuntimeException(e); }
+    }
+    protected RandomAccessLLF() {
     }
     public void seek(long pos) {
 	try {
@@ -59,17 +51,14 @@ public class UDIFRandomAccessLLF implements LowLevelFile {
 	} catch(IOException ioe) { throw new RuntimeException(ioe); }
     }
     public void readFully(byte[] data) {
-	readFully(data, 0, data.length);
+	try {
+	    raf.readFully(data);
+	} catch(IOException ioe) { throw new RuntimeException(ioe); }
     }
-
     public void readFully(byte[] data, int offset, int length) {
-	int bytesRead = 0;
-	while(bytesRead < length) {
-	    int curBytesRead = read(data, offset+bytesRead, length-bytesRead);
-	    if(curBytesRead > 0) bytesRead += curBytesRead;
-	    else 
-		throw new RuntimeException("Couldn't read the entire length.");
-	}
+	try {
+	    raf.readFully(data, offset, length);
+	} catch(IOException ioe) { throw new RuntimeException(ioe); }
     }
     public long length() {
 	try {

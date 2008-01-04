@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer;
+package org.catacombae.hfsexplorer.io;
 import java.io.*;
 
 /** This class wraps a java.io.RandomAccessFile (opened in read/write mode) and maps its operations

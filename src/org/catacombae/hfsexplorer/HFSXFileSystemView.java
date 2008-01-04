@@ -17,6 +17,7 @@
 
 package org.catacombae.hfsexplorer;
 
+import org.catacombae.hfsexplorer.io.LowLevelFile;
 import org.catacombae.hfsexplorer.types.*;
 
 /**

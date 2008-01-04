@@ -16,7 +16,7 @@
  */
 
 package org.catacombae.hfsexplorer.partitioning;
-import org.catacombae.hfsexplorer.LowLevelFile;
+import org.catacombae.hfsexplorer.io.LowLevelFile;
 import java.util.zip.CRC32;
 
 /** Updates a CRC32 checksum for each byte you read from the underlying stream.

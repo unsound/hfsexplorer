@@ -20,7 +20,7 @@ package org.catacombae.hfsexplorer.win32;
 import org.catacombae.hfsexplorer.Util;
 import java.io.*;
 
-public class WindowsLowLevelIO implements org.catacombae.hfsexplorer.LowLevelFile {
+public class WindowsLowLevelIO implements org.catacombae.hfsexplorer.io.LowLevelFile {
     protected byte[] fileHandle;
     protected int sectorSize = 512; //Detect this later..
     protected long filePointer = 0;

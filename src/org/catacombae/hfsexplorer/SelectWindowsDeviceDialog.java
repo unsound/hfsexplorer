@@ -17,6 +17,8 @@
 
 package org.catacombae.hfsexplorer;
 
+import org.catacombae.hfsexplorer.io.LowLevelFile;
+import org.catacombae.hfsexplorer.io.ConcatenatedFile;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
 import org.catacombae.hfsexplorer.gui.SelectWindowsDevicePanel;
 import org.catacombae.hfsexplorer.partitioning.*;
@@ -216,10 +218,11 @@ public class SelectWindowsDeviceDialog extends JDialog {
 		PartitionSystemRecognizer.PartitionSystemType pst = psr.detectPartitionSystem();
                 
                 boolean fileSystemFound = false;
-                if(pst == PartitionSystemRecognizer.PartitionSystemType.APPLE_PARTITION_MAP) {
+                if(pst == PartitionSystemRecognizer.PartitionSystemType.APPLE_PARTITION_MAP ||
+                   pst == PartitionSystemRecognizer.PartitionSystemType.GUID_PARTITION_TABLE) {
                     DriverDescriptorRecord ddr = new DriverDescriptorRecord(llf, 0);
                     if(ddr.isValid()) {
-                        ApplePartitionMap apm = new ApplePartitionMap(llf, ddr.getSbBlkSize() * 1, ddr.getSbBlkSize());
+                        PartitionSystem apm = new ApplePartitionMap(llf, ddr.getSbBlkSize() * 1, ddr.getSbBlkSize());
                         Partition[] parts = apm.getUsedPartitionEntries();
                         for(int j = 0; j < parts.length; ++j) {
                             Partition part = parts[j];
@@ -234,7 +237,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
                     }
                 }
                 else if(pst == PartitionSystemRecognizer.PartitionSystemType.GUID_PARTITION_TABLE) {
-                    GUIDPartitionTable gpt = new GUIDPartitionTable(llf, 0);
+                    PartitionSystem gpt = new GUIDPartitionTable(llf, 0);
                     if(gpt.isValid()) {
                         Partition[] parts = gpt.getUsedPartitionEntries();
                         for(int j = 0; j < parts.length; ++j) {

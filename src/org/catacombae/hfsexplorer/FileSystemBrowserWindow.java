@@ -17,6 +17,9 @@
 
 package org.catacombae.hfsexplorer;
 
+import org.catacombae.hfsexplorer.io.RandomAccessLLF;
+import org.catacombae.hfsexplorer.io.UDIFRandomAccessLLF;
+import org.catacombae.hfsexplorer.io.LowLevelFile;
 import org.catacombae.hfsexplorer.partitioning.*;
 import org.catacombae.hfsexplorer.types.*;
 import org.catacombae.hfsexplorer.types.hfs.*;

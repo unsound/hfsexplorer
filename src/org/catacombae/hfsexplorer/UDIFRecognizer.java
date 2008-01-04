@@ -17,6 +17,8 @@
 
 package org.catacombae.hfsexplorer;
 
+import org.catacombae.hfsexplorer.io.LowLevelFile;
+
 public class UDIFRecognizer {
     private static final int SIGNATURE = 0x6B6F6C79; // in ASCII this reads 'koly' as a fourcc
     public static boolean isUDIF(LowLevelFile llf) {

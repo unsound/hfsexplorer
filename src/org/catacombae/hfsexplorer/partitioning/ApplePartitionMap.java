@@ -17,6 +17,8 @@
 
 package org.catacombae.hfsexplorer.partitioning;
 
+import org.catacombae.hfsexplorer.io.RandomAccessLLF;
+import org.catacombae.hfsexplorer.io.LowLevelFile;
 import org.catacombae.hfsexplorer.*;
 import java.util.ArrayList;
 import java.io.PrintStream;

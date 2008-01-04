@@ -17,7 +17,7 @@
 
 package org.catacombae.hfsexplorer.partitioning;
 
-import org.catacombae.hfsexplorer.LowLevelFile;
+import org.catacombae.hfsexplorer.io.LowLevelFile;
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.Util2;
 import java.io.PrintStream;
