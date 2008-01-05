@@ -36,27 +36,21 @@ public class MBRPartitionTable implements PartitionSystem {
     private final PartitionSystem[] embeddedPartitionSystems;
  
     public MBRPartitionTable(byte[] data, int offset) {
-        this(new ArrayBackedFile(data), offset);
-    }
-    public MBRPartitionTable(byte[] data, int offset, boolean noParseEBRs) {
-        this(new ArrayBackedFile(data), offset, noParseEBRs);
+        this(new ArrayBackedFile(data), offset, false);
     }
     public MBRPartitionTable(byte[] data, int offset, int sectorSize) {
-        this(new ArrayBackedFile(data), offset, sectorSize);
-    }
-    public MBRPartitionTable(byte[] data, int offset, int sectorSize, boolean noParseEBRs) {
-        this(new ArrayBackedFile(data), offset, sectorSize, noParseEBRs);
+        this(new ArrayBackedFile(data), offset, sectorSize, false);
     }
     public MBRPartitionTable(LowLevelFile raf, int offset) {
-        this(raf, offset, false);
+        this(raf, offset, true);
     }
-    public MBRPartitionTable(LowLevelFile raf, int offset, boolean noParseEBRs) {
-        this(raf, offset, DEFAULT_SECTOR_SIZE, noParseEBRs);
+    public MBRPartitionTable(LowLevelFile raf, int offset, boolean parseEmbeddedPartitionSystems) {
+        this(raf, offset, DEFAULT_SECTOR_SIZE, parseEmbeddedPartitionSystems);
     }
     public MBRPartitionTable(LowLevelFile raf, int offset, int sectorSize) {
-        this(raf, offset, sectorSize, false);
+        this(raf, offset, sectorSize, true);
     }
-    public MBRPartitionTable(LowLevelFile raf, int offset, int sectorSize, boolean noParseEBRs) {
+    public MBRPartitionTable(LowLevelFile raf, int offset, int sectorSize, boolean parseEmbeddedPartitionSystems) {
         byte[] block = new byte[sectorSize];
         raf.seek(offset);
         raf.readFully(block);
@@ -69,7 +63,7 @@ public class MBRPartitionTable implements PartitionSystem {
             MBRPartition p = mbrPartitions[i];
             PartitionSystem embeddedPS = null;
 
-            if(noParseEBRs); // Disable all other elses
+            if(!parseEmbeddedPartitionSystems); // Disable all other elses
             else if(p.getPartitionTypeAsEnum() == MBRPartition.MBRPartitionType.PARTITION_TYPE_DOS_EXTENDED ||
                     p.getPartitionTypeAsEnum() == MBRPartition.MBRPartitionType.PARTITION_TYPE_DOS_EXTENDED_INT13HX) {
                 try {

@@ -23,7 +23,7 @@ import org.catacombae.hfsexplorer.partitioning.*;
 import org.catacombae.hfsexplorer.win32.*;
 import java.io.*;
 
-public class PrintMBRPartitions {
+public class PrintMBRPartitionTable {
     public static void main(String[] args) throws Exception {
         LowLevelFile llf;
         if(System.getProperty("os.name").toLowerCase().startsWith("windows")) {
@@ -41,7 +41,7 @@ public class PrintMBRPartitions {
         System.out.println("Wrote the raw MBR table to file: mbr_table.debug");
             
         System.out.println("Length of file: " + llf.length());
-	MBRPartitionTable mbr = new MBRPartitionTable(referencetable, 0);
+	MBRPartitionTable mbr = new MBRPartitionTable(llf, 0);
 	mbr.print(System.out, "");
 	System.out.println("Is this parititon table valid? " + mbr.isValid() + ".");
 	    
