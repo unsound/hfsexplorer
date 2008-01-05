@@ -147,6 +147,7 @@ public class ExtendedBootRecord {
 	System.arraycopy(optIBMBootmgrEntry, 0, result, i, optIBMBootmgrEntry.length); i += optIBMBootmgrEntry.length;
 	System.arraycopy(reserved2, 0, result, i, reserved2.length); i += reserved2.length;
 	System.arraycopy(optDiskSignature, 0, result, i, optDiskSignature.length); i += optDiskSignature.length;
+        System.arraycopy(reserved3, 0, result, i, reserved3.length); i += reserved3.length;
 	curData = firstEntry.getBytes();
         System.arraycopy(curData, 0, result, i, curData.length); i += curData.length;
         curData = secondEntry.getBytes();
