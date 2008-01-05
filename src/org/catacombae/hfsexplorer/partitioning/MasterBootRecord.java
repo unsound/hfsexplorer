@@ -63,14 +63,14 @@ public class MasterBootRecord {
     
     /** <code>data</code> is assumed to be at least (<code>offset</code>+512) bytes in length. */
     public MasterBootRecord(byte[] data, int offset, int sectorSize) {
-	System.arraycopy(data, 0, reserved1, 0, reserved1.length);
+	System.arraycopy(data, offset+0, reserved1, 0, reserved1.length);
 	System.arraycopy(data, offset+IBM_EXTENDED_DATA_OFFSET+0, optIBMExtendedData1, 0, 9);
 	System.arraycopy(data, offset+IBM_EXTENDED_DATA_OFFSET+9, optIBMExtendedData2, 0, 9);
 	System.arraycopy(data, offset+IBM_EXTENDED_DATA_OFFSET+18, optIBMExtendedData3, 0, 9);
 	System.arraycopy(data, offset+IBM_EXTENDED_DATA_OFFSET+27, optIBMExtendedData4, 0, 9);
-	System.arraycopy(data, 430, reserved2, 0, reserved2.length);
+	System.arraycopy(data, offset+430, reserved2, 0, reserved2.length);
 	System.arraycopy(data, offset+OPTIONAL_DISK_SIGNATURE_OFFSET, optDiskSignature, 0, 4);
-	System.arraycopy(data, 444, reserved3, 0, reserved3.length);
+	System.arraycopy(data, offset+444, reserved3, 0, reserved3.length);
 	for(int i = 0; i < 4; ++i)
 	    partitions[i] = new MBRPartition(data, offset+MBR_PARTITIONS_OFFSET+i*16, sectorSize);
 	System.arraycopy(data, offset+MBR_PARTITIONS_OFFSET+64, mbrSignature, 0, 2);
@@ -115,13 +115,14 @@ public class MasterBootRecord {
     
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " diskSignature: 0x" + Util.toHexStringBE(getOptionalDiskSignature()) + " (optional, and possibly incorrect)");
+        ps.println(prefix + " partitions:");
 	for(int i = 0; i < partitions.length; ++i) {
-	    ps.println(prefix + " partitions[" + i + "]:");
+	    ps.println(prefix + "  [" + i + "]:");
 	    if(partitions[i].isValid()) {
-		partitions[i].print(ps, prefix + "  ");
+		partitions[i].print(ps, prefix + "   ");
 	    }
 	    else
-		ps.println(prefix + "  [Invalid data]");
+		ps.println(prefix + "   [Invalid data]");
 	}
 	ps.println(prefix + " mbrSignature: 0x" + Util.toHexStringBE(getMBRSignature()));
     }
