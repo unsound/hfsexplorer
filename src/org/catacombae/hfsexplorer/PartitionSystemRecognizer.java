@@ -121,10 +121,7 @@ public class PartitionSystemRecognizer {
 	case GUID_PARTITION_TABLE:
 	    return new GUIDPartitionTable(bitstream, 0);
 	case MASTER_BOOT_RECORD:
-	    byte[] firstSector = new byte[512];
-	    bitstream.seek(0);
-	    bitstream.readFully(firstSector);
-	    return new MBRPartitionTable(firstSector, 0);
+	    return new MBRPartitionTable(bitstream, 0);
 	default:
 	    return null;
 	}

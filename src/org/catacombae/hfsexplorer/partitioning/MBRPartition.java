@@ -72,6 +72,7 @@ public class MBRPartition implements Partition {
 	PARTITION_TYPE_EFI_SYSTEM_ON_MBR    ((byte)0xEF),
 	PARTITION_TYPE_APPLE_UFS            ((byte)0xA8), // UFS in NeXT format (only slightly different)
 	PARTITION_TYPE_APPLE_HFS            ((byte)0xAF), // Used for HFS, HFS+ and HFSX
+	PARTITION_TYPE_LINUX_SWAP           ((byte)0x82),
 	PARTITION_TYPE_LINUX_NATIVE         ((byte)0x83), // Used for reiserfs, ext2, ext3 and many more
 	UNKNOWN_PARTITION_TYPE; // Returned when no known type can be matched
 	
@@ -200,7 +201,7 @@ public class MBRPartition implements Partition {
     }
 
     public void print(PrintStream ps, String prefix) {
-	ps.println(prefix + "MBRPartition:");
+        ps.println(prefix + this.getClass().getSimpleName() + ":");
 	printFields(ps, prefix);
     }
     
@@ -251,6 +252,8 @@ public class MBRPartition implements Partition {
 	    return PartitionType.APPLE_HFS;
 	case PARTITION_TYPE_LINUX_NATIVE:
 	    return PartitionType.LINUX_NATIVE;
+	case PARTITION_TYPE_LINUX_SWAP:
+	    return PartitionType.LINUX_SWAP;
 	default:
 	    return PartitionType.UNKNOWN;
 	}

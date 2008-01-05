@@ -37,30 +37,20 @@ public interface Partition {
 	    FAT12, FAT16, FAT32, NTFS, HPFS, DOS_EXTENDED,
 	    LINUX_SWAP, LINUX_NATIVE, XFS, ZFS,
 	    UNKNOWN };
-//     protected long startOffset;
-//     protected long length;
-//     protected PartitionType type;
-    
-//     public Partition(long startOffset, long length, PartitionType type) {
-// 	this.startOffset = startOffset;
-// 	this.length = length;
-// 	this.type = type;
-//     }
-//     protected Partition() {} // Only for those that know what they're doing ;)
     
     /** Returns the start offset in bytes. */
-    public long getStartOffset();// { return startOffset; }
+    public long getStartOffset();
     
     /** Returns the length of the partition in bytes. */
-    public long getLength();// { return length; }
+    public long getLength();
     
     /** Returns the type of the partition. */
-    public PartitionType getType();// { return type; }
+    public PartitionType getType();
     
     /** Prints the values of the fields of this partition. */
-    public /*abstract*/ void printFields(PrintStream ps, String prefix);
+    public void printFields(PrintStream ps, String prefix);
     
     /** Prints the type name followed by the values of its fields. */
-    public /*abstract*/ void print(PrintStream ps, String prefix);
+    public void print(PrintStream ps, String prefix);
 
 }
