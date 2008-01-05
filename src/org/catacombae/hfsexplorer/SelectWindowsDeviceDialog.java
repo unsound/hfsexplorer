@@ -218,44 +218,23 @@ public class SelectWindowsDeviceDialog extends JDialog {
 		PartitionSystemRecognizer.PartitionSystemType pst = psr.detectPartitionSystem();
                 
                 boolean fileSystemFound = false;
-                if(pst == PartitionSystemRecognizer.PartitionSystemType.APPLE_PARTITION_MAP ||
-                   pst == PartitionSystemRecognizer.PartitionSystemType.GUID_PARTITION_TABLE) {
-                    DriverDescriptorRecord ddr = new DriverDescriptorRecord(llf, 0);
-                    if(ddr.isValid()) {
-                        PartitionSystem apm = new ApplePartitionMap(llf, ddr.getSbBlkSize() * 1, ddr.getSbBlkSize());
-                        Partition[] parts = apm.getUsedPartitionEntries();
-                        for(int j = 0; j < parts.length; ++j) {
-                            Partition part = parts[j];
-                            if(part.getType() == Partition.PartitionType.APPLE_HFS) {
-                                FileSystemRecognizer fsr = new FileSystemRecognizer(llf, part.getStartOffset());
-                                if(fsr.isTypeSupported(fsr.detectFileSystem())) {
-                                    fileSystemFound = true;
-                                    embeddedFileSystems.add(new EmbeddedPartitionEntry(deviceName, j, part));
-                                }
+                
+                if(pst != PartitionSystemRecognizer.PartitionSystemType.NONE_FOUND) {
+                    PartitionSystem partSys = psr.getPartitionSystem();
+                    Partition[] parts = partSys.getUsedPartitionEntries();
+                    for(int j = 0; j < parts.length; ++j) {
+                        Partition part = parts[j];
+                        if(part.getType() == Partition.PartitionType.APPLE_HFS) {
+                            FileSystemRecognizer fsr = new FileSystemRecognizer(llf, part.getStartOffset());
+                            if(fsr.isTypeSupported(fsr.detectFileSystem())) {
+                                fileSystemFound = true;
+                                embeddedFileSystems.add(new EmbeddedPartitionEntry(deviceName, j, part));
                             }
                         }
                     }
                 }
-                else if(pst == PartitionSystemRecognizer.PartitionSystemType.GUID_PARTITION_TABLE) {
-                    PartitionSystem gpt = new GUIDPartitionTable(llf, 0);
-                    if(gpt.isValid()) {
-                        Partition[] parts = gpt.getUsedPartitionEntries();
-                        for(int j = 0; j < parts.length; ++j) {
-                            Partition part = parts[j];
-                            if(part.getType() == Partition.PartitionType.APPLE_HFS) {
-                                FileSystemRecognizer fsr = new FileSystemRecognizer(llf, part.getStartOffset());
-                                if(fsr.isTypeSupported(fsr.detectFileSystem())) {
-                                    fileSystemFound = true;
-                                    embeddedFileSystems.add(new EmbeddedPartitionEntry(deviceName, j, part));
-                                }
-                            }
-                        }
-                    }
-                }
-		/* detection of MBR partitions are deliberately handed over to Windows because we haven't implemented
-		   support for common schemes such as extended partitions... Windows simply does it better. */
-		//else if(pst == PartitionSystemRecognizer.PartitionSystemType.MASTER_BOOT_RECORD) {}
-		if(!fileSystemFound) {
+                
+                if(!fileSystemFound && deviceName.endsWith("Partition0")) {
 		    FileSystemRecognizer fsr = new FileSystemRecognizer(llf, 0);
 		    if(fsr.isTypeSupported(fsr.detectFileSystem()))
 			plainFileSystems.add(deviceName);
@@ -382,6 +361,8 @@ public class SelectWindowsDeviceDialog extends JDialog {
                 return "APM";
             else if(partition instanceof GPTEntry)
                 return "GPT";
+            else if(partition instanceof EBRPartition)
+                return "EBR";
             else if(partition instanceof MBRPartition)
                 return "MBR";
             else

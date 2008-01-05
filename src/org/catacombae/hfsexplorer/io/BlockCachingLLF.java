@@ -82,13 +82,14 @@ public class BlockCachingLLF extends FilterLLF {
 	this.blockSize = blockSize;
 	this.virtualLength = backing.length(); // Immutable
 	int actualItemCount = maxItemCount;
-	System.err.println("BlockCachingLLF created. virtualLength: " + virtualLength + " maxItemCount*blockSize: " + (maxItemCount*blockSize));
+	//System.err.println("BlockCachingLLF created. virtualLength: " + virtualLength + " maxItemCount*blockSize: " + (maxItemCount*blockSize));
 	if(actualItemCount*blockSize > virtualLength) {
 	    actualItemCount = (int)( virtualLength/blockSize - ((virtualLength%blockSize == 0) ? 1 : 0) );
-	    System.err.println("Adjusted actualItemCount to " + actualItemCount);
+	    //System.err.println("Adjusted actualItemCount to " + actualItemCount);
 	}
 	this.cache = new BlockStore[actualItemCount];
     }
+    @Override
     public void seek(long pos) {
 	if(closed) throw new RuntimeException("File is closed.");
 	if(pos < virtualLength && pos >= 0)
@@ -96,6 +97,7 @@ public class BlockCachingLLF extends FilterLLF {
 	else
 	    throw new IllegalArgumentException("pos out of range (pos=" + pos + ")");
     }
+    @Override
     public int read() {
 	// Generic read() method
 	byte[] b = new byte[1];
@@ -105,10 +107,12 @@ public class BlockCachingLLF extends FilterLLF {
 	else
 	    return -1;
     }
+    @Override
     public int read(byte[] data) {
 	// Generic read(byte[]) method
 	return read(data, 0, data.length);
     }
+    @Override
     public int read(final byte[] data, final int pos, final int len) {
 	if(closed) throw new RuntimeException("File is closed.");
 	//System.out.println("BlockCachingLLF.read(data, " + pos + ", " + len + ");");
@@ -127,11 +131,13 @@ public class BlockCachingLLF extends FilterLLF {
 	
 	return bytesProcessed;
     }
+    @Override
     public void readFully(byte[] data) {
 	// Generic readFully(byte[]) method
 	readFully(data, 0, data.length);
     }
 
+    @Override
     public void readFully(byte[] data, int offset, int length) {
 	// Generic readFully(byte[], int, int) method
 	int bytesRead = 0;
@@ -142,14 +148,17 @@ public class BlockCachingLLF extends FilterLLF {
 		throw new RuntimeException("Couldn't read the entire length.");
 	}
     }
+    @Override
     public long length() {
 	if(closed) throw new RuntimeException("File is closed.");
 	return virtualLength;
     }
+    @Override
     public long getFilePointer() {
 	if(closed) throw new RuntimeException("File is closed.");
 	return virtualFP;
     }
+    @Override
     public void close() {
 	closed = true;
 	backingStore.close();

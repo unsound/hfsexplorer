@@ -30,10 +30,10 @@ public class DOSExtendedPartitionSystem implements PartitionSystem {
     
     public DOSExtendedPartitionSystem(LowLevelFile llf, long extendedPartitionOffset,
                                       long extendedPartitionLength, int sectorSize) {
-	System.err.println("creating a new DOSExtendedPartitionSystem with:");
-	System.err.println("  extendedPartitionOffset=" + extendedPartitionOffset);
-	System.err.println("  extendedPartitionLength=" + extendedPartitionLength);
-	System.err.println("  sectorSize=" + sectorSize);
+//	System.err.println("creating a new DOSExtendedPartitionSystem with:");
+//	System.err.println("  extendedPartitionOffset=" + extendedPartitionOffset);
+//	System.err.println("  extendedPartitionLength=" + extendedPartitionLength);
+//	System.err.println("  sectorSize=" + sectorSize);
         LinkedList<ExtendedBootRecord> recordList = new LinkedList<ExtendedBootRecord>();
         byte[] block = new byte[sectorSize];
         long seekLocation = extendedPartitionOffset;
@@ -44,8 +44,8 @@ public class DOSExtendedPartitionSystem implements PartitionSystem {
         ExtendedBootRecord ebr = new ExtendedBootRecord(block, 0, extendedPartitionOffset, sectorSize);
         recordList.addLast(ebr);
 	int i = 0;
-	System.err.println("ebr[" + i++ + "]:");
-	ebr.print(System.err, " ");
+//	System.err.println("ebr[" + i++ + "]:");
+//	ebr.print(System.err, " ");
         while(ebr.getSecondEntry().getLBAPartitionLength() != 0 ||
               ebr.getSecondEntry().getLBAFirstSector() != 0) {
             seekLocation = ebr.getSecondEntry().getStartOffset();
@@ -55,8 +55,8 @@ public class DOSExtendedPartitionSystem implements PartitionSystem {
             llf.readFully(block);
             ebr = new ExtendedBootRecord(block, 0, extendedPartitionOffset, sectorSize);
             recordList.addLast(ebr);
-	    System.err.println("ebr[" + i++ + "]:");
-	    ebr.print(System.err, " ");
+//	    System.err.println("ebr[" + i++ + "]:");
+//	    ebr.print(System.err, " ");
 	}
         
         this.extendedBootRecords = recordList.toArray(new ExtendedBootRecord[recordList.size()]);
