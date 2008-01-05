@@ -60,7 +60,7 @@ public class ExtendedBootRecord {
     public ExtendedBootRecord(byte[] data, int offset, long extendedPartitionOffset, int sectorSize) {
 	System.arraycopy(data, offset+0, reserved1, 0, reserved1.length);
 	System.arraycopy(data, offset+394, optIBMBootmgrEntry, 0, optIBMBootmgrEntry.length);
-	System.arraycopy(data, offset+430, reserved2, 0, reserved2.length);
+	System.arraycopy(data, offset+403, reserved2, 0, reserved2.length);
 	System.arraycopy(data, offset+440, optDiskSignature, 0, optDiskSignature.length);
 	System.arraycopy(data, offset+444, reserved3, 0, reserved3.length);
         firstEntry = new EBRPartition(data, offset+446, extendedPartitionOffset, sectorSize);
