@@ -123,6 +123,9 @@ public class GUIDPartitionTable implements PartitionSystem {
 	}
 	return result;
     }
+    public int getPartitionCount() {
+        return entries.length;
+    }
     public int getUsedPartitionCount() {
 	int count = 0;
 	for(GPTEntry ge : entries) {
@@ -130,7 +133,7 @@ public class GUIDPartitionTable implements PartitionSystem {
 	}
 	return count;
     }
-    public Partition getPartitionEntry(int index) { return entries[index]; }
+    public Partition getPartitionEntry(int index) { return getEntry(index); }
     public Partition[] getPartitionEntries() {
 	return getEntries();
     }

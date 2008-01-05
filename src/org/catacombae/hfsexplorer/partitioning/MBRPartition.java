@@ -27,7 +27,9 @@ public class MBRPartition implements Partition {
     /** By some reason I couldn't put this variable inside MBRPartitionType. Initalizer error. */
     private static final Hashtable<Byte,MBRPartitionType> byteMap = new Hashtable<Byte,MBRPartitionType>();
     public static enum MBRPartitionType {
-	/* Partition type data from microsoft (http://technet2.microsoft.com/WindowsServer/en/library/bdeda920-1f08-4683-9ffb-7b4b50df0b5a1033.mspx?mfr=true)
+	/* Partition type data from microsoft 
+         * (http://technet2.microsoft.com/WindowsServer/en/library/bdeda920-1f08-4683-9ffb-7b4b50df0b5a1033.mspx?mfr=true)
+         * 
 	 * 0x01 FAT12 primary partition or logical drive (fewer than 32,680 sectors in the volume)
 	 * 0x04 FAT16 partition or logical drive (32,680-65,535 sectors or 16 MB-33 MB)
 	 * 0x05 Extended partition
@@ -174,8 +176,8 @@ public class MBRPartition implements Partition {
 	
 	
 	
-	byte status = getStatus();
-	return (status == PARTITION_NOT_BOOTABLE || status == PARTITION_BOOTABLE);
+	byte statusByte = getStatus();
+	return (statusByte == PARTITION_NOT_BOOTABLE || statusByte == PARTITION_BOOTABLE);
     }
     /** Returns true if isValid() evaluates to true, and partition type is not 0x00 (PARTITION_TYPE_UNUSED). */
     public boolean isUsed() {
@@ -201,7 +203,7 @@ public class MBRPartition implements Partition {
 	ps.println(prefix + "MBRPartition:");
 	printFields(ps, prefix);
     }
-
+    
     private PartitionType convertPartitionType(MBRPartitionType mpt) {
 	// I haven't bothered to generalize the partition types in detail...
 	switch(mpt) {

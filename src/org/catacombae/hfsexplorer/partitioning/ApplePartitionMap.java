@@ -19,6 +19,7 @@ package org.catacombae.hfsexplorer.partitioning;
 
 import org.catacombae.hfsexplorer.io.RandomAccessLLF;
 import org.catacombae.hfsexplorer.io.LowLevelFile;
+import org.catacombae.hfsexplorer.io.ArrayBackedFile;
 import org.catacombae.hfsexplorer.*;
 import java.util.ArrayList;
 import java.io.PrintStream;
@@ -41,6 +42,8 @@ public class ApplePartitionMap implements PartitionSystem {
     }
     
     public ApplePartitionMap(byte[] data, int off, int blockSize) {
+        this(new ArrayBackedFile(data, 0, data.length), off, blockSize);
+        /*
 	byte[] currentBlock = new byte[blockSize];
 	ArrayList<APMPartition> partitionList = new ArrayList<APMPartition>();
 	while(data.length > off+currentBlock.length) { // Loop while we have data left in the array
@@ -52,6 +55,7 @@ public class ApplePartitionMap implements PartitionSystem {
 	    else break;
 	}
 	partitions = partitionList.toArray(new APMPartition[partitionList.size()]);
+        */
     }
 
     public boolean isValid() {
@@ -66,9 +70,14 @@ public class ApplePartitionMap implements PartitionSystem {
             return false;
     }
 
-    public int getUsedPartitionCount() {
+    public int getPartitionCount() {
 	return partitions.length;
     }
+    
+    public int getUsedPartitionCount() {
+	return getPartitionCount();
+    }
+
     /** index must be between 0 and getNumPartitions()-1. */
     public APMPartition getAPMPartition(int index) {
 	return partitions[index];

@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2006-2007 Erik Larsson
+ * Copyright (C) 2008 Erik Larsson
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,186 +16,197 @@
  */
 
 package org.catacombae.hfsexplorer.partitioning;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.hfsexplorer.io.LowLevelFile;
+import org.catacombae.hfsexplorer.io.ArrayBackedFile;
 import java.io.PrintStream;
 import java.util.LinkedList;
 
+/**
+ * This class includes support for the MBR partition scheme, including the
+ * common "Extended Boot Record" scheme (parsing of extended boot
+ * records can be turned off, if desired).
+ * 
+ * @author Erik
+ */
 public class MBRPartitionTable implements PartitionSystem {
     /* Until I figure out a way to detect sector size, it will be 512... */
-    public static final int SECTOR_SIZE = 512;
+    public static final int DEFAULT_SECTOR_SIZE = 512;
     
-    public static final short MBR_SIGNATURE = 0x55AA;
-    public static final int IBM_EXTENDED_DATA_OFFSET = 0x018A;
-    public static final int OPTIONAL_DISK_SIGNATURE_OFFSET = 0x01B8;
-    public static final int MBR_PARTITIONS_OFFSET = 0x01BE;
-    /*
-     * struct MBRPartitionTable
-     * size: 512 bytes
-     *
-     * BP   Size  Type              Variable name        Description
-     * --------------------------------------------------------------
-     * 0    394   byte[394]         reserved1            possibly executable code
-     * 394  9     byte[9]           optIBMExtendedData1  either part of the executable code, or IBM extended data
-     * 403  9     byte[9]           optIBMExtendedData2  either part of the executable code, or IBM extended data
-     * 412  9     byte[9]           optIBMExtendedData3  either part of the executable code, or IBM extended data
-     * 421  9     byte[9]           optIBMExtendedData4  either part of the executable code, or IBM extended data
-     * 430  10    byte[10]          reserved2            possibly executable code
-     * 440  4     UInt32            optDiskSignature     either part of the executable code, or IBM extended data
-     * 444  2     byte[2]           reserved3            possibly executable code
-     * 446  16*4  MBRPartition[4]   partitions           the MBR partition table
-     * 510  2     UInt16            mbrSignature         signature that should always be present
-     *
-     */
-    protected final byte[] reserved1 = new byte[394];
-    protected final byte[] optIBMExtendedData1 = new byte[9];
-    protected final byte[] optIBMExtendedData2 = new byte[9];
-    protected final byte[] optIBMExtendedData3 = new byte[9];
-    protected final byte[] optIBMExtendedData4 = new byte[9];
-    protected final byte[] reserved2 = new byte[10];
-    protected final byte[] optDiskSignature = new byte[4];
-    protected final byte[] reserved3 = new byte[2];
-    protected final MBRPartition[] partitions = new MBRPartition[4];
-    protected final byte[] mbrSignature = new byte[2];
-    
-    private final LinkedList<Partition> tempList = new LinkedList<Partition>(); // getUsedPartitionEntries()
-    
-    /** <code>data</code> is assumed to be at least (<code>offset</code>+512) bytes in length. */
+    private final MasterBootRecord masterBootRecord;
+    private final PartitionSystem[] embeddedPartitionSystems;
+ 
     public MBRPartitionTable(byte[] data, int offset) {
-	System.arraycopy(data, 0, reserved1, 0, reserved1.length);
-	System.arraycopy(data, offset+IBM_EXTENDED_DATA_OFFSET+0, optIBMExtendedData1, 0, 9);
-	System.arraycopy(data, offset+IBM_EXTENDED_DATA_OFFSET+9, optIBMExtendedData2, 0, 9);
-	System.arraycopy(data, offset+IBM_EXTENDED_DATA_OFFSET+18, optIBMExtendedData3, 0, 9);
-	System.arraycopy(data, offset+IBM_EXTENDED_DATA_OFFSET+27, optIBMExtendedData4, 0, 9);
-	System.arraycopy(data, 430, reserved2, 0, reserved2.length);
-	System.arraycopy(data, offset+OPTIONAL_DISK_SIGNATURE_OFFSET, optDiskSignature, 0, 4);
-	System.arraycopy(data, 444, reserved3, 0, reserved3.length);
-	for(int i = 0; i < 4; ++i)
-	    partitions[i] = new MBRPartition(data, offset+MBR_PARTITIONS_OFFSET+i*16, SECTOR_SIZE);
-	System.arraycopy(data, offset+MBR_PARTITIONS_OFFSET+64, mbrSignature, 0, 2);
-	
-	if(!Util.arrayRegionsEqual(getBytes(), 0, getStructSize(), data, offset, getStructSize()))
-	    throw new RuntimeException("Internal error!");
+        this(new ArrayBackedFile(data), offset);
     }
-    
-    public MBRPartitionTable(MBRPartitionTable source) {
-	System.arraycopy(source.reserved1, 0, reserved1, 0, reserved1.length);
-	System.arraycopy(source.optIBMExtendedData1, 0, optIBMExtendedData1, 0, optIBMExtendedData1.length);
-	System.arraycopy(source.optIBMExtendedData2, 0, optIBMExtendedData2, 0, optIBMExtendedData2.length);
-	System.arraycopy(source.optIBMExtendedData3, 0, optIBMExtendedData3, 0, optIBMExtendedData3.length);
-	System.arraycopy(source.optIBMExtendedData4, 0, optIBMExtendedData4, 0, optIBMExtendedData4.length);
-	System.arraycopy(source.reserved2, 0, reserved2, 0, reserved2.length);
-	System.arraycopy(source.optDiskSignature, 0, optDiskSignature, 0, optDiskSignature.length);
-	System.arraycopy(source.reserved3, 0, reserved3, 0, reserved3.length);
-	for(int i = 0; i < 4; ++i)
-	    partitions[i] = new MBRPartition(source.partitions[i]);
-	System.arraycopy(source.mbrSignature, 0, mbrSignature, 0, mbrSignature.length);
+    public MBRPartitionTable(byte[] data, int offset, boolean noParseEBRs) {
+        this(new ArrayBackedFile(data), offset, noParseEBRs);
     }
-    
-    public static int getStructSize() { return 512; }
-    
-    /** This is an optional field, and might contain unexpected and invalid data. */
-    public byte[] getOptionalIBMExtendedData1() { return Util.createCopy(optIBMExtendedData1); }
-    /** This is an optional field, and might contain unexpected and invalid data. */
-    public byte[] getOptionalIBMExtendedData2() { return Util.createCopy(optIBMExtendedData2); }
-    /** This is an optional field, and might contain unexpected and invalid data. */
-    public byte[] getOptionalIBMExtendedData3() { return Util.createCopy(optIBMExtendedData3); }
-    /** This is an optional field, and might contain unexpected and invalid data. */
-    public byte[] getOptionalIBMExtendedData4() { return Util.createCopy(optIBMExtendedData4); }
-    /** This is an optional field, and might contain unexpected and invalid data. */
-    public int getOptionalDiskSignature() { return Util.readIntBE(optDiskSignature); }
-    public MBRPartition[] getPartitions() {
-	MBRPartition[] result = new MBRPartition[partitions.length];
-	for(int i = 0; i < result.length; ++i)
-	    result[i] = partitions[i];
-	return result;
+    public MBRPartitionTable(byte[] data, int offset, int sectorSize) {
+        this(new ArrayBackedFile(data), offset, sectorSize);
     }
-    public short getMBRSignature() { return Util.readShortBE(mbrSignature); }
-    
-    public void printFields(PrintStream ps, String prefix) {
-	ps.println(prefix + " diskSignature: 0x" + Util.toHexStringBE(getOptionalDiskSignature()) + " (optional, and possibly incorrect)");
-	for(int i = 0; i < partitions.length; ++i) {
-	    ps.println(prefix + " partitions[" + i + "]:");
-	    if(partitions[i].isValid()) {
-		partitions[i].print(ps, prefix + "  ");
-	    }
-	    else
-		ps.println(prefix + "  [Invalid data]");
-	}
-	ps.println(prefix + " mbrSignature: 0x" + Util.toHexStringBE(getMBRSignature()));
+    public MBRPartitionTable(byte[] data, int offset, int sectorSize, boolean noParseEBRs) {
+        this(new ArrayBackedFile(data), offset, sectorSize, noParseEBRs);
     }
+    public MBRPartitionTable(LowLevelFile raf, int offset) {
+        this(raf, offset, false);
+    }
+    public MBRPartitionTable(LowLevelFile raf, int offset, boolean noParseEBRs) {
+        this(raf, offset, DEFAULT_SECTOR_SIZE, noParseEBRs);
+    }
+    public MBRPartitionTable(LowLevelFile raf, int offset, int sectorSize) {
+        this(raf, offset, sectorSize, false);
+    }
+    public MBRPartitionTable(LowLevelFile raf, int offset, int sectorSize, boolean noParseEBRs) {
+        byte[] block = new byte[sectorSize];
+        raf.seek(offset);
+        raf.readFully(block);
+        masterBootRecord = new MasterBootRecord(block, 0, sectorSize);
+        
+        // Check for embedded partition systems
+        MBRPartition[] mbrPartitions = masterBootRecord.getPartitions();
+        embeddedPartitionSystems = new PartitionSystem[mbrPartitions.length];
+        for(int i = 0; i < mbrPartitions.length; ++i) {
+            MBRPartition p = mbrPartitions[i];
+            PartitionSystem embeddedPS = null;
 
-    public void print(PrintStream ps, String prefix) {
-	ps.println("MBRPartitionTable:");
-	printFields(ps, prefix);
+            if(noParseEBRs); // Disable all other elses
+            else if(p.getPartitionTypeAsEnum() == MBRPartition.MBRPartitionType.PARTITION_TYPE_DOS_EXTENDED ||
+                    p.getPartitionTypeAsEnum() == MBRPartition.MBRPartitionType.PARTITION_TYPE_DOS_EXTENDED_INT13HX) {
+                try {
+                    embeddedPS =
+                        new DOSExtendedPartitionSystem(raf, p.getStartOffset(), p.getLength(), sectorSize);
+                }
+                catch(Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            embeddedPartitionSystems[i] = embeddedPS;
+        }
+    }
+    
+    public MasterBootRecord getMasterBootRecord() { return masterBootRecord; }
+    
+    /**
+     * This will return an array of exactly 4 elements, corresponding to the
+     * four entries in the Master Boot Record. If the element at position i is
+     * null, it means there is no embedded partition system at that MBR entry.
+     * If no embedded partition systems exists, then this array will consist of
+     * all null elements.
+     * @return a four element array containing the embedded partition systems
+     * of this MBR layout, if any.
+     */
+    public PartitionSystem[] getEmbeddedPartitionSystems() {
+        PartitionSystem[] result = new PartitionSystem[embeddedPartitionSystems.length];
+        System.arraycopy(embeddedPartitionSystems, 0, result, 0, result.length);
+        return result;
+    }
+    
+    public PartitionSystem getEmbeddedPartitionSystem(int index) {
+        return embeddedPartitionSystems[index];
     }
     
     public boolean isValid() {
-	return (getMBRSignature() == MBR_SIGNATURE) && (getValidPartitionCount() == 4);
-	// More validity contraints could be added later... like that the partitions should be in order and
-	// that their lengths should be non negative and stay within device borders...
+        if(masterBootRecord.isValid()) {
+            for(PartitionSystem ebr : embeddedPartitionSystems) {
+                if(ebr != null && !ebr.isValid())
+                    return false;
+            }
+            return true;
+        }
+        return false;
     }
-    
-    public int getValidPartitionCount() {
-	int num = 0;
-	for(MBRPartition mp : getPartitions()) {
-	    if(mp.isValid()) ++num;
-	    //else break; // we don't check the later ones
+
+    public int getPartitionCount() {
+ 	int num = masterBootRecord.getPartitionCount();
+	for(PartitionSystem ps : embeddedPartitionSystems) {
+	    if(ps != null)
+                num += ps.getPartitionCount();
 	}
 	return num;
-    }
+   }
     
     public int getUsedPartitionCount() {
-	int num = 0;
-	for(MBRPartition mp : getPartitions()) {
-	    if(mp.isUsed()) ++num;
-	    //else break; // we don't check the later ones
+	int num = masterBootRecord.getUsedPartitionCount();
+	for(PartitionSystem ps : embeddedPartitionSystems) {
+	    if(ps != null)
+                num += ps.getUsedPartitionCount();
 	}
 	return num;
-    }
-    
-    public Partition[] getPartitionEntries() {
-	return getPartitions();
-    }
-    
-    public Partition getPartitionEntry(int index) {
-	MBRPartition p = partitions[index];
-	if(p.isValid())
-	    return p;
-	else
-	    throw new ArrayIndexOutOfBoundsException(index);
     }
     
     public Partition[] getUsedPartitionEntries() {
-	tempList.clear();
-	for(MBRPartition mp : getPartitions()) {
-	    if(mp.isUsed()) tempList.addLast(mp);
-	    //else break; // we don't check the later ones
+        LinkedList<Partition> tempList = new LinkedList<Partition>();
+        for(Partition p : masterBootRecord.getUsedPartitionEntries())
+            tempList.addLast(p);
+        
+	for(PartitionSystem ps : embeddedPartitionSystems) {
+	    if(ps != null) {
+                for(Partition p : ps.getUsedPartitionEntries())
+                    tempList.addLast(p);
+            }
 	}
-	return tempList.toArray(new Partition[tempList.size()]);
+        
+        return tempList.toArray(new Partition[tempList.size()]);
     }
+
+    public Partition getPartitionEntry(int index) {
+        if(index >= 0 && index < 4) {
+            return masterBootRecord.getPartitionEntry(index);
+        }
+        else if(index >= 4) {
+            int curIndex = 4;
+            for(PartitionSystem ps : embeddedPartitionSystems) {
+                int psPartitions = ps.getPartitionCount();
+                if(index < curIndex+psPartitions)
+                    return ps.getPartitionEntry(index-curIndex);
+                curIndex += psPartitions;
+            }
+        }
+        
+        throw new IllegalArgumentException("index out of bounds (index=" + index + ")");
+    }
+
+    public Partition[] getPartitionEntries() {
+        LinkedList<Partition> tempList = new LinkedList<Partition>();
+        for(Partition p : masterBootRecord.getPartitionEntries())
+            tempList.addLast(p);
+        
+	for(PartitionSystem ps : embeddedPartitionSystems) {
+	    if(ps != null) {
+                for(Partition p : ps.getPartitionEntries())
+                    tempList.addLast(p);
+            }
+	}
+        
+        return tempList.toArray(new Partition[tempList.size()]);
+    }
+
 
     public String getLongName() { return "Master Boot Record"; }
+    
     public String getShortName() { return "MBR"; }
 
-    public byte[] getBytes() {
-	byte[] result = new byte[512];
-	int i = 0;
-	System.arraycopy(reserved1, 0, result, i, reserved1.length); i += reserved1.length;
-	System.arraycopy(optIBMExtendedData1, 0, result, i, optIBMExtendedData1.length); i += optIBMExtendedData1.length;
-	System.arraycopy(optIBMExtendedData2, 0, result, i, optIBMExtendedData2.length); i += optIBMExtendedData2.length;
-	System.arraycopy(optIBMExtendedData3, 0, result, i, optIBMExtendedData3.length); i += optIBMExtendedData3.length;
-	System.arraycopy(optIBMExtendedData4, 0, result, i, optIBMExtendedData4.length); i += optIBMExtendedData4.length;
-	System.arraycopy(reserved2, 0, result, i, reserved2.length); i += reserved2.length;
-	System.arraycopy(optDiskSignature, 0, result, i, optDiskSignature.length); i += optDiskSignature.length;
-	System.arraycopy(reserved3, 0, result, i, reserved3.length); i += reserved3.length;
-	for(int j = 0; j < partitions.length; ++j) {
-	    byte[] curData = partitions[j].getBytes();
-	    System.arraycopy(curData, 0, result, i, curData.length); i += curData.length;
-	}
-	System.arraycopy(mbrSignature, 0, result, i, mbrSignature.length); i += mbrSignature.length;
-	
-	if(i != result.length)
-	    throw new RuntimeException("Internal error!");
-	return result;
+    public void printFields(PrintStream ps, String prefix) {
+        ps.println(prefix + " masterBootRecord:");
+        masterBootRecord.print(ps, prefix + "  ");
+        ps.println(prefix + " embeddedPartitionSystems:");
+        for(int i = 0; i < embeddedPartitionSystems.length; ++i) {
+            PartitionSystem partSys = embeddedPartitionSystems[i];
+            ps.print(prefix + "  [" + i + "]:");
+            if(partSys == null)
+                ps.println(" null");
+            else {
+                ps.println();
+                partSys.print(ps, prefix + "   ");
+            }
+        }
     }
+
+    public void print(PrintStream ps, String prefix) {
+        ps.println(prefix + this.getClass().getSimpleName() + ":");
+	printFields(ps, prefix);
+    }
+
+    
 }

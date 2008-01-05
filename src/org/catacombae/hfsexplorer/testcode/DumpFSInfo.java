@@ -147,7 +147,7 @@ public class DumpFSInfo {
 		    MBRPartitionTable mbr = (MBRPartitionTable)partSys;
 		    File mbrFile = new File("fsdump-" + runTimestamp + "_mbr.dat");
 		    FileOutputStream fos = new FileOutputStream(mbrFile);
-		    fos.write(mbr.getBytes());
+		    fos.write(mbr.getMasterBootRecord().getBytes());
 		    fos.close();
 		    generatedFiles.add(mbrFile);		    
 		}

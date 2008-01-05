@@ -18,15 +18,22 @@
 package org.catacombae.hfsexplorer.io;
 import java.util.*;
 
+/**
+ * An implementation of LowLevelFile which concatenates a sequence of
+ * LowLevelFiles into a new logical LowLevelFile.
+ * @author Erik Larsson, erik82@kth.se
+ */
 public class ConcatenatedFile implements LowLevelFile {
     private class Part {
-	public Part(LowLevelFile file, long startOffset, long length) {
+	public final LowLevelFile file;
+	public final long startOffset;
+        public final long length;
+        
+        public Part(LowLevelFile file, long startOffset, long length) {
 	    this.file = file;
 	    this.startOffset = startOffset;
 	    this.length = length;
 	}
-	public LowLevelFile file;
-	public long startOffset, length;
     }
     private final List<Part> parts = new ArrayList<Part>();
     private Part currentPart;

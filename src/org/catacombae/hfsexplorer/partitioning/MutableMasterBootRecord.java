@@ -18,11 +18,11 @@
 package org.catacombae.hfsexplorer.partitioning;
 import org.catacombae.hfsexplorer.*;
 
-public class MutableMBRPartitionTable extends MBRPartitionTable {
+public class MutableMasterBootRecord extends MasterBootRecord {
 //     private MutableMBRPartitionTable() {
 // 	throw new RuntimeException("Default boot code not yet written.");
 //     }
-    public MutableMBRPartitionTable(MBRPartitionTable mbr) {
+    public MutableMasterBootRecord(MasterBootRecord mbr) {
 	super(mbr);
     }
     
