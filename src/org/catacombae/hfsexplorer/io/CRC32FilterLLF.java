@@ -15,8 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.partitioning;
-import org.catacombae.hfsexplorer.io.LowLevelFile;
+package org.catacombae.hfsexplorer.io;
 import java.util.zip.CRC32;
 
 /** Updates a CRC32 checksum for each byte you read from the underlying stream.
