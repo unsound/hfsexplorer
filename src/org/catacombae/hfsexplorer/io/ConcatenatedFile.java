@@ -114,8 +114,8 @@ public class ConcatenatedFile implements LowLevelFile {
 	for(int i = 0; i < currentPartIndex; ++i)
 	    fp += parts.get(i).length;
 	
-	Part currentPart = parts.get(currentPartIndex);
-	fp += currentPart.file.getFilePointer() + currentPart.startOffset;
+	Part currentPartLocal = parts.get(currentPartIndex);
+	fp += currentPartLocal.file.getFilePointer() + currentPartLocal.startOffset;
 	
 	return fp;
     }
