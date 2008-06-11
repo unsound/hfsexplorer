@@ -35,7 +35,7 @@ public class RepairMyGPTPleaseTheSequel {
     public static void main(String[] args) throws Exception {
 	long runTimeStamp = System.currentTimeMillis();
 	WritableLowLevelFile llf;
-	if(System.getProperty("os.name").toLowerCase().startsWith("windows"))
+	if(WritableWin32File.isSystemSupported())
 	    llf = new WritableWin32File(args[0]);
 	else
 	    llf = new WritableRandomAccessLLF(args[0]);

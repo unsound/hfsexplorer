@@ -616,8 +616,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	
 	// Menus
 	JMenuItem loadFSFromDeviceItem = null;
-	if(System.getProperty("os.name").toLowerCase().startsWith("windows") &&
-	   System.getProperty("os.arch").toLowerCase().equals("x86")) {
+	if(WindowsLowLevelIO.isSystemSupported()) {
 	    // Only for Windows systems...
 	    loadFSFromDeviceItem = new JMenuItem("Load file system from device...");
 	    loadFSFromDeviceItem.addActionListener(new ActionListener() {
@@ -970,8 +969,7 @@ public class FileSystemBrowserWindow extends JFrame {
     public void loadFSWithUDIFAutodetect(String filename) {
 	LowLevelFile fsFile;
 	try {
-	    if(System.getProperty("os.name").toLowerCase().startsWith("windows") &&
-	       System.getProperty("os.arch").toLowerCase().equals("x86"))
+	    if(WindowsLowLevelIO.isSystemSupported())
 		fsFile = new WindowsLowLevelIO(filename);
 	    else
 		fsFile = new RandomAccessLLF(filename);
@@ -1018,8 +1016,7 @@ public class FileSystemBrowserWindow extends JFrame {
     }
     public void loadFS(String filename) {
 	LowLevelFile fsFile;
-	if(System.getProperty("os.name").toLowerCase().startsWith("windows") &&
-	   System.getProperty("os.arch").toLowerCase().equals("x86"))
+	if(WindowsLowLevelIO.isSystemSupported())
 	    fsFile = new WindowsLowLevelIO(filename);
 	else
 	    fsFile = new RandomAccessLLF(filename);

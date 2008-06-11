@@ -26,7 +26,7 @@ import java.io.*;
 public class PrintGPTPartitions {
     public static void main(String[] args) throws Exception {
 	LowLevelFile llf;
-	if(System.getProperty("os.name").toLowerCase().startsWith("windows")) {
+	if(WindowsLowLevelIO.isSystemSupported()) {
 	    llf = new WindowsLowLevelIO(args[0]);
 	}
 	else {

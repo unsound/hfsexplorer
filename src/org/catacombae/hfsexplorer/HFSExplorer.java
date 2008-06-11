@@ -24,11 +24,10 @@ import org.catacombae.hfsexplorer.types.*;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
 import java.util.*;
 import java.io.*;
-import java.math.BigInteger;
 
 public class HFSExplorer {
     public static final String VERSION = "0.19.1pre";
-    public static final String COPYRIGHT = "Copyright \u00A9 Erik Larsson 2006-2007";
+    public static final String COPYRIGHT = "Copyright \u00A9 Erik Larsson 2006-2008";
     public static final String[] NOTICES = { "This program is distributed under the GNU General Public License version 3.",
 					     "See <http://www.gnu.org/copyleft/gpl.html> for the details.",
 					     "",
@@ -81,8 +80,7 @@ public class HFSExplorer {
 	
 	//RandomAccessFile isoRaf = new RandomAccessFile(args[0], "r");
 	LowLevelFile isoRaf;
-	if(System.getProperty("os.name").toLowerCase().startsWith("windows") &&
-	   System.getProperty("os.arch").toLowerCase().equals("x86"))
+	if(WindowsLowLevelIO.isSystemSupported())
 	    isoRaf = new WindowsLowLevelIO(operation.getFilename());
 	else
 	    isoRaf = new RandomAccessLLF(operation.getFilename());

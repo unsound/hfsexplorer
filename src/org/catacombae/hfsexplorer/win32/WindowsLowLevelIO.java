@@ -24,15 +24,27 @@ public class WindowsLowLevelIO implements org.catacombae.hfsexplorer.io.LowLevel
     protected byte[] fileHandle;
     protected int sectorSize = 512; //Detect this later..
     protected long filePointer = 0;
-
-    static {
+    private static Object loadLibSync = new Object();
+    private static boolean libraryLoaded = false;
+    
+    public static boolean isSystemSupported() {
+        return System.getProperty("os.name").toLowerCase().startsWith("windows") /*&&
+	   System.getProperty("os.arch").toLowerCase().equals("x86")*/;
+    }
+    private static void loadLibrary() {
 	try {
 	    System.loadLibrary("llio");
+            libraryLoaded = true;
 	} catch(Exception e) {
 	    e.printStackTrace();
 	}
     }
     public WindowsLowLevelIO(String filename) {
+        synchronized(loadLibSync) {
+            if(!libraryLoaded) {
+                loadLibrary();
+            }
+        }
 	boolean verbose = false;
 	fileHandle = open(filename);
 	//System.out.println("fileHandle: 0x" + Util.byteArrayToHexString(fileHandle));

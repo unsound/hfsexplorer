@@ -57,8 +57,7 @@ public class DumpFSInfo {
     public static void dumpInfo(String[] args) throws Exception {
 	long runTimestamp = System.currentTimeMillis();
 	LowLevelFile fsFile;
-	if(System.getProperty("os.name").toLowerCase().startsWith("windows") &&
-	   System.getProperty("os.arch").toLowerCase().equals("x86")) {
+	if(WindowsLowLevelIO.isSystemSupported()) {
 	    if(args.length == 1) {
 		fsFile = new WindowsLowLevelIO(args[0]);
 	    }
