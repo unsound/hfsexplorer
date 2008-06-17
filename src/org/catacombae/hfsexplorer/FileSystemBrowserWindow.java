@@ -64,7 +64,8 @@ public class FileSystemBrowserWindow extends JFrame {
 	    this.composedNodeName = rec.getKey().getNodeName().getUnicodeAsComposedString();
 	}
 	public HFSPlusCatalogLeafRecord getRecord() { return rec; }
-	public String toString() { return composedNodeName; }
+        
+        @Override public String toString() { return composedNodeName; }
     }
     
     private FilesystemBrowserPanel fsbPanel;
@@ -117,6 +118,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		throw new IllegalArgumentException("Illegal type for thread data.");
 	    this.threadRecord = threadRecord;
 	}
+        @Override
 	public String toString() {
 	    //HFSPlusCatalogLeafRecordData recData = parentRecord.getData();
 	    return composedNodeName;//parentRecord.getKey().getNodeName().getUnicodeAsComposedString();
@@ -126,7 +128,7 @@ public class FileSystemBrowserWindow extends JFrame {
     public static class NoLeafMutableTreeNode extends DefaultMutableTreeNode {
 	public NoLeafMutableTreeNode(Object o) { super(o); }
 	/** Hack to avoid that JTree paints leaf nodes. We have no leafs, only dirs. */
-	public boolean isLeaf() { return false; }
+	@Override public boolean isLeaf() { return false; }
     }
     
     public FileSystemBrowserWindow() {
@@ -179,6 +181,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		}
 	    });
 	addressField.addKeyListener(new KeyAdapter() {
+                @Override
 		public void keyPressed(KeyEvent e) {
 		    if(fsView != null) {
 			if(e.getKeyCode() == KeyEvent.VK_ENTER)
@@ -190,7 +193,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		}
 	    });
 	
-	final Class recordContainerClass = new RecordContainer().getClass();
+	//final Class recordContainerClass = new RecordContainer().getClass();
 	final Class objectClass = new Object().getClass();
 	colNames.add("Name");
 	colNames.add("Size");
@@ -199,6 +202,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	colNames.add("");
 	//Vector<Vector<String>> = new Vector<Vector<String>>();
 	tableModel = new DefaultTableModel(colNames, 0)  {
+                @Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
 		    return false;
 		}
@@ -339,6 +343,7 @@ public class FileSystemBrowserWindow extends JFrame {
 				    objectComponent.setLocation(jl.getWidth(), 0);
 				    setSize(jl.getWidth()+objectComponent.getWidth(), Math.max(jl.getHeight(), objectComponent.getHeight()));
 				}
+                                @Override
 				public void paint(Graphics g) {
  				    jl.paint(g);
 				    int translatex = jl.getWidth();
@@ -380,6 +385,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		}
 	    });
 	fileTableScroller.addMouseListener(new MouseAdapter() {
+                @Override
                 public void mouseClicked(MouseEvent e) {
 		    int row = fileTable.rowAtPoint(e.getPoint());
 		    if(row == -1) // If we click outside the table, clear selection in table
@@ -387,6 +393,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		}
 	    });
 	fileTable.addMouseListener(new MouseAdapter() {
+                @Override
                 public void mouseClicked(MouseEvent e) {
 		    if(e.getButton() == MouseEvent.BUTTON3) {
 			int row = fileTable.rowAtPoint(e.getPoint());
@@ -398,6 +405,7 @@ public class FileSystemBrowserWindow extends JFrame {
 			    fileTable.requestFocus();
 			    
 			    JPopupMenu jpm = new JPopupMenu();
+                            
 			    JMenuItem infoItem = new JMenuItem("Information");
 			    infoItem.addActionListener(new ActionListener() {
 				    public void actionPerformed(ActionEvent e) {
@@ -405,14 +413,32 @@ public class FileSystemBrowserWindow extends JFrame {
 				    }
 				});
 			    jpm.add(infoItem);
-			    JMenuItem resExtractItem = new JMenuItem("Extract resource fork");
+                            
+			    JMenuItem dataExtractItem = new JMenuItem("Extract data");
+			    dataExtractItem.addActionListener(new ActionListener() {
+				    public void actionPerformed(ActionEvent e) {
+					actionExtractToDir(true, false);
+				    }
+				});
+			    jpm.add(dataExtractItem);
+                            
+			    JMenuItem resExtractItem = new JMenuItem("Extract resource fork(s)");
 			    resExtractItem.addActionListener(new ActionListener() {
 				    public void actionPerformed(ActionEvent e) {
-					actionExtractToDir(true);
+					actionExtractToDir(false, true);
 				    }
 				});
 			    jpm.add(resExtractItem);
-			    jpm.show(fileTable, e.getX(), e.getY());
+                            
+			    JMenuItem bothExtractItem = new JMenuItem("Extract data and resource fork(s)");
+			    bothExtractItem.addActionListener(new ActionListener() {
+				    public void actionPerformed(ActionEvent e) {
+					actionExtractToDir(true, true);
+				    }
+				});
+			    jpm.add(bothExtractItem);
+                            
+                            jpm.show(fileTable, e.getX(), e.getY());
 			}
 		    }
 		    else if(e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
@@ -490,7 +516,8 @@ public class FileSystemBrowserWindow extends JFrame {
 	    });
 	
 	dirTree.addMouseListener(new MouseAdapter() {
-		public void mouseClicked(MouseEvent e) {
+            @Override
+            public void mouseClicked(MouseEvent e) {
 		    if(e.getButton() == MouseEvent.BUTTON3) {
 			TreePath tp = dirTree.getPathForLocation(e.getX(), e.getY());
 			if(tp != null) {
@@ -607,7 +634,8 @@ public class FileSystemBrowserWindow extends JFrame {
 	    });
 	
  	fileTableScroller.addComponentListener(new ComponentAdapter() {
- 		public void componentResized(ComponentEvent e) {
+                @Override
+                public void componentResized(ComponentEvent e) {
  		    //System.err.println("Component resized");
 		    adjustTableWidth();
 		}
@@ -871,6 +899,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	// /Menus
 	
 	addWindowListener(new WindowAdapter() {
+            @Override
 		public void windowClosing(WindowEvent we) {
 		    exitApplication();
 		}
@@ -1386,9 +1415,11 @@ public class FileSystemBrowserWindow extends JFrame {
     }
     
     private void actionExtractToDir() {
-	actionExtractToDir(false);
+	actionExtractToDir(true, false);
     }
-    private void actionExtractToDir(final boolean resourceFork) {
+    private void actionExtractToDir(final boolean dataFork, final boolean resourceFork) {
+        if(!dataFork && !resourceFork)
+            throw new IllegalArgumentException("Can't choose to extract nothing!");
 	try {
 	    final HFSPlusCatalogLeafRecord[] selection = getSelectedRecords();
 	    if(selection.length > 0) {
@@ -1400,15 +1431,18 @@ public class FileSystemBrowserWindow extends JFrame {
 		    final ExtractProgressDialog progress = new ExtractProgressDialog(this);
 		    Runnable r = new Runnable() {
 			    public void run() {
+                                // Caching is now turned on or off manually, either for the entire device/file, or not at all.
 				//fsView.retainCatalogFile(); // Cache the catalog file to speed up operations
 				//fsView.enableFileSystemCache();
 				try {
-				    if(!resourceFork)
-					progress.setDataSize(fsView.calculateDataForkSizeRecursive(selection));
-				    else
-					progress.setDataSize(fsView.calculateResourceForkSizeRecursive(selection));
-				    
-				    int errorCount = extract(selection, outDir, progress, resourceFork);
+                                    long dataSize = 0;
+                                    if(dataFork)
+                                        dataSize += fsView.calculateDataForkSizeRecursive(selection);
+				    if(resourceFork)
+                                        dataSize += fsView.calculateResourceForkSizeRecursive(selection);
+                                    progress.setDataSize(dataSize);
+                                    
+				    int errorCount = extract(selection, outDir, progress, dataFork, resourceFork);
 				    if(!progress.cancelSignaled()) {
 					if(errorCount == 0)
 					    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
@@ -1445,7 +1479,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		JOptionPane.showMessageDialog(this, "No file or folder selected.",
 					      "Information", JOptionPane.INFORMATION_MESSAGE);
 	    }
-	    else throw new RuntimeException("wtf?");
+	    else throw new RuntimeException("wtf?"); // ;)
 	} catch(RuntimeException re) {
 	    JOptionPane.showMessageDialog(this, re.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 	}
@@ -1613,26 +1647,28 @@ public class FileSystemBrowserWindow extends JFrame {
     
     /** <code>progressDialog</code> may NOT be null. */
     protected int extract(HFSPlusCatalogLeafRecord rec, File outDir, ProgressMonitor progressDialog) {
-	return extract(rec, outDir, progressDialog, false);
+	return extract(rec, outDir, progressDialog, true, false);
     }
     /** <code>progressDialog</code> may NOT be null. */
-    protected int extract(HFSPlusCatalogLeafRecord rec, File outDir, ProgressMonitor progressDialog, boolean resourceFork) {
-	return extractRecursive(rec, outDir, progressDialog, new ObjectContainer<Boolean>(false), resourceFork);
+    protected int extract(HFSPlusCatalogLeafRecord rec, File outDir, ProgressMonitor progressDialog, boolean dataFork, boolean resourceFork) {
+	return extractRecursive(rec, outDir, progressDialog, new ObjectContainer<Boolean>(false), dataFork, resourceFork);
     }
     /** <code>progressDialog</code> may NOT be null. */
     protected int extract(HFSPlusCatalogLeafRecord[] recs, File outDir, ProgressMonitor progressDialog) {
-	return extract(recs, outDir, progressDialog, false);
+	return extract(recs, outDir, progressDialog, true, false);
     }
     /** <code>progressDialog</code> may NOT be null. */
-    protected int extract(HFSPlusCatalogLeafRecord[] recs, File outDir, ProgressMonitor progressDialog, boolean resourceFork) {
+    protected int extract(HFSPlusCatalogLeafRecord[] recs, File outDir, ProgressMonitor progressDialog, boolean dataFork, boolean resourceFork) {
 	int errorCount = 0;
 	for(HFSPlusCatalogLeafRecord rec : recs) {
-	    errorCount += extractRecursive(rec, outDir, progressDialog, new ObjectContainer<Boolean>(false), resourceFork);
+	    errorCount += extractRecursive(rec, outDir, progressDialog, new ObjectContainer<Boolean>(false), dataFork, resourceFork);
 	}
 	return errorCount;
     }
     private int extractRecursive(HFSPlusCatalogLeafRecord rec, File outDir, ProgressMonitor progressDialog,
-				 ObjectContainer<Boolean> overwriteAll, boolean resourceFork) {
+				 ObjectContainer<Boolean> overwriteAll, boolean dataFork, boolean resourceFork) {
+        if(!dataFork && !resourceFork)
+            throw new IllegalArgumentException("Neither the data fork or resource fork were selected for extraction. Can't do nothing...");
 	if(progressDialog.cancelSignaled()) {
 	    progressDialog.confirmCancel();
 	    return 0;
@@ -1643,11 +1679,69 @@ public class FileSystemBrowserWindow extends JFrame {
 	if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
 	   recData instanceof HFSPlusCatalogFile) {
 	    HFSPlusCatalogFile catFile = (HFSPlusCatalogFile)recData;
-	    String filename = rec.getKey().getNodeName().getUnicodeAsComposedString();
-	    if(resourceFork) filename = "._" + filename; // Special syntax for resource forks in foreign file systems
+	    
+            if(dataFork)
+                errorCount += extractFile(rec, catFile, outDir, progressDialog, overwriteAll, false);
+            if(resourceFork)
+                errorCount += extractFile(rec, catFile, outDir, progressDialog, overwriteAll, true);
+	}
+	else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
+		recData instanceof HFSPlusCatalogFolder) {
+	    String dirName = rec.getKey().getNodeName().getUnicodeAsComposedString();
+	    progressDialog.updateCurrentDir(dirName);
+	    HFSCatalogNodeID requestedID;
+	    HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder)recData;
+	    requestedID = catFolder.getFolderID();
+	    
+	    HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
+	    //System.out.println("folder: \"" + dirName + "\" valence: " + contents.length + " range: " + fractionLowLimit + "-" + fractionHighLimit);
+	    // We now have the contents of the requested directory
+	    File thisDir = new File(outDir, dirName);
+	    if(!overwriteAll.o && thisDir.exists()) {
+		String[] options = new String[] { "Continue", "Cancel" };
+		int reply = JOptionPane.showOptionDialog(this, "Warning! Directory:\n    \"" + thisDir.getAbsolutePath() + "\"\n" +
+							 "already exists. Do you want to continue extracting to this directory?",
+							 "Warning", JOptionPane.YES_NO_CANCEL_OPTION,
+							 JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+		if(reply != 0) {
+		    ++errorCount;
+		    progressDialog.signalCancel();
+		    return errorCount;
+		}
+	    }
+
+	    if(thisDir.mkdir() || thisDir.exists()) {
+		for(HFSPlusCatalogLeafRecord outRec : contents) {
+		    errorCount += extractRecursive(outRec, thisDir, progressDialog, overwriteAll, dataFork, resourceFork);
+		}
+	    }
+	    else {
+		int reply = JOptionPane.showConfirmDialog(this, "Could not create directory:\n  " + 
+							  thisDir.getAbsolutePath() + "\nDo you want to " +
+							  "continue? (All files under this directory will be " +
+							  "skipped)", "Error", JOptionPane.YES_NO_OPTION,
+							  JOptionPane.ERROR_MESSAGE);
+		if(reply == JOptionPane.NO_OPTION)
+		    progressDialog.signalCancel();
+		++errorCount;
+	    }
+	}
+// 	else
+// 	    System.out.println("thread with range: " + fractionLowLimit + "-" + fractionHighLimit);
+	return errorCount;
+    }
+    
+    private int extractFile(final HFSPlusCatalogLeafRecord rec, final HFSPlusCatalogFile catFile,
+            final File outDir, final ProgressMonitor progressDialog,
+            final ObjectContainer<Boolean> overwriteAll, final boolean extractResourceFork) {
+            int errorCount = 0;
+            String filename = rec.getKey().getNodeName().getUnicodeAsComposedString();
+            if(extractResourceFork)
+                filename = "._" + filename; // Special syntax for resource forks in foreign file systems
+            
 	    while(true) {
 		//System.out.println("file: \"" + filename + "\" range: " + fractionLowLimit + "-" + fractionHighLimit);
-		if(!resourceFork)
+		if(!extractResourceFork)
 		    progressDialog.updateCurrentFile(filename, catFile.getDataFork().getLogicalSize());
 		else
 		    progressDialog.updateCurrentFile(filename, catFile.getResourceFork().getLogicalSize());
@@ -1705,7 +1799,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		    if(!outFile.getParentFile().equals(outDir) || !outFile.getName().equals(filename))
 			throw new FileNotFoundException();
 		    FileOutputStream fos = new FileOutputStream(outFile);
-		    if(!resourceFork)
+		    if(!extractResourceFork)
 			fsView.extractDataForkToStream(rec, fos, progressDialog);
 		    else
 			fsView.extractResourceForkToStream(rec, fos, progressDialog);
@@ -1767,7 +1861,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		    ++errorCount;
 		    if(reply == JOptionPane.NO_OPTION)
 			progressDialog.signalCancel();
-		} catch(Exception e) {
+		} catch(Throwable e) {
 		    e.printStackTrace();
 		    String message = "An exception occurred while extracting \"" + filename + "\"!";
 		    message += "\n  " + e.toString();
@@ -1784,56 +1878,8 @@ public class FileSystemBrowserWindow extends JFrame {
 		}
 		break;
 	    }
-	    //progressDialog.addDataProgress(((HFSPlusCatalogFile)recData).getDataFork().getLogicalSize());
 
-	}
-	else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
-		recData instanceof HFSPlusCatalogFolder) {
-	    String dirName = rec.getKey().getNodeName().getUnicodeAsComposedString();
-	    progressDialog.updateCurrentDir(dirName);
-	    HFSCatalogNodeID requestedID;
-	    HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder)recData;
-	    requestedID = catFolder.getFolderID();
-	    
-	    HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
-	    //System.out.println("folder: \"" + dirName + "\" valence: " + contents.length + " range: " + fractionLowLimit + "-" + fractionHighLimit);
-	    // We now have the contents of the requested directory
-	    File thisDir = new File(outDir, dirName);
-	    if(!overwriteAll.o && thisDir.exists()) {
-		String[] options = new String[] { "Continue", "Cancel" };
-		int reply = JOptionPane.showOptionDialog(this, "Warning! Directory:\n    \"" + thisDir.getAbsolutePath() + "\"\n" +
-							 "already exists. Do you want to continue extracting to this directory?",
-							 "Warning", JOptionPane.YES_NO_CANCEL_OPTION,
-							 JOptionPane.WARNING_MESSAGE, null, options, options[0]);
-		if(reply != 0) {
-		    ++errorCount;
-		    progressDialog.signalCancel();
-		    return errorCount;
-		}
-	    }
-
-	    if(thisDir.mkdir() || thisDir.exists()) {
-// 		final double step = (fractionHighLimit-fractionLowLimit)/contents.length;
-// 		double floor = fractionLowLimit;
-		for(HFSPlusCatalogLeafRecord outRec : contents) {
-		    errorCount += extractRecursive(outRec, thisDir, progressDialog, overwriteAll, resourceFork);
-// 		    floor += step;
-		}
-	    }
-	    else {
-		int reply = JOptionPane.showConfirmDialog(this, "Could not create directory:\n  " + 
-							  thisDir.getAbsolutePath() + "\nDo you want to " +
-							  "continue? (All files under this directory will be " +
-							  "skipped)", "Error", JOptionPane.YES_NO_OPTION,
-							  JOptionPane.ERROR_MESSAGE);
-		if(reply == JOptionPane.NO_OPTION)
-		    progressDialog.signalCancel();
-		++errorCount;
-	    }
-	}
-// 	else
-// 	    System.out.println("thread with range: " + fractionLowLimit + "-" + fractionHighLimit);
-	return errorCount;
+        return errorCount;
     }
     
     public static void main(String[] args) {
