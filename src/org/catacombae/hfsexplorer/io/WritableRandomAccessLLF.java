@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2007 Erik Larsson
+ * Copyright (C) 2007-2008 Erik Larsson
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,16 +26,25 @@ public class WritableRandomAccessLLF extends RandomAccessLLF implements Writable
 	    this.raf = new RandomAccessFile(filename, "rw");
 	} catch(Exception e) { throw new RuntimeException(e); }	
     }
+    
+    public WritableRandomAccessLLF(File file) {
+	try {
+	    this.raf = new RandomAccessFile(file, "rw");
+	} catch(Exception e) { throw new RuntimeException(e); }	
+    }
+    
     public void write(byte[] b) {
 	try {
 	    raf.write(b);
 	} catch(IOException ioe) { throw new RuntimeException(ioe); }
     }
+    
     public void write(byte[] b, int off, int len) {
 	try {
 	    raf.write(b, off, len);
 	} catch(IOException ioe) { throw new RuntimeException(ioe); }
     }
+    
     public void write(int b) {
 	try {
 	    raf.write(b);

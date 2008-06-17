@@ -28,6 +28,11 @@ public class RandomAccessLLF implements LowLevelFile {
 	    this.raf = new RandomAccessFile(filename, "r");
 	} catch(Exception e) { throw new RuntimeException(e); }
     }
+    public RandomAccessLLF(File file) {
+	try {
+	    this.raf = new RandomAccessFile(file, "r");
+	} catch(Exception e) { throw new RuntimeException(e); }
+    }
     protected RandomAccessLLF() {
     }
     public void seek(long pos) {

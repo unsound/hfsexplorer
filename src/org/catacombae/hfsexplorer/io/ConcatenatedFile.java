@@ -24,7 +24,7 @@ import java.util.*;
  * @author Erik Larsson, erik82@kth.se
  */
 public class ConcatenatedFile implements LowLevelFile {
-    private class Part {
+    static class Part {
 	public final LowLevelFile file;
 	public final long startOffset;
         public final long length;
@@ -35,15 +35,21 @@ public class ConcatenatedFile implements LowLevelFile {
 	    this.length = length;
 	}
     }
-    private final List<Part> parts = new ArrayList<Part>();
-    private Part currentPart;
-    private int currentPartIndex;
+    final List<Part> parts = new ArrayList<Part>();
+    Part currentPart;
+    int currentPartIndex;
     
     public ConcatenatedFile(LowLevelFile firstPart, long startOffset, long length) {
 	currentPart = new Part(firstPart, startOffset, length);
 	parts.add(currentPart);
 	currentPartIndex = 0;
     }
+    
+    public void addPart(LowLevelFile newFile, long off, long len) {
+        Part newPart = new Part(newFile, off, len);
+        parts.add(newPart);
+    }
+    
     public void seek(long pos) {
 	long curPos = 0;
 	for(Part p : parts) {
@@ -56,6 +62,7 @@ public class ConcatenatedFile implements LowLevelFile {
 		curPos += p.length;
 	}
     }
+    
     public int read() {
 	byte[] tmp = new byte[1];
 	int res = read(tmp, 0, 1);
