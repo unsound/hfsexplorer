@@ -48,8 +48,9 @@ public class ExtractProgressDialog extends JDialog implements ProgressMonitor {
 	
 	setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 	addWindowListener(new WindowAdapter() {
+                @Override
 		public void windowClosing(WindowEvent we) {
-		    signalCancel();
+		    requestCloseWindow();
 		}
 	    });
 	
@@ -80,6 +81,11 @@ public class ExtractProgressDialog extends JDialog implements ProgressMonitor {
     public void confirmCancel() {
 	if(isVisible())
 	    setVisible(false);
+    }
+    private synchronized void requestCloseWindow() {
+        if(!cancelSignaled)
+            signalCancel();
+        setVisible(false);
     }
 //     public void addCancelListener(ActionListener al) {
 // 	cancelListener = al;
