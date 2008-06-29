@@ -8,16 +8,15 @@
 // Generated from the TEXTINCLUDE 2 resource.
 //
 #include "afxres.h"
-
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Swedish resources
+// English (Neutral) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_SVE)
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 #ifdef _WIN32
-LANGUAGE LANG_SWEDISH, SUBLANG_DEFAULT
+LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
 #pragma code_page(1252)
 #endif //_WIN32
 
@@ -60,6 +59,16 @@ BEGIN
 END
 
 
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON1               ICON                    "C:\\Documents and Settings\\Erik\\My Documents\\devel\\HFSExplorer\\doc\\dmg_iconsource\\finderdrive.ico"
+IDI_ICON2               ICON                    "C:\\Documents and Settings\\Erik\\My Documents\\devel\\HFSExplorer\\dist\\dmg.ico"
+
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -83,7 +92,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // Swedish resources
+#endif    // English (Neutral) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -93,7 +102,6 @@ END
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
