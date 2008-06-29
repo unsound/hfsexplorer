@@ -16,7 +16,7 @@
  */
 
 /*
- * This program constitutes a Win32 launcher for HFSExplorer, making
+ * This file constitutes a Win32 launcher for HFSExplorer, making
  * it easier to associate files with the program and to create
  * shortcuts to it. In most cases, it also creates one unique
  * process for HFSExplorer, by the name of the executable file that
