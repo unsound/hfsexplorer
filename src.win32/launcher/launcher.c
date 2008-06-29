@@ -16,7 +16,7 @@
  */
 
 /*
- * This file represents a Win32 launcher for HFSExplorer, making it
+ * This program is a Win32 launcher for HFSExplorer, making it
  * easier to associate files with the program and to create
  * shortcuts to it. In most cases, it also creates one unique
  * process for HFSExplorer, by the name of the executable file that
@@ -56,8 +56,6 @@
  * - Try to find a way to execute java(w).exe in the context of the
  *   current process (i.e. same process id and name). I want it to
  *   look nice.
- * - How do I specify extended properties for an executable, like
- *   its name and version etc...? The emacs executable has it...
  * - It would probably be nice to get MessageBox error messages in
  *   case stuff goes wrong when locating START_CLASS, invoking main
  *   method etc...
@@ -439,9 +437,10 @@ int main(int original_argc, char** original_argv) {
   int returnValue = -2;
   
   if(argc > 1 && _tcscmp(argv[1], _T("-invokeuac")) == 0) {
-    _TCHAR currentWorkingDirectory[MAX_PATH];
-
-    if(GetCurrentDirectory(MAX_PATH, currentWorkingDirectory) > 0) {
+    DWORD currentWorkingDirectoryLength = GetCurrentDirectory(0, NULL);
+    _TCHAR currentWorkingDirectory[currentWorkingDirectoryLength];
+    
+    if(GetCurrentDirectory(currentWorkingDirectoryLength, currentWorkingDirectory) > 0) {
       DEBUG(_T("CWD: \"%s\"\n"), currentWorkingDirectory);
       
       // Build a space separated argv string
@@ -457,7 +456,7 @@ int main(int original_argc, char** original_argv) {
 	_tcscat(argvString, _T("\""));
 	_tcscat(argvString, cur);
 	_tcscat(argvString, _T("\" "));
-     }
+      }
       argvString[argvStringLength-1] = _T('\0');
       DEBUG(_T("argvString=\"%s\"\n"), argvString);
 
