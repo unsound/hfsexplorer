@@ -16,8 +16,8 @@
  */
 
 /*
- * This program is a Win32 launcher for HFSExplorer, making it
- * easier to associate files with the program and to create
+ * This program constitutes a Win32 launcher for HFSExplorer, making
+ * it easier to associate files with the program and to create
  * shortcuts to it. In most cases, it also creates one unique
  * process for HFSExplorer, by the name of the executable file that
  * results from compiling this. However, this is only true when a
@@ -116,22 +116,28 @@ static int readStringFromRegistry(HKEY key, const _TCHAR *name, char *buf, DWORD
 static int readJvmPathFromRegistry(_TCHAR *buf, int bufsize) {
     HKEY key, subkey;
     char version[MAX_PATH];
- 
-    if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, JRE_KEY, 0, KEY_READ, &key) != ERROR_SUCCESS)
-        return -1;
+    
+    DEBUG(_T(" readJvmPathFromRegistry(%s, %i)\n"), buf, bufsize);
+    if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, JRE_KEY, 0, KEY_READ, &key) != ERROR_SUCCESS) {
+      DEBUG(_T("  Could not open key HKLM\\%s. Aborting...\n"), JRE_KEY);
+      return -1;
+    }
     if (readStringFromRegistry(key, CURVER_STR, version, sizeof(version)) != 0) {
-        RegCloseKey(key);
-        return -2;
+      DEBUG(_T("  Could not read %s string (CURVER) from Java registry location. Aborting...\n"), CURVER_STR);
+      RegCloseKey(key);
+      return -2;
     }
     // If we call the unicode version of the function, we will get unicode data back, so we can cast to _TCHAR
     if (RegOpenKeyEx(key, (_TCHAR*)version, 0, KEY_READ, &subkey) != ERROR_SUCCESS) {
-        RegCloseKey(key);
-        return -3;
+      DEBUG(_T("  Could not open subkey %s. Aborting...\n"), (_TCHAR*)version);
+      RegCloseKey(key);
+      return -3;
     }
     if (readStringFromRegistry(subkey, RUNLIB_STR, (char*)buf, bufsize) != 0) {
-        RegCloseKey(subkey);
-        RegCloseKey(key);
-        return -4;
+      DEBUG(_T("  Could not read %s string (RUNLIB) from Java registry location. Aborting...\n"), RUNLIB_STR);
+      RegCloseKey(subkey);
+      RegCloseKey(key);
+      return -4;
     }
     RegCloseKey(subkey);
     RegCloseKey(key);
