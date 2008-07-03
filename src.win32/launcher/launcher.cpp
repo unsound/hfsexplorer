@@ -69,6 +69,8 @@
 #include <windows.h>
 #include <tchar.h>
 
+#include "WOW64Operations.hh"
+
 #define FIRSTARG _T("-dbgconsole")
 #define START_CLASS_PKGSYNTAX _T("org.catacombae.hfsexplorer.FileSystemBrowserWindow ") FIRSTARG
 #define START_CLASS           "org/catacombae/hfsexplorer/FileSystemBrowserWindow"
@@ -131,7 +133,7 @@ static int readJvmPathFromRegistry(_TCHAR *buf, int bufsize) {
     HKEY key, subkey;
     BYTE version[MAX_PATH];
     
-    DEBUG(_T(" readJvmPathFromRegistry(%s, %i)\n"), buf, bufsize);
+    DEBUG(_T(" readJvmPathFromRegistry(__out _TCHAR *buf [ptr: 0x%X], %i)\n"), (int)buf, bufsize);
     if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, JRE_KEY, 0, KEY_READ, &key) != ERROR_SUCCESS) {
       DEBUG(_T("  Could not open key HKLM\\%s. Aborting.\n"), JRE_KEY);
       return -1;
@@ -305,28 +307,29 @@ static int createExternalJavaProcess(int argc, _TCHAR **argv) {
   /* copy the contents of argv into new strings */
   //DEBUG(_T("  copying the contents of argc into new strings...\n"));
   int i;
-  int newArgStringSize = sizeof(_TCHAR); // For the null terminator;
+  unsigned int newArgStringLength = 0;
   for(i = 1; i < argc; ++i)
-    newArgStringSize += (_tcslen(argv[i]) + 3)*sizeof(_TCHAR); // +3 for two "-characters and one whitespace
+    newArgStringLength += _tcslen(argv[i]) + 3; // +3 for two "-characters and one whitespace
+  newArgStringLength += 1; // For the null terminator;
+  unsigned int newArgStringSize = newArgStringLength*sizeof(_TCHAR);
 
   //DEBUG(_T("  allocating memory for new string... (%d bytes)\n"), newArgStringSize);
-  _TCHAR *newArgString = (_TCHAR*) malloc(newArgStringSize);
-  int ptr = 0;
+  _TCHAR *newArgString = new _TCHAR[newArgStringLength]; // (_TCHAR*) malloc(newArgStringSize);
+  unsigned int ptr = 0;
   //DEBUG(_T("  copying args...\n"));
   for(i = 1; i < argc; ++i) {
     //DEBUG(_T("    argv[%d]...\n"), i);
     _TCHAR* cur = argv[i];
     int curlen = _tcslen(cur);
-    _tcscpy(newArgString+ptr, _T(" \""));
-    ptr += 2;
+    newArgString[ptr++] = _T(' ');
+    newArgString[ptr++] = _T('\"');
     _tcscpy(newArgString+ptr, cur);
     ptr += curlen;
-    _tcscpy(newArgString+ptr, _T("\""));
-    ptr += 1;
+    newArgString[ptr++] = _T('\"');
   }
-  if(ptr != (newArgStringSize/sizeof(_TCHAR))-1)
+  if(ptr != (newArgStringLength-1))
     DEBUG(_T("INTERNAL ERROR! newArgString has been incorrectly copied! ptr=%d newArgStringSize=%d\n"), ptr, newArgStringSize);
-  _tcscpy(newArgString+ptr, _T("\0")); ++ptr; // Important! This is a bug fix. No null terminator = chaos.
+  newArgString[ptr++] = _T('\0'); // No null terminator => chaos.
   
   //DEBUG(_T("  concatentating first string into true command line...\n"));
 
@@ -344,7 +347,7 @@ static int createExternalJavaProcess(int argc, _TCHAR **argv) {
   _tcscpy(szTrueCmdline2+lenSzCmdline2, newArgString);
 
   //DEBUG(_T("  freeing newArgString...\n"));
-  free(newArgString);
+  delete newArgString;
   
   DEBUG(_T("szTrueCmdline2=\"%s\"\n"), szTrueCmdline2);
   //MessageBox(NULL, szTrueCmdline1, _T("szTrueCmdline1"), MB_OK);
@@ -414,6 +417,17 @@ int main(int original_argc, char** original_argv) {
   int argc = original_argc;
 #endif
   
+  // Make sure WOW64 file system redirection isn't active.
+  if(WOW64Operations::isWOW64Process()) {
+    PVOID oldValue;
+    if(WOW64Operations::disableWOW64FileSystemRedirection(&oldValue)) {
+      DEBUG(_T("Disabled WOW64 fs redirection.\n"));
+    }
+    else {
+      DEBUG(_T("Failed to disable WOW64 fs redirection!\n"));
+    }
+  }
+
   // Get the fully qualified path of this executable
   int processFilenameLength = MAX_PATH;
   _TCHAR *processFilename = NULL;
@@ -458,8 +472,9 @@ int main(int original_argc, char** original_argv) {
   int returnValue = -2;
   
   if(argc > 1 && _tcscmp(argv[1], _T("-invokeuac")) == 0) {
+    /* We do a little process magic here in order to invoke an UAC prompt. */
     DWORD currentWorkingDirectoryLength = GetCurrentDirectory(0, NULL);
-    _TCHAR currentWorkingDirectory[currentWorkingDirectoryLength];
+    _TCHAR *currentWorkingDirectory = (_TCHAR*) malloc(currentWorkingDirectoryLength);
     
     if(GetCurrentDirectory(currentWorkingDirectoryLength, currentWorkingDirectory) > 0) {
       DEBUG(_T("CWD: \"%s\"\n"), currentWorkingDirectory);
@@ -477,7 +492,7 @@ int main(int original_argc, char** original_argv) {
 	_tcscat(argvString, _T("\""));
 	_tcscat(argvString, cur);
 	_tcscat(argvString, _T("\" "));
-     }
+      }
       argvString[argvStringLength-1] = _T('\0');
       DEBUG(_T("argvString=\"%s\"\n"), argvString);
 
@@ -501,33 +516,12 @@ int main(int original_argc, char** original_argv) {
 	DEBUG(_T("ShellExecuteEx failed!\n"));
 	MessageBox(NULL, _T("Error while trying to create new process..."), _T("HFSExplorer launch error"), MB_OK);
       }
-
-      // Old invocation code (which still works, but...)
-/*       HINSTANCE inst = ShellExecute(NULL, */
-/* 				    _T("runas"), */
-/* 				    argv[0]/\*wcExeName*\/, */
-/* 				    _T(""), */
-/* 				    currentWorkingDirectory, */
-/* 				    SW_SHOWNORMAL); */
-/*       if((int)inst <= 32) { */
-/* 	DEBUG(_T("Result from ShellExecute: %d"), (int)inst); */
-/* 	MessageBox(NULL, _T("Error while trying to create new process..."), _T("HFSExplorer launch error"), MB_OK); */
-/*       } */
-/*       else { */
-/* 	DEBUG(_T("Process executed?")); */
-/* 	MessageBox(NULL, _T("YO"), _T("HFSExplorer launch error"), MB_OK); */
-/*       } */
-    
     }
     else {
       DEBUG(_T("Error code: %d\n"), (int)GetLastError());
       MessageBox(NULL, _T("Could not get the current working directory."), _T("HFSExplorer launch error"), MB_OK);
     }
-/*     } */
-/*     else { */
-/*       DEBUG(_T("Error code: %d\n"), (int)GetLastError()); */
-/*       MessageBox(NULL, _T("Could not read the path of the current process executable."), _T("HFSExplorer launch error"), MB_OK); */
-/*     } */
+    free(currentWorkingDirectory);
     returnValue = 0;
   }
   else {
@@ -578,8 +572,8 @@ int main(int original_argc, char** original_argv) {
 	  jclass stringClass = env->FindClass("java/lang/String");
 	  DEBUG(_T("    - got String class\n"));
 	
-	  // Create array to hold args
-	  jobjectArray argsArray = env->NewObjectArray(argc, stringClass, NULL);
+	  // Create array to hold args (cast to jobjectArray is neccessary for g++ to accept code)
+	  jobjectArray argsArray = (jobjectArray)env->NewObjectArray(argc, stringClass, NULL);
 	  DEBUG(_T("    - created args array\n"));
 	  if(argsArray != NULL) {
 	    int newi;
@@ -650,13 +644,9 @@ int main(int original_argc, char** original_argv) {
 	DEBUG(_T("    - ERROR. Could not find class\n"));
       }
       FreeLibrary(jvmLib);
-      //getchar();
       returnValue = 0;
     }
     else if(!DISABLE_JAVA_PROCESS_CREATION && createExternalJavaProcess(argc, argv) == TRUE) {
-
-      // Nothing needs to be done. everything is done in createExternalJavaProcess
-      //getchar();
       returnValue = 0;
     }
     else {
