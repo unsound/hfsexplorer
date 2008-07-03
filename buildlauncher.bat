@@ -31,12 +31,12 @@ set WINDRES_RES=%ERRORLEVEL%
 popd
 if not "%WINDRES_RES%"=="0" goto error
 
-echo Compiling launcher.c...
-gcc -g -Wall -D_JNI_IMPLEMENTATION_ -c "%LAUNCHER_SRC%\launcher.c" -o "%BUILD_DIR%\launcher.o"
+echo Compiling launcher.cpp...
+g++ -g -Wall -D_JNI_IMPLEMENTATION_ -c "%LAUNCHER_SRC%\launcher.cpp" -o "%BUILD_DIR%\launcher.o"
 if not "%ERRORLEVEL%"=="0" goto error
 
 echo Building %BUILDTYPE% app...
-gcc -g -m%BUILDTYPE% -Wall -D_JNI_IMPLEMENTATION_ -Wl,--kill-at "%BUILD_DIR%\launcher_res.o" "%BUILD_DIR%\launcher.o" -o "%OUTDIR%\%OUTFILE%"
+g++ -g -m%BUILDTYPE% -Wall -D_JNI_IMPLEMENTATION_ -Wl,--kill-at "%BUILD_DIR%\launcher_res.o" "%BUILD_DIR%\launcher.o" -o "%OUTDIR%\%OUTFILE%"
 if not "%ERRORLEVEL%"=="0" goto error
 echo Done!
 goto end
