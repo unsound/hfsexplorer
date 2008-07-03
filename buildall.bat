@@ -3,19 +3,22 @@
 setlocal
 pushd %~dp0
 
+call "%~dp0common_vars.bat"
 set LIBRARY_PATH=%~dp0lib
 set JARFILE_PATH=%~dp0dist\lib
 set JARFILENAME=hfsx.jar
 set CLASSPATH="%~dp0build.~";"%~dp0dist\lib\swing-layout-1.0.1.jar";"%~dp0dist\lib\hfsx_dmglib.jar";"%~dp0lib\AppleJavaExtensions.jar";"%~dp0lib\java_awt_Desktop.jar"
 set SOURCES_DIR=%~dp0src
-set BUILD_DIR=%~dp0build.~
+set BUILD_DIR=%CV_JAVA_BUILD_DIR%
 set RESOURCE_SRC_DIR=%~dp0resource
 set RESOURCE_DST_DIR=%BUILD_DIR%\res
 set BUILDENUM_CP="%~dp0lib\buildenumerator.jar"
 
 echo Removing all class files...
 if exist "%BUILD_DIR%" rmdir /s /q "%BUILD_DIR%"
+if not "%ERRORLEVEL%"=="0" goto error
 mkdir "%BUILD_DIR%"
+if not "%ERRORLEVEL%"=="0" goto error
 
 echo Copying resources to classpath...
 mkdir "%RESOURCE_DST_DIR%"
