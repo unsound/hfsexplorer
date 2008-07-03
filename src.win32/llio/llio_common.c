@@ -17,11 +17,6 @@
 
 #define UNICODE
 #define _UNICODE
-#define _WIN32_WINNT 0x0500 // Minimum windows 2000 required, because of GetFileSizeEx. (could be done in a more compatible way, but why care about legacy crap?)
-#include <windows.h>
-#include <winioctl.h>
-#include <tchar.h>
-#include "org_catacombae_hfsexplorer_win32_WindowsLowLevelIO.h"
 
 #include "llio_common.h"
 #define DEBUG FALSE
