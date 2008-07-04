@@ -58,8 +58,7 @@ goto build
 :build
 echo Cleaning build dir...
 if exist "%BUILD_DIR%" rmdir /s /q "%BUILD_DIR%"
-if exist "%BUILD_DIR%" echo Could not clean build dir!
-if exist "%BUILD_DIR%" goto error
+if exist "%BUILD_DIR%" echo Could not clean build dir! & goto error
 mkdir "%BUILD_DIR%"
 
 echo Compiling resources...
