@@ -43,7 +43,7 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "CompanyName", "Catacombae Software"
-            VALUE "FileDescription", "HFSExplorer 0.19.1"
+            VALUE "FileDescription", "HFSExplorer"
             VALUE "FileVersion", "0, 19, 1, 0"
             VALUE "InternalName", "HFSExplorer"
             VALUE "LegalCopyright", "Copyright (C) 2006-2008 Erik Larsson"
