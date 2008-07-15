@@ -47,31 +47,31 @@ decrement_buildnumber() {
 
 buildhfsx() {
     echo "Building org.catacombae.hfsexplorer..."
-    javac -cp $CLASSPATH -sourcepath $SOURCES_DIR -d $BUILD_DIR -Xlint:unchecked $SOURCES_DIR/org/catacombae/hfsexplorer/*.java
+    javac -target 1.5 -source 1.5 -cp $CLASSPATH -sourcepath $SOURCES_DIR -d $BUILD_DIR -Xlint:unchecked $SOURCES_DIR/org/catacombae/hfsexplorer/*.java
     return $?
 }
 
 buildhfsx_partitioning() {
     echo "Building org.catacombae.hfsexplorer.partitioning..."
-    javac -cp $CLASSPATH -sourcepath $SOURCES_DIR -d $BUILD_DIR -Xlint:unchecked $SOURCES_DIR/org/catacombae/hfsexplorer/partitioning/*.java
+    javac -target 1.5 -source 1.5 -cp $CLASSPATH -sourcepath $SOURCES_DIR -d $BUILD_DIR -Xlint:unchecked $SOURCES_DIR/org/catacombae/hfsexplorer/partitioning/*.java
     return $?
 }
 
 buildhfsx_gui() {
     echo "Building org.catacombae.hfsexplorer.gui..."
-    javac -cp $CLASSPATH -sourcepath $SOURCES_DIR -d $BUILD_DIR -Xlint:unchecked $SOURCES_DIR/org/catacombae/hfsexplorer/gui/*.java
+    javac -target 1.5 -source 1.5 -cp $CLASSPATH -sourcepath $SOURCES_DIR -d $BUILD_DIR -Xlint:unchecked $SOURCES_DIR/org/catacombae/hfsexplorer/gui/*.java
     return $?
 }
 
 buildhfsx_testcode() {
     echo "Building org.catacombae.hfsexplorer.testcode..."
-    javac -cp $CLASSPATH -sourcepath $SOURCES_DIR -d $BUILD_DIR -Xlint:unchecked $SOURCES_DIR/org/catacombae/hfsexplorer/testcode/*.java
+    javac -target 1.5 -source 1.5 -cp $CLASSPATH -sourcepath $SOURCES_DIR -d $BUILD_DIR -Xlint:unchecked $SOURCES_DIR/org/catacombae/hfsexplorer/testcode/*.java
     return $?
 }
 
 buildhfsx_types() {
     echo "Building org.catacombae.hfsexplorer.types..."
-    javac -cp $CLASSPATH -sourcepath $SOURCES_DIR -d $BUILD_DIR -Xlint:unchecked $SOURCES_DIR/org/catacombae/hfsexplorer/types/*.java
+    javac -target 1.5 -source 1.5 -cp $CLASSPATH -sourcepath $SOURCES_DIR -d $BUILD_DIR -Xlint:unchecked $SOURCES_DIR/org/catacombae/hfsexplorer/types/*.java
     return $?
 }
 
