@@ -1,0 +1,2 @@
+Main-Class: org.catacombae.hfsexplorer.FileSystemBrowserWindow
+Class-Path: hfsx_dmglib.jar apache-ant-1.7.0-bzip2.jar iharder-base64.jar swing-layout-1.0.1.jar

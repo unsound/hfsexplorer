@@ -18,6 +18,8 @@ JARFILE=hfsx.jar
 RESOURCE_SRC_DIR=resource
 RESOURCE_DST_DIR=$BUILD_DIR/res
 BUILDENUM_CP=lib/buildenumerator.jar
+METAINF_DIR=src.META-INF
+MANIFEST_FILE=MANIFEST.MF
 
 removeclassfiles() {
     echo "Removing all class files..."
@@ -79,7 +81,7 @@ buildjar() {
 	echo "Making library path"
     	mkdir $JARFILE_DIR
     fi
-    jar cf $JARFILE_DIR/$JARFILE -C $BUILD_DIR .
+    jar cfm $JARFILE_DIR/$JARFILE $METAINF_DIR/$MANIFEST_FILE -C $BUILD_DIR .
     return $?
 }
 

@@ -13,6 +13,7 @@ set BUILD_DIR=%CV_JAVA_BUILD_DIR%
 set RESOURCE_SRC_DIR=%~dp0resource
 set RESOURCE_DST_DIR=%BUILD_DIR%\res
 set BUILDENUM_CP="%~dp0lib\buildenumerator.jar"
+set MANIFEST=%~dp0src.META-INF\MANIFEST.MF
 
 echo Removing all class files...
 if exist "%BUILD_DIR%" rmdir /s /q "%BUILD_DIR%"
@@ -63,7 +64,7 @@ if not "%JAVAC_EXIT_CODE%"=="0" goto error
 
 echo Building jar-file...
 if not exist "%JARFILE_PATH%" mkdir "%JARFILE_PATH%"
-jar cvf "%JARFILE_PATH%\%JARFILENAME%" -C "%BUILD_DIR%" . >NUL:
+jar cvfm "%JARFILE_PATH%\%JARFILENAME%" "%MANIFEST%" -C "%BUILD_DIR%" . >NUL:
 if "%ERRORLEVEL%"=="0" (echo Done!) else echo Problems while building jar-file...
 
 goto end
