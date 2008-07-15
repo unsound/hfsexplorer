@@ -20,6 +20,7 @@ current
   error checking if extraction hangs.
 - Windows: Added support for 64-bit JVMs (compiled code now exists for x86_64 and
   Itanium, though only x86_64 has been tested).
+- Launcher improvements and various small bug fixes to cope with 64-bit Windows and WOW64.
 
 0.19
 ----
