@@ -16,10 +16,11 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="backButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="homeButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="466" max="32767" attributes="0"/>
+              <EmptySpace pref="486" max="32767" attributes="0"/>
           </Group>
           <Component id="htmlViewScroller" alignment="0" pref="616" max="32767" attributes="0"/>
       </Group>
@@ -27,12 +28,13 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="backButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="homeButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="htmlViewScroller" pref="341" max="32767" attributes="0"/>
+              <Component id="htmlViewScroller" pref="330" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
