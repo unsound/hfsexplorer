@@ -1,0 +1,19 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Troubleshooting</title>
+</head>
+
+<body>
+  <h2>HFSExplorer troubleshooting</h2>
+  <h3>[Windows] Pressing the autodetect button doesn't make HFSExplorer locate my HFS+/HFSX hard drive</h3>
+<p>This can have many causes. First you have to make sure that HFSExplorer can find your hard drives. If the list box labeled &quot;Detected devices&quot; is empty or contains only &quot;CdRom&quot;-devices, your user probably doesn't have sufficient rights to access hard disk devices directly.</p>
+<p>To gain sufficient rights,
+  run the program through the menu shortcut &quot;Run HFSExplorer in Administrator mode&quot;.<br /> 
+  If you're running Windows Vista and have User Account Control turned on, you will get a dialog asking for credentials if you're a non-administrator user, or a dialog asking you to confirm that you want to give administrator rights to the application if you are an administrator user.<br />
+If you're running an earlier version of Windows, such as Windows XP, you will get a dialog asking you to enter the username and password of an administrator user.<br />
+HFSExplorer cannot currently read from attached hard drives without administrator rights, because of security barriers in the operating system.</p>
+<p>If you can see your hard drives and &quot;Autodetect&quot; still doesn't do the job, try to load the file system manually by trying to load each of the detected hard drives. If one of them does work, when autodetect does not, there is a bug in the &quot;Autodetect&quot; code, and you should report it back to the developer.</p>
+</body>
+</html>
