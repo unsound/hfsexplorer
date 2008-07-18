@@ -71,11 +71,12 @@ cl /c "/Fo%OBJ_TARGET%" "/IC:\Program Files\Java\jdk\include" "/IC:\Program File
 if not "%ERRORLEVEL%"=="0" goto error
 
 echo Linking...
-link /defaultlib:user32 /defaultlib:shell32 /defaultlib:advapi32 /subsystem:%SUBSYSTEM% /entry:mainCRTStartup "/out:%TARGET_EXE%" "%OBJ_TARGET%" "%RES_TARGET%"
+link /defaultlib:user32 /defaultlib:shell32 /defaultlib:advapi32 /defaultlib:ole32 /subsystem:%SUBSYSTEM% /entry:mainCRTStartup "/out:%TARGET_EXE%" "%OBJ_TARGET%" "%RES_TARGET%"
 if not "%ERRORLEVEL%"=="0" goto error
 goto completed
 
 :completed
+echo Target generated at %TARGET_EXE%
 echo Done!
 goto end
 
