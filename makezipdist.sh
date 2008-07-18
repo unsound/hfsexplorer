@@ -14,6 +14,9 @@ chmod a+x $TEMPDIR/*.sh
 echo "Removing CVS directories..."
 rm -r $TEMPDIR/CVS
 rm -r $TEMPDIR/lib/CVS
+rm -r $TEMPDIR/doc/CVS
+rm -r $TEMPDIR/doc/html/CVS
+rm -r $TEMPDIR/doc/html/img/CVS
 
 echo "Building zip file..."
 cd $TEMPDIR
