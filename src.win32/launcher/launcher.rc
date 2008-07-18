@@ -26,8 +26,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
 //
 
 1 VERSIONINFO
- FILEVERSION 0,19,1,0
- PRODUCTVERSION 0,19,1,0
+ FILEVERSION 0,19,5,0
+ PRODUCTVERSION 0,19,5,0
  FILEFLAGSMASK 0x0L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -44,12 +44,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Catacombae Software"
             VALUE "FileDescription", "HFSExplorer"
-            VALUE "FileVersion", "0, 19, 1, 0"
+            VALUE "FileVersion", "0, 19, 5, 0"
             VALUE "InternalName", "HFSExplorer"
             VALUE "LegalCopyright", "Copyright (C) 2006-2008 Erik Larsson"
             VALUE "OriginalFilename", "hfsexplorer.exe"
             VALUE "ProductName", "HFSExplorer: A tool for accessing HFS+/HFSX hard drives and disk images."
-            VALUE "ProductVersion", "0, 19, 1, 0"
+            VALUE "ProductVersion", "0, 19, 5, 0"
         END
     END
     BLOCK "VarFileInfo"
@@ -66,8 +66,8 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_ICON1               ICON                    "C:\\Documents and Settings\\Erik\\My Documents\\devel\\HFSExplorer\\doc\\dmg_iconsource\\finderdrive.ico"
-IDI_ICON2               ICON                    "C:\\Documents and Settings\\Erik\\My Documents\\devel\\HFSExplorer\\dist\\dmg.ico"
+IDI_ICON1               ICON                    "..\\..\\doc\\dmg_iconsource\\finderdrive_folderback.ico"
+IDI_ICON2               ICON                    "..\\..\\doc\\dmg_iconsource\\dmg.ico"
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////

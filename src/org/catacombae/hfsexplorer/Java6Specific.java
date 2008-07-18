@@ -17,15 +17,28 @@
 
 package org.catacombae.hfsexplorer;
 
+import java.util.LinkedList;
 import java.io.File;
 import java.io.IOException;
 import java.awt.Desktop;
+import java.awt.Image;
+import java.awt.Window;
+import javax.swing.ImageIcon;
 
 public class Java6Specific {
+    public static boolean isJava6OrHigher() {
+	return System.getProperty("java.vm.version").compareTo("1.6") >= 0;
+    }
     public static boolean canOpen() {
 	return Desktop.getDesktop().isSupported(Desktop.Action.OPEN);
     }
     public static void openFile(File f) throws IOException {
 	Desktop.getDesktop().open(f);
+    }
+    public static void setIconImages(ImageIcon[] icons, Window window) {
+	LinkedList<Image> iconImages = new LinkedList<Image>();
+	for(ImageIcon ii : icons)
+	    iconImages.addLast(ii.getImage());
+	window.setIconImages(iconImages);
     }
 }

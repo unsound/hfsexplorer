@@ -2,7 +2,7 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "HFSExplorer"
-!define PRODUCT_VERSION "0.19"
+!define PRODUCT_VERSION "0.19.5"
 !define PRODUCT_PUBLISHER "Catacombae Software"
 !define PRODUCT_WEB_SITE "http://hem.bredband.net/catacombae/"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -23,7 +23,7 @@ SetCompressor bzip2
 ; Welcome page
 !insertmacro MUI_PAGE_WELCOME
 ; License page
-!insertmacro MUI_PAGE_LICENSE "C:\Documents and settings\Erik\Mina dokument\devel\HFSExplorer\doc\gpl.txt"
+!insertmacro MUI_PAGE_LICENSE ".\gpl.txt"
 ; Components page
 !insertmacro MUI_PAGE_COMPONENTS
 ; Directory page
@@ -60,60 +60,100 @@ ShowInstDetails show
 ShowUnInstDetails show
 ;LicenseForceSelection checkbox "Jag Godkänner"
 
-;InstType "Full"
+InstType "Typical"
 
 Section "HFSExplorer" SEC01
   SectionIn RO ; Means that the section is read-only (can't be deselected by the user)
+  
   SetOutPath "$INSTDIR"
   SetOverwrite ifnewer
-  File "..\dist\gpl.txt"
-  File "..\dist\hfsexplorer.exe"
-  File "..\dist\llio.dll"
-  File "..\dist\runfsb.bat"
-  File "..\dist\runfsb.sh"
-  File "..\dist\runfsb_vista.vbs"
-  File "..\dist\hfsx.bat"
-  File "..\dist\hfsx.sh"
-  File "..\dist\dmg.ico"
+  File "..\dist\*.txt"
+  File "..\dist\*.exe"
+  File "..\dist\*.bat"
+  File "..\dist\*.sh"
+  File "..\dist\*.vbs"
+  
   SetOutPath "$INSTDIR\lib"
   SetOverwrite ifnewer
   File "..\dist\lib\*.jar"
+  File "..\dist\lib\*.dll"
+  
+  SetOutPath "$INSTDIR\doc\html"
+  SetOverwrite ifnewer
+  File "..\dist\doc\html\*.html"
+  
+  SetOutPath "$INSTDIR\doc\html\img"
+  SetOverwrite ifnewer
+  File "..\dist\doc\html\img\*.png"
 
   ; Shortcuts
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
   CreateDirectory "$SMPROGRAMS\$ICONS_GROUP"
-  ;CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Starta Matematikselet.lnk" "$INSTDIR\rungame.bat""%~dp0lib\swing-layout-1.0.1.jar"
   SetOutPath $INSTDIR
   CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\HFSExplorer.lnk" "$INSTDIR\hfsexplorer.exe"
   CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Run HFSExplorer in Administrator mode.lnk" "$INSTDIR\hfsexplorer.exe" "-invokeuac"
-  ;SetOutPath $INSTDIR\bin\changedb
-  ;CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Ändra sökväg till databasen.lnk" "$INSTDIR\bin\changedb\changedb.exe"
-  ;SetOutPath $INSTDIR\bin\levelconverter
-  ;CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Starta Bankonverteraren.lnk" "$INSTDIR\bin\levelconverter\levelconverter.exe"
   SetOutPath -
   !insertmacro MUI_STARTMENU_WRITE_END
 SectionEnd
 
 Section "Register .dmg file association" SEC02
-  ;SectionIn 1
-  ;SetOutPath "$INSTDIR"
-  ;SetOverwrite ifnewer
-  ;File /r "..\release\batfiles\*.bat"
+  SectionIn 1
+  
   !define FILE_EXTENSION ".dmg"
   !define PROGRAM_EXTENSION_ID "CatacombaeHFSExplorer.DMGFile"
   !define WINDOWS_DESCRIPTION ".dmg Disk image"
-  !define ICON_FILE "$INSTDIR\dmg.ico,0"
+  !define ICON_FILE "$INSTDIR\hfsexplorer.exe,1"
   !define OPEN_COMMAND '$INSTDIR\hfsexplorer.exe "%1"'
   
   !define Index "Line${__LINE__}"
   ; Back up current extension mapping, if existent
   ReadRegStr $1 HKCR "${FILE_EXTENSION}" ""                   ; Read current extension mapping
-  StrCmp $1 "" "${Index}-NoBackup"                          ; If there is none, jump to NoBackup
+  StrCmp $1 "" "${Index}-NoBackup"                            ; If there is none, jump to NoBackup
   StrCmp $1 "${PROGRAM_EXTENSION_ID}" "${Index}-NoBackup"     ; If it exists, and is equal to this program's PROGRAM_EXTENSION_ID, also jump to NoBackup
   WriteRegStr HKCR "${FILE_EXTENSION}" "backup_val" $1        ; Else, write its value to a new key, called 'backup_val'
   
   "${Index}-NoBackup:"
   
+  ; Write our file extension mapping to registry
+  WriteRegStr HKCR "${FILE_EXTENSION}" "" "${PROGRAM_EXTENSION_ID}" ; Write mapping .dmg->CatacombaeHFSExplorer.DMGFile
+  ReadRegStr $0 HKCR "${PROGRAM_EXTENSION_ID}" ""                   ; Read current contents of CatacombaeHFSExplorer.DMGFile
+  StrCmp $0 "" 0 "${Index}-Skip"                                    ; If the key CatacombaeHFSExplorer.DMGFile does exist, jump to Skip
+  WriteRegStr HKCR "${PROGRAM_EXTENSION_ID}" "" "${WINDOWS_DESCRIPTION}"
+  WriteRegStr HKCR "${PROGRAM_EXTENSION_ID}\shell" "" "open"
+  WriteRegStr HKCR "${PROGRAM_EXTENSION_ID}\DefaultIcon" "" "${ICON_FILE}"
+  "${Index}-Skip:"
+  WriteRegStr HKCR "${PROGRAM_EXTENSION_ID}\shell\open\command" "" '${OPEN_COMMAND}'
+      ;WriteRegStr HKCR "OptionsFile\shell\edit" "" "Edit Options File"
+      ;WriteRegStr HKCR "OptionsFile\shell\edit\command" "" '$INSTDIR\execute.exe "%1"'
+
+  System::Call 'Shell32::SHChangeNotify(i 0x8000000, i 0, i 0, i 0)' ; Alert Windows that is has to update its file extension list.
+  !undef Index
+  !undef FILE_EXTENSION
+  !undef PROGRAM_EXTENSION_ID
+  !undef WINDOWS_DESCRIPTION
+  !undef ICON_FILE
+  !undef OPEN_COMMAND
+  ; Rest of script
+SectionEnd
+
+Section "Register .cdr file association" SEC03
+  SectionIn 2
+  
+  !define FILE_EXTENSION ".cdr"
+  !define PROGRAM_EXTENSION_ID "CatacombaeHFSExplorer.CDRFile"
+  !define WINDOWS_DESCRIPTION ".cdr CD/DVD image"
+  !define ICON_FILE "$INSTDIR\hfsexplorer.exe,1"
+  !define OPEN_COMMAND '$INSTDIR\hfsexplorer.exe "%1"'
+
+  !define Index "Line${__LINE__}"
+  ; Back up current extension mapping, if existent
+  ReadRegStr $1 HKCR "${FILE_EXTENSION}" ""                   ; Read current extension mapping
+  StrCmp $1 "" "${Index}-NoBackup"                            ; If there is none, jump to NoBackup
+  StrCmp $1 "${PROGRAM_EXTENSION_ID}" "${Index}-NoBackup"     ; If it exists, and is equal to this program's PROGRAM_EXTENSION_ID, also jump to NoBackup
+  WriteRegStr HKCR "${FILE_EXTENSION}" "backup_val" $1        ; Else, write its value to a new key, called 'backup_val'
+
+  "${Index}-NoBackup:"
+
   ; Write our file extension mapping to registry
   WriteRegStr HKCR "${FILE_EXTENSION}" "" "${PROGRAM_EXTENSION_ID}" ; Write mapping .dmg->CatacombaeHFSExplorer.DMGFile
   ReadRegStr $0 HKCR "${PROGRAM_EXTENSION_ID}" ""                   ; Read current contents of CatacombaeHFSExplorer.DMGFile
@@ -189,7 +229,35 @@ Section Uninstall
   WriteRegStr HKCR "${FILE_EXTENSION}" "" $1
   DeleteRegValue HKCR "${FILE_EXTENSION}" "backup_val"
 
-  ; In any case, we WILL delete HKCR\CatacombaeHFSExplorer.DMGFile
+  ; In any case, we WILL delete HKCR\${PROGRAM_EXTENSION_ID}
+  "${Index}-NoOwn:"
+  DeleteRegKey HKCR "${PROGRAM_EXTENSION_ID}" ;Delete key with association settings
+  System::Call 'Shell32::SHChangeNotify(i 0x8000000, i 0, i 0, i 0)'
+
+  !undef Index
+  !undef FILE_EXTENSION
+  !undef PROGRAM_EXTENSION_ID
+  ; End of restore script
+
+  ; I should make these variables global or something... make them parameters of a function, if NSIS can do that...
+  !define FILE_EXTENSION ".cdr"
+  !define PROGRAM_EXTENSION_ID "CatacombaeHFSExplorer.CDRFile"
+
+  ; Start of restore script
+  !define Index "Line${__LINE__}"
+  ReadRegStr $1 HKCR "${FILE_EXTENSION}" ""
+  StrCmp $1 "${PROGRAM_EXTENSION_ID}" 0 "${Index}-NoOwn" ; only do this if we own it
+
+  ReadRegStr $1 HKCR "${FILE_EXTENSION}" "backup_val"
+  StrCmp $1 "" 0 "${Index}-Restore" ; if backup="" then delete the whole key
+  DeleteRegKey HKCR "${FILE_EXTENSION}"
+  Goto "${Index}-NoOwn"
+
+  "${Index}-Restore:"
+  WriteRegStr HKCR "${FILE_EXTENSION}" "" $1
+  DeleteRegValue HKCR "${FILE_EXTENSION}" "backup_val"
+
+  ; In any case, we WILL delete HKCR\${PROGRAM_EXTENSION_ID}
   "${Index}-NoOwn:"
   DeleteRegKey HKCR "${PROGRAM_EXTENSION_ID}" ;Delete key with association settings
   System::Call 'Shell32::SHChangeNotify(i 0x8000000, i 0, i 0, i 0)'
@@ -207,6 +275,11 @@ Section Uninstall
 
   Delete "$INSTDIR\lib\*.*"
   RMDir "$INSTDIR\lib"
+  Delete "$INSTDIR\doc\html\img\*.*"
+  RMDir "$INSTDIR\doc\html\img"
+  Delete "$INSTDIR\doc\html\*.*"
+  RMDir "$INSTDIR\doc\html"
+  RMDir "$INSTDIR\doc"
   Delete "$INSTDIR\*.*"
   RMDir "$INSTDIR"
 

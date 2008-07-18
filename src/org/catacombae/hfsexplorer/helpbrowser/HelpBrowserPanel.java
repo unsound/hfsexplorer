@@ -82,37 +82,48 @@ public class HelpBrowserPanel extends javax.swing.JPanel {
     }
     protected void goToPage(final URL iUrl) {
         try {
-            System.out.println("setCurrentPage(" + iUrl + ");");
+            //System.out.println("setCurrentPage(" + iUrl + ");");
             if(currentPage != null && iUrl.equals(currentPage)) {
-                System.out.println("  Refreshing page.");
+                //System.out.println("  Refreshing page.");
                 htmlView.setPage(currentPage);
             }
             else {
-                System.out.println("  Before:");
-                System.out.println("    currentPage == " + currentPage);
-                {
-                    int i = 0;
-                    for(URL curUrl : history) {
-                        System.out.println("    history[" + i++ + "]: " + curUrl);
-                    }
-                }
+                //System.out.println("  Before:");
+                //System.out.println("    currentPage == " + currentPage);
+                //{
+                //    int i = 0;
+                //    for(URL curUrl : history) {
+                //        System.out.println("    history[" + i++ + "]: " + curUrl);
+                //    }
+                //}
                 if(currentPage != null)
                     history.addLast(currentPage);
                 htmlView.setPage(iUrl);
                 currentPage = iUrl;
-                System.out.println("  After:");
-                System.out.println("    currentPage == " + currentPage);
-                {
-                    int i = 0;
-                    for(URL curUrl : history) {
-                        System.out.println("    history[" + i++ + "]: " + curUrl);
-                    }
-                }
+                //System.out.println("  After:");
+                //System.out.println("    currentPage == " + currentPage);
+                //{
+                //    int i = 0;
+                //    for(URL curUrl : history) {
+                //        System.out.println("    history[" + i++ + "]: " + curUrl);
+                //    }
+                //}
             }
         } catch(IOException ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.WARNING,
                     "Could not load page " + iUrl, ex);
         }
+    }
+    
+    public static void showHelpBrowserWindow(String iTitle, URL iHomePage) {
+	JFrame f = new JFrame(iTitle);
+        f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        JPanel helpBrowserPanel = new HelpBrowserPanel(iHomePage);
+        //helpBrowserPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+        f.add(helpBrowserPanel);
+        f.pack();
+        f.setLocationRelativeTo(null);
+        f.setVisible(true);
     }
 
     /** This method is called from within the constructor to

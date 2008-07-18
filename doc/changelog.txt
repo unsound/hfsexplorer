@@ -23,6 +23,9 @@ HFSExplorer Changelog
 - Added support for more than 20 partitions per drive, more than 20 drives and more than
   20 CD-ROMs in "Load file system from device" dialog (not that anyone has actually
   needed to use that many, but why impose limitations when you don't really have to?).
+- "Open file" in Windows is now much more usable due to invoking the Windows handler
+  instead of using the Java6 openFile handler when available.
+- Fixed a few user interface bugs and quirks.
 
 0.19
 ----
