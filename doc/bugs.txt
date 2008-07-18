@@ -5,11 +5,39 @@
   a slider or change the size or position of anything it all fits in
   perfectly, but I can't seem to programmatically make it that way
   at the start.
+  (Update 2008-07-18: Is this valid? It seems ok with current
+  builds...)
 
 2007-06-27
 ----------
 - INVALID? Discovered that the dates are incorrect... need to
   revise the date calculation mechanism...
   UPDATE: Can't reproduce this bug, everything seems fine.
+
 - Double-clicking a file in the right pane to enter a new directory
   takes more time than clicking it in the left pane. Why?
+  (Update 2008-07-18: I can not notice this issue anymore, but I
+  don't think I ever investigated it...)
+
+2008-07-18
+----------
+- Launcher: With the current argument structure, a user can NEVER
+  open a file called "-invokeuac".
+  It's not very likely that any that anyone would need to open a
+  file by that name, but HFSExplorer should be able to handle it.
+  Proposed solution:
+  The switch
+    -invokeuac
+  is replaced by:
+    -- -invokeuac
+  This means that one of the arguments "--" or "-invokeuac" is not
+  alone sufficient to trigger elevation. This means that
+  hfsexplorer.exe can easily be run with "hfsexplorer.exe --" for a
+  file called "--" or "hfsexplorer.exe -invokeuac" for a file called
+  "-invokeuac".
+  As long as we only allow one file at a time to be opened by
+  HFSExplorer, this scheme will work for all cases.
+
+- FileSystemBrowserWindow.main: A problem similar to the above issue
+  occurs with the switch "-dbgconsole". A similar solution should be
+  developed. Make sure the two solutions don't invalidate each other.

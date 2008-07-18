@@ -17,6 +17,9 @@
 
 package org.catacombae.hfsexplorer;
 
+import java.net.MalformedURLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.catacombae.hfsexplorer.io.RandomAccessLLF;
 import org.catacombae.hfsexplorer.io.UDIFRandomAccessLLF;
 import org.catacombae.hfsexplorer.io.LowLevelFile;
@@ -29,7 +32,6 @@ import java.util.*;
 import java.io.*;
 import java.net.URL;
 import java.text.DateFormat;
-//import java.awt.*;
 import java.awt.BorderLayout;
 import java.awt.Toolkit;
 import java.awt.Component;
@@ -39,13 +41,27 @@ import javax.swing.*;
 import javax.swing.tree.*;
 import javax.swing.table.*;
 import javax.swing.event.*;
+//import org.catacombae.hfsexplorer.fsframework.FSFile;
+import org.catacombae.hfsexplorer.helpbrowser.HelpBrowserPanel;
 
 public class FileSystemBrowserWindow extends JFrame {
-    private static final String TITLE_STRING = "HFSExplorer v" + HFSExplorer.VERSION;
+    private static final String TITLE_STRING = "HFSExplorer " + HFSExplorer.VERSION;
+    private static final ImageIcon[] WINDOW_ICONS =
+    { 
+	new ImageIcon(ClassLoader.getSystemResource("res/finderdrive_folderback_16.png")),
+	new ImageIcon(ClassLoader.getSystemResource("res/finderdrive_folderback_32.png")),
+	new ImageIcon(ClassLoader.getSystemResource("res/finderdrive_folderback_48.png"))
+    };
     private static final String[] VERSION_INFO_DICTIONARY = {
 	"http://www.typhontools.cjb.net/hfsx/version.sdic.txt",
 	"http://hem.bredband.net/unsound/hfsx/version.sdic.txt"
     };
+    
+    /**
+     * The command line argument that makes HFSExplorer print stdout and
+     * stderr to a special debug console.
+     */
+    private static final String DEBUG_CONSOLE_ARG = "-dbgconsole";
     
     private static class ObjectContainer<A> {
 	public A o;
@@ -67,38 +83,6 @@ public class FileSystemBrowserWindow extends JFrame {
         
         @Override public String toString() { return composedNodeName; }
     }
-    
-    private FilesystemBrowserPanel fsbPanel;
-    
-    // Fast accessors for the corresponding variables in org.catacombae.hfsexplorer.gui.FilesystemBrowserPanel
-    private JTable fileTable;
-    private final JScrollPane fileTableScroller;
-    private JTree dirTree;
-    private JTextField addressField;
-    private JButton backButton;
-    private JButton goButton;
-    private JButton extractButton;
-    private JLabel statusLabel;
-    private final JCheckBoxMenuItem toggleCachingItem;
-    
-    // Focus timestamps (for determining what to extract)
-    private long fileTableLastFocus = 0;
-    private long dirTreeLastFocus = 0;
-
-    // For determining the standard layout size of the columns in the table
-    private int totalColumnWidth = 0;
-
-    // Communication between adjustColumnsWidths and the column listener
-    private final boolean[] disableColumnListener = { false };
-    private final ObjectContainer<int[]> lastWidths = new ObjectContainer<int[]>(null);
-    
-    // For managing all files opened with the "open file" command
-    private final LinkedList<File> tempFiles = new LinkedList<File>();
-    
-    private final JFileChooser fileChooser = new JFileChooser();
-    private final Vector<String> colNames = new Vector<String>();
-    private final DefaultTableModel tableModel;
-    private HFSPlusFileSystemView fsView;
     
     private static class RecordNodeStorage {
 	private HFSPlusCatalogLeafRecord parentRecord;
@@ -131,76 +115,103 @@ public class FileSystemBrowserWindow extends JFrame {
 	@Override public boolean isLeaf() { return false; }
     }
     
+    private FilesystemBrowserPanel fsbPanel;
+    
+    // Fast accessors for the corresponding variables in org.catacombae.hfsexplorer.gui.FilesystemBrowserPanel
+    private JTable fileTable;
+    private final JScrollPane fileTableScroller;
+    private JTree dirTree;
+    private JTextField addressField;
+    private JButton upButton;
+    private JButton goButton;
+    private JButton extractButton;
+    private JLabel statusLabel;
+    private final JCheckBoxMenuItem toggleCachingItem;
+    
+    // Focus timestamps (for determining what to extract)
+    private long fileTableLastFocus = 0;
+    private long dirTreeLastFocus = 0;
+
+    // For determining the standard layout size of the columns in the table
+    private int totalColumnWidth = 0;
+
+    // Communication between adjustColumnsWidths and the column listener
+    private final boolean[] disableColumnListener = { false };
+    private final ObjectContainer<int[]> lastWidths = new ObjectContainer<int[]>(null);
+    
+    // For managing all files opened with the "open file" command
+    private final LinkedList<File> tempFiles = new LinkedList<File>();
+    
+    private final JFileChooser fileChooser = new JFileChooser();
+    private final Vector<String> colNames = new Vector<String>();
+    private final DefaultTableModel tableModel;
+    private HFSPlusFileSystemView fsView;
+    
+    
     public FileSystemBrowserWindow() {
 	this(null);
     }
     public FileSystemBrowserWindow(final DebugConsoleWindow dcw) {
 	super(TITLE_STRING);
+	
+	if(Java6Specific.isJava6OrHigher())
+	    Java6Specific.setIconImages(WINDOW_ICONS, this);
+	else
+	    setIconImage(WINDOW_ICONS[0].getImage());
+	
 	fsbPanel = new FilesystemBrowserPanel();
 	fileTable = fsbPanel.fileTable;
 	fileTableScroller = fsbPanel.fileTableScroller;
 	dirTree = fsbPanel.dirTree;
 	addressField = fsbPanel.addressField;
-	backButton = fsbPanel.backButton;
+	upButton = fsbPanel.upButton;
 	goButton = fsbPanel.goButton;
 	extractButton = fsbPanel.extractButton;
 	statusLabel = fsbPanel.statusLabel;
 	JButton infoButton = fsbPanel.infoButton;
+        
+        upButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if(ensureFileSystemLoaded())
+                    actionGoToParentDir();
+            }
+        });
+        extractButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if(ensureFileSystemLoaded())
+                    actionExtractToDir();
+            }
+        });
 
-	// UI Features for these are not implemented yet.
-	backButton.setEnabled(false);
-	//addressField.setEnabled(false);
-	//goButton.setEnabled(false);
-	
-	extractButton.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    if(fsView != null)
-			actionExtractToDir();
-		    else
-			JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "No file system loaded.",
-						      "Error", JOptionPane.ERROR_MESSAGE);
-		}
-	    });
-	
-	infoButton.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    if(fsView != null)
-			actionGetInfo();
-		    else
-			JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "No file system loaded.",
-						      "Error", JOptionPane.ERROR_MESSAGE);
-		}
-	    });
+        infoButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if(ensureFileSystemLoaded())
+                    actionGetInfo();
+            }
+        });
 	goButton.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-		    if(fsView != null)
+		    if(ensureFileSystemLoaded())
 			actionGotoDir();
-		    else
-			JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "No file system loaded.",
-						      "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	    });
 	addressField.addKeyListener(new KeyAdapter() {
                 @Override
 		public void keyPressed(KeyEvent e) {
-		    if(fsView != null) {
+		    if(ensureFileSystemLoaded()) {
 			if(e.getKeyCode() == KeyEvent.VK_ENTER)
 			    actionGotoDir();
 		    }
-		    else
-			JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "No file system loaded.",
-						      "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	    });
 	
-	//final Class recordContainerClass = new RecordContainer().getClass();
 	final Class objectClass = new Object().getClass();
 	colNames.add("Name");
 	colNames.add("Size");
 	colNames.add("Type");
 	colNames.add("Date Modified");
 	colNames.add("");
-	//Vector<Vector<String>> = new Vector<Vector<String>>();
+	
 	tableModel = new DefaultTableModel(colNames, 0)  {
                 @Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -386,7 +397,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	    });
 	fileTableScroller.addMouseListener(new MouseAdapter() {
                 @Override
-                public void mouseClicked(MouseEvent e) {
+                public void mousePressed(MouseEvent e) {
 		    int row = fileTable.rowAtPoint(e.getPoint());
 		    if(row == -1) // If we click outside the table, clear selection in table
 			fileTable.clearSelection();
@@ -394,8 +405,8 @@ public class FileSystemBrowserWindow extends JFrame {
 	    });
 	fileTable.addMouseListener(new MouseAdapter() {
                 @Override
-                public void mouseClicked(MouseEvent e) {
-		    if(e.getButton() == MouseEvent.BUTTON3) {
+                public void mousePressed(MouseEvent e) {
+		    if(e.getButton() == MouseEvent.BUTTON3 && fsView != null) {
 			int row = fileTable.rowAtPoint(e.getPoint());
 			int col = fileTable.columnAtPoint(e.getPoint());
 			if(col == 0 && row >= 0) {
@@ -409,7 +420,8 @@ public class FileSystemBrowserWindow extends JFrame {
 			    JMenuItem infoItem = new JMenuItem("Information");
 			    infoItem.addActionListener(new ActionListener() {
 				    public void actionPerformed(ActionEvent e) {
-					actionGetInfo();
+                                        if(ensureFileSystemLoaded())
+                                            actionGetInfo();
 				    }
 				});
 			    jpm.add(infoItem);
@@ -417,7 +429,8 @@ public class FileSystemBrowserWindow extends JFrame {
 			    JMenuItem dataExtractItem = new JMenuItem("Extract data");
 			    dataExtractItem.addActionListener(new ActionListener() {
 				    public void actionPerformed(ActionEvent e) {
-					actionExtractToDir(true, false);
+                                        if(ensureFileSystemLoaded())
+                                            actionExtractToDir(true, false);
 				    }
 				});
 			    jpm.add(dataExtractItem);
@@ -425,7 +438,8 @@ public class FileSystemBrowserWindow extends JFrame {
 			    JMenuItem resExtractItem = new JMenuItem("Extract resource fork(s)");
 			    resExtractItem.addActionListener(new ActionListener() {
 				    public void actionPerformed(ActionEvent e) {
-					actionExtractToDir(false, true);
+                                        if(ensureFileSystemLoaded())
+                                            actionExtractToDir(false, true);
 				    }
 				});
 			    jpm.add(resExtractItem);
@@ -433,7 +447,8 @@ public class FileSystemBrowserWindow extends JFrame {
 			    JMenuItem bothExtractItem = new JMenuItem("Extract data and resource fork(s)");
 			    bothExtractItem.addActionListener(new ActionListener() {
 				    public void actionPerformed(ActionEvent e) {
-					actionExtractToDir(true, true);
+                                        if(ensureFileSystemLoaded())
+                                            actionExtractToDir(true, true);
 				    }
 				});
 			    jpm.add(bothExtractItem);
@@ -441,7 +456,7 @@ public class FileSystemBrowserWindow extends JFrame {
                             jpm.show(fileTable, e.getX(), e.getY());
 			}
 		    }
-		    else if(e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
+		    else if(e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2 && fsView != null) {
 			int row = fileTable.rowAtPoint(e.getPoint());
 			int col = fileTable.columnAtPoint(e.getPoint());
 			if(col == 0 && row >= 0) {
@@ -517,8 +532,8 @@ public class FileSystemBrowserWindow extends JFrame {
 	
 	dirTree.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-		    if(e.getButton() == MouseEvent.BUTTON3) {
+            public void mousePressed(MouseEvent e) {
+		    if(e.getButton() == MouseEvent.BUTTON3 && fsView != null) {
 			TreePath tp = dirTree.getPathForLocation(e.getX(), e.getY());
 			if(tp != null) {
 			    dirTree.clearSelection();
@@ -529,10 +544,39 @@ public class FileSystemBrowserWindow extends JFrame {
 			    JMenuItem infoItem = new JMenuItem("Information");
 			    infoItem.addActionListener(new ActionListener() {
 				    public void actionPerformed(ActionEvent e) {
-					actionGetInfo();
+                                        if(ensureFileSystemLoaded())
+                                            actionGetInfo();
 				    }
 				});
 			    jpm.add(infoItem);
+
+			    JMenuItem dataExtractItem = new JMenuItem("Extract data");
+			    dataExtractItem.addActionListener(new ActionListener() {
+				    public void actionPerformed(ActionEvent e) {
+                                        if(ensureFileSystemLoaded())
+                                            actionExtractToDir(true, false);
+				    }
+				});
+			    jpm.add(dataExtractItem);
+                            
+			    JMenuItem resExtractItem = new JMenuItem("Extract resource fork(s)");
+			    resExtractItem.addActionListener(new ActionListener() {
+				    public void actionPerformed(ActionEvent e) {
+                                        if(ensureFileSystemLoaded())
+                                            actionExtractToDir(false, true);
+				    }
+				});
+			    jpm.add(resExtractItem);
+                            
+			    JMenuItem bothExtractItem = new JMenuItem("Extract data and resource fork(s)");
+			    bothExtractItem.addActionListener(new ActionListener() {
+				    public void actionPerformed(ActionEvent e) {
+                                        if(ensureFileSystemLoaded())
+                                            actionExtractToDir(true, true);
+				    }
+				});
+			    jpm.add(bothExtractItem);
+			    
 			    jpm.show(dirTree, e.getX(), e.getY());
 			}
 		    }
@@ -780,13 +824,47 @@ public class FileSystemBrowserWindow extends JFrame {
 	    });
 	fsInfoItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 	
+	toggleCachingItem = new JCheckBoxMenuItem("Use file system caching");
+	toggleCachingItem.setState(true);
+	toggleCachingItem.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent ae) {
+		    if(fsView != null) {
+			if(toggleCachingItem.getState()) {
+			    System.out.print("Enabling caching...");
+			    fsView.enableFileSystemCaching();
+			    System.out.println("done!");
+			}
+			else {
+			    System.out.print("Disabling caching...");
+			    fsView.disableFileSystemCaching();
+			    System.out.println("done!");
+			}
+		    }
+		}
+	    });
+	
+	JMenuItem startHelpBrowserItem = new JMenuItem("Help browser");
+	startHelpBrowserItem.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent ae) {
+		    File f = new File("doc/html/index.html");
+		    if(f.exists()) {
+                        try {
+                            HelpBrowserPanel.showHelpBrowserWindow("HFSExplorer help browser", f.toURI().toURL());
+                        } catch(MalformedURLException ex) {
+                            ex.printStackTrace();
+                            Logger.getLogger(FileSystemBrowserWindow.class.getName()).log(Level.WARNING, null, ex);
+                        }
+                    }
+		}
+	    });
+	
 	JMenuItem checkUpdatesItem = new JMenuItem("Check for updates...");
 	checkUpdatesItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
 		    InputStream infoDictStream = null;
 		    for(String s : VERSION_INFO_DICTIONARY) {
 			try {
-			    System.out.println("Retrieveing version info from " + s + "...");
+			    System.out.println("Retrieving version info from " + s + "...");
 			    infoDictStream = new URL(s).openStream();
 			    SimpleDictionaryParser sdp = new SimpleDictionaryParser(infoDictStream);
 			    String dictVersion = sdp.getValue("Version");
@@ -838,25 +916,6 @@ public class FileSystemBrowserWindow extends JFrame {
 		}
 	    });
 
-	toggleCachingItem = new JCheckBoxMenuItem("Use file system caching");
-	toggleCachingItem.setState(true);
-	toggleCachingItem.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent ae) {
-		    if(fsView != null) {
-			if(toggleCachingItem.getState()) {
-			    System.out.print("Enabling caching...");
-			    fsView.enableFileSystemCaching();
-			    System.out.println("done!");
-			}
-			else {
-			    System.out.print("Disabling caching...");
-			    fsView.disableFileSystemCaching();
-			    System.out.println("done!");
-			}
-		    }
-		}
-	    });
-	
 	JMenuItem aboutItem = new JMenuItem("About...");
 	aboutItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
@@ -889,6 +948,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	    fileMenu.add(exitProgramItem);
 	infoMenu.add(fsInfoItem);
 	infoMenu.add(toggleCachingItem);
+	helpMenu.add(startHelpBrowserItem);
 	helpMenu.add(checkUpdatesItem);
 	helpMenu.add(aboutItem);
 	JMenuBar menuBar = new JMenuBar();
@@ -909,6 +969,21 @@ public class FileSystemBrowserWindow extends JFrame {
 	add(fsbPanel, BorderLayout.CENTER);
 	pack();
 	setLocationRelativeTo(null);
+    }
+    
+    private boolean ensureFileSystemLoaded() {
+        if(fsView != null) {
+            return true;
+        }
+        else {
+            JOptionPane.showMessageDialog(this, "No file system loaded.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+    }
+
+    public void setStatusLabelText(String text) {
+        statusLabel.setText(text);
     }
     
     private void exitApplication() {
@@ -1258,27 +1333,37 @@ public class FileSystemBrowserWindow extends JFrame {
 	adjustTableWidth();
     }
     
+    private HFSPlusCatalogLeafRecord getDirTreeSelection() {
+        Object o = dirTree.getLastSelectedPathComponent();
+        if(o == null) {
+            return null;
+        }
+        else if(o instanceof DefaultMutableTreeNode) {
+            Object o2 = ((DefaultMutableTreeNode) o).getUserObject();
+            if(o2 instanceof RecordNodeStorage) {
+                return ((RecordNodeStorage) o2).getRecord();
+            }
+            else {
+                throw new RuntimeException("Unexpected data in tree user object. (Internal error, report to " +
+                        "developer)" + "\nClass: " + o.getClass().toString());
+            }
+        }
+        else {
+            throw new RuntimeException("Unexpected data in tree model. (Internal error, report to developer)" +
+                    "\nClass: " + o.getClass().toString());
+        }
+    }
+    
     /** Never returns null. If nothing is selected, a zero-length array is returned.
 	A RuntimeException may be thrown in case of an implementation error (i.e. should never happen), in which case
 	a detailed explanation is found through Exception.getMessage(). */
     private HFSPlusCatalogLeafRecord[] getSelectedRecords() {
 	if(dirTreeLastFocus > fileTableLastFocus) {
-	    Object o = dirTree.getLastSelectedPathComponent();
-	    if(o == null) {
-		return new HFSPlusCatalogLeafRecord[0];
-	    }
-	    else if(o instanceof DefaultMutableTreeNode) {
-		Object o2 = ((DefaultMutableTreeNode)o).getUserObject();
-		if(o2 instanceof RecordNodeStorage)
-		    return new HFSPlusCatalogLeafRecord[] { ((RecordNodeStorage)o2).getRecord() };
-		else
-		    throw new RuntimeException("Unexpected data in tree user object. (Internal error, report to " +
-					       "developer)" + "\nClass: " + o.getClass().toString());
-	    }
-	    else {
-		throw new RuntimeException("Unexpected data in tree model. (Internal error, report to developer)" +
-					   "\nClass: " + o.getClass().toString());
-	    }
+            HFSPlusCatalogLeafRecord rec = getDirTreeSelection();
+            if(rec == null)
+                return new HFSPlusCatalogLeafRecord[0];
+            else
+                return new HFSPlusCatalogLeafRecord[] { rec };
 	}
 	else {
 	    int[] selectedRows = fileTable.getSelectedRows();
@@ -1308,6 +1393,115 @@ public class FileSystemBrowserWindow extends JFrame {
     
     private void actionDoubleClickFile(final HFSPlusCatalogLeafRecord rec, HFSPlusCatalogFile file) {
 	final JDialog fopFrame = new JDialog(this, rec.getKey().getNodeName().toString(), true);
+	fopFrame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+	
+	ActionListener alOpen = null;
+	if(System.getProperty("os.name").toLowerCase().startsWith("windows")) {
+	    //System.err.println("Windows detected");
+	    final String finalCommand = "cmd.exe /c start \"HFSExplorer invoker\" \"" + rec.getKey().getNodeName().toString() + "\"";
+	    alOpen = new ActionListener() {
+		    public void actionPerformed(ActionEvent ae) {
+			File tempDir = new File(System.getProperty("java.io.tmpdir"));
+			if(extract(rec, tempDir, NullProgressMonitor.getInstance()) == 0) {
+			    tempFiles.add(new File(tempDir, rec.getKey().getNodeName().toString()));
+			    try {
+// 				System.err.print("Trying to execute:");
+// 				for(String s : finalCommand)
+// 				    System.err.print(" \"" + s + "\"");
+// 				System.err.println(" in directory \"" + tempDir + "\"");
+				Process p = Runtime.getRuntime().exec(finalCommand, null, tempDir);
+				fopFrame.dispose();
+			    } catch(Exception e) {
+				String stackTrace = e.toString() + "\n";
+				for(StackTraceElement ste : e.getStackTrace()) stackTrace += "    " + ste.toString() + "\n";
+				JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "Open failed. Exception caught:\n" +
+							      stackTrace,
+							      "Error", JOptionPane.ERROR_MESSAGE);
+			    }
+			}
+			else
+			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+							  "Error while extracting file to temp dir.",
+							  "Error", JOptionPane.ERROR_MESSAGE);
+		    }
+		};
+	}
+	else if(Java6Specific.isJava6OrHigher() && Java6Specific.canOpen()) {
+	    //System.err.println("Java 1.6 detected.");
+	    alOpen = new ActionListener() {
+		    public void actionPerformed(ActionEvent ae) {
+			File tempDir = new File(System.getProperty("java.io.tmpdir"));
+			if(extract(rec, tempDir, NullProgressMonitor.getInstance()) == 0) {
+			    File extractedFile = new File(tempDir, rec.getKey().getNodeName().toString());
+			    tempFiles.add(new File(tempDir, rec.getKey().getNodeName().toString()));
+			    try {
+				Java6Specific.openFile(extractedFile);
+				fopFrame.dispose();
+			    } catch(IOException e) {
+                                JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "Could not find a handler to open the file with.\n" +
+                                                              "The file remains in\n    \"" + tempDir + "\"\nuntil you exit the program.",
+							      "Error", JOptionPane.ERROR_MESSAGE);
+			    } catch(Exception e) {
+				String stackTrace = e.toString() + "\n";
+				for(StackTraceElement ste : e.getStackTrace()) stackTrace += "    " + ste.toString() + "\n";
+				JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "Open failed. Exception caught:\n" +
+							      stackTrace,
+							      "Error", JOptionPane.ERROR_MESSAGE);
+			    }
+			}
+		    }
+		};
+	    
+	}
+	else if(System.getProperty("os.name").toLowerCase().startsWith("mac os x")) {
+	    //System.err.println("OS X detected");
+	    final String[] finalCommand = new String[] { "open", rec.getKey().getNodeName().toString() };
+	    alOpen = new ActionListener() {
+		    public void actionPerformed(ActionEvent ae) {
+			File tempDir = new File(System.getProperty("java.io.tmpdir"));
+			if(extract(rec, tempDir, NullProgressMonitor.getInstance()) == 0) {
+			    tempFiles.add(new File(tempDir, rec.getKey().getNodeName().toString()));
+			    try {
+// 				System.err.print("Trying to execute:");
+// 				for(String s : finalCommand)
+// 				    System.err.print(" \"" + s + "\"");
+// 				System.err.println(" in directory \"" + tempDir + "\"");
+				Process p = Runtime.getRuntime().exec(finalCommand, null, tempDir);
+				fopFrame.dispose();
+			    } catch(Exception e) {
+				String stackTrace = e.toString() + "\n";
+				for(StackTraceElement ste : e.getStackTrace()) stackTrace += "    " + ste.toString() + "\n";
+				JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "Open failed. Exception caught:\n" +
+							      stackTrace,
+							      "Error", JOptionPane.ERROR_MESSAGE);
+			    }
+			}
+			else
+			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+							  "Error while extracting file to temp dir.",
+							  "Error", JOptionPane.ERROR_MESSAGE);
+		    }
+		};
+	}
+	
+	ActionListener alSave = new ActionListener() {
+		public void actionPerformed(ActionEvent ae) {
+		    actionExtractToDir();
+		    fopFrame.dispose();
+		}
+	    };
+	FileOperationsPanel fop = new FileOperationsPanel(fopFrame, rec.getKey().getNodeName().toString(),
+							  file.getDataFork().getLogicalSize(),
+							  alOpen, alSave);
+	fopFrame.add(fop, BorderLayout.CENTER);
+	fopFrame.pack();
+	fopFrame.setLocationRelativeTo(null);
+	fopFrame.setVisible(true);
+    }
+    
+    /*
+    private void actionDoubleClickFile(final FSFile rec) {
+	final JDialog fopFrame = new JDialog(this, rec.getName(), true);
 	fopFrame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 	
 	ActionListener alOpen = null;
@@ -1413,11 +1607,24 @@ public class FileSystemBrowserWindow extends JFrame {
 	fopFrame.setLocationRelativeTo(null);
 	fopFrame.setVisible(true);
     }
+    */
     
-    private void actionExtractToDir() {
+    private void actionGoToParentDir() {
+        HFSPlusCatalogLeafRecord targetRecord = getDirTreeSelection();
+        if(targetRecord != null) {
+            LinkedList<HFSPlusCatalogLeafRecord> recordPath =
+                    fsView.getPathTo(targetRecord);
+            recordPath.removeFirst(); // setTreePath takes a path excluding the root node
+            if(recordPath.size() > 0) {
+                recordPath.removeLast(); // We seek our parents, not ourselves.
+                setTreePath(recordPath);
+            }
+        }
+    }
+    public void actionExtractToDir() {
 	actionExtractToDir(true, false);
     }
-    private void actionExtractToDir(final boolean dataFork, final boolean resourceFork) {
+    public void actionExtractToDir(final boolean dataFork, final boolean resourceFork) {
         if(!dataFork && !resourceFork)
             throw new IllegalArgumentException("Can't choose to extract nothing!");
 	try {
@@ -1479,7 +1686,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		JOptionPane.showMessageDialog(this, "No file or folder selected.",
 					      "Information", JOptionPane.INFORMATION_MESSAGE);
 	    }
-	    else throw new RuntimeException("wtf?"); // ;)
+	    else throw new RuntimeException("wtf?"); // ;-)
 	} catch(RuntimeException re) {
 	    JOptionPane.showMessageDialog(this, re.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 	}
@@ -1495,7 +1702,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	//fileChooser.setCurrentDirectory(fileChooser.getCurrentDirectory());
     }
         
-    private void actionGetInfo() {
+    public void actionGetInfo() {
 	HFSPlusCatalogLeafRecord rec = null;
 	if(dirTreeLastFocus > fileTableLastFocus) {
 	    Object o = dirTree.getLastSelectedPathComponent();
@@ -1668,13 +1875,37 @@ public class FileSystemBrowserWindow extends JFrame {
     private int extractRecursive(HFSPlusCatalogLeafRecord rec, File outDir, ProgressMonitor progressDialog,
 				 ObjectContainer<Boolean> overwriteAll, boolean dataFork, boolean resourceFork) {
         if(!dataFork && !resourceFork)
-            throw new IllegalArgumentException("Neither the data fork or resource fork were selected for extraction. Can't do nothing...");
+            throw new IllegalArgumentException("Neither the data fork or resource fork were selected for extraction. Won't do nothing...");
 	if(progressDialog.cancelSignaled()) {
 	    progressDialog.confirmCancel();
 	    return 0;
 	}
 	
 	int errorCount = 0;
+	if(!outDir.exists()) {
+	    String[] options = new String[] { "Create directory", "Cancel" };
+	    int reply =
+		JOptionPane.showOptionDialog(this, "Warning! Target directory:\n    \"" + outDir.getAbsolutePath() + "\"\n" +
+					     "does not exist. Do you want to create this directory?",
+					     "Warning", JOptionPane.YES_NO_CANCEL_OPTION,
+					     JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+	    if(reply != 0) {
+		++errorCount;
+		progressDialog.signalCancel();
+		return errorCount;
+	    }
+	    else {
+		if(!outDir.mkdirs()) {
+		    JOptionPane.showMessageDialog(this, "Could not create directory:\n    \"" +
+						  outDir.getAbsolutePath() + "\"\n",
+						  "Error", JOptionPane.ERROR_MESSAGE);
+		    ++errorCount;
+		    progressDialog.signalCancel();
+		    return errorCount;
+		}
+	    }
+	}
+	
 	HFSPlusCatalogLeafRecordData recData = rec.getData();
 	if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
 	   recData instanceof HFSPlusCatalogFile) {
@@ -1893,9 +2124,10 @@ public class FileSystemBrowserWindow extends JFrame {
 	catch(Exception e) {
 	    //It's ok. Non-critical.
 	}
+	
 	int parsedArgs = 0;
 	final FileSystemBrowserWindow fsbWindow;
-	if(args.length > 0 && args[0].equals("-dbgconsole")) {
+	if(args.length > 0 && args[0].equals(DEBUG_CONSOLE_ARG)) {
 	    DebugConsoleWindow dcw = new DebugConsoleWindow();
 	    System.setOut(new PrintStream(dcw.debugStream));
 	    System.setErr(new PrintStream(dcw.debugStream));
@@ -1904,6 +2136,14 @@ public class FileSystemBrowserWindow extends JFrame {
 	}	    
 	else
 	    fsbWindow = new FileSystemBrowserWindow();
+	
+	/*
+	System.err.println(FileSystemBrowserWindow.class.getName() + ".main invoked.");
+	for(int i = 0; i < args.length; ++i)
+	    System.err.println("  args[" + i + "]: \"" + args[i] + "\"");
+	System.err.println();
+	System.err.println("java.library.path=\"" + System.getProperty("java.library.path") + "\"");
+	*/
 	
 	fsbWindow.setVisible(true);
 	

@@ -257,14 +257,28 @@ public class HFSPlusFileSystemView {
 	else
 	    return null;
     }
-    public List<HFSPlusCatalogLeafRecord> getPathTo(HFSCatalogNodeID leafID) {
+    public LinkedList<HFSPlusCatalogLeafRecord> getPathTo(HFSCatalogNodeID leafID) {
 	HFSPlusCatalogLeafRecord leafRec = getRecord(leafID, new HFSUniStr255(""));
 	if(leafRec != null)
 	    return getPathTo(leafRec);
 	else
 	    throw new RuntimeException("No folder thread found!");
     }
-    public List<HFSPlusCatalogLeafRecord> getPathTo(HFSPlusCatalogLeafRecord leaf) {
+    
+    /**
+     * Calculates the path in the file system hierarchy to <code>leaf</code>.
+     * The path will be returned as a list where the first element is the root
+     * of the tree, and the last element is <code>leaf</code>. All the elements
+     * in between are the path components from the root to the leaf.
+     * 
+     * @param leaf the leaf to which the path from the root will go.
+     * @return a list of path components with the root record ('/') as head and
+     * <code>leaf</code> as tail.
+     */
+    public LinkedList<HFSPlusCatalogLeafRecord> getPathTo(HFSPlusCatalogLeafRecord leaf) {
+        if(leaf == null)
+            throw new IllegalArgumentException("argument \"leaf\" must not be null!");
+        
 	LinkedList<HFSPlusCatalogLeafRecord> pathList = new LinkedList<HFSPlusCatalogLeafRecord>();
 	pathList.addLast(leaf);
 	HFSCatalogNodeID parentID = leaf.getKey().getParentID();

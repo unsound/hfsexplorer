@@ -81,27 +81,52 @@
 #define DISABLE_JAVA_PROCESS_CREATION  FALSE
 
 /* The following defines specify the valid return values from the launcher executable. */
+/** One of the possible return values from this executable. */
 #define RETVAL_OK                              0
+/** One of the possible return values from this executable. */
 #define RETVAL_UNKNOWN_ERROR                  -1
+/** One of the possible return values from this executable. */
 #define RETVAL_JVM_NOT_FOUND                  -2
+/** One of the possible return values from this executable. */
 #define RETVAL_COULD_NOT_GET_CWD              -3
+/** One of the possible return values from this executable. */
 #define RETVAL_COMMANDLINETOARGVW_FAILED      -4
+/** One of the possible return values from this executable. */
 #define RETVAL_COULD_NOT_GET_EXE_PATH         -5
+/** One of the possible return values from this executable. */
 #define RETVAL_INVOKEUAC_FAILED               -6
+/** One of the possible return values from this executable. */
 #define RETVAL_ERROR_STARTING_JVM             -7
 
-/* Some string #defines that alter the program's behavior. */
-#define DLL_HOME                   "lib"
-#define PATH_SEPARATOR             ";" // This is Windows...
+
+/* <Some string #defines that alter the program's behavior.> */
+
+/**
+ * Relative path to the place where JNI .dll files used by the Java application are located.<br>
+ * The path is resolved against the parent directory of the executable.
+ */
+#define DLL_HOME        "lib"
+
+/** Path separator (':' on unix, ';' on Windows... and this is a Windows application...). */
+#define PATH_SEPARATOR  ";"
+
+/** The Windows registry path to the base key for locating a Java Runtime Environment. */
+#define JRE_KEY         _T("SOFTWARE\\JavaSoft\\Java Runtime Environment")
+
+/** The Windows registry key for "CurrentVersion". */
+#define CURVER_STR      _T("CurrentVersion")
+
+/** The Windows registry key for "RuntimeLib". */
+#define RUNLIB_STR      _T("RuntimeLib")
+
+/* </Some string #defines that alter the program's behavior.> */
+
 
 /* Debug macros. */
 #define FALSE     0
 #define TRUE      1
 
 /* Constants for the lookup of Java registry keys. */
-#define JRE_KEY         _T("SOFTWARE\\JavaSoft\\Java Runtime Environment")
-#define CURVER_STR      _T("CurrentVersion")
-#define RUNLIB_STR      _T("RuntimeLib")
 
 /* Other */
 #define ASCII_CODEPAGE 20127
@@ -197,7 +222,7 @@ static inline _TCHAR* ___A2T_copyChars(const char *source, _TCHAR* dest) {
 
 #endif /* defined _UNICODE */
 
-/*
+/**
  * Prints a Windows error value, obtained via GetLastError, in a human-readable way with an associated
  * message obtained from the windows API (FormatMessage).
  * This function also takes a prefix string, printed before the error LOG-message.
@@ -247,7 +272,7 @@ static inline void printError(const _TCHAR *const prefix, const DWORD errorVal) 
   LOG(trace, "returning from void printError((_TCHAR*) 0x%X, %d)", prefix, errorVal);
 }
 
-/*
+/**
  * Prints a Windows error value, obtained via GetLastError, in a human-readable way with an associated
  * message obtained from the windows API (FormatMessage).
  */
@@ -257,7 +282,7 @@ static inline void printError(const DWORD errorVal) {
   LOG(trace, "returning from void printError(%d)", errorVal);
 }
 
-/*
+/**
  * Convenience method for intializing the COM subsystem. Doesn't depend on static linking
  * with OLE/COM libraries.
  */
@@ -291,7 +316,7 @@ static bool initializeCOM() {
   return retval;
 }
 
-/*
+/**
  * Convenience method for un-intializing the COM subsystem. Doesn't depend on static linking
  * with OLE/COM libraries.
  */
@@ -317,7 +342,7 @@ static void uninitializeCOM() {
   LOG(trace, "returning from void uninitializeCOM()");
 }
 
-/*
+/**
  * Inline utility function for getting the correct string for a bool value
  * (i.e. not 1 or 0, but "true" or "false").
  */
@@ -626,7 +651,7 @@ static bool startJavaVM(JavaVM *jvmInstance, const int javaArgsLength, const _TC
       LOG(debug, "    - main method found");
       jclass stringClass = env->FindClass("java/lang/String");
       LOG(debug, "    - got String class");
-	  
+      
       // Create array to hold args (cast to jobjectArray is neccessary for g++ to accept code)
       jobjectArray argsArray = (jobjectArray)env->NewObjectArray(javaArgsLength, stringClass, NULL);
       LOG(debug, "    - created args array");
@@ -640,21 +665,20 @@ static bool startJavaVM(JavaVM *jvmInstance, const int javaArgsLength, const _TC
 	    
 	    
 #ifdef _UNICODE
-	  wcCur = _tcsdup(cur);
 	  wcCurLength = curLength;
+	  wcCur = new WCHAR[wcCurLength];
+	  wcsncpy(wcCur, cur, curLength);
 #else
 	  wcCurLength = MultiByteToWideChar(CP_OEMCP, 0, cur, curLength, NULL, 0);
 	  if(wcCurLength == 0) {
-	    //handleMultiByteToWideCharError(env, GetLastError());
-	    LOG(debug, "MultiByteToWideChar (getting length) failed...");
+	    printError(_T("MultiByteToWideChar (getting length) failed with error: "), GetLastError());
 	    return -1;
 	  }
 	  else {
-	    wcCur = (WCHAR*)malloc(sizeof(WCHAR)*wcCurLength);
+	    wcCur = new WCHAR[wcCurLength];
 	    if(MultiByteToWideChar(CP_OEMCP, 0, cur, curLength, wcCur, wcCurLength) == 0) {
-	      //handleMultiByteToWideCharError(env, GetLastError());
-	      LOG(debug, "MultiByteToWideChar (converting) failed...");
-	      free(wcCur);
+	      printError(_T("MultiByteToWideChar (converting) failed with error: "), getLastError());
+	      delete[] wcCur;
 	      wcCur = NULL;
 	    }
 	  }
@@ -665,26 +689,26 @@ static bool startJavaVM(JavaVM *jvmInstance, const int javaArgsLength, const _TC
 	    char* utf8String;
 	    int utf8StringLength = WideCharToMultiByte(CP_UTF8, 0, wcCur, wcCurLength, NULL, 0, NULL, NULL);
 	    LOG(debug, "utf8StringLength=%d", utf8StringLength);
-	    utf8String = (char*) malloc(sizeof(char)*utf8StringLength + 1); // +1, beacause of terminating \0 character
+	    utf8String = new char[utf8StringLength + 1]; // +1, beacause of terminating \0 character
 	    if(WideCharToMultiByte(CP_UTF8, 0, wcCur, wcCurLength, utf8String, utf8StringLength, NULL, NULL) != 0) {
 	      utf8String[utf8StringLength] = '\0';
 	      jstring cur = env->NewStringUTF(utf8String);
 	      env->SetObjectArrayElement(argsArray, newi, cur);
 	    }
 	    else
-	      LOG(debug, "Failed to convert wcCur (argv[%d]) to UTF-8!", newi);
-	    free(utf8String);
+	      LOG(error, "Failed to convert wcCur (argv[%d]) to UTF-8!", newi);
+	    delete[] utf8String;
 	  }
 	  else
-	    LOG(debug, "Failed to convert argv[%d] to WCHAR!", newi);
-	  free(wcCur);
+	    LOG(error, "Failed to convert argv[%d] to WCHAR!", newi);
+	  delete[] wcCur;
 	}
 	  
 	LOG(debug, "    - args array built. Calling main(String[])...");
 	env->CallStaticVoidMethod(cls, mid, argsArray);
 	if(env->ExceptionOccurred()) {
 	  env->ExceptionDescribe();
-	  LOG(debug, "    - Exception occurred!");
+	  LOG(error, "    - Exception occurred!");
 	}
 	else {
 	  LOG(debug, "    - Successfully invoked main method!");	  
@@ -701,7 +725,7 @@ static bool startJavaVM(JavaVM *jvmInstance, const int javaArgsLength, const _TC
   return retval;
 }
 
-/*
+/**
  * Creates an external Java process using imageFile as the Java executable.
  * imageFile is typically the path to an .exe file called "java.exe" or "javaw.exe".
  */
@@ -741,6 +765,9 @@ static bool createExternalJavaProcess(const _TCHAR *imageFile, int javaArgsLengt
     _TCHAR *commandLine = argsStringBuilder.toWideCharString(new _TCHAR[argsStringBuilder.length()+1]);
     
     LOG(debug, "commandLine=\"%s\"", commandLine);
+    //LOG(debug, "printing characters in commandLine detailed:");
+    //for(int i = 0; commandLine[i] != _T('\0'); ++i)
+    //  LOG(debug, "  commandLine[%d]: '%c' (0x%X)", i, commandLine[i], commandLine[i]);
     LOG(debug, "Trying to spawn process from commandLine...");
     // This is PATHETIC. A simpler API please, MS.. null null false null 0 null bla bla unreadable
     if(CreateProcess(NULL, commandLine, 
@@ -802,7 +829,7 @@ static bool createExternalJavaProcesses(int javaArgsLength, const _TCHAR **javaA
   return retval;
 }
 
-/*
+/**
  * Modifies the global variable classpathString as a result.
  */
 static void resolveClasspath(const _TCHAR *const prefix) {
@@ -845,7 +872,7 @@ static void resolveClasspath(const _TCHAR *const prefix) {
   LOG(trace, "returning from void resolveClasspath((_TCHAR*) 0x%X)", prefix);
 }
 
-/*
+/**
  * If the first argument is "-invokeuac" we do a little magic in order to fork off
  * a new process with higher access rights than the current process. This will in
  * Windows Vista lead to an UAC dialog (if UAC is turned on) so the user can
@@ -953,7 +980,6 @@ static bool spawnElevatedProcess(_TCHAR *imageFile, _TCHAR *currentWorkingDirect
   return retval;
 }
 
-//int __cdecl _tmain(int argc, _TCHAR **argv, _TCHAR **envp) {
 int main(int original_argc, char** original_argv) {
   LOG(trace, "int main(%d, (char**)0x%X)", original_argc, original_argv);
 #ifdef _UNICODE
@@ -974,7 +1000,6 @@ int main(int original_argc, char** original_argv) {
   _TCHAR *processFilename = NULL;
   while(1) {
     if(processFilename != NULL) {
-      //processFilename = (_TCHAR*) realloc(processFilename, sizeof(_TCHAR)*processFilenameLength);
       delete[] processFilename;
     }
     processFilename = new _TCHAR[processFilenameLength];
@@ -1196,7 +1221,7 @@ int main(int original_argc, char** original_argv) {
   // <Cleanup>
   delete[] currentWorkingDirectory;
   delete[] processParentDir;
-  free(processFilename);
+  delete[] processFilename;
   // </Cleanup>
 
   return returnValue;

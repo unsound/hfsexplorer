@@ -27,16 +27,75 @@ public class WindowsLowLevelIO implements org.catacombae.hfsexplorer.io.LowLevel
     private static Object loadLibSync = new Object();
     private static boolean libraryLoaded = false;
     
-    public static boolean isSystemSupported() {
-        return System.getProperty("os.name").toLowerCase().startsWith("windows") &&
-	   System.getProperty("os.arch").toLowerCase().equals("x86");
+    private enum ArchitectureIdentifier {
+	I386("i386"), AMD64("amd64"), IA64("ia64"), UNKNOWN;
+	
+	private final String idString;
+	
+	private ArchitectureIdentifier() {
+	    this.idString = null;
+	}
+	private ArchitectureIdentifier(String idString) {
+	    this.idString = idString;
+	}
+	
+	public String getArchitectureString() {
+	    return idString;
+	}
+    };
+    
+    private static ArchitectureIdentifier getJVMArchitecture() {
+	// Trying to cover all thinkable cases here...
+	// Got some hints from http://lopica.sourceforge.net/os.html
+	final String osArch = System.getProperty("os.arch");
+	if(osArch.equalsIgnoreCase("x86") ||
+	   osArch.equalsIgnoreCase("i386") ||
+	   osArch.equalsIgnoreCase("i486") ||
+	   osArch.equalsIgnoreCase("i586") ||
+	   osArch.equalsIgnoreCase("i686"))
+	    return ArchitectureIdentifier.I386;
+	else if(osArch.equalsIgnoreCase("amd64") ||
+		osArch.equalsIgnoreCase("x86_64") ||
+		osArch.equalsIgnoreCase("x64"))
+	    return ArchitectureIdentifier.AMD64;
+	else if(osArch.equalsIgnoreCase("ia64") ||
+		osArch.equalsIgnoreCase("ia64n"))
+	    return ArchitectureIdentifier.IA64;
+	else
+	    return ArchitectureIdentifier.UNKNOWN;
     }
+    
+    public static boolean isSystemSupported() {
+	ArchitectureIdentifier archId = getJVMArchitecture();
+        return
+	    System.getProperty("os.name").toLowerCase().startsWith("windows") &&
+	    (archId == ArchitectureIdentifier.I386 ||
+	     archId == ArchitectureIdentifier.AMD64 ||
+	     archId == ArchitectureIdentifier.IA64);
+    }
+    
+    /**
+     * Does not check if the system is supported, and just tries to load the approprate library
+     * from the architecture string specified in this system's ArchitectureIdentifier.
+     */
     private static void loadLibrary() {
-	try {
-	    System.loadLibrary("llio");
-            libraryLoaded = true;
-	} catch(Exception e) {
-	    e.printStackTrace();
+	final ArchitectureIdentifier archId = getJVMArchitecture();
+	if(archId == ArchitectureIdentifier.UNKNOWN) {
+	    System.err.println(System.getProperty("os.arch") + ": architecture unknown! Cannot locate appropriate native I/O library.");
+	    throw new RuntimeException("loadLibrary(): CPU architecture unknown!");
+	}
+	else {
+	    final String libName = "llio_" + archId.getArchitectureString();
+	    try {
+		System.err.println("Trying to load native library \"" + libName + "\"...");
+		System.loadLibrary(libName);
+		System.err.println("Native library \"" + libName + "\" successfully loaded.");
+		libraryLoaded = true;
+	    } catch(UnsatisfiedLinkError e) {
+		System.err.println("ERROR: Native library \"" + libName + "\" failed to load!");
+		System.err.println("java.library.path=\"" + System.getProperty("java.library.path") + "\"");
+		throw e;
+	    }
 	}
     }
     

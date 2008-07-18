@@ -9,7 +9,7 @@ jobCompleted() {
     echo "Done!"
 }
 
-CLASSPATH=build.~:dist/lib/swing-layout-1.0.1.jar:dist/lib/hfsx_dmglib.jar:lib/java_awt_Desktop.jar
+CLASSPATH=build.~:dist/lib/swing-layout-1.0.3.jar:dist/lib/hfsx_dmglib.jar:lib/java_awt_Desktop.jar
 SOURCES_DIR=src
 BUILD_DIR=build.~
 LIBRARY_PATH=lib
