@@ -9,7 +9,9 @@ jobCompleted() {
     echo "Done!"
 }
 
-CLASSPATH=build.~:dist/lib/swing-layout-1.0.3.jar:dist/lib/hfsx_dmglib.jar:lib/java_awt_Desktop.jar
+JAVAC_CMD="${JAVA_HOME:+${JAVA_HOME}/bin/}javac"
+JAVAC_DEFAULT_ARGS="-target 1.5 -source 1.5 -encoding iso-8859-1"
+CLASSPATH=build.~:lib/AppleJavaExtensions.jar:dist/lib/swing-layout-1.0.3.jar:dist/lib/hfsx_dmglib.jar:lib/java_awt_Desktop.jar
 SOURCES_DIR=src
 BUILD_DIR=build.~
 LIBRARY_PATH=lib
@@ -20,6 +22,8 @@ RESOURCE_DST_DIR=$BUILD_DIR/res
 BUILDENUM_CP=lib/buildenumerator.jar
 METAINF_DIR=src.META-INF
 MANIFEST_FILE=MANIFEST.MF
+
+echo "javac command: ${JAVAC_CMD}"
 
 removeclassfiles() {
     echo "Removing all class files..."
@@ -47,31 +51,31 @@ decrement_buildnumber() {
 
 buildhfsx() {
     echo "Building org.catacombae.hfsexplorer..."
-    javac -target 1.5 -source 1.5 -cp $CLASSPATH -sourcepath $SOURCES_DIR -d $BUILD_DIR -Xlint:unchecked $SOURCES_DIR/org/catacombae/hfsexplorer/*.java
+    "${JAVAC_CMD}" $JAVAC_DEFAULT_ARGS -cp $CLASSPATH -sourcepath $SOURCES_DIR -d $BUILD_DIR -Xlint:unchecked $SOURCES_DIR/org/catacombae/hfsexplorer/*.java
     return $?
 }
 
 buildhfsx_partitioning() {
     echo "Building org.catacombae.hfsexplorer.partitioning..."
-    javac -target 1.5 -source 1.5 -cp $CLASSPATH -sourcepath $SOURCES_DIR -d $BUILD_DIR -Xlint:unchecked $SOURCES_DIR/org/catacombae/hfsexplorer/partitioning/*.java
+    "${JAVAC_CMD}" $JAVAC_DEFAULT_ARGS -cp $CLASSPATH -sourcepath $SOURCES_DIR -d $BUILD_DIR -Xlint:unchecked $SOURCES_DIR/org/catacombae/hfsexplorer/partitioning/*.java
     return $?
 }
 
 buildhfsx_gui() {
     echo "Building org.catacombae.hfsexplorer.gui..."
-    javac -target 1.5 -source 1.5 -cp $CLASSPATH -sourcepath $SOURCES_DIR -d $BUILD_DIR -Xlint:unchecked $SOURCES_DIR/org/catacombae/hfsexplorer/gui/*.java
+    "${JAVAC_CMD}" $JAVAC_DEFAULT_ARGS -cp $CLASSPATH -sourcepath $SOURCES_DIR -d $BUILD_DIR -Xlint:unchecked $SOURCES_DIR/org/catacombae/hfsexplorer/gui/*.java
     return $?
 }
 
 buildhfsx_testcode() {
     echo "Building org.catacombae.hfsexplorer.testcode..."
-    javac -target 1.5 -source 1.5 -cp $CLASSPATH -sourcepath $SOURCES_DIR -d $BUILD_DIR -Xlint:unchecked $SOURCES_DIR/org/catacombae/hfsexplorer/testcode/*.java
+    "${JAVAC_CMD}" $JAVAC_DEFAULT_ARGS -cp $CLASSPATH -sourcepath $SOURCES_DIR -d $BUILD_DIR -Xlint:unchecked $SOURCES_DIR/org/catacombae/hfsexplorer/testcode/*.java
     return $?
 }
 
 buildhfsx_types() {
     echo "Building org.catacombae.hfsexplorer.types..."
-    javac -target 1.5 -source 1.5 -cp $CLASSPATH -sourcepath $SOURCES_DIR -d $BUILD_DIR -Xlint:unchecked $SOURCES_DIR/org/catacombae/hfsexplorer/types/*.java
+    "${JAVAC_CMD}" $JAVAC_DEFAULT_ARGS -cp $CLASSPATH -sourcepath $SOURCES_DIR -d $BUILD_DIR -Xlint:unchecked $SOURCES_DIR/org/catacombae/hfsexplorer/types/*.java
     return $?
 }
 
