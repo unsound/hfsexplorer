@@ -14,7 +14,7 @@ HFSExplorer Changelog
   - Extract data and resource fork(s)
 - Extract progress window now always closes when user clicks the window's close button,
   even though the extraction process might not have ended. This enables the user to do
-  error checking if extraction hangs. (CHECK THIS)
+  error checking if extraction hangs.
 - Windows: Added support for 64-bit JVMs (compiled code now exists for x86_64 and
   Itanium, though only x86_64 has been tested).
 - Launcher improvements and various small bug fixes to cope with 64-bit Windows and WOW64.
