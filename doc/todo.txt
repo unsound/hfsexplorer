@@ -1,6 +1,6 @@
 HFSExplorer TODO:
 
-- All in bugs.txt
+- All in bugs.txt [LÅT STÅ]
 
 - Valence of a folder should be read immediatly after expansion so that the user
   doesn't have to click it to see if it contains any children.
@@ -10,8 +10,6 @@ HFSExplorer TODO:
 
 - Create an indeterminate progress monitor window for when opening DMG files
   (reading their structures) takes a long time.
-
-- Sorting of files in the right pane by clicking the table headers.
 
 - Implement support for symbolic links. Need to read more about them.
   "James" <jg193404@ohio.edu> writes:
@@ -25,3 +23,35 @@ HFSExplorer TODO:
     Anyway, thanks for your work and I hope you continue improving your program.
     
     James
+
+- Backing store structure view:
+  View the different data layers through which the HFS+ file system was loaded.
+
+- Detection of ISO9660/UDF file systems, to help the user understand why the
+  optical media image could not be loaded.
+
+- HFS+ volume label change. (First write-feature...)
+
+- UDIF menu for UDIF-loaded file systems where the user can convert UDIF to ISO
+  and also display properties on the UDIF file, for instance type
+  (UDBZ, UDCO, etc.).
+
+- Improvements on the extract dialog:
+  - "Advanced >>" button which displays checkboxes for default actions when
+    encountering Overwrite situations, Rename situations, Directory already
+    exists operations... etc.
+  - Show a log file at the end (which can be saved) displaying all errors
+    encountered and which actions were taken in response.
+
+- Tools menu -> Calculate file system fragmentation
+  To find out how badly fragmented files are in the file system. Code is already
+  there for hfsx command line tool.
+
+- Info dialog summary for files and folders with recursive background calculation
+  of tree weights (like Explorer). Should be the first tab for files and folders.
+
+- Implement file thread and folder thread views in the B-Tree view.
+
+- Complete journal view, in preparation of write mode. We must be able to utilize
+  journaling from the beginning, because we can't trust the operating system's
+  write caching features.
