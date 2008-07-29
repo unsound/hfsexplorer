@@ -8,7 +8,9 @@ jobCompleted() {
     echo "Done!"
 }
 
-CLASSPATH=build.~:dist/lib/swing-layout-1.0.1.jar:dist/lib/hfsx_dmglib.jar:lib/java_awt_Desktop.jar
+JAVAC_CMD="${JAVA_HOME:+${JAVA_HOME}/bin/}javac"
+JAVAC_DEFAULT_ARGS="-target 1.5 -source 1.5 -encoding iso-8859-1"
+CLASSPATH=build.~:dist/lib/catacombae_io.jar:dist/lib/swing-layout-1.0.3.jar:dist/lib/hfsx_dmglib.jar:lib/java_awt_Desktop.jar
 SOURCES_DIR=src
 BUILD_DIR=build.~
 LIBRARY_PATH=lib
@@ -27,7 +29,7 @@ removeclassfiles() {
 
 buildjparted() {
     echo "Building org.catacombae.jparted.app..."
-    javac -cp $CLASSPATH -sourcepath $SOURCES_DIR -d $BUILD_DIR -Xlint:unchecked $SOURCES_DIR/org/catacombae/jparted/app/*.java
+    "${JAVAC_CMD}" $JAVAC_DEFAULT_ARGS -cp $CLASSPATH -sourcepath $SOURCES_DIR -d $BUILD_DIR -Xlint:unchecked $SOURCES_DIR/org/catacombae/jparted/app/*.java
     return $?
 }
 

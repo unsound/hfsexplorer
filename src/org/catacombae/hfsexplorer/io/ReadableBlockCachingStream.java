@@ -18,8 +18,10 @@
 package org.catacombae.hfsexplorer.io;
 
 import java.util.*;
+import org.catacombae.io.ReadableFilterStream;
+import org.catacombae.io.ReadableRandomAccessStream;
 
-public class BlockCachingLLF extends FilterLLF {
+public class ReadableBlockCachingStream extends ReadableFilterStream {
     /*
      * Keep track of the access count for every (?) block. The <itemCount> blocks with the highest
      * access count are kept in the cache.
@@ -70,7 +72,7 @@ public class BlockCachingLLF extends FilterLLF {
 	}
     }
 			    
-    public BlockCachingLLF(LowLevelFile backing, int blockSize, int maxItemCount) {
+    public ReadableBlockCachingStream(ReadableRandomAccessStream backing, int blockSize, int maxItemCount) {
 	super(backing);
 	if(backing == null)
 	    throw new IllegalArgumentException("backing can not be null");
@@ -82,7 +84,7 @@ public class BlockCachingLLF extends FilterLLF {
 	this.blockSize = blockSize;
 	this.virtualLength = backing.length(); // Immutable
 	int actualItemCount = maxItemCount;
-	//System.err.println("BlockCachingLLF created. virtualLength: " + virtualLength + " maxItemCount*blockSize: " + (maxItemCount*blockSize));
+	//System.err.println("ReadableBlockCachingStream created. virtualLength: " + virtualLength + " maxItemCount*blockSize: " + (maxItemCount*blockSize));
 	if(actualItemCount*blockSize > virtualLength) {
 	    actualItemCount = (int)( virtualLength/blockSize - ((virtualLength%blockSize == 0) ? 1 : 0) );
 	    //System.err.println("Adjusted actualItemCount to " + actualItemCount);
@@ -115,7 +117,7 @@ public class BlockCachingLLF extends FilterLLF {
     @Override
     public int read(final byte[] data, final int pos, final int len) {
 	if(closed) throw new RuntimeException("File is closed.");
-	//System.out.println("BlockCachingLLF.read(data, " + pos + ", " + len + ");");
+	//System.out.println("ReadableBlockCachingStream.read(data, " + pos + ", " + len + ");");
 	//long fp = getFilePointer();
 	int bytesProcessed = 0;
 	while(bytesProcessed < len) {

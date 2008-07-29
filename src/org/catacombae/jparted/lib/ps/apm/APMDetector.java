@@ -5,7 +5,7 @@
 package org.catacombae.jparted.lib.ps.apm;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.io.LowLevelFile;
+import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.partitioning.ApplePartitionMap;
 import org.catacombae.hfsexplorer.partitioning.DriverDescriptorRecord;
 import org.catacombae.jparted.lib.DataLocator;
@@ -25,7 +25,7 @@ public class APMDetector extends PartitionSystemDetector {
     @Override
     public boolean existsPartitionSystem() {
         try {
-            LowLevelFile llf = data.createReadOnlyFile();
+            ReadableRandomAccessStream llf = data.createReadOnlyFile();
             byte[] firstBlock = new byte[512];
             
             llf.readFully(firstBlock);

@@ -16,8 +16,8 @@
  */
 
 package org.catacombae.hfsexplorer.partitioning;
-import org.catacombae.hfsexplorer.io.LowLevelFile;
-import org.catacombae.hfsexplorer.io.ArrayBackedFile;
+import org.catacombae.io.ReadableRandomAccessStream;
+import org.catacombae.io.ReadableByteArrayStream;
 import java.io.PrintStream;
 import java.util.LinkedList;
 
@@ -36,21 +36,21 @@ public class MBRPartitionTable implements PartitionSystem {
     private final PartitionSystem[] embeddedPartitionSystems;
  
     public MBRPartitionTable(byte[] data, int offset) {
-        this(new ArrayBackedFile(data), offset, false);
+        this(new ReadableByteArrayStream(data), offset, false);
     }
     public MBRPartitionTable(byte[] data, int offset, int sectorSize) {
-        this(new ArrayBackedFile(data), offset, sectorSize, false);
+        this(new ReadableByteArrayStream(data), offset, sectorSize, false);
     }
-    public MBRPartitionTable(LowLevelFile raf, int offset) {
+    public MBRPartitionTable(ReadableRandomAccessStream raf, int offset) {
         this(raf, offset, true);
     }
-    public MBRPartitionTable(LowLevelFile raf, int offset, boolean parseEmbeddedPartitionSystems) {
+    public MBRPartitionTable(ReadableRandomAccessStream raf, int offset, boolean parseEmbeddedPartitionSystems) {
         this(raf, offset, DEFAULT_SECTOR_SIZE, parseEmbeddedPartitionSystems);
     }
-    public MBRPartitionTable(LowLevelFile raf, int offset, int sectorSize) {
+    public MBRPartitionTable(ReadableRandomAccessStream raf, int offset, int sectorSize) {
         this(raf, offset, sectorSize, true);
     }
-    public MBRPartitionTable(LowLevelFile raf, int offset, int sectorSize, boolean parseEmbeddedPartitionSystems) {
+    public MBRPartitionTable(ReadableRandomAccessStream raf, int offset, int sectorSize, boolean parseEmbeddedPartitionSystems) {
         byte[] block = new byte[sectorSize];
         raf.seek(offset);
         raf.readFully(block);

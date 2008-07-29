@@ -6,8 +6,8 @@
 package org.catacombae.jparted.lib;
 
 //import java.io.InputStream;
-import org.catacombae.hfsexplorer.io.LowLevelFile;
-import org.catacombae.hfsexplorer.io.WritableLowLevelFile;
+import org.catacombae.io.ReadableRandomAccessStream;
+import org.catacombae.io.RandomAccessStream;
 
 /**
  *
@@ -20,6 +20,6 @@ public abstract class DataLocator {
         return new RandomAccessFileInputStream(createReadOnlyFile());
     }
     */
-    public abstract LowLevelFile createReadOnlyFile();
-    public abstract WritableLowLevelFile createReadWriteFile();
+    public abstract ReadableRandomAccessStream createReadOnlyFile();
+    public abstract RandomAccessStream createReadWriteFile();
 }

@@ -17,7 +17,7 @@
 
 package org.catacombae.hfsexplorer.partitioning;
 
-import org.catacombae.hfsexplorer.io.LowLevelFile;
+import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.Util2;
 import java.io.PrintStream;
@@ -55,7 +55,7 @@ public class DriverDescriptorRecord {
     private final DriverDescriptorEntry[] entries;
     private final byte[] ddPad;
     
-    public DriverDescriptorRecord(LowLevelFile llf, long offset) {
+    public DriverDescriptorRecord(ReadableRandomAccessStream llf, long offset) {
 	this(readData(llf, offset), 0);
     }
     public DriverDescriptorRecord(byte[] data, int offset) {
@@ -78,7 +78,7 @@ public class DriverDescriptorRecord {
 	System.arraycopy(data, padOffset, ddPad, 0, ddPad.length);
     }
     
-    private static byte[] readData(LowLevelFile llf, long offset) {
+    private static byte[] readData(ReadableRandomAccessStream llf, long offset) {
 	byte[] data = new byte[length()];
 	llf.seek(offset);
 	if(llf.read(data) != data.length)

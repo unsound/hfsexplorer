@@ -37,24 +37,24 @@
 
 package org.catacombae.hfsexplorer;
 
-import org.catacombae.hfsexplorer.io.LowLevelFile;
+import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.types.*;
 
-public class ForkFilter implements LowLevelFile {
+public class ForkFilter implements ReadableRandomAccessStream {
     private HFSPlusForkData forkData;
     private HFSPlusExtentDescriptor[] extentDescriptors;
-    private LowLevelFile sourceFile;
+    private ReadableRandomAccessStream sourceFile;
     private long fsOffset;
     private long blockSize;
     private long logicalPosition; // The current position in the fork
     private long lastLogicalPos; // The position in the fork where we stopped reading last time
     private long lastPhysicalPos; // The position in the fork where we stopped reading last time
     
-//     public ForkFilter(HFSPlusForkData forkData, LowLevelFile sourceFile, long fsOffset, long blockSize) {
+//     public ForkFilter(HFSPlusForkData forkData, ReadableRandomAccessStream sourceFile, long fsOffset, long blockSize) {
 // 	this(forkData, forkData.getExtents().getExtentDescriptors(), sourceFile, fsOffset, blockSize);
 //     }
     public ForkFilter(HFSPlusForkData forkData, HFSPlusExtentDescriptor[] extentDescriptors, 
-		      LowLevelFile sourceFile, long fsOffset, long blockSize) {
+		      ReadableRandomAccessStream sourceFile, long fsOffset, long blockSize) {
 	this.forkData = forkData;
 	this.extentDescriptors = extentDescriptors;
 	this.sourceFile = sourceFile;
@@ -168,7 +168,7 @@ public class ForkFilter implements LowLevelFile {
     public long length() { return forkData.getLogicalSize(); }
     public long getFilePointer() { return logicalPosition; }
     
-    public LowLevelFile getUnderlyingStream() { return sourceFile; }
+    public ReadableRandomAccessStream getUnderlyingStream() { return sourceFile; }
     
     /** Closes the underlying stream. Equivalent to <code>getUnderlyingStream().close()</code>. Nothing more is done. */
     public void close() { sourceFile.close(); }

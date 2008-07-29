@@ -17,8 +17,8 @@
 
 package org.catacombae.hfsexplorer;
 
-import org.catacombae.hfsexplorer.io.RandomAccessLLF;
-import org.catacombae.hfsexplorer.io.LowLevelFile;
+import org.catacombae.io.ReadableFileStream;
+import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.partitioning.*;
 import org.catacombae.hfsexplorer.types.*;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
@@ -79,11 +79,11 @@ public class HFSExplorer {
 	parseOptions(args, 0, args.length);
 	
 	//RandomAccessFile isoRaf = new RandomAccessFile(args[0], "r");
-	LowLevelFile isoRaf;
+	ReadableRandomAccessStream isoRaf;
 	if(WindowsLowLevelIO.isSystemSupported())
 	    isoRaf = new WindowsLowLevelIO(operation.getFilename());
 	else
-	    isoRaf = new RandomAccessLLF(operation.getFilename());
+	    isoRaf = new ReadableFileStream(operation.getFilename());
 	
 	long offset; // Offset in isoRaf where the file system starts
 	long length; // Length of the file system data
@@ -137,7 +137,7 @@ public class HFSExplorer {
 	    operationSystemFileInfo(operation, isoRaf, offset, length);
     }
     
-    private static void operationTest(Operation operation, LowLevelFile isoRaf, long offset, long length) throws IOException {
+    private static void operationTest(Operation operation, ReadableRandomAccessStream isoRaf, long offset, long length) throws IOException {
 	    System.out.println("Reading partition data starting at " + offset + "...");
 	    byte[] currentBlock = new byte[512];
 	    isoRaf.seek(offset + 1024);
@@ -336,7 +336,7 @@ public class HFSExplorer {
 	
     }
     
-    public static void operationBrowse(Operation op, LowLevelFile hfsFile, long fsOffset, long fsLength) {
+    public static void operationBrowse(Operation op, ReadableRandomAccessStream hfsFile, long fsOffset, long fsLength) {
 	HFSPlusFileSystemView fsView = new HFSPlusFileSystemView(hfsFile, fsOffset);
 	HFSPlusCatalogLeafRecord rootRecord = fsView.getRoot();
 	HFSPlusCatalogLeafRecord currentDir = rootRecord;
@@ -606,7 +606,7 @@ public class HFSExplorer {
 	}
     }
 
-    private static void operationFragCheck(Operation op, LowLevelFile hfsFile, long fsOffset, long fsLength) {
+    private static void operationFragCheck(Operation op, ReadableRandomAccessStream hfsFile, long fsOffset, long fsLength) {
 	println("Gathering information about the files on the volume...");
 	final int numberOfFilesToDisplay = 10;
 	ArrayList<Pair<HFSPlusCatalogLeafRecord, Integer>> mostFragmentedList = new ArrayList<Pair<HFSPlusCatalogLeafRecord, Integer>>(numberOfFilesToDisplay+1);
@@ -678,8 +678,8 @@ public class HFSExplorer {
 	}
     }
     
-    private static void operationSystemFileInfo(Operation op, LowLevelFile hfsFile, long fsOffset, long fsLength) {
-	LowLevelFile oldHfsFile = hfsFile;
+    private static void operationSystemFileInfo(Operation op, ReadableRandomAccessStream hfsFile, long fsOffset, long fsLength) {
+	ReadableRandomAccessStream oldHfsFile = hfsFile;
 // 	System.err.println("Opening hack UDIF file...");
 // 	hfsFile = new UDIFRandomAccessLLF("/Users/erik/documents.dmg");
 // 	System.err.println("Opened.");

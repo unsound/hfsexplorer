@@ -18,9 +18,10 @@
 package org.catacombae.hfsexplorer.win32;
 
 import org.catacombae.hfsexplorer.Util;
+import org.catacombae.io.ReadableRandomAccessStream;
 import java.io.*;
 
-public class WindowsLowLevelIO implements org.catacombae.hfsexplorer.io.LowLevelFile {
+public class WindowsLowLevelIO implements ReadableRandomAccessStream {
     protected byte[] fileHandle;
     protected int sectorSize = 512; //Detect this later..
     protected long filePointer = 0;

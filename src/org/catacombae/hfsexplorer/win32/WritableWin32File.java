@@ -16,13 +16,13 @@
  */
 
 package org.catacombae.hfsexplorer.win32;
-import org.catacombae.hfsexplorer.io.WritableLowLevelFile;
+import org.catacombae.io.RandomAccessStream;
 import org.catacombae.hfsexplorer.*;
 
 /** BUG: Writing at the end of a file will always expand it to fit the sector size! Not very good. Fixit.
     Note: Is this fixed? */
 
-public class WritableWin32File extends WindowsLowLevelIO implements WritableLowLevelFile {
+public class WritableWin32File extends WindowsLowLevelIO implements RandomAccessStream {
     private byte[] sectorBuffer;
     public WritableWin32File(String filename) {
 	super(filename);

@@ -17,11 +17,11 @@
 
 package org.catacombae.hfsexplorer;
 
-import org.catacombae.hfsexplorer.io.LowLevelFile;
+import org.catacombae.io.ReadableRandomAccessStream;
 
 public class UDIFRecognizer {
     private static final int SIGNATURE = 0x6B6F6C79; // in ASCII this reads 'koly' as a fourcc
-    public static boolean isUDIF(LowLevelFile llf) {
+    public static boolean isUDIF(ReadableRandomAccessStream llf) {
 	if(llf.length() < 512) return false;
 	
 	llf.seek(llf.length()-512);
