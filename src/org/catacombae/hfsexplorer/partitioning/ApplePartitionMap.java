@@ -17,17 +17,16 @@
 
 package org.catacombae.hfsexplorer.partitioning;
 
-import org.catacombae.hfsexplorer.io.RandomAccessLLF;
-import org.catacombae.hfsexplorer.io.LowLevelFile;
-import org.catacombae.hfsexplorer.io.ArrayBackedFile;
-import org.catacombae.hfsexplorer.*;
+import org.catacombae.io.ReadableFileStream;
+import org.catacombae.io.ReadableRandomAccessStream;
+import org.catacombae.io.ReadableByteArrayStream;
 import java.util.ArrayList;
 import java.io.PrintStream;
 
 public class ApplePartitionMap implements PartitionSystem {
     private APMPartition[] partitions;
     
-    public ApplePartitionMap(LowLevelFile isoRaf, long pmOffset, int blockSize) {
+    public ApplePartitionMap(ReadableRandomAccessStream isoRaf, long pmOffset, int blockSize) {
 	isoRaf.seek(pmOffset);
 	byte[] currentBlock = new byte[/*512*/blockSize];
 	ArrayList<APMPartition> partitionList = new ArrayList<APMPartition>();
@@ -42,7 +41,7 @@ public class ApplePartitionMap implements PartitionSystem {
     }
     
     public ApplePartitionMap(byte[] data, int off, int blockSize) {
-        this(new ArrayBackedFile(data, 0, data.length), off, blockSize);
+        this(new ReadableByteArrayStream(data, 0, data.length), off, blockSize);
         /*
 	byte[] currentBlock = new byte[blockSize];
 	ArrayList<APMPartition> partitionList = new ArrayList<APMPartition>();
@@ -126,7 +125,7 @@ public class ApplePartitionMap implements PartitionSystem {
     
     /** This main method prints the fields of the DDR and APM in the file specified in args[0], offset 0. */
     public static void main(String[] args) {
-	RandomAccessLLF fin = new RandomAccessLLF(args[0]);
+	ReadableFileStream fin = new ReadableFileStream(args[0]);
 	byte[] curBlock = new byte[DriverDescriptorRecord.length()];
 	
 	if(fin.read(curBlock) != curBlock.length) throw new RuntimeException("Could not read all...");

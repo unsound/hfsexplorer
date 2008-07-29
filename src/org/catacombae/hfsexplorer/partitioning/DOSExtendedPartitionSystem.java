@@ -19,7 +19,7 @@ package org.catacombae.hfsexplorer.partitioning;
 
 import java.io.PrintStream;
 import java.util.LinkedList;
-import org.catacombae.hfsexplorer.io.LowLevelFile;
+import org.catacombae.io.ReadableRandomAccessStream;
 
 /**
  *
@@ -28,7 +28,7 @@ import org.catacombae.hfsexplorer.io.LowLevelFile;
 public class DOSExtendedPartitionSystem implements PartitionSystem {
     private final ExtendedBootRecord[] extendedBootRecords;
     
-    public DOSExtendedPartitionSystem(LowLevelFile llf, long extendedPartitionOffset,
+    public DOSExtendedPartitionSystem(ReadableRandomAccessStream llf, long extendedPartitionOffset,
                                       long extendedPartitionLength, int sectorSize) {
 //	System.err.println("creating a new DOSExtendedPartitionSystem with:");
 //	System.err.println("  extendedPartitionOffset=" + extendedPartitionOffset);

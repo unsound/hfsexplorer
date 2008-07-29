@@ -17,7 +17,7 @@
 
 package org.catacombae.hfsexplorer;
 
-import org.catacombae.hfsexplorer.io.LowLevelFile;
+import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.types.*;
 
 /**
@@ -40,7 +40,7 @@ public class HFSXFileSystemView extends HFSPlusFileSystemView {
 	    }
   	};
 
-    public HFSXFileSystemView(LowLevelFile hfsFile, long fsOffset, boolean cachingEnabled) {
+    public HFSXFileSystemView(ReadableRandomAccessStream hfsFile, long fsOffset, boolean cachingEnabled) {
 	super(hfsFile, fsOffset, HFSX_OPERATIONS, cachingEnabled);
     }
 }

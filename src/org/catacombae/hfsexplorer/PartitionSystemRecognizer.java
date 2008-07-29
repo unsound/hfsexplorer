@@ -16,8 +16,8 @@
  */
 
 package org.catacombae.hfsexplorer;
-import org.catacombae.hfsexplorer.io.RandomAccessLLF;
-import org.catacombae.hfsexplorer.io.LowLevelFile;
+import org.catacombae.io.ReadableFileStream;
+import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.partitioning.*;
 
 /**
@@ -27,9 +27,9 @@ import org.catacombae.hfsexplorer.partitioning.*;
  */
 public class PartitionSystemRecognizer {
     public static enum PartitionSystemType { APPLE_PARTITION_MAP, MASTER_BOOT_RECORD, GUID_PARTITION_TABLE, NONE_FOUND };
-    private LowLevelFile bitstream;
+    private ReadableRandomAccessStream bitstream;
     
-    public PartitionSystemRecognizer(LowLevelFile bitstream) {
+    public PartitionSystemRecognizer(ReadableRandomAccessStream bitstream) {
 	this.bitstream = bitstream;
     }
     
@@ -128,7 +128,7 @@ public class PartitionSystemRecognizer {
     }
     
     public static void main(String[] args) throws Exception {
-	LowLevelFile llf = new RandomAccessLLF(args[0]);
+	ReadableRandomAccessStream llf = new ReadableFileStream(args[0]);
 	new PartitionSystemRecognizer(llf).getPartitionSystem().print(System.out, "");
     }
 }

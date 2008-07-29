@@ -6,7 +6,7 @@
 package org.catacombae.jparted.lib.ps.apm;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.io.LowLevelFile;
+import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.partitioning.ApplePartitionMap;
 import org.catacombae.hfsexplorer.partitioning.DriverDescriptorRecord;
 import org.catacombae.jparted.lib.DataLocator;
@@ -79,7 +79,7 @@ public class APMHandler extends PartitionSystemHandler {
 
     private ApplePartitionMap readPartitionMap() {
         try {
-            LowLevelFile llf = partitionData.createReadOnlyFile();
+            ReadableRandomAccessStream llf = partitionData.createReadOnlyFile();
             byte[] firstBlock = new byte[512];
             
             llf.readFully(firstBlock);

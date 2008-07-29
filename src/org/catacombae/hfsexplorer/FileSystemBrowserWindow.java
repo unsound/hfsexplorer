@@ -20,9 +20,9 @@ package org.catacombae.hfsexplorer;
 import java.net.MalformedURLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.catacombae.hfsexplorer.io.RandomAccessLLF;
-import org.catacombae.hfsexplorer.io.UDIFRandomAccessLLF;
-import org.catacombae.hfsexplorer.io.LowLevelFile;
+import org.catacombae.io.ReadableFileStream;
+import org.catacombae.io.ReadableRandomAccessStream;
+import org.catacombae.hfsexplorer.io.ReadableUDIFStream;
 import org.catacombae.hfsexplorer.partitioning.*;
 import org.catacombae.hfsexplorer.types.*;
 import org.catacombae.hfsexplorer.types.hfs.*;
@@ -698,7 +698,7 @@ public class FileSystemBrowserWindow extends JFrame {
 							  true,
 							  "Load file system from device");
 			deviceDialog.setVisible(true);
-			LowLevelFile io = deviceDialog.getPartitionStream();
+			ReadableRandomAccessStream io = deviceDialog.getPartitionStream();
 			String pathName = deviceDialog.getPathName();
 			if(io != null) {
 			    try { loadFS(io, pathName); }
@@ -1071,19 +1071,19 @@ public class FileSystemBrowserWindow extends JFrame {
     }
     
     public void loadFSWithUDIFAutodetect(String filename) {
-	LowLevelFile fsFile;
+	ReadableRandomAccessStream fsFile;
 	try {
 	    if(WindowsLowLevelIO.isSystemSupported())
 		fsFile = new WindowsLowLevelIO(filename);
 	    else
-		fsFile = new RandomAccessLLF(filename);
+		fsFile = new ReadableFileStream(filename);
 	    
 	    //System.err.println("Trying to autodetect UDIF structure...");
 	    if(UDIFRecognizer.isUDIF(fsFile)) {
 		//System.err.println("UDIF structure found! Creating stream...");
-		UDIFRandomAccessLLF stream = null;
+		ReadableUDIFStream stream = null;
 		try {
-		    stream = new UDIFRandomAccessLLF(filename);
+		    stream = new ReadableUDIFStream(filename);
 		}
 		catch(Exception e) {
 		    e.printStackTrace();
@@ -1119,15 +1119,15 @@ public class FileSystemBrowserWindow extends JFrame {
 	}
     }
     public void loadFS(String filename) {
-	LowLevelFile fsFile;
+	ReadableRandomAccessStream fsFile;
 	if(WindowsLowLevelIO.isSystemSupported())
 	    fsFile = new WindowsLowLevelIO(filename);
 	else
-	    fsFile = new RandomAccessLLF(filename);
+	    fsFile = new ReadableFileStream(filename);
 	
 	loadFS(fsFile, new File(filename).getName());
     }
-    public void loadFS(LowLevelFile fsFile, String displayName) {
+    public void loadFS(ReadableRandomAccessStream fsFile, String displayName) {
 	
 	int blockSize = 0x200; // == 512
 	int ddrBlockSize;

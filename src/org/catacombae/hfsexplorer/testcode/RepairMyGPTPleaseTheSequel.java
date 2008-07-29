@@ -16,9 +16,8 @@
  */
 
 package org.catacombae.hfsexplorer.testcode;
-import org.catacombae.hfsexplorer.io.WritableRandomAccessLLF;
-import org.catacombae.hfsexplorer.io.WritableLowLevelFile;
-import org.catacombae.hfsexplorer.*;
+import org.catacombae.io.FileStream;
+import org.catacombae.io.RandomAccessStream;
 import org.catacombae.hfsexplorer.partitioning.*;
 import org.catacombae.hfsexplorer.win32.*;
 import java.io.*;
@@ -34,11 +33,11 @@ public class RepairMyGPTPleaseTheSequel {
     private static BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
     public static void main(String[] args) throws Exception {
 	long runTimeStamp = System.currentTimeMillis();
-	WritableLowLevelFile llf;
+	RandomAccessStream llf;
 	if(WritableWin32File.isSystemSupported())
 	    llf = new WritableWin32File(args[0]);
 	else
-	    llf = new WritableRandomAccessLLF(args[0]);
+	    llf = new FileStream(args[0]);
 	
 	final GUIDPartitionTable originalGpt = new GUIDPartitionTable(llf, 0);
 	MutableGUIDPartitionTable gpt = new MutableGUIDPartitionTable(originalGpt);

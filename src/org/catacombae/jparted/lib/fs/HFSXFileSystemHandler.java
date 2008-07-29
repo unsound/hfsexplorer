@@ -15,4 +15,9 @@ public class HFSXFileSystemHandler extends FileSystemHandler {
     public HFSXFileSystemHandler(DataLocator fsLocator) {
         
     }
+
+    @Override
+    public FSEntry[] listFiles(String... path) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

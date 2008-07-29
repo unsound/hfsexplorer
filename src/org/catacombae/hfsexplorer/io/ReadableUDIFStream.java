@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2006 Erik Larsson
+ * Copyright (C) 2006-2007 Erik Larsson
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,19 @@
 
 package org.catacombae.hfsexplorer.io;
 
-/* Designed to mimic a subset of RandomAccessFile. */
+import java.io.FileNotFoundException;
+import java.io.RandomAccessFile;
+import org.catacombae.io.ReadableFileStream;
+import org.catacombae.io.ReadableFilterStream;
+import org.catacombae.udif.UDIFFile;
+import org.catacombae.udif.UDIFRandomAccessStream;
 
-public interface LowLevelFile {
-    public void seek(long pos);
-    public int read();
-    public int read(byte[] data);
-    public int read(byte[] data, int pos, int len);
-    public void readFully(byte[] data);
-    public void readFully(byte[] data, int offset, int length);
-    public long length();
-    public long getFilePointer();
-    public void close();
+/**
+ * This class acts as the bridge between the libraries of DMGExtractor and
+ * HFSExplorer.
+ */
+public class ReadableUDIFStream extends ReadableFilterStream {
+    public ReadableUDIFStream(String filename) throws FileNotFoundException {
+        super(new UDIFRandomAccessStream(new UDIFFile(new ReadableFileStream(new RandomAccessFile(filename, "r")))));
+    }
 }

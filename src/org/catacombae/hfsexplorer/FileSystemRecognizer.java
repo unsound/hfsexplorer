@@ -17,7 +17,7 @@
 
 package org.catacombae.hfsexplorer;
 
-import org.catacombae.hfsexplorer.io.LowLevelFile;
+import org.catacombae.io.ReadableRandomAccessStream;
 
 /** This class just detects if the file system is of type HFS, HFS+ or HFSX. */
 public class FileSystemRecognizer {
@@ -33,9 +33,9 @@ public class FileSystemRecognizer {
 							    FileSystemType.HFS_WRAPPED_HFS_PLUS,
 							    FileSystemType.HFSX };
     
-    private LowLevelFile bitstream;
+    private ReadableRandomAccessStream bitstream;
     private long offset;
-    public FileSystemRecognizer(LowLevelFile bitstream, long offset) {
+    public FileSystemRecognizer(ReadableRandomAccessStream bitstream, long offset) {
 	this.bitstream = bitstream;
 	this.offset = offset;
     }

@@ -7,7 +7,7 @@ package org.catacombae.jparted.lib.ps.mbr;
 
 import org.catacombae.jparted.lib.DataLocator;
 import org.catacombae.jparted.lib.ps.PartitionSystemDetector;
-import org.catacombae.hfsexplorer.io.LowLevelFile;
+import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.partitioning.MBRPartitionTable;
 
 /**
@@ -24,7 +24,7 @@ public class MBRDetector extends PartitionSystemDetector {
     @Override
     public boolean existsPartitionSystem() {
         try {
-            LowLevelFile llf = data.createReadOnlyFile();
+            ReadableRandomAccessStream llf = data.createReadOnlyFile();
             byte[] firstBlock = new byte[512];
             llf.read(firstBlock);
             

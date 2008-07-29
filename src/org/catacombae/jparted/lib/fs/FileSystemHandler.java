@@ -10,7 +10,7 @@ package org.catacombae.jparted.lib.fs;
  * @author erik
  */
 public abstract class FileSystemHandler {
-    //public abstract String[] listFiles(String... path);
+    public abstract FSEntry[] listFiles(String... path);
     //public abstract FileInfo stat(String... path);
 
 }

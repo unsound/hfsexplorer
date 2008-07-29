@@ -7,7 +7,7 @@ package org.catacombae.jparted.lib.ps.gpt;
 
 import org.catacombae.jparted.lib.DataLocator;
 import org.catacombae.jparted.lib.ps.PartitionSystemDetector;
-import org.catacombae.hfsexplorer.io.LowLevelFile;
+import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.partitioning.GPTHeader;
 
 /**
@@ -24,7 +24,7 @@ public class GPTDetector extends PartitionSystemDetector {
     @Override
     public boolean existsPartitionSystem() {
         try {
-            LowLevelFile llf = data.createReadOnlyFile();
+            ReadableRandomAccessStream llf = data.createReadOnlyFile();
             byte[] secondBlock = new byte[512];
             llf.seek(512);
             llf.readFully(secondBlock);

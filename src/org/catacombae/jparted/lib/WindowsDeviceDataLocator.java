@@ -5,10 +5,10 @@
 
 package org.catacombae.jparted.lib;
 
-import org.catacombae.hfsexplorer.io.ConcatenatedFile;
-import org.catacombae.hfsexplorer.io.LowLevelFile;
-import org.catacombae.hfsexplorer.io.WritableConcatenatedFile;
-import org.catacombae.hfsexplorer.io.WritableLowLevelFile;
+import org.catacombae.io.ReadableConcatenatedStream;
+import org.catacombae.io.ReadableRandomAccessStream;
+import org.catacombae.io.ConcatenatedStream;
+import org.catacombae.io.RandomAccessStream;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
 import org.catacombae.hfsexplorer.win32.WritableWin32File;
 
@@ -33,19 +33,19 @@ public class WindowsDeviceDataLocator extends DataLocator {
     }
     
     @Override
-    public LowLevelFile createReadOnlyFile() {
-        LowLevelFile llf = new WindowsLowLevelIO(devicePath);
+    public ReadableRandomAccessStream createReadOnlyFile() {
+        ReadableRandomAccessStream llf = new WindowsLowLevelIO(devicePath);
         if(pos != null && len != null)
-            return new ConcatenatedFile(llf, pos, len);
+            return new ReadableConcatenatedStream(llf, pos, len);
         else
             return llf;
     }
 
     @Override
-    public WritableLowLevelFile createReadWriteFile() {
-        WritableLowLevelFile wllf = new WritableWin32File(devicePath);
+    public RandomAccessStream createReadWriteFile() {
+        RandomAccessStream wllf = new WritableWin32File(devicePath);
         if(pos != null && len != null)
-            return new WritableConcatenatedFile(wllf, pos, len);
+            return new ConcatenatedStream(wllf, pos, len);
         else
             return wllf;
     }

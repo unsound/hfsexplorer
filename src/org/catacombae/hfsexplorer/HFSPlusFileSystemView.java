@@ -17,10 +17,9 @@
 
 package org.catacombae.hfsexplorer;
 
-import org.catacombae.hfsexplorer.io.BlockCachingLLF;
-import org.catacombae.hfsexplorer.io.LowLevelFile;
+import org.catacombae.hfsexplorer.io.ReadableBlockCachingStream;
+import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.types.*;
-import java.util.List;
 import java.util.LinkedList;
 import java.io.OutputStream;
 import java.io.IOException;
@@ -51,7 +50,7 @@ public class HFSPlusFileSystemView {
     /** Internal class. */
     private abstract class InitProcedure {
 	public final HFSPlusVolumeHeader header;
-	public final LowLevelFile forkFilterFile;
+	public final ReadableRandomAccessStream forkFilterFile;
 	public final BTNodeDescriptor btnd;
 	public final BTHeaderRec bthr;
 	
@@ -70,18 +69,18 @@ public class HFSPlusFileSystemView {
 	    this.bthr = new BTHeaderRec(headerRec, 0);
 	    
 	}
-	protected abstract LowLevelFile getForkFilterFile(HFSPlusVolumeHeader header);
+	protected abstract ReadableRandomAccessStream getForkFilterFile(HFSPlusVolumeHeader header);
     }
     
     /** Internal class. */
     private class CatalogInitProcedure extends InitProcedure {
-	public LowLevelFile catalogFile;
+	public ReadableRandomAccessStream catalogFile;
 	
 	public CatalogInitProcedure() {
 	    this.catalogFile = forkFilterFile;
 	}
 	
-	protected LowLevelFile getForkFilterFile(HFSPlusVolumeHeader header) {
+	protected ReadableRandomAccessStream getForkFilterFile(HFSPlusVolumeHeader header) {
 	    if(catalogCache != null)
 		return catalogCache;
 	    HFSPlusExtentDescriptor[] allCatalogFileDescriptors =
@@ -93,13 +92,13 @@ public class HFSPlusFileSystemView {
     
     /** Internal class. */
     private class ExtentsInitProcedure extends InitProcedure {
-	public LowLevelFile extentsFile;
+	public ReadableRandomAccessStream extentsFile;
 	
 	public ExtentsInitProcedure() {
 	    this.extentsFile = forkFilterFile;
 	}
 	
-	protected LowLevelFile getForkFilterFile(HFSPlusVolumeHeader header) {
+	protected ReadableRandomAccessStream getForkFilterFile(HFSPlusVolumeHeader header) {
 	    return new ForkFilter(header.getExtentsFile(),
 				  header.getExtentsFile().getExtents().getExtentDescriptors(),
 				  hfsFile, fsOffset, staticBlockSize);
@@ -127,22 +126,22 @@ public class HFSPlusFileSystemView {
 	    }
   	};
 
-    private LowLevelFile hfsFile;
-    private final LowLevelFile backingFile;
+    private ReadableRandomAccessStream hfsFile;
+    private final ReadableRandomAccessStream backingFile;
     private final long fsOffset;
     protected final CatalogOperations catOps;
     private final long staticBlockSize;
     
     // Variables for reading cached files.
-    private BlockCachingLLF catalogCache = null;
+    private ReadableBlockCachingStream catalogCache = null;
     
-    public HFSPlusFileSystemView(LowLevelFile hfsFile, long fsOffset) {
+    public HFSPlusFileSystemView(ReadableRandomAccessStream hfsFile, long fsOffset) {
 	this(hfsFile, fsOffset, HFS_PLUS_OPERATIONS, false);
     }
-    public HFSPlusFileSystemView(LowLevelFile hfsFile, long fsOffset, boolean cachingEnabled) {
+    public HFSPlusFileSystemView(ReadableRandomAccessStream hfsFile, long fsOffset, boolean cachingEnabled) {
 	this(hfsFile, fsOffset, HFS_PLUS_OPERATIONS, cachingEnabled);
     }
-    protected HFSPlusFileSystemView(LowLevelFile hfsFile, long fsOffset, CatalogOperations ops, boolean cachingEnabled) {
+    protected HFSPlusFileSystemView(ReadableRandomAccessStream hfsFile, long fsOffset, CatalogOperations ops, boolean cachingEnabled) {
 	this.hfsFile = hfsFile;
 	this.backingFile = hfsFile;
 	this.fsOffset = fsOffset;
@@ -153,13 +152,13 @@ public class HFSPlusFileSystemView {
 	    enableFileSystemCaching();
     }
     public boolean isFileSystemCachingEnabled() {
-	return hfsFile != backingFile && backingFile instanceof BlockCachingLLF;
+	return hfsFile != backingFile && backingFile instanceof ReadableBlockCachingStream;
     }
     public void enableFileSystemCaching() {
 	enableFileSystemCaching(256*1024, 64); // 64 pages of 256 KiB each is the default setting
     }
     public void enableFileSystemCaching(int blockSize, int blocksInCache) {
-	hfsFile = new BlockCachingLLF(backingFile, blockSize, blocksInCache);
+	hfsFile = new ReadableBlockCachingStream(backingFile, blockSize, blocksInCache);
     }
     public void disableFileSystemCaching() {
 	hfsFile = backingFile;
@@ -168,8 +167,8 @@ public class HFSPlusFileSystemView {
     /** Switches to cached mode for reading the catalog file. */
     public void retainCatalogFile() {
 	CatalogInitProcedure init = new CatalogInitProcedure();
-	LowLevelFile ff = init.forkFilterFile;
-	catalogCache = new BlockCachingLLF(ff, 512*1024, 32); // 512 KiB blocks, 32 of them
+	ReadableRandomAccessStream ff = init.forkFilterFile;
+	catalogCache = new ReadableBlockCachingStream(ff, 512*1024, 32); // 512 KiB blocks, 32 of them
 	catalogCache.preloadBlocks();
     }
     
@@ -178,7 +177,7 @@ public class HFSPlusFileSystemView {
 	catalogCache = null;
     }
     
-    public LowLevelFile getStream() {
+    public ReadableRandomAccessStream getStream() {
 	return hfsFile;
     }
     
@@ -357,7 +356,7 @@ public class HFSPlusFileSystemView {
 	that's needed, but make sure it's a folder ID and not a file ID, or something bad will happen. */
     public HFSPlusCatalogLeafRecord[] listRecords(HFSCatalogNodeID folderID) {	
 	CatalogInitProcedure init = new CatalogInitProcedure();
-	final LowLevelFile catalogFile = init.forkFilterFile;
+	final ReadableRandomAccessStream catalogFile = init.forkFilterFile;
 	return collectFilesInDir(folderID, init.bthr.getRootNode(), hfsFile, fsOffset, init.header, init.bthr, catalogFile, catOps);
     }
 
@@ -579,19 +578,19 @@ public class HFSPlusFileSystemView {
 	IN FACT, DON'T USE IT AT ALL.
 	@deprecated */
     public static HFSPlusCatalogLeafRecord[] collectFilesInDir(HFSCatalogNodeID dirID, int currentNodeNumber, 
-							       LowLevelFile hfsFile, long fsOffset, 
+							       ReadableRandomAccessStream hfsFile, long fsOffset, 
 							       final HFSPlusVolumeHeader header,
 							       final BTHeaderRec bthr,
-							       final LowLevelFile catalogFile) {
+							       final ReadableRandomAccessStream catalogFile) {
 	
 	return collectFilesInDir(dirID, currentNodeNumber, hfsFile, fsOffset, 
 				 header, bthr, catalogFile, HFS_PLUS_OPERATIONS);
     }
     private static HFSPlusCatalogLeafRecord[] collectFilesInDir(HFSCatalogNodeID dirID, int currentNodeNumber, 
-								LowLevelFile hfsFile, long fsOffset, 
+								ReadableRandomAccessStream hfsFile, long fsOffset, 
 								final HFSPlusVolumeHeader header,
 								final BTHeaderRec bthr,
-								final LowLevelFile catalogFile,
+								final ReadableRandomAccessStream catalogFile,
 								final CatalogOperations catOps) {
 		
 	byte[] currentNodeData = new byte[bthr.getNodeSize()];

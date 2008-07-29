@@ -17,7 +17,7 @@
 
 package org.catacombae.hfsexplorer.partitioning;
 
-import org.catacombae.hfsexplorer.io.LowLevelFile;
+import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.*;
 import java.io.PrintStream;
 import java.util.LinkedList;
@@ -47,7 +47,7 @@ public class GUIDPartitionTable implements PartitionSystem {
     /** Method-private to getUsedPartitionEntries(). */
     private final LinkedList<GPTEntry> tempList = new LinkedList<GPTEntry>();
     
-    public GUIDPartitionTable(LowLevelFile llf, int offset) {
+    public GUIDPartitionTable(ReadableRandomAccessStream llf, int offset) {
 	// Common temporary storage variables
 	byte[] headerData = new byte[512];
 	byte[] currentEntryData = new byte[128];

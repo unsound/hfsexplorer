@@ -16,8 +16,8 @@
  */
 
 package org.catacombae.hfsexplorer.testcode;
-import org.catacombae.hfsexplorer.io.RandomAccessLLF;
-import org.catacombae.hfsexplorer.io.LowLevelFile;
+import org.catacombae.io.ReadableFileStream;
+import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.*;
 import org.catacombae.hfsexplorer.partitioning.*;
 import org.catacombae.hfsexplorer.win32.*;
@@ -25,12 +25,12 @@ import java.io.*;
 
 public class PrintGPTPartitions {
     public static void main(String[] args) throws Exception {
-	LowLevelFile llf;
+	ReadableRandomAccessStream llf;
 	if(WindowsLowLevelIO.isSystemSupported()) {
 	    llf = new WindowsLowLevelIO(args[0]);
 	}
 	else {
-	    llf = new RandomAccessLLF(args[0]);
+	    llf = new ReadableFileStream(args[0]);
 	}
 	byte[] referencetable = new byte[16896];
 	llf.seek(512);

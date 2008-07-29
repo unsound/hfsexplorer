@@ -17,15 +17,14 @@
 
 package org.catacombae.hfsexplorer;
 
-import org.catacombae.hfsexplorer.io.LowLevelFile;
-import org.catacombae.hfsexplorer.io.ConcatenatedFile;
+import org.catacombae.io.ReadableRandomAccessStream;
+import org.catacombae.io.ReadableConcatenatedStream;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
 import org.catacombae.hfsexplorer.gui.SelectWindowsDevicePanel;
 import org.catacombae.hfsexplorer.partitioning.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.border.*;
 import java.util.*;
 
 public class SelectWindowsDeviceDialog extends JDialog {
@@ -45,7 +44,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
     // Additional gui stuff
     private ButtonGroup selectSpecifyGroup;
     
-    private LowLevelFile result = null;
+    private ReadableRandomAccessStream result = null;
     private String resultCreatePath = null;
     private String[] detectedDeviceNames;
     
@@ -125,7 +124,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
 	setResizable(false);
     }
 
-    public LowLevelFile getPartitionStream() { return result; }
+    public ReadableRandomAccessStream getPartitionStream() { return result; }
     
     /** Could include an identifier of a partitioning scheme. This should only be used to display a descriptive locator. */
     public String getPathName() { return resultCreatePath; }
@@ -211,7 +210,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
             //else
             //    skipPrefix = null;
             
-	    LowLevelFile llf = null;
+	    ReadableRandomAccessStream llf = null;
 	    try {
 		llf = new WindowsLowLevelIO(DEVICE_PREFIX + deviceName);
 		PartitionSystemRecognizer psr = new PartitionSystemRecognizer(llf);
@@ -297,20 +296,20 @@ public class SelectWindowsDeviceDialog extends JDialog {
 			    throw new RuntimeException("Internal error again.");
 			
 			if(embeddedInfo.partition instanceof APMPartition) {
-			    LowLevelFile llf = new WindowsLowLevelIO(DEVICE_PREFIX + embeddedInfo.deviceName);
+			    ReadableRandomAccessStream llf = new WindowsLowLevelIO(DEVICE_PREFIX + embeddedInfo.deviceName);
 			    DriverDescriptorRecord ddr = new DriverDescriptorRecord(llf, 0);
 			    ApplePartitionMap apm = new ApplePartitionMap(llf, ddr.getSbBlkSize()*1, ddr.getSbBlkSize());
 			    Partition p = apm.getPartitionEntry((int)embeddedInfo.partitionNumber);
 			    resultCreatePath = DEVICE_PREFIX + selectedValue.toString();
-			    result = new ConcatenatedFile(llf, p.getStartOffset(), p.getLength());
+			    result = new ReadableConcatenatedStream(llf, p.getStartOffset(), p.getLength());
 			    setVisible(false);
 			}
 			else if(embeddedInfo.partition instanceof GPTEntry) {
-                            LowLevelFile llf = new WindowsLowLevelIO(DEVICE_PREFIX + embeddedInfo.deviceName);
+                            ReadableRandomAccessStream llf = new WindowsLowLevelIO(DEVICE_PREFIX + embeddedInfo.deviceName);
 			    GUIDPartitionTable gpt = new GUIDPartitionTable(llf, 0);
 			    Partition p = gpt.getPartitionEntry((int)embeddedInfo.partitionNumber);
 			    resultCreatePath = DEVICE_PREFIX + selectedValue.toString();
-			    result = new ConcatenatedFile(llf, p.getStartOffset(), p.getLength());
+			    result = new ReadableConcatenatedStream(llf, p.getStartOffset(), p.getLength());
 			    setVisible(false);
                         }
 			//else if(embeddedInfo.partition instanceof MBRPartition) {}

@@ -7,7 +7,7 @@ call "%~dp0common_vars.bat"
 set LIBRARY_PATH=%~dp0lib
 set JARFILE_PATH=%~dp0dist\lib
 set JARFILENAME=hfsx.jar
-set CLASSPATH="%~dp0build.~";"%~dp0dist\lib\swing-layout-1.0.3.jar";"%~dp0dist\lib\hfsx_dmglib.jar";"%~dp0lib\AppleJavaExtensions.jar";"%~dp0lib\java_awt_Desktop.jar"
+set CLASSPATH="%~dp0build.~";"%~dp0dist\lib\catacombae_io.jar";"%~dp0dist\lib\swing-layout-1.0.3.jar";"%~dp0dist\lib\hfsx_dmglib.jar";"%~dp0lib\AppleJavaExtensions.jar";"%~dp0lib\java_awt_Desktop.jar"
 set SOURCES_DIR=%~dp0src
 set BUILD_DIR=%CV_JAVA_BUILD_DIR%
 set RESOURCE_SRC_DIR=%~dp0resource

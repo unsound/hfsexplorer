@@ -6,12 +6,12 @@
 package org.catacombae.jparted.lib;
 
 import java.io.File;
-import org.catacombae.hfsexplorer.io.ConcatenatedFile;
-import org.catacombae.hfsexplorer.io.LowLevelFile;
-import org.catacombae.hfsexplorer.io.RandomAccessLLF;
-import org.catacombae.hfsexplorer.io.WritableConcatenatedFile;
-import org.catacombae.hfsexplorer.io.WritableLowLevelFile;
-import org.catacombae.hfsexplorer.io.WritableRandomAccessLLF;
+import org.catacombae.io.ReadableConcatenatedStream;
+import org.catacombae.io.ReadableRandomAccessStream;
+import org.catacombae.io.ReadableFileStream;
+import org.catacombae.io.ConcatenatedStream;
+import org.catacombae.io.RandomAccessStream;
+import org.catacombae.io.FileStream;
 
 /**
  *
@@ -46,19 +46,19 @@ public class RandomAccessFileDataLocator extends DataLocator {
     }
     
     @Override
-    public LowLevelFile createReadOnlyFile() {
-        LowLevelFile llf = new RandomAccessLLF(file);
+    public ReadableRandomAccessStream createReadOnlyFile() {
+        ReadableRandomAccessStream llf = new ReadableFileStream(file);
         if(pos != null && len != null)
-            return new ConcatenatedFile(llf, pos, len);
+            return new ReadableConcatenatedStream(llf, pos, len);
         else
             return llf;
     }
 
     @Override
-    public WritableLowLevelFile createReadWriteFile() {
-        WritableLowLevelFile wllf = new WritableRandomAccessLLF(file);
+    public RandomAccessStream createReadWriteFile() {
+        RandomAccessStream wllf = new FileStream(file);
         if(pos != null && len != null)
-            return new WritableConcatenatedFile(wllf, pos, len);
+            return new ConcatenatedStream(wllf, pos, len);
         else
             return wllf;
     }

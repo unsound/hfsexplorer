@@ -6,7 +6,7 @@
 package org.catacombae.jparted.lib.ps.container.hfs;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.io.LowLevelFile;
+import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.jparted.lib.DataLocator;
 import org.catacombae.jparted.lib.fs.FileSystemMajorType;
 import org.catacombae.jparted.lib.ps.PartitionSystemType;
@@ -50,7 +50,7 @@ public class HFSContainerHandler extends ContainerHandler {
      */
     @Override
     public FileSystemMajorType detectFileSystemType() {
-        LowLevelFile bitstream = partitionData.createReadOnlyFile();
+        ReadableRandomAccessStream bitstream = partitionData.createReadOnlyFile();
         bitstream.seek(1024);
         byte[] signatureData = new byte[2];
         bitstream.readFully(signatureData);

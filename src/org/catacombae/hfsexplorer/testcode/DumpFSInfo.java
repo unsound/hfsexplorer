@@ -16,8 +16,8 @@
  */
 
 package org.catacombae.hfsexplorer.testcode;
-import org.catacombae.hfsexplorer.io.RandomAccessLLF;
-import org.catacombae.hfsexplorer.io.LowLevelFile;
+import org.catacombae.io.ReadableFileStream;
+import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.*;
 import org.catacombae.hfsexplorer.win32.*;
 import org.catacombae.hfsexplorer.partitioning.*;
@@ -56,7 +56,7 @@ public class DumpFSInfo {
     }
     public static void dumpInfo(String[] args) throws Exception {
 	long runTimestamp = System.currentTimeMillis();
-	LowLevelFile fsFile;
+	ReadableRandomAccessStream fsFile;
 	if(WindowsLowLevelIO.isSystemSupported()) {
 	    if(args.length == 1) {
 		fsFile = new WindowsLowLevelIO(args[0]);
@@ -78,7 +78,7 @@ public class DumpFSInfo {
 	}
 	else {
 	    if(args.length == 1) {
-		fsFile = new RandomAccessLLF(args[0]);
+		fsFile = new ReadableFileStream(args[0]);
 	    }
 	    else {
 		System.out.println("Usage: java DumpFSInfo <filename>");
