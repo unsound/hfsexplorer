@@ -50,4 +50,8 @@ public class WindowsDeviceDataLocator extends DataLocator {
             return wllf;
     }
 
+    @Override
+    public boolean isWritable() {
+        return true;
+    }
 }

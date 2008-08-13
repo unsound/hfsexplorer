@@ -17,9 +17,10 @@
 
 package org.catacombae.hfsexplorer.win32;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.io.ReadableRandomAccessStream;
-import java.io.*;
 
 public class WindowsLowLevelIO implements ReadableRandomAccessStream {
     protected byte[] fileHandle;
@@ -29,7 +30,11 @@ public class WindowsLowLevelIO implements ReadableRandomAccessStream {
     private static boolean libraryLoaded = false;
     
     private enum ArchitectureIdentifier {
-	I386("i386"), AMD64("amd64"), IA64("ia64"), UNKNOWN;
+	I386("i386"), AMD64("amd64"), IA64("ia64"),
+        POWERPC("ppc32"), POWERPC64("ppc64"),
+        SPARC("sparc32"), SPARC64("sparc64"),
+        MIPS("mips32"), MIPS64("mips64"), ALPHA("alpha"),
+        UNKNOWN;
 	
 	private final String idString;
 	
@@ -120,6 +125,8 @@ public class WindowsLowLevelIO implements ReadableRandomAccessStream {
 	    if(verbose) System.out.println("Could not determine sector size.");
     }
     public void seek(long pos) {
+        //System.err.println("WindowsLowLevelIO.seek(" + pos + ");");
+
 	if(fileHandle != null) {
 	    // We seek to the beginning of the sector containing pos
 	    seek((pos/sectorSize)*sectorSize, fileHandle);
@@ -139,6 +146,7 @@ public class WindowsLowLevelIO implements ReadableRandomAccessStream {
 	return read(data, 0, data.length);
     }
     public int read(byte[] data, int pos, int len) {
+        //System.err.println("WindowsLowLevelIO.read(" + data + ", " + pos + ", " + len + ");");
 	if(fileHandle != null) {
 	    /* First make sure that we are at the beginning of the sector containing
 	       filePointer. */
@@ -193,7 +201,9 @@ public class WindowsLowLevelIO implements ReadableRandomAccessStream {
     }
     
     public long length() {
+        //System.err.println("WindowsLowLevelIO.length();");
 	if(fileHandle != null) {
+            //System.err.println("  returning " + length(fileHandle));
 	    return length(fileHandle);
 	}
 	else
@@ -201,7 +211,9 @@ public class WindowsLowLevelIO implements ReadableRandomAccessStream {
     }
 	
     public long getFilePointer() {
+        //System.err.println("WindowsLowLevelIO.getFilePointer();");
 	if(fileHandle != null) {
+            //System.err.println("  returning " + filePointer);
 	    return filePointer;//getFilePointer(fileHandle);
 	}
 	else

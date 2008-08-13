@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @author Erik
  */
-public class FSFolder extends FSEntry {
+class FSFolder extends FSEntry {
     public List<FSEntry> list() {
         FileSystem fs = getParentFileSystem();
         return fs.listFolder(this);

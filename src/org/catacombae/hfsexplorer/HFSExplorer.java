@@ -26,22 +26,26 @@ import java.util.*;
 import java.io.*;
 
 public class HFSExplorer {
-    public static final String VERSION = "0.19.5";
+    public static final String VERSION = "0.19.6pre";
     public static final String COPYRIGHT = "Copyright \u00A9 Erik Larsson 2006-2008";
-    public static final String[] NOTICES = { "This program is distributed under the GNU General Public License version 3.",
-					     "See <http://www.gnu.org/copyleft/gpl.html> for the details.",
-					     "",
-					     "Libraries used:",
-					     "    swing-layout <https://swing-layout.dev.java.net/>",
-					     "        Copyright \u00A9 2005-2006 Sun Microsystems, Inc. Licensed under",
-					     "        the Lesser General Public License.",
-					     "        See <http://www.gnu.org/licenses/lgpl.html> for the details.",
-					     "    iHarder Base64 encoder/decoder <http://iharder.sourceforge.net>",
-					     "        Public domain software.",
-					     "    Apache Ant bzip2 library <http://ant.apache.org/>",
-					     "        Copyright \u00A9 the Apache Software Foundation (ASF). Licensed",
-					     "        under the Apache License, Version 2.0.",
-					     "        See <http://www.apache.org/licenses/LICENSE-2.0> for the details." };
+    public static final String[] NOTICES =
+    {
+        "This program is distributed under the GNU General Public License version 3.",
+        "See <http://www.gnu.org/copyleft/gpl.html> for the details.",
+        "",
+        "Libraries used:",
+        "    swing-layout <https://swing-layout.dev.java.net/>",
+        "        Copyright \u00A9 2005-2006 Sun Microsystems, Inc. Licensed under",
+        "        the Lesser General Public License.",
+        "        See <http://www.gnu.org/licenses/lgpl.html> for the details.",
+        "    iHarder Base64 encoder/decoder <http://iharder.sourceforge.net>",
+        "        Public domain software.",
+        "    Apache Ant bzip2 library <http://ant.apache.org/>",
+        "        Copyright \u00A9 the Apache Software Foundation (ASF). Licensed",
+        "        under the Apache License, Version 2.0.",
+        "        See <http://www.apache.org/licenses/LICENSE-2.0> for the details."
+    };
+    
     public static BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
     private static class Options {
 	public boolean readAPM = false;

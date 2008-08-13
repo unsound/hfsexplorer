@@ -11,7 +11,7 @@ import java.io.InputStream;
  *
  * @author Erik
  */
-public abstract class FSFile extends FSEntry {
+abstract class FSFile extends FSEntry {
     public abstract long getMainStreamSize();
     public abstract InputStream getMainStream();
     

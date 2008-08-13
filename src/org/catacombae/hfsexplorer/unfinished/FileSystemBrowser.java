@@ -5,7 +5,8 @@
 
 package org.catacombae.hfsexplorer.unfinished;
 
-import org.catacombae.hfsexplorer.*;
+import java.util.Date;
+import java.util.Vector;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
@@ -16,14 +17,21 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
@@ -42,74 +50,32 @@ import javax.swing.table.TableColumn;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.ExpandVetoException;
+import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import org.catacombae.hfsexplorer.fsframework.FSEntry;
-import org.catacombae.hfsexplorer.fsframework.FSFile;
-import org.catacombae.hfsexplorer.fsframework.FSFolder;
+import org.catacombae.hfsexplorer.SpeedUnitUtils;
+import org.catacombae.hfsexplorer.gui.FilesystemBrowserPanel;
 
 /**
  *
  * @author Erik
  */
-public class FileSystemBrowser {
-    private static class ObjectContainer<A> {
-	public A o;
-	public ObjectContainer(A o) { this.o = o; }
-    }
-    
-    /** Aggregation class for storage in the first column of fileTable. */
-    private static class RecordContainer {
-	private FSEntry rec;
-	private String composedNodeName;
-	private RecordContainer() {}
-	public RecordContainer(FSEntry rec) {
-	    this.rec = rec;
-	    
-	    this.composedNodeName = rec.getName();
-	}
-	public FSEntry getRecord() { return rec; }
-        
-        @Override public String toString() { return composedNodeName; }
-    }
-    
-    /*
-    private static class RecordNodeStorage {
-	private HFSPlusCatalogLeafRecord parentRecord;
-	private HFSPlusCatalogLeafRecord threadRecord = null;
-	private String composedNodeName;
+public class FileSystemBrowser<A> {
+    private final FileSystemProvider<A> controller;
+    private final FilesystemBrowserPanel viewComponent;
 
-	public RecordNodeStorage(HFSPlusCatalogLeafRecord parentRecord) {
-	    this.parentRecord = parentRecord;
-	    if(parentRecord.getData().getRecordType() != HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER)
-		throw new IllegalArgumentException("Illegal type for record data.");
-	    this.composedNodeName = parentRecord.getKey().getNodeName().getUnicodeAsComposedString();
-	}
-	public HFSPlusCatalogLeafRecord getRecord() { return parentRecord; }
-	public HFSPlusCatalogLeafRecord getThread() { return threadRecord; }
-	public void setThread(HFSPlusCatalogLeafRecord threadRecord) {
-	    if(threadRecord.getData().getRecordType() != HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD)
-		throw new IllegalArgumentException("Illegal type for thread data.");
-	    this.threadRecord = threadRecord;
-	}
-        @Override
-	public String toString() {
-	    //HFSPlusCatalogLeafRecordData recData = parentRecord.getData();
-	    return composedNodeName;//parentRecord.getKey().getNodeName().getUnicodeAsComposedString();
-	}
-    }*/
-    
-    public static class NoLeafMutableTreeNode extends DefaultMutableTreeNode {
-	public NoLeafMutableTreeNode(Object o) { super(o); }
-	/** Hack to avoid that JTree paints leaf nodes. We have no leafs, only dirs. */
-	@Override public boolean isLeaf() { return false; }
-    }
-    
-    private final FileSystemBrowserWindow controller;
-    
+    private final JTextField addressField;
+    private final JButton upButton;
+    private final JButton extractButton;
+    private final JButton infoButton;
+    private final JButton goButton;
+    private final JLabel statusLabel;
     private final JTable fileTable;
     private final JScrollPane fileTableScroller;
     private final JTree dirTree;
+    
+    //private final JPopupMenu treeNodePopupMenu;
+    //private final JPopupMenu tableNodePopupMenu;
     
     private final Vector<String> colNames = new Vector<String>();
     private final DefaultTableModel tableModel;
@@ -121,18 +87,73 @@ public class FileSystemBrowser {
     /** For determining the standard layout size of the columns in the table. */
     private int totalColumnWidth = 0;
     
+    /** Used for formatting byte size strings, like 234,12 MiB. */
+    private final DecimalFormat sizeFormat = new DecimalFormat("0.00");
+    
     // Communication between adjustColumnsWidths and the column listener
     private final boolean[] disableColumnListener = { false };
     private final ObjectContainer<int[]> lastWidths = new ObjectContainer<int[]>(null);
-
-
-    public FileSystemBrowser(JTable iFileTable, JScrollPane iFileTableScroller, JTree iDirTree) {
-        this.fileTable = iFileTable;
-        this.fileTableScroller = iFileTableScroller;
-        this.dirTree = iDirTree;
+    private DefaultTreeModel treeModel;
+    
+    private final GenericPlaceholder<A> genericPlaceholder = new GenericPlaceholder<A>();
+    private TreePath lastTreeSelectionPath = null;
+    
+    public FileSystemBrowser(FileSystemProvider<A> iController) {
+        this.controller = iController;
+        this.viewComponent = new FilesystemBrowserPanel();
         
-        	final Class objectClass = new Object().getClass();
-	colNames.add("Name");
+        this.addressField = viewComponent.addressField;
+	this.upButton = viewComponent.upButton;
+        this.infoButton = viewComponent.infoButton;
+	this.extractButton = viewComponent.extractButton;
+	this.goButton = viewComponent.goButton;
+	this.statusLabel = viewComponent.statusLabel;
+        this.fileTable = viewComponent.fileTable;
+        this.fileTableScroller = viewComponent.fileTableScroller;
+        this.dirTree = viewComponent.dirTree;
+        
+        upButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                actionGotoParentDir();
+            }
+        });
+        extractButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                actionExtractToDir();
+            }
+        });
+
+        infoButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                actionGetInfo();
+            }
+        });
+        
+        goButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                actionGotoDir();
+            }
+        });
+        
+        addressField.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                actionGotoDir();
+            }
+        });
+        /*
+	addressField.addKeyListener(new KeyAdapter() {
+                @Override
+		public void keyPressed(KeyEvent e) {
+                    if(e.getKeyCode() == KeyEvent.VK_ENTER)
+                        actionGotoDir();
+		}
+	    });
+        */
+        //this.treeNodePopupMenu = controller.createTreeNodePopupMenu();
+        //this.tableNodePopupMenu = controller.createTableNodePopupMenu();
+        
+        final Class objectClass = new Object().getClass();
+        colNames.add("Name");
 	colNames.add("Size");
 	colNames.add("Type");
 	colNames.add("Date Modified");
@@ -264,10 +285,10 @@ public class FileSystemBrowser {
 		    if(value instanceof RecordContainer) {
 			final Component objectComponent = objectRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);			
 			final JLabel jl = theOne;
-			FSEntry rec = ((RecordContainer)value).getRecord();
-			if(rec instanceof FSFolder)
+			Record rec = ((RecordContainer)value).getRecord(genericPlaceholder);
+			if(rec.getType() == RecordType.FOLDER)
 			    jl.setIcon(folderIcon);
-			else if(rec instanceof FSFile)
+			else if(rec.getType() == RecordType.FILE)
 			    jl.setIcon(documentIcon);
 			else
 			    jl.setIcon(emptyIcon);
@@ -301,82 +322,69 @@ public class FileSystemBrowser {
 	    });
     
         fileTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-		private final java.text.DecimalFormat sizeFormat = new java.text.DecimalFormat("0.00");
 		public void valueChanged(ListSelectionEvent e) {
-		    //statusLabel.setText("Selection (" + e.getFirstIndex() + "-" + e.getLastIndex() + ") has changed. isAdjusting()==" + e.getValueIsAdjusting());
+                    /* When the selection in the file table changes, update the
+                     * selection status field with the new selection count and
+                     * selection size. */
+                    
 		    int[] selection = fileTable.getSelectedRows();
 		    long selectionSize = 0;
 		    for(int selectedRow : selection) {
 			Object o = tableModel.getValueAt(selectedRow, 0);
 			
 			if(o instanceof RecordContainer) {
-			    FSEntry rec = ((RecordContainer)o).getRecord();
-			    if(rec instanceof FSFile)
-				selectionSize += ((FSFile)rec).getSize();
+			    Record rec = ((RecordContainer)o).getRecord(genericPlaceholder);
+			    if(rec.getType() == RecordType.FILE)
+				selectionSize += rec.getSize();
 			}
 		    }
-		    String sizeString = (selectionSize >= 1024)?SpeedUnitUtils.bytesToBinaryUnit(selectionSize, sizeFormat):selectionSize + " bytes";
-		    controller.setStatusLabelText(selection.length + ((selection.length==1)?" object":" objects") + " selected (" + sizeString + ")");
+		    setSelectionStatus(selection.length, selectionSize);
 		}
 	    });
+        
 	fileTableScroller.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
+                     /* If we click outside the table, i.e. in the JScrollPane,
+                      * clear selection in table. */
+                    
 		    int row = fileTable.rowAtPoint(e.getPoint());
-		    if(row == -1) // If we click outside the table, clear selection in table
+		    if(row == -1)
 			fileTable.clearSelection();
 		}
 	    });
+        
 	fileTable.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
 		    if(e.getButton() == MouseEvent.BUTTON3) {
-			int row = fileTable.rowAtPoint(e.getPoint());
+                        /* When the user clicks the secondary mouse button
+                         * (usually the right mouse button) in the table,
+                         * possibly open a JPopupMenu with some options. */
+                        
+                        int row = fileTable.rowAtPoint(e.getPoint());
 			int col = fileTable.columnAtPoint(e.getPoint());
 			if(col == 0 && row >= 0) {
-			    // These lines are here because right-clicking doesn't change focus or selection
+			    /* These lines are here because right-clicking
+                             * doesn't change focus or selection. */
 			    fileTable.clearSelection();
 			    fileTable.changeSelection(row, col, false, false);
 			    fileTable.requestFocus();
 			    
-			    JPopupMenu jpm = new JPopupMenu();
+                            List<Record<A>> selection = getTableSelection();
+                            if(selection.size() != 1)
+                                throw new RuntimeException("Right click selection with more than " +
+                                        "one entry! (" + selection.size() + " entries)");
                             
-			    JMenuItem infoItem = new JMenuItem("Information");
-			    infoItem.addActionListener(new ActionListener() {
-				    public void actionPerformed(ActionEvent e) {
-					controller.actionGetInfo();
-				    }
-				});
-			    jpm.add(infoItem);
-                            
-			    JMenuItem dataExtractItem = new JMenuItem("Extract data");
-			    dataExtractItem.addActionListener(new ActionListener() {
-				    public void actionPerformed(ActionEvent e) {
-					controller.actionExtractToDir(true, false);
-				    }
-				});
-			    jpm.add(dataExtractItem);
-                            
-			    JMenuItem resExtractItem = new JMenuItem("Extract resource fork(s)");
-			    resExtractItem.addActionListener(new ActionListener() {
-				    public void actionPerformed(ActionEvent e) {
-					controller.actionExtractToDir(false, true);
-				    }
-				});
-			    jpm.add(resExtractItem);
-                            
-			    JMenuItem bothExtractItem = new JMenuItem("Extract data and resource fork(s)");
-			    bothExtractItem.addActionListener(new ActionListener() {
-				    public void actionPerformed(ActionEvent e) {
-					controller.actionExtractToDir(true, true);
-				    }
-				});
-			    jpm.add(bothExtractItem);
-                            
-                            jpm.show(fileTable, e.getX(), e.getY());
+                            controller.getRightClickRecordPopupMenu(selection.get(0))
+                                    .show(fileTable, e.getX(), e.getY());
 			}
 		    }
 		    else if(e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
+                        /* When the user double-clicks using the primary mouse
+                         * button, send the event on to the controller, which
+                         * may handle it as it likes. */
+                        
 			int row = fileTable.rowAtPoint(e.getPoint());
 			int col = fileTable.columnAtPoint(e.getPoint());
 			if(col == 0 && row >= 0) {
@@ -384,64 +392,11 @@ public class FileSystemBrowser {
 			    Object colValue = fileTable.getModel().getValueAt(row, col);
 			    //System.err.println("  Value class: " + colValue.getClass());
 			    if(colValue instanceof RecordContainer) {
-				HFSPlusCatalogLeafRecord rec = ((RecordContainer)colValue).getRecord();
-				HFSPlusCatalogLeafRecordData recData = rec.getData();
-				HFSCatalogNodeID requestedID;
-				if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
-				   recData instanceof HFSPlusCatalogFolder) {
-				    HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder)recData;
-				    requestedID = catFolder.getFolderID();
-				}
-				else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
-					recData instanceof HFSPlusCatalogThread) {
-				    HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
-				    requestedID = rec.getKey().getParentID();
-				}
-				else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
-					recData instanceof HFSPlusCatalogFile) {
-				    if(true)
-					controller.actionDoubleClickFile(rec);
-				    else { // Some normalization testcode, currently disabled.
-					UnicodeNormalizationToolkit ud = UnicodeNormalizationToolkit.getDefaultInstance();
-					String filename = rec.getKey().getNodeName().toString();
-					System.err.println("Decomposed (unmodified):     \"" + filename + "\"");
-					System.err.print("Decomposed (unmodified) hex:");
-					for(char c : filename.toCharArray()) System.err.print(" " + Util.toHexStringBE(c));
-					System.err.println();
-					String composedFilename = ud.compose(filename);
-					System.err.println("Composed:                 \"" + composedFilename + "\"");
-					System.err.print("Composed hex:            ");
-					for(char c : composedFilename.toCharArray()) System.err.print(" " + Util.toHexStringBE(c));
-					System.err.println();
-				    }
-				    return;
-				}
-				else throw new RuntimeException("recData instanceof " + recData.getClass().toString());
-				
-				HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
-				populateTable(contents);
-				fileTableScroller.getVerticalScrollBar().setValue(0);
-				
-				List<HFSPlusCatalogLeafRecord> path = fsView.getPathTo(requestedID);
-// 				System.err.println("Path:");
-// 				for(HFSPlusCatalogLeafRecord clf : path)
-// 				    clf.getKey().print(System.err, "  ");
-				
-				path.remove(0); // The first element will be the root, and setTreePath doesn't want the root
-				path.remove(path.size()-1); // The last element will be the thread record for the folder.
-				TreePath selectionPath = dirTree.getSelectionPath();
-				dirTree.expandPath(selectionPath);
-				setTreePath(path);
-				//TreePath selectionPath = dirTree.getSelectionPath();
-				//dirTree.expandPath(selectionPath);
-				selectionPath = dirTree.getSelectionPath();
-				Object[] userObjectPath = selectionPath.getPath();
-				StringBuilder pathString = new StringBuilder("/");
-				for(int i = 1; i < userObjectPath.length; ++i) {
-				    pathString.append(userObjectPath[i].toString());
-				    pathString.append("/");
-				}
-				addressField.setText(pathString.toString()); 
+                                Record<A> rec = ((RecordContainer)colValue).getRecord(genericPlaceholder);
+                                if(rec.getType() == RecordType.FILE)
+                                    controller.actionDoubleClickFile(rec);
+                                else if(rec.getType() == RecordType.FOLDER)
+                                    actionChangeDir(rec);
 			    }
 			    else
 				throw new RuntimeException("Invalid type in column 0 in fileTable!");
@@ -452,102 +407,41 @@ public class FileSystemBrowser {
 	
 	dirTree.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-		    if(e.getButton() == MouseEvent.BUTTON3) {
+            public void mousePressed(MouseEvent e) {
+		    if(e.getButton() == MouseEvent.BUTTON3 &&
+                            controller.isFileSystemLoaded()) {
 			TreePath tp = dirTree.getPathForLocation(e.getX(), e.getY());
 			if(tp != null) {
 			    dirTree.clearSelection();
 			    dirTree.setSelectionPath(tp);
 			    dirTree.requestFocus();
 			    
-			    JPopupMenu jpm = new JPopupMenu();
-			    JMenuItem infoItem = new JMenuItem("Information");
-			    infoItem.addActionListener(new ActionListener() {
-				    public void actionPerformed(ActionEvent e) {
-					actionGetInfo();
-				    }
-				});
-			    jpm.add(infoItem);
-			    jpm.show(dirTree, e.getX(), e.getY());
+			    controller.getRightClickRecordPopupMenu(getTreeSelection())
+                                    .show(dirTree, e.getX(), e.getY());
 			}
 		    }
 		}
 	    });
 	DefaultMutableTreeNode rootNode = new NoLeafMutableTreeNode("No file system loaded");
-	DefaultTreeModel model = new DefaultTreeModel(rootNode);
-	dirTree.setModel(model);
+	treeModel = new DefaultTreeModel(rootNode);
+	dirTree.setModel(treeModel);
 	dirTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 	
 	dirTree.addTreeSelectionListener(new TreeSelectionListener() {
 		public void valueChanged(TreeSelectionEvent e) {
 		    TreePath tp = e.getPath();
-		    Object obj = tp.getLastPathComponent();
-		    if(obj instanceof NoLeafMutableTreeNode) {
-			Object obj2 = ((NoLeafMutableTreeNode)obj).getUserObject();
-			if(obj2 instanceof RecordNodeStorage) {
-			    HFSPlusCatalogLeafRecord rec = ((RecordNodeStorage)obj2).getRecord();
-			    HFSPlusCatalogLeafRecordData recData = rec.getData();
-			    HFSCatalogNodeID requestedID;
-			    if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
-			       recData instanceof HFSPlusCatalogFolder) {
-				HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder)recData;
-				requestedID = catFolder.getFolderID();
-			    }
-			    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
-				    recData instanceof HFSPlusCatalogThread) {
-				HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
-				requestedID = rec.getKey().getParentID();
-			    }
-			    else
-				throw new RuntimeException("Invalid type.");
-			
-			    HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
-			    populateTable(contents);
-			    fileTableScroller.getVerticalScrollBar().setValue(0);
-			    
-			    StringBuilder path = new StringBuilder("/");
-			    Object[] userObjectPath = ((NoLeafMutableTreeNode)obj).getUserObjectPath();
-			    for(int i = 1; i < userObjectPath.length; ++i) {
-				path.append(userObjectPath[i].toString());
-				path.append("/");
-			    }
-			    addressField.setText(path.toString()); 
-			}
-		    }
-		}
+                    actionTreeNodeSelected(tp);
+                }
 	    });
 	dirTree.addTreeWillExpandListener(new TreeWillExpandListener() {
 		public void treeWillExpand(TreeExpansionEvent e) 
                     throws ExpandVetoException {
 		    //System.out.println("Tree will expand!");
-		    TreePath tp = e.getPath();
-		    Object obj = tp.getLastPathComponent();
-		    if(obj instanceof NoLeafMutableTreeNode) {
-			Object obj2 = ((NoLeafMutableTreeNode)obj).getUserObject();
-			if(obj2 instanceof RecordNodeStorage) {
-			    HFSPlusCatalogLeafRecord rec = ((RecordNodeStorage)obj2).getRecord();
-			    HFSPlusCatalogLeafRecordData recData = rec.getData();
-			    HFSCatalogNodeID requestedID;
-			    if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
-			       recData instanceof HFSPlusCatalogFolder) {
-				HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder)recData;
-				requestedID = catFolder.getFolderID();
-			    }
-			    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
-				    recData instanceof HFSPlusCatalogThread) {
-				HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
-				requestedID = rec.getKey().getParentID();
-			    }
-			    else
-				throw new RuntimeException("Invalid type.");
-			
-			    HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
-			    populateNode(((NoLeafMutableTreeNode)obj), contents);
-			}
-		    }
+                    actionExpandDirTreeNode(e.getPath());
 		}
 		
 		public void treeWillCollapse(TreeExpansionEvent e) {}
+
 	    });
 	
 	// Focus monitoring
@@ -577,11 +471,174 @@ public class FileSystemBrowser {
  	    });
     }
     
-        private void adjustTableWidth() {
-	//System.err.println("adjustTableWidth()");
-	int columnCount = fileTable.getColumnModel().getColumnCount();
-	int[] w1 = new int[columnCount];
-	for(int i = 0; i < w1.length; ++i)
+    /**
+     * Action code for the action "go to parent directory" in the file system browser.
+     */
+    private void actionGotoParentDir() {
+        if(ensureFileSystemLoaded()) {
+            TreePath parentPath = lastTreeSelectionPath.getParentPath();
+            selectInTree(parentPath);
+        }
+    }
+
+    /**
+     * Action code for the action "extract selection to directory" in the file system browser.
+     */
+    private void actionExtractToDir() {
+        if(ensureFileSystemLoaded()) {
+            controller.actionExtractToDir(getSelection());
+        }
+    }
+
+    private void actionChangeDir(Record<A> subDir) {
+        TreePath currentTreeSelection = lastTreeSelectionPath;
+        Object objectToPopulate = lastTreeSelectionPath.getLastPathComponent();
+        FolderTreeNode nodeToPopulate;
+        if(objectToPopulate instanceof FolderTreeNode) {
+            nodeToPopulate = (FolderTreeNode) objectToPopulate;
+            
+            List<Record<A>> recordPath = getRecordPath(currentTreeSelection);
+            
+            // First make sure we have updated contents
+            populateTreeNodeFromPath(nodeToPopulate, recordPath);
+            dirTree.expandPath(lastTreeSelectionPath);
+            
+            int childCount = treeModel.getChildCount(nodeToPopulate);
+            
+            Object finalChild = null;
+            for(int i = 0; i < childCount; ++i) {
+                Object curChild = treeModel.getChild(nodeToPopulate, i);
+                if(curChild instanceof FolderTreeNode &&
+                        ((FolderTreeNode) curChild).getRecordContainer()
+                        .getRecord(genericPlaceholder).getName().equals(subDir.getName())) {
+                    TreePath childPath = lastTreeSelectionPath.pathByAddingChild(curChild);
+                    //dirTree.expandPath(childPath);
+                    selectInTree(childPath);
+                    finalChild = curChild;
+                    break;
+                }
+            }
+            if(finalChild == null)
+                throw new RuntimeException("Selection path to leaf child not found!");
+        }
+         /*       
+        String[] rawPath = new String[recordPath.size()-1+1];
+        int i = 0;
+        for(Record<A> rec : recordPath) {
+            if(i > 0)
+                rawPath[i-1] = rec.getName();
+            ++i;
+        }
+        rawPath[i] = subDir.getName();
+        
+        setCurrentDirectory(rawPath);
+          * */
+    }
+    
+    /**
+     * Action code for the action "get info about selection" in the file system browser.
+     */
+    private void actionGetInfo() {
+        if(ensureFileSystemLoaded()) {
+            controller.actionGetInfo(getSelection());
+        }
+    }
+
+    /**
+     * Action code for the action "go to specified directory" in the file system browser.
+     */
+    private void actionGotoDir() {
+        if(ensureFileSystemLoaded()) {
+            String targetAddress = addressField.getText();
+            String[] addressComponents = controller.parseAddressPath(targetAddress);
+            if(addressComponents != null)
+                setCurrentDirectory(addressComponents);
+            else
+                JOptionPane.showMessageDialog(viewComponent, "Invalid pathname.", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void actionExpandDirTreeNode(TreePath targetNodePath) {
+        if(ensureFileSystemLoaded()) {
+            try {
+                final FolderTreeNode nodeToPopulate;
+                {
+                    Object objToExpand = targetNodePath.getLastPathComponent();
+                    if(objToExpand instanceof FolderTreeNode) {
+                        nodeToPopulate = (FolderTreeNode) objToExpand;
+                    }
+                    else {
+                        throw new RuntimeException("Unexpected node class in tree: " +
+                                objToExpand.getClass());
+                    }
+                }
+
+                List<Record<A>> recordPath = getRecordPath(targetNodePath);
+
+                populateTreeNodeFromPath(nodeToPopulate, recordPath);
+            } catch(Throwable e) {
+                displayUnhandledException(e);
+            }
+        }
+    }
+    
+    private void actionTreeNodeSelected(TreePath selectionPath) {
+        // If we have selected another node type than FolderTreeNode, we don't do anything.
+        if(selectionPath.getLastPathComponent() instanceof FolderTreeNode) {
+            if(ensureFileSystemLoaded()) {
+                try {
+                    List<Record<A>> recordPath = getRecordPath(selectionPath);
+                    populateTableFromPath(recordPath);
+                    lastTreeSelectionPath = selectionPath;
+                } catch(Throwable e) {
+                    displayUnhandledException(e);
+                }
+            }
+        }
+    }
+    
+    private void displayUnhandledException(Throwable e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(viewComponent, e.getClass() + " while populating " +
+                "tree node:\n  " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    }
+                
+    private List<Record<A>> getRecordPath(TreePath tp) {
+        List<Record<A>> recordPath = new ArrayList<Record<A>>(tp.getPathCount());
+        for(Object obj : tp.getPath()) {
+            if(obj instanceof FolderTreeNode) {
+                FolderTreeNode noLeafMutableTreeNode = (FolderTreeNode) obj;
+                Object userObj = noLeafMutableTreeNode.getUserObject();
+                if(userObj instanceof RecordContainer) {
+                    Record<A> rec = ((RecordContainer) userObj).getRecord(genericPlaceholder);
+
+                    if(rec.getType() == RecordType.FOLDER) {
+                        recordPath.add(rec);
+                    }
+                    else {
+                        throw new RuntimeException("Unexpected record type in tree: " +
+                                rec.getType());
+                    }
+                }
+                else {
+                    throw new RuntimeException("Unexpected user object class in tree: " +
+                            userObj.getClass());
+                }
+            }
+            else {
+                throw new RuntimeException("Unexpected node class in tree: " + obj.getClass());
+            }
+        }
+        
+        return recordPath;
+    }
+
+    private void adjustTableWidth() {
+        //System.err.println("adjustTableWidth()");
+        int columnCount = fileTable.getColumnModel().getColumnCount();
+        int[] w1 = new int[columnCount];
+        for(int i = 0; i < w1.length; ++i)
 	    w1[i] = fileTable.getColumnModel().getColumn(i).getPreferredWidth();
 		    
 // 	System.err.print("  Widths before =");
@@ -621,4 +678,498 @@ public class FileSystemBrowser {
 	lastWidths.o = null;
 	disableColumnListener[0] = false;
     }
+    
+    private void populateTreeNodeFromPath(DefaultMutableTreeNode nodeToPopulate, List<Record<A>> recordPath) {
+        List<Record<A>> childRecords =
+                controller.getFolderContents(recordPath);
+        populateTreeNodeFromContents(nodeToPopulate, childRecords);
+    }
+    
+    private void populateTreeNodeFromContents(DefaultMutableTreeNode nodeToPopulate, List<Record<A>> childRecords) {
+        // Remove all current leafs to this node
+        nodeToPopulate.removeAllChildren();
+        
+        // Add new leafs
+        for(Record<A> childRecord : childRecords) {
+            // The tree only displays the folders...
+            if(childRecord.getType() == RecordType.FOLDER) {
+                nodeToPopulate.add(new FolderTreeNode(new RecordContainer(childRecord)));
+//                treeModel.insertNodeInto(nodeToPopulate,
+//                        new FolderTreeNode(new RecordContainer(childRecord)),
+//                        treeModel.getChildCount(nodeToPopulate));
+            }
+            /*
+            else {
+                throw new RuntimeException("INTERNAL ERROR: Encountered " +
+                        "unexpected record type: " + childRecord.getType());
+            }
+             * */
+        }
+        
+        treeModel.reload(nodeToPopulate);
+    }
+    
+    private List<String> asNameList(List<Record<A>> recordList) {
+        ArrayList<String> res = new ArrayList<String>();
+        for(Record<A> rec : recordList)
+            res.add(rec.getName());
+        return res;
+    }
+    
+    private void populateTableFromPath(List<Record<A>> folderRecordPath) {
+        List<Record<A>> childRecords = controller.getFolderContents(folderRecordPath);
+        List<String> nameList = asNameList(folderRecordPath.subList(1, folderRecordPath.size()));
+        String displayPath =
+                controller.getAddressPath(nameList);
+        
+        populateTableFromContents(childRecords, displayPath);
+        /*
+        StringBuilder path = new StringBuilder("/");
+        Object[] userObjectPath = ((FolderTreeNode) obj).getUserObjectPath();
+        for(int i = 1; i < userObjectPath.length; ++i) {
+            path.append(userObjectPath[i].toString());
+            path.append("/");
+        }
+        addressField.setText(path.toString());
+         * */
+    }
+    
+    private void populateTableFromContents(List<Record<A>> contents, String displayPath) {
+        while(tableModel.getRowCount() > 0) {
+            tableModel.removeRow(tableModel.getRowCount()-1);
+	}
+	
+	for(Record<A> rec : contents) {
+	    Vector<Object> currentRow = new Vector<Object>(4);
+	    
+            currentRow.add(new RecordContainer(rec));
+            currentRow.add(SpeedUnitUtils.bytesToBinaryUnit(rec.getSize()));
+	    if(rec.getType() == RecordType.FILE) {
+		currentRow.add("File");
+	    }
+	    else if(rec.getType() == RecordType.FOLDER) {
+		currentRow.add("Folder");
+	    }
+	    else
+		throw new RuntimeException("INTERNAL ERROR: Encountered " +
+                        "unexpected record type (" + rec.getType() + ")");
+            
+            DateFormat dti = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+            currentRow.add("" + dti.format(rec.getModifyDate()));
+            currentRow.add("");
+            
+            tableModel.addRow(currentRow);
+	}
+	adjustTableWidth();
+        
+        fileTableScroller.getVerticalScrollBar().setValue(0);
+        addressField.setText(displayPath);
+    }
+
+    /**
+     * Returns the JComponent that can be used to display the FileSystemBrowser.
+     * 
+     * @return the JComponent that can be used to display the FileSystemBrowser.
+     */
+    public JComponent getViewComponent() {
+        return viewComponent;
+    }
+    
+    /**
+     * Returns the current user selection as a list of the user objects
+     * contained within the records, rather than a list of the records
+     * themselves. This is a convenience method.
+     * 
+     * @return the current user selection as a list of user objects.
+     */
+    public List<A> getUserObjectSelection() {
+        List<Record<A>> recs = getSelection();
+        ArrayList<A> result = new ArrayList<A>(recs.size());
+        for(Record<A> rec : recs) {
+            result.add(rec.getUserObject());
+        }
+        return result;
+    }
+    
+    /**
+     * Returns the current user selection for the file system browser. The
+     * selection may be from the tree, in which case there is only one object,
+     * or from the table, in which case there can be several. Which one to
+     * choose when there is a selection in both the table and the tree depends
+     * on which component last had focus.
+     * 
+     * @return the current user selection for the file system browser.
+     */
+    public List<Record<A>> getSelection() {
+        final List<Record<A>> result;
+	if(dirTreeLastFocus > fileTableLastFocus) {
+	    Record<A> treeSelection = getTreeSelection();
+            result = new ArrayList<Record<A>>(1);
+            result.add(treeSelection);
+	}
+	else {
+	    result = getTableSelection();
+	}
+        return result;
+    }
+    
+    /**
+     * Returns the current user selection for the folder tree.
+     * 
+     * @return the current user selection for the folder tree.
+     */
+    private Record<A> getTreeSelection() {
+        //List<Record<A>> result;
+        Record<A> result;
+        Object o = lastTreeSelectionPath.getLastPathComponent();
+        if(o == null) {
+            JOptionPane.showMessageDialog(viewComponent, "No file or folder selected.",
+                    "Information", JOptionPane.INFORMATION_MESSAGE);
+            result = null;
+        }
+        else if(o instanceof DefaultMutableTreeNode) {
+            Object o2 = ((DefaultMutableTreeNode) o).getUserObject();
+            if(o2 instanceof RecordContainer) {
+                Record<A> rec = ((RecordContainer) o2).getRecord(genericPlaceholder);
+                //result = new ArrayList<Record<A>>(1);
+                //result.add(rec);
+                result = rec;
+            }
+            else {
+                JOptionPane.showMessageDialog(viewComponent,
+                        "[getTreeSelection()] Unexpected data in tree model: " +
+                        o2.getClass() + ". (Internal error, report to " +
+                        "developer)", "Error", JOptionPane.ERROR_MESSAGE);
+                result = null;
+            }
+        }
+        else {
+            JOptionPane.showMessageDialog(viewComponent,
+                    "[getTreeSelection()] Unexpected tree node type: " +
+                    o.getClass() + "! (Internal error, report to developer)",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            result = null;
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Returns the current user selection for the folder contents table.
+     * 
+     * @return the current user selection for the folder contents table.
+     */
+    private List<Record<A>> getTableSelection() {
+        List<Record<A>> result;
+
+        int[] selectedRows = fileTable.getSelectedRows();
+        if(selectedRows.length == 0) {
+            JOptionPane.showMessageDialog(viewComponent, "No file selected.",
+                    "Information", JOptionPane.INFORMATION_MESSAGE);
+            result = null;
+        }
+        else {
+            ArrayList<Record<A>> actualResult =
+                    new ArrayList<Record<A>>(selectedRows.length);
+            for(int i = 0; i < selectedRows.length; ++i) {
+                Object o = tableModel.getValueAt(selectedRows[i], 0);
+                if(o instanceof RecordContainer) {
+                    Record<A> rekk = ((RecordContainer) o).getRecord(genericPlaceholder);
+                    actualResult.add(rekk);
+                }
+                else {
+                    JOptionPane.showMessageDialog(viewComponent,
+                            "[getTableSelection()] Unexpected data in " +
+                            "table model. (Internal error, report to " +
+                            "developer)", "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    actualResult = null;
+                    break;
+                }
+            }
+            result = actualResult;
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Returns whether or not a file system is loaded by the controller. If a
+     * file system is not loaded, an error message dialog is displayed to notify
+     * the user that the operation it requested could not be performed, and then
+     * <code>false</code> is returned.
+     * 
+     * @return whether or not a file system is loaded by the controller.
+     */
+    private boolean ensureFileSystemLoaded() {
+        if(controller.isFileSystemLoaded()) {
+            return true;
+        }
+        else {
+            JOptionPane.showMessageDialog(viewComponent, "No file system " +
+                    "loaded.", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+    }
+    
+    public void setRoot(Record<A> rootRecord) {
+        List<Record<A>> rootRecordPath = new ArrayList<Record<A>>(1);
+        rootRecordPath.add(rootRecord);
+        
+        DefaultMutableTreeNode rootNode =
+                new FolderTreeNode(new RecordContainer(rootRecord));
+        
+	populateTreeNodeFromPath(rootNode, rootRecordPath);
+	treeModel = new DefaultTreeModel(rootNode);
+	dirTree.setModel(treeModel);
+        
+        lastTreeSelectionPath = new TreePath(rootNode);
+        selectInTree(lastTreeSelectionPath);
+
+	populateTableFromPath(rootRecordPath);
+        setSelectionStatus(0, 0);
+    }
+
+    private void selectInTree(TreePath childPath) {
+        dirTree.setSelectionPath(childPath);
+        dirTree.scrollPathToVisible(childPath);
+    }
+    
+    /*
+     * Notes on changing the current directory.
+     * 
+     * Directories can be changed by:
+     * - Clicking on the requested directory
+     * - Typing the address in the address bar and pressing enter or pushing the "Go"-button
+     * - Double-clicking a directory entry in the directory contents table
+     * 
+     * Expected reaction:
+     * - The directory contents table is populated with the contents of the requested directory
+     * - The tree components leading up to the selected directory are expanded.
+     * - The correct node in the directory tree is selected. No automatic expansion should take
+     *   place, except if there are no subdirectories to this node, in which case the node should
+     *   be expanded to remove the expansion sign.
+     * - The address field is updated to reflect the currently selected directory.
+     * 
+     * Action entry points:
+     * - actionChangeDir - triggered by a double-click in the contents table
+     * - 
+     * 
+     * What we need to do:
+     * 
+     * Because of how events are triggered, 
+     * - Look up the required Record<A> entry for the directory
+     *   1. For 
+     * - Look up the contents of the requested directory
+     * 
+     * When a change directory-event is triggered, the following should take place:
+     * 
+     * - 
+     */
+    private void setCurrentDirectory(String[] pathnameComponents) {
+        System.err.println("setCurrentDirectory(): printing pathnameComponents");
+        for(int i = 0; i < pathnameComponents.length; ++i)
+            System.err.println("  [" + i + "]: " + pathnameComponents[i]);
+        Object rootObj = treeModel.getRoot();
+        FolderTreeNode curNode;
+        if(rootObj instanceof FolderTreeNode) {
+            curNode = (FolderTreeNode) rootObj;
+        }
+        else
+            throw new RuntimeException("Unexpected root node class: " + rootObj.getClass());
+        
+        LinkedList<Record<A>> dirStack = new LinkedList<Record<A>>();
+        LinkedList<FolderTreeNode> nodeStack = new LinkedList<FolderTreeNode>();
+        nodeStack.addLast(curNode);
+        
+        for(String currentComponent : pathnameComponents) {
+            //FolderTreeNode curNode = (FolderTreeNode) curObj;
+            
+            dirStack.addLast(curNode.getRecordContainer().getRecord(genericPlaceholder));
+            populateTreeNodeFromPath(curNode, dirStack);
+            
+            int childCount = treeModel.getChildCount(curNode);
+            FolderTreeNode requestedNode = null;
+            for(int i = 0; i < childCount; ++i) {
+                Object curChild = treeModel.getChild(curNode, i);
+                if(curChild instanceof FolderTreeNode) {
+                    FolderTreeNode curChildNode = (FolderTreeNode) curChild;
+                    Record<A> rec = curChildNode.getRecordContainer().getRecord(genericPlaceholder);
+                    if(rec.getName().equals(currentComponent)) {
+                        requestedNode = curChildNode;
+                        break;
+                    }
+                }
+                else {
+                    throw new RuntimeException("Unexpected tree node class: " + curChild.getClass());
+                }
+            }
+            
+            if(requestedNode != null) {
+                curNode = requestedNode;
+                nodeStack.addLast(curNode);
+            }
+            else {
+                String dir = controller.getAddressPath(Arrays.asList(pathnameComponents));
+                JOptionPane.showMessageDialog(viewComponent, "No such directory.", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+        
+        TreePath tp = new TreePath(nodeStack.toArray(new FolderTreeNode[nodeStack.size()]));
+        System.err.println("setCurrentDirectory(): selecting the following path in tree:");
+        for(Object o : tp.getPath())
+            System.err.print(" \"" + o.toString() + "\"");
+        
+        selectInTree(tp);
+    }
+    
+    /**
+     * This method is called each time the user makes/changes a selection in
+     * the right pane. The resulting text is supposed to be printed somewhere
+     * below the file system browser, but it's up to the controller to decide
+     * where to display it.<br>
+     * The text will look something like "3 objects selected (11,39 KiB)".
+     * 
+     * @param selectedFilesCount  number of files currently selected.
+     * @param totalSize           the total size of the selection.
+     */
+    private void setSelectionStatus(long selectedFilesCount, long selectionSize) {
+        String sizeString;
+        if(selectionSize >= 1024) 
+            sizeString = SpeedUnitUtils.bytesToBinaryUnit(selectionSize,
+                    sizeFormat);
+        else
+            sizeString = selectionSize + " bytes";
+        
+        statusLabel.setText(selectedFilesCount +
+                ((selectedFilesCount==1)?" object":" objects") +
+                " selected (" + sizeString + ")");
+    }
+    
+    public static enum RecordType {
+        FILE, FOLDER, SYMBOLIC_LINK;
+    }
+    
+    public static class Record<A> {
+        private RecordType type;
+        private String name;
+        private long size;
+        private Date modifyDate;
+        private A userObject;
+        
+        public Record(RecordType iType, String iName, long iSize,
+                Date iModifyDate, A iUserObject) {
+            this.type = iType;
+            this.name = iName;
+            this.size = iSize;
+            this.modifyDate = iModifyDate;
+            this.userObject = iUserObject;
+        }
+        
+        public RecordType getType() {
+            return type;
+        }
+        
+        public String getName() {
+            return name;
+        }
+        
+        public long getSize() {
+            return size;
+        }
+        
+        public Date getModifyDate() {
+            return modifyDate;
+        }
+        
+        public A getUserObject() {
+            return userObject;
+        }
+    }
+        
+    public static interface FileSystemProvider<A> {
+        
+        public void actionDoubleClickFile(Record<A> record);
+
+        public void actionExtractToDir(List<Record<A>> recordList);
+        
+        public void actionGetInfo(List<Record<A>> recordList);
+
+        public JPopupMenu getRightClickRecordPopupMenu(Record<A> record);
+        
+        public boolean isFileSystemLoaded();
+        
+        public List<Record<A>> getFolderContents(List<Record<A>> folderRecordPath);
+
+        public String getAddressPath(List<String> pathComponents);
+        
+        /**
+         * Parses the string <code>targetAddress</code> as a path specifier in the context of the
+         * current file system. For example, in a unix-like file system environment you would want
+         * to parse the string "/usr/bin" to <code>{ "usr", "bin" }</code>, and for a Windows file
+         * system you can choose to parse the path "\Windows\System32" or "C:\Windows\System32" as
+         * <code>{ "Windows", "System32" }</code>. The parsing must be consistent with the result of
+         * <code>getAddressPath</code>.
+         * 
+         * @param targetAddress
+         * @return the components of the address path if the parsing was successful, or
+         * <code>null</code> if the target address string was invalid.
+         */
+        public String[] parseAddressPath(String targetAddress);
+        
+        
+    }
+    
+    /** Aggregation class for storage in the first column of fileTable. */
+    private static class RecordContainer {
+	private Record rec;
+	private String composedNodeName;
+	private RecordContainer() {}
+	public RecordContainer(Record rec) {
+	    this.rec = rec;
+	    
+	    this.composedNodeName = rec.getName();
+	}
+        
+        /*public Record getRecord() {
+            return rec;
+        }*/
+        
+        @SuppressWarnings("unchecked")
+	public <T> Record<T> getRecord(GenericPlaceholder<T> placeholder) {
+            return (Record<T>)rec;
+        }
+        
+        @Override public String toString() { return composedNodeName; }
+    }
+    
+    private static class NoLeafMutableTreeNode extends DefaultMutableTreeNode {
+        public NoLeafMutableTreeNode(Object userObject) {
+            super(userObject);
+        }
+        
+	/** Hack to avoid that JTree paints leaf nodes. We have no leafs, only dirs. */
+	@Override public boolean isLeaf() { return false; }
+    }
+    
+    private static class FolderTreeNode extends NoLeafMutableTreeNode {
+        
+        private final RecordContainer rc;
+        
+	public FolderTreeNode(RecordContainer o) {
+            super(o);
+            rc = o;
+        }
+        
+        public RecordContainer getRecordContainer() { return rc; }
+    }
+    
+    private static class ObjectContainer<A> {
+	public A o;
+	public ObjectContainer(A o) { this.o = o; }
+    }
+    
+    private static class GenericPlaceholder<A> {}
 }

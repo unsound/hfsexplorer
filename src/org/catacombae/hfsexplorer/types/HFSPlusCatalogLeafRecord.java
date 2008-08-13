@@ -18,7 +18,6 @@
 package org.catacombae.hfsexplorer.types;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.Util2;
 import java.io.PrintStream;
 
 public class HFSPlusCatalogLeafRecord {

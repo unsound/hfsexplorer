@@ -20,6 +20,7 @@ package org.catacombae.hfsexplorer;
 import java.net.MalformedURLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.catacombae.hfsexplorer.unfinished.FileSystemBrowser.Record;
 import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.io.ReadableUDIFStream;
@@ -43,6 +44,9 @@ import javax.swing.table.*;
 import javax.swing.event.*;
 //import org.catacombae.hfsexplorer.fsframework.FSFile;
 import org.catacombae.hfsexplorer.helpbrowser.HelpBrowserPanel;
+import org.catacombae.hfsexplorer.unfinished.FileSystemBrowser;
+import org.catacombae.jparted.lib.fs.FSEntry;
+import org.catacombae.jparted.lib.fs.FileSystemHandler;
 
 public class FileSystemBrowserWindow extends JFrame {
     private static final String TITLE_STRING = "HFSExplorer " + HFSExplorer.VERSION;
@@ -147,6 +151,7 @@ public class FileSystemBrowserWindow extends JFrame {
     private final DefaultTableModel tableModel;
     private HFSPlusFileSystemView fsView;
     
+    //private FileSystemHandler fsHandler;
     
     public FileSystemBrowserWindow() {
 	this(null);
@@ -464,64 +469,7 @@ public class FileSystemBrowserWindow extends JFrame {
 			    Object colValue = fileTable.getModel().getValueAt(row, col);
 			    //System.err.println("  Value class: " + colValue.getClass());
 			    if(colValue instanceof RecordContainer) {
-				HFSPlusCatalogLeafRecord rec = ((RecordContainer)colValue).getRecord();
-				HFSPlusCatalogLeafRecordData recData = rec.getData();
-				HFSCatalogNodeID requestedID;
-				if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
-				   recData instanceof HFSPlusCatalogFolder) {
-				    HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder)recData;
-				    requestedID = catFolder.getFolderID();
-				}
-				else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
-					recData instanceof HFSPlusCatalogThread) {
-				    HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
-				    requestedID = rec.getKey().getParentID();
-				}
-				else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
-					recData instanceof HFSPlusCatalogFile) {
-				    if(true)
-					actionDoubleClickFile(rec, (HFSPlusCatalogFile)recData);
-				    else { // Some normalization testcode, currently disabled.
-					UnicodeNormalizationToolkit ud = UnicodeNormalizationToolkit.getDefaultInstance();
-					String filename = rec.getKey().getNodeName().toString();
-					System.err.println("Decomposed (unmodified):     \"" + filename + "\"");
-					System.err.print("Decomposed (unmodified) hex:");
-					for(char c : filename.toCharArray()) System.err.print(" " + Util.toHexStringBE(c));
-					System.err.println();
-					String composedFilename = ud.compose(filename);
-					System.err.println("Composed:                 \"" + composedFilename + "\"");
-					System.err.print("Composed hex:            ");
-					for(char c : composedFilename.toCharArray()) System.err.print(" " + Util.toHexStringBE(c));
-					System.err.println();
-				    }
-				    return;
-				}
-				else throw new RuntimeException("recData instanceof " + recData.getClass().toString());
-				
-				HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
-				populateTable(contents);
-				fileTableScroller.getVerticalScrollBar().setValue(0);
-				
-				List<HFSPlusCatalogLeafRecord> path = fsView.getPathTo(requestedID);
-// 				System.err.println("Path:");
-// 				for(HFSPlusCatalogLeafRecord clf : path)
-// 				    clf.getKey().print(System.err, "  ");
-				
-				path.remove(0); // The first element will be the root, and setTreePath doesn't want the root
-				path.remove(path.size()-1); // The last element will be the thread record for the folder.
-				TreePath selectionPath = dirTree.getSelectionPath();
-				dirTree.expandPath(selectionPath);
-				setTreePath(path);
-				//TreePath selectionPath = dirTree.getSelectionPath();
-				//dirTree.expandPath(selectionPath);
-				selectionPath = dirTree.getSelectionPath();
-				Object[] userObjectPath = selectionPath.getPath();
-				StringBuilder pathString = new StringBuilder("/");
-				for(int i = 1; i < userObjectPath.length; ++i) {
-				    pathString.append(userObjectPath[i].toString());
-				    pathString.append("/");
-				}
-				addressField.setText(pathString.toString()); 
+				actionDoubleClickTableEntry(((RecordContainer)colValue).getRecord());
 			    }
 			    else
 				throw new RuntimeException("Invalid type in column 0 in fileTable!");
@@ -632,31 +580,12 @@ public class FileSystemBrowserWindow extends JFrame {
 		    TreePath tp = e.getPath();
 		    Object obj = tp.getLastPathComponent();
 		    if(obj instanceof NoLeafMutableTreeNode) {
-			Object obj2 = ((NoLeafMutableTreeNode)obj).getUserObject();
-			if(obj2 instanceof RecordNodeStorage) {
-			    HFSPlusCatalogLeafRecord rec = ((RecordNodeStorage)obj2).getRecord();
-			    HFSPlusCatalogLeafRecordData recData = rec.getData();
-			    HFSCatalogNodeID requestedID;
-			    if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
-			       recData instanceof HFSPlusCatalogFolder) {
-				HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder)recData;
-				requestedID = catFolder.getFolderID();
-			    }
-			    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
-				    recData instanceof HFSPlusCatalogThread) {
-				HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
-				requestedID = rec.getKey().getParentID();
-			    }
-			    else
-				throw new RuntimeException("Invalid type.");
-			
-			    HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
-			    populateNode(((NoLeafMutableTreeNode)obj), contents);
-			}
+                        actionExpandDirTreeNode((NoLeafMutableTreeNode)obj);
 		    }
 		}
 		
 		public void treeWillCollapse(TreeExpansionEvent e) {}
+
 	    });
 	
 	// Focus monitoring
@@ -970,6 +899,97 @@ public class FileSystemBrowserWindow extends JFrame {
 	pack();
 	setLocationRelativeTo(null);
     }
+
+    public void actionDoubleClickTableEntry(HFSPlusCatalogLeafRecord rec) {
+        HFSPlusCatalogLeafRecordData recData = rec.getData();
+        HFSCatalogNodeID requestedID;
+        if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
+                recData instanceof HFSPlusCatalogFolder) {
+            HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder) recData;
+            requestedID = catFolder.getFolderID();
+        }
+        else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
+                recData instanceof HFSPlusCatalogThread) {
+            HFSPlusCatalogThread catThread = (HFSPlusCatalogThread) recData;
+            requestedID = rec.getKey().getParentID();
+        }
+        else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
+                recData instanceof HFSPlusCatalogFile) {
+            if(true) {
+                actionDoubleClickFile(rec, (HFSPlusCatalogFile)recData);
+            }
+            else { // Some normalization testcode, currently disabled.
+                UnicodeNormalizationToolkit ud = UnicodeNormalizationToolkit.getDefaultInstance();
+                String filename = rec.getKey().getNodeName().toString();
+                System.err.println("Decomposed (unmodified):     \"" + filename + "\"");
+                System.err.print("Decomposed (unmodified) hex:");
+                for(char c : filename.toCharArray()) {
+                    System.err.print(" " + Util.toHexStringBE(c));
+                }
+                System.err.println();
+                String composedFilename = ud.compose(filename);
+                System.err.println("Composed:                 \"" + composedFilename + "\"");
+                System.err.print("Composed hex:            ");
+                for(char c : composedFilename.toCharArray()) {
+                    System.err.print(" " + Util.toHexStringBE(c));
+                }
+                System.err.println();
+            }
+            return;
+        }
+        else {
+            throw new RuntimeException("recData instanceof " + recData.getClass().toString());
+        }
+        HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
+        populateTable(contents);
+        fileTableScroller.getVerticalScrollBar().setValue(0);
+
+        List<HFSPlusCatalogLeafRecord> path = fsView.getPathTo(requestedID);
+// 				System.err.println("Path:");
+// 				for(HFSPlusCatalogLeafRecord clf : path)
+// 				    clf.getKey().print(System.err, "  ");
+
+        path.remove(0); // The first element will be the root, and setTreePath doesn't want the root
+        path.remove(path.size() - 1); // The last element will be the thread record for the folder.
+        TreePath selectionPath = dirTree.getSelectionPath();
+        dirTree.expandPath(selectionPath);
+        setTreePath(path);
+        //TreePath selectionPath = dirTree.getSelectionPath();
+        //dirTree.expandPath(selectionPath);
+        selectionPath = dirTree.getSelectionPath();
+        Object[] userObjectPath = selectionPath.getPath();
+        StringBuilder pathString = new StringBuilder("/");
+        for(int i = 1; i < userObjectPath.length; ++i) {
+            pathString.append(userObjectPath[i].toString());
+            pathString.append("/");
+        }
+        addressField.setText(pathString.toString());
+    }
+
+    private void actionExpandDirTreeNode(NoLeafMutableTreeNode noLeafMutableTreeNode) {
+        Object obj2 = noLeafMutableTreeNode.getUserObject();
+        if(obj2 instanceof RecordNodeStorage) {
+            HFSPlusCatalogLeafRecord rec = ((RecordNodeStorage) obj2).getRecord();
+            HFSPlusCatalogLeafRecordData recData = rec.getData();
+            HFSCatalogNodeID requestedID;
+            if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
+                    recData instanceof HFSPlusCatalogFolder) {
+                HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder) recData;
+                requestedID = catFolder.getFolderID();
+            }
+            else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
+                    recData instanceof HFSPlusCatalogThread) {
+                //HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
+                requestedID = rec.getKey().getParentID();
+            }
+            else {
+                throw new RuntimeException("Invalid type.");
+            }
+            HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
+            populateNode(noLeafMutableTreeNode, contents);
+        }
+    }
+
     
     private boolean ensureFileSystemLoaded() {
         if(fsView != null) {
@@ -2112,6 +2132,53 @@ public class FileSystemBrowserWindow extends JFrame {
 
         return errorCount;
     }
+    /*
+    private class FileSystemBrowserController implements FileSystemBrowser.Controller<FSEntry> {
+
+        public void actionDoubleClickTableEntry(Record<FSEntry> record) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public JPopupMenu createTreeNodePopupMenu() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public JPopupMenu createTableNodePopupMenu() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public boolean isFileSystemLoaded() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public List<Record<FSEntry>> getFolderContents(Record<FSEntry> folderRecord) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public void notifyCurrentDirChanged(Record<FSEntry> folderRecord) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public void setSelectionStatusText(String text) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public void actionExtractToDir() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public void actionGetInfo() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public void actionGoToParentDir() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public void actionGotoDir() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+    }*/
     
     public static void main(String[] args) {
        	try {
@@ -2126,16 +2193,16 @@ public class FileSystemBrowserWindow extends JFrame {
 	}
 	
 	int parsedArgs = 0;
-	final FileSystemBrowserWindow fsbWindow;
+	final FileSystemBrowserWindow2 fsbWindow;
 	if(args.length > 0 && args[0].equals(DEBUG_CONSOLE_ARG)) {
 	    DebugConsoleWindow dcw = new DebugConsoleWindow();
 	    System.setOut(new PrintStream(dcw.debugStream));
 	    System.setErr(new PrintStream(dcw.debugStream));
-	    fsbWindow = new FileSystemBrowserWindow(dcw);
+	    fsbWindow = new FileSystemBrowserWindow2(dcw);
 	    ++parsedArgs;
 	}	    
 	else
-	    fsbWindow = new FileSystemBrowserWindow();
+	    fsbWindow = new FileSystemBrowserWindow2();
 	
 	/*
 	System.err.println(FileSystemBrowserWindow.class.getName() + ".main invoked.");

@@ -62,4 +62,9 @@ public class RandomAccessFileDataLocator extends DataLocator {
         else
             return wllf;
     }
+    
+    @Override
+    public boolean isWritable() {
+        return true;
+    }    
 }

@@ -41,11 +41,11 @@ import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.types.*;
 
 public class ForkFilter implements ReadableRandomAccessStream {
-    private HFSPlusForkData forkData;
-    private HFSPlusExtentDescriptor[] extentDescriptors;
-    private ReadableRandomAccessStream sourceFile;
-    private long fsOffset;
-    private long blockSize;
+    private final HFSPlusForkData forkData;
+    private final HFSPlusExtentDescriptor[] extentDescriptors;
+    private final ReadableRandomAccessStream sourceFile;
+    private final long fsOffset;
+    private final long blockSize;
     private long logicalPosition; // The current position in the fork
     private long lastLogicalPos; // The position in the fork where we stopped reading last time
     private long lastPhysicalPos; // The position in the fork where we stopped reading last time
@@ -55,6 +55,9 @@ public class ForkFilter implements ReadableRandomAccessStream {
 //     }
     public ForkFilter(HFSPlusForkData forkData, HFSPlusExtentDescriptor[] extentDescriptors, 
 		      ReadableRandomAccessStream sourceFile, long fsOffset, long blockSize) {
+        //System.err.println("ForkFilter.<init>(" + forkData + ", " + extentDescriptors + ", " +
+        //        sourceFile + ", " + fsOffset + ", " + blockSize + ");");
+        //System.err.println("  fork has " + extentDescriptors.length + " extents.");
 	this.forkData = forkData;
 	this.extentDescriptors = extentDescriptors;
 	this.sourceFile = sourceFile;
@@ -66,6 +69,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
     }
 
     public void seek(long pos) {
+        //System.err.println("ForkFilter.seek(" + pos + ");");
 	logicalPosition = pos;
     }
     public int read() {
@@ -79,6 +83,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
 	return read(data, 0, data.length);
     }
     public int read(byte[] data, int pos, int len) {
+        //System.err.println("ForkFilter.read(" + data + ", " + pos + ", " + len);
 	long offset = fsOffset;
 	long bytesToSkip = logicalPosition;
 	int extIndex;
@@ -149,9 +154,12 @@ public class ForkFilter implements ReadableRandomAccessStream {
 	
 	// Update tracker variables before returning
 	lastPhysicalPos = sourceFile.getFilePointer();
-	logicalPosition += len;
+	logicalPosition += len-bytesLeftToRead;
 	
-	return len;
+        if(bytesLeftToRead < len)
+            return len-bytesLeftToRead;
+        else
+            return -1;
     }
     public void readFully(byte[] data) {
 	readFully(data, 0, data.length);
