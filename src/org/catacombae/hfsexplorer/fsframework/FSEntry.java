@@ -12,7 +12,7 @@ import org.catacombae.hfsexplorer.Util;
  *
  * @author Erik
  */
-public class FSEntry {
+class FSEntry {
     private FileSystem parentFileSystem;
     
     protected byte[] fsId;

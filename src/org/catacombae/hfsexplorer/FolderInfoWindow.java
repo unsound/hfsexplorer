@@ -23,6 +23,8 @@ import org.catacombae.hfsexplorer.types.HFSPlusCatalogFolder;
 //import org.catacombae.hfsexplorer.types.JournalInfoBlock;
 import java.awt.*;
 import javax.swing.*;
+import org.catacombae.jparted.lib.fs.FSFolder;
+import org.catacombae.jparted.lib.fs.hfsplus.HFSPlusFSFolder;
 
 public class FolderInfoWindow extends JFrame {
     private JTabbedPane tabs;
@@ -58,6 +60,14 @@ public class FolderInfoWindow extends JFrame {
 	setLocationRelativeTo(null);
     }
     
+    public void setFields(FSFolder folder) {
+        if(folder instanceof HFSPlusFSFolder) {
+            infoPanel.setFields(((HFSPlusFSFolder)folder).getInternalCatalogFolder());
+        }
+        else
+            throw new RuntimeException("FSFolder type " + folder.getClass() +
+                    " not yet supported!");
+    }
     public void setFields(HFSPlusCatalogFolder vh) {
 	infoPanel.setFields(vh);
     }

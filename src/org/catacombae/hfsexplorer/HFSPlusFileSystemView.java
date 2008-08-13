@@ -230,6 +230,7 @@ public class HFSPlusFileSystemView {
      * the moment. Otherwise the returned BTNode object will be of subtype HFSPlusCatalogIndexNode or
      * HFSPlusCatalogLeafNode.<br>
      * Calling this method with a negative <code>nodeNumber</code> argument returns the root node.
+     * 
      * @param nodeNumber the node number inside the catalog file, or a negative value if we want the root
      * @return the requested node if it exists and has type index node or leaf node, null otherwise
      */
@@ -415,6 +416,52 @@ public class HFSPlusFileSystemView {
 	}
 	return forkData.getLogicalSize()-bytesToRead;
 // 	}
+    }
+    
+    /**
+     * Returns a stream from which the data fork of the specified file record
+     * can be accessed.
+     * 
+     * @return a stream from which the data fork of the specified file record
+     * can be accessed.
+     * @throws IllegalArgumentException if fileRecord is not a file record.
+     */
+    public ReadableRandomAccessStream getReadableDataForkStream(HFSPlusCatalogLeafRecord fileRecord) {
+        HFSPlusCatalogLeafRecordData recData = fileRecord.getData();
+	if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
+	   recData instanceof HFSPlusCatalogFile) {
+	    HFSPlusCatalogFile catFile = (HFSPlusCatalogFile)recData;
+	    HFSPlusForkData fork = catFile.getDataFork();
+	    return getReadableForkStream(fork, getAllDataExtentDescriptors(fileRecord));
+	}
+	else
+	    throw new IllegalArgumentException("fileRecord.getData() it not of type RECORD_TYPE_FILE");
+    }
+    
+    /**
+     * Returns a stream from which the resource fork of the specified file record
+     * can be accessed.
+     * 
+     * @return a stream from which the resource fork of the specified file record
+     * can be accessed.
+     * @throws IllegalArgumentException if fileRecord is not a file record.
+     */
+    public ReadableRandomAccessStream getReadableResourceForkStream(HFSPlusCatalogLeafRecord fileRecord) {
+        HFSPlusCatalogLeafRecordData recData = fileRecord.getData();
+	if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
+	   recData instanceof HFSPlusCatalogFile) {
+	    HFSPlusCatalogFile catFile = (HFSPlusCatalogFile)recData;
+	    HFSPlusForkData fork = catFile.getResourceFork();
+	    return getReadableForkStream(fork, getAllResourceExtentDescriptors(fileRecord));
+	}
+	else
+	    throw new IllegalArgumentException("fileRecord.getData() it not of type RECORD_TYPE_FILE");
+    }
+    
+    private ReadableRandomAccessStream getReadableForkStream(HFSPlusForkData forkData,
+            HFSPlusExtentDescriptor[] extentDescriptors) {
+        return new ForkFilter(forkData, extentDescriptors, hfsFile, fsOffset,
+                staticBlockSize);
     }
     
     public HFSPlusExtentLeafRecord getOverflowExtent(HFSPlusExtentKey key) {

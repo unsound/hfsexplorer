@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2006 Erik Larsson
+ * Copyright (C) 2008 Erik Larsson
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,10 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer;
+package org.catacombae.jparted.lib.fs;
 
-public class BuildNumber {
-    //[BuildEnumerator:Opening] WARNING: The following lines are managed by an external program. Do NOT change.
-    public static final long BUILD_NUMBER = 459L;
-    //[BuildEnumerator:Closing] The lines managed by an external program end here.
+import java.util.Date;
+
+/**
+ *
+ * @author <a href="mailto:erik82@kth.se">Erik Larsson</a>
+ */
+public abstract class FSAttributes {
+    public static class POSIXFileAttributes {}
+    
+    public abstract POSIXFileAttributes getPOSIXAttributes();
+    
+    public abstract WindowsFileAttributes getWindowsFileAttributes();
+    
+    public abstract Date getModifyDate();
+    //public abstract FSAccessControlList getAccessControlList();
 }

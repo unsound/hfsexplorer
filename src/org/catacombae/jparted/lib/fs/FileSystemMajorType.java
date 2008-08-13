@@ -1,10 +1,24 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/*-
+ * Copyright (C) 2008 Erik Larsson
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.catacombae.jparted.lib.fs;
 
+import org.catacombae.jparted.lib.fs.hfsx.HFSXFileSystemHandlerFactory;
+import org.catacombae.jparted.lib.fs.hfsplus.HFSPlusFileSystemHandlerFactory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -23,11 +37,12 @@ import java.util.Map;
 public enum FileSystemMajorType {
     APPLE_MFS,
     APPLE_HFS,
-    APPLE_HFS_PLUS(getFactories("HFS+")),
+    APPLE_HFS_PLUS(HFSPlusFileSystemHandlerFactory.class),
     APPLE_HFSX(HFSXFileSystemHandlerFactory.class),
     APPLE_PRODOS, FAT12, FAT16, FAT32, EXFAT, NTFS, HPFS, EXT3, REISERFS,
     REISER4, XFS, JFS, ZFS, UNKNOWN;
     
+    /*
     private static final Map<String, List<Class<? extends FileSystemHandlerFactory>>> DEFINED_FACTORIES;
     
     static {
@@ -45,6 +60,7 @@ public enum FileSystemMajorType {
                 DEFINED_FACTORIES.get(fsType);
         return factoryList.toArray(new Class[factoryList.size()]);
     }
+     * */
     
     private final LinkedList<FileSystemHandlerFactory> factories =
             new LinkedList<FileSystemHandlerFactory>();
@@ -74,6 +90,7 @@ public enum FileSystemMajorType {
     private FileSystemMajorType(Class... pFactoryClasses) {
         for(Class factoryClass : pFactoryClasses) {
             try {
+                @SuppressWarnings("unchecked")
                 Constructor c =
                     factoryClass.getConstructor();
                 Object o = c.newInstance();
@@ -115,7 +132,7 @@ public enum FileSystemMajorType {
         if(factories.size() < 1)
             return null;
         else {
-            return factories.getFirst();
+            return factories.getFirst().newInstance();
         }
     }
     

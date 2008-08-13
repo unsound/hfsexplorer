@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2006 Erik Larsson
+ * Copyright (C) 2008 Erik Larsson
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,10 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer;
+package org.catacombae.jparted.lib.fs;
 
-public class BuildNumber {
-    //[BuildEnumerator:Opening] WARNING: The following lines are managed by an external program. Do NOT change.
-    public static final long BUILD_NUMBER = 459L;
-    //[BuildEnumerator:Closing] The lines managed by an external program end here.
+/**
+ * Enumerates the fork types that are recognized by the API as having a special
+ * meaning.
+ * 
+ * @author Erik Larsson
+ */
+public enum FSForkType {
+    /**
+     * The data fork, the "main" fork of a file. All file system
+     * implementations must support this fork type.
+     */
+    DATA,
+    /**
+     * The resource fork in a MacOS file system. The resource fork has a special
+     * meaning for MacOS operating systems, as content type, thumbnails and
+     * other metadata are stored there.
+     */
+    MACOS_RESOURCE;
 }

@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @author Erik
  */
-public interface FileSystem {
+interface FileSystem {
     public FSEntry getEntry(String... path) throws FSFileNotFoundException;
     public FSFile getFile(String... path) throws FSFileNotFoundException;
     public FSFolder getFolder(String... path) throws FSFileNotFoundException;

@@ -9,7 +9,7 @@ package org.catacombae.hfsexplorer.fsframework;
  *
  * @author Erik
  */
-public class FSFileNotFoundException extends RuntimeException {
+class FSFileNotFoundException extends RuntimeException {
     public FSFileNotFoundException() {
 	super();
     }
