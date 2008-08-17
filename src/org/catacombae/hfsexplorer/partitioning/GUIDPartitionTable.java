@@ -22,6 +22,7 @@ import org.catacombae.hfsexplorer.*;
 import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.zip.CRC32;
+import org.catacombae.csjc.StructElements;
 
 /**
  * Notes about the structure of GPT:
@@ -36,7 +37,7 @@ import java.util.zip.CRC32;
  *   So: crc32Checksum, primaryLBA, backupLBA and partitionEntryLBA will differ.
  *   The two partition arrays though, are supposed to be completely identical.
  */
-public class GUIDPartitionTable implements PartitionSystem {
+public class GUIDPartitionTable implements PartitionSystem, StructElements {
     private static final int BLOCK_SIZE = 512; // carved in stone!
     protected final GPTHeader header;
     protected final GPTEntry[] entries;
@@ -271,6 +272,30 @@ public class GUIDPartitionTable implements PartitionSystem {
 	return result;
     }
     
+
+    public Dictionary getStructElements() {
+        DictionaryBuilder dbStruct = new DictionaryBuilder(getClass().getSimpleName());
+        dbStruct.add("header", header.getStructElements());
+        {
+            ArrayBuilder ab = new ArrayBuilder(GPTEntry.class.getSimpleName());
+            for(int i = 0; i < entries.length; ++i) {
+                GPTEntry ge = entries[i];
+                ab.add(ge.getStructElements());
+            }
+            dbStruct.add("entries", ab.getResult());
+        }
+        dbStruct.add("backupHeader",  backupHeader.getStructElements());
+        {
+            ArrayBuilder ab = new ArrayBuilder(GPTEntry.class.getSimpleName());
+            for(int i = 0; i < backupEntries.length; ++i) {
+                GPTEntry ge = backupEntries[i];
+                ab.add(ge.getStructElements());
+            }
+            dbStruct.add("backupEntries", ab.getResult());
+        }
+        return dbStruct.getResult();
+    }
+    
     @Override
     public boolean equals(Object obj) {
 	if(obj instanceof GUIDPartitionTable) {
@@ -281,5 +306,5 @@ public class GUIDPartitionTable implements PartitionSystem {
 	}
 	else
 	    return false;
-    }    
+    }
 }

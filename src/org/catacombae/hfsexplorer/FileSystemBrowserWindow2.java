@@ -197,6 +197,43 @@ public class FileSystemBrowserWindow2 extends JFrame {
 	    });
 	openUDIFItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 	
+        JMenuItem openFromPosItem = new JMenuItem("Read file system from specified position in file...");
+	openFromPosItem.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent ae) {
+		    //JFileChooser fileChooser = new JFileChooser();
+		    fileChooser.setMultiSelectionEnabled(false);
+		    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		    SimpleFileFilter sff = new SimpleFileFilter();
+		    sff.addExtension("dmg");
+		    sff.setDescription("Disk images");
+		    fileChooser.setFileFilter(sff);
+		    int res = fileChooser.showOpenDialog(FileSystemBrowserWindow2.this);
+		    if(res == JFileChooser.APPROVE_OPTION) {
+			try {
+			    File selectedFile = fileChooser.getSelectedFile();
+			    String pathName = selectedFile.getCanonicalPath();
+                            
+                            String s = JOptionPane.showInputDialog(FileSystemBrowserWindow2.this,
+                                    "Enter the byte position of the start of the file system.");
+                            long pos = Long.parseLong(s);
+                            
+			    loadFSWithUDIFAutodetect(pathName, pos);
+			} catch(IOException ioe) {
+			    ioe.printStackTrace();
+			    JOptionPane.showMessageDialog(FileSystemBrowserWindow2.this,
+							  "Count not resolve pathname!",
+							  "Error", JOptionPane.ERROR_MESSAGE);
+			} catch(Exception e) {
+			    e.printStackTrace();
+			    JOptionPane.showMessageDialog(FileSystemBrowserWindow2.this,
+							  "Could not read contents of partition!",
+							  "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		    }
+		    fileChooser.resetChoosableFileFilters();
+		}
+	    });
+        
 	JMenuItem debugConsoleItem = null;
 	if(dcw != null) {
 	    debugConsoleItem = new JMenuItem("Debug console");
@@ -265,6 +302,18 @@ public class FileSystemBrowserWindow2 extends JFrame {
 		}
 	    });
 	
+        JMenuItem setFileReadOffsetItem = new JMenuItem("Set file read offset...");
+	setFileReadOffsetItem.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent ae) {
+                    String s = JOptionPane.showInputDialog(FileSystemBrowserWindow2.this,
+                            "Enter offset:", HFSPlusFileSystemView.fileReadOffset);
+                    if(s != null) {
+                        HFSPlusFileSystemView.fileReadOffset = Long.parseLong(s);
+                    }
+		}
+	    });
+
+            
 	JMenuItem startHelpBrowserItem = new JMenuItem("Help browser");
 	startHelpBrowserItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
@@ -364,12 +413,14 @@ public class FileSystemBrowserWindow2 extends JFrame {
 	    fileMenu.add(loadFSFromDeviceItem);
 	fileMenu.add(loadFSFromFileItem);
 	fileMenu.add(openUDIFItem);
+        fileMenu.add(openFromPosItem);
 	if(debugConsoleItem != null)
 	    fileMenu.add(debugConsoleItem);
 	if(exitProgramItem != null)
 	    fileMenu.add(exitProgramItem);
 	infoMenu.add(fsInfoItem);
 	infoMenu.add(toggleCachingItem);
+        infoMenu.add(setFileReadOffsetItem);
 	helpMenu.add(startHelpBrowserItem);
 	helpMenu.add(checkUpdatesItem);
 	helpMenu.add(aboutItem);
@@ -541,6 +592,9 @@ public class FileSystemBrowserWindow2 extends JFrame {
     
     
     public void loadFSWithUDIFAutodetect(String filename) {
+        loadFSWithUDIFAutodetect(filename, 0);
+    }
+    public void loadFSWithUDIFAutodetect(String filename, long pos) {
 	ReadableRandomAccessStream fsFile;
 	try {
 	    if(WindowsLowLevelIO.isSystemSupported())
@@ -580,6 +634,9 @@ public class FileSystemBrowserWindow2 extends JFrame {
 		System.err.println("UDIF structure not found. Proceeding normally...");
 	    }
 	    
+            if(pos != 0)
+                fsFile = new ReadableConcatenatedStream(fsFile, pos, fsFile.length()-pos);
+            
 	    loadFS(fsFile, new File(filename).getName());
 	} catch(Exception e) {
 	    System.err.println("Could not open file! Exception thrown:");
@@ -721,7 +778,7 @@ public class FileSystemBrowserWindow2 extends JFrame {
 
     private long extractForkToStream(FSFork theFork, OutputStream os, ProgressMonitor pm) throws IOException {
         ReadableRandomAccessStream forkFilter = theFork.getReadableRandomAccessStream();
-        System.out.println("extractForkToStream working with a " + forkFilter.getClass());
+        //System.out.println("extractForkToStream working with a " + forkFilter.getClass());
         final long originalLength = theFork.getLength();
 	long bytesToRead = originalLength;
 	byte[] buffer = new byte[4096];
@@ -733,8 +790,8 @@ public class FileSystemBrowserWindow2 extends JFrame {
 	    if(bytesRead < 0)
 		break;
 	    else {
-                System.out.println("Read the following from the forkfilter (" + bytesRead + " bytes): ");
-                System.out.println(Util.byteArrayToHexString(buffer, 0, bytesRead));
+                //System.out.println("Read the following from the forkfilter (" + bytesRead + " bytes): ");
+                //System.out.println(Util.byteArrayToHexString(buffer, 0, bytesRead));
 		pm.addDataProgress(bytesRead);
 		os.write(buffer, 0, bytesRead);
 		bytesToRead -= bytesRead;
@@ -1645,8 +1702,15 @@ public class FileSystemBrowserWindow2 extends JFrame {
         public String[] parseAddressPath(String targetAddress) {
             if(!targetAddress.startsWith("/"))
                 return null;
-            else
-                return targetAddress.substring(1).split("/");
+            else {
+                String remainder = targetAddress.substring(1);
+                if(remainder.length() == 0)
+                    return new String[0];
+                else {
+                    String[] res = remainder.split("/");
+                    return res;
+                }
+            }
         }
 
     }

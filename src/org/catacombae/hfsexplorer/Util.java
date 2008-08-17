@@ -296,19 +296,65 @@ public class Util {
 	set(ba, offset, length, (long)0);
     }
     
+    public static void set(boolean[] array, boolean value) {
+        set(array, 0, array.length, value);
+    }
+    
+    public static void set(byte[] array, byte value) {
+        set(array, 0, array.length, value);
+    }
+    
+    public static void set(short[] array, short value) {
+        set(array, 0, array.length, value);
+    }
+    
+    public static void set(char[] array, char value) {
+        set(array, 0, array.length, value);
+    }
+    
+    public static void set(int[] array, int value) {
+        set(array, 0, array.length, value);
+    }
+    
+    public static void set(long[] array, long value) {
+        set(array, 0, array.length, value);
+    }
+    
+    public static <T> void set(T[] array, T value) {
+        set(array, 0, array.length, value);
+    }
+    
+    public static void set(boolean[] ba, int offset, int length, boolean value) {
+	for(int i = offset; i < length; ++i)
+	    ba[i] = value;
+    }
+    
     public static void set(byte[] ba, int offset, int length, byte value) {
 	for(int i = offset; i < length; ++i)
 	    ba[i] = value;
     }
+    
     public static void set(short[] ba, int offset, int length, short value) {
 	for(int i = offset; i < length; ++i)
 	    ba[i] = value;
     }
+    
+    public static void set(char[] ba, int offset, int length, char value) {
+	for(int i = offset; i < length; ++i)
+	    ba[i] = value;
+    }
+    
     public static void set(int[] ba, int offset, int length, int value) {
 	for(int i = offset; i < length; ++i)
 	    ba[i] = value;
     }
+    
     public static void set(long[] ba, int offset, int length, long value) {
+	for(int i = offset; i < length; ++i)
+	    ba[i] = value;
+    }
+
+    public static <T> void set(T[] ba, int offset, int length, T value) {
 	for(int i = offset; i < length; ++i)
 	    ba[i] = value;
     }
@@ -323,13 +369,52 @@ public class Util {
 	return copy;
     }
     
-    public static void arrayCopy(byte[] source, byte[] dest, int destPos) {
+    /** 
+     * Creates a copy of the input data reversed byte by byte. This is helpful for endian swapping.
+     * 
+     * @param data
+     * @return
+     */     
+    public static byte[] createReverseCopy(byte[] data) {
+	return createReverseCopy(data, 0, data.length);
+    }
+    
+    /**
+     * Creates a copy of the input data reversed byte by byte. This is helpful for endian swapping.
+     * 
+     * @param data
+     * @param offset
+     * @param length
+     * @return
+     */
+    public static byte[] createReverseCopy(byte[] data, int offset, int length) {
+	byte[] copy = new byte[length];
+	for(int i = 0; i < copy.length; ++i) {
+            copy[i] = data[offset+(length-i-1)];
+        } 
+	return copy;
+    }
+    
+    public static byte[] arrayCopy(byte[] source, byte[] dest) {
+	return arrayCopy(source, dest, 0);
+    }
+    
+    public static byte[] arrayCopy(byte[] source, byte[] dest, int destPos) {
 	if(dest.length-destPos < source.length)
 	    throw new RuntimeException("Destination array not large enough.");
 	System.arraycopy(source, 0, dest, 0, source.length);
+        return dest;
     }
-    public static void arrayCopy(byte[] source, byte[] dest) {
-	arrayCopy(source, dest, 0);
+    
+    public static <T> T[] arrayCopy(T[] source, T[] dest) {
+        return arrayCopy(source, dest, 0);
+    }
+    
+    public static <T> T[] arrayCopy(T[] source, T[] dest, int destPos) {
+        if(dest.length-destPos < source.length)
+	    throw new RuntimeException("Destination array not large enough.");
+	System.arraycopy(source, 0, dest, 0, source.length);
+        return dest;
     }
     
     public static boolean arraysEqual(boolean[] a, boolean[] b) {
@@ -584,6 +669,4 @@ public class Util {
     public static long unsign(int i) {
 	return i & 0xFFFFFFFFL;
     }
-    
-    // End of Util2 stuff
 }
