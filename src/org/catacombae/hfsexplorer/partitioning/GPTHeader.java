@@ -19,8 +19,9 @@ package org.catacombae.hfsexplorer.partitioning;
 import org.catacombae.hfsexplorer.Util;
 import java.io.PrintStream;
 import java.util.zip.CRC32;
+import org.catacombae.csjc.StructElements;
 
-public class GPTHeader {
+public class GPTHeader implements StructElements {
     // Header is 92 bytes long. The rest of the 512 bytes (420 bytes) is reserved.
     public static final long GPT_SIGNATURE = 0x4546492050415254L;
 
@@ -237,5 +238,40 @@ public class GPTHeader {
 	}
 	else
 	    return false;
+    }
+
+    public Dictionary getStructElements() {
+        DictionaryBuilder dbStruct = new DictionaryBuilder(getClass().getSimpleName());
+        
+        dbStruct.add("signature", new IntegerField(signature,
+                IntegerFieldBits.BITS_64, false, false));
+        dbStruct.add("revision", new IntegerField(revision,
+                IntegerFieldBits.BITS_32, false, true));
+        dbStruct.add("headerSize", new IntegerField(headerSize,
+                IntegerFieldBits.BITS_32, false, true));
+        dbStruct.add("crc32Checksum", new IntegerField(crc32Checksum,
+                IntegerFieldBits.BITS_32, false, true));
+        dbStruct.add("reserved1", new IntegerField(reserved1,
+                IntegerFieldBits.BITS_32, false, false));
+        dbStruct.add("primaryLBA", new IntegerField(primaryLBA,
+                IntegerFieldBits.BITS_64, false, true));
+        dbStruct.add("backupLBA", new IntegerField(backupLBA,
+                IntegerFieldBits.BITS_64, false, true));
+        dbStruct.add("firstUsableLBA", new IntegerField(firstUsableLBA,
+                IntegerFieldBits.BITS_64, false, true));
+        dbStruct.add("lastUsableLBA", new IntegerField(lastUsableLBA,
+                IntegerFieldBits.BITS_64, false, true));
+        dbStruct.add("diskGUID", new ByteArrayField(diskGUID));
+        dbStruct.add("partitionEntryLBA", new IntegerField(partitionEntryLBA,
+                IntegerFieldBits.BITS_64, false, true));
+        dbStruct.add("numberOfPartitionEntries", new IntegerField(numberOfPartitionEntries,
+                IntegerFieldBits.BITS_32, false, true));
+        dbStruct.add("sizeOfPartitionEntry", new IntegerField(sizeOfPartitionEntry,
+                IntegerFieldBits.BITS_32, false, true));
+        dbStruct.add("partitionEntryArrayCRC32", new IntegerField(partitionEntryArrayCRC32,
+                IntegerFieldBits.BITS_32, false, true));
+        dbStruct.add("reserved2", new ByteArrayField(reserved2));
+        
+        return dbStruct.getResult();
     }
 }

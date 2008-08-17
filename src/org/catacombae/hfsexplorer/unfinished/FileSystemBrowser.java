@@ -21,6 +21,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.ImageIcon;
@@ -476,8 +477,10 @@ public class FileSystemBrowser<A> {
      */
     private void actionGotoParentDir() {
         if(ensureFileSystemLoaded()) {
-            TreePath parentPath = lastTreeSelectionPath.getParentPath();
-            selectInTree(parentPath);
+            if(lastTreeSelectionPath.getPathCount() > 1) {
+                TreePath parentPath = lastTreeSelectionPath.getParentPath();
+                selectInTree(parentPath);
+            }
         }
     }
 
@@ -679,13 +682,63 @@ public class FileSystemBrowser<A> {
 	disableColumnListener[0] = false;
     }
     
-    private void populateTreeNodeFromPath(DefaultMutableTreeNode nodeToPopulate, List<Record<A>> recordPath) {
+    private void populateTreeNodeFromPath(FolderTreeNode nodeToPopulate, List<Record<A>> recordPath) {
         List<Record<A>> childRecords =
                 controller.getFolderContents(recordPath);
         populateTreeNodeFromContents(nodeToPopulate, childRecords);
     }
     
-    private void populateTreeNodeFromContents(DefaultMutableTreeNode nodeToPopulate, List<Record<A>> childRecords) {
+    private void populateTreeNodeFromContents(FolderTreeNode nodeToPopulate,
+            List<Record<A>> childRecords) {
+        if(true) {
+        LinkedList<Record<A>> remainingRecords = new LinkedList<Record<A>>();
+        for(Record<A> childRecord : childRecords) {
+            if(childRecord.getType() == RecordType.FOLDER)
+                remainingRecords.add(childRecord);
+        }
+        
+        List<FolderTreeNode> currentNodes =
+                new ArrayList<FolderTreeNode>(nodeToPopulate.getChildCount());
+        Enumeration en = nodeToPopulate.children();
+        while(en.hasMoreElements()) {
+            Object o = en.nextElement();
+            if(o instanceof FolderTreeNode)
+                currentNodes.add((FolderTreeNode)o);
+            else
+                throw new RuntimeException("Unexpected child type: " + o.getClass());
+        }
+        
+        {
+            LinkedList<Object> removedChildren = new LinkedList<Object>();
+            LinkedList<Integer> childIndices = new LinkedList<Integer>();
+            
+        }
+        
+        int currentIndex = 0;
+        for(FolderTreeNode node : currentNodes) {
+            String nodeName = node.getRecordContainer().getRecord(genericPlaceholder).getName();
+            
+            while(remainingRecords.getFirst().getName().compareTo(nodeName) < 0) {
+                FolderTreeNode newNode =
+                        new FolderTreeNode(new RecordContainer(remainingRecords.removeFirst()));
+                nodeToPopulate.insert(newNode, currentIndex++);
+            }
+            if(remainingRecords.getFirst().getName().compareTo(nodeName) == 0) {
+                node.setUserObject(new RecordContainer(remainingRecords.removeFirst()));
+                ++currentIndex;
+            }
+            else {
+                nodeToPopulate.remove(node);
+            }
+        }
+        
+        while(remainingRecords.size() > 0) {
+            FolderTreeNode newNode =
+                        new FolderTreeNode(new RecordContainer(remainingRecords.removeFirst()));
+            nodeToPopulate.insert(newNode, currentIndex++);
+        }
+        }
+        else {
         // Remove all current leafs to this node
         nodeToPopulate.removeAllChildren();
         
@@ -705,6 +758,7 @@ public class FileSystemBrowser<A> {
             }
              * */
         }
+        }
         
         treeModel.reload(nodeToPopulate);
     }
@@ -723,15 +777,6 @@ public class FileSystemBrowser<A> {
                 controller.getAddressPath(nameList);
         
         populateTableFromContents(childRecords, displayPath);
-        /*
-        StringBuilder path = new StringBuilder("/");
-        Object[] userObjectPath = ((FolderTreeNode) obj).getUserObjectPath();
-        for(int i = 1; i < userObjectPath.length; ++i) {
-            path.append(userObjectPath[i].toString());
-            path.append("/");
-        }
-        addressField.setText(path.toString());
-         * */
     }
     
     private void populateTableFromContents(List<Record<A>> contents, String displayPath) {
@@ -916,7 +961,7 @@ public class FileSystemBrowser<A> {
         List<Record<A>> rootRecordPath = new ArrayList<Record<A>>(1);
         rootRecordPath.add(rootRecord);
         
-        DefaultMutableTreeNode rootNode =
+        FolderTreeNode rootNode =
                 new FolderTreeNode(new RecordContainer(rootRecord));
         
 	populateTreeNodeFromPath(rootNode, rootRecordPath);
@@ -931,6 +976,8 @@ public class FileSystemBrowser<A> {
     }
 
     private void selectInTree(TreePath childPath) {
+        if(childPath.getPathCount() > 1)
+            dirTree.expandPath(childPath.getParentPath());
         dirTree.setSelectionPath(childPath);
         dirTree.scrollPathToVisible(childPath);
     }
@@ -979,14 +1026,16 @@ public class FileSystemBrowser<A> {
             throw new RuntimeException("Unexpected root node class: " + rootObj.getClass());
         
         LinkedList<Record<A>> dirStack = new LinkedList<Record<A>>();
-        LinkedList<FolderTreeNode> nodeStack = new LinkedList<FolderTreeNode>();
-        nodeStack.addLast(curNode);
+        //LinkedList<FolderTreeNode> nodeStack = new LinkedList<FolderTreeNode>();
+        //nodeStack.addLast(curNode);
+        TreePath treePath = new TreePath(curNode);
         
         for(String currentComponent : pathnameComponents) {
             //FolderTreeNode curNode = (FolderTreeNode) curObj;
             
             dirStack.addLast(curNode.getRecordContainer().getRecord(genericPlaceholder));
             populateTreeNodeFromPath(curNode, dirStack);
+            dirTree.expandPath(treePath);
             
             int childCount = treeModel.getChildCount(curNode);
             FolderTreeNode requestedNode = null;
@@ -1007,22 +1056,23 @@ public class FileSystemBrowser<A> {
             
             if(requestedNode != null) {
                 curNode = requestedNode;
-                nodeStack.addLast(curNode);
+                //nodeStack.addLast(curNode);
+                treePath = treePath.pathByAddingChild(curNode);
             }
             else {
-                String dir = controller.getAddressPath(Arrays.asList(pathnameComponents));
+                //String dir = controller.getAddressPath(Arrays.asList(pathnameComponents));
                 JOptionPane.showMessageDialog(viewComponent, "No such directory.", "Error",
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
         }
         
-        TreePath tp = new TreePath(nodeStack.toArray(new FolderTreeNode[nodeStack.size()]));
+        //TreePath tp = new TreePath(nodeStack.toArray(new FolderTreeNode[nodeStack.size()]));
         System.err.println("setCurrentDirectory(): selecting the following path in tree:");
-        for(Object o : tp.getPath())
+        for(Object o : treePath.getPath())
             System.err.print(" \"" + o.toString() + "\"");
         
-        selectInTree(tp);
+        selectInTree(treePath);
     }
     
     /**
@@ -1125,12 +1175,10 @@ public class FileSystemBrowser<A> {
     /** Aggregation class for storage in the first column of fileTable. */
     private static class RecordContainer {
 	private Record rec;
-	private String composedNodeName;
+        
 	private RecordContainer() {}
 	public RecordContainer(Record rec) {
 	    this.rec = rec;
-	    
-	    this.composedNodeName = rec.getName();
 	}
         
         /*public Record getRecord() {
@@ -1142,7 +1190,7 @@ public class FileSystemBrowser<A> {
             return (Record<T>)rec;
         }
         
-        @Override public String toString() { return composedNodeName; }
+        @Override public String toString() { return rec.getName(); }
     }
     
     private static class NoLeafMutableTreeNode extends DefaultMutableTreeNode {

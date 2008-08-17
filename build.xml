@@ -19,6 +19,9 @@
   <property name="target.all.jarmanifest" value="${manifest.source.dir}/MANIFEST.MF"/>
   <property name="target.all.outjar" value="${java.runtime.library.dir}/hfsx.jar"/>
   
+  <property name="target.jparted.jarmanifest" value="${manifest.source.dir}/jparted/MANIFEST.MF"/>
+  <property name="target.jparted.outjar" value="targets/jparted/lib/jparted.jar"/>
+  
   <path id="java.runtime.classpath">
     <fileset dir="${java.runtime.library.dir}">
       <include name="**/*.jar"/>
@@ -90,6 +93,7 @@
     </javac>
   </target>
   
+  <target name="build-jparted" depends="clean,jar-jparted"/>
   
   <target name="compile-jparted" depends="init">
     <javac srcdir="${java.source.dir}"
@@ -103,6 +107,9 @@
     </javac>
   </target>
   
+  <target name="jar-jparted" depends="compile-jparted">
+    <jar destfile="${target.jparted.outjar}" basedir="${builddir}" manifest="${target.jparted.jarmanifest}"/>
+  </target>
   
   <target name="javadoc">
     <javadoc destdir="javadoc.~"

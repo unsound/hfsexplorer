@@ -84,7 +84,7 @@ public class HFSPlusFileSystemHandler extends FileSystemHandler {
         else
             return record.getKey().getNodeName().getUnicodeAsDecomposedString();
 
-    }
+    }    
 
     ReadableRandomAccessStream getReadableDataForkStream(HFSPlusCatalogLeafRecord fileRecord) {
         return view.getReadableDataForkStream(fileRecord);

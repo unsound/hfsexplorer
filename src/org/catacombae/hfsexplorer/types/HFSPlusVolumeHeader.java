@@ -199,10 +199,10 @@ public class HFSPlusVolumeHeader extends MutableStruct {
 	printAttributes(ps, prefix + "  ");
 	ps.println(prefix + "lastMountedVersion: " + getLastMountedVersion());
 	ps.println(prefix + "journalInfoBlock: " + getJournalInfoBlock());
-	ps.println(prefix + "createDate: " + getCreateDate());
-	ps.println(prefix + "modifyDate: " + getModifyDate());
-	ps.println(prefix + "backupDate: " + getBackupDate());
-	ps.println(prefix + "checkedDate: " + getCheckedDate());
+	ps.println(prefix + "createDate: " + getCreateDateAsDate());
+	ps.println(prefix + "modifyDate: " + getModifyDateAsDate());
+	ps.println(prefix + "backupDate: " + getBackupDateAsDate());
+	ps.println(prefix + "checkedDate: " + getCheckedDateAsDate());
 	ps.println(prefix + "fileCount: " + getFileCount());
 	ps.println(prefix + "folderCount: " + getFolderCount());
 	ps.println(prefix + "blockSize: " + getBlockSize());
@@ -250,5 +250,21 @@ public class HFSPlusVolumeHeader extends MutableStruct {
 	ps.println(prefix + "kHFSCatalogNodeIDsReusedBit = " + ((attributes >> 12) & 0x1));
 	ps.println(prefix + "kHFSVolumeJournaledBit = " + ((attributes >> 13) & 0x1));
 	ps.println(prefix + "kHFSVolumeSoftwareLockBit = " + ((attributes >> 15) & 0x1));	    
+    }
+    
+    public static void main(String[] args) throws Exception {
+        if(args.length != 2)
+            System.err.println("usage: main <file> <byteposition>");
+        else {
+            Long pos = Long.parseLong(args[1]);
+            
+            RandomAccessFile raf = new RandomAccessFile(args[0], "r");
+            raf.seek(pos);
+            byte[] buf = new byte[_getSize()];
+            raf.readFully(buf);
+            raf.close();
+            
+            new HFSPlusVolumeHeader(buf).print(System.out, "");
+        }
     }
 }

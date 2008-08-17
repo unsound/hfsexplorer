@@ -46,7 +46,9 @@ public class HFSPlusFileSystemView {
      *             a problem... ever. Variable staticBlockSize contains the
      *             block size.
      */
-
+     
+    public static long fileReadOffset = 0;
+    
     /** Internal class. */
     private abstract class InitProcedure {
 	public final HFSPlusVolumeHeader header;
@@ -460,7 +462,7 @@ public class HFSPlusFileSystemView {
     
     private ReadableRandomAccessStream getReadableForkStream(HFSPlusForkData forkData,
             HFSPlusExtentDescriptor[] extentDescriptors) {
-        return new ForkFilter(forkData, extentDescriptors, hfsFile, fsOffset,
+        return new ForkFilter(forkData, extentDescriptors, hfsFile, fsOffset+fileReadOffset,
                 staticBlockSize);
     }
     
