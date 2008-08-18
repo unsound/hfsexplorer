@@ -5,6 +5,12 @@
 package org.catacombae.csjc;
 
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import org.catacombae.hfsexplorer.Util;
@@ -87,7 +93,7 @@ public interface StructElements {
         private final StructElement[] elements;
 
         public Array(String typeName, StructElement[] elements) {
-            super(typeName);
+            super(typeName + "[" + elements.length + "]");
             this.elements = new StructElement[elements.length];
             for(int i = 0; i < this.elements.length; ++i) {
                 this.elements[i] = elements[i];
@@ -118,7 +124,7 @@ public interface StructElements {
     }
     
     public static enum FieldType {
-        INTEGER, BYTEARRAY, ASCIISTRING;
+        INTEGER, BYTEARRAY, ASCIISTRING, CUSTOM_CHARSET_STRING;
     }
 
     public static abstract class Field extends StructElement {
@@ -386,6 +392,81 @@ public interface StructElements {
                     asciiChars[i] = (byte)(valueArray[i] & 0x7F);
                 }
                 System.arraycopy(asciiChars, 0, fieldData, 0, fieldData.length);
+            }
+            else
+                throw new IllegalArgumentException("Invalid string value! Message: " +
+                        validateMsg);
+        }
+    }
+    
+    public static class EncodedStringField extends Field {
+        private final byte[] fieldData;
+        private final Charset charset;
+        
+        public EncodedStringField(byte[] fieldData, String encoding) {
+            super("Byte[" + fieldData.length + "]", FieldType.CUSTOM_CHARSET_STRING);
+            
+            this.fieldData = fieldData;
+            this.charset = Charset.forName(encoding);
+
+            String validateMsg = validate(fieldData);
+            if(validateMsg != null) {
+                throw new IllegalArgumentException("Invalid value passed to constructor! Message: " +
+                        validateMsg);
+            }
+        }
+
+        @Override
+        public String validateStringValue(String s) {
+            try {
+                CharsetEncoder enc = charset.newEncoder();
+                ByteBuffer bb = enc.encode(CharBuffer.wrap(s));
+                return validate(bb.array());
+            } catch(CharacterCodingException cce) {
+                return "Exception while encoding string data: " + cce.toString();
+            }
+        }
+        
+        private String validate(byte[] data) {
+            if(data.length != fieldData.length)
+                return "Invalid length for string. Was: " + data.length + " Should be: " +
+                        fieldData.length;
+            
+            // Attempt to decode data
+            try {
+                CharsetDecoder dec = charset.newDecoder();
+                dec.decode(ByteBuffer.wrap(data));
+            } catch(Exception e) {
+                return "Decode operation failed! Exception: " + e.toString();
+            }
+            
+            return null; // Success
+        }
+
+        @Override
+        public String getValueAsString() {
+            try {
+                CharsetDecoder dec = charset.newDecoder();
+                return dec.decode(ByteBuffer.wrap(fieldData)).toString();
+            } catch(CharacterCodingException cce) {
+                throw new RuntimeException("Exception while decoding data...", cce);
+            }
+        }
+
+        @Override
+        public void setStringValue(String value) throws IllegalArgumentException {
+            String validateMsg = validateStringValue(value);
+            if(validateMsg == null) {
+                try {
+                    CharsetEncoder enc = charset.newEncoder();
+                    ByteBuffer bb = enc.encode(CharBuffer.wrap(value));
+                    byte[] encodedData = bb.array();
+                    if(encodedData.length != fieldData.length)
+                        throw new RuntimeException("You should not see this.");
+                    System.arraycopy(encodedData, 0, fieldData, 0, fieldData.length);
+                } catch(CharacterCodingException cce) {
+                    throw new RuntimeException("Exception while encoding string data: ", cce);
+                }
             }
             else
                 throw new IllegalArgumentException("Invalid string value! Message: " +
