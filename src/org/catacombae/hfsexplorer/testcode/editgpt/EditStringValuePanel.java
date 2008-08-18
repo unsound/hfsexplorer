@@ -6,12 +6,16 @@
 
 package org.catacombae.hfsexplorer.testcode.editgpt;
 
+import org.catacombae.csjc.StructElements.Field;
+
 /**
  *
  * @author  Erik
  */
 public class EditStringValuePanel extends javax.swing.JPanel {
-
+    private Field userData;
+    private String originalValue;
+    
     /** Creates new form EditStringValuePanel */
     public EditStringValuePanel() {
         initComponents();
@@ -30,11 +34,12 @@ public class EditStringValuePanel extends javax.swing.JPanel {
         lockedCheckbox = new javax.swing.JCheckBox();
         descriptionLabel = new javax.swing.JLabel();
 
+        contentsField.setColumns(9);
         contentsField.setEditable(false);
         contentsField.setText("jTextField1");
 
         lockedCheckbox.setSelected(true);
-        lockedCheckbox.setText("Locked");
+        lockedCheckbox.setText("Lock");
         lockedCheckbox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 lockedCheckboxActionPerformed(evt);
@@ -50,7 +55,7 @@ public class EditStringValuePanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(descriptionLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(contentsField, javax.swing.GroupLayout.DEFAULT_SIZE, 69, Short.MAX_VALUE)
+                .addComponent(contentsField, javax.swing.GroupLayout.DEFAULT_SIZE, 374, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lockedCheckbox))
         );
@@ -69,6 +74,10 @@ private void lockedCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GE
     else
         contentsField.setEditable(true);
 }//GEN-LAST:event_lockedCheckboxActionPerformed
+    
+    public String getDescription() {
+        return descriptionLabel.getText();
+    }
 
     public void setDecription(String s) {
         descriptionLabel.setText(s);
@@ -76,10 +85,23 @@ private void lockedCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GE
     
     public void setValue(String value) {
         contentsField.setText(value);
+        this.originalValue = value;
     }
     
     public String getValue() {
         return contentsField.getText();
+    }
+    
+    public boolean isModified() {
+        return !contentsField.getText().equals(originalValue);
+    }
+    
+    public void setUserData(Field data) {
+        this.userData = data;
+    }
+    
+    public Field getUserData() {
+        return userData;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

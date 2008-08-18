@@ -9,6 +9,7 @@ package org.catacombae.hfsexplorer.testcode.editgpt;
 import java.awt.BorderLayout;
 import java.io.File;
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 import org.catacombae.hfsexplorer.partitioning.GUIDPartitionTable;
 import org.catacombae.hfsexplorer.partitioning.MutableGUIDPartitionTable;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
@@ -72,11 +73,22 @@ public class EditGPT extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
     
     public static void main(String[] args) {
+        try {
+	    javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+	    /*
+	     * Description of look&feels:
+	     *   http://java.sun.com/docs/books/tutorial/uiswing/misc/plaf.html
+	     */
+	}
+	catch(Throwable e) {
+	    //It's ok. Non-critical.
+	}
+        
         File gptFile = new File(args[0]);
         
         JFrame jf = new JFrame("EditGPT");
         EditGPT egpt = new EditGPT();
-        jf.add(egpt);
+        jf.add(new JScrollPane(egpt));
         egpt.loadFile(gptFile);
         jf.pack();
         jf.setLocationRelativeTo(null);
