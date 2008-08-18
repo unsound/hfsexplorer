@@ -6,8 +6,14 @@
 
 package org.catacombae.hfsexplorer.testcode.editgpt;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.LinkedList;
+import java.util.List;
 import javax.swing.Box;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
+import org.catacombae.csjc.StructElements.Array;
 import org.catacombae.csjc.StructElements.Dictionary;
 import org.catacombae.csjc.StructElements.Field;
 import org.catacombae.csjc.StructElements.StructElement;
@@ -17,7 +23,9 @@ import org.catacombae.csjc.StructElements.StructElement;
  * @author  Erik
  */
 public class ContainerPanel extends javax.swing.JPanel {
-
+    private LinkedList<ContainerPanel> subPanels = new LinkedList<ContainerPanel>();
+    private LinkedList<EditStringValuePanel> fields = new LinkedList<EditStringValuePanel>();
+    
     public ContainerPanel() {
         this(null);
     }
@@ -26,10 +34,18 @@ public class ContainerPanel extends javax.swing.JPanel {
     public ContainerPanel(String label) {
         initComponents();
         
-        if(label != null)
+        if(label != null) {
             descriptionLabel.setText(label);
-        else
+            saveButton.setVisible(false);
+        }
+        else {
             descriptionLabel.setVisible(false);
+            saveButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent evt) {
+                    actionSave();
+                }
+            });
+        }
     }
 
     /** This method is called from within the constructor to
@@ -43,10 +59,13 @@ public class ContainerPanel extends javax.swing.JPanel {
 
         contentsPanel = new javax.swing.JPanel();
         descriptionLabel = new javax.swing.JLabel();
+        saveButton = new javax.swing.JButton();
 
         contentsPanel.setLayout(new javax.swing.BoxLayout(contentsPanel, javax.swing.BoxLayout.PAGE_AXIS));
 
         descriptionLabel.setText("jLabel1");
+
+        saveButton.setText("Save");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -58,21 +77,27 @@ public class ContainerPanel extends javax.swing.JPanel {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(10, 10, 10)
                         .addComponent(contentsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE))
-                    .addComponent(descriptionLabel))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(descriptionLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 104, Short.MAX_VALUE)
+                        .addComponent(saveButton)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(descriptionLabel)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(descriptionLabel)
+                    .addComponent(saveButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(contentsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 106, Short.MAX_VALUE)
+                .addComponent(contentsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
     public void setFields(Dictionary rootDict) {
+        contentsPanel.removeAll();
         String[] keys = rootDict.getKeys();
         
         for(String key : keys) {
@@ -84,8 +109,10 @@ public class ContainerPanel extends javax.swing.JPanel {
                 EditStringValuePanel panel = new EditStringValuePanel();
                 panel.setDecription(key + " (" + curField.getTypeName() + ")");
                 panel.setValue(curField.getValueAsString());
+                panel.setUserData(curField);
                 System.err.println("  (1)adding " + panel + " to containerpanel");
                 addComponent(panel);
+                fields.add(panel);
             }
             else if(curElem instanceof Dictionary) {
                 Dictionary curDict = (Dictionary)curElem;
@@ -93,18 +120,116 @@ public class ContainerPanel extends javax.swing.JPanel {
                 panel.setFields(curDict);
                 System.err.println("  (2)adding " + panel + " to containerpanel");
                 addComponent(panel);
+                subPanels.add(panel);
             }
+            else if(curElem instanceof Array) {
+                Array curArray = (Array)curElem;
+                ContainerPanel panel = new ContainerPanel(key + " (" + curArray.getTypeName() + ")");
+                panel.setFields(curArray);
+                System.err.println("  (2)adding " + panel + " to containerpanel");
+                addComponent(panel);
+                subPanels.add(panel);
+            }
+        }
+        contentsPanel.add(Box.createVerticalGlue());
+    }
+    
+    public void setFields(Array rootArray) {
+        contentsPanel.removeAll();
+        StructElement[] elements = rootArray.getElements();
+        
+        for(int i = 0; i < elements.length; ++i) {
+            StructElement curElem = elements[i];
+            System.err.println("setFields processing array element...");
+            System.err.println("  curElem = " + curElem);
+            if(curElem instanceof Field) {
+                Field curField = (Field)curElem;
+                EditStringValuePanel panel = new EditStringValuePanel();
+                panel.setDecription("[" + i + "] (" + curField.getTypeName() + ")");
+                panel.setValue(curField.getValueAsString());
+                panel.setUserData(curField);
+                System.err.println("  (1)adding " + panel + " to containerpanel");
+                addComponent(panel);
+            }
+            else if(curElem instanceof Dictionary) {
+                Dictionary curDict = (Dictionary)curElem;
+                ContainerPanel panel = new ContainerPanel("[" + i + "] (" + curDict.getTypeName() + ")");
+                panel.setFields(curDict);
+                System.err.println("  (2)adding " + panel + " to containerpanel");
+                addComponent(panel);
+            }
+            else if(curElem instanceof Array) {
+                Array curArray = (Array)curElem;
+                ContainerPanel panel = new ContainerPanel("[" + i + "] (" + curArray.getTypeName() + ")");
+                panel.setFields(curArray);
+                System.err.println("  (3)adding " + panel + " to containerpanel");
+                addComponent(panel);
+            }
+        }
+        contentsPanel.add(Box.createVerticalGlue());
+    }
+    
+    
+    private void actionSave() {
+        // Gather all the modified components
+        List<EditStringValuePanel> modifiedFields = getModifiedFields();
+        if(modifiedFields.size() == 0) {
+            JOptionPane.showMessageDialog(this, "Nothing to save.", "Information",
+                    JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        // Validate their data
+        StringBuilder messageBuilder = new StringBuilder();
+        for(EditStringValuePanel vp : modifiedFields) {
+            Field field = vp.getUserData();
+            String validateRes = field.validateStringValue(vp.getValue());
+            if(validateRes != null) {
+                messageBuilder.append(vp.getDescription()).append(": ").append(vp.getValue());
+                messageBuilder.append(" [").append(validateRes).append("]\n");
+            }
+        }
+        
+        if(messageBuilder.length() != 0) {
+            JOptionPane.showMessageDialog(this, "The following fields failed to validate:\n\n" +
+                    messageBuilder.toString(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        else {
+            messageBuilder.append("The following modifications were made:\n\n");
+            for(EditStringValuePanel vp : modifiedFields) {
+                messageBuilder.append(vp.getDescription()).append(": \"").append(vp.getValue())
+                        .append("\"\n");
+            }
+            messageBuilder.append("\nCarry on with save?");
+            
+            JOptionPane.showConfirmDialog(this, messageBuilder.toString(), "Confirm save",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         }
     }
     
+    private List<EditStringValuePanel> getModifiedFields() {
+        LinkedList<EditStringValuePanel> tmpList = new LinkedList<EditStringValuePanel>();
+        for(EditStringValuePanel field : fields) {
+            if(field.isModified())
+                tmpList.add(field);
+        }
+        
+        for(ContainerPanel cp : subPanels)
+            tmpList.addAll(cp.getModifiedFields());
+        
+        return tmpList;
+    }
+    
     private void addComponent(JComponent jc) {
+        
         contentsPanel.add(jc);
-        contentsPanel.add(Box.createVerticalGlue());
+        
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel contentsPanel;
     private javax.swing.JLabel descriptionLabel;
+    private javax.swing.JButton saveButton;
     // End of variables declaration//GEN-END:variables
 
 }
