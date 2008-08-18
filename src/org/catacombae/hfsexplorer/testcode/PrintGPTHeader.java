@@ -39,7 +39,7 @@ public class PrintGPTHeader {
 	sourceRaf.seek(offset);
 	sourceRaf.read(data);
 	
-	GPTHeader gph = new GPTHeader(data, 0);
+	GPTHeader gph = new GPTHeader(data, 0, 512);
 	gph.print(System.out, "");
     }
 }

@@ -107,18 +107,9 @@ public class RepairMyGPTPlease3 {
 	     * to:
 	     *   Basic Data Partition                       {EBD0A0A2-B9E5-4433-87C0-68B6B72699C7}
 	     */
-	    byte[] efiSystemPartitionType = new byte[] { (byte)0x28, (byte)0x73, (byte)0x2A, (byte)0xC1,
-							 (byte)0x1F, (byte)0xF8, (byte)0xD2, (byte)0x11,
-							 (byte)0xBA, (byte)0x4B, (byte)0x00, (byte)0xA0,
-							 (byte)0xC9, (byte)0x3E, (byte)0xC9, (byte)0x3B };
-	    byte[] microsoftBasicDataType = new byte[] { (byte)0xA2, (byte)0xA0, (byte)0xD0, (byte)0xEB, 
-							 (byte)0xE5, (byte)0xB9, (byte)0x33, (byte)0x44,
-							 (byte)0x87, (byte)0xC0, (byte)0x68, (byte)0xB6, 
-							 (byte)0xB7, (byte)0x26, (byte)0x99, (byte)0xC7 };
-	    byte[] appleHfsType = new byte[] { (byte)0x00, (byte)0x53, (byte)0x46, (byte)0x48, 
-					       (byte)0x00, (byte)0x00, (byte)0xAA, (byte)0x11, 
-					       (byte)0xAA, (byte)0x11, (byte)0x00, (byte)0x30, 
-					       (byte)0x65, (byte)0x43, (byte)0xEC, (byte)0xAC };
+	    byte[] efiSystemPartitionType = GPTEntry.GPTPartitionType.PARTITION_TYPE_EFI_SYSTEM.getBytes();
+	    byte[] microsoftBasicDataType = GPTEntry.GPTPartitionType.PARTITION_TYPE_PRIMARY_PARTITION.getBytes();
+	    byte[] appleHfsType = GPTEntry.GPTPartitionType.PARTITION_TYPE_APPLE_HFS.getBytes();
 	    byte[] microsoftReservedType = GPTEntry.GPTPartitionType.PARTITION_TYPE_MICROSOFT_RESERVED.getBytes();
 	    
 	    // First we verify that the current data is as we expect it to be.
@@ -147,24 +138,24 @@ public class RepairMyGPTPlease3 {
 	    }
 	    System.out.println("yes.");
 	    
-	    System.out.print("Checking if the third partition has type \"Microsoft Reserved\"...");
+	    System.out.print("Checking if the fourth partition has type \"Microsoft Reserved\"...");
 	    byte[] currentType4 = gpt.getEntry(3).getPartitionTypeGUID();
 	    if(!Util.arraysEqual(currentType4, microsoftReservedType)) {
 		System.out.println("failed! Halting program.");
 		System.exit(0);
 	    }
 	    System.out.println("yes.");
-
-	    System.exit(0);
+	    
+	    System.out.println("All seems to be as expected.");
 	    
 	    // Now let's modify the table in memory
 	    
 	    System.out.println("Modifying GPT data in memory:");
-	    System.out.print("  - Setting new partition type for second partition...");
-	    MutableGPTEntry modifiedEntry1 = gpt.getMutablePrimaryEntry(1);
-	    MutableGPTEntry modifiedEntry2 = gpt.getMutableBackupEntry(1);
-	    modifiedEntry1.setPartitionTypeGUID(microsoftBasicDataType, 0);
-	    modifiedEntry2.setPartitionTypeGUID(microsoftBasicDataType, 0);
+	    System.out.print("  - Setting new partition type for fourth partition...");
+	    MutableGPTEntry modifiedEntry1 = gpt.getMutablePrimaryEntry(3);
+	    MutableGPTEntry modifiedEntry2 = gpt.getMutableBackupEntry(3);
+	    modifiedEntry1.setPartitionTypeGUID(appleHfsType, 0);
+	    modifiedEntry2.setPartitionTypeGUID(appleHfsType, 0);
 	    System.out.println("done.");
 	    
 	    MutableGPTHeader primaryHeader = gpt.getMutablePrimaryHeader();

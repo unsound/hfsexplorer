@@ -95,9 +95,12 @@ public class GPTHeader implements StructElements {
     protected final byte[] partitionEntryArrayCRC32 = new byte[4];
     protected final byte[] reserved2 = new byte[420];
 
+    protected int blockSize;
     private final CRC32 crc = new CRC32();
     
-    public GPTHeader(byte[] data, int offset) {
+    public GPTHeader(byte[] data, int offset, int blockSize) {
+	this.blockSize = blockSize;
+	
 	System.arraycopy(data, offset+0, signature, 0, 8);
 	System.arraycopy(data, offset+8, revision, 0, 4);
 	System.arraycopy(data, offset+12, headerSize, 0, 4);
@@ -114,12 +117,18 @@ public class GPTHeader implements StructElements {
 	System.arraycopy(data, offset+88, partitionEntryArrayCRC32, 0, 4);
 	System.arraycopy(data, offset+92, reserved2, 0, 420);
     }
-    protected GPTHeader() {
+    protected GPTHeader(int blockSize) {
+	this.blockSize = blockSize;
 	System.arraycopy(Util.toByteArrayBE(GPT_SIGNATURE), 0, signature, 0, 8);
 	Util.zero(reserved1);
 	Util.zero(reserved2);
     }
     public GPTHeader(GPTHeader source) {
+	setFieldsInternal(source);
+    }
+    
+    protected void setFieldsInternal(GPTHeader source) {
+	this.blockSize = source.blockSize;
 	System.arraycopy(source.signature, 0, signature, 0, signature.length);
 	System.arraycopy(source.revision, 0, revision, 0, revision.length);
 	System.arraycopy(source.headerSize, 0, headerSize, 0, headerSize.length);
@@ -134,7 +143,7 @@ public class GPTHeader implements StructElements {
 	System.arraycopy(source.numberOfPartitionEntries, 0, numberOfPartitionEntries, 0, numberOfPartitionEntries.length);
 	System.arraycopy(source.sizeOfPartitionEntry, 0, sizeOfPartitionEntry, 0, sizeOfPartitionEntry.length);
 	System.arraycopy(source.partitionEntryArrayCRC32, 0, partitionEntryArrayCRC32, 0, partitionEntryArrayCRC32.length);
-	System.arraycopy(source.reserved2, 0, reserved2, 0, reserved2.length);	
+	System.arraycopy(source.reserved2, 0, reserved2, 0, reserved2.length);
     }
 //     public GPTHeader(long signature, int revision, int headerSize, int crc32Checksum, int reserved1,
 // 		     long primaryLBA, long backupLBA, long firstUsableLBA, long lastUsableLBA, byte[] diskGUID,
@@ -238,6 +247,86 @@ public class GPTHeader implements StructElements {
 	}
 	else
 	    return false;
+    }
+    
+    /**
+     * Checks that if supplied GPTHeader is a valid backup header to this header (or the reverse,
+     * as a primary header is always a valid backup to the backup header).<br>
+     * Note that this method does not check the validity of the fields in the header, it just
+     * checks if the fields that should be equal are equal. Use isValid() to check the validity of
+     * the field data.
+     *
+     * @param backupHeader the backup header to check for validity againt this header.
+     * @return true if the headers complement each other as backups, or false otherwise.
+     */
+    public boolean isValidBackup(GPTHeader backupHeader) {
+	if(!Util.arraysEqual(this.signature, backupHeader.signature)) return false;
+	if(!Util.arraysEqual(this.revision, backupHeader.revision)) return false;
+	if(!Util.arraysEqual(this.headerSize, backupHeader.headerSize)) return false;
+	
+	// Special treatment: CRC32s should not be equal
+	if(Util.arraysEqual(this.crc32Checksum, backupHeader.crc32Checksum)) return false;
+	// End special treatment
+	
+	if(!Util.arraysEqual(this.reserved1, backupHeader.reserved1)) return false;
+	
+	// Special treatment: primary and backup LBAs are swapped
+	if(!Util.arraysEqual(this.primaryLBA, backupHeader.backupLBA)) return false;
+	if(!Util.arraysEqual(this.backupLBA, backupHeader.primaryLBA)) return false;
+	// End special treatment
+	
+	if(!Util.arraysEqual(this.firstUsableLBA, backupHeader.firstUsableLBA)) return false;
+	if(!Util.arraysEqual(this.lastUsableLBA, backupHeader.lastUsableLBA)) return false;
+	if(!Util.arraysEqual(this.diskGUID, backupHeader.diskGUID)) return false;
+
+	// Special treatment: partition entry LBAs should not be equal
+	if(Util.arraysEqual(this.partitionEntryLBA, backupHeader.partitionEntryLBA)) return false;
+	// End special treatment
+	
+	if(!Util.arraysEqual(this.numberOfPartitionEntries, backupHeader.numberOfPartitionEntries)) return false;
+	if(!Util.arraysEqual(this.sizeOfPartitionEntry, backupHeader.sizeOfPartitionEntry)) return false;
+	if(!Util.arraysEqual(this.partitionEntryArrayCRC32, backupHeader.partitionEntryArrayCRC32)) return false;
+	if(!Util.arraysEqual(this.reserved2, backupHeader.reserved2)) return false;
+	
+	return true;
+    }
+
+    public GPTHeader createValidBackupHeader()  {
+	GPTHeader newHeader = new GPTHeader(this);
+	
+	// 1. Swap primary and backup LBAs for the new header
+	byte[] primaryLBA = Util.createCopy(newHeader.primaryLBA);
+	byte[] backupLBA = Util.createCopy(newHeader.backupLBA);
+	Util.arrayCopy(primaryLBA, newHeader.backupLBA);
+	Util.arrayCopy(backupLBA, newHeader.primaryLBA);
+	
+	// 2. Calculate correct value for partitionEntryLBA
+	/* 
+	 * The backup header's partition entry LBA is calculated from substracting
+	 * (numberOfPartitionEntries*sizeOfPartitionEntry)/blockSize from primaryLBA,
+	 * adding one if the byte size of the partition entry area is not aligned with
+	 * blockSize.
+	 */
+	long peByteLen = (newHeader.getNumberOfPartitionEntries()*newHeader.getSizeOfPartitionEntry());
+	long peLBALen = peByteLen/blockSize + ( (peByteLen%blockSize != 0) ? 1 : 0 );
+	long pePos = newHeader.getPrimaryLBA()-peLBALen;
+	byte[] pePosBytes = Util.toByteArrayLE(pePos);
+	if(pePosBytes.length != newHeader.partitionEntryLBA.length)
+	    throw new RuntimeException("Assertion pePosBytes.length(" + pePosBytes.length +
+				       ") == newHeader.partitionEntryLBA.length(" + newHeader.partitionEntryLBA.length +
+				       ") failed.");
+	System.arraycopy(pePosBytes, 0, newHeader.partitionEntryLBA, 0, newHeader.partitionEntryLBA.length);
+	
+	// 3. Finalize the header by calculating its CRC32 value and setting it.
+	int crc = newHeader.calculateCRC32();
+	byte[] crcBytes = Util.toByteArrayLE(crc);
+	if(crcBytes.length != newHeader.crc32Checksum.length)
+	    throw new RuntimeException("Assertion crcBytes.length(" + crcBytes.length +
+				       ") == newHeader.crc32Checksum.length(" + newHeader.crc32Checksum.length +
+				       ") failed.");
+	System.arraycopy(crcBytes, 0, newHeader.crc32Checksum, 0, newHeader.crc32Checksum.length);
+	
+	return newHeader;
     }
 
     public Dictionary getStructElements() {

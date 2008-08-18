@@ -35,6 +35,10 @@ public class MutableGPTEntry extends GPTEntry {
     public void setAttributeBits(long i) { Util.arrayCopy(Util.toByteArrayBE(i), attributeBits); }
     public void setPartitionName(byte[] data, int off) { copyData(data, off, partitionName); }
     
+    public void setFields(GPTEntry gptEntry) {
+	super.copyFields(gptEntry);
+    }
+    
     private static void copyData(byte[] data, int off, byte[] dest) {
 	copyData(data, off, dest, dest.length);
     }
