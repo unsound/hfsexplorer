@@ -136,7 +136,7 @@ public class GPTEntry implements Partition, StructElements {
 	}
 
 	public byte[] getBytes() {
-	    if(typeGUIDMsb == null && typeGUIDLsb == null) {
+	    if(typeGUIDMsb != null && typeGUIDLsb != null) {
 		byte[] result = new byte[16];
 		for(int i = 0; i < 8; ++i) {
 		    result[i] = (byte)((typeGUIDMsb >> ((7-i)*8)) & 0xFF);
@@ -188,6 +188,9 @@ public class GPTEntry implements Partition, StructElements {
     protected GPTEntry(int blockSize) { this.blockSize = blockSize; }
     public GPTEntry(GPTEntry source) {
 	this(source.blockSize);
+	copyFields(source);
+    }
+    protected void copyFields(GPTEntry source) {
  	System.arraycopy(source.partitionTypeGUID, 0, partitionTypeGUID, 0, partitionTypeGUID.length);
 	System.arraycopy(source.uniquePartitionGUID, 0, uniquePartitionGUID, 0, uniquePartitionGUID.length);
 	System.arraycopy(source.startingLBA, 0, startingLBA, 0, startingLBA.length);

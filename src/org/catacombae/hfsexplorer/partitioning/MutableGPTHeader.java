@@ -20,11 +20,15 @@ import org.catacombae.hfsexplorer.Util;
 import java.io.PrintStream;
 
 public class MutableGPTHeader extends GPTHeader {
-    public MutableGPTHeader() {
-	super();
+    public MutableGPTHeader(int blockSize) {
+	super(blockSize);
     }
     public MutableGPTHeader(GPTHeader source) {
 	super(source);
+    }
+    
+    public void setFields(GPTHeader source) {
+	setFieldsInternal(source);
     }
     
     /** DON'T EVER USE THIS METHOD! The signature is set automatically when an object

@@ -81,7 +81,7 @@ public class PartitionSystemRecognizer {
 		    // Let's assume that blocks are always 512 bytes in size with MBR and GPT. I don't know
 		    // how to detect the actual block size (at least when reading from a file, otherwise I
 		    // guess there are system specific ways)...
-		    GPTHeader gh = new GPTHeader(piece2, 0);
+		    GPTHeader gh = new GPTHeader(piece2, 0, 512);
 		    if(gh.isValid()) {
 			return PartitionSystemType.GUID_PARTITION_TABLE;
 		    }

@@ -18,13 +18,14 @@
 package org.catacombae.hfsexplorer.partitioning;
 
 public class MutableGUIDPartitionTable extends GUIDPartitionTable {
-    protected final MutableGPTHeader mutableHeader;
-    protected final MutableGPTEntry[] mutableEntries;
-    protected final MutableGPTHeader mutableBackupHeader;
-    protected final MutableGPTEntry[] mutableBackupEntries;
+    protected MutableGPTHeader mutableHeader;
+    protected MutableGPTEntry[] mutableEntries;
+    protected MutableGPTHeader mutableBackupHeader;
+    protected MutableGPTEntry[] mutableBackupEntries;
     
     public MutableGUIDPartitionTable(GUIDPartitionTable source) {
-	super(new MutableGPTHeader(source.header), new MutableGPTHeader(source.backupHeader), source.entries.length);
+	super(new MutableGPTHeader(source.header), new MutableGPTHeader(source.backupHeader),
+	      source.entries.length, source.backupEntries.length);
 	
 	this.mutableHeader = (MutableGPTHeader)header;
 	this.mutableEntries = new MutableGPTEntry[source.entries.length];
@@ -47,4 +48,24 @@ public class MutableGUIDPartitionTable extends GUIDPartitionTable {
     public MutableGPTEntry getMutableBackupEntry(int index) { return mutableBackupEntries[index]; }
     public MutableGPTEntry[] getMutablePrimaryEntries() { return mutableEntries; }
     public MutableGPTEntry[] getMutableBackupEntries() { return mutableBackupEntries; }
+    
+    public void setMutablePrimaryHeader(MutableGPTHeader mutableHeader) {
+	this.mutableHeader = mutableHeader;
+	this.header = mutableHeader;
+    }
+    
+    public void setMutableBackupHeader(MutableGPTHeader mutableBackupHeader) {
+	this.mutableBackupHeader = mutableBackupHeader;
+	this.backupHeader = mutableBackupHeader;
+    }
+    
+    public void setMutablePrimaryEntries(MutableGPTEntry[] mutableEntries) {
+	this.mutableEntries = mutableEntries;
+	this.entries = mutableEntries;
+    }
+    
+    public void setMutableBackupEntries(MutableGPTEntry[] mutableBackupEntries) {
+	this.mutableBackupEntries = mutableBackupEntries;
+	this.backupEntries = mutableBackupEntries;
+    }
 }
