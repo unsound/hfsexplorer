@@ -306,16 +306,8 @@ public class GPTEntry implements Partition, StructElements {
                 IntegerFieldBits.BITS_64, false, true));
         dbStruct.add("endingLBA", new IntegerField(endingLBA,
                 IntegerFieldBits.BITS_64, false, true));
-        dbStruct.add("partitionName", new ASCIIStringField(partitionName));
+        dbStruct.add("partitionName", new EncodedStringField(partitionName, "UTF-16LE"));
         
-        /*
-         * public byte[] getPartitionTypeGUID() { return Util.createCopy(partitionTypeGUID); }
-         * public byte[] getUniquePartitionGUID() { return Util.createCopy(uniquePartitionGUID); }
-         * public long getStartingLBA() { return Util.readLongLE(startingLBA); }
-         * public long getEndingLBA() { return Util.readLongLE(endingLBA); }
-         * public long getAttributeBits() { return Util.readLongBE(attributeBits); }
-         * public byte[] getPartitionName() { return Util.createCopy(partitionName); }
-         */
         return dbStruct.getResult();
     }
 }
