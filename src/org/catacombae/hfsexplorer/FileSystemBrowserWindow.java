@@ -20,7 +20,6 @@ package org.catacombae.hfsexplorer;
 import java.net.MalformedURLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.catacombae.hfsexplorer.unfinished.FileSystemBrowser.Record;
 import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.io.ReadableUDIFStream;
@@ -44,9 +43,6 @@ import javax.swing.table.*;
 import javax.swing.event.*;
 //import org.catacombae.hfsexplorer.fsframework.FSFile;
 import org.catacombae.hfsexplorer.helpbrowser.HelpBrowserPanel;
-import org.catacombae.hfsexplorer.unfinished.FileSystemBrowser;
-import org.catacombae.jparted.lib.fs.FSEntry;
-import org.catacombae.jparted.lib.fs.FileSystemHandler;
 
 public class FileSystemBrowserWindow extends JFrame {
     private static final String TITLE_STRING = "HFSExplorer " + HFSExplorer.VERSION;

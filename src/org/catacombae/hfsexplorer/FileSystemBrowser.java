@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.catacombae.hfsexplorer.unfinished;
+package org.catacombae.hfsexplorer;
 
 import java.util.Date;
 import java.util.Vector;
