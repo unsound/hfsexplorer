@@ -20,29 +20,37 @@ package org.catacombae.hfsexplorer;
 import java.net.MalformedURLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.catacombae.hfsexplorer.FileSystemBrowser.Record;
 import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.io.ReadableUDIFStream;
 import org.catacombae.hfsexplorer.partitioning.*;
-import org.catacombae.hfsexplorer.types.*;
-import org.catacombae.hfsexplorer.types.hfs.*;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
 import org.catacombae.hfsexplorer.gui.*;
 import java.util.*;
 import java.io.*;
 import java.net.URL;
-import java.text.DateFormat;
 import java.awt.BorderLayout;
 import java.awt.Toolkit;
-import java.awt.Component;
-import java.awt.Graphics;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.tree.*;
-import javax.swing.table.*;
-import javax.swing.event.*;
 //import org.catacombae.hfsexplorer.fsframework.FSFile;
 import org.catacombae.hfsexplorer.helpbrowser.HelpBrowserPanel;
+import org.catacombae.hfsexplorer.types.HFSPlusVolumeHeader;
+import org.catacombae.hfsexplorer.types.hfs.ExtDescriptor;
+import org.catacombae.hfsexplorer.types.hfs.HFSPlusWrapperMDB;
+import org.catacombae.hfsexplorer.FileSystemBrowser.RecordType;
+import org.catacombae.io.ReadableConcatenatedStream;
+import org.catacombae.jparted.lib.ReadableStreamDataLocator;
+import org.catacombae.jparted.lib.fs.FSEntry;
+import org.catacombae.jparted.lib.fs.FSFile;
+import org.catacombae.jparted.lib.fs.FSFolder;
+import org.catacombae.jparted.lib.fs.FSFork;
+import org.catacombae.jparted.lib.fs.FSForkType;
+import org.catacombae.jparted.lib.fs.FileSystemHandlerFactory;
+import org.catacombae.jparted.lib.fs.FileSystemHandlerFactory.StandardAttribute;
+import org.catacombae.jparted.lib.fs.FileSystemMajorType;
+import org.catacombae.jparted.lib.fs.hfsplus.HFSPlusFileSystemHandler;
 
 public class FileSystemBrowserWindow extends JFrame {
     private static final String TITLE_STRING = "HFSExplorer " + HFSExplorer.VERSION;
@@ -63,91 +71,18 @@ public class FileSystemBrowserWindow extends JFrame {
      */
     private static final String DEBUG_CONSOLE_ARG = "-dbgconsole";
     
-    private static class ObjectContainer<A> {
-	public A o;
-	public ObjectContainer(A o) { this.o = o; }
-    }
-    /** Aggregation class for storage in the first column of fileTable. */
-    private static class RecordContainer {
-	private HFSPlusCatalogLeafRecord rec;
-	private String composedNodeName;
-	private RecordContainer() {}
-	public RecordContainer(HFSPlusCatalogLeafRecord rec) {
-	    this.rec = rec;
-	    rec.getKey();
-	    rec.getKey().getNodeName();
-	    rec.getKey().getNodeName().getUnicodeAsComposedString();
-	    this.composedNodeName = rec.getKey().getNodeName().getUnicodeAsComposedString();
-	}
-	public HFSPlusCatalogLeafRecord getRecord() { return rec; }
-        
-        @Override public String toString() { return composedNodeName; }
-    }
-    
-    private static class RecordNodeStorage {
-	private HFSPlusCatalogLeafRecord parentRecord;
-	private HFSPlusCatalogLeafRecord threadRecord = null;
-	private String composedNodeName;
-
-	public RecordNodeStorage(HFSPlusCatalogLeafRecord parentRecord) {
-	    this.parentRecord = parentRecord;
-	    if(parentRecord.getData().getRecordType() != HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER)
-		throw new IllegalArgumentException("Illegal type for record data.");
-	    this.composedNodeName = parentRecord.getKey().getNodeName().getUnicodeAsComposedString();
-	}
-	public HFSPlusCatalogLeafRecord getRecord() { return parentRecord; }
-	public HFSPlusCatalogLeafRecord getThread() { return threadRecord; }
-	public void setThread(HFSPlusCatalogLeafRecord threadRecord) {
-	    if(threadRecord.getData().getRecordType() != HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD)
-		throw new IllegalArgumentException("Illegal type for thread data.");
-	    this.threadRecord = threadRecord;
-	}
-        @Override
-	public String toString() {
-	    //HFSPlusCatalogLeafRecordData recData = parentRecord.getData();
-	    return composedNodeName;//parentRecord.getKey().getNodeName().getUnicodeAsComposedString();
-	}
-    }
-    
-    public static class NoLeafMutableTreeNode extends DefaultMutableTreeNode {
-	public NoLeafMutableTreeNode(Object o) { super(o); }
-	/** Hack to avoid that JTree paints leaf nodes. We have no leafs, only dirs. */
-	@Override public boolean isLeaf() { return false; }
-    }
-    
-    private FilesystemBrowserPanel fsbPanel;
+    private FileSystemBrowser<FSEntry> fsb;
     
     // Fast accessors for the corresponding variables in org.catacombae.hfsexplorer.gui.FilesystemBrowserPanel
-    private JTable fileTable;
-    private final JScrollPane fileTableScroller;
-    private JTree dirTree;
-    private JTextField addressField;
-    private JButton upButton;
-    private JButton goButton;
-    private JButton extractButton;
-    private JLabel statusLabel;
     private final JCheckBoxMenuItem toggleCachingItem;
-    
-    // Focus timestamps (for determining what to extract)
-    private long fileTableLastFocus = 0;
-    private long dirTreeLastFocus = 0;
-
-    // For determining the standard layout size of the columns in the table
-    private int totalColumnWidth = 0;
-
-    // Communication between adjustColumnsWidths and the column listener
-    private final boolean[] disableColumnListener = { false };
-    private final ObjectContainer<int[]> lastWidths = new ObjectContainer<int[]>(null);
     
     // For managing all files opened with the "open file" command
     private final LinkedList<File> tempFiles = new LinkedList<File>();
     
     private final JFileChooser fileChooser = new JFileChooser();
-    private final Vector<String> colNames = new Vector<String>();
-    private final DefaultTableModel tableModel;
-    private HFSPlusFileSystemView fsView;
     
-    //private FileSystemHandler fsHandler;
+    //private HFSPlusFileSystemView fsView;
+    private HFSPlusFileSystemHandler fsHandler = null;
     
     public FileSystemBrowserWindow() {
 	this(null);
@@ -160,457 +95,10 @@ public class FileSystemBrowserWindow extends JFrame {
 	else
 	    setIconImage(WINDOW_ICONS[0].getImage());
 	
-	fsbPanel = new FilesystemBrowserPanel();
-	fileTable = fsbPanel.fileTable;
-	fileTableScroller = fsbPanel.fileTableScroller;
-	dirTree = fsbPanel.dirTree;
-	addressField = fsbPanel.addressField;
-	upButton = fsbPanel.upButton;
-	goButton = fsbPanel.goButton;
-	extractButton = fsbPanel.extractButton;
-	statusLabel = fsbPanel.statusLabel;
-	JButton infoButton = fsbPanel.infoButton;
-        
-        upButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if(ensureFileSystemLoaded())
-                    actionGoToParentDir();
-            }
-        });
-        extractButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if(ensureFileSystemLoaded())
-                    actionExtractToDir();
-            }
-        });
-
-        infoButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if(ensureFileSystemLoaded())
-                    actionGetInfo();
-            }
-        });
-	goButton.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    if(ensureFileSystemLoaded())
-			actionGotoDir();
-		}
-	    });
-	addressField.addKeyListener(new KeyAdapter() {
-                @Override
-		public void keyPressed(KeyEvent e) {
-		    if(ensureFileSystemLoaded()) {
-			if(e.getKeyCode() == KeyEvent.VK_ENTER)
-			    actionGotoDir();
-		    }
-		}
-	    });
+        fsb = new FileSystemBrowser<FSEntry>(new FileSystemProvider());
 	
 	final Class objectClass = new Object().getClass();
-	colNames.add("Name");
-	colNames.add("Size");
-	colNames.add("Type");
-	colNames.add("Date Modified");
-	colNames.add("");
-	
-	tableModel = new DefaultTableModel(colNames, 0)  {
-                @Override
-		public boolean isCellEditable(int rowIndex, int columnIndex) {
-		    return false;
-		}
- 	    };
-	
-	fileTable.setModel(tableModel);
-	fileTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-	// AUTO_RESIZE_SUBSEQUENT_COLUMNS AUTO_RESIZE_OFF AUTO_RESIZE_LAST_COLUMN
-	fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-	fileTable.getColumnModel().getColumn(0).setPreferredWidth(180);
-	fileTable.getColumnModel().getColumn(1).setPreferredWidth(96);
-	fileTable.getColumnModel().getColumn(2).setPreferredWidth(120);
-	fileTable.getColumnModel().getColumn(3).setPreferredWidth(120);
-	fileTable.getColumnModel().getColumn(4).setPreferredWidth(0);
-	totalColumnWidth = 180+96+120+120;
-	fileTable.getColumnModel().getColumn(4).setMinWidth(0);
-	fileTable.getColumnModel().getColumn(4).setResizable(false);
-
-	TableColumnModelListener columnListener = new TableColumnModelListener() {
-		private boolean locked = false;
-		private int[] w1 = null;
-		//public int[] lastWidths = null;
-		public void columnAdded(TableColumnModelEvent e) { /*System.out.println("columnAdded");*/ }
-		public void columnMarginChanged(ChangeEvent e) {
-		    if(disableColumnListener[0])
-			return;
-		    synchronized(this) {
-			if(!locked)
-			    locked = true;
-			else {
-// 			    System.err.println("    BOUNCING!");
-			    return;
-			}
-		    }
-// 		    System.err.print("columnMarginChanged");
-// 		    System.err.print("  Width diff:");
- 		    int columnCount = fileTable.getColumnModel().getColumnCount();
-		    TableColumn lastColumn = fileTable.getColumnModel().getColumn(columnCount-1);
-		    if(lastWidths.o == null)
-			lastWidths.o = new int[columnCount];
-		    if(w1 == null || w1.length != columnCount)
-			w1 = new int[columnCount];
-		    int diffSum = 0;
-		    int currentWidth = 0;
- 		    for(int i = 0; i < w1.length; ++i) {
- 			w1[i] = fileTable.getColumnModel().getColumn(i).getWidth();
-			currentWidth += w1[i];
-			int diff = (w1[i] - lastWidths.o[i]);
-// 			System.err.print(" " + (w1[i] - lastWidths.o[i]));
-			if(i < w1.length-1)
-			    diffSum += diff;
-			
-		    }
-		    int lastDiff = (w1[columnCount-1] - lastWidths.o[columnCount-1]);
-// 		    System.err.print("  Diff sum: " + diffSum);
-// 		    System.err.println("  Last diff: " + (w1[columnCount-1] - lastWidths.o[columnCount-1]));
-		    if(lastDiff != -diffSum) {
-			int importantColsWidth = currentWidth - w1[columnCount-1];
-
-			//int newLastColumnWidth = lastWidths.o[columnCount-1] - diffSum;
-			int newLastColumnWidth = totalColumnWidth-importantColsWidth;
-			
-			int nextTotalWidth = importantColsWidth + newLastColumnWidth;
-// 			System.err.println("  totalColumnWidth=" + totalColumnWidth + " currentWidth=" + currentWidth + " nextTotalWidth=" + nextTotalWidth + " newLast..=" + newLastColumnWidth);
-			
-			if(newLastColumnWidth >= 0) {
-			    if((nextTotalWidth <= totalColumnWidth || diffSum > 0)) {
-				//if(currentWidth > totalColumnWidth)
-				
-// 				System.err.println("  (1)Adjusting last column from " + w1[columnCount-1] + " to " + newLastColumnWidth + "!");
-				
-				lastColumn.setPreferredWidth(newLastColumnWidth);
-				lastColumn.setWidth(newLastColumnWidth);
-				//fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-// 				System.err.println("  (1)Last column width: " + lastColumn.getWidth() + "  revalidating...");
-				fileTableScroller.invalidate();
-				fileTableScroller.validate();
-// 				System.err.println("  (1)Adjustment complete. Final last column width: " + lastColumn.getWidth());
-			    }
-// 			    else
-// 				System.err.println("  Outside bounds. Idling.");
-			}
-			else {
-			    if(lastColumn.getWidth() != 0) {
-				// System.err.println("  (2)Adjusting last column from " + w1[columnCount-1] + " to zero!");
-				lastColumn.setPreferredWidth(0);
-				lastColumn.setWidth(0);
-				//fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-// 				System.err.println("  (2)Last column width: " + lastColumn.getWidth() + "  revalidating...");
-				fileTableScroller.invalidate();
-				fileTableScroller.validate();
-// 				System.err.println("  (2)Adjustment complete. Final last column width: " + lastColumn.getWidth());
-			    }
-			}
-		    }
-
-		    
- 		    for(int i = 0; i < w1.length; ++i) {
- 			w1[i] = fileTable.getColumnModel().getColumn(i).getWidth();
-		    }
-		    int[] usedArray = lastWidths.o;
-		    lastWidths.o = w1;
-		    w1 = usedArray; // Switch arrays.
-		    
-		    synchronized(this) { locked = false; /*System.err.println();*/ }
-		}
-		public void columnMoved(TableColumnModelEvent e) { /*System.out.println("columnMoved");*/ }
-		public void columnRemoved(TableColumnModelEvent e) { /*System.out.println("columnRemoved");*/ }
-		public void columnSelectionChanged(ListSelectionEvent e) { /*System.out.println("columnSelectionChanged");*/ }
-	    };
-	fileTable.getColumnModel().addColumnModelListener(columnListener);
-	
-	final TableCellRenderer objectRenderer = fileTable.getDefaultRenderer(objectClass);
-	fileTable.setDefaultRenderer(objectClass, new TableCellRenderer() {
-		private JLabel theOne = new JLabel();
-		private JLabel theTwo = new JLabel("", SwingConstants.RIGHT);
-		private ImageIcon documentIcon = new ImageIcon(ClassLoader.getSystemResource("res/emptydocument.png"));
-		private ImageIcon folderIcon = new ImageIcon(ClassLoader.getSystemResource("res/folder.png"));
-		private ImageIcon emptyIcon = new ImageIcon(ClassLoader.getSystemResource("res/nothing.png"));
-		
-		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, final int row, final int column) {
-		    if(value instanceof RecordContainer) {
-			final Component objectComponent = objectRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);			
-			final JLabel jl = theOne;
-			HFSPlusCatalogLeafRecord rec = ((RecordContainer)value).getRecord();
-			if(rec.getData().getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER)
-			    jl.setIcon(folderIcon);
-			else if(rec.getData().getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE)
-			    jl.setIcon(documentIcon);
-			else
-			    jl.setIcon(emptyIcon);
-			jl.setVisible(true);
-			Component c = new Component() {
-				{
-				    jl.setSize(jl.getPreferredSize());
-				    jl.setLocation(0, 0);
-				    objectComponent.setSize(objectComponent.getPreferredSize());
-				    objectComponent.setLocation(jl.getWidth(), 0);
-				    setSize(jl.getWidth()+objectComponent.getWidth(), Math.max(jl.getHeight(), objectComponent.getHeight()));
-				}
-                                @Override
-				public void paint(Graphics g) {
- 				    jl.paint(g);
-				    int translatex = jl.getWidth();
-				    g.translate(translatex, 0);
-				    objectComponent.paint(g);
-				    g.translate(-translatex, 0);
-				}
-			    };
-			return c;
-		    }
-		    else if(column == 1) {
-			theTwo.setText(value.toString());
-			return theTwo;
-		    }
-		    else
-			return objectRenderer.getTableCellRendererComponent(table, value, false, false, row, column);
-		}
-	    });
-	fileTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-		private final java.text.DecimalFormat sizeFormat = new java.text.DecimalFormat("0.00");
-		public void valueChanged(ListSelectionEvent e) {
-		    //statusLabel.setText("Selection (" + e.getFirstIndex() + "-" + e.getLastIndex() + ") has changed. isAdjusting()==" + e.getValueIsAdjusting());
-		    int[] selection = fileTable.getSelectedRows();
-		    long selectionSize = 0;
-		    for(int selectedRow : selection) {
-			Object o = tableModel.getValueAt(selectedRow, 0);
-			HFSPlusCatalogLeafRecord rec;
-			HFSPlusCatalogLeafRecordData recData;
-			if(o instanceof RecordContainer) {
-			    rec = ((RecordContainer)o).getRecord();
-			    HFSPlusCatalogLeafRecordData data = rec.getData();
-			    if(data.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
-			       data instanceof HFSPlusCatalogFile)
-				selectionSize += ((HFSPlusCatalogFile)data).getDataFork().getLogicalSize();
-			}
-		    }
-		    String sizeString = (selectionSize >= 1024)?SpeedUnitUtils.bytesToBinaryUnit(selectionSize, sizeFormat):selectionSize + " bytes";
-		    statusLabel.setText(selection.length + ((selection.length==1)?" object":" objects") + " selected (" + sizeString + ")");
-		}
-	    });
-	fileTableScroller.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent e) {
-		    int row = fileTable.rowAtPoint(e.getPoint());
-		    if(row == -1) // If we click outside the table, clear selection in table
-			fileTable.clearSelection();
-		}
-	    });
-	fileTable.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent e) {
-		    if(e.getButton() == MouseEvent.BUTTON3 && fsView != null) {
-			int row = fileTable.rowAtPoint(e.getPoint());
-			int col = fileTable.columnAtPoint(e.getPoint());
-			if(col == 0 && row >= 0) {
-			    // These lines are here because right-clicking doesn't change focus or selection
-			    fileTable.clearSelection();
-			    fileTable.changeSelection(row, col, false, false);
-			    fileTable.requestFocus();
-			    
-			    JPopupMenu jpm = new JPopupMenu();
-                            
-			    JMenuItem infoItem = new JMenuItem("Information");
-			    infoItem.addActionListener(new ActionListener() {
-				    public void actionPerformed(ActionEvent e) {
-                                        if(ensureFileSystemLoaded())
-                                            actionGetInfo();
-				    }
-				});
-			    jpm.add(infoItem);
-                            
-			    JMenuItem dataExtractItem = new JMenuItem("Extract data");
-			    dataExtractItem.addActionListener(new ActionListener() {
-				    public void actionPerformed(ActionEvent e) {
-                                        if(ensureFileSystemLoaded())
-                                            actionExtractToDir(true, false);
-				    }
-				});
-			    jpm.add(dataExtractItem);
-                            
-			    JMenuItem resExtractItem = new JMenuItem("Extract resource fork(s)");
-			    resExtractItem.addActionListener(new ActionListener() {
-				    public void actionPerformed(ActionEvent e) {
-                                        if(ensureFileSystemLoaded())
-                                            actionExtractToDir(false, true);
-				    }
-				});
-			    jpm.add(resExtractItem);
-                            
-			    JMenuItem bothExtractItem = new JMenuItem("Extract data and resource fork(s)");
-			    bothExtractItem.addActionListener(new ActionListener() {
-				    public void actionPerformed(ActionEvent e) {
-                                        if(ensureFileSystemLoaded())
-                                            actionExtractToDir(true, true);
-				    }
-				});
-			    jpm.add(bothExtractItem);
-                            
-                            jpm.show(fileTable, e.getX(), e.getY());
-			}
-		    }
-		    else if(e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2 && fsView != null) {
-			int row = fileTable.rowAtPoint(e.getPoint());
-			int col = fileTable.columnAtPoint(e.getPoint());
-			if(col == 0 && row >= 0) {
-			    //System.err.println("Double click at (" + row + "," + col + ")");
-			    Object colValue = fileTable.getModel().getValueAt(row, col);
-			    //System.err.println("  Value class: " + colValue.getClass());
-			    if(colValue instanceof RecordContainer) {
-				actionDoubleClickTableEntry(((RecordContainer)colValue).getRecord());
-			    }
-			    else
-				throw new RuntimeException("Invalid type in column 0 in fileTable!");
-			}
-		    }
-		}
-	    });
-	
-	dirTree.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-		    if(e.getButton() == MouseEvent.BUTTON3 && fsView != null) {
-			TreePath tp = dirTree.getPathForLocation(e.getX(), e.getY());
-			if(tp != null) {
-			    dirTree.clearSelection();
-			    dirTree.setSelectionPath(tp);
-			    dirTree.requestFocus();
-			    
-			    JPopupMenu jpm = new JPopupMenu();
-			    JMenuItem infoItem = new JMenuItem("Information");
-			    infoItem.addActionListener(new ActionListener() {
-				    public void actionPerformed(ActionEvent e) {
-                                        if(ensureFileSystemLoaded())
-                                            actionGetInfo();
-				    }
-				});
-			    jpm.add(infoItem);
-
-			    JMenuItem dataExtractItem = new JMenuItem("Extract data");
-			    dataExtractItem.addActionListener(new ActionListener() {
-				    public void actionPerformed(ActionEvent e) {
-                                        if(ensureFileSystemLoaded())
-                                            actionExtractToDir(true, false);
-				    }
-				});
-			    jpm.add(dataExtractItem);
-                            
-			    JMenuItem resExtractItem = new JMenuItem("Extract resource fork(s)");
-			    resExtractItem.addActionListener(new ActionListener() {
-				    public void actionPerformed(ActionEvent e) {
-                                        if(ensureFileSystemLoaded())
-                                            actionExtractToDir(false, true);
-				    }
-				});
-			    jpm.add(resExtractItem);
-                            
-			    JMenuItem bothExtractItem = new JMenuItem("Extract data and resource fork(s)");
-			    bothExtractItem.addActionListener(new ActionListener() {
-				    public void actionPerformed(ActionEvent e) {
-                                        if(ensureFileSystemLoaded())
-                                            actionExtractToDir(true, true);
-				    }
-				});
-			    jpm.add(bothExtractItem);
-			    
-			    jpm.show(dirTree, e.getX(), e.getY());
-			}
-		    }
-		}
-	    });
-	DefaultMutableTreeNode rootNode = new NoLeafMutableTreeNode("No file system loaded");
-	DefaultTreeModel model = new DefaultTreeModel(rootNode);
-	dirTree.setModel(model);
-	dirTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-	
-	dirTree.addTreeSelectionListener(new TreeSelectionListener() {
-		public void valueChanged(TreeSelectionEvent e) {
-		    TreePath tp = e.getPath();
-		    Object obj = tp.getLastPathComponent();
-		    if(obj instanceof NoLeafMutableTreeNode) {
-			Object obj2 = ((NoLeafMutableTreeNode)obj).getUserObject();
-			if(obj2 instanceof RecordNodeStorage) {
-			    HFSPlusCatalogLeafRecord rec = ((RecordNodeStorage)obj2).getRecord();
-			    HFSPlusCatalogLeafRecordData recData = rec.getData();
-			    HFSCatalogNodeID requestedID;
-			    if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
-			       recData instanceof HFSPlusCatalogFolder) {
-				HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder)recData;
-				requestedID = catFolder.getFolderID();
-			    }
-			    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
-				    recData instanceof HFSPlusCatalogThread) {
-				HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
-				requestedID = rec.getKey().getParentID();
-			    }
-			    else
-				throw new RuntimeException("Invalid type.");
-			
-			    HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
-			    populateTable(contents);
-			    fileTableScroller.getVerticalScrollBar().setValue(0);
-			    
-			    StringBuilder path = new StringBuilder("/");
-			    Object[] userObjectPath = ((NoLeafMutableTreeNode)obj).getUserObjectPath();
-			    for(int i = 1; i < userObjectPath.length; ++i) {
-				path.append(userObjectPath[i].toString());
-				path.append("/");
-			    }
-			    addressField.setText(path.toString()); 
-			}
-		    }
-		}
-	    });
-	dirTree.addTreeWillExpandListener(new TreeWillExpandListener() {
-		public void treeWillExpand(TreeExpansionEvent e) 
-                    throws ExpandVetoException {
-		    //System.out.println("Tree will expand!");
-		    TreePath tp = e.getPath();
-		    Object obj = tp.getLastPathComponent();
-		    if(obj instanceof NoLeafMutableTreeNode) {
-                        actionExpandDirTreeNode((NoLeafMutableTreeNode)obj);
-		    }
-		}
-		
-		public void treeWillCollapse(TreeExpansionEvent e) {}
-
-	    });
-	
-	// Focus monitoring
-	fileTable.addFocusListener(new FocusListener() {
-		public void focusGained(FocusEvent e) {
-		    //System.err.println("fileTable gained focus!");
-		    fileTableLastFocus = System.nanoTime();
-		    //dirTree.clearSelection();
-		}
-		public void focusLost(FocusEvent e) {}
-	    });
-	dirTree.addFocusListener(new FocusListener() {
-		public void focusGained(FocusEvent e) {
-		    //System.err.println("dirTree gained focus!");
-		    dirTreeLastFocus = System.nanoTime();
-		    //fileTable.clearSelection(); // I'm unsure whether this behaviour is desired
-		}
-		public void focusLost(FocusEvent e) {}
-	    });
-	
- 	fileTableScroller.addComponentListener(new ComponentAdapter() {
-                @Override
-                public void componentResized(ComponentEvent e) {
- 		    //System.err.println("Component resized");
-		    adjustTableWidth();
-		}
- 	    });
-	
-	
+        
 	// Menus
 	JMenuItem loadFSFromDeviceItem = null;
 	if(WindowsLowLevelIO.isSystemSupported()) {
@@ -700,6 +188,43 @@ public class FileSystemBrowserWindow extends JFrame {
 	    });
 	openUDIFItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 	
+        JMenuItem openFromPosItem = new JMenuItem("Read file system from specified position in file...");
+	openFromPosItem.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent ae) {
+		    //JFileChooser fileChooser = new JFileChooser();
+		    fileChooser.setMultiSelectionEnabled(false);
+		    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		    SimpleFileFilter sff = new SimpleFileFilter();
+		    sff.addExtension("dmg");
+		    sff.setDescription("Disk images");
+		    fileChooser.setFileFilter(sff);
+		    int res = fileChooser.showOpenDialog(FileSystemBrowserWindow.this);
+		    if(res == JFileChooser.APPROVE_OPTION) {
+			try {
+			    File selectedFile = fileChooser.getSelectedFile();
+			    String pathName = selectedFile.getCanonicalPath();
+                            
+                            String s = JOptionPane.showInputDialog(FileSystemBrowserWindow.this,
+                                    "Enter the byte position of the start of the file system.");
+                            long pos = Long.parseLong(s);
+                            
+			    loadFSWithUDIFAutodetect(pathName, pos);
+			} catch(IOException ioe) {
+			    ioe.printStackTrace();
+			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+							  "Count not resolve pathname!",
+							  "Error", JOptionPane.ERROR_MESSAGE);
+			} catch(Exception e) {
+			    e.printStackTrace();
+			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+							  "Could not read contents of partition!",
+							  "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		    }
+		    fileChooser.resetChoosableFileFilters();
+		}
+	    });
+        
 	JMenuItem debugConsoleItem = null;
 	if(dcw != null) {
 	    debugConsoleItem = new JMenuItem("Debug console");
@@ -734,13 +259,13 @@ public class FileSystemBrowserWindow extends JFrame {
 	JMenuItem fsInfoItem = new JMenuItem("File system info");
 	fsInfoItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
-		    if(fsView != null) {
-			VolumeInfoWindow infoWindow = new VolumeInfoWindow(fsView);
+		    if(fsHandler != null) {
+			VolumeInfoWindow infoWindow = new VolumeInfoWindow(fsHandler.getFSView());
 			infoWindow.setVisible(true);
-			HFSPlusVolumeHeader vh = fsView.getVolumeHeader();
+			HFSPlusVolumeHeader vh = fsHandler.getFSView().getVolumeHeader();
 			infoWindow.setVolumeFields(vh);
 			if(vh.getAttributeVolumeJournaled())
-			    infoWindow.setJournalFields(fsView.getJournalInfoBlock());
+			    infoWindow.setJournalFields(fsHandler.getFSView().getJournalInfoBlock());
 		    }
 		    else
 			JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "No file system loaded.",
@@ -753,21 +278,33 @@ public class FileSystemBrowserWindow extends JFrame {
 	toggleCachingItem.setState(true);
 	toggleCachingItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
-		    if(fsView != null) {
+		    if(fsHandler != null) {
 			if(toggleCachingItem.getState()) {
 			    System.out.print("Enabling caching...");
-			    fsView.enableFileSystemCaching();
+			    fsHandler.getFSView().enableFileSystemCaching();
 			    System.out.println("done!");
 			}
 			else {
 			    System.out.print("Disabling caching...");
-			    fsView.disableFileSystemCaching();
+			    fsHandler.getFSView().disableFileSystemCaching();
 			    System.out.println("done!");
 			}
 		    }
 		}
 	    });
 	
+        JMenuItem setFileReadOffsetItem = new JMenuItem("Set file read offset...");
+	setFileReadOffsetItem.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent ae) {
+                    String s = JOptionPane.showInputDialog(FileSystemBrowserWindow.this,
+                            "Enter offset:", HFSPlusFileSystemView.fileReadOffset);
+                    if(s != null) {
+                        HFSPlusFileSystemView.fileReadOffset = Long.parseLong(s);
+                    }
+		}
+	    });
+
+            
 	JMenuItem startHelpBrowserItem = new JMenuItem("Help browser");
 	startHelpBrowserItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
@@ -867,12 +404,14 @@ public class FileSystemBrowserWindow extends JFrame {
 	    fileMenu.add(loadFSFromDeviceItem);
 	fileMenu.add(loadFSFromFileItem);
 	fileMenu.add(openUDIFItem);
+        fileMenu.add(openFromPosItem);
 	if(debugConsoleItem != null)
 	    fileMenu.add(debugConsoleItem);
 	if(exitProgramItem != null)
 	    fileMenu.add(exitProgramItem);
 	infoMenu.add(fsInfoItem);
 	infoMenu.add(toggleCachingItem);
+        infoMenu.add(setFileReadOffsetItem);
 	helpMenu.add(startHelpBrowserItem);
 	helpMenu.add(checkUpdatesItem);
 	helpMenu.add(aboutItem);
@@ -891,116 +430,116 @@ public class FileSystemBrowserWindow extends JFrame {
 	    });
 
 	setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-	add(fsbPanel, BorderLayout.CENTER);
+	add(fsb.getViewComponent(), BorderLayout.CENTER);
 	pack();
 	setLocationRelativeTo(null);
     }
 
-    public void actionDoubleClickTableEntry(HFSPlusCatalogLeafRecord rec) {
-        HFSPlusCatalogLeafRecordData recData = rec.getData();
-        HFSCatalogNodeID requestedID;
-        if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
-                recData instanceof HFSPlusCatalogFolder) {
-            HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder) recData;
-            requestedID = catFolder.getFolderID();
-        }
-        else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
-                recData instanceof HFSPlusCatalogThread) {
-            HFSPlusCatalogThread catThread = (HFSPlusCatalogThread) recData;
-            requestedID = rec.getKey().getParentID();
-        }
-        else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
-                recData instanceof HFSPlusCatalogFile) {
-            if(true) {
-                actionDoubleClickFile(rec, (HFSPlusCatalogFile)recData);
-            }
-            else { // Some normalization testcode, currently disabled.
-                UnicodeNormalizationToolkit ud = UnicodeNormalizationToolkit.getDefaultInstance();
-                String filename = rec.getKey().getNodeName().toString();
-                System.err.println("Decomposed (unmodified):     \"" + filename + "\"");
-                System.err.print("Decomposed (unmodified) hex:");
-                for(char c : filename.toCharArray()) {
-                    System.err.print(" " + Util.toHexStringBE(c));
-                }
-                System.err.println();
-                String composedFilename = ud.compose(filename);
-                System.err.println("Composed:                 \"" + composedFilename + "\"");
-                System.err.print("Composed hex:            ");
-                for(char c : composedFilename.toCharArray()) {
-                    System.err.print(" " + Util.toHexStringBE(c));
-                }
-                System.err.println();
-            }
-            return;
-        }
-        else {
-            throw new RuntimeException("recData instanceof " + recData.getClass().toString());
-        }
-        HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
-        populateTable(contents);
-        fileTableScroller.getVerticalScrollBar().setValue(0);
+//    public void actionDoubleClickTableEntry(HFSPlusCatalogLeafRecord rec) {
+//        HFSPlusCatalogLeafRecordData recData = rec.getData();
+//        HFSCatalogNodeID requestedID;
+//        if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
+//                recData instanceof HFSPlusCatalogFolder) {
+//            HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder) recData;
+//            requestedID = catFolder.getFolderID();
+//        }
+//        else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
+//                recData instanceof HFSPlusCatalogThread) {
+//            HFSPlusCatalogThread catThread = (HFSPlusCatalogThread) recData;
+//            requestedID = rec.getKey().getParentID();
+//        }
+//        else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
+//                recData instanceof HFSPlusCatalogFile) {
+//            if(true) {
+//                actionDoubleClickFile(rec, (HFSPlusCatalogFile)recData);
+//            }
+//            else { // Some normalization testcode, currently disabled.
+//                UnicodeNormalizationToolkit ud = UnicodeNormalizationToolkit.getDefaultInstance();
+//                String filename = rec.getKey().getNodeName().toString();
+//                System.err.println("Decomposed (unmodified):     \"" + filename + "\"");
+//                System.err.print("Decomposed (unmodified) hex:");
+//                for(char c : filename.toCharArray()) {
+//                    System.err.print(" " + Util.toHexStringBE(c));
+//                }
+//                System.err.println();
+//                String composedFilename = ud.compose(filename);
+//                System.err.println("Composed:                 \"" + composedFilename + "\"");
+//                System.err.print("Composed hex:            ");
+//                for(char c : composedFilename.toCharArray()) {
+//                    System.err.print(" " + Util.toHexStringBE(c));
+//                }
+//                System.err.println();
+//            }
+//            return;
+//        }
+//        else {
+//            throw new RuntimeException("recData instanceof " + recData.getClass().toString());
+//        }
+//        HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
+//        populateTable(contents);
+//        fileTableScroller.getVerticalScrollBar().setValue(0);
+//
+//        List<HFSPlusCatalogLeafRecord> path = fsView.getPathTo(requestedID);
+//// 				System.err.println("Path:");
+//// 				for(HFSPlusCatalogLeafRecord clf : path)
+//// 				    clf.getKey().print(System.err, "  ");
+//
+//        path.remove(0); // The first element will be the root, and setTreePath doesn't want the root
+//        path.remove(path.size() - 1); // The last element will be the thread record for the folder.
+//        TreePath selectionPath = dirTree.getSelectionPath();
+//        dirTree.expandPath(selectionPath);
+//        setTreePath(path);
+//        //TreePath selectionPath = dirTree.getSelectionPath();
+//        //dirTree.expandPath(selectionPath);
+//        selectionPath = dirTree.getSelectionPath();
+//        Object[] userObjectPath = selectionPath.getPath();
+//        StringBuilder pathString = new StringBuilder("/");
+//        for(int i = 1; i < userObjectPath.length; ++i) {
+//            pathString.append(userObjectPath[i].toString());
+//            pathString.append("/");
+//        }
+//        addressField.setText(pathString.toString());
+//    }
 
-        List<HFSPlusCatalogLeafRecord> path = fsView.getPathTo(requestedID);
-// 				System.err.println("Path:");
-// 				for(HFSPlusCatalogLeafRecord clf : path)
-// 				    clf.getKey().print(System.err, "  ");
-
-        path.remove(0); // The first element will be the root, and setTreePath doesn't want the root
-        path.remove(path.size() - 1); // The last element will be the thread record for the folder.
-        TreePath selectionPath = dirTree.getSelectionPath();
-        dirTree.expandPath(selectionPath);
-        setTreePath(path);
-        //TreePath selectionPath = dirTree.getSelectionPath();
-        //dirTree.expandPath(selectionPath);
-        selectionPath = dirTree.getSelectionPath();
-        Object[] userObjectPath = selectionPath.getPath();
-        StringBuilder pathString = new StringBuilder("/");
-        for(int i = 1; i < userObjectPath.length; ++i) {
-            pathString.append(userObjectPath[i].toString());
-            pathString.append("/");
-        }
-        addressField.setText(pathString.toString());
-    }
-
-    private void actionExpandDirTreeNode(NoLeafMutableTreeNode noLeafMutableTreeNode) {
-        Object obj2 = noLeafMutableTreeNode.getUserObject();
-        if(obj2 instanceof RecordNodeStorage) {
-            HFSPlusCatalogLeafRecord rec = ((RecordNodeStorage) obj2).getRecord();
-            HFSPlusCatalogLeafRecordData recData = rec.getData();
-            HFSCatalogNodeID requestedID;
-            if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
-                    recData instanceof HFSPlusCatalogFolder) {
-                HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder) recData;
-                requestedID = catFolder.getFolderID();
-            }
-            else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
-                    recData instanceof HFSPlusCatalogThread) {
-                //HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
-                requestedID = rec.getKey().getParentID();
-            }
-            else {
-                throw new RuntimeException("Invalid type.");
-            }
-            HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
-            populateNode(noLeafMutableTreeNode, contents);
-        }
-    }
+//    private void actionExpandDirTreeNode(NoLeafMutableTreeNode noLeafMutableTreeNode) {
+//        Object obj2 = noLeafMutableTreeNode.getUserObject();
+//        if(obj2 instanceof RecordNodeStorage) {
+//            HFSPlusCatalogLeafRecord rec = ((RecordNodeStorage) obj2).getRecord();
+//            HFSPlusCatalogLeafRecordData recData = rec.getData();
+//            HFSCatalogNodeID requestedID;
+//            if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
+//                    recData instanceof HFSPlusCatalogFolder) {
+//                HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder) recData;
+//                requestedID = catFolder.getFolderID();
+//            }
+//            else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
+//                    recData instanceof HFSPlusCatalogThread) {
+//                //HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
+//                requestedID = rec.getKey().getParentID();
+//            }
+//            else {
+//                throw new RuntimeException("Invalid type.");
+//            }
+//            HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
+//            populateNode(noLeafMutableTreeNode, contents);
+//        }
+//    }
 
     
-    private boolean ensureFileSystemLoaded() {
-        if(fsView != null) {
-            return true;
-        }
-        else {
-            JOptionPane.showMessageDialog(this, "No file system loaded.",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-    }
+//    private boolean ensureFileSystemLoaded() {
+//        if(fsView != null) {
+//            return true;
+//        }
+//        else {
+//            JOptionPane.showMessageDialog(this, "No file system loaded.",
+//                    "Error", JOptionPane.ERROR_MESSAGE);
+//            return false;
+//        }
+//    }
 
-    public void setStatusLabelText(String text) {
-        statusLabel.setText(text);
-    }
+//    public void setStatusLabelText(String text) {
+//        statusLabel.setText(text);
+//    }
     
     private void exitApplication() {
 	// Clean up temp files.
@@ -1035,58 +574,18 @@ public class FileSystemBrowserWindow extends JFrame {
 	}
 	
 	setVisible(false);
-	if(fsView != null) {
-	    fsView.getStream().close();
+	if(fsHandler != null) {
+	    fsHandler.close();
 	}
 	System.exit(0);
     }
     
-    private void adjustTableWidth() {
-	//System.err.println("adjustTableWidth()");
-	int columnCount = fileTable.getColumnModel().getColumnCount();
-	int[] w1 = new int[columnCount];
-	for(int i = 0; i < w1.length; ++i)
-	    w1[i] = fileTable.getColumnModel().getColumn(i).getPreferredWidth();
-		    
-// 	System.err.print("  Widths before =");
-// 	for(int width : w1)
-// 	    System.err.print(" " + width);
-// 	System.err.println();
-
-	disableColumnListener[0] = true;
-		    
-	fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-	fileTableScroller.invalidate();
-	//fileTable.invalidate();
-	//fileTable.validate();
-	fileTableScroller.validate();
-	int[] w2 = new int[columnCount];
-	int newTotalWidth = 0;
-	for(int i = 0; i < columnCount; ++i) {
-	    w2[i] = fileTable.getColumnModel().getColumn(i).getWidth();
-	    newTotalWidth += w2[i];
-	}
-	totalColumnWidth = newTotalWidth; // For telling marginChanged what size to adjust to
-// 	System.err.println("  totalColumnWidth=" + totalColumnWidth);
-	int newLastColumnWidth = newTotalWidth;
-	for(int i = 0; i < w1.length-1; ++i)
-	    newLastColumnWidth -= w1[i];
-	if(newLastColumnWidth < 0)
-	    newLastColumnWidth = 0;
-	fileTable.getColumnModel().getColumn(columnCount-1).setPreferredWidth(newLastColumnWidth);
-	fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-	fileTableScroller.invalidate();
-	fileTableScroller.validate();
-// 	System.err.print("  Widths after =");
-// 	for(int i = 0; i < columnCount; ++i)
-// 	    System.err.print(" " + fileTable.getColumnModel().getColumn(i).getPreferredWidth());
-// 	System.err.println();
-		    
-	lastWidths.o = null;
-	disableColumnListener[0] = false;
-    }
+    
     
     public void loadFSWithUDIFAutodetect(String filename) {
+        loadFSWithUDIFAutodetect(filename, 0);
+    }
+    public void loadFSWithUDIFAutodetect(String filename, long pos) {
 	ReadableRandomAccessStream fsFile;
 	try {
 	    if(WindowsLowLevelIO.isSystemSupported())
@@ -1126,6 +625,9 @@ public class FileSystemBrowserWindow extends JFrame {
 		System.err.println("UDIF structure not found. Proceeding normally...");
 	    }
 	    
+            if(pos != 0)
+                fsFile = new ReadableConcatenatedStream(fsFile, pos, fsFile.length()-pos);
+            
 	    loadFS(fsFile, new File(filename).getName());
 	} catch(Exception e) {
 	    System.err.println("Could not open file! Exception thrown:");
@@ -1223,18 +725,36 @@ public class FileSystemBrowserWindow extends JFrame {
 	}
 	if(fsType == FileSystemRecognizer.FileSystemType.HFS_PLUS ||
 	   fsType == FileSystemRecognizer.FileSystemType.HFSX) {
-	    if(fsView != null) {
-		fsView.getStream().close();
+	    if(fsHandler != null) {
+		fsHandler.close();
 	    }
+            
+            FileSystemMajorType fsMajorType = null;
 	    if(fsType == FileSystemRecognizer.FileSystemType.HFS_PLUS)
-		fsView = new HFSPlusFileSystemView(fsFile, fsOffset, toggleCachingItem.getState());
-	    else
-		fsView = new HFSXFileSystemView(fsFile, fsOffset, toggleCachingItem.getState());
-	    HFSPlusCatalogLeafRecord rootRecord = fsView.getRoot();
-	    HFSPlusCatalogLeafRecord[] rootContents = fsView.listRecords(rootRecord);
-	    populateFilesystemGUI(rootRecord, rootContents);
+                fsMajorType = FileSystemMajorType.APPLE_HFS_PLUS;
+            else
+                fsMajorType = FileSystemMajorType.APPLE_HFSX;
+            
+            FileSystemHandlerFactory factory = fsMajorType.getDefaultHandlerFactory();
+            if(factory.isSupported(StandardAttribute.CACHING_ENABLED)) {
+                factory.getCreateAttributes().
+                        setBooleanAttribute(StandardAttribute.CACHING_ENABLED,
+                            toggleCachingItem.getState());
+            }
+            
+            System.err.println("loadFS(): fsFile=" + fsFile);
+            System.err.println("loadFS(): Creating ReadableConcatenatedStream...");
+            ReadableConcatenatedStream stage1 = new ReadableConcatenatedStream(fsFile, fsOffset,
+                                fsLength);
+            System.err.println("loadFS(): Creating ReadableStreamDataLocator...");
+            ReadableStreamDataLocator stage2 = new ReadableStreamDataLocator(stage1);
+            System.err.println("loadFS(): Creating fsHandler...");
+
+            fsHandler = (HFSPlusFileSystemHandler) factory.createHandler(stage2);
+	    FSFolder rootRecord = fsHandler.getRoot();
+	    //FSEntry[] rootContents = rootRecord.list();
+	    populateFilesystemGUI(rootRecord);
 	    setTitle(TITLE_STRING + " - [" + displayName + "]");
-	    statusLabel.setText("0 objects selected (0 bytes)");
 	    //adjustTableWidth();
 	}
 	else
@@ -1247,15 +767,43 @@ public class FileSystemBrowserWindow extends JFrame {
 		    
     }
 
-    private void populateFilesystemGUI(HFSPlusCatalogLeafRecord root, HFSPlusCatalogLeafRecord[] contents) {
-	DefaultMutableTreeNode rootNode = new NoLeafMutableTreeNode(new RecordNodeStorage(root));
-	populateNode(rootNode, contents);
-	DefaultTreeModel model = new DefaultTreeModel(rootNode);
-	dirTree.setModel(model);
-
-	populateTable(contents);
-	addressField.setText("/");
+    private long extractForkToStream(FSFork theFork, OutputStream os, ProgressMonitor pm) throws IOException {
+        ReadableRandomAccessStream forkFilter = theFork.getReadableRandomAccessStream();
+        //System.out.println("extractForkToStream working with a " + forkFilter.getClass());
+        final long originalLength = theFork.getLength();
+	long bytesToRead = originalLength;
+	byte[] buffer = new byte[4096];
+	while(bytesToRead > 0) {
+	    if(pm.cancelSignaled()) break;
+	    //System.out.print("forkFilter.read([].length=" + buffer.length + ", 0, " + (bytesToRead < buffer.length ? (int)bytesToRead : buffer.length) + "...");
+	    int bytesRead = forkFilter.read(buffer, 0, (bytesToRead < buffer.length ? (int)bytesToRead : buffer.length));
+	    //System.out.println("done. bytesRead = " + bytesRead);
+	    if(bytesRead < 0)
+		break;
+	    else {
+                //System.out.println("Read the following from the forkfilter (" + bytesRead + " bytes): ");
+                //System.out.println(Util.byteArrayToHexString(buffer, 0, bytesRead));
+		pm.addDataProgress(bytesRead);
+		os.write(buffer, 0, bytesRead);
+		bytesToRead -= bytesRead;
+	    }
+	}
+	return originalLength-bytesToRead;
     }
+
+    private void populateFilesystemGUI(FSFolder rootFolder) {
+        FileSystemBrowser.Record<FSEntry> rootRecord =
+                new FileSystemBrowser.Record<FSEntry>(
+                    FileSystemBrowser.RecordType.FOLDER,
+                    rootFolder.getName(),
+                    0,
+                    rootFolder.getAttributes().getModifyDate(),
+                    rootFolder
+                );
+        fsb.setRoot(rootRecord);
+    }
+    
+    /*
     private void populateNode(DefaultMutableTreeNode rootNode, HFSPlusCatalogLeafRecord[] contents) {
 	boolean folderThreadSet = false;
 	boolean hasChildren = false;
@@ -1300,8 +848,9 @@ public class FileSystemBrowserWindow extends JFrame {
 	else
 	    JOptionPane.showMessageDialog(this, "Unexpected type in node user object. Type: " + o.getClass(),
 					  "Error", JOptionPane.ERROR_MESSAGE);
-    }
+    }*/
     
+    /*
     public void populateTable(HFSPlusCatalogLeafRecord[] contents) {
 	while(tableModel.getRowCount() > 0) {
 	    tableModel.removeRow(tableModel.getRowCount()-1);
@@ -1347,9 +896,10 @@ public class FileSystemBrowserWindow extends JFrame {
 	    
 	}
 	adjustTableWidth();
-    }
+    }*/
     
-    private HFSPlusCatalogLeafRecord getDirTreeSelection() {
+    /*
+    private FSFolder getDirTreeSelection() {
         Object o = dirTree.getLastSelectedPathComponent();
         if(o == null) {
             return null;
@@ -1369,57 +919,58 @@ public class FileSystemBrowserWindow extends JFrame {
                     "\nClass: " + o.getClass().toString());
         }
     }
+     * */
     
     /** Never returns null. If nothing is selected, a zero-length array is returned.
 	A RuntimeException may be thrown in case of an implementation error (i.e. should never happen), in which case
 	a detailed explanation is found through Exception.getMessage(). */
-    private HFSPlusCatalogLeafRecord[] getSelectedRecords() {
-	if(dirTreeLastFocus > fileTableLastFocus) {
-            HFSPlusCatalogLeafRecord rec = getDirTreeSelection();
-            if(rec == null)
-                return new HFSPlusCatalogLeafRecord[0];
-            else
-                return new HFSPlusCatalogLeafRecord[] { rec };
-	}
-	else {
-	    int[] selectedRows = fileTable.getSelectedRows();
-	    if(selectedRows.length == 0) {
-		return new HFSPlusCatalogLeafRecord[0];
-	    }
-	    else {
-		final HFSPlusCatalogLeafRecord[] selectedRecords = new HFSPlusCatalogLeafRecord[selectedRows.length];
-		for(int i = 0; i < selectedRows.length; ++i) {
-		    int selectedRow = selectedRows[i];
-		    Object o = tableModel.getValueAt(selectedRow, 0);
-		    HFSPlusCatalogLeafRecord rec;
-		    HFSPlusCatalogLeafRecordData recData;
-		    if(o instanceof RecordContainer) {
-			rec = ((RecordContainer)o).getRecord();
-			selectedRecords[i] = rec;
-		    }
-		    else {
-			throw new RuntimeException("Unexpected data in table model. (Internal error, report to developer)" +
-						   "\nClass: " + o.getClass().toString());
-		    }
-		}
-		return selectedRecords;
-	    }
-	}
-    }
+//    private HFSPlusCatalogLeafRecord[] getSelectedRecords() {
+//	if(dirTreeLastFocus > fileTableLastFocus) {
+//            HFSPlusCatalogLeafRecord rec = getDirTreeSelection();
+//            if(rec == null)
+//                return new HFSPlusCatalogLeafRecord[0];
+//            else
+//                return new HFSPlusCatalogLeafRecord[] { rec };
+//	}
+//	else {
+//	    int[] selectedRows = fileTable.getSelectedRows();
+//	    if(selectedRows.length == 0) {
+//		return new HFSPlusCatalogLeafRecord[0];
+//	    }
+//	    else {
+//		final HFSPlusCatalogLeafRecord[] selectedRecords = new HFSPlusCatalogLeafRecord[selectedRows.length];
+//		for(int i = 0; i < selectedRows.length; ++i) {
+//		    int selectedRow = selectedRows[i];
+//		    Object o = tableModel.getValueAt(selectedRow, 0);
+//		    HFSPlusCatalogLeafRecord rec;
+//		    HFSPlusCatalogLeafRecordData recData;
+//		    if(o instanceof RecordContainer) {
+//			rec = ((RecordContainer)o).getRecord();
+//			selectedRecords[i] = rec;
+//		    }
+//		    else {
+//			throw new RuntimeException("Unexpected data in table model. (Internal error, report to developer)" +
+//						   "\nClass: " + o.getClass().toString());
+//		    }
+//		}
+//		return selectedRecords;
+//	    }
+//	}
+//    }
     
-    private void actionDoubleClickFile(final HFSPlusCatalogLeafRecord rec, HFSPlusCatalogFile file) {
-	final JDialog fopFrame = new JDialog(this, rec.getKey().getNodeName().toString(), true);
+    private void actionDoubleClickFile(final FSFile rec) {
+	final JDialog fopFrame = new JDialog(this, rec.getName(), true);
 	fopFrame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 	
 	ActionListener alOpen = null;
 	if(System.getProperty("os.name").toLowerCase().startsWith("windows")) {
 	    //System.err.println("Windows detected");
-	    final String finalCommand = "cmd.exe /c start \"HFSExplorer invoker\" \"" + rec.getKey().getNodeName().toString() + "\"";
+	    final String finalCommand = "cmd.exe /c start \"HFSExplorer invoker\" \"" + rec.getName() + "\"";
 	    alOpen = new ActionListener() {
 		    public void actionPerformed(ActionEvent ae) {
 			File tempDir = new File(System.getProperty("java.io.tmpdir"));
 			if(extract(rec, tempDir, NullProgressMonitor.getInstance()) == 0) {
-			    tempFiles.add(new File(tempDir, rec.getKey().getNodeName().toString()));
+			    tempFiles.add(new File(tempDir, rec.getName()));
 			    try {
 // 				System.err.print("Trying to execute:");
 // 				for(String s : finalCommand)
@@ -1448,8 +999,8 @@ public class FileSystemBrowserWindow extends JFrame {
 		    public void actionPerformed(ActionEvent ae) {
 			File tempDir = new File(System.getProperty("java.io.tmpdir"));
 			if(extract(rec, tempDir, NullProgressMonitor.getInstance()) == 0) {
-			    File extractedFile = new File(tempDir, rec.getKey().getNodeName().toString());
-			    tempFiles.add(new File(tempDir, rec.getKey().getNodeName().toString()));
+			    File extractedFile = new File(tempDir, rec.getName());
+			    tempFiles.add(new File(tempDir, rec.getName()));
 			    try {
 				Java6Specific.openFile(extractedFile);
 				fopFrame.dispose();
@@ -1471,12 +1022,12 @@ public class FileSystemBrowserWindow extends JFrame {
 	}
 	else if(System.getProperty("os.name").toLowerCase().startsWith("mac os x")) {
 	    //System.err.println("OS X detected");
-	    final String[] finalCommand = new String[] { "open", rec.getKey().getNodeName().toString() };
+	    final String[] finalCommand = new String[] { "open", rec.getName() };
 	    alOpen = new ActionListener() {
 		    public void actionPerformed(ActionEvent ae) {
 			File tempDir = new File(System.getProperty("java.io.tmpdir"));
 			if(extract(rec, tempDir, NullProgressMonitor.getInstance()) == 0) {
-			    tempFiles.add(new File(tempDir, rec.getKey().getNodeName().toString()));
+			    tempFiles.add(new File(tempDir, rec.getName()));
 			    try {
 // 				System.err.print("Trying to execute:");
 // 				for(String s : finalCommand)
@@ -1502,12 +1053,12 @@ public class FileSystemBrowserWindow extends JFrame {
 	
 	ActionListener alSave = new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
-		    actionExtractToDir();
+		    actionExtractToDir(rec);
 		    fopFrame.dispose();
 		}
 	    };
-	FileOperationsPanel fop = new FileOperationsPanel(fopFrame, rec.getKey().getNodeName().toString(),
-							  file.getDataFork().getLogicalSize(),
+	FileOperationsPanel fop = new FileOperationsPanel(fopFrame, rec.getName(),
+							  rec.getMainFork().getLength(),
 							  alOpen, alSave);
 	fopFrame.add(fop, BorderLayout.CENTER);
 	fopFrame.pack();
@@ -1515,116 +1066,9 @@ public class FileSystemBrowserWindow extends JFrame {
 	fopFrame.setVisible(true);
     }
     
+    
+
     /*
-    private void actionDoubleClickFile(final FSFile rec) {
-	final JDialog fopFrame = new JDialog(this, rec.getName(), true);
-	fopFrame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-	
-	ActionListener alOpen = null;
-	if(System.getProperty("java.vm.version").compareTo("1.6") >= 0 && Java6Specific.canOpen()) {
-	    //System.err.println("Java 1.6 detected.");
-	    alOpen = new ActionListener() {
-		    public void actionPerformed(ActionEvent ae) {
-			File tempDir = new File(System.getProperty("java.io.tmpdir"));
-			if(extract(rec, tempDir, NullProgressMonitor.getInstance()) == 0) {
-			    File extractedFile = new File(tempDir, rec.getKey().getNodeName().toString());
-			    tempFiles.add(new File(tempDir, rec.getKey().getNodeName().toString()));
-			    try {
-				Java6Specific.openFile(extractedFile);
-				fopFrame.dispose();
-			    } catch(IOException e) {
-                                JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "Could not find a handler to open the file with.\n" +
-                                                              "The file remains in\n    \"" + tempDir + "\"\nuntil you exit the program.",
-							      "Error", JOptionPane.ERROR_MESSAGE);
-			    } catch(Exception e) {
-				String stackTrace = e.toString() + "\n";
-				for(StackTraceElement ste : e.getStackTrace()) stackTrace += "    " + ste.toString() + "\n";
-				JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "Open failed. Exception caught:\n" +
-							      stackTrace,
-							      "Error", JOptionPane.ERROR_MESSAGE);
-			    }
-			}
-		    }
-		};
-	    
-	}
-	else if(System.getProperty("os.name").toLowerCase().startsWith("windows")) {
-	    //System.err.println("Windows detected");
-	    final String[] finalCommand = new String[] { "cmd.exe", "/c", "start", "", rec.getKey().getNodeName().toString() };
-	    alOpen = new ActionListener() {
-		    public void actionPerformed(ActionEvent ae) {
-			File tempDir = new File(System.getProperty("java.io.tmpdir"));
-			if(extract(rec, tempDir, NullProgressMonitor.getInstance()) == 0) {
-			    tempFiles.add(new File(tempDir, rec.getKey().getNodeName().toString()));
-			    try {
-// 				System.err.print("Trying to execute:");
-// 				for(String s : finalCommand)
-// 				    System.err.print(" \"" + s + "\"");
-// 				System.err.println(" in directory \"" + tempDir + "\"");
-				Process p = Runtime.getRuntime().exec(finalCommand, null, tempDir);
-				fopFrame.dispose();
-			    } catch(Exception e) {
-				String stackTrace = e.toString() + "\n";
-				for(StackTraceElement ste : e.getStackTrace()) stackTrace += "    " + ste.toString() + "\n";
-				JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "Open failed. Exception caught:\n" +
-							      stackTrace,
-							      "Error", JOptionPane.ERROR_MESSAGE);
-			    }
-			}
-			else
-			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-							  "Error while extracting file to temp dir.",
-							  "Error", JOptionPane.ERROR_MESSAGE);
-		    }
-		};
-	}
-	else if(System.getProperty("os.name").toLowerCase().startsWith("mac os x")) {
-	    //System.err.println("OS X detected");
-	    final String[] finalCommand = new String[] { "open", rec.getKey().getNodeName().toString() };
-	    alOpen = new ActionListener() {
-		    public void actionPerformed(ActionEvent ae) {
-			File tempDir = new File(System.getProperty("java.io.tmpdir"));
-			if(extract(rec, tempDir, NullProgressMonitor.getInstance()) == 0) {
-			    tempFiles.add(new File(tempDir, rec.getKey().getNodeName().toString()));
-			    try {
-// 				System.err.print("Trying to execute:");
-// 				for(String s : finalCommand)
-// 				    System.err.print(" \"" + s + "\"");
-// 				System.err.println(" in directory \"" + tempDir + "\"");
-				Process p = Runtime.getRuntime().exec(finalCommand, null, tempDir);
-				fopFrame.dispose();
-			    } catch(Exception e) {
-				String stackTrace = e.toString() + "\n";
-				for(StackTraceElement ste : e.getStackTrace()) stackTrace += "    " + ste.toString() + "\n";
-				JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "Open failed. Exception caught:\n" +
-							      stackTrace,
-							      "Error", JOptionPane.ERROR_MESSAGE);
-			    }
-			}
-			else
-			    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-							  "Error while extracting file to temp dir.",
-							  "Error", JOptionPane.ERROR_MESSAGE);
-		    }
-		};
-	}
-	
-	ActionListener alSave = new ActionListener() {
-		public void actionPerformed(ActionEvent ae) {
-		    actionExtractToDir();
-		    fopFrame.dispose();
-		}
-	    };
-	FileOperationsPanel fop = new FileOperationsPanel(fopFrame, rec.getKey().getNodeName().toString(),
-							  file.getDataFork().getLogicalSize(),
-							  alOpen, alSave);
-	fopFrame.add(fop, BorderLayout.CENTER);
-	fopFrame.pack();
-	fopFrame.setLocationRelativeTo(null);
-	fopFrame.setVisible(true);
-    }
-    */
-    
     private void actionGoToParentDir() {
         HFSPlusCatalogLeafRecord targetRecord = getDirTreeSelection();
         if(targetRecord != null) {
@@ -1637,15 +1081,20 @@ public class FileSystemBrowserWindow extends JFrame {
             }
         }
     }
-    public void actionExtractToDir() {
-	actionExtractToDir(true, false);
+     * */
+    private void actionExtractToDir(FSEntry entry) {
+        actionExtractToDir(Arrays.asList(entry));
     }
-    public void actionExtractToDir(final boolean dataFork, final boolean resourceFork) {
+    private void actionExtractToDir(List<FSEntry> selection) {
+	actionExtractToDir(selection, true, false);
+    }
+    private void actionExtractToDir(final List<FSEntry> selection, final boolean dataFork,
+            final boolean resourceFork) {
         if(!dataFork && !resourceFork)
             throw new IllegalArgumentException("Can't choose to extract nothing!");
 	try {
-	    final HFSPlusCatalogLeafRecord[] selection = getSelectedRecords();
-	    if(selection.length > 0) {
+	    //final List<FSEntry> selection = fsb.getUserObjectSelection();
+	    if(selection.size() > 0) {
 		fileChooser.setMultiSelectionEnabled(false);
 		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		fileChooser.setSelectedFiles(new File[0]);
@@ -1659,10 +1108,13 @@ public class FileSystemBrowserWindow extends JFrame {
 				//fsView.enableFileSystemCache();
 				try {
                                     long dataSize = 0;
+                                    LinkedList<FSForkType> forkTypes = new LinkedList<FSForkType>();
                                     if(dataFork)
-                                        dataSize += fsView.calculateDataForkSizeRecursive(selection);
+                                        forkTypes.add(FSForkType.DATA);
 				    if(resourceFork)
-                                        dataSize += fsView.calculateResourceForkSizeRecursive(selection);
+                                        forkTypes.add(FSForkType.MACOS_RESOURCE);
+                                    
+                                    dataSize += calculateForkSizeRecursive(selection, forkTypes);
                                     progress.setDataSize(dataSize);
                                     
 				    int errorCount = extract(selection, outDir, progress, dataFork, resourceFork);
@@ -1698,7 +1150,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		    progress.setVisible(true);
 		}
 	    }
-	    else if(selection.length == 0) {
+	    else if(selection.size() == 0) {
 		JOptionPane.showMessageDialog(this, "No file or folder selected.",
 					      "Information", JOptionPane.INFORMATION_MESSAGE);
 	    }
@@ -1717,178 +1169,188 @@ public class FileSystemBrowserWindow extends JFrame {
 	//fileChooser.setSelectedFiles(new File[0]);
 	//fileChooser.setCurrentDirectory(fileChooser.getCurrentDirectory());
     }
-        
-    public void actionGetInfo() {
-	HFSPlusCatalogLeafRecord rec = null;
-	if(dirTreeLastFocus > fileTableLastFocus) {
-	    Object o = dirTree.getLastSelectedPathComponent();
-	    //System.err.println(o.toString());
-	    if(o == null) {
-		JOptionPane.showMessageDialog(this, "No file or folder selected.",
-					      "Information", JOptionPane.INFORMATION_MESSAGE);
-	    }
-	    else if(o instanceof DefaultMutableTreeNode) {
-		Object o2 = ((DefaultMutableTreeNode)o).getUserObject();
-		if(o2 instanceof RecordNodeStorage)
-		    rec = ((RecordNodeStorage)o2).getRecord();
-		else 
-		    JOptionPane.showMessageDialog(this, "[actionGetInfo():Tree] Unexpected data in tree model. (Internal " +
-						  "error, report to developer)", "Error", JOptionPane.ERROR_MESSAGE);
-	    }
-	    else
-		JOptionPane.showMessageDialog(this, "[actionGetInfo():Tree] Unexpected tree node type! (Internal " +
-					      "error, report to developer)", "Error", JOptionPane.ERROR_MESSAGE);
-	}
-	else {
-	    int[] selectedRows = fileTable.getSelectedRows();
-	    if(selectedRows.length == 0) {
-		JOptionPane.showMessageDialog(this, "No file selected.",
-					      "Information", JOptionPane.INFORMATION_MESSAGE);
-		return;
-	    }
-	    else if(selectedRows.length == 1) {
-		int selectedRow = selectedRows[0];
-		Object o = tableModel.getValueAt(selectedRow, 0);
-		if(o instanceof RecordContainer) {
-		    rec = ((RecordContainer)o).getRecord();
-		}
-		else 
-		    JOptionPane.showMessageDialog(this, "[actionGetInfo():Table] Unexpected data in table model. " + 
-						  "(Internal error, report to developer)",
-						  "Error", JOptionPane.ERROR_MESSAGE);
-	    }
-	    else {
-		JOptionPane.showMessageDialog(this, "Please select one file at a time.",
-					      "Error", JOptionPane.ERROR_MESSAGE);
-	    }
-	}
-
-	if(rec != null) {
-	    HFSPlusCatalogLeafRecordData recData = rec.getData();
-	    if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
-	       recData instanceof HFSPlusCatalogFile) {
-		HFSPlusCatalogFile file = (HFSPlusCatalogFile)recData;
-		FileInfoWindow fiw = new FileInfoWindow(rec.getKey().getNodeName().toString());
-		fiw.setFields(file);
-		fiw.setVisible(true);
-	    }
-	    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
-		    recData instanceof HFSPlusCatalogFolder) {
-		HFSPlusCatalogFolder folder = (HFSPlusCatalogFolder)recData;
-		FolderInfoWindow fiw = new FolderInfoWindow(rec.getKey().getNodeName().toString());
-		fiw.setFields(folder);
-		fiw.setVisible(true);
-	    }
-	    else
-		JOptionPane.showMessageDialog(this, "[actionGetInfo()] Record data has unexpected type (" +
-					      recData.getRecordType() + ").\nReport bug to developer.",
-					      "Error", JOptionPane.ERROR_MESSAGE);
-	}
-    }
-
-    private void actionGotoDir() {
-	String requestedPath = addressField.getText();
-	String[] components = requestedPath.split("/");
-	LinkedList<HFSPlusCatalogLeafRecord> recordPath = new LinkedList<HFSPlusCatalogLeafRecord>();
-	HFSPlusCatalogLeafRecord currentRecord = fsView.getRoot();
-	HFSPlusCatalogLeafRecordData currentRecordData = currentRecord.getData();
-	//recordPath.addLast(currentRecord);
-	for(String s : components) {
-	    if(!s.trim().equals("")) {
-		if(currentRecordData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
-		   currentRecordData instanceof HFSPlusCatalogFolder) {
-		    HFSPlusCatalogFolder folder = (HFSPlusCatalogFolder) currentRecordData;
-		    HFSPlusCatalogLeafRecord nextRecord = fsView.getRecord(folder.getFolderID(), new HFSUniStr255(s));
-		    
-		    if(nextRecord == null) {
-			currentRecord = null;
-			break;
-		    }
-		    else {
-			currentRecord = nextRecord;
-			currentRecordData = currentRecord.getData();
-			recordPath.addLast(currentRecord);
-		    }
-
-		}
-		else {
-		    currentRecord = null;
-		    break;
-		}
-	    }
-	}
-	
-	if(currentRecord == null)
-	    JOptionPane.showMessageDialog(this, "Path not found!", "Error", JOptionPane.ERROR_MESSAGE);
-	else if(currentRecordData.getRecordType() != HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER)
-	    JOptionPane.showMessageDialog(this, "Requested path points to a file. Can only browse folders...", "Error", JOptionPane.ERROR_MESSAGE);
-	else {
-	    setTreePath(recordPath);
-	}
-	
-    }
-
-    private void setTreePath(List<HFSPlusCatalogLeafRecord> recordPath) {
-	Object root = dirTree.getModel().getRoot();
-	DefaultMutableTreeNode rootNode;
-	if(root instanceof DefaultMutableTreeNode)
-	    rootNode = (DefaultMutableTreeNode)root;
-	else
-	    throw new RuntimeException("Invalid type in tree");
-	TreePath treePath = new TreePath(rootNode);
-	//System.out.println("Children:");
-	
-	for(HFSPlusCatalogLeafRecord rec : recordPath) {
-	    DefaultMutableTreeNode rootNodeBefore = rootNode;
-	    LinkedList<String> debug = new LinkedList<String>();
-	    for(Enumeration e = rootNode.children() ; e.hasMoreElements() ;) {
-		Object o = e.nextElement();
-		if(o instanceof DefaultMutableTreeNode) {
-		    DefaultMutableTreeNode currentNode = (DefaultMutableTreeNode)o;
-		    Object o2 = currentNode.getUserObject();
-		    debug.addLast(o2.toString());
-		    if(o2.toString().equals(rec.getKey().getNodeName().toString())) {
-			rootNode = currentNode;
-			treePath = treePath.pathByAddingChild(rootNode);
-			break;
-		    }
-		}
-	    }
-	    if(rootNode == rootNodeBefore) {
-		System.err.println("Record string: \"" + rec.getKey().getNodeName().toString() + "\"");
-		System.err.println("Contents:");
-		for(String s : debug)
-		    System.err.println("    " + s);
-		throw new RuntimeException("Could not find record in tree!");
-	    }
-	}
-	
-	dirTree.setSelectionPath(treePath);
-	
-	//JOptionPane.showMessageDialog(this, "Found path, and path is folder! :)\nRoot of the tree has class: " + root.getClass(), "YEA", JOptionPane.INFORMATION_MESSAGE);
+    
+    /**
+     * Thank God for overloading.
+     * 
+     * @param selection
+     * @param forkTypes
+     * @return
+     */
+    private long calculateForkSizeRecursive(List<FSEntry> selection, List<FSForkType> forkTypes) {
+        return calculateForkSizeRecursive(selection.toArray(new FSEntry[selection.size()]),
+                                          forkTypes.toArray(new FSForkType[forkTypes.size()]));
     }
     
+    /**
+     * Calculates the combined sizes of the forks of types <code>forkTypes</code> for the selection,
+     * including all files in subdirectories. If <code>forkTypes</code> is empty, all forks are
+     * included in the calculation.
+     * 
+     * @param selection
+     * @param forkTypes
+     * @return
+     */
+    private long calculateForkSizeRecursive(FSEntry[] selection, FSForkType... forkTypes) {
+        long res = 0;
+        for(FSEntry curEntry : selection) {
+            if(curEntry instanceof FSFile) {
+                FSFile curFile = (FSFile)curEntry;
+                
+                if(forkTypes.length > 0) {
+                    for(FSForkType t : forkTypes) {
+                        FSFork curFork = curFile.getForkByType(t);
+                        if(curFork != null)
+                            res += curFork.getLength();
+                    }
+                }
+                else
+                    res += curFile.getCombinedLength();
+            }
+            else if(curEntry instanceof FSFolder) {
+                FSFolder curFolder = (FSFolder)curEntry;
+                res += calculateForkSizeRecursive(curFolder.list(), forkTypes);
+            }
+            else
+                System.err.println("INFO: Silently ignoring FSEntry subtype " +
+                        curEntry.getClass());
+        }
+        
+        return res;
+    }
+        
+    private void actionGetInfo(FSEntry entry) {
+        if(entry instanceof FSFile) {
+            FSFile file = (FSFile) entry;
+            FileInfoWindow fiw = new FileInfoWindow(entry.getName());
+            fiw.setFields(file);
+            fiw.setVisible(true);
+        }
+        else if(entry instanceof FSFolder) {
+            FSFolder folder = (FSFolder) entry;
+            FolderInfoWindow fiw = new FolderInfoWindow(entry.getName());
+            fiw.setFields(folder);
+            fiw.setVisible(true);
+        }
+        else {
+            JOptionPane.showMessageDialog(this, "[actionGetInfo()] Record data has unexpected type (" +
+                    entry.getClass() + ").\nReport bug to developer.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+//    private void actionGotoDir() {
+//	String requestedPath = addressField.getText();
+//	String[] components = requestedPath.split("/");
+//	LinkedList<HFSPlusCatalogLeafRecord> recordPath = new LinkedList<HFSPlusCatalogLeafRecord>();
+//	HFSPlusCatalogLeafRecord currentRecord = fsView.getRoot();
+//	HFSPlusCatalogLeafRecordData currentRecordData = currentRecord.getData();
+//	//recordPath.addLast(currentRecord);
+//	for(String s : components) {
+//	    if(!s.trim().equals("")) {
+//		if(currentRecordData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
+//		   currentRecordData instanceof HFSPlusCatalogFolder) {
+//		    HFSPlusCatalogFolder folder = (HFSPlusCatalogFolder) currentRecordData;
+//		    HFSPlusCatalogLeafRecord nextRecord = fsView.getRecord(folder.getFolderID(), new HFSUniStr255(s));
+//		    
+//		    if(nextRecord == null) {
+//			currentRecord = null;
+//			break;
+//		    }
+//		    else {
+//			currentRecord = nextRecord;
+//			currentRecordData = currentRecord.getData();
+//			recordPath.addLast(currentRecord);
+//		    }
+//
+//		}
+//		else {
+//		    currentRecord = null;
+//		    break;
+//		}
+//	    }
+//	}
+//	
+//	if(currentRecord == null)
+//	    JOptionPane.showMessageDialog(this, "Path not found!", "Error", JOptionPane.ERROR_MESSAGE);
+//	else if(currentRecordData.getRecordType() != HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER)
+//	    JOptionPane.showMessageDialog(this, "Requested path points to a file. Can only browse folders...", "Error", JOptionPane.ERROR_MESSAGE);
+//	else {
+//	    setTreePath(recordPath);
+//	}
+//	
+//    }
+
+//    private void setTreePath(List<HFSPlusCatalogLeafRecord> recordPath) {
+//	Object root = dirTree.getModel().getRoot();
+//	DefaultMutableTreeNode rootNode;
+//	if(root instanceof DefaultMutableTreeNode)
+//	    rootNode = (DefaultMutableTreeNode)root;
+//	else
+//	    throw new RuntimeException("Invalid type in tree");
+//	TreePath treePath = new TreePath(rootNode);
+//	//System.out.println("Children:");
+//	
+//	for(HFSPlusCatalogLeafRecord rec : recordPath) {
+//	    DefaultMutableTreeNode rootNodeBefore = rootNode;
+//	    LinkedList<String> debug = new LinkedList<String>();
+//	    for(Enumeration e = rootNode.children() ; e.hasMoreElements() ;) {
+//		Object o = e.nextElement();
+//		if(o instanceof DefaultMutableTreeNode) {
+//		    DefaultMutableTreeNode currentNode = (DefaultMutableTreeNode)o;
+//		    Object o2 = currentNode.getUserObject();
+//		    debug.addLast(o2.toString());
+//		    if(o2.toString().equals(rec.getKey().getNodeName().toString())) {
+//			rootNode = currentNode;
+//			treePath = treePath.pathByAddingChild(rootNode);
+//			break;
+//		    }
+//		}
+//	    }
+//	    if(rootNode == rootNodeBefore) {
+//		System.err.println("Record string: \"" + rec.getKey().getNodeName().toString() + "\"");
+//		System.err.println("Contents:");
+//		for(String s : debug)
+//		    System.err.println("    " + s);
+//		throw new RuntimeException("Could not find record in tree!");
+//	    }
+//	}
+//	
+//	dirTree.setSelectionPath(treePath);
+//	
+//	//JOptionPane.showMessageDialog(this, "Found path, and path is folder! :)\nRoot of the tree has class: " + root.getClass(), "YEA", JOptionPane.INFORMATION_MESSAGE);
+//    }
+    
     /** <code>progressDialog</code> may NOT be null. */
-    protected int extract(HFSPlusCatalogLeafRecord rec, File outDir, ProgressMonitor progressDialog) {
-	return extract(rec, outDir, progressDialog, true, false);
+    protected int extract(FSEntry rec, File outDir, ProgressMonitor progressDialog) {
+	return extract(Arrays.asList(rec), outDir, progressDialog, true, false);
     }
     /** <code>progressDialog</code> may NOT be null. */
-    protected int extract(HFSPlusCatalogLeafRecord rec, File outDir, ProgressMonitor progressDialog, boolean dataFork, boolean resourceFork) {
-	return extractRecursive(rec, outDir, progressDialog, new ObjectContainer<Boolean>(false), dataFork, resourceFork);
+    protected int extract(FSEntry rec, File outDir, ProgressMonitor progressDialog, boolean dataFork, boolean resourceFork) {
+      	return extract(Arrays.asList(rec), outDir, progressDialog, dataFork, resourceFork);
     }
     /** <code>progressDialog</code> may NOT be null. */
-    protected int extract(HFSPlusCatalogLeafRecord[] recs, File outDir, ProgressMonitor progressDialog) {
+    protected int extract(FSEntry[] recs, File outDir, ProgressMonitor progressDialog) {
+	return extract(Arrays.asList(recs), outDir, progressDialog, true, false);
+    }
+    /** <code>progressDialog</code> may NOT be null. */
+    protected int extract(FSEntry[] recs, File outDir, ProgressMonitor progressDialog, boolean dataFork, boolean resourceFork) {
+      	return extract(Arrays.asList(recs), outDir, progressDialog, dataFork, resourceFork);
+    }
+    /** <code>progressDialog</code> may NOT be null. */
+    protected int extract(List<FSEntry> recs, File outDir, ProgressMonitor progressDialog) {
 	return extract(recs, outDir, progressDialog, true, false);
     }
     /** <code>progressDialog</code> may NOT be null. */
-    protected int extract(HFSPlusCatalogLeafRecord[] recs, File outDir, ProgressMonitor progressDialog, boolean dataFork, boolean resourceFork) {
+    protected int extract(List<FSEntry> recs, File outDir, ProgressMonitor progressDialog, boolean dataFork, boolean resourceFork) {
 	int errorCount = 0;
-	for(HFSPlusCatalogLeafRecord rec : recs) {
+	for(FSEntry rec : recs) {
 	    errorCount += extractRecursive(rec, outDir, progressDialog, new ObjectContainer<Boolean>(false), dataFork, resourceFork);
 	}
 	return errorCount;
     }
-    private int extractRecursive(HFSPlusCatalogLeafRecord rec, File outDir, ProgressMonitor progressDialog,
+    
+    private int extractRecursive(FSEntry rec, File outDir, ProgressMonitor progressDialog,
 				 ObjectContainer<Boolean> overwriteAll, boolean dataFork, boolean resourceFork) {
         if(!dataFork && !resourceFork)
             throw new IllegalArgumentException("Neither the data fork or resource fork were selected for extraction. Won't do nothing...");
@@ -1922,25 +1384,18 @@ public class FileSystemBrowserWindow extends JFrame {
 	    }
 	}
 	
-	HFSPlusCatalogLeafRecordData recData = rec.getData();
-	if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
-	   recData instanceof HFSPlusCatalogFile) {
-	    HFSPlusCatalogFile catFile = (HFSPlusCatalogFile)recData;
-	    
+	
+	if(rec instanceof FSFile) {
             if(dataFork)
-                errorCount += extractFile(rec, catFile, outDir, progressDialog, overwriteAll, false);
+                errorCount += extractFile((FSFile)rec, outDir, progressDialog, overwriteAll, false);
             if(resourceFork)
-                errorCount += extractFile(rec, catFile, outDir, progressDialog, overwriteAll, true);
+                errorCount += extractFile((FSFile)rec, outDir, progressDialog, overwriteAll, true);
 	}
-	else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
-		recData instanceof HFSPlusCatalogFolder) {
-	    String dirName = rec.getKey().getNodeName().getUnicodeAsComposedString();
+	else if(rec instanceof FSFolder) {
+	    String dirName = rec.getName();
 	    progressDialog.updateCurrentDir(dirName);
-	    HFSCatalogNodeID requestedID;
-	    HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder)recData;
-	    requestedID = catFolder.getFolderID();
-	    
-	    HFSPlusCatalogLeafRecord[] contents = fsView.listRecords(requestedID);
+            
+	    FSEntry[] contents = ((FSFolder)rec).list();
 	    //System.out.println("folder: \"" + dirName + "\" valence: " + contents.length + " range: " + fractionLowLimit + "-" + fractionHighLimit);
 	    // We now have the contents of the requested directory
 	    File thisDir = new File(outDir, dirName);
@@ -1958,7 +1413,7 @@ public class FileSystemBrowserWindow extends JFrame {
 	    }
 
 	    if(thisDir.mkdir() || thisDir.exists()) {
-		for(HFSPlusCatalogLeafRecord outRec : contents) {
+		for(FSEntry outRec : contents) {
 		    errorCount += extractRecursive(outRec, thisDir, progressDialog, overwriteAll, dataFork, resourceFork);
 		}
 	    }
@@ -1978,21 +1433,28 @@ public class FileSystemBrowserWindow extends JFrame {
 	return errorCount;
     }
     
-    private int extractFile(final HFSPlusCatalogLeafRecord rec, final HFSPlusCatalogFile catFile,
-            final File outDir, final ProgressMonitor progressDialog,
+    private int extractFile(final FSFile rec, final File outDir, final ProgressMonitor progressDialog,
             final ObjectContainer<Boolean> overwriteAll, final boolean extractResourceFork) {
             int errorCount = 0;
-            String filename = rec.getKey().getNodeName().getUnicodeAsComposedString();
+            String filename = rec.getName();
             if(extractResourceFork)
                 filename = "._" + filename; // Special syntax for resource forks in foreign file systems
             
 	    while(true) {
 		//System.out.println("file: \"" + filename + "\" range: " + fractionLowLimit + "-" + fractionHighLimit);
+                final FSFork theFork;
 		if(!extractResourceFork)
-		    progressDialog.updateCurrentFile(filename, catFile.getDataFork().getLogicalSize());
-		else
-		    progressDialog.updateCurrentFile(filename, catFile.getResourceFork().getLogicalSize());
-		//progressDialog.updateTotalProgress(fractionLowLimit);
+                    theFork = rec.getMainFork();
+                else
+                    theFork = rec.getForkByType(FSForkType.MACOS_RESOURCE);
+                
+                if(theFork == null)
+                    throw new RuntimeException("Could not find " +
+                            (extractResourceFork?"resource":"main") + " fork!");
+                
+		progressDialog.updateCurrentFile(filename, theFork.getLength());
+                
+                //progressDialog.updateTotalProgress(fractionLowLimit);
 		File outFile = new File(outDir, filename);
 
 		if(!overwriteAll.o && outFile.exists()) {
@@ -2046,10 +1508,7 @@ public class FileSystemBrowserWindow extends JFrame {
 		    if(!outFile.getParentFile().equals(outDir) || !outFile.getName().equals(filename))
 			throw new FileNotFoundException();
 		    FileOutputStream fos = new FileOutputStream(outFile);
-		    if(!extractResourceFork)
-			fsView.extractDataForkToStream(rec, fos, progressDialog);
-		    else
-			fsView.extractResourceForkToStream(rec, fos, progressDialog);
+                    extractForkToStream(theFork, fos, progressDialog);
 		    fos.close();
 		    //JOptionPane.showMessageDialog(this, "The file was successfully extracted!\n",
 		    //			  "Extraction complete!", JOptionPane.INFORMATION_MESSAGE);
@@ -2128,53 +1587,154 @@ public class FileSystemBrowserWindow extends JFrame {
 
         return errorCount;
     }
-    /*
-    private class FileSystemBrowserController implements FileSystemBrowser.Controller<FSEntry> {
+    
 
-        public void actionDoubleClickTableEntry(Record<FSEntry> record) {
-            throw new UnsupportedOperationException("Not supported yet.");
+    
+    private class FileSystemProvider implements FileSystemBrowser.FileSystemProvider<FSEntry> {
+
+        public void actionDoubleClickFile(Record<FSEntry> record) {
+            FSEntry entry = record.getUserObject();
+            if(entry instanceof FSFile) 
+                FileSystemBrowserWindow.this.actionDoubleClickFile((FSFile)entry);
+            else
+                throw new RuntimeException("Unexpected FSEntry type: " + entry.getClass());
         }
 
-        public JPopupMenu createTreeNodePopupMenu() {
-            throw new UnsupportedOperationException("Not supported yet.");
+        public void actionExtractToDir(List<Record<FSEntry>> recordList) {
+            List<FSEntry> fsEntryList = new ArrayList<FSEntry>(recordList.size());
+            for(Record<FSEntry> rec : recordList)
+                fsEntryList.add(rec.getUserObject());
+            FileSystemBrowserWindow.this.actionExtractToDir(fsEntryList, true, false);
         }
 
-        public JPopupMenu createTableNodePopupMenu() {
-            throw new UnsupportedOperationException("Not supported yet.");
+        public void actionGetInfo(List<Record<FSEntry>> recordList) {
+            if(recordList.size() == 1)
+                FileSystemBrowserWindow.this.actionGetInfo(recordList.get(0).getUserObject());
+            else if(recordList.size() > 1) {
+                JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+                        "Please select one entry at a time.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+        public JPopupMenu getRightClickRecordPopupMenu(final Record<FSEntry> record) {
+            JPopupMenu jpm = new JPopupMenu();
+
+            JMenuItem infoItem = new JMenuItem("Information");
+            infoItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    FileSystemBrowserWindow.this.actionGetInfo(record.getUserObject());
+                }
+            });
+            jpm.add(infoItem);
+
+            JMenuItem dataExtractItem = new JMenuItem("Extract data");
+            dataExtractItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    List<FSEntry> oneItemList = new ArrayList<FSEntry>(1);
+                    oneItemList.add(record.getUserObject());
+                    FileSystemBrowserWindow.this.actionExtractToDir(oneItemList, true, false);
+                }
+            });
+            jpm.add(dataExtractItem);
+
+            JMenuItem resExtractItem = new JMenuItem("Extract resource fork(s)");
+            resExtractItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    List<FSEntry> oneItemList = new ArrayList<FSEntry>(1);
+                    oneItemList.add(record.getUserObject());
+                    FileSystemBrowserWindow.this.actionExtractToDir(oneItemList, false, true);
+                }
+            });
+            jpm.add(resExtractItem);
+
+            JMenuItem bothExtractItem = new JMenuItem("Extract data and resource fork(s)");
+            bothExtractItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    List<FSEntry> oneItemList = new ArrayList<FSEntry>(1);
+                    oneItemList.add(record.getUserObject());
+                    FileSystemBrowserWindow.this.actionExtractToDir(oneItemList, true, true);
+                }
+            });
+            jpm.add(bothExtractItem);
+            
+            return jpm;
         }
 
         public boolean isFileSystemLoaded() {
-            throw new UnsupportedOperationException("Not supported yet.");
+            return fsHandler != null;
         }
 
-        public List<Record<FSEntry>> getFolderContents(Record<FSEntry> folderRecord) {
-            throw new UnsupportedOperationException("Not supported yet.");
+        public List<Record<FSEntry>> getFolderContents(List<Record<FSEntry>> folderRecordPath) {
+            FSEntry lastEntry = folderRecordPath.get(folderRecordPath.size()-1).getUserObject();
+            if(lastEntry instanceof FSFolder) {
+                FSEntry[] entryArray = ((FSFolder)lastEntry).list();
+                ArrayList<Record<FSEntry>> entryList = new ArrayList<Record<FSEntry>>(entryArray.length);
+                for(FSEntry entry : entryArray) {
+                    Record<FSEntry> rec = new FSEntryRecord(entry);
+                    entryList.add(rec);
+                }
+                return entryList;
+            }
+            else
+                throw new RuntimeException("Tried to get folder contents for type " +
+                        lastEntry.getClass());
         }
 
-        public void notifyCurrentDirChanged(Record<FSEntry> folderRecord) {
-            throw new UnsupportedOperationException("Not supported yet.");
+        public String getAddressPath(List<String> pathComponents) {
+            StringBuilder sb = new StringBuilder("/");
+            
+            for(String name : pathComponents) {
+                sb.append(name);
+                sb.append("/");
+            }
+            return sb.toString();
         }
 
-        public void setSelectionStatusText(String text) {
-            throw new UnsupportedOperationException("Not supported yet.");
+        public String[] parseAddressPath(String targetAddress) {
+            if(!targetAddress.startsWith("/"))
+                return null;
+            else {
+                String remainder = targetAddress.substring(1);
+                if(remainder.length() == 0)
+                    return new String[0];
+                else {
+                    String[] res = remainder.split("/");
+                    return res;
+                }
+            }
         }
 
-        public void actionExtractToDir() {
-            throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
+    private static class FSEntryRecord extends Record<FSEntry> {
+        public FSEntryRecord(FSEntry entry) {
+            super(entryTypeToRecordType(entry), entry.getName(), getEntrySize(entry),
+                    entry.getAttributes().getModifyDate(), entry);
         }
-
-        public void actionGetInfo() {
-            throw new UnsupportedOperationException("Not supported yet.");
+        
+        public static RecordType entryTypeToRecordType(FSEntry entry) {
+            if(entry instanceof FSFile)
+                return RecordType.FILE;
+            else if(entry instanceof FSFolder)
+                return RecordType.FOLDER;
+            else
+                throw new IllegalArgumentException("Unsupported FSEntry type: " + entry.getClass());
         }
-
-        public void actionGoToParentDir() {
-            throw new UnsupportedOperationException("Not supported yet.");
+        
+        public static long getEntrySize(FSEntry entry) {
+            if(entry instanceof FSFile)
+                return ((FSFile)entry).getMainFork().getLength();
+            else if(entry instanceof FSFolder)
+                return 0;
+            else
+                throw new IllegalArgumentException("Unsupported FSEntry type: " + entry.getClass());
         }
-
-        public void actionGotoDir() {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-    }*/
+    }
+    
+    private static class ObjectContainer<A> {
+	public A o;
+	public ObjectContainer(A o) { this.o = o; }
+    }
     
     public static void main(String[] args) {
        	try {
@@ -2189,16 +1749,16 @@ public class FileSystemBrowserWindow extends JFrame {
 	}
 	
 	int parsedArgs = 0;
-	final FileSystemBrowserWindow2 fsbWindow;
+	final FileSystemBrowserWindow fsbWindow;
 	if(args.length > 0 && args[0].equals(DEBUG_CONSOLE_ARG)) {
 	    DebugConsoleWindow dcw = new DebugConsoleWindow();
 	    System.setOut(new PrintStream(dcw.debugStream));
 	    System.setErr(new PrintStream(dcw.debugStream));
-	    fsbWindow = new FileSystemBrowserWindow2(dcw);
+	    fsbWindow = new FileSystemBrowserWindow(dcw);
 	    ++parsedArgs;
 	}	    
 	else
-	    fsbWindow = new FileSystemBrowserWindow2();
+	    fsbWindow = new FileSystemBrowserWindow();
 	
 	/*
 	System.err.println(FileSystemBrowserWindow.class.getName() + ".main invoked.");
