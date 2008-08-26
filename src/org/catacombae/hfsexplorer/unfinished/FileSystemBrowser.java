@@ -22,8 +22,10 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -54,7 +56,9 @@ import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
+import org.catacombae.hfsexplorer.Pair;
 import org.catacombae.hfsexplorer.SpeedUnitUtils;
+import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.gui.FilesystemBrowserPanel;
 
 /**
@@ -691,76 +695,372 @@ public class FileSystemBrowser<A> {
     private void populateTreeNodeFromContents(FolderTreeNode nodeToPopulate,
             List<Record<A>> childRecords) {
         if(true) {
-        LinkedList<Record<A>> remainingRecords = new LinkedList<Record<A>>();
-        for(Record<A> childRecord : childRecords) {
-            if(childRecord.getType() == RecordType.FOLDER)
-                remainingRecords.add(childRecord);
-        }
-        
-        List<FolderTreeNode> currentNodes =
-                new ArrayList<FolderTreeNode>(nodeToPopulate.getChildCount());
-        Enumeration en = nodeToPopulate.children();
-        while(en.hasMoreElements()) {
-            Object o = en.nextElement();
-            if(o instanceof FolderTreeNode)
-                currentNodes.add((FolderTreeNode)o);
-            else
-                throw new RuntimeException("Unexpected child type: " + o.getClass());
-        }
-        
-        {
-            LinkedList<Object> removedChildren = new LinkedList<Object>();
-            LinkedList<Integer> childIndices = new LinkedList<Integer>();
+            System.err.println("populateTreeNodeFromContents called for " + nodeToPopulate.getUserObject().toString());
             
-        }
-        
-        int currentIndex = 0;
-        for(FolderTreeNode node : currentNodes) {
-            String nodeName = node.getRecordContainer().getRecord(genericPlaceholder).getName();
-            
-            while(remainingRecords.getFirst().getName().compareTo(nodeName) < 0) {
-                FolderTreeNode newNode =
-                        new FolderTreeNode(new RecordContainer(remainingRecords.removeFirst()));
-                nodeToPopulate.insert(newNode, currentIndex++);
+            final LinkedList<Record<A>> remainingRecords;
+            { // Initialize remainingRecords
+                remainingRecords = new LinkedList<Record<A>>();
+                for(Record<A> childRecord : childRecords) {
+                    if(childRecord.getType() == RecordType.FOLDER) {
+                        remainingRecords.add(childRecord);
+                    }
+                }
             }
-            if(remainingRecords.getFirst().getName().compareTo(nodeName) == 0) {
-                node.setUserObject(new RecordContainer(remainingRecords.removeFirst()));
-                ++currentIndex;
+            
+            
+            if(false) {
+                { // 1. Remove all records that are not part of remainingRecords
+                    System.err.println("  1. Remove all records that are not part of remainingRecords");
+                    final List<FolderTreeNode> currentNodes;
+                    { // Initialize currentNodes
+                        currentNodes = new ArrayList<FolderTreeNode>(nodeToPopulate.getChildCount());
+                        Enumeration en = nodeToPopulate.children();
+                        while(en.hasMoreElements()) {
+                            Object o = en.nextElement();
+                            if(o instanceof FolderTreeNode) {
+                                currentNodes.add((FolderTreeNode) o);
+                            }
+                            else {
+                                throw new RuntimeException("Unexpected child type: " + o.getClass());
+                            }
+                        }
+                    }
+                    LinkedList<FolderTreeNode> removedChildren = new LinkedList<FolderTreeNode>();
+                    LinkedList<Integer> childIndices = new LinkedList<Integer>();
+                    Iterator<Record<A>> remainingRecordsIt = remainingRecords.iterator();
+                    if(remainingRecordsIt.hasNext()) {
+                        Record<A> currentRecord = remainingRecordsIt.next();
+
+                        int currentIndex = 0;
+                        mainloop:
+                        for(FolderTreeNode node : currentNodes) {
+                            String nodeName = node.getRecordContainer().getRecord(genericPlaceholder).getName();
+
+                            while(currentRecord.getName().compareTo(nodeName) < 0) {
+                                if(remainingRecordsIt.hasNext()) {
+                                    currentRecord = remainingRecordsIt.next();
+                                }
+                                else {
+                                    break mainloop;
+                                }
+                            }
+                            if(currentRecord.getName().compareTo(nodeName) > 0) {
+                                nodeToPopulate.remove(node);
+                                removedChildren.add(node);
+                                childIndices.add(currentIndex);
+                            }
+                            ++currentIndex;
+                        }
+
+                        if(removedChildren.size() > 0) {
+                            System.err.println("    The following nodes were removed:");
+                            for(FolderTreeNode ftn : removedChildren) {
+                                System.err.println("      " + ftn.getUserObject().toString());
+                            }
+                            int[] intIndices = new int[removedChildren.size()];
+                            int iIntIndices = 0;
+                            for(int curIndex : childIndices) {
+                                intIndices[iIntIndices++] = curIndex;
+                            }
+                            treeModel.nodesWereRemoved(nodeToPopulate, intIndices,
+                                    removedChildren.toArray(new Object[removedChildren.size()]));
+                        }
+                        else {
+                            System.err.println("    Nothing to remove!");
+                        }
+                    }
+                }
+
+                { // 2. Insert new records
+                    System.err.println("  2. Insert new records");
+
+                    final List<FolderTreeNode> currentNodes;
+                    { // Initialize currentNodes
+                        currentNodes = new ArrayList<FolderTreeNode>(nodeToPopulate.getChildCount());
+                        Enumeration en = nodeToPopulate.children();
+                        while(en.hasMoreElements()) {
+                            Object o = en.nextElement();
+                            if(o instanceof FolderTreeNode) {
+                                currentNodes.add((FolderTreeNode) o);
+                            }
+                            else {
+                                throw new RuntimeException("Unexpected child type: " + o.getClass());
+                            }
+                        }
+                    }
+
+                    LinkedList<FolderTreeNode> insertedChildren = new LinkedList<FolderTreeNode>();
+                    LinkedList<Integer> childIndices = new LinkedList<Integer>();
+                    Iterator<Record<A>> remainingRecordsIt = remainingRecords.iterator();
+                    if(remainingRecordsIt.hasNext()) {
+                        Record<A> currentRecord = remainingRecordsIt.next();
+
+                        int currentIndex = 0;
+                        mainloop:
+                        for(FolderTreeNode node : currentNodes) {
+                            String nodeName = node.getRecordContainer().getRecord(genericPlaceholder).getName();
+
+                            while(currentRecord.getName().compareTo(nodeName) < 0) {
+                                FolderTreeNode newNode =
+                                        new FolderTreeNode(new RecordContainer(currentRecord));
+                                nodeToPopulate.insert(newNode, currentIndex);
+                                insertedChildren.add(newNode);
+                                childIndices.add(currentIndex);
+                                ++currentIndex;
+
+                                if(remainingRecordsIt.hasNext()) {
+                                    currentRecord = remainingRecordsIt.next();
+                                }
+                                else {
+                                    break mainloop; // Nothing more to process
+                                }
+                            }
+                            ++currentIndex;
+                        }
+
+                        if(insertedChildren.size() > 0) {
+                            System.err.println("    The following nodes were inserted:");
+                            for(FolderTreeNode ftn : insertedChildren) {
+                                System.err.println("      " + ftn.getUserObject().toString());
+                            }
+                            int[] intIndices = new int[insertedChildren.size()];
+                            int iIntIndices = 0;
+                            for(int curIndex : childIndices) {
+                                intIndices[iIntIndices++] = curIndex;
+                            }
+                            treeModel.nodesWereInserted(nodeToPopulate, intIndices);
+                        }
+                        else {
+                            System.err.println("    Nothing to insert!");
+                        }
+                    }
+                }
+
+                { // 3. Change existing records
+                    System.err.println("  3. Change existing records");
+                    final List<FolderTreeNode> currentNodes;
+                    { // Initialize currentNodes
+                        currentNodes = new ArrayList<FolderTreeNode>(nodeToPopulate.getChildCount());
+                        Enumeration en = nodeToPopulate.children();
+                        while(en.hasMoreElements()) {
+                            Object o = en.nextElement();
+                            if(o instanceof FolderTreeNode) {
+                                currentNodes.add((FolderTreeNode) o);
+                            }
+                            else {
+                                throw new RuntimeException("Unexpected child type: " + o.getClass());
+                            }
+                        }
+                    }
+
+                    LinkedList<FolderTreeNode> changedChildren = new LinkedList<FolderTreeNode>();
+                    LinkedList<Integer> childIndices = new LinkedList<Integer>();
+                    Iterator<Record<A>> remainingRecordsIt = remainingRecords.iterator();
+                    if(remainingRecordsIt.hasNext()) {
+                        Record<A> currentRecord = remainingRecordsIt.next();
+
+                        int currentIndex = 0;
+                        mainloop:
+                        for(FolderTreeNode node : currentNodes) {
+                            String nodeName = node.getRecordContainer().getRecord(genericPlaceholder).getName();
+
+                            while(currentRecord.getName().compareTo(nodeName) < 0) {
+                                if(remainingRecordsIt.hasNext()) {
+                                    currentRecord = remainingRecordsIt.next();
+                                }
+                                else {
+                                    break mainloop; // Nothing more to process
+                                }
+                            }
+                            if(currentRecord.getName().compareTo(nodeName) == 0) {
+                                node.setUserObject(new RecordContainer(currentRecord));
+                                changedChildren.add(node);
+                                childIndices.add(currentIndex);
+                            }
+
+                            ++currentIndex;
+                        }
+
+                        if(changedChildren.size() > 0) {
+                            System.err.println("    The following nodes were changed:");
+                            for(FolderTreeNode ftn : changedChildren) {
+                                System.err.println("      " + ftn.getUserObject().toString());
+                            }
+                            int[] intIndices = new int[changedChildren.size()];
+                            int iIntIndices = 0;
+                            for(int curIndex : childIndices) {
+                                intIndices[iIntIndices++] = curIndex;
+                            }
+                            treeModel.nodesChanged(nodeToPopulate, intIndices);
+                        }
+                        else {
+                            System.err.println("    Nothing to change!");
+                        }
+                    }
+                }
+            }
+            else if(true) {
+                final List<FolderTreeNode> currentNodes;
+                { // Initialize currentNodes
+                    currentNodes = new ArrayList<FolderTreeNode>(nodeToPopulate.getChildCount());
+                    Enumeration en = nodeToPopulate.children();
+                    while(en.hasMoreElements()) {
+                        Object o = en.nextElement();
+                        if(o instanceof FolderTreeNode) {
+                            currentNodes.add((FolderTreeNode) o);
+                        }
+                        else {
+                            throw new RuntimeException("Unexpected child type: " + o.getClass());
+                        }
+                    }
+                }
+                
+                // Sort out all nodes to remove, add or change
+                Queue<Record<A>> remainingQueue = remainingRecords;
+                LinkedList<Pair<FolderTreeNode,Record<A>>> nodesToUpdate =
+                        new LinkedList<Pair<FolderTreeNode,Record<A>>>();
+                LinkedList<FolderTreeNode> nodesToRemove = new LinkedList<FolderTreeNode>();
+                LinkedList<Integer> insertedRecordIndices = new LinkedList<Integer>();
+                int currentIndex = 0;
+                for(FolderTreeNode node : currentNodes) {
+                    String nodeName = node.getRecordContainer().getRecord(genericPlaceholder).getName();
+                    
+                    Record<A> firstRemainingRecord = remainingQueue.peek();
+                    while(firstRemainingRecord != null &&
+                            firstRemainingRecord.getName().compareTo(nodeName) < 0) {
+                        //recordsToInsert.add(remainingRecords.removeFirst());
+                        FolderTreeNode newNode =
+                                new FolderTreeNode(new RecordContainer(remainingQueue.remove()));
+                        insertedRecordIndices.add(currentIndex);                        
+                        nodeToPopulate.insert(newNode, currentIndex++);
+                        firstRemainingRecord = remainingQueue.peek();
+                    }
+                    
+                    if(firstRemainingRecord != null &&
+                            firstRemainingRecord.getName().compareTo(nodeName) == 0) {
+                        nodesToUpdate.add(new Pair<FolderTreeNode,Record<A>>(node, remainingQueue.remove()));
+                    }
+                    else {
+                        nodesToRemove.add(node);
+                    }
+                    ++currentIndex;
+                }
+                while(remainingQueue.peek() != null) {
+                    FolderTreeNode newNode =
+                                new FolderTreeNode(new RecordContainer(remainingQueue.remove()));
+                    insertedRecordIndices.add(currentIndex);
+                    nodeToPopulate.insert(newNode, currentIndex++);
+                }
+                
+                int[] insertedRecordIndicesArray = new int[insertedRecordIndices.size()];
+                {
+                    int i = 0;
+                    for(int index : insertedRecordIndices)
+                        insertedRecordIndicesArray[i++] = index;
+                }
+                System.err.println("nodesWereInserted: " + insertedRecordIndicesArray.length);
+                if(insertedRecordIndicesArray.length > 0)
+                    treeModel.nodesWereInserted(nodeToPopulate, insertedRecordIndicesArray);
+                
+                // 1. Remove those nodes that should be removed
+                {
+                    FolderTreeNode[] removedChildren = new FolderTreeNode[nodesToRemove.size()];
+                    int[] removedIndices = new int[removedChildren.length];
+                    int index = 0;
+                    for(FolderTreeNode node : nodesToRemove) {
+                        removedChildren[index] = node;
+                        removedIndices[index] = nodeToPopulate.getIndex(node);
+                        if(removedIndices[index] < 0)
+                            throw new RuntimeException("INTERNAL ERROR: Can't find node in nodeToPopulate!");
+                        ++index;
+                    }
+                    for(int i : removedIndices)
+                        nodeToPopulate.remove(i);
+                    
+                    System.err.println("nodesWereRemoved: " + removedIndices.length);
+                    if(removedIndices.length > 0)
+                        treeModel.nodesWereRemoved(nodeToPopulate, removedIndices, removedChildren);
+                }
+                
+                // 2. Update those nodes that should be updated
+                {
+                    int[] updatedIndices = new int[nodesToUpdate.size()];
+                    int index = 0;
+                    for(Pair<FolderTreeNode,Record<A>> p : nodesToUpdate) {
+                        p.a.setUserObject(new RecordContainer(p.b));
+                        updatedIndices[index] = nodeToPopulate.getIndex(p.a);
+                        if(updatedIndices[index] < 0)
+                            throw new RuntimeException("INTERNAL ERROR: Can't find node in nodeToPopulate!");
+                        ++index;
+                    }
+                    System.err.println("nodesChanged: " + updatedIndices.length);
+                    if(updatedIndices.length > 0)
+                        treeModel.nodesChanged(nodeToPopulate, updatedIndices);
+                }
             }
             else {
-                nodeToPopulate.remove(node);
+                final List<FolderTreeNode> currentNodes;
+                { // Initialize currentNodes
+                    currentNodes = new ArrayList<FolderTreeNode>(nodeToPopulate.getChildCount());
+                    Enumeration en = nodeToPopulate.children();
+                    while(en.hasMoreElements()) {
+                        Object o = en.nextElement();
+                        if(o instanceof FolderTreeNode) {
+                            currentNodes.add((FolderTreeNode) o);
+                        }
+                        else {
+                            throw new RuntimeException("Unexpected child type: " + o.getClass());
+                        }
+                    }
+                }
+                int currentIndex = 0;
+                for(FolderTreeNode node : currentNodes) {
+                    String nodeName = node.getRecordContainer().getRecord(genericPlaceholder).getName();
+
+                    while(remainingRecords.getFirst().getName().compareTo(nodeName) < 0) {
+                        FolderTreeNode newNode =
+                                new FolderTreeNode(new RecordContainer(remainingRecords.removeFirst()));
+                        nodeToPopulate.insert(newNode, currentIndex++);
+                    }
+                    if(remainingRecords.getFirst().getName().compareTo(nodeName) == 0) {
+                        node.setUserObject(new RecordContainer(remainingRecords.removeFirst()));
+                        ++currentIndex;
+                    }
+                    else {
+                        nodeToPopulate.remove(node);
+                    }
+                }
+
+                while(remainingRecords.size() > 0) {
+                    FolderTreeNode newNode =
+                            new FolderTreeNode(new RecordContainer(remainingRecords.removeFirst()));
+                    nodeToPopulate.insert(newNode, currentIndex++);
+                }
+                treeModel.reload(nodeToPopulate);
             }
         }
-        
-        while(remainingRecords.size() > 0) {
-            FolderTreeNode newNode =
-                        new FolderTreeNode(new RecordContainer(remainingRecords.removeFirst()));
-            nodeToPopulate.insert(newNode, currentIndex++);
-        }
-        }
         else {
-        // Remove all current leafs to this node
-        nodeToPopulate.removeAllChildren();
-        
-        // Add new leafs
-        for(Record<A> childRecord : childRecords) {
-            // The tree only displays the folders...
-            if(childRecord.getType() == RecordType.FOLDER) {
-                nodeToPopulate.add(new FolderTreeNode(new RecordContainer(childRecord)));
+            // Remove all current leafs to this node
+            nodeToPopulate.removeAllChildren();
+
+            // Add new leafs
+            for(Record<A> childRecord : childRecords) {
+                // The tree only displays the folders...
+                if(childRecord.getType() == RecordType.FOLDER) {
+                    nodeToPopulate.add(new FolderTreeNode(new RecordContainer(childRecord)));
 //                treeModel.insertNodeInto(nodeToPopulate,
 //                        new FolderTreeNode(new RecordContainer(childRecord)),
 //                        treeModel.getChildCount(nodeToPopulate));
-            }
+                }
             /*
             else {
-                throw new RuntimeException("INTERNAL ERROR: Encountered " +
-                        "unexpected record type: " + childRecord.getType());
+            throw new RuntimeException("INTERNAL ERROR: Encountered " +
+            "unexpected record type: " + childRecord.getType());
             }
              * */
+            }
+            treeModel.reload(nodeToPopulate);
         }
-        }
-        
-        treeModel.reload(nodeToPopulate);
     }
     
     private List<String> asNameList(List<Record<A>> recordList) {
