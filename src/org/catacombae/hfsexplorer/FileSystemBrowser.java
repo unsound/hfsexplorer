@@ -1493,7 +1493,7 @@ public class FileSystemBrowser<A> {
         @Override public String toString() { return rec.getName(); }
     }
     
-    private static class NoLeafMutableTreeNode extends DefaultMutableTreeNode {
+    public static class NoLeafMutableTreeNode extends DefaultMutableTreeNode {
         public NoLeafMutableTreeNode(Object userObject) {
             super(userObject);
         }

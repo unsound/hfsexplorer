@@ -22,7 +22,7 @@
  */
 
 package org.catacombae.hfsexplorer.gui;
-import static org.catacombae.hfsexplorer.FileSystemBrowserWindow.NoLeafMutableTreeNode;
+import org.catacombae.hfsexplorer.FileSystemBrowser.NoLeafMutableTreeNode;
 import org.catacombae.hfsexplorer.*;
 import org.catacombae.hfsexplorer.types.*;
 import java.awt.*;
@@ -44,6 +44,7 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
 	    this.text = text;
 	}
 	public BTNode getNode() { return node; }
+        @Override
 	public String toString() { return text; }
     }
     private static class BTLeafStorage {
@@ -54,6 +55,7 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
 	    this.text = text;
 	}
 	public HFSPlusCatalogLeafRecord getRecord() { return rec; }
+        @Override
 	public String toString() { return text; }
     }
     
