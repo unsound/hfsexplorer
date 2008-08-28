@@ -1,0 +1,12 @@
+struct BTHdrRec {
+        SInt16          bthDepth;       current depth of tree (Integer)
+        SInt32          bthRoot;        number of root node (LongInt)
+        SInt32          bthNRecs;       number of leaf records in tree (LongInt)
+        SInt32          bthFNode;       number of first leaf node (LongInt)
+        SInt32          bthLNode;       number of last leaf node (LongInt)
+        SInt16          bthNodeSize;    size of a node (Integer)
+        SInt16          bthKeyLen;      maximum length of a key (Integer)
+        SInt32          bthNNodes;      total number of nodes in tree (LongInt)
+        SInt32          bthFree;        number of free nodes (LongInt)
+        SInt8           bthResv[76];    reserved (ARRAY[1..76] OF SignedByte)
+};

@@ -1,0 +1,7 @@
+struct CdrFThdRec {
+        SInt8           cdrType;        record type (SignedByte)
+        SInt8           cdrResrv2;      reserved (SignedByte)
+        SInt32          fthdResrv[2];   reserved (ARRAY[1..2] OF LongInt)
+        SInt32          fthdParID;      parent ID for this file (LongInt)
+        Char            fthdCName[32];  name of this file (Str31)
+};

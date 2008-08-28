@@ -1,0 +1,7 @@
+struct FInfo {
+        OSType          fdType;         File type.
+        OSType          fdCreator;      The signature of the application that created the file.
+        UInt16          fdFlags;        Finder flags. See ÒFinder Flags.Ó
+        Point           fdLocation;     The location--specified in coordinates local to the window--of the file's icon within its window. 
+        SInt16          fdFldr;         The window in which the file's icon appears; this information is meaningful only to the Finder. 
+};
