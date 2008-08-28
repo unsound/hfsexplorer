@@ -1,0 +1,8 @@
+struct NodeDescriptor {
+        SInt32          ndFLink;        forward link (LongInt)
+        SInt32          ndBLink;        backward link (LongInt)
+        SInt8           ndType;         node type (SignedByte)
+        SInt8           ndNHeight;      node level (SignedByte)
+        SInt16          ndNRecs;        number of records in node (Integer)
+        SInt16          ndResv2;        reserved (Integer)
+};

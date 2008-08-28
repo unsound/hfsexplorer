@@ -1,0 +1,13 @@
+struct CdrDirRec {
+        SInt8           cdrType;        record type (SignedByte)
+        SInt8           cdrResrv2;      reserved (SignedByte)
+        SInt16          dirFlags;       directory flags (Integer)
+        SInt16          dirVal;         directory valence (Integer)
+        SInt32          dirDirID;       directory ID (LongInt)
+        SInt32          dirCrDat;       date and time of creation (LongInt)
+        SInt32          dirMdDat;       date and time of last modification (LongInt)
+        SInt32          dirBkDat;       date and time of last backup (LongInt)
+        DInfo           dirUsrInfo;     Finder information (DInfo)
+        DXInfo          dirFndrInfo;    additional Finder information (DXInfo)
+        SInt32          dirResrv[4];    reserved (ARRAY[1..4] OF LongInt)
+};

@@ -1,0 +1,8 @@
+struct FXInfo {
+        SInt16          fdIconID;           An ID number for the file's icon; the numbers that identify icons are assigned by the Finder.
+        SInt16          fdReserved[3];      Reserved.
+        SInt8           fdScript;           Extended flags. Script code if high-bit is set.
+        SInt8           fdXFlags;           Extended flags.
+        SInt16          fdComment;          Reserved (set to 0). If the high-bit is clear, an ID number for the comment that is displayed in the information window when the user selects a file and chooses the Get Info command from the File menu. The numbers that identify comments are assigned by the Finder.
+        SInt32          fdPutAway;          If the user moves the file onto the desktop, the directory ID of the folder from which the user moves the file. 
+};

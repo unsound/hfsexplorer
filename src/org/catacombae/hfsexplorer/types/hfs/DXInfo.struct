@@ -1,0 +1,8 @@
+struct DXInfo {
+        Point           frScroll;       Scroll position within the Finder window. The Finder does not necessarily save this position immediately upon user action. 
+        SInt32          frOpenChain;    Chain of directory IDs for open folders. The Finder numbers directory IDs. The Finder does not necessarily save this information immediately upon user action. 
+        SInt8           frScript;       Extended flags. If the high-bit is set, the script system for displaying the folder's name.
+        SInt8           frXFlags;       Extended flags. See ÒExtended Finder Flags .Ó
+        SInt16          frComment;      Reserved (set to 0). If the high-bit is clear, an ID number for the comment that is displayed in the information window when the user selects a folder and chooses the Get Info command from the File menu. The numbers that identify comments are assigned by the Finder.
+        SInt32          frPutAway;      If the user moves the folder onto the desktop, the directory ID of the folder from which the user moves it. 
+};

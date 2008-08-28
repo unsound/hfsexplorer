@@ -38,6 +38,7 @@ public class OSType {
     
     public FourCharCode getOSType() { return osType; }
     
+    @Override
     public String toString() {
 	return osType.getFourCharCodeAsString();
     }
@@ -49,5 +50,9 @@ public class OSType {
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "OSType:");
 	printFields(ps, prefix);
+    }
+    
+    public byte[] getBytes() {
+        return osType.getBytes();
     }
 }

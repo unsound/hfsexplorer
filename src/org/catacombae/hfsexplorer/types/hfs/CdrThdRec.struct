@@ -1,0 +1,7 @@
+struct CdrThdRec {
+        SInt8           cdrType;        record type (SignedByte)
+        SInt8           cdrResrv2;      reserved (SignedByte)
+        SInt32          thdResrv[2];    reserved (ARRAY[1..2] OF LongInt)
+        SInt32          thdParID;       parent ID for this directory (LongInt)
+        Char            thdCName[32];   name of this directory (Str31)
+};

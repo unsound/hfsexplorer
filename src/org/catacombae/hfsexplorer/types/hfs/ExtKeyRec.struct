@@ -1,0 +1,6 @@
+struct ExtKeyRec {
+        SInt8           xkrKeyLen;      key length (SignedByte)
+        SInt8           xkrFkType;      fork type (SignedByte)
+        SInt32          xkrFNum;        file number (LongInt)
+        SInt16          xkrFABN;        starting file allocation block (Integer)
+};

@@ -1,0 +1,6 @@
+struct DInfo {
+        Rect            frRect;         The rectangle for the window that the Finder displays when the user opens the folder. 
+        UInt16          frFlags;        Reserved. 
+        Point           frLocation;     Location of the folder in the parent window. 
+        SInt16          frView;         The manner in which folders are displayed; this is set by the user with commands from the View menu of the Finder. 
+};

@@ -49,4 +49,8 @@ public class FourCharCode {
 	ps.println(prefix + "FourCharCode:");
 	printFields(ps, prefix);
     }
+    
+    public byte[] getBytes() {
+        return Util.createCopy(fourCharCode);
+    }
 }
