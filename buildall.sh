@@ -1,5 +1,21 @@
 #!/bin/sh
 
+#JAVAC_CMD="${JAVA_HOME:+${JAVA_HOME}/bin/}javac"
+#JAVAC_DEFAULT_ARGS="-target 1.5 -source 1.5 -encoding iso-8859-1"
+#CLASSPATH=build.~:lib/AppleJavaExtensions.jar:dist/lib/catacombae_io.jar:dist/lib/swing-layout-1.0.3.jar:dist/lib/hfsx_dmglib.jar:lib/java_awt_Desktop.jar
+SOURCES_DIR=src
+#BUILD_DIR=build.~
+#LIBRARY_PATH=lib
+#JARFILE_DIR=dist/lib
+#JARFILE=hfsx.jar
+#RESOURCE_SRC_DIR=resource
+#RESOURCE_DST_DIR=$BUILD_DIR/res
+BUILDENUM_CP=lib/buildenumerator.jar
+#METAINF_DIR=src.META-INF
+#MANIFEST_FILE=MANIFEST.MF
+
+echo "javac command: ${JAVAC_CMD}"
+
 error() {
     decrement_buildnumber
     echo "There were errors..."
@@ -8,22 +24,6 @@ error() {
 jobCompleted() {
     echo "Done!"
 }
-
-JAVAC_CMD="${JAVA_HOME:+${JAVA_HOME}/bin/}javac"
-JAVAC_DEFAULT_ARGS="-target 1.5 -source 1.5 -encoding iso-8859-1"
-CLASSPATH=build.~:lib/AppleJavaExtensions.jar:dist/lib/catacombae_io.jar:dist/lib/swing-layout-1.0.3.jar:dist/lib/hfsx_dmglib.jar:lib/java_awt_Desktop.jar
-SOURCES_DIR=src
-BUILD_DIR=build.~
-LIBRARY_PATH=lib
-JARFILE_DIR=dist/lib
-JARFILE=hfsx.jar
-RESOURCE_SRC_DIR=resource
-RESOURCE_DST_DIR=$BUILD_DIR/res
-BUILDENUM_CP=lib/buildenumerator.jar
-METAINF_DIR=src.META-INF
-MANIFEST_FILE=MANIFEST.MF
-
-echo "javac command: ${JAVAC_CMD}"
 
 removeclassfiles() {
     echo "Removing all class files..."
@@ -89,7 +89,25 @@ buildjar() {
     return $?
 }
 
+antbuild() {
+    echo "Building with ant..."
+    ant build-all
+    return $?
+}
+
 main() {
+    increment_buildnumber
+    antbuild
+    if [ "$?" == 0 ]; then
+	jobCompleted
+	return 0
+    else
+	error
+	return -1
+    fi
+}
+
+oldmain() {
     increment_buildnumber
     removeclassfiles
     if [ "$?" == 0 ]; then
