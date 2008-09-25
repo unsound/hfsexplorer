@@ -1,4 +1,4 @@
-package org.catacombae.hfsexplorer.types.hfs;
+package org.catacombae.hfsexplorer.types.finder;
 
 import java.io.PrintStream;
 import org.catacombae.hfsexplorer.Util;

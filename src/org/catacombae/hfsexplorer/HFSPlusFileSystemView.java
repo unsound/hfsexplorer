@@ -24,9 +24,11 @@ import java.util.LinkedList;
 import java.io.OutputStream;
 import java.io.IOException;
 
-/** Provides a view over the data in an HFS Plus file system (HFS and HFSX future
-    support is planned), making data access easier.
-    (Unrelated to javax.swing.jfilechooser.FileSystemView) */
+/**
+ * Provides a view over the data in an HFS Plus file system (HFS and HFSX
+ * future support is planned), making data access easier.
+ * (Unrelated to javax.swing.jfilechooser.FileSystemView)
+ */
 
 public class HFSPlusFileSystemView {
     /*
@@ -199,7 +201,7 @@ public class HFSPlusFileSystemView {
 	int currentNodeNumber = init.bthr.getRootNode();
 	
 	byte[] currentNodeData = new byte[init.bthr.getNodeSize()];
-	init.catalogFile.seek(Util2.unsign(currentNodeNumber)*init.bthr.getNodeSize());
+	init.catalogFile.seek(Util.unsign(currentNodeNumber)*init.bthr.getNodeSize());
 	init.catalogFile.readFully(currentNodeData);
 	BTNodeDescriptor nodeDescriptor = new BTNodeDescriptor(currentNodeData, 0);
 	while(nodeDescriptor.getKind() == BTNodeDescriptor.BT_INDEX_NODE) {
@@ -207,7 +209,7 @@ public class HFSPlusFileSystemView {
 	    BTIndexRecord matchingRecord = findKey(currentNode, parentID);
 	    
 	    currentNodeNumber = matchingRecord.getIndex();
-	    init.catalogFile.seek(Util2.unsign(currentNodeNumber)*init.bthr.getNodeSize());
+	    init.catalogFile.seek(Util.unsign(currentNodeNumber)*init.bthr.getNodeSize());
 	    init.catalogFile.readFully(currentNodeData);
 	    nodeDescriptor = new BTNodeDescriptor(currentNodeData, 0);
 	}
@@ -248,7 +250,7 @@ public class HFSPlusFileSystemView {
 	int nodeSize = init.bthr.getNodeSize();
 	
 	byte[] currentNodeData = new byte[init.bthr.getNodeSize()];
-	init.catalogFile.seek(Util2.unsign(currentNodeNumber)*Util2.unsign(init.bthr.getNodeSize()));
+	init.catalogFile.seek(Util.unsign(currentNodeNumber)*Util.unsign(init.bthr.getNodeSize()));
 	init.catalogFile.readFully(currentNodeData);
 	BTNodeDescriptor nodeDescriptor = new BTNodeDescriptor(currentNodeData, 0);
 	
@@ -314,7 +316,7 @@ public class HFSPlusFileSystemView {
 	// Search down through the layers of indices (O(log n) steps, where n is the size of the tree)
 	
 	byte[] currentNodeData = new byte[init.bthr.getNodeSize()];
-	init.catalogFile.seek(Util2.unsign(currentNodeNumber)*Util2.unsign(init.bthr.getNodeSize()));
+	init.catalogFile.seek(Util.unsign(currentNodeNumber)*Util.unsign(init.bthr.getNodeSize()));
 	init.catalogFile.readFully(currentNodeData);
 	BTNodeDescriptor nodeDescriptor = new BTNodeDescriptor(currentNodeData, 0);
 	
@@ -323,7 +325,7 @@ public class HFSPlusFileSystemView {
 	    BTIndexRecord matchingRecord = findLEKey(currentNode, catOps.newCatalogKey(parentID, nodeName, init.bthr));
 	    
 	    currentNodeNumber = matchingRecord.getIndex();
-	    init.catalogFile.seek(Util2.unsign(currentNodeNumber)*Util2.unsign(init.bthr.getNodeSize()));
+	    init.catalogFile.seek(Util.unsign(currentNodeNumber)*Util.unsign(init.bthr.getNodeSize()));
 	    init.catalogFile.readFully(currentNodeData);
 	    nodeDescriptor = new BTNodeDescriptor(currentNodeData, 0);
 	}
@@ -479,7 +481,7 @@ public class HFSPlusFileSystemView {
 	// Search down through the layers of indices (O(log n) steps, where n is the size of the tree)
 	
 	byte[] currentNodeData = new byte[init.bthr.getNodeSize()];
-	init.extentsFile.seek(Util2.unsign(currentNodeNumber)*Util2.unsign(init.bthr.getNodeSize()));
+	init.extentsFile.seek(Util.unsign(currentNodeNumber)*Util.unsign(init.bthr.getNodeSize()));
 	init.extentsFile.readFully(currentNodeData);
 	BTNodeDescriptor nodeDescriptor = new BTNodeDescriptor(currentNodeData, 0);
 	
@@ -488,7 +490,7 @@ public class HFSPlusFileSystemView {
 	    BTIndexRecord matchingRecord = findLEKey(currentNode, key);
 	    
 	    currentNodeNumber = matchingRecord.getIndex();
-	    init.extentsFile.seek(Util2.unsign(currentNodeNumber)*Util2.unsign(init.bthr.getNodeSize()));
+	    init.extentsFile.seek(Util.unsign(currentNodeNumber)*Util.unsign(init.bthr.getNodeSize()));
 	    init.extentsFile.readFully(currentNodeData);
 	    nodeDescriptor = new BTNodeDescriptor(currentNodeData, 0);
 	}
@@ -540,7 +542,7 @@ public class HFSPlusFileSystemView {
 
 	long basicExtentsBlockCount = 0;
 	for(int i = 0; i < 8; ++i)
-	    basicExtentsBlockCount += Util2.unsign(forkData.getExtents().getExtentDescriptor(i).getBlockCount());
+	    basicExtentsBlockCount += Util.unsign(forkData.getExtents().getExtentDescriptor(i).getBlockCount());
 	    
 	if(basicExtentsBlockCount == forkData.getTotalBlocks()) {
 	    result = new HFSPlusExtentRecord[1];
@@ -565,7 +567,7 @@ public class HFSPlusFileSystemView {
 		HFSPlusExtentRecord currentRecordData = currentRecord.getRecordData();
 		resultList.addLast(currentRecordData);
 		for(int i = 0; i < 8; ++i)
-		    currentBlock += Util2.unsign(currentRecordData.getExtentDescriptor(i).getBlockCount());
+		    currentBlock += Util.unsign(currentRecordData.getExtentDescriptor(i).getBlockCount());
 	    }
 	    //System.err.println("  Finished reading extents... (currentblock: " + currentBlock + " total: " + forkData.getTotalBlocks() + ")");
 		
@@ -611,7 +613,7 @@ public class HFSPlusFileSystemView {
     public JournalInfoBlock getJournalInfoBlock() {
 	HFSPlusVolumeHeader vh = getVolumeHeader();
 	if(vh.getAttributeVolumeJournaled()) {
-	    long blockNumber = Util2.unsign(vh.getJournalInfoBlock());
+	    long blockNumber = Util.unsign(vh.getJournalInfoBlock());
 	    hfsFile.seek(fsOffset + blockNumber*staticBlockSize);
 	    byte[] data = new byte[JournalInfoBlock.getStructSize()];
 	    hfsFile.readFully(data);
@@ -643,7 +645,7 @@ public class HFSPlusFileSystemView {
 								final CatalogOperations catOps) {
 		
 	byte[] currentNodeData = new byte[bthr.getNodeSize()];
-	catalogFile.seek(Util2.unsign(currentNodeNumber)*bthr.getNodeSize());
+	catalogFile.seek(Util.unsign(currentNodeNumber)*bthr.getNodeSize());
 	catalogFile.readFully(currentNodeData);
 	
 	BTNodeDescriptor nodeDescriptor = new BTNodeDescriptor(currentNodeData, 0);
@@ -662,7 +664,7 @@ public class HFSPlusFileSystemView {
 	    return results.toArray(new HFSPlusCatalogLeafRecord[results.size()]);
 	}
 	else if(nodeDescriptor.getKind() == BTNodeDescriptor.BT_LEAF_NODE) {
-	    HFSPlusCatalogLeafNode currentNode = catOps.newCatalogLeafNode(currentNodeData, 0, Util2.unsign(bthr.getNodeSize()), bthr);
+	    HFSPlusCatalogLeafNode currentNode = catOps.newCatalogLeafNode(currentNodeData, 0, Util.unsign(bthr.getNodeSize()), bthr);
 	    
 	    return getChildrenTo(currentNode, dirID);
 	}

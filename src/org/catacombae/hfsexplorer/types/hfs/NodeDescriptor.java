@@ -22,6 +22,11 @@ public class NodeDescriptor {
     
     public static final int STRUCTSIZE = 14;
     
+    public static final byte ndIndxNode = (byte)0x00; // index node
+    public static final byte ndHdrNode  = (byte)0x01; // header node
+    public static final byte ndMapNode  = (byte)0x02; // map node
+    public static final byte ndLeafNode = (byte)0xFF; // leaf node
+    
     private final byte[] ndFLink = new byte[4];
     private final byte[] ndBLink = new byte[4];
     private final byte[] ndType = new byte[1];

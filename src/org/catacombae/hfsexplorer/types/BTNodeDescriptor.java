@@ -18,7 +18,6 @@
 package org.catacombae.hfsexplorer.types;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.Util2;
 import java.io.PrintStream;
 
 public class BTNodeDescriptor {
@@ -40,6 +39,8 @@ public class BTNodeDescriptor {
     public static final int BT_INDEX_NODE = 0;
     public static final int BT_HEADER_NODE = 1;
     public static final int BT_MAP_NODE = 2;
+
+    private static final int STRUCTSIZE = 14;
     
     private final byte[] fLink = new byte[4];
     private final byte[] bLink = new byte[4];
@@ -56,6 +57,9 @@ public class BTNodeDescriptor {
 	System.arraycopy(data, offset+10, numRecords, 0, 2);
 	System.arraycopy(data, offset+12, reserved, 0, 2);
     }
+
+    public static int length() { return STRUCTSIZE; }
+
     /** Returns the node number of the next node of the same kind. 0 for the last node. */
     public int getFLink() { return Util.readIntBE(fLink); }
     /** Returns the node number of the previous node of the same kind. 0 for the first node. */

@@ -24,30 +24,37 @@ import java.io.PrintStream;
 public class ExtDataRec {
     /*
      * struct ExtDataRec
-     * size: 16 bytes
+     * size: 12 bytes
      * description: 
      * 
-     * BP  Size  Type              Identifier  Description       
-     * ----------------------------------------------------------
-     * 0   4*4   ExtDescriptor[4]  extDataRec  extent data record
+     * BP  Size  Type              Identifier   Description       
+     * -----------------------------------------------------------
+     * 0   4*3   ExtDescriptor[3]  extDataRecs  extent data record
      */
     
-    public static final int STRUCTSIZE = 16;
+    public static final int STRUCTSIZE = 12;
     
-    private final ExtDescriptor extDataRec;
+    private final ExtDescriptor[] extDataRecs = new ExtDescriptor[3];
     
     public ExtDataRec(byte[] data, int offset) {
-	extDataRec = new ExtDescriptor(data, offset+0);
+        int curOff = offset;
+        for(int i = 0; i < extDataRecs.length; ++i) {
+            extDataRecs[i] = new ExtDescriptor(data, curOff);
+            curOff += ExtDescriptor.length();
+        }
     }
     
     public static int length() { return STRUCTSIZE; }
     
     /** extent data record */
-    public ExtDescriptor getExtDataRec() { return extDataRec; }
+    public ExtDescriptor[] getExtDataRecs() { return Util.arrayCopy(extDataRecs, new ExtDescriptor[extDataRecs.length]); }
     
     public void printFields(PrintStream ps, String prefix) {
-	ps.println(prefix + " extDataRec: ");
-	getExtDataRec().print(ps, prefix+"  ");
+	ps.println(prefix + " extDataRecs: ");
+        for(int i = 0; i < extDataRecs.length; ++i) {
+            ps.println(prefix + "  [" + i + "]: ");
+            extDataRecs[i].print(ps, prefix+"   ");
+        }
     }
     
     public void print(PrintStream ps, String prefix) {
@@ -56,11 +63,15 @@ public class ExtDataRec {
     }
     
     public byte[] getBytes() {
-	byte[] result = new byte[STRUCTSIZE];
+	byte[] result = new byte[length()];
 	byte[] tempData;
 	int offset = 0;
-	tempData = extDataRec.getBytes();
-	System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
+        
+        for(ExtDescriptor extDataRec : extDataRecs) {
+            tempData = extDataRec.getBytes();
+            System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
+        }
+        
 	return result;
     }
 }

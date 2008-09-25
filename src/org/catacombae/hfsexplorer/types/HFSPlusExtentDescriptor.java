@@ -18,7 +18,6 @@
 package org.catacombae.hfsexplorer.types;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.Util2;
 import java.io.PrintStream;
 
 public class HFSPlusExtentDescriptor {
@@ -57,6 +56,15 @@ public class HFSPlusExtentDescriptor {
 	ps.println(prefix + "startBlock: " + getStartBlock());
 	ps.println(prefix + "blockCount: " + getBlockCount());
     }
+
+    byte[] getBytes() {
+        byte[] result = new byte[getSize()];
+	int offset = 0;
+        
+        System.arraycopy(startBlock, 0, result, offset, startBlock.length); offset += startBlock.length;
+        System.arraycopy(blockCount, 0, result, offset, blockCount.length); offset += blockCount.length;
+        
+        return result;    }
 }
 
 /* Maximal filstorlek i HFS+ måste vara blockSize*2^32*8. Dvs. vid blockSize = 4096:

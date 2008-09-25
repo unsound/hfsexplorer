@@ -18,7 +18,6 @@
 package org.catacombae.hfsexplorer.types;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.Util2;
 import java.io.PrintStream;
 
 public abstract class HFSPlusCatalogLeafRecordData {
@@ -29,7 +28,7 @@ public abstract class HFSPlusCatalogLeafRecordData {
 
     public abstract short getRecordType();
     public String getRecordTypeAsString() {
-	int recordType = Util2.unsign(getRecordType());
+	int recordType = Util.unsign(getRecordType());
 	if(recordType == RECORD_TYPE_FOLDER) return "kHFSPlusFolderRecord";
 	else if(recordType == RECORD_TYPE_FILE) return "kHFSPlusFileRecord";
 	else if(recordType == RECORD_TYPE_FOLDER_THREAD) return "kHFSPlusFolderThreadRecord";

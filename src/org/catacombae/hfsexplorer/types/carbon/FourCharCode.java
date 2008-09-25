@@ -15,10 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.types;
+package org.catacombae.hfsexplorer.types.carbon;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.Util2;
 import java.io.PrintStream;
 
 public class FourCharCode {
@@ -40,7 +39,7 @@ public class FourCharCode {
 
     public int getFourCharCode() { return Util.readIntBE(fourCharCode); }
     
-    public String getFourCharCodeAsString() { return Util2.toASCIIString(getFourCharCode()); }
+    public String getFourCharCodeAsString() { return Util.toASCIIString(getFourCharCode()); }
 
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " fourCharCode: \"" + getFourCharCodeAsString() + "\"");

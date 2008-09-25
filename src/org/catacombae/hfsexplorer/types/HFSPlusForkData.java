@@ -18,7 +18,6 @@
 package org.catacombae.hfsexplorer.types;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.Util2;
 import java.io.PrintStream;
 
 public class HFSPlusForkData {
@@ -45,7 +44,9 @@ public class HFSPlusForkData {
 	System.arraycopy(data, offset+12, totalBlocks, 0, 4);
 	extents = new HFSPlusExtentRecord(data, offset+16);
     }
-	
+
+    public static int length() { return 80; }
+
     public long getLogicalSize() {
 	return Util.readLongBE(logicalSize);
     }
@@ -70,5 +71,19 @@ public class HFSPlusForkData {
 	ps.println(prefix + "totalBlocks: " + getTotalBlocks());
 	ps.println(prefix + "extents:");
 	extents.print(ps, prefix + "  ");
+    }
+
+    byte[] getBytes() {
+        byte[] result = new byte[length()];
+	byte[] tempData;
+	int offset = 0;
+        
+	System.arraycopy(logicalSize, 0, result, offset, logicalSize.length); offset += logicalSize.length;
+	System.arraycopy(clumpSize, 0, result, offset, clumpSize.length); offset += clumpSize.length;
+	System.arraycopy(totalBlocks, 0, result, offset, totalBlocks.length); offset += totalBlocks.length;
+        tempData = extents.getBytes();
+	System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
+        
+        return result;
     }
 }

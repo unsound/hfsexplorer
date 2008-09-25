@@ -24,7 +24,6 @@
 package org.catacombae.hfsexplorer.gui;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.Util2;
 import org.catacombae.hfsexplorer.types.HFSPlusVolumeHeader;
 import org.catacombae.hfsexplorer.types.HFSPlusForkData;
 import java.text.DateFormat;
@@ -49,7 +48,7 @@ public class VolumeInfoPanel extends javax.swing.JPanel {
      * @param vh the structure containing the values to set.
      */
     public void setFields(HFSPlusVolumeHeader vh) {
-	signatureField.setText("" + Util2.toASCIIString(vh.getSignature()));
+	signatureField.setText("" + Util.toASCIIString(vh.getSignature()));
 	versionField.setText("" + vh.getVersion());
         
 	hardwareLockBox.setSelected(vh.getAttributeVolumeHardwareLock());
@@ -63,7 +62,7 @@ public class VolumeInfoPanel extends javax.swing.JPanel {
 	softwareLockBox.setSelected(vh.getAttributeVolumeSoftwareLock());
         
 	lastMountedVersionField.setText("" +
-                Util2.toASCIIString(vh.getLastMountedVersion()));
+                Util.toASCIIString(vh.getLastMountedVersion()));
 	journalInfoBlockField.setText("0x" +
                 Util.toHexStringBE(vh.getJournalInfoBlock()));
 	createDateField.setText("" + dti.format(vh.getCreateDateAsDate()));

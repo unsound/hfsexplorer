@@ -18,7 +18,6 @@
 package org.catacombae.hfsexplorer.types;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.Util2;
 import java.io.PrintStream;
 
 public class HFSCatalogNodeID {
@@ -55,7 +54,7 @@ public class HFSCatalogNodeID {
     public static int length() { return 4; }
 
     public int toInt() { return Util.readIntBE(hfsCatalogNodeID); }
-    public long toLong() { return Util2.unsign(toInt()); }
+    public long toLong() { return Util.unsign(toInt()); }
     public String getDescription() {
 	/*
 	 * kHFSRootParentID            = 1,
@@ -111,8 +110,10 @@ public class HFSCatalogNodeID {
 	}
 	return result;
     }
+    
+    @Override
     public String toString() {
-	return "" + Util2.unsign(toInt());// + " (" + getDescription() + ")";
+	return "" + Util.unsign(toInt());// + " (" + getDescription() + ")";
     }
     
     public void printFields(PrintStream ps, String prefix) {
@@ -122,6 +123,10 @@ public class HFSCatalogNodeID {
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "HFSCatalogNodeID:");
 	printFields(ps, prefix);
+    }
+
+    public byte[] getBytes() {
+        return Util.createCopy(hfsCatalogNodeID);
     }
 }
     

@@ -539,12 +539,28 @@ public class Util {
     public static boolean getBit(long data, int bitNumber) {
 	return ((data >>> bitNumber) & 0x1) == 0x1;
     }
-
-    public static int unsignedArrayCompare(char[] a, char[] b) {
-	return unsignedArrayCompare(a, 0, a.length, b, 0, b.length);
+    
+    public static int arrayCompareLex(byte[] a, byte[] b) {
+        return arrayCompareLex(a, 0, a.length, b, 0, b.length);
     }
-    public static int unsignedArrayCompare(char[] a, int aoff, int alen, char[] b, int boff, int blen) {
-	int compareLen = Math.min(alen, blen);
+    
+    public static int arrayCompareLex(byte[] a, int aoff, int alen, byte[] b, int boff, int blen) {
+        int compareLen = alen < blen ? alen : blen; // equiv. Math.min
+	for(int i = 0; i < compareLen; ++i) {
+	    byte curA = a[aoff+i];
+	    byte curB = b[boff+i];
+	    if(curA != curB)
+		return curA - curB;
+	}
+	return alen-blen; // The shortest array gets higher priority
+    }
+    
+    public static int unsignedArrayCompareLex(char[] a, char[] b) {
+	return unsignedArrayCompareLex(a, 0, a.length, b, 0, b.length);
+    }
+    
+    public static int unsignedArrayCompareLex(char[] a, int aoff, int alen, char[] b, int boff, int blen) {
+	int compareLen = alen < blen ? alen : blen; // equiv. Math.min
 	for(int i = 0; i < compareLen; ++i) {
 	    int curA = a[aoff+i] & 0xFFFF; // Unsigned char values represented as int
 	    int curB = b[boff+i] & 0xFFFF;
@@ -610,6 +626,9 @@ public class Util {
 		       (data[offset+1] & 0xFF) << 0);
     }
     
+    public static byte[] readByteArrayBE(byte[] b) {
+	return createCopy(b);
+    }
     public static char[] readCharArrayBE(byte[] b) {
 	char[] result = new char[b.length/2];
 	for(int i = 0; i < result.length; ++i)
@@ -626,6 +645,12 @@ public class Util {
 	int[] result = new int[b.length/4];
 	for(int i = 0; i < result.length; ++i)
 	    result[i] = Util.readIntBE(b, i*4);
+	return result;
+    }
+    public static long[] readLongArrayBE(byte[] b) {
+	long[] result = new long[b.length/8];
+	for(int i = 0; i < result.length; ++i)
+	    result[i] = Util.readLongBE(b, i*8);
 	return result;
     }
     
@@ -660,8 +685,8 @@ public class Util {
 	return buffer;
     }
     
-    public static int unsign(byte b) {
-	return b & 0xFF;
+    public static short unsign(byte b) {
+	return (short)(b & 0xFF);
     }
     public static int unsign(short s) {
 	return s & 0xFFFF;
