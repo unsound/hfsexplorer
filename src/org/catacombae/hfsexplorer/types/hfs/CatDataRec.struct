@@ -1,0 +1,4 @@
+struct CatDataRec {
+        SInt8           cdrType;        record type (SignedByte)
+        SInt8           cdrResrv2;      reserved (SignedByte)
+};

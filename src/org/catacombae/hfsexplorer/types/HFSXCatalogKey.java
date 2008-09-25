@@ -32,10 +32,13 @@ public class HFSXCatalogKey extends HFSPlusCatalogKey {
 	super(parentID, nodeName);
 	this.catalogHeaderRec = catalogHeaderRec;
     }
+    
     public HFSXCatalogKey(int parentIDInt, String nodeNameString, BTHeaderRec catalogHeaderRec) {
 	super(parentIDInt, nodeNameString);
 	this.catalogHeaderRec = catalogHeaderRec;
     }
+    
+    @Override
     public int compareTo(BTKey btk) {
 	if(btk instanceof HFSPlusCatalogKey) {
 	    HFSPlusCatalogKey catKey = (HFSPlusCatalogKey) btk;
@@ -44,7 +47,7 @@ public class HFSXCatalogKey extends HFSPlusCatalogKey {
 		case BTHeaderRec.kHFSCaseFolding:
 		    return FastUnicodeCompare.compare(getNodeName().getUnicode(), catKey.getNodeName().getUnicode());
 		case BTHeaderRec.kHFSBinaryCompare:
-		    return Util.unsignedArrayCompare(getNodeName().getUnicode(), catKey.getNodeName().getUnicode());
+		    return Util.unsignedArrayCompareLex(getNodeName().getUnicode(), catKey.getNodeName().getUnicode());
 		default:
 		    throw new RuntimeException("Invalid value in file system structure! BTHeaderRec.getKeyCompareType() = " + 
 					       catalogHeaderRec.getKeyCompareType());

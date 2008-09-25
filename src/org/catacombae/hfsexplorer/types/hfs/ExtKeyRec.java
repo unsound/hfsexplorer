@@ -17,7 +17,10 @@ public class ExtKeyRec {
      * 2   4     SInt32  xkrFNum     file number (LongInt)                   
      * 6   2     SInt16  xkrFABN     starting file allocation block (Integer)
      */
-    
+
+    public static final byte FORK_TYPE_DATA = 0x00;
+    public static final byte FORK_TYPE_RESOURCE = (byte)0xFF;
+
     public static final int STRUCTSIZE = 8;
     
     private final byte[] xkrKeyLen = new byte[1];
@@ -30,6 +33,13 @@ public class ExtKeyRec {
 	System.arraycopy(data, offset+1, xkrFkType, 0, 1);
 	System.arraycopy(data, offset+2, xkrFNum, 0, 4);
 	System.arraycopy(data, offset+6, xkrFABN, 0, 2);
+    }
+    
+    public ExtKeyRec(byte forkType, int fileID, short startBlock) {
+        this.xkrKeyLen[0] = 7; // Constant
+        this.xkrFkType[0] = forkType;
+        System.arraycopy(Util.toByteArrayBE(fileID), 0, this.xkrFNum, 0, this.xkrFNum.length);
+        System.arraycopy(Util.toByteArrayBE(startBlock), 0, this.xkrFABN, 0, this.xkrFABN.length);
     }
     
     public static int length() { return STRUCTSIZE; }

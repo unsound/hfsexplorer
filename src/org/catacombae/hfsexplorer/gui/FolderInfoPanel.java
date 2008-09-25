@@ -22,6 +22,8 @@
  */
 
 package org.catacombae.hfsexplorer.gui;
+import org.catacombae.hfsexplorer.types.finder.ExtendedFolderInfo;
+import org.catacombae.hfsexplorer.types.finder.FolderInfo;
 import org.catacombae.hfsexplorer.types.*;
 import org.catacombae.hfsexplorer.Util;
 import java.awt.Color;

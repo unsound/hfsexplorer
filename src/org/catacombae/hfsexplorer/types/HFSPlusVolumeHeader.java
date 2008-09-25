@@ -18,7 +18,6 @@
 package org.catacombae.hfsexplorer.types;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.Util2;
 import org.catacombae.csjc.MutableStruct;
 import java.util.Date;
 import java.io.*;
@@ -128,7 +127,7 @@ public class HFSPlusVolumeHeader extends MutableStruct {
     }
 	
     public HFSPlusVolumeHeader(InputStream is) throws IOException {
-	this(Util2.fillBuffer(is, new byte[_getSize()]), 0);
+	this(Util.fillBuffer(is, new byte[_getSize()]), 0);
     }
 	
     private static int _getSize() {
@@ -155,7 +154,7 @@ public class HFSPlusVolumeHeader extends MutableStruct {
     public HFSCatalogNodeID getNextCatalogID() { return nextCatalogID; } // typedef HFSCatalogNodeID UInt32 0x40
     public int getWriteCount()                 { return Util.readIntBE(writeCount); } // UInt32 0x44
     public long getEncodingsBitmap()           { return Util.readLongBE(encodingsBitmap); } // UInt64 0x48
-    public int[] getFinderInfo()               { return Util2.readIntArrayBE(finderInfo); } // UInt32[8] 0x50
+    public int[] getFinderInfo()               { return Util.readIntArrayBE(finderInfo); } // UInt32[8] 0x50
  
     public HFSPlusForkData getAllocationFile() { return allocationFile; } // 0x70
     public HFSPlusForkData getExtentsFile()    { return extentsFile; } // 0xC0
@@ -193,7 +192,7 @@ public class HFSPlusVolumeHeader extends MutableStruct {
     }
     public void print(PrintStream ps, String prefix) {
 	    
-	ps.println(prefix + "signature: \"" + Util2.toASCIIString(getSignature()) + "\"");
+	ps.println(prefix + "signature: \"" + Util.toASCIIString(getSignature()) + "\"");
 	ps.println(prefix + "version: " + getVersion());
 	ps.println(prefix + "attributes: " + getAttributes());
 	printAttributes(ps, prefix + "  ");

@@ -18,7 +18,6 @@
 package org.catacombae.hfsexplorer.types;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.Util2;
 import java.io.PrintStream;
 
 public class BTHeaderRec {
@@ -84,7 +83,7 @@ public class BTHeaderRec {
 	System.arraycopy(data, offset+38, attributes, 0, 4);
 	System.arraycopy(data, offset+42, reserved3, 0, 4*16);
     }
-    
+
     public short getTreeDepth() { return Util.readShortBE(treeDepth); }
     public int getRootNode() { return Util.readIntBE(rootNode); }
     public int getLeafRecords() { return Util.readIntBE(leafRecords); }
@@ -102,7 +101,7 @@ public class BTHeaderRec {
 	<code>kHFSCaseFolding</code> or <code>kHFSBinaryCompare</code> defined as static constants of this class. */
     public byte getKeyCompareType() { return Util.readByteBE(keyCompareType); }
     public int getAttributes() { return Util.readIntBE(attributes); }
-    public int[] getReserved3() { return Util2.readIntArrayBE(reserved3); }
+    public int[] getReserved3() { return Util.readIntArrayBE(reserved3); }
     
     // Access to attributes:
     public boolean isBTBadCloseSet() { return Util.getBit(getAttributes(), 0); }
@@ -132,5 +131,28 @@ public class BTHeaderRec {
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "BTHeaderRec:");
 	printFields(ps, prefix);
+    }
+    
+    public byte[] getBytes() {
+        byte[] result = new byte[length()];
+	int offset = 0;
+        
+        System.arraycopy(treeDepth, 0, result, offset, treeDepth.length); offset += treeDepth.length;
+        System.arraycopy(rootNode, 0, result, offset, rootNode.length); offset += rootNode.length;
+        System.arraycopy(leafRecords, 0, result, offset, leafRecords.length); offset += leafRecords.length;
+        System.arraycopy(firstLeafNode, 0, result, offset, firstLeafNode.length); offset += firstLeafNode.length;
+        System.arraycopy(lastLeafNode, 0, result, offset, lastLeafNode.length); offset += lastLeafNode.length;
+        System.arraycopy(nodeSize, 0, result, offset, nodeSize.length); offset += nodeSize.length;
+        System.arraycopy(maxKeyLength, 0, result, offset, maxKeyLength.length); offset += maxKeyLength.length;
+        System.arraycopy(totalNodes, 0, result, offset, totalNodes.length); offset += totalNodes.length;
+        System.arraycopy(freeNodes, 0, result, offset, freeNodes.length); offset += freeNodes.length;
+        System.arraycopy(reserved1, 0, result, offset, reserved1.length); offset += reserved1.length;
+        System.arraycopy(clumpSize, 0, result, offset, clumpSize.length); offset += clumpSize.length;
+        System.arraycopy(btreeType, 0, result, offset, btreeType.length); offset += btreeType.length;
+        System.arraycopy(keyCompareType, 0, result, offset, keyCompareType.length); offset += keyCompareType.length;
+        System.arraycopy(attributes, 0, result, offset, attributes.length); offset += attributes.length;
+        System.arraycopy(reserved3, 0, result, offset, reserved3.length); offset += reserved3.length;
+        
+        return result;
     }
 }

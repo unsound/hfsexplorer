@@ -255,20 +255,20 @@ public class HFSExplorer {
 		}
 	    
 		for(int i = 0; i < offsets.length; ++i) {
-		    int currentOffset = Util2.unsign(offsets[i]);
+		    int currentOffset = Util.unsign(offsets[i]);
 
 		    if(i < offsets.length-1) {
 		    //System.out.println("  [" + nodeNumber + "] Offset to record " + i + ": " + currentOffset);
-		    //System.out.println("  [" + nodeNumber + "]  Size of record: " + (Util2.unsign(offsets[i+1])-currentOffset) + " bytes");
+		    //System.out.println("  [" + nodeNumber + "]  Size of record: " + (Util.unsign(offsets[i+1])-currentOffset) + " bytes");
 		    /*
 		    int keyLength;
 		    int keyLengthSize;
 		    if(bthr.isBTBigKeysSet()) {
-			keyLength = Util2.unsign(Util.readShortBE(currentNode, currentOffset));
+			keyLength = Util.unsign(Util.readShortBE(currentNode, currentOffset));
 			keyLengthSize = 2;
 		    }
 		    else {
-			keyLength = Util2.unsign(Util.readByteBE(currentNode, currentOffset));
+			keyLength = Util.unsign(Util.readByteBE(currentNode, currentOffset));
 			keyLengthSize = 1;
 		    }
 		    */
@@ -314,9 +314,9 @@ public class HFSExplorer {
 			    }
 			    else if(nodeDescriptor.getKind() == BTNodeDescriptor.BT_INDEX_NODE) {
 // 			    System.out.println("  [" + nodeNumber + "]  Remaining data for index: " + 
-// 					       ((Util2.unsign(offsets[i+1])-currentOffset)-
-// 						Util2.unsign(currentKey.length())) + " bytes");
-				System.out.println("  [" + nodeNumber + "]    \"" + currentKey.getNodeName().toString() + "\" (parent: " + currentKey.getParentID() + ") -> " + Util2.unsign(Util.readIntBE(currentNode, currentOffset+currentKey.length())));
+// 					       ((Util.unsign(offsets[i+1])-currentOffset)-
+// 						Util.unsign(currentKey.length())) + " bytes");
+				System.out.println("  [" + nodeNumber + "]    \"" + currentKey.getNodeName().toString() + "\" (parent: " + currentKey.getParentID() + ") -> " + Util.unsign(Util.readIntBE(currentNode, currentOffset+currentKey.length())));
 			    }
 			}
 		    }
@@ -434,7 +434,7 @@ public class HFSExplorer {
 			    if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
 			       recData instanceof HFSPlusCatalogFile) {
 				HFSPlusCatalogFile catFile = (HFSPlusCatalogFile)recData;
-				if(Util2.unsign(catFile.getFileID().toInt()) == nextID) {
+				if(Util.unsign(catFile.getFileID().toInt()) == nextID) {
 				    selectedFileRecord = rec;
 				    selectedFile = (HFSPlusCatalogFile)recData;
 				    break;
@@ -491,7 +491,7 @@ public class HFSExplorer {
 			    if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
 			       recData instanceof HFSPlusCatalogFile) {
 				HFSPlusCatalogFile catFile = (HFSPlusCatalogFile)recData;
-				if(Util2.unsign(catFile.getFileID().toInt()) == nextID) {
+				if(Util.unsign(catFile.getFileID().toInt()) == nextID) {
 				    selectedFileRecord = rec;
 				    rec.print(System.out, "");
 				    break;
@@ -523,7 +523,7 @@ public class HFSExplorer {
 				   recData instanceof HFSPlusCatalogFolder) {
 				    //System.out.println(rec.getKey().getNodeName() + ".equals(" + input +")");
 				    HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder)recData;
-				    if(Util2.unsign(catFolder.getFolderID().toInt()) == nextID) {
+				    if(Util.unsign(catFolder.getFolderID().toInt()) == nextID) {
 					nextDir = rec;
 					break;
 				    }

@@ -5,6 +5,8 @@
 
 package org.catacombae.hfsexplorer.types;
 
+import org.catacombae.hfsexplorer.types.finder.ExtendedFileInfo;
+import org.catacombae.hfsexplorer.types.finder.FileInfo;
 import org.catacombae.hfsexplorer.Util;
 import java.io.PrintStream;
 import java.util.Date;
@@ -128,5 +130,36 @@ public class HFSPlusCatalogFile extends HFSPlusCatalogLeafRecordData implements 
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "HFSPlusCatalogFile:");
 	printFields(ps, prefix);
+    }
+    
+    public byte[] getBytes() {
+	byte[] result = new byte[length()];
+	byte[] tempData;
+	int offset = 0;
+        
+	System.arraycopy(recordType, 0, result, offset, recordType.length); offset += recordType.length;
+	System.arraycopy(flags, 0, result, offset, flags.length); offset += flags.length;
+	System.arraycopy(reserved1, 0, result, offset, reserved1.length); offset += reserved1.length;
+        tempData = fileID.getBytes();
+        System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
+	System.arraycopy(createDate, 0, result, offset, createDate.length); offset += createDate.length;
+	System.arraycopy(contentModDate, 0, result, offset, contentModDate.length); offset += contentModDate.length;
+	System.arraycopy(attributeModDate, 0, result, offset, attributeModDate.length); offset += attributeModDate.length;
+	System.arraycopy(accessDate, 0, result, offset, accessDate.length); offset += accessDate.length;
+	System.arraycopy(backupDate, 0, result, offset, backupDate.length); offset += backupDate.length;
+        tempData = permissions.getBytes();
+        System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
+        tempData = userInfo.getBytes();
+        System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
+        tempData = finderInfo.getBytes();
+        System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
+        System.arraycopy(textEncoding, 0, result, offset, textEncoding.length); offset += textEncoding.length;
+	System.arraycopy(reserved2, 0, result, offset, reserved2.length); offset += reserved2.length;
+        tempData = dataFork.getBytes();
+        System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
+        tempData = resourceFork.getBytes();
+        System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
+        
+        return result;        
     }
 }

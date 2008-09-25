@@ -18,7 +18,6 @@
 package org.catacombae.hfsexplorer.types;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.Util2;
 
 public abstract class BTIndexNode extends BTNode {
     //protected final BTNodeDescriptor nodeDescriptor;
@@ -28,7 +27,7 @@ public abstract class BTIndexNode extends BTNode {
     protected BTIndexNode(byte[] data, int offset, int nodeSize) {
 	//nodeDescriptor = new BTNodeDescriptor(data, offset);
 	super(data, offset, nodeSize);
-	offsets = new short[Util2.unsign(nodeDescriptor.getNumRecords())+1]; //Last one is free space index
+	offsets = new short[Util.unsign(nodeDescriptor.getNumRecords())+1]; //Last one is free space index
 	for(int i = 0; i < offsets.length; ++i) {
 	    offsets[i] = Util.readShortBE(data, offset+nodeSize-((i+1)*2));
 	}

@@ -18,7 +18,6 @@
 package org.catacombae.hfsexplorer.types;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.Util2;
 
 import java.io.PrintStream;
 
@@ -60,10 +59,10 @@ public class JournalInfoBlock {
     public static int length() { return 180; }
     
     public int getFlags() { return Util.readIntBE(flags); }
-    public int[] getDeviceSignature() { return Util2.readIntArrayBE(deviceSignature); }
+    public int[] getDeviceSignature() { return Util.readIntArrayBE(deviceSignature); }
     public long getOffset() { return Util.readLongBE(offset); }
     public long getSize() { return Util.readLongBE(size); }
-    public int[] getReserved() { return Util2.readIntArrayBE(reserved); }
+    public int[] getReserved() { return Util.readIntArrayBE(reserved); }
     
     public static int getStructSize() { return 180; }
     

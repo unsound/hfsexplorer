@@ -19,10 +19,13 @@ package org.catacombae.hfsexplorer.types;
 
 public abstract class BTKey implements Comparable<BTKey> {
     public abstract short getKeyLength();
-    public abstract int length();
+    public abstract int length();    
+    public abstract byte[] getBytes();
+
+    @Override
     public int compareTo(BTKey btk) {
-	byte[] thisData = getData();
-	byte[] thatData = btk.getData();
+	byte[] thisData = getBytes();
+	byte[] thatData = btk.getBytes();
 	for(int i = 0; i < Math.min(thisData.length, thatData.length); ++i) {
 	    if(thisData[i] < thatData[i])
 		return -1;
@@ -36,5 +39,4 @@ public abstract class BTKey implements Comparable<BTKey> {
 	else
 	    return 0;
     }
-    public abstract byte[] getData();
 }

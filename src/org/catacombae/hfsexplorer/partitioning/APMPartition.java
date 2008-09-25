@@ -18,7 +18,6 @@
 package org.catacombae.hfsexplorer.partitioning;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.Util2;
 import java.io.PrintStream;
 
 public class APMPartition implements Partition {
@@ -118,12 +117,12 @@ public class APMPartition implements Partition {
     public int getPmBootEntry2()   { return Util.readIntBE(pmBootEntry2); }
     public int getPmBootCksum()    { return Util.readIntBE(pmBootCksum); }
     public byte[] getPmProcessor() { return Util.createCopy(pmProcessor); }
-    public short[] getPmPad()      { return Util2.readShortArrayBE(pmPad); }
+    public short[] getPmPad()      { return Util.readShortArrayBE(pmPad); }
     
-    public String getPmSigAsString() { return Util2.toASCIIString(pmSig); }
-    public String getPmPartNameAsString() { return Util2.readNullTerminatedASCIIString(pmPartName); }
-    public String getPmParTypeAsString() { return Util2.readNullTerminatedASCIIString(pmParType); }
-    public String getPmProcessorAsString() { return Util2.readNullTerminatedASCIIString(pmProcessor); }
+    public String getPmSigAsString() { return Util.toASCIIString(pmSig); }
+    public String getPmPartNameAsString() { return Util.readNullTerminatedASCIIString(pmPartName); }
+    public String getPmParTypeAsString() { return Util.readNullTerminatedASCIIString(pmParType); }
+    public String getPmProcessorAsString() { return Util.readNullTerminatedASCIIString(pmProcessor); }
     
     public boolean isValid() {
         // Signature check

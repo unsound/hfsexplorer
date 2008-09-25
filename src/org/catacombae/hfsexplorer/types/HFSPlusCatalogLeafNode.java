@@ -18,36 +18,30 @@
 package org.catacombae.hfsexplorer.types;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.Util2;
 
 public class HFSPlusCatalogLeafNode extends BTLeafNode {
-    //protected BTNodeDescriptor nodeDescriptor;
     protected HFSPlusCatalogLeafRecord[] leafRecords;
     
     public HFSPlusCatalogLeafNode(byte[] data, int offset, int nodeSize) {
 	this(data, offset, nodeSize, null);
     }
     protected HFSPlusCatalogLeafNode(byte[] data, int offset, int nodeSize, BTHeaderRec catalogHeaderRec) {
-	//nodeDescriptor = new BTNodeDescriptor(data, offset);
 	super(data, offset, nodeSize);
-	short[] offsets = new short[Util2.unsign(nodeDescriptor.getNumRecords())+1];
+	short[] offsets = new short[Util.unsign(nodeDescriptor.getNumRecords())+1];
 	for(int i = 0; i < offsets.length; ++i) {
 	    offsets[i] = Util.readShortBE(data, offset+nodeSize-((i+1)*2));
 	}
 	leafRecords = new HFSPlusCatalogLeafRecord[offsets.length-1];
 	// we loop offsets.length-1 times, since last offset is offset to free space
 	for(int i = 0; i < leafRecords.length; ++i) {
-	    int currentOffset = Util2.unsign(offsets[i]);
-	    //HFSPlusCatalogKey currentKey = new HFSPlusCatalogKey(currentNode, offset+currentOffset);
+	    int currentOffset = Util.unsign(offsets[i]);
 	    if(catalogHeaderRec == null)
 		leafRecords[i] = new HFSPlusCatalogLeafRecord(data, offset+currentOffset);
 	    else
 		leafRecords[i] = new HFSXCatalogLeafRecord(data, offset+currentOffset, catalogHeaderRec);
 	}
-	
     }
     
-    //public BTNodeDescriptor getNodeDescriptor() { return nodeDescriptor; }
     public HFSPlusCatalogLeafRecord getLeafRecord(int index) { return leafRecords[index]; }
     public HFSPlusCatalogLeafRecord[] getLeafRecords() {
 	HFSPlusCatalogLeafRecord[] copy = new HFSPlusCatalogLeafRecord[leafRecords.length];

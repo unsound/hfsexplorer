@@ -44,6 +44,13 @@ public class HFSPlusExtentRecord {
 	    arrayCopy[i] = array[i];
 	return arrayCopy;
     }
+
+    public int length() {
+        int res = 0;
+        for(HFSPlusExtentDescriptor desc : array)
+            res += desc.getSize();
+        return res;
+    }
     
     /**
      * Returns the number of extents that are in use, i.e. non-zero block count
@@ -73,5 +80,18 @@ public class HFSPlusExtentRecord {
 	    ps.println(prefix + "array[" + i + "]:");
 	    array[i].print(ps, prefix + "  ");
 	}
+    }
+
+    public byte[] getBytes() {
+        byte[] result = new byte[length()];
+	byte[] tempData;
+	int offset = 0;
+        
+        for(HFSPlusExtentDescriptor desc : array) {
+            tempData = desc.getBytes();
+            System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
+        }
+        
+        return result;
     }
 }

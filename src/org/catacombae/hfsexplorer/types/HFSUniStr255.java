@@ -18,7 +18,6 @@
 package org.catacombae.hfsexplorer.types;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.Util2;
 import org.catacombae.hfsexplorer.UnicodeNormalizationToolkit;
 import java.io.PrintStream;
 
@@ -40,7 +39,7 @@ public class HFSUniStr255 {
     
     public HFSUniStr255(byte[] data, int offset) {
 	System.arraycopy(data, offset+0, length, 0, 2);
-	unicode = new byte[2*Util2.unsign(getLength())];
+	unicode = new byte[2*Util.unsign(getLength())];
 	System.arraycopy(data, offset+2, unicode, 0, unicode.length);
     }
     public HFSUniStr255(String unicodeString) {
@@ -48,16 +47,22 @@ public class HFSUniStr255 {
 	if(unicodeChars.length > 255)
 	    throw new RuntimeException("String too large.");
 	System.arraycopy(Util.toByteArrayBE((short)unicodeChars.length), 0, length, 0, 2);
-	unicode = Util2.readByteArrayBE(unicodeChars);
+	unicode = Util.readByteArrayBE(unicodeChars);
     }
     
     public int length() { return 2+unicode.length; }
     
     public short getLength() { return Util.readShortBE(length); }
     
+    /**
+     * Returns the raw bytes constituting this UTF-16BE string.
+     * @return the raw bytes constituting this UTF-16BE string.
+     */
+    public byte[] getRawUnicode() { return Util.createCopy(unicode); }
+    
     /** This is a char for char representation of what data is in the actual file system. The string will
 	(if the filesystem is valid) be in decomposed form, as the HFS+ volume format requires. */
-    public char[] getUnicode() { return Util2.readCharArrayBE(unicode); }
+    public char[] getUnicode() { return Util.readCharArrayBE(unicode); }
     
     /** A simple conversion of the decomposed string from getUnicode() into a String object. */
     public String getUnicodeAsDecomposedString() { return new String(getUnicode()); }
@@ -67,8 +72,9 @@ public class HFSUniStr255 {
     public String getUnicodeAsComposedString() {
 	return UnicodeNormalizationToolkit.getDefaultInstance().compose(getUnicodeAsDecomposedString());
     }
-    
-    public byte[] getData() {
+
+
+    public byte[] getBytes() {
 	byte[] result = new byte[length()];
 	System.arraycopy(length, 0, result, 0, 2);
 	System.arraycopy(unicode, 0, result, 2, unicode.length);
@@ -76,7 +82,7 @@ public class HFSUniStr255 {
     }
     
     public void printFields(PrintStream ps, String prefix) {
-	ps.println(prefix + " length: " + Util2.unsign(getLength()));
+	ps.println(prefix + " length: " + Util.unsign(getLength()));
 	ps.println(prefix + " unicode (decomposed): \"" + getUnicodeAsDecomposedString() + "\"");
 	ps.println(prefix + "           (composed): \"" + getUnicodeAsComposedString() + "\"");
     }
@@ -86,6 +92,7 @@ public class HFSUniStr255 {
 	printFields(ps, prefix);
     }
 
+    @Override
     public String toString() {
 	return getUnicodeAsComposedString();
     }

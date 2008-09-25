@@ -1,0 +1,63 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package org.catacombae.hfsexplorer.types.hfscommon;
+
+import org.catacombae.hfsexplorer.Util;
+import org.catacombae.hfsexplorer.types.HFSPlusExtentDescriptor;
+import org.catacombae.hfsexplorer.types.hfs.ExtDescriptor;
+
+/**
+ *
+ * @author erik
+ */
+public abstract class CommonHFSExtentDescriptor {
+    public abstract long getStartBlock();
+    public abstract long getBlockCount();
+    
+    public static CommonHFSExtentDescriptor create(HFSPlusExtentDescriptor hped) {
+        return new HFSPlusImplementation(hped);
+    }
+    
+    public static CommonHFSExtentDescriptor create(ExtDescriptor hped) {
+        return new HFSImplementation(hped);
+    }
+    
+    public static class HFSPlusImplementation extends CommonHFSExtentDescriptor {
+        private final HFSPlusExtentDescriptor hped;
+        
+        public HFSPlusImplementation(HFSPlusExtentDescriptor hped) {
+            this.hped = hped;
+        }
+        
+        @Override
+        public long getStartBlock() {
+            return Util.unsign(hped.getStartBlock());
+        }
+        
+        @Override
+        public long getBlockCount() {
+            return Util.unsign(hped.getBlockCount());
+        }
+    }
+    
+    public static class HFSImplementation extends CommonHFSExtentDescriptor {
+        private final ExtDescriptor hped;
+        
+        public HFSImplementation(ExtDescriptor hped) {
+            this.hped = hped;
+        }
+        
+        @Override
+        public long getStartBlock() {
+            return Util.unsign(hped.getXdrStABN());
+        }
+        
+        @Override
+        public long getBlockCount() {
+            return Util.unsign(hped.getXdrNumABlks());
+        }
+    }
+}

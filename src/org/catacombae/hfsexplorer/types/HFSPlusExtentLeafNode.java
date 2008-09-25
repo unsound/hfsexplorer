@@ -18,7 +18,6 @@
 package org.catacombae.hfsexplorer.types;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.Util2;
 import java.io.PrintStream;
 
 public class HFSPlusExtentLeafNode extends BTLeafNode {
@@ -29,14 +28,14 @@ public class HFSPlusExtentLeafNode extends BTLeafNode {
     public HFSPlusExtentLeafNode(byte[] data, int offset, int nodeSize) {
 	//nodeDescriptor = new BTNodeDescriptor(data, offset);
 	super(data, offset, nodeSize);
-	leafRecordOffsets = new short[Util2.unsign(nodeDescriptor.getNumRecords())+1]; // The last offset is offset to free space
+	leafRecordOffsets = new short[Util.unsign(nodeDescriptor.getNumRecords())+1]; // The last offset is offset to free space
 	for(int i = 0; i < leafRecordOffsets.length; ++i) {
 	    leafRecordOffsets[i] = Util.readShortBE(data, offset+nodeSize-((i+1)*2));
 	}
 	leafRecords = new HFSPlusExtentLeafRecord[leafRecordOffsets.length-1];
 	// we loop offsets.length-1 times, since last offset is offset to free space
 	for(int i = 0; i < leafRecords.length; ++i) {
-	    int currentOffset = Util2.unsign(leafRecordOffsets[i]);
+	    int currentOffset = Util.unsign(leafRecordOffsets[i]);
 	    leafRecords[i] = new HFSPlusExtentLeafRecord(data, offset+currentOffset);
 	}
 	
