@@ -20,86 +20,130 @@
  *
  * Created on den 20 mars 2007, 19:28
  */
-
 package org.catacombae.hfsexplorer.gui;
+
+import java.awt.CardLayout;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTree;
+import javax.swing.SwingConstants;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.event.TreeWillExpandListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.ExpandVetoException;
+import javax.swing.tree.TreePath;
 import org.catacombae.hfsexplorer.FileSystemBrowser.NoLeafMutableTreeNode;
-import org.catacombae.hfsexplorer.*;
-import org.catacombae.hfsexplorer.types.*;
-import java.awt.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.tree.*;
+import org.catacombae.hfsexplorer.types.HFSPlusCatalogFile;
+import org.catacombae.hfsexplorer.types.HFSPlusCatalogFolder;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonBTIndexRecord;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonBTKey;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonBTNode;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonBTNodeDescriptor;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFile;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFileRecord;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFileThreadRecord;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolder;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolderRecord;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolderThreadRecord;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogIndexNode;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogKey;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafNode;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafRecord;
+import org.catacombae.hfsexplorer.unfinished.BaseHFSFileSystemView;
 
 /**
  *
  * @author  Erik
  */
 public class CatalogInfoPanel extends javax.swing.JPanel {
-    
-    private static class BTNodeStorage {
-	private BTNode node;
-	private String text;
-	public BTNodeStorage(BTNode node, String text) {
-	    this.node = node;
-	    this.text = text;
-	}
-	public BTNode getNode() { return node; }
-        @Override
-	public String toString() { return text; }
-    }
-    private static class BTLeafStorage {
-	private HFSPlusCatalogLeafRecord rec;
-	private String text;
-	public BTLeafStorage(HFSPlusCatalogLeafRecord rec, String text) {
-	    this.rec = rec;
-	    this.text = text;
-	}
-	public HFSPlusCatalogLeafRecord getRecord() { return rec; }
-        @Override
-	public String toString() { return text; }
-    }
-    
-    /** Creates new form CatalogInfoPanel */
-    public CatalogInfoPanel(final HFSPlusFileSystemView fsView) {
-        initComponents();
-	
-	JTree dirTree = catalogTree;
-	// Populate the root
-	/* 
-	 * What we need is a method that gets us the children of the "current" node.
-	 * A B-tree starts with a header node, 
-	 */
-	BTNode iNode = fsView.getCatalogNode(-1); // Get root index node.
-	
-	DefaultMutableTreeNode rootNode = new NoLeafMutableTreeNode(new BTNodeStorage(iNode, "Catalog root"));
-	expandNode(rootNode, iNode, fsView);
-	
-	DefaultTreeModel model = new DefaultTreeModel(rootNode);
-	dirTree.setModel(model);
 
-	dirTree.addTreeWillExpandListener(new TreeWillExpandListener() {
-		public void treeWillExpand(TreeExpansionEvent e) 
+    private static class BTNodeStorage {
+
+        private CommonBTNode node;
+        private String text;
+
+        public BTNodeStorage(CommonBTNode node, String text) {
+            this.node = node;
+            this.text = text;
+        }
+
+        public CommonBTNode getNode() {
+            return node;
+        }
+
+        @Override
+        public String toString() {
+            return text;
+        }
+    }
+
+    private static class BTLeafStorage {
+
+        private CommonHFSCatalogLeafRecord rec;
+        private String text;
+
+        public BTLeafStorage(CommonHFSCatalogLeafRecord rec, String text) {
+            this.rec = rec;
+            this.text = text;
+        }
+
+        public CommonHFSCatalogLeafRecord getRecord() {
+            return rec;
+        }
+
+        @Override
+        public String toString() {
+            return text;
+        }
+    }
+
+    /** Creates new form CatalogInfoPanel */
+    public CatalogInfoPanel(final BaseHFSFileSystemView fsView) {
+        initComponents();
+
+        JTree dirTree = catalogTree;
+        // Populate the root
+	/* 
+         * What we need is a method that gets us the children of the "current" node.
+         * A B-tree starts with a header node,
+         */
+        CommonBTNode iNode = fsView.getCatalogNode(-1); // Get root index node.
+
+        DefaultMutableTreeNode rootNode = new NoLeafMutableTreeNode(new BTNodeStorage(iNode, "Catalog root"));
+        expandNode(rootNode, iNode, fsView);
+
+        DefaultTreeModel model = new DefaultTreeModel(rootNode);
+        dirTree.setModel(model);
+
+        dirTree.addTreeWillExpandListener(new TreeWillExpandListener() {
+
+            public void treeWillExpand(TreeExpansionEvent e)
                     throws ExpandVetoException {
-		    
-		    TreePath tp = e.getPath();
-		    Object obj = tp.getLastPathComponent();
-		    if(obj instanceof DefaultMutableTreeNode) {
-			DefaultMutableTreeNode dmtn = ((DefaultMutableTreeNode)obj);
-			Object obj2 = dmtn.getUserObject();
-			if(obj2 instanceof BTNodeStorage) {
-			    BTNode node = ((BTNodeStorage)obj2).getNode();
-			    expandNode(dmtn, node, fsView);
-			}
-			else
-			    throw new RuntimeException("Wrong user object type in expandable node!");
-		    }
-		    else
-			throw new RuntimeException("Wrong node type in tree!");		    
-		}
-		
-		public void treeWillCollapse(TreeExpansionEvent e) {}
-	    });
-            
+
+                TreePath tp = e.getPath();
+                Object obj = tp.getLastPathComponent();
+                if(obj instanceof DefaultMutableTreeNode) {
+                    DefaultMutableTreeNode dmtn = ((DefaultMutableTreeNode) obj);
+                    Object obj2 = dmtn.getUserObject();
+                    if(obj2 instanceof BTNodeStorage) {
+                        CommonBTNode node = ((BTNodeStorage) obj2).getNode();
+                        expandNode(dmtn, node, fsView);
+                    }
+                    else
+                        throw new RuntimeException("Wrong user object type in expandable node!");
+                }
+                else
+                    throw new RuntimeException("Wrong node type in tree!");
+            }
+
+            public void treeWillCollapse(TreeExpansionEvent e) {
+            }
+        });
+
         //final JPanel infoPanel = new JPanel();
         final JPanel leafPanel = new JPanel();
         final FileInfoPanel fileInfoPanel = new FileInfoPanel();
@@ -116,88 +160,104 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
         JScrollPane folderInfoPanelScroller = new JScrollPane(folderInfoPanel);
         folderInfoPanelScroller.getVerticalScrollBar().setUnitIncrement(5);
         leafPanel.add(folderInfoPanelScroller, "folder");
-        
+
         infoPanel.setLayout(clRoot);
         final JLabel indexNodeLabel = new JLabel("No selection.", SwingConstants.CENTER);
         infoPanel.add(indexNodeLabel, "index");
         infoPanel.add(leafPanel, "leaf");
         //infoScroller.setViewportView(infoPanel);
-        
+
         catalogTree.addTreeSelectionListener(new TreeSelectionListener() {
+
             public void valueChanged(TreeSelectionEvent te) {
-               //System.err.println("Tree selection");
-               Object o = te.getPath().getLastPathComponent();
-               if(o instanceof DefaultMutableTreeNode) {
-                   Object o2 = ((DefaultMutableTreeNode)o).getUserObject();
-                   if(o2 instanceof BTNodeStorage) {
-                       BTNode btn = ((BTNodeStorage)o2).getNode();
-                       BTNodeDescriptor btnd = btn.getNodeDescriptor();
-                       if(btnd.getKind() == BTNodeDescriptor.BT_INDEX_NODE) {
-                           indexNodeLabel.setText("Index node with " + btnd.getNumRecords() + " records.");
-                       }
-                       else if(btnd.getKind() == BTNodeDescriptor.BT_LEAF_NODE) {
-                           indexNodeLabel.setText("Leaf node with " + btnd.getNumRecords() + " records.");
-                       }
-                       else {
-                           indexNodeLabel.setText("Unknown error!");
-                       }
-                           
-                       clRoot.show(infoPanel, "index");
-                   }
-                   else if(o2 instanceof BTLeafStorage) {
-                       HFSPlusCatalogLeafRecord rec = ((BTLeafStorage)o2).getRecord();
-                       HFSPlusCatalogLeafRecordData data = rec.getData();
-                       if(data.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
-                          data instanceof HFSPlusCatalogFile) {
-                            fileInfoPanel.setFields((HFSPlusCatalogFile)data);
-                            clLeaf.show(leafPanel, "file");
-                       }
-                       else if(data.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
-                               data instanceof HFSPlusCatalogFolder) {
-                            folderInfoPanel.setFields((HFSPlusCatalogFolder)data);
-                            clLeaf.show(leafPanel, "folder");
-                       }
-                       else if(data.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE_THREAD)
-                           clLeaf.show(leafPanel, "filethread");
-                       else if(data.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD)
-                           clLeaf.show(leafPanel, "folderthread");
-                       else
-                           clLeaf.show(leafPanel, "other");
-                       clRoot.show(infoPanel, "leaf");
-                       
-                   }
-                   else
-                       System.err.println("WARNING: unknown type in catalog tree user object - " + o2.getClass().toString());
-               }
-               else
-                   System.err.println("WARNING: unknown type in catalog tree - " + o.getClass().toString());
+                //System.err.println("Tree selection");
+                Object o = te.getPath().getLastPathComponent();
+                if(o instanceof DefaultMutableTreeNode) {
+                    Object o2 = ((DefaultMutableTreeNode) o).getUserObject();
+                    if(o2 instanceof BTNodeStorage) {
+                        CommonBTNode btn = ((BTNodeStorage) o2).getNode();
+                        CommonBTNodeDescriptor btnd = btn.getNodeDescriptor();
+                        switch(btnd.getNodeType()) {
+                            case INDEX:
+                                indexNodeLabel.setText("Index node with " +
+                                        btnd.getNumberOfRecords() + " records.");
+                                break;
+                            case LEAF:
+                                indexNodeLabel.setText("Leaf node with " +
+                                        btnd.getNumberOfRecords() + " records.");
+                                break;
+                            default:
+                                indexNodeLabel.setText("Unknown error!");
+                        }
+
+                        clRoot.show(infoPanel, "index");
+                    }
+                    else if(o2 instanceof BTLeafStorage) {
+                        CommonHFSCatalogLeafRecord rec = ((BTLeafStorage) o2).getRecord();
+                        //HFSPlusCatalogLeafRecordData data = rec.getData();
+                        if(rec instanceof CommonHFSCatalogFileRecord) {
+                            CommonHFSCatalogFile fil = ((CommonHFSCatalogFileRecord)rec).getData();
+                            if(fil instanceof CommonHFSCatalogFile.HFSPlusImplementation) {
+                                HFSPlusCatalogFile underlying =
+                                        ((CommonHFSCatalogFile.HFSPlusImplementation)fil).getUnderlying();
+                                fileInfoPanel.setFields(underlying);
+                                clLeaf.show(leafPanel, "file");
+                            }
+                            else
+                                clLeaf.show(leafPanel, "other");
+                        }
+                        else if(rec instanceof CommonHFSCatalogFolderRecord) {
+                            CommonHFSCatalogFolder fld = ((CommonHFSCatalogFolderRecord)rec).getData();
+                            if(fld instanceof CommonHFSCatalogFolder.HFSPlusImplementation) {
+                                HFSPlusCatalogFolder underlying =
+                                        ((CommonHFSCatalogFolder.HFSPlusImplementation)fld).getUnderlying();
+                                folderInfoPanel.setFields(underlying);
+                                clLeaf.show(leafPanel, "folder");
+                            }
+                            else
+                                clLeaf.show(leafPanel, "other");
+                        }
+                        else if(rec instanceof CommonHFSCatalogFileThreadRecord)
+                            clLeaf.show(leafPanel, "filethread");
+                        else if(rec instanceof CommonHFSCatalogFolderThreadRecord)
+                            clLeaf.show(leafPanel, "folderthread");
+                        else
+                            clLeaf.show(leafPanel, "other");
+                        clRoot.show(infoPanel, "leaf");
+
+                    }
+                    else
+                        System.err.println("WARNING: unknown type in catalog tree user object - " + o2.getClass().toString());
+                }
+                else
+                    System.err.println("WARNING: unknown type in catalog tree - " + o.getClass().toString());
             }
         });
     }
 
-    public void expandNode(DefaultMutableTreeNode dmtn, BTNode node, HFSPlusFileSystemView fsView) {
-	if(node instanceof HFSPlusCatalogIndexNode) {
-	    BTIndexRecord[] recs = ((HFSPlusCatalogIndexNode)node).getIndexRecords();
-	    for(BTIndexRecord rec : recs) {
-		BTNode curNode = fsView.getCatalogNode(rec.getIndex());
-		BTKey key = rec.getKey();
-		if(key instanceof HFSPlusCatalogKey) {
-		    HFSPlusCatalogKey trueKey = (HFSPlusCatalogKey)key;
-		    dmtn.add(new NoLeafMutableTreeNode(new BTNodeStorage(curNode, trueKey.getParentID().toString() + ":" + trueKey.getNodeName().toString())));
-		}
-		else
-		    throw new RuntimeException("Wrong key type in catalog tree");
-	    }
-	}
-	else if(node instanceof HFSPlusCatalogLeafNode) {
-	    HFSPlusCatalogLeafRecord[] recs = ((HFSPlusCatalogLeafNode)node).getLeafRecords();
-	    for(HFSPlusCatalogLeafRecord rec : recs)
-		dmtn.add(new DefaultMutableTreeNode(new BTLeafStorage(rec, rec.getKey().getParentID().toString() + ":" + rec.getKey().getNodeName().toString())));
-	}
-	else
-	    throw new RuntimeException("Invalid node type in tree.");
+    public void expandNode(DefaultMutableTreeNode dmtn, CommonBTNode node, BaseHFSFileSystemView fsView) {
+        if(node instanceof CommonHFSCatalogIndexNode) {
+            CommonBTIndexRecord[] recs = ((CommonHFSCatalogIndexNode) node).getIndexRecords();
+            for(CommonBTIndexRecord rec : recs) {
+                CommonBTNode curNode = fsView.getCatalogNode(rec.getIndex());
+                CommonBTKey key = rec.getKey();
+                if(key instanceof CommonHFSCatalogKey) {
+                    CommonHFSCatalogKey trueKey = (CommonHFSCatalogKey) key;
+                    dmtn.add(new NoLeafMutableTreeNode(new BTNodeStorage(curNode, trueKey.getParentID().toString() + ":" + trueKey.getNodeName().toString())));
+                }
+                else
+                    throw new RuntimeException("Wrong key type in catalog tree");
+            }
+        }
+        else if(node instanceof CommonHFSCatalogLeafNode) {
+            CommonHFSCatalogLeafRecord[] recs = ((CommonHFSCatalogLeafNode) node).getLeafRecords();
+            for(CommonHFSCatalogLeafRecord rec : recs)
+                dmtn.add(new DefaultMutableTreeNode(new BTLeafStorage(rec, rec.getKey().getParentID().toString() + ":" + rec.getKey().getNodeName().toString())));
+        }
+        else
+            throw new RuntimeException("Invalid node type in tree.");
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -265,8 +325,6 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
-    
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JTree catalogTree;
     private javax.swing.JScrollPane catalogTreeScroller;
@@ -275,5 +333,4 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JSplitPane jSplitPane1;
     // End of variables declaration//GEN-END:variables
-    
 }

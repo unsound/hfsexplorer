@@ -5,14 +5,17 @@
 
 package org.catacombae.hfsexplorer.types.hfscommon;
 
+import java.util.Date;
+import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.types.HFSPlusCatalogFolder;
+import org.catacombae.hfsexplorer.types.HFSPlusDate;
 import org.catacombae.hfsexplorer.types.hfs.CdrDirRec;
 
 /**
  *
  * @author erik
  */
-public abstract class CommonHFSCatalogFolder {
+public abstract class CommonHFSCatalogFolder implements CommonHFSCatalogAttributes {
     public abstract CommonHFSCatalogNodeID getFolderID();
     
     public static CommonHFSCatalogFolder create(HFSPlusCatalogFolder data) {
@@ -22,21 +25,32 @@ public abstract class CommonHFSCatalogFolder {
     public static CommonHFSCatalogFolder create(CdrDirRec data) {
         return new HFSImplementation(data);
     }
+
+    public abstract long getValence();
     
     public abstract int length();
 
     public abstract byte[] getBytes();
     
-    private static class HFSPlusImplementation extends CommonHFSCatalogFolder {
+    public static class HFSPlusImplementation extends CommonHFSCatalogFolder {
         private HFSPlusCatalogFolder data;
         
         public HFSPlusImplementation(HFSPlusCatalogFolder data) {
             this.data = data;
         }
+
+        @Deprecated
+        public HFSPlusCatalogFolder getUnderlying() {
+            return data;
+        }
         
         @Override
         public CommonHFSCatalogNodeID getFolderID() {
             return CommonHFSCatalogNodeID.create(data.getFolderID());
+        }
+
+        @Override public long getValence() {
+            return Util.unsign(data.getValence());
         }
 
         @Override
@@ -48,9 +62,57 @@ public abstract class CommonHFSCatalogFolder {
         public byte[] getBytes() {
             return data.getBytes();
         }
+        
+        public short getRecordType() {
+            return data.getRecordType();
+        }
+
+        public short getFlags() {
+            return data.getFlags();
+        }
+
+        public int getCreateDate() {
+            return data.getCreateDate();
+        }
+
+        public int getContentModDate() {
+            return data.getContentModDate();
+        }
+
+        public int getAttributeModDate() {
+            return data.getAttributeModDate();
+        }
+
+        public int getAccessDate() {
+            return data.getAccessDate();
+        }
+
+        public int getBackupDate() {
+            return data.getBackupDate();
+        }
+
+        public Date getCreateDateAsDate() {
+            return data.getCreateDateAsDate();
+        }
+
+        public Date getContentModDateAsDate() {
+            return data.getContentModDateAsDate();
+        }
+
+        public Date getAttributeModDateAsDate() {
+            return data.getAttributeModDateAsDate();
+        }
+
+        public Date getAccessDateAsDate() {
+            return data.getAccessDateAsDate();
+        }
+
+        public Date getBackupDateAsDate() {
+            return data.getBackupDateAsDate();
+        }
     }
     
-    private static class HFSImplementation extends CommonHFSCatalogFolder {
+    public static class HFSImplementation extends CommonHFSCatalogFolder {
         private CdrDirRec data;
         
         public HFSImplementation(CdrDirRec data) {
@@ -62,6 +124,10 @@ public abstract class CommonHFSCatalogFolder {
             return CommonHFSCatalogNodeID.create(data.getDirDirID());
         }
 
+        @Override public long getValence() {
+            return Util.unsign(data.getDirVal());
+        }
+
         @Override
         public int length() {
             return data.length();
@@ -70,6 +136,55 @@ public abstract class CommonHFSCatalogFolder {
         @Override
         public byte[] getBytes() {
             return data.getBytes();
+        }
+        
+
+        public short getRecordType() {
+            return data.getCdrType();
+        }
+
+        public short getFlags() {
+            return data.getDirFlags();
+        }
+
+        public int getCreateDate() {
+            return data.getDirCrDat();
+        }
+
+        public int getContentModDate() {
+            return data.getDirMdDat();
+        }
+
+        public int getAttributeModDate() {
+            return data.getDirMdDat();
+        }
+
+        public int getAccessDate() {
+            return data.getDirMdDat();
+        }
+
+        public int getBackupDate() {
+            return data.getDirBkDat();
+        }
+
+        public Date getCreateDateAsDate() {
+            return HFSPlusDate.localTimestampToDate(getCreateDate());
+        }
+
+        public Date getContentModDateAsDate() {
+            return HFSPlusDate.localTimestampToDate(getContentModDate());
+        }
+
+        public Date getAttributeModDateAsDate() {
+            return HFSPlusDate.localTimestampToDate(getAttributeModDate());
+        }
+
+        public Date getAccessDateAsDate() {
+            return HFSPlusDate.localTimestampToDate(getAccessDate());
+        }
+
+        public Date getBackupDateAsDate() {
+            return HFSPlusDate.localTimestampToDate(getBackupDate());
         }
     }
 }

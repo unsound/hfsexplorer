@@ -68,7 +68,7 @@ public class ImplHFSPlusFileSystemView extends BaseHFSFileSystemView {
     protected ImplHFSPlusFileSystemView(ReadableRandomAccessStream hfsFile, long fsOffset, CatalogOperations catOps, boolean cachingEnabled) {
         super(hfsFile, fsOffset, catOps, cachingEnabled);
     }
-    
+
     private HFSPlusVolumeHeader getHFSPlusVolumeHeader() {
 	byte[] currentBlock = new byte[512]; // Could be made a global var? (thread war?)
 	hfsFile.seek(fsOffset + 1024);
@@ -77,8 +77,8 @@ public class ImplHFSPlusFileSystemView extends BaseHFSFileSystemView {
     }
     
     @Override
-    protected CommonHFSVolumeHeader getVolumeHeader() {
-	return CommonHFSVolumeHeader.create(getHFSPlusVolumeHeader());
+    public CommonHFSVolumeHeader getVolumeHeader() {
+        return CommonHFSVolumeHeader.create(getHFSPlusVolumeHeader());
     }
 
     @Override
@@ -138,10 +138,12 @@ public class ImplHFSPlusFileSystemView extends BaseHFSFileSystemView {
         return CommonHFSCatalogNodeID.getHFSPlusReservedID(requestedNodeID);
     }
 
+    /*
     @Override
     protected CommonHFSCatalogString createCommonHFSCatalogString(String name) {
         return CommonHFSCatalogString.create(new HFSUniStr255(name));
     }
+     * */
 
     @Override
     public JournalInfoBlock getJournalInfoBlock() {
@@ -155,5 +157,15 @@ public class ImplHFSPlusFileSystemView extends BaseHFSFileSystemView {
 	}
 	else
 	    return null;
+    }
+
+    @Override
+    public String getString(CommonHFSCatalogString str) {
+        if(str instanceof CommonHFSCatalogString.HFSPlusImplementation) {
+            char[] ca = Util.readCharArrayBE(str.getBytes());
+            return new String(ca);
+        }
+        else
+            throw new RuntimeException("Invalid string type: " + str.getClass());
     }
 }

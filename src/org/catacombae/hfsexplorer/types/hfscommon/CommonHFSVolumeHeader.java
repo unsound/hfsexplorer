@@ -45,6 +45,11 @@ public abstract class CommonHFSVolumeHeader {
             this.hdr = hdr;
         }
 
+        @Deprecated
+        public HFSPlusVolumeHeader getUnderlying() {
+            return hdr;
+        }
+
         @Override
         public short getSignature() {
             return hdr.getSignature();

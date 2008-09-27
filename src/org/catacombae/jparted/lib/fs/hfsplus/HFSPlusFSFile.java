@@ -5,9 +5,8 @@
  */
 package org.catacombae.jparted.lib.fs.hfsplus;
 
-import org.catacombae.hfsexplorer.types.HFSPlusCatalogFile;
-import org.catacombae.hfsexplorer.types.HFSPlusCatalogLeafRecord;
-import org.catacombae.hfsexplorer.types.HFSPlusCatalogLeafRecordData;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFile;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFileRecord;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.jparted.lib.fs.FSAttributes;
 import org.catacombae.jparted.lib.fs.FSFile;
@@ -22,13 +21,13 @@ import org.catacombae.jparted.lib.fs.FSForkType;
  */
 public class HFSPlusFSFile extends FSFile {
     private final HFSPlusFileSystemHandler parent;
-    private final HFSPlusCatalogLeafRecord fileRecord;
-    private final HFSPlusCatalogFile catalogFile;
+    private final CommonHFSCatalogFileRecord fileRecord;
+    private final CommonHFSCatalogFile catalogFile;
     private final HFSPlusFSAttributes attributes;
     private final FSFork dataFork;
     private final FSFork resourceFork;
     
-    HFSPlusFSFile(HFSPlusFileSystemHandler iParent, HFSPlusCatalogLeafRecord iFileRecord) {
+    HFSPlusFSFile(HFSPlusFileSystemHandler iParent, CommonHFSCatalogFileRecord iFileRecord) {
         super(iParent);
         
         // Input check
@@ -39,18 +38,10 @@ public class HFSPlusFSFile extends FSFile {
         
         this.parent = iParent;
         this.fileRecord = iFileRecord;
-        HFSPlusCatalogLeafRecordData data = fileRecord.getData();
-        if(data.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
-           data instanceof HFSPlusCatalogFile) {
-            this.catalogFile = (HFSPlusCatalogFile)data;
-            this.attributes = new HFSPlusFSAttributes(this, catalogFile);
-            this.dataFork = new HFSPlusFSFork(this, FSForkType.DATA, catalogFile.getDataFork());
-            this.resourceFork = new HFSPlusFSFork(this, FSForkType.MACOS_RESOURCE, catalogFile.getResourceFork());
-        }
-        else
-            throw new IllegalArgumentException("Field iFileRecord: Expected" +
-                    " data to be a HFSPlusCatalogFile, but got a " +
-                    data.getClass());
+        this.catalogFile = fileRecord.getData();
+        this.attributes = new HFSPlusFSAttributes(this, catalogFile);
+        this.dataFork = new HFSPlusFSFork(this, FSForkType.DATA, catalogFile.getDataFork());
+        this.resourceFork = new HFSPlusFSFork(this, FSForkType.MACOS_RESOURCE, catalogFile.getResourceFork());
     }
     
     @Override
@@ -107,7 +98,7 @@ public class HFSPlusFSFile extends FSFile {
         return parent;
     }
     
-    public HFSPlusCatalogFile getInternalCatalogFile() {
+    public CommonHFSCatalogFile getInternalCatalogFile() {
         return catalogFile;
     }
 }

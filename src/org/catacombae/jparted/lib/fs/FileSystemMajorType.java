@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import org.catacombae.jparted.lib.fs.hfs.HFSFileSystemHandlerFactory;
 
 /**
  * Contains the possible "major file system types" that the library will work
@@ -36,7 +36,7 @@ import java.util.Map;
  */
 public enum FileSystemMajorType {
     APPLE_MFS,
-    APPLE_HFS,
+    APPLE_HFS(HFSFileSystemHandlerFactory.class),
     APPLE_HFS_PLUS(HFSPlusFileSystemHandlerFactory.class),
     APPLE_HFSX(HFSXFileSystemHandlerFactory.class),
     APPLE_PRODOS, FAT12, FAT16, FAT32, EXFAT, NTFS, HPFS, EXT3, REISERFS,

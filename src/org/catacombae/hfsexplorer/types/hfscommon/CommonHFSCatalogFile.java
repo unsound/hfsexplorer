@@ -5,15 +5,17 @@
 
 package org.catacombae.hfsexplorer.types.hfscommon;
 
+import java.util.Date;
 import org.catacombae.csjc.StaticStruct;
 import org.catacombae.hfsexplorer.types.HFSPlusCatalogFile;
+import org.catacombae.hfsexplorer.types.HFSPlusDate;
 import org.catacombae.hfsexplorer.types.hfs.CdrFilRec;
 
 /**
  *
  * @author erik
  */
-public abstract class CommonHFSCatalogFile implements StaticStruct {
+public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCatalogAttributes {
     
     public abstract CommonHFSCatalogNodeID getFileID();
     public abstract CommonHFSForkData getDataFork();
@@ -28,11 +30,16 @@ public abstract class CommonHFSCatalogFile implements StaticStruct {
         return new HFSImplementation(data);
     }
 
-    private static class HFSPlusImplementation extends CommonHFSCatalogFile {
+    public static class HFSPlusImplementation extends CommonHFSCatalogFile {
         private HFSPlusCatalogFile data;
         
-        public HFSPlusImplementation(HFSPlusCatalogFile data) {
+        private HFSPlusImplementation(HFSPlusCatalogFile data) {
             this.data = data;
+        }
+
+        @Deprecated
+        public HFSPlusCatalogFile getUnderlying() {
+            return data;
         }
 
         @Override
@@ -59,12 +66,60 @@ public abstract class CommonHFSCatalogFile implements StaticStruct {
         public byte[] getBytes() {
             return data.getBytes();
         }
+
+        public short getRecordType() {
+            return data.getRecordType();
+        }
+
+        public short getFlags() {
+            return data.getFlags();
+        }
+
+        public int getCreateDate() {
+            return data.getCreateDate();
+        }
+
+        public int getContentModDate() {
+            return data.getContentModDate();
+        }
+
+        public int getAttributeModDate() {
+            return data.getAttributeModDate();
+        }
+
+        public int getAccessDate() {
+            return data.getAccessDate();
+        }
+
+        public int getBackupDate() {
+            return data.getBackupDate();
+        }
+
+        public Date getCreateDateAsDate() {
+            return data.getCreateDateAsDate();
+        }
+
+        public Date getContentModDateAsDate() {
+            return data.getContentModDateAsDate();
+        }
+
+        public Date getAttributeModDateAsDate() {
+            return data.getAttributeModDateAsDate();
+        }
+
+        public Date getAccessDateAsDate() {
+            return data.getAccessDateAsDate();
+        }
+
+        public Date getBackupDateAsDate() {
+            return data.getBackupDateAsDate();
+        }
     }
     
-    private static class HFSImplementation extends CommonHFSCatalogFile {
+    public static class HFSImplementation extends CommonHFSCatalogFile {
         private CdrFilRec data;
         
-        public HFSImplementation(CdrFilRec data) {
+        private HFSImplementation(CdrFilRec data) {
             this.data = data;
         }
 
@@ -91,6 +146,54 @@ public abstract class CommonHFSCatalogFile implements StaticStruct {
         @Override
         public byte[] getBytes() {
             return data.getBytes();
+        }
+
+        public short getRecordType() {
+            return data.getCdrType();
+        }
+
+        public short getFlags() {
+            return data.getFilFlags();
+        }
+
+        public int getCreateDate() {
+            return data.getFilCrDat();
+        }
+
+        public int getContentModDate() {
+            return data.getFilMdDat();
+        }
+
+        public int getAttributeModDate() {
+            return data.getFilMdDat();
+        }
+
+        public int getAccessDate() {
+            return data.getFilMdDat();
+        }
+
+        public int getBackupDate() {
+            return data.getFilBkDat();
+        }
+
+        public Date getCreateDateAsDate() {
+            return HFSPlusDate.localTimestampToDate(getCreateDate());
+        }
+
+        public Date getContentModDateAsDate() {
+            return HFSPlusDate.localTimestampToDate(getContentModDate());
+        }
+
+        public Date getAttributeModDateAsDate() {
+            return HFSPlusDate.localTimestampToDate(getAttributeModDate());
+        }
+
+        public Date getAccessDateAsDate() {
+            return HFSPlusDate.localTimestampToDate(getAccessDate());
+        }
+
+        public Date getBackupDateAsDate() {
+            return HFSPlusDate.localTimestampToDate(getBackupDate());
         }
     }
 }
