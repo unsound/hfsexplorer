@@ -198,7 +198,7 @@ public abstract class BaseHFSFileSystemView {
 	return hfsFile;
     }
     
-    protected abstract CommonHFSVolumeHeader getVolumeHeader();
+    public abstract CommonHFSVolumeHeader getVolumeHeader();
     protected abstract CommonBTNodeDescriptor getNodeDescriptor(Readable rd);
     protected abstract CommonBTHeaderRecord getHeaderRecord(Readable rd);
     protected abstract CommonBTNodeDescriptor createCommonBTNodeDescriptor(
@@ -215,45 +215,62 @@ public abstract class BaseHFSFileSystemView {
     
     protected abstract CommonHFSCatalogNodeID getCommonHFSCatalogNodeID(
             ReservedID requestedNodeID);
-    protected abstract CommonHFSCatalogString createCommonHFSCatalogString(
-            String name);
+    /*protected abstract CommonHFSCatalogString createCommonHFSCatalogString(
+            String name);*/
     
-    public CommonHFSCatalogLeafRecord getRoot() {
-	CatalogInitProcedure init = new CatalogInitProcedure();
+    /**
+     * Decodes the supplied CommonHFSCatalogString according to the current
+     * settings of the view.
+     * 
+     * @param str
+     * @return
+     */
+    public abstract String getString(CommonHFSCatalogString str);
+    
+    public CommonHFSCatalogFolderRecord getRoot() {
+        CatalogInitProcedure init = new CatalogInitProcedure();
 
-	// Search down through the layers of indices to the record with parentID 1.
-	CommonHFSCatalogNodeID parentID = getCommonHFSCatalogNodeID(ReservedID.ROOT_PARENT);
+        // Search down through the layers of indices to the record with parentID 1.
+        CommonHFSCatalogNodeID parentID = getCommonHFSCatalogNodeID(ReservedID.ROOT_PARENT);
         final int nodeSize = init.bthr.getNodeSize();
-	long currentNodeNumber = init.bthr.getRootNodeNumber();
-	
-	byte[] currentNodeData = new byte[nodeSize];
-	init.catalogFile.seek(currentNodeNumber*init.bthr.getNodeSize());
-	init.catalogFile.readFully(currentNodeData);
-	CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
-	while(nodeDescriptor.getNodeType() == NodeType.INDEX) {
-	    CommonHFSCatalogIndexNode currentNode =
+        long currentNodeNumber = init.bthr.getRootNodeNumber();
+
+        byte[] currentNodeData = new byte[nodeSize];
+        init.catalogFile.seek(currentNodeNumber * init.bthr.getNodeSize());
+        init.catalogFile.readFully(currentNodeData);
+        CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
+        while(nodeDescriptor.getNodeType() == NodeType.INDEX) {
+            CommonHFSCatalogIndexNode currentNode =
                     catOps.newCatalogIndexNode(currentNodeData, 0, init.bthr.getNodeSize(), init.bthr);
-	    CommonBTIndexRecord matchingRecord = findKey(currentNode, parentID);
-	    
-	    currentNodeNumber = matchingRecord.getIndex();
-	    init.catalogFile.seek(currentNodeNumber*nodeSize);
-	    init.catalogFile.readFully(currentNodeData);
-	    nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
-	}
-	
-	// Leaf node reached. Find record with parent id 1. (or whatever value is in the parentID variable :) )
-	if(nodeDescriptor.getNodeType() == NodeType.LEAF) {
-	    CommonHFSCatalogLeafNode leaf =
+            CommonBTIndexRecord matchingRecord = findKey(currentNode, parentID);
+
+            currentNodeNumber = matchingRecord.getIndex();
+            init.catalogFile.seek(currentNodeNumber * nodeSize);
+            init.catalogFile.readFully(currentNodeData);
+            nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
+        }
+
+        // Leaf node reached. Find record with parent id 1. (or whatever value is in the parentID variable :) )
+        if(nodeDescriptor.getNodeType() == NodeType.LEAF) {
+            CommonHFSCatalogLeafNode leaf =
                     catOps.newCatalogLeafNode(currentNodeData, 0, nodeSize, init.bthr);
-	    CommonHFSCatalogLeafRecord[] recs = leaf.getLeafRecords();
-	    for(CommonHFSCatalogLeafRecord rec : recs)
-		if(rec.getKey().getParentID().toInt() == parentID.toInt())
-		    return rec;
-	    return null;
-	}
-	else
-	    throw new RuntimeException("Expected leaf node. Found other kind: " + 
-				       nodeDescriptor.getNodeType());
+            CommonHFSCatalogLeafRecord[] recs = leaf.getLeafRecords();
+            for(CommonHFSCatalogLeafRecord rec : recs) {
+                if(rec.getKey().getParentID().toInt() == parentID.toInt()) {
+                    if(rec instanceof CommonHFSCatalogFolderRecord)
+                        return (CommonHFSCatalogFolderRecord)rec;
+                    else
+                        throw new RuntimeException("Error in internal structures: " +
+                                " root node is not a folder record, but a " +
+                                rec.getClass());
+                }
+            }
+            return null;
+        }
+        else {
+            throw new RuntimeException("Expected leaf node. Found other kind: " +
+                    nodeDescriptor.getNodeType());
+        }
     }
     
     /**
@@ -301,7 +318,7 @@ public abstract class BaseHFSFileSystemView {
      * <code>leaf</code> as tail.
      */
     public LinkedList<CommonHFSCatalogLeafRecord> getPathTo(CommonHFSCatalogNodeID leafID) {
-	CommonHFSCatalogLeafRecord leafRec = getRecord(leafID, createCommonHFSCatalogString(""));
+	CommonHFSCatalogLeafRecord leafRec = getRecord(leafID, CommonHFSCatalogString.EMPTY);
 	if(leafRec != null)
 	    return getPathTo(leafRec);
 	else
@@ -327,7 +344,7 @@ public abstract class BaseHFSFileSystemView {
 	pathList.addLast(leaf);
 	CommonHFSCatalogNodeID parentID = leaf.getKey().getParentID();
 	while(!parentID.equals(parentID.getReservedID(ReservedID.ROOT_PARENT))) {
-	    CommonHFSCatalogLeafRecord parent = getRecord(parentID, createCommonHFSCatalogString("")); // Look for the thread record associated with the parent dir
+	    CommonHFSCatalogLeafRecord parent = getRecord(parentID, CommonHFSCatalogString.EMPTY); // Look for the thread record associated with the parent dir
 	    if(parent == null)
 		throw new RuntimeException("No folder thread found!");
 	    //CommonHFSCatalogLeafRecord data = parent.getData();

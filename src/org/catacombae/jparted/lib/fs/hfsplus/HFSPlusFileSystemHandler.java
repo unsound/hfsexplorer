@@ -18,13 +18,17 @@
 package org.catacombae.jparted.lib.fs.hfsplus;
 
 import java.util.LinkedList;
-import org.catacombae.hfsexplorer.HFSPlusFileSystemView;
-import org.catacombae.hfsexplorer.types.HFSCatalogNodeID;
-import org.catacombae.hfsexplorer.types.HFSPlusCatalogFolder;
-import org.catacombae.hfsexplorer.types.HFSPlusCatalogLeafRecord;
-import org.catacombae.hfsexplorer.types.HFSPlusCatalogLeafRecordData;
-import org.catacombae.hfsexplorer.types.HFSPlusCatalogThread;
-import org.catacombae.hfsexplorer.types.HFSUniStr255;
+import org.catacombae.hfsexplorer.UnicodeNormalizationToolkit;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolderRecord;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFileRecord;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolderThreadRecord;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFileThreadRecord;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolderThread;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafRecord;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogNodeID;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogString;
+import org.catacombae.hfsexplorer.unfinished.BaseHFSFileSystemView;
+import org.catacombae.hfsexplorer.unfinished.ImplHFSPlusFileSystemView;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.jparted.lib.fs.*;
 import org.catacombae.jparted.lib.DataLocator;
@@ -36,16 +40,16 @@ import org.catacombae.jparted.lib.DataLocator;
  * @author Erik Larsson
  */
 public class HFSPlusFileSystemHandler extends FileSystemHandler {
-    private HFSPlusFileSystemView view;
+    private BaseHFSFileSystemView view;
     private boolean doUnicodeFileNameComposition;
     
     public HFSPlusFileSystemHandler(DataLocator fsLocator, boolean useCaching,
             boolean iDoUnicodeFileNameComposition) {
-        this(new HFSPlusFileSystemView(fsLocator.createReadOnlyFile(), 0,
+        this(new ImplHFSPlusFileSystemView(fsLocator.createReadOnlyFile(), 0,
                     useCaching), iDoUnicodeFileNameComposition);
     }
     
-    protected HFSPlusFileSystemHandler(HFSPlusFileSystemView iView,
+    protected HFSPlusFileSystemHandler(BaseHFSFileSystemView iView,
                     boolean iDoUnicodeFileNameComposition) {
         this.view = iView;
         this.doUnicodeFileNameComposition = iDoUnicodeFileNameComposition;
@@ -53,15 +57,13 @@ public class HFSPlusFileSystemHandler extends FileSystemHandler {
     
     @Override
     public FSEntry[] list(String... path) {
-        HFSPlusCatalogLeafRecord curFolder = view.getRoot();
+        CommonHFSCatalogLeafRecord curFolder = view.getRoot();
         for(String curFolderName : path) {
-            final HFSPlusCatalogLeafRecord originalFolder = curFolder;
-            HFSPlusCatalogLeafRecord[] subRecords = view.listRecords(curFolder);
-            for(HFSPlusCatalogLeafRecord subRecord : subRecords) {
-                HFSPlusCatalogLeafRecordData recData = subRecord.getData();
+            final CommonHFSCatalogLeafRecord originalFolder = curFolder;
+            CommonHFSCatalogLeafRecord[] subRecords = view.listRecords(curFolder);
+            for(CommonHFSCatalogLeafRecord subRecord : subRecords) {
                 if(getProperNodeName(subRecord).equals(curFolderName) &&
-                   recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
-                   recData instanceof HFSPlusCatalogFolder) {
+                   subRecord instanceof CommonHFSCatalogFolderRecord) {
                     curFolder = subRecord;
                     break;
                 }
@@ -78,19 +80,24 @@ public class HFSPlusFileSystemHandler extends FileSystemHandler {
         return new FSForkType[] { FSForkType.DATA, FSForkType.MACOS_RESOURCE };
     }
 
-    String getProperNodeName(HFSPlusCatalogLeafRecord record) {
+    String getProperNodeName(CommonHFSCatalogLeafRecord record) {
+        
+        //if(doUnicodeFileNameComposition)
+        //    return record.getKey().getNodeName().decode(COMPOSED_UTF16_DECODER);
+        //else
+        //    return record.getKey().getNodeName().decode(DECOMPOSED_UTF16_DECODER);
+        String nodeNameRaw = view.getString(record.getKey().getNodeName());
         if(doUnicodeFileNameComposition)
-            return record.getKey().getNodeName().getUnicodeAsComposedString();
+            return UnicodeNormalizationToolkit.getDefaultInstance().compose(nodeNameRaw);
         else
-            return record.getKey().getNodeName().getUnicodeAsDecomposedString();
-
+            return nodeNameRaw;
     }    
 
-    ReadableRandomAccessStream getReadableDataForkStream(HFSPlusCatalogLeafRecord fileRecord) {
+    ReadableRandomAccessStream getReadableDataForkStream(CommonHFSCatalogFileRecord fileRecord) {
         return view.getReadableDataForkStream(fileRecord);
     }
     
-    ReadableRandomAccessStream getReadableResourceForkStream(HFSPlusCatalogLeafRecord fileRecord) {
+    ReadableRandomAccessStream getReadableResourceForkStream(CommonHFSCatalogFileRecord fileRecord) {
         return view.getReadableResourceForkStream(fileRecord);
     }
     
@@ -100,42 +107,49 @@ public class HFSPlusFileSystemHandler extends FileSystemHandler {
     }
      * */
     
-    FSEntry[] listFSEntries(HFSPlusCatalogLeafRecord folderRecord) {
-        HFSPlusCatalogLeafRecord[] subRecords = view.listRecords(folderRecord);
+    FSEntry[] listFSEntries(CommonHFSCatalogLeafRecord folderRecord) {
+        CommonHFSCatalogLeafRecord[] subRecords = view.listRecords(folderRecord);
         LinkedList<FSEntry> result = new LinkedList<FSEntry>();
         for(int i = 0; i < subRecords.length; ++i) {
-            HFSPlusCatalogLeafRecord curRecord = subRecords[i];
-            if(curRecord.getData().getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE)
-                result.addLast(new HFSPlusFSFile(this, curRecord));
-            else if(curRecord.getData().getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER)
-                result.addLast(new HFSPlusFSFolder(this, curRecord));
+            CommonHFSCatalogLeafRecord curRecord = subRecords[i];
+            if(curRecord instanceof CommonHFSCatalogFileRecord)
+                result.addLast(new HFSPlusFSFile(this, (CommonHFSCatalogFileRecord)curRecord));
+            else if(curRecord instanceof CommonHFSCatalogFolderRecord) {
+                result.addLast(new HFSPlusFSFolder(this, (CommonHFSCatalogFolderRecord)curRecord));
+            }
         }
         return result.toArray(new FSEntry[result.size()]);
     }
     
-    FSFolder lookupParentFolder(HFSPlusCatalogLeafRecord childRecord) {
-        HFSCatalogNodeID parentID = childRecord.getKey().getParentID();
+    FSFolder lookupParentFolder(CommonHFSCatalogLeafRecord childRecord) {
+        CommonHFSCatalogNodeID parentID = childRecord.getKey().getParentID();
         
         // Look for the thread record associated with the parent dir
-        HFSPlusCatalogLeafRecord parent =
-                view.getRecord(parentID, new HFSUniStr255(""));
+        CommonHFSCatalogLeafRecord parent =
+                view.getRecord(parentID, CommonHFSCatalogString.EMPTY);
         if(parent == null) {
             throw new RuntimeException("INTERNAL ERROR: No folder thread found!");
         }
-        HFSPlusCatalogLeafRecordData data = parent.getData();
-        if(data.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
-                data instanceof HFSPlusCatalogThread) {
-            HFSPlusCatalogThread threadData = (HFSPlusCatalogThread) data;
-            return new HFSPlusFSFolder(this,
-                    view.getRecord(threadData.getParentID(),
-                        threadData.getNodeName()));
+
+        if(parent instanceof CommonHFSCatalogFolderThreadRecord) {
+            CommonHFSCatalogFolderThread data =
+                    ((CommonHFSCatalogFolderThreadRecord)parent).getData();
+            CommonHFSCatalogLeafRecord rec =
+                    view.getRecord(data.getParentID(), data.getNodeName());
+            if(rec instanceof CommonHFSCatalogFolderRecord)
+                return new HFSPlusFSFolder(this, (CommonHFSCatalogFolderRecord)rec);
+            else
+                throw new RuntimeException("Internal error: rec not instanceof " +
+                        "CommonHFSCatalogFolderRecord, but instead:" +
+                        rec.getClass());
         }
-        else if(data.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE_THREAD &&
-                data instanceof HFSPlusCatalogThread) {
-            throw new RuntimeException("Tried to get folder thread (" + parentID + ",\"\") but found a file thread!");
+        else if(parent instanceof CommonHFSCatalogFileThreadRecord) {
+            throw new RuntimeException("Tried to get folder thread record (" +
+                    parentID + ",\"\") but found a file thread record!");
         }
         else {
-            throw new RuntimeException("Tried to get folder thread (" + parentID + ",\"\") but found a " + data.getClass() + "!");
+            throw new RuntimeException("Tried to get folder thread record (" +
+                    parentID + ",\"\") but found a " + parent.getClass() + "!");
         }
     }
     
@@ -145,7 +159,7 @@ public class HFSPlusFileSystemHandler extends FileSystemHandler {
      * @deprecated
      * @return
      */
-    public HFSPlusFileSystemView getFSView() {
+    public BaseHFSFileSystemView getFSView() {
         return view;
     }
 

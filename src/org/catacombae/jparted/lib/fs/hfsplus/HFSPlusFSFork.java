@@ -11,6 +11,7 @@ import org.catacombae.hfsexplorer.ForkFilter;
 import org.catacombae.hfsexplorer.io.ReadableRandomAccessInputStream;
 import org.catacombae.hfsexplorer.io.SynchronizedReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.types.HFSPlusForkData;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSForkData;
 import org.catacombae.io.RandomAccessStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.TruncatableRandomAccessStream;
@@ -25,9 +26,9 @@ import org.catacombae.jparted.lib.fs.FSForkType;
 public class HFSPlusFSFork extends FSFork {
     private final HFSPlusFSFile parent;
     private final FSForkType type;
-    private final HFSPlusForkData forkData;
+    private final CommonHFSForkData forkData;
     
-    HFSPlusFSFork(HFSPlusFSFile iParent, FSForkType iType, HFSPlusForkData iForkData) {
+    HFSPlusFSFork(HFSPlusFSFile iParent, FSForkType iType, CommonHFSForkData iForkData) {
         super(iParent);
         
         // Input check

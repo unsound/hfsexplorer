@@ -9,6 +9,9 @@ import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.types.HFSPlusCatalogFolder;
 import org.catacombae.hfsexplorer.types.HFSPlusCatalogLeafRecord;
 import org.catacombae.hfsexplorer.types.HFSPlusCatalogLeafRecordData;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolder;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolderRecord;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.jparted.lib.fs.FSAttributes;
 import org.catacombae.jparted.lib.fs.FSEntry;
 import org.catacombae.jparted.lib.fs.FSFolder;
@@ -19,11 +22,11 @@ import org.catacombae.jparted.lib.fs.FSFolder;
  */
 public class HFSPlusFSFolder extends FSFolder {
     private final HFSPlusFileSystemHandler fsHandler;
-    private final HFSPlusCatalogLeafRecord folderRecord;
-    private final HFSPlusCatalogFolder catalogFolder;
+    private final CommonHFSCatalogFolderRecord folderRecord;
+    private final CommonHFSCatalogFolder catalogFolder;
     private final HFSPlusFSAttributes attributes;
     
-    public HFSPlusFSFolder(HFSPlusFileSystemHandler iParent, HFSPlusCatalogLeafRecord iFolderRecord) {
+    public HFSPlusFSFolder(HFSPlusFileSystemHandler iParent, CommonHFSCatalogFolderRecord iFolderRecord) {
         super(iParent);
         
         // Input check
@@ -34,16 +37,9 @@ public class HFSPlusFSFolder extends FSFolder {
         
         this.fsHandler = iParent;
         this.folderRecord = iFolderRecord;
-        HFSPlusCatalogLeafRecordData data = folderRecord.getData();
-        if(data.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
-           data instanceof HFSPlusCatalogFolder) {
-            this.catalogFolder = (HFSPlusCatalogFolder)data;
-            this.attributes = new HFSPlusFSAttributes(this, catalogFolder);
-        }
-        else
-            throw new IllegalArgumentException("Field iFolderRecord: Expected" +
-                    " data to be a HFSPlusCatalogFolder, but got a " +
-                    data.getClass());
+        //CommonHFSCatalogLeafRecordData data = folderRecord.getData();
+        this.catalogFolder = folderRecord.getData();
+        this.attributes = new HFSPlusFSAttributes(this, catalogFolder);
     }
 
     @Override
@@ -53,7 +49,7 @@ public class HFSPlusFSFolder extends FSFolder {
 
     @Override
     public long getValence() {
-        return Util.unsign(catalogFolder.getValence());
+        return catalogFolder.getValence();
     }
 
     @Override
@@ -71,7 +67,7 @@ public class HFSPlusFSFolder extends FSFolder {
         return fsHandler.lookupParentFolder(folderRecord);
     }
     
-    public HFSPlusCatalogFolder getInternalCatalogFolder() {
+    public CommonHFSCatalogFolder getInternalCatalogFolder() {
         return catalogFolder;
     }
 }

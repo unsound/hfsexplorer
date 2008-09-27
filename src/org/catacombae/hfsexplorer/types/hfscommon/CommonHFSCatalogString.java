@@ -13,6 +13,7 @@ import org.catacombae.hfsexplorer.types.HFSUniStr255;
  * @author erik
  */
 public abstract class CommonHFSCatalogString {
+    public static final CommonHFSCatalogString EMPTY = create(new byte[0]);
 
     public static CommonHFSCatalogString create(HFSUniStr255 nodeName) {
         return new HFSPlusImplementation(nodeName);
@@ -29,10 +30,10 @@ public abstract class CommonHFSCatalogString {
         
     public abstract byte[] getBytes();
     
-    private static class HFSPlusImplementation extends CommonHFSCatalogString {
+    public static class HFSPlusImplementation extends CommonHFSCatalogString {
         private HFSUniStr255 nodeName;
         
-        public HFSPlusImplementation(HFSUniStr255 nodeName) {
+        private HFSPlusImplementation(HFSUniStr255 nodeName) {
             this.nodeName = nodeName;
         }
         
@@ -42,10 +43,10 @@ public abstract class CommonHFSCatalogString {
         }
     }
     
-    private static class HFSImplementation extends CommonHFSCatalogString {
+    public static class HFSImplementation extends CommonHFSCatalogString {
         private final byte[] ckrCName;
         
-        public HFSImplementation(byte[] ckrCName) {
+        private HFSImplementation(byte[] ckrCName) {
             this.ckrCName = ckrCName;
         }
 

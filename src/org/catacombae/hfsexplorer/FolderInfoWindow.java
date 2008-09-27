@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.catacombae.hfsexplorer;
 
 import org.catacombae.hfsexplorer.gui.FolderInfoPanel;
@@ -23,53 +22,61 @@ import org.catacombae.hfsexplorer.types.HFSPlusCatalogFolder;
 //import org.catacombae.hfsexplorer.types.JournalInfoBlock;
 import java.awt.*;
 import javax.swing.*;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolder;
 import org.catacombae.jparted.lib.fs.FSFolder;
 import org.catacombae.jparted.lib.fs.hfsplus.HFSPlusFSFolder;
 
 public class FolderInfoWindow extends JFrame {
+
     private JTabbedPane tabs;
     private JScrollPane infoPanelScroller;
     //private JScrollPane journalInfoPanelScroller;
     private FolderInfoPanel infoPanel;
     //private JournalInfoPanel journalInfoPanel;
-    
+
     public FolderInfoWindow(String filename) {
-	super("Info - " + filename);
-	
-	tabs = new JTabbedPane();
-	infoPanel = new FolderInfoPanel();
-	//journalInfoPanel = new JournalInfoPanel();
-	
-	infoPanelScroller = new JScrollPane(infoPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-	//journalInfoPanelScroller = new JScrollPane(journalInfoPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-	tabs.addTab("Detailed", infoPanelScroller);
-	//tabs.addTab("Journal info", journalInfoPanelScroller);
-	add(tabs, BorderLayout.CENTER);
-	
-	infoPanelScroller.getVerticalScrollBar().setUnitIncrement(10);
-	
-	setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-	pack();
-	int width = getSize().width;
-	int height = getSize().height;
-	int adjustedHeight = width + width/2;
-	//System.err.println("w: " + width + " h: " + height + " ah: " + adjustedHeight);
-	if(adjustedHeight < height)
-	    setSize(width, adjustedHeight);
-	
-	setLocationRelativeTo(null);
+        super("Info - " + filename);
+
+        tabs = new JTabbedPane();
+        infoPanel = new FolderInfoPanel();
+        //journalInfoPanel = new JournalInfoPanel();
+
+        infoPanelScroller = new JScrollPane(infoPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        //journalInfoPanelScroller = new JScrollPane(journalInfoPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        tabs.addTab("Detailed", infoPanelScroller);
+        //tabs.addTab("Journal info", journalInfoPanelScroller);
+        add(tabs, BorderLayout.CENTER);
+
+        infoPanelScroller.getVerticalScrollBar().setUnitIncrement(10);
+
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        pack();
+        int width = getSize().width;
+        int height = getSize().height;
+        int adjustedHeight = width + width / 2;
+        //System.err.println("w: " + width + " h: " + height + " ah: " + adjustedHeight);
+        if(adjustedHeight < height)
+            setSize(width, adjustedHeight);
+
+        setLocationRelativeTo(null);
     }
-    
+
     public void setFields(FSFolder folder) {
         if(folder instanceof HFSPlusFSFolder) {
-            infoPanel.setFields(((HFSPlusFSFolder)folder).getInternalCatalogFolder());
+            CommonHFSCatalogFolder fld = ((HFSPlusFSFolder) folder).getInternalCatalogFolder();
+            if(fld instanceof CommonHFSCatalogFolder.HFSPlusImplementation) {
+                infoPanel.setFields(((CommonHFSCatalogFolder.HFSPlusImplementation)fld).getUnderlying());
+            }
+            else
+                throw new IllegalArgumentException("No HFSPlusImplementation...");
         }
         else
             throw new RuntimeException("FSFolder type " + folder.getClass() +
                     " not yet supported!");
     }
+
     public void setFields(HFSPlusCatalogFolder vh) {
-	infoPanel.setFields(vh);
+        infoPanel.setFields(vh);
     }
 //     public void setJournalFields(JournalInfoBlock jib) {
 // 	journalInfoPanel.setFields(jib);

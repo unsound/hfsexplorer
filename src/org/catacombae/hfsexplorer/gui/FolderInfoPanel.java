@@ -20,8 +20,8 @@
  *
  * Created on den 16 mars 2007, 07:37
  */
-
 package org.catacombae.hfsexplorer.gui;
+
 import org.catacombae.hfsexplorer.types.finder.ExtendedFolderInfo;
 import org.catacombae.hfsexplorer.types.finder.FolderInfo;
 import org.catacombae.hfsexplorer.types.*;
@@ -34,84 +34,85 @@ import java.text.DateFormat;
  * @author  erik
  */
 public class FolderInfoPanel extends javax.swing.JPanel {
+
     private final DateFormat dti = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
     private Boolean originalOpaqueness = null;
     private Color originalColor = null;
-    
+
     /** Creates new form FolderInfoPanel */
     public FolderInfoPanel() {
         initComponents();
     }
-    
+
     public void setFields(HFSPlusCatalogFolder cf) {
-	recordTypeField.setText("0x" + Util.toHexStringBE(cf.getRecordType()));	
-	flagsField.setText("0x" + Util.toHexStringBE(cf.getFlags()));
+        recordTypeField.setText("0x" + Util.toHexStringBE(cf.getRecordType()));
+        flagsField.setText("0x" + Util.toHexStringBE(cf.getFlags()));
         valenceField.setText("" + cf.getValence());
-	folderIDField.setText(cf.getFolderID().toString());
-	createDateField.setText(dti.format(cf.getCreateDateAsDate()));
-	contentModifyDateField.setText(dti.format(cf.getContentModDateAsDate()));
-	attributesModifyDateField.setText(dti.format(cf.getAttributeModDateAsDate()));
+        folderIDField.setText(cf.getFolderID().toString());
+        createDateField.setText(dti.format(cf.getCreateDateAsDate()));
+        contentModifyDateField.setText(dti.format(cf.getContentModDateAsDate()));
+        attributesModifyDateField.setText(dti.format(cf.getAttributeModDateAsDate()));
         accessDateField.setText(dti.format(cf.getAccessDateAsDate()));
-	backupDateField.setText(dti.format(cf.getBackupDateAsDate()));
-	
-	HFSPlusBSDInfo bi = cf.getPermissions();
-	permissionsOwnerIDField.setText("" + bi.getOwnerID());
-	permissionsGroupIDField.setText("" + bi.getGroupID());
-	permissionsAdminFlagsArchivedBox.setSelected(bi.getAdminArchivedFlag());
-	permissionsAdminFlagsImmutableBox.setSelected(bi.getAdminImmutableFlag());
-	permissionsAdminFlagsAppendBox.setSelected(bi.getAdminAppendFlag());
-	permissionsOwnerFlagsNodumpBox.setSelected(bi.getOwnerNodumpFlag());
-	permissionsOwnerFlagsImmutableBox.setSelected(bi.getOwnerImmutableFlag());
-	permissionsOwnerFlagsAppendBox.setSelected(bi.getOwnerAppendFlag());
-	permissionsOwnerFlagsOpaqueBox.setSelected(bi.getOwnerOpaqueFlag());
-	permissionsFileModeField.setText(bi.getFileModeString());
- 	permissionsFileModeSUIDBox.setSelected(bi.getFileModeSetUserID());
- 	permissionsFileModeSGIDBox.setSelected(bi.getFileModeSetGroupID());
- 	permissionsFileModeSTXTBox.setSelected(bi.getFileModeSticky());
-	permissionsSpecialField.setText("0x" + Util.toHexStringBE(bi.getSpecial()));
-	
-	FolderInfo ui = cf.getUserInfo();
-	userInfoWindowBoundsField.setText(ui.getWindowBounds().toString());
+        backupDateField.setText(dti.format(cf.getBackupDateAsDate()));
+
+        HFSPlusBSDInfo bi = cf.getPermissions();
+        permissionsOwnerIDField.setText("" + bi.getOwnerID());
+        permissionsGroupIDField.setText("" + bi.getGroupID());
+        permissionsAdminFlagsArchivedBox.setSelected(bi.getAdminArchivedFlag());
+        permissionsAdminFlagsImmutableBox.setSelected(bi.getAdminImmutableFlag());
+        permissionsAdminFlagsAppendBox.setSelected(bi.getAdminAppendFlag());
+        permissionsOwnerFlagsNodumpBox.setSelected(bi.getOwnerNodumpFlag());
+        permissionsOwnerFlagsImmutableBox.setSelected(bi.getOwnerImmutableFlag());
+        permissionsOwnerFlagsAppendBox.setSelected(bi.getOwnerAppendFlag());
+        permissionsOwnerFlagsOpaqueBox.setSelected(bi.getOwnerOpaqueFlag());
+        permissionsFileModeField.setText(bi.getFileModeString());
+        permissionsFileModeSUIDBox.setSelected(bi.getFileModeSetUserID());
+        permissionsFileModeSGIDBox.setSelected(bi.getFileModeSetGroupID());
+        permissionsFileModeSTXTBox.setSelected(bi.getFileModeSticky());
+        permissionsSpecialField.setText("0x" + Util.toHexStringBE(bi.getSpecial()));
+
+        FolderInfo ui = cf.getUserInfo();
+        userInfoWindowBoundsField.setText(ui.getWindowBounds().toString());
         userInfoFinderFlagsIsOnDeskBox.setSelected(ui.getFinderFlagIsOnDesk());
-	int[] rgb = ui.getFinderFlagColorRGB();
+        int[] rgb = ui.getFinderFlagColorRGB();
         if(originalOpaqueness == null)
             originalOpaqueness = userInfoFinderFlagsColorField.isOpaque();
         if(originalColor == null)
             originalColor = userInfoFinderFlagsColorField.getBackground();
-	if(rgb != null) {
+        if(rgb != null) {
             userInfoFinderFlagsColorField.setOpaque(true);
-	    userInfoFinderFlagsColorField.setBackground(new Color(rgb[0], rgb[1], rgb[2]));
+            userInfoFinderFlagsColorField.setBackground(new Color(rgb[0], rgb[1], rgb[2]));
         }
         else {
             userInfoFinderFlagsColorField.setOpaque(originalOpaqueness);
             userInfoFinderFlagsColorField.setBackground(originalColor);
         }
-	userInfoFinderFlagsColorField.setText("" + ui.getFinderFlagColor());
-	userInfoFinderFlagsIsSharedBox.setSelected(ui.getFinderFlagIsShared());
-	userInfoFinderFlagsHasNoINITsBox.setSelected(ui.getFinderFlagHasNoINITs());
-	userInfoFinderFlagsHasBeenInitedBox.setSelected(ui.getFinderFlagHasBeenInited());
-	userInfoFinderFlagsHasCustomIconBox.setSelected(ui.getFinderFlagHasCustomIcon());
-	userInfoFinderFlagsIsStationeryBox.setSelected(ui.getFinderFlagIsStationery());
-	userInfoFinderFlagsNameLockedBox.setSelected(ui.getFinderFlagNameLocked());
-	userInfoFinderFlagsHasBundleBox.setSelected(ui.getFinderFlagHasBundle());
-	userInfoFinderFlagsIsInvisibleBox.setSelected(ui.getFinderFlagIsInvisible());
-	userInfoFinderFlagsIsAliasBox.setSelected(ui.getFinderFlagIsAlias());
-	userInfoLocationField.setText(ui.getLocation().toString());
-	userInfoReservedField.setText("0x" + Util.toHexStringBE(ui.getReservedField()));
-	
-	ExtendedFolderInfo ei = cf.getFinderInfo();
-        finderInfoScrollPositionField.setText(ei.getScrollPosition().toString());
-	finderInfoReserved1Field.setText("0x" + Util.toHexStringBE(ei.getReserved1()));
- 	finderInfoExtendedFinderFlagsExtendedFlagsAreInvalidBox.setSelected(ei.getExtendedFinderFlagExtendedFlagsAreInvalid());
- 	finderInfoExtendedFinderFlagsExtendedFlagHasCustomBadgeBox.setSelected(ei.getExtendedFinderFlagExtendedFlagHasCustomBadge());
- 	finderInfoExtendedFinderFlagsExtendedFlagHasRoutingInfoBox.setSelected(ei.getExtendedFinderFlagExtendedFlagHasRoutingInfo());
-	finderInfoReserved2Field.setText("0x" + Util.toHexStringBE(ei.getReserved2()));
-	finderInfoPutAwayFolderIDField.setText("" + ei.getPutAwayFolderID());
+        userInfoFinderFlagsColorField.setText("" + ui.getFinderFlagColor());
+        userInfoFinderFlagsIsSharedBox.setSelected(ui.getFinderFlagIsShared());
+        userInfoFinderFlagsHasNoINITsBox.setSelected(ui.getFinderFlagHasNoINITs());
+        userInfoFinderFlagsHasBeenInitedBox.setSelected(ui.getFinderFlagHasBeenInited());
+        userInfoFinderFlagsHasCustomIconBox.setSelected(ui.getFinderFlagHasCustomIcon());
+        userInfoFinderFlagsIsStationeryBox.setSelected(ui.getFinderFlagIsStationery());
+        userInfoFinderFlagsNameLockedBox.setSelected(ui.getFinderFlagNameLocked());
+        userInfoFinderFlagsHasBundleBox.setSelected(ui.getFinderFlagHasBundle());
+        userInfoFinderFlagsIsInvisibleBox.setSelected(ui.getFinderFlagIsInvisible());
+        userInfoFinderFlagsIsAliasBox.setSelected(ui.getFinderFlagIsAlias());
+        userInfoLocationField.setText(ui.getLocation().toString());
+        userInfoReservedField.setText("0x" + Util.toHexStringBE(ui.getReservedField()));
 
-	textEncodingField.setText("" + cf.getTextEncoding());
-	reservedField.setText("0x" + Util.toHexStringBE(cf.getReserved()));
+        ExtendedFolderInfo ei = cf.getFinderInfo();
+        finderInfoScrollPositionField.setText(ei.getScrollPosition().toString());
+        finderInfoReserved1Field.setText("0x" + Util.toHexStringBE(ei.getReserved1()));
+        finderInfoExtendedFinderFlagsExtendedFlagsAreInvalidBox.setSelected(ei.getExtendedFinderFlagExtendedFlagsAreInvalid());
+        finderInfoExtendedFinderFlagsExtendedFlagHasCustomBadgeBox.setSelected(ei.getExtendedFinderFlagExtendedFlagHasCustomBadge());
+        finderInfoExtendedFinderFlagsExtendedFlagHasRoutingInfoBox.setSelected(ei.getExtendedFinderFlagExtendedFlagHasRoutingInfo());
+        finderInfoReserved2Field.setText("0x" + Util.toHexStringBE(ei.getReserved2()));
+        finderInfoPutAwayFolderIDField.setText("" + ei.getPutAwayFolderID());
+
+        textEncodingField.setText("" + cf.getTextEncoding());
+        reservedField.setText("0x" + Util.toHexStringBE(cf.getReserved()));
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -968,8 +969,6 @@ public class FolderInfoPanel extends javax.swing.JPanel {
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-    
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField accessDateField;
     private javax.swing.JTextField attributesModifyDateField;
@@ -1071,5 +1070,4 @@ public class FolderInfoPanel extends javax.swing.JPanel {
     private javax.swing.JTextField userInfoWindowBoundsField;
     private javax.swing.JTextField valenceField;
     // End of variables declaration//GEN-END:variables
-    
 }
