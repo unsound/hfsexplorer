@@ -3,11 +3,12 @@
  * and open the template in the editor.
  */
 
-package org.catacombae.hfsexplorer.fsframework;
+package org.catacombae.hfsexplorer.deprecated;
 
 /**
  *
  * @author Erik
+ * @deprecated
  */
 class FSFileNotFoundException extends RuntimeException {
     public FSFileNotFoundException() {

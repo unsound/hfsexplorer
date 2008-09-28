@@ -5,7 +5,7 @@
 
 package org.catacombae.jparted.lib.fs.hfs;
 
-import org.catacombae.hfsexplorer.unfinished.ImplHFSFileSystemView;
+import org.catacombae.hfsexplorer.fs.ImplHFSFileSystemView;
 import org.catacombae.jparted.lib.DataLocator;
 import org.catacombae.jparted.lib.fs.hfsplus.HFSPlusFileSystemHandler;
 

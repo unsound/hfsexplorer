@@ -25,7 +25,7 @@ import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusVolumeHeader;
 import org.catacombae.hfsexplorer.types.hfsplus.JournalInfoBlock;
 import java.awt.*;
 import javax.swing.*;
-import org.catacombae.hfsexplorer.unfinished.BaseHFSFileSystemView;
+import org.catacombae.hfsexplorer.fs.BaseHFSFileSystemView;
 
 public class VolumeInfoWindow extends JFrame {
     private JTabbedPane tabs;

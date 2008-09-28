@@ -3,13 +3,14 @@
  * and open the template in the editor.
  */
 
-package org.catacombae.hfsexplorer.fsframework;
+package org.catacombae.hfsexplorer.deprecated;
 
 import java.util.List;
 
 /**
  *
  * @author Erik
+ * @deprecated
  */
 interface FileSystem {
     public FSEntry getEntry(String... path) throws FSFileNotFoundException;

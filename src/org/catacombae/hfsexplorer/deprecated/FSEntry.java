@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.catacombae.hfsexplorer.fsframework;
+package org.catacombae.hfsexplorer.deprecated;
 
 import java.util.Date;
 import org.catacombae.hfsexplorer.Util;
@@ -11,6 +11,7 @@ import org.catacombae.hfsexplorer.Util;
 /**
  *
  * @author Erik
+ * @deprecated
  */
 class FSEntry {
     private FileSystem parentFileSystem;

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.unfinished;
+package org.catacombae.hfsexplorer.fs;
 import org.catacombae.hfsexplorer.io.ForkFilter;
 import org.catacombae.hfsexplorer.*; // until we move it back
 

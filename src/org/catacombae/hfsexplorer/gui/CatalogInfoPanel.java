@@ -53,7 +53,7 @@ import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogIndexNode;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogKey;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafNode;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafRecord;
-import org.catacombae.hfsexplorer.unfinished.BaseHFSFileSystemView;
+import org.catacombae.hfsexplorer.fs.BaseHFSFileSystemView;
 
 /**
  *

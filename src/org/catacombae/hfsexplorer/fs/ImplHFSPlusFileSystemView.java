@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.catacombae.hfsexplorer.unfinished;
+package org.catacombae.hfsexplorer.fs;
 
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.types.hfsplus.BTHeaderRec;
