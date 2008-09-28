@@ -22,13 +22,11 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
     public abstract CommonHFSForkData getDataFork();
     public abstract CommonHFSForkData getResourceFork();
     public abstract byte[] getBytes();
-
-
+    
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + "CommonHFSCatalogFile:");
         printFields(ps, prefix + " ");
     }
-
 
     public abstract void printFields(PrintStream ps, String string);
     
@@ -136,7 +134,10 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
         private CdrFilRec data;
         
         private HFSImplementation(CdrFilRec data) {
+            System.err.println("CommonHFSCatalogFile.HFSImplementation invoked!");
             this.data = data;
+            data.print(System.err, "  ");
+            System.err.println("CommonHFSCatalogFile.HFSImplementation finished.");
         }
 
         @Override

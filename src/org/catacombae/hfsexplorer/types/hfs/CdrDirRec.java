@@ -10,25 +10,25 @@ import org.catacombae.hfsexplorer.Util;
 public class CdrDirRec extends CatDataRec implements StaticStruct {
     /*
      * struct CdrDirRec
-     * size: 36 bytes
-     * description: 
-     * 
-     * BP  Size  Type       Identifier   Description                                 
+     * size: 70 bytes
+     * description:
+     *
+     * BP  Size  Type       Identifier   Description
      * ------------------------------------------------------------------------------
-     * 0   1     SInt8      cdrType      record type (SignedByte)                    
-     * 1   1     SInt8      cdrResrv2    reserved (SignedByte)                       
-     * 2   2     SInt16     dirFlags     directory flags (Integer)                   
-     * 4   2     SInt16     dirVal       directory valence (Integer)                 
-     * 6   4     SInt32     dirDirID     directory ID (LongInt)                      
-     * 10  4     SInt32     dirCrDat     date and time of creation (LongInt)         
+     * 0   1     SInt8      cdrType      record type (SignedByte)
+     * 1   1     SInt8      cdrResrv2    reserved (SignedByte)
+     * 2   2     SInt16     dirFlags     directory flags (Integer)
+     * 4   2     SInt16     dirVal       directory valence (Integer)
+     * 6   4     SInt32     dirDirID     directory ID (LongInt)
+     * 10  4     SInt32     dirCrDat     date and time of creation (LongInt)
      * 14  4     SInt32     dirMdDat     date and time of last modification (LongInt)
-     * 18  4     SInt32     dirBkDat     date and time of last backup (LongInt)      
-     * 22  16    DInfo      dirUsrInfo   Finder information (DInfo)                  
-     * 21  16    DXInfo     dirFndrInfo  additional Finder information (DXInfo)      
-     * 20  4*4   SInt32[4]  dirResrv     reserved (ARRAY[1..4] OF LongInt)           
+     * 18  4     SInt32     dirBkDat     date and time of last backup (LongInt)
+     * 22  16    DInfo      dirUsrInfo   Finder information (DInfo)
+     * 38  16    DXInfo     dirFndrInfo  additional Finder information (DXInfo)
+     * 54  4*4   SInt32[4]  dirResrv     reserved (ARRAY[1..4] OF LongInt)
      */
     
-    public static final int STRUCTSIZE = 36;
+    public static final int STRUCTSIZE = 70;
     
     private final byte[] dirFlags = new byte[2];
     private final byte[] dirVal = new byte[2];
@@ -42,15 +42,15 @@ public class CdrDirRec extends CatDataRec implements StaticStruct {
     
     public CdrDirRec(byte[] data, int offset) {
         super(data, offset);
-	System.arraycopy(data, offset+2, dirFlags, 0, 2);
-	System.arraycopy(data, offset+4, dirVal, 0, 2);
-	System.arraycopy(data, offset+6, dirDirID, 0, 4);
-	System.arraycopy(data, offset+10, dirCrDat, 0, 4);
-	System.arraycopy(data, offset+14, dirMdDat, 0, 4);
-	System.arraycopy(data, offset+18, dirBkDat, 0, 4);
-	dirUsrInfo = new DInfo(data, offset+22);
-	dirFndrInfo = new DXInfo(data, offset+21);
-	System.arraycopy(data, offset+20, dirResrv, 0, 4*4);
+        System.arraycopy(data, offset + 2, dirFlags, 0, 2);
+        System.arraycopy(data, offset + 4, dirVal, 0, 2);
+        System.arraycopy(data, offset + 6, dirDirID, 0, 4);
+        System.arraycopy(data, offset + 10, dirCrDat, 0, 4);
+        System.arraycopy(data, offset + 14, dirMdDat, 0, 4);
+        System.arraycopy(data, offset + 18, dirBkDat, 0, 4);
+        dirUsrInfo = new DInfo(data, offset + 22);
+        dirFndrInfo = new DXInfo(data, offset + 38);
+        System.arraycopy(data, offset + 54, dirResrv, 0, 4 * 4);
     }
     
     public static int length() { return STRUCTSIZE; }
@@ -77,19 +77,19 @@ public class CdrDirRec extends CatDataRec implements StaticStruct {
     @Override
     public void printFields(PrintStream ps, String prefix) {
         super.printFields(ps, prefix);
-	ps.println(prefix + " cdrType: " + getCdrType());
-	ps.println(prefix + " cdrResrv2: " + getCdrResrv2());
-	ps.println(prefix + " dirFlags: " + getDirFlags());
-	ps.println(prefix + " dirVal: " + getDirVal());
-	ps.println(prefix + " dirDirID: " + getDirDirID());
-	ps.println(prefix + " dirCrDat: " + getDirCrDat());
-	ps.println(prefix + " dirMdDat: " + getDirMdDat());
-	ps.println(prefix + " dirBkDat: " + getDirBkDat());
-	ps.println(prefix + " dirUsrInfo: ");
-	getDirUsrInfo().print(ps, prefix+"  ");
-	ps.println(prefix + " dirFndrInfo: ");
-	getDirFndrInfo().print(ps, prefix+"  ");
-	ps.println(prefix + " dirResrv: " + getDirResrv());
+        ps.println(prefix + " cdrType: " + getCdrType());
+        ps.println(prefix + " cdrResrv2: " + getCdrResrv2());
+        ps.println(prefix + " dirFlags: " + getDirFlags());
+        ps.println(prefix + " dirVal: " + getDirVal());
+        ps.println(prefix + " dirDirID: " + getDirDirID());
+        ps.println(prefix + " dirCrDat: " + getDirCrDat());
+        ps.println(prefix + " dirMdDat: " + getDirMdDat());
+        ps.println(prefix + " dirBkDat: " + getDirBkDat());
+        ps.println(prefix + " dirUsrInfo: ");
+        getDirUsrInfo().print(ps, prefix + "  ");
+        ps.println(prefix + " dirFndrInfo: ");
+        getDirFndrInfo().print(ps, prefix + "  ");
+        ps.println(prefix + " dirResrv: " + getDirResrv());
     }
     
     @Override
@@ -100,24 +100,24 @@ public class CdrDirRec extends CatDataRec implements StaticStruct {
     
     @Override
     public byte[] getBytes() {
-	byte[] result = new byte[size()];
-	byte[] tempData;
-	int offset = 0;
-        
+        byte[] result = new byte[size()];
+        byte[] tempData;
+        int offset = 0;
+
         byte[] superData = super.getBytes();
         System.arraycopy(superData, 0, result, offset, superData.length); offset += superData.length;
-	System.arraycopy(dirFlags, 0, result, offset, dirFlags.length); offset += dirFlags.length;
-	System.arraycopy(dirVal, 0, result, offset, dirVal.length); offset += dirVal.length;
-	System.arraycopy(dirDirID, 0, result, offset, dirDirID.length); offset += dirDirID.length;
-	System.arraycopy(dirCrDat, 0, result, offset, dirCrDat.length); offset += dirCrDat.length;
-	System.arraycopy(dirMdDat, 0, result, offset, dirMdDat.length); offset += dirMdDat.length;
-	System.arraycopy(dirBkDat, 0, result, offset, dirBkDat.length); offset += dirBkDat.length;
-	tempData = dirUsrInfo.getBytes();
-	System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
-	tempData = dirFndrInfo.getBytes();
-	System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
-	System.arraycopy(dirResrv, 0, result, offset, dirResrv.length); offset += dirResrv.length;
-	return result;
+        System.arraycopy(dirFlags, 0, result, offset, dirFlags.length); offset += dirFlags.length;
+        System.arraycopy(dirVal, 0, result, offset, dirVal.length); offset += dirVal.length;
+        System.arraycopy(dirDirID, 0, result, offset, dirDirID.length); offset += dirDirID.length;
+        System.arraycopy(dirCrDat, 0, result, offset, dirCrDat.length); offset += dirCrDat.length;
+        System.arraycopy(dirMdDat, 0, result, offset, dirMdDat.length); offset += dirMdDat.length;
+        System.arraycopy(dirBkDat, 0, result, offset, dirBkDat.length); offset += dirBkDat.length;
+        tempData = dirUsrInfo.getBytes();
+        System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
+        tempData = dirFndrInfo.getBytes();
+        System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
+        System.arraycopy(dirResrv, 0, result, offset, dirResrv.length); offset += dirResrv.length;
+        return result;
     }
 
     public int size() {

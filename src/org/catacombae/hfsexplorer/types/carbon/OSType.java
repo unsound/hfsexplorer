@@ -33,23 +33,26 @@ public class OSType {
     private FourCharCode osType;
     
     public OSType(byte[] data, int offset) {
-	osType = new FourCharCode(data, offset);
+        osType = new FourCharCode(data, offset);
     }
     
-    public FourCharCode getOSType() { return osType; }
-    
+    public FourCharCode getOSType() {
+        return osType;
+    }
+
     @Override
     public String toString() {
-	return osType.getFourCharCodeAsString();
+        return osType.getFourCharCodeAsString();
     }
 
     public void printFields(PrintStream ps, String prefix) {
-	ps.println(prefix + " osType: ");
-	osType.print(ps, prefix+"  ");
+        ps.println(prefix + " osType: ");
+        osType.print(ps, prefix + "  ");
     }
+
     public void print(PrintStream ps, String prefix) {
-	ps.println(prefix + "OSType:");
-	printFields(ps, prefix);
+        ps.println(prefix + "OSType:");
+        printFields(ps, prefix);
     }
     
     public byte[] getBytes() {

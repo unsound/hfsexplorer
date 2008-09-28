@@ -34,21 +34,26 @@ public class FourCharCode {
     private final byte[] fourCharCode = new byte[4];
     
     public FourCharCode(byte[] data, int offset) {
-	System.arraycopy(data, offset+0, fourCharCode, 0, 4);
+        System.arraycopy(data, offset + 0, fourCharCode, 0, 4);
     }
 
-    public int getFourCharCode() { return Util.readIntBE(fourCharCode); }
-    
-    public String getFourCharCodeAsString() { return Util.toASCIIString(getFourCharCode()); }
+    public int getFourCharCode() {
+        return Util.readIntBE(fourCharCode);
+    }
+
+    public String getFourCharCodeAsString() {
+        return Util.toASCIIString(getFourCharCode());
+    }
 
     public void printFields(PrintStream ps, String prefix) {
-	ps.println(prefix + " fourCharCode: \"" + getFourCharCodeAsString() + "\"");
+        ps.println(prefix + " fourCharCode: \"" + getFourCharCodeAsString() + "\"");
     }
+
     public void print(PrintStream ps, String prefix) {
-	ps.println(prefix + "FourCharCode:");
-	printFields(ps, prefix);
+        ps.println(prefix + "FourCharCode:");
+        printFields(ps, prefix);
     }
-    
+
     public byte[] getBytes() {
         return Util.createCopy(fourCharCode);
     }
