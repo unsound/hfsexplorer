@@ -332,33 +332,20 @@ public class GPTHeader implements StructElements {
     public Dictionary getStructElements() {
         DictionaryBuilder dbStruct = new DictionaryBuilder(getClass().getSimpleName());
         
-        dbStruct.add("signature", new IntegerField(signature,
-                IntegerFieldBits.BITS_64, false, false));
-        dbStruct.add("revision", new IntegerField(revision,
-                IntegerFieldBits.BITS_32, false, true));
-        dbStruct.add("headerSize", new IntegerField(headerSize,
-                IntegerFieldBits.BITS_32, false, true));
-        dbStruct.add("crc32Checksum", new IntegerField(crc32Checksum,
-                IntegerFieldBits.BITS_32, false, true));
-        dbStruct.add("reserved1", new IntegerField(reserved1,
-                IntegerFieldBits.BITS_32, false, false));
-        dbStruct.add("primaryLBA", new IntegerField(primaryLBA,
-                IntegerFieldBits.BITS_64, false, true));
-        dbStruct.add("backupLBA", new IntegerField(backupLBA,
-                IntegerFieldBits.BITS_64, false, true));
-        dbStruct.add("firstUsableLBA", new IntegerField(firstUsableLBA,
-                IntegerFieldBits.BITS_64, false, true));
-        dbStruct.add("lastUsableLBA", new IntegerField(lastUsableLBA,
-                IntegerFieldBits.BITS_64, false, true));
+        dbStruct.add("signature", new IntegerField(signature, BITS_64, UNSIGNED, BIG_ENDIAN));
+        dbStruct.add("revision", new IntegerField(revision, BITS_32, UNSIGNED, LITTLE_ENDIAN));
+        dbStruct.add("headerSize", new IntegerField(headerSize, BITS_32, UNSIGNED, LITTLE_ENDIAN));
+        dbStruct.add("crc32Checksum", new IntegerField(crc32Checksum, BITS_32, UNSIGNED, LITTLE_ENDIAN));
+        dbStruct.add("reserved1", new IntegerField(reserved1, BITS_32, UNSIGNED, BIG_ENDIAN));
+        dbStruct.add("primaryLBA", new IntegerField(primaryLBA, BITS_64, UNSIGNED, LITTLE_ENDIAN));
+        dbStruct.add("backupLBA", new IntegerField(backupLBA, BITS_64, UNSIGNED, LITTLE_ENDIAN));
+        dbStruct.add("firstUsableLBA", new IntegerField(firstUsableLBA, BITS_64, UNSIGNED, LITTLE_ENDIAN));
+        dbStruct.add("lastUsableLBA", new IntegerField(lastUsableLBA, BITS_64, UNSIGNED, LITTLE_ENDIAN));
         dbStruct.add("diskGUID", new ByteArrayField(diskGUID));
-        dbStruct.add("partitionEntryLBA", new IntegerField(partitionEntryLBA,
-                IntegerFieldBits.BITS_64, false, true));
-        dbStruct.add("numberOfPartitionEntries", new IntegerField(numberOfPartitionEntries,
-                IntegerFieldBits.BITS_32, false, true));
-        dbStruct.add("sizeOfPartitionEntry", new IntegerField(sizeOfPartitionEntry,
-                IntegerFieldBits.BITS_32, false, true));
-        dbStruct.add("partitionEntryArrayCRC32", new IntegerField(partitionEntryArrayCRC32,
-                IntegerFieldBits.BITS_32, false, true));
+        dbStruct.add("partitionEntryLBA", new IntegerField(partitionEntryLBA, BITS_64, UNSIGNED, LITTLE_ENDIAN));
+        dbStruct.add("numberOfPartitionEntries", new IntegerField(numberOfPartitionEntries, BITS_32, UNSIGNED, LITTLE_ENDIAN));
+        dbStruct.add("sizeOfPartitionEntry", new IntegerField(sizeOfPartitionEntry, BITS_32, UNSIGNED, LITTLE_ENDIAN));
+        dbStruct.add("partitionEntryArrayCRC32", new IntegerField(partitionEntryArrayCRC32, BITS_32, UNSIGNED, LITTLE_ENDIAN));
         dbStruct.add("reserved2", new ByteArrayField(reserved2));
         
         return dbStruct.getResult();
