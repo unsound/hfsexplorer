@@ -3,7 +3,7 @@
  *
  * All rights reserved.
  */
-package org.catacombae.jparted.lib.fs.hfsplus;
+package org.catacombae.jparted.lib.fs.hfscommon;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,12 +23,12 @@ import org.catacombae.jparted.lib.fs.FSForkType;
  *
  * @author Erik Larsson
  */
-public class HFSPlusFSFork extends FSFork {
-    private final HFSPlusFSFile parent;
+public class HFSCommonFSFork extends FSFork {
+    private final HFSCommonFSFile parent;
     private final FSForkType type;
     private final CommonHFSForkData forkData;
     
-    HFSPlusFSFork(HFSPlusFSFile iParent, FSForkType iType, CommonHFSForkData iForkData) {
+    HFSCommonFSFork(HFSCommonFSFile iParent, FSForkType iType, CommonHFSForkData iForkData) {
         super(iParent);
         
         // Input check

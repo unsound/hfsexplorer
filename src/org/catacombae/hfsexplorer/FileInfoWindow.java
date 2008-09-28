@@ -25,7 +25,7 @@ import java.awt.*;
 import javax.swing.*;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFile;
 import org.catacombae.jparted.lib.fs.FSFile;
-import org.catacombae.jparted.lib.fs.hfsplus.HFSPlusFSFile;
+import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFSFile;
 
 public class FileInfoWindow extends JFrame {
     private JTabbedPane tabs;
@@ -62,8 +62,8 @@ public class FileInfoWindow extends JFrame {
     }
     
     public void setFields(FSFile file) {
-        if(file instanceof HFSPlusFSFile) {
-            CommonHFSCatalogFile fld = ((HFSPlusFSFile) file).getInternalCatalogFile();
+        if(file instanceof HFSCommonFSFile) {
+            CommonHFSCatalogFile fld = ((HFSCommonFSFile) file).getInternalCatalogFile();
             if(fld instanceof CommonHFSCatalogFile.HFSPlusImplementation) {
                 infoPanel.setFields(((CommonHFSCatalogFile.HFSPlusImplementation)fld).getUnderlying());
             }

@@ -3,7 +3,7 @@
  *
  * All rights reserved.
  */
-package org.catacombae.jparted.lib.fs.hfsplus;
+package org.catacombae.jparted.lib.fs.hfscommon;
 
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFolder;
@@ -20,13 +20,13 @@ import org.catacombae.jparted.lib.fs.FSFolder;
  *
  * @author Erik Larsson
  */
-public class HFSPlusFSFolder extends FSFolder {
-    private final HFSPlusFileSystemHandler fsHandler;
+public class HFSCommonFSFolder extends FSFolder {
+    private final HFSCommonFileSystemHandler fsHandler;
     private final CommonHFSCatalogFolderRecord folderRecord;
     private final CommonHFSCatalogFolder catalogFolder;
-    private final HFSPlusFSAttributes attributes;
+    private final HFSCommonFSAttributes attributes;
     
-    public HFSPlusFSFolder(HFSPlusFileSystemHandler iParent, CommonHFSCatalogFolderRecord iFolderRecord) {
+    public HFSCommonFSFolder(HFSCommonFileSystemHandler iParent, CommonHFSCatalogFolderRecord iFolderRecord) {
         super(iParent);
         
         // Input check
@@ -39,7 +39,7 @@ public class HFSPlusFSFolder extends FSFolder {
         this.folderRecord = iFolderRecord;
         //CommonHFSCatalogLeafRecordData data = folderRecord.getData();
         this.catalogFolder = folderRecord.getData();
-        this.attributes = new HFSPlusFSAttributes(this, catalogFolder);
+        this.attributes = new HFSCommonFSAttributes(this, catalogFolder);
     }
 
     @Override

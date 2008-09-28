@@ -3,7 +3,7 @@
  *
  * All rights reserved.
  */
-package org.catacombae.jparted.lib.fs.hfsplus;
+package org.catacombae.jparted.lib.fs.hfscommon;
 
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFile;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFileRecord;
@@ -19,15 +19,15 @@ import org.catacombae.jparted.lib.fs.FSForkType;
  *
  * @author Erik Larsson
  */
-public class HFSPlusFSFile extends FSFile {
-    private final HFSPlusFileSystemHandler parent;
+public class HFSCommonFSFile extends FSFile {
+    private final HFSCommonFileSystemHandler parent;
     private final CommonHFSCatalogFileRecord fileRecord;
     private final CommonHFSCatalogFile catalogFile;
-    private final HFSPlusFSAttributes attributes;
+    private final HFSCommonFSAttributes attributes;
     private final FSFork dataFork;
     private final FSFork resourceFork;
     
-    HFSPlusFSFile(HFSPlusFileSystemHandler iParent, CommonHFSCatalogFileRecord iFileRecord) {
+    HFSCommonFSFile(HFSCommonFileSystemHandler iParent, CommonHFSCatalogFileRecord iFileRecord) {
         super(iParent);
         
         // Input check
@@ -39,9 +39,9 @@ public class HFSPlusFSFile extends FSFile {
         this.parent = iParent;
         this.fileRecord = iFileRecord;
         this.catalogFile = fileRecord.getData();
-        this.attributes = new HFSPlusFSAttributes(this, catalogFile);
-        this.dataFork = new HFSPlusFSFork(this, FSForkType.DATA, catalogFile.getDataFork());
-        this.resourceFork = new HFSPlusFSFork(this, FSForkType.MACOS_RESOURCE, catalogFile.getResourceFork());
+        this.attributes = new HFSCommonFSAttributes(this, catalogFile);
+        this.dataFork = new HFSCommonFSFork(this, FSForkType.DATA, catalogFile.getDataFork());
+        this.resourceFork = new HFSCommonFSFork(this, FSForkType.MACOS_RESOURCE, catalogFile.getResourceFork());
     }
     
     @Override
@@ -94,7 +94,7 @@ public class HFSPlusFSFile extends FSFile {
         return parent.getReadableResourceForkStream(fileRecord);
     }
     
-    HFSPlusFileSystemHandler getFileSystemHandler() {
+    HFSCommonFileSystemHandler getFileSystemHandler() {
         return parent;
     }
     
