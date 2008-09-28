@@ -72,7 +72,9 @@
 	   debug="true"
 	   debuglevel="${debuglevel}"
 	   source="${java.source.level}"
-	   target="${java.target.level}">
+	   target="${java.target.level}"
+	   deprecation="on">
+      <compilerarg value="-Xlint:unchecked"/>
       <classpath refid="java.build.classpath"/>
     </javac>
   </target>
