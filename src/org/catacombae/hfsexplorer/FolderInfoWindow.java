@@ -18,7 +18,7 @@ package org.catacombae.hfsexplorer;
 
 import org.catacombae.hfsexplorer.gui.FolderInfoPanel;
 //import org.catacombae.hfsexplorer.gui.JournalInfoPanel;
-import org.catacombae.hfsexplorer.types.HFSPlusCatalogFolder;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFolder;
 //import org.catacombae.hfsexplorer.types.JournalInfoBlock;
 import java.awt.*;
 import javax.swing.*;

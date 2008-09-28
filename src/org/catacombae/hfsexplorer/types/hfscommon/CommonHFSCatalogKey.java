@@ -8,8 +8,8 @@ package org.catacombae.hfsexplorer.types.hfscommon;
 import java.io.PrintStream;
 import org.catacombae.hfsexplorer.FastUnicodeCompare;
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.types.HFSPlusCatalogKey;
-import org.catacombae.hfsexplorer.types.HFSXKeyCompareType;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogKey;
+import org.catacombae.hfsexplorer.types.hfsx.HFSXKeyCompareType;
 import org.catacombae.hfsexplorer.types.hfs.CatKeyRec;
 
 /**

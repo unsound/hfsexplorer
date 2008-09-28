@@ -16,6 +16,7 @@
  */
 
 package org.catacombae.hfsexplorer.testcode;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentLeafNode;
 import org.catacombae.hfsexplorer.types.*;
 import java.io.*;
 

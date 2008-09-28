@@ -6,8 +6,8 @@
 package org.catacombae.hfsexplorer.types.hfscommon;
 
 import java.io.PrintStream;
-import org.catacombae.hfsexplorer.types.HFSPlusCatalogKey;
-import org.catacombae.hfsexplorer.types.HFSPlusCatalogThread;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogKey;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogThread;
 import org.catacombae.hfsexplorer.types.hfs.CatKeyRec;
 import org.catacombae.hfsexplorer.types.hfs.CdrFThdRec;
 

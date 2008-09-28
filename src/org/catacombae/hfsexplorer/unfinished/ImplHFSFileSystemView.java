@@ -6,7 +6,7 @@
 package org.catacombae.hfsexplorer.unfinished;
 
 import java.io.UnsupportedEncodingException;
-import org.catacombae.hfsexplorer.types.JournalInfoBlock;
+import org.catacombae.hfsexplorer.types.hfsplus.JournalInfoBlock;
 import org.catacombae.hfsexplorer.types.hfs.BTHdrRec;
 import org.catacombae.hfsexplorer.types.hfs.CatKeyRec;
 import org.catacombae.hfsexplorer.types.hfs.ExtKeyRec;

@@ -9,8 +9,8 @@ import java.io.PrintStream;
 import java.util.Date;
 import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.types.HFSPlusCatalogFolder;
-import org.catacombae.hfsexplorer.types.HFSPlusDate;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFolder;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusDate;
 import org.catacombae.hfsexplorer.types.hfs.CdrDirRec;
 
 /**

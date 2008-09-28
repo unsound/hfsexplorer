@@ -5,7 +5,7 @@
 
 package org.catacombae.hfsexplorer.types.hfscommon;
 
-import org.catacombae.hfsexplorer.types.HFSPlusExtentKey;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentKey;
 import org.catacombae.hfsexplorer.types.hfs.ExtKeyRec;
 
 /**

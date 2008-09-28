@@ -7,7 +7,7 @@ package org.catacombae.hfsexplorer.types.hfscommon;
 
 import java.io.PrintStream;
 import org.catacombae.csjc.PrintableStruct;
-import org.catacombae.hfsexplorer.types.HFSPlusCatalogThread;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogThread;
 import org.catacombae.hfsexplorer.types.hfs.CdrFThdRec;
 
 /**

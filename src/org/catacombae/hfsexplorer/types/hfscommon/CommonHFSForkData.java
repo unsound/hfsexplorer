@@ -5,8 +5,8 @@
 
 package org.catacombae.hfsexplorer.types.hfscommon;
 
-import org.catacombae.hfsexplorer.types.HFSPlusExtentDescriptor;
-import org.catacombae.hfsexplorer.types.HFSPlusForkData;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentDescriptor;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusForkData;
 import org.catacombae.hfsexplorer.types.hfs.ExtDataRec;
 import org.catacombae.hfsexplorer.types.hfs.ExtDescriptor;
 

@@ -23,7 +23,7 @@
 
 package org.catacombae.hfsexplorer.gui;
 import org.catacombae.hfsexplorer.*;
-import org.catacombae.hfsexplorer.types.JournalInfoBlock;
+import org.catacombae.hfsexplorer.types.hfsplus.JournalInfoBlock;
 
 /**
  *

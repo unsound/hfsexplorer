@@ -6,7 +6,7 @@
 package org.catacombae.hfsexplorer.types.hfscommon;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.types.HFSCatalogNodeID;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSCatalogNodeID;
 
 /**
  *

@@ -8,7 +8,7 @@ package org.catacombae.hfsexplorer.types.hfscommon;
 import java.io.PrintStream;
 import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.types.BTHeaderRec;
+import org.catacombae.hfsexplorer.types.hfsplus.BTHeaderRec;
 import org.catacombae.hfsexplorer.types.hfs.BTHdrRec;
 
 /**

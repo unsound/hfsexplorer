@@ -17,6 +17,19 @@
 
 package org.catacombae.hfsexplorer;
 
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentDescriptor;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFolder;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusVolumeHeader;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogLeafNode;
+import org.catacombae.hfsexplorer.types.hfsplus.BTHeaderRec;
+import org.catacombae.hfsexplorer.types.hfsplus.BTNodeDescriptor;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogKey;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFile;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogLeafRecordData;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSCatalogNodeID;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusForkData;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogLeafRecord;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogThread;
 import org.catacombae.hfsexplorer.io.ForkFilter;
 import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;

@@ -6,13 +6,13 @@
 package org.catacombae.hfsexplorer.types.hfscommon;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.types.BTHeaderRec;
-import org.catacombae.hfsexplorer.types.HFSPlusCatalogFile;
-import org.catacombae.hfsexplorer.types.HFSPlusCatalogFolder;
-import org.catacombae.hfsexplorer.types.HFSPlusCatalogKey;
-import org.catacombae.hfsexplorer.types.HFSPlusCatalogLeafRecordData;
-import org.catacombae.hfsexplorer.types.HFSPlusCatalogThread;
-import org.catacombae.hfsexplorer.types.HFSXCatalogKey;
+import org.catacombae.hfsexplorer.types.hfsplus.BTHeaderRec;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFile;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFolder;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogKey;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogLeafRecordData;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogThread;
+import org.catacombae.hfsexplorer.types.hfsx.HFSXCatalogKey;
 import org.catacombae.hfsexplorer.types.hfs.CatDataRec;
 import org.catacombae.hfsexplorer.types.hfs.CatKeyRec;
 import org.catacombae.hfsexplorer.types.hfs.CdrDirRec;
