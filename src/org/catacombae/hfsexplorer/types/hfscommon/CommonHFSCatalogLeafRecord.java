@@ -32,23 +32,31 @@ public abstract class CommonHFSCatalogLeafRecord extends CommonBTRecord {
 
         key = new CatKeyRec(data, offset);
 
+        int recordOffset = offset + key.occupiedSize();
+        // Align to word boundary (primitive...)
+        if(recordOffset % 2 != 0)
+            recordOffset++;
+
         // Peek at known 8-bit value indicating the record type
-        byte recordType = data[offset + key.occupiedSize()];
+        byte recordType = data[recordOffset];
         switch (recordType) {
             case CatDataRec.HFS_DIRECTORY_RECORD:
-                recordData = new CdrDirRec(data, offset + key.occupiedSize());
+                recordData = new CdrDirRec(data, recordOffset);
                 break;
             case CatDataRec.HFS_FILE_RECORD:
-                recordData = new CdrFilRec(data, offset + key.occupiedSize());
+                recordData = new CdrFilRec(data, recordOffset);
                 break;
             case CatDataRec.HFS_DIRECTORY_THREAD_RECORD:
-                recordData = new CdrThdRec(data, offset + key.occupiedSize());
+                recordData = new CdrThdRec(data, recordOffset);
                 break;
             case CatDataRec.HFS_FILE_THREAD_RECORD:
-                recordData = new CdrFThdRec(data, offset + key.occupiedSize());
+                recordData = new CdrFThdRec(data, recordOffset);
                 break;
             default:
-                throw new RuntimeException("Invalid HFS record type.");
+                System.err.println("key:");
+                key.print(System.err, " ");
+                System.err.println("data: " + Util.byteArrayToHexString(data, offset, length));
+                throw new RuntimeException("Invalid HFS record type: " + recordType);
         }
         
         return create(key, recordData);

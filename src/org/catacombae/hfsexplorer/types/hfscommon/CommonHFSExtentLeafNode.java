@@ -51,7 +51,7 @@ public abstract class CommonHFSExtentLeafNode extends CommonBTNode {
         }
         
         @Override
-        protected CommonBTRecord createBTRecord(byte[] data, int offset, int length) {
+        protected CommonBTRecord createBTRecord(int recordNumber, byte[] data, int offset, int length) {
             final HFSPlusExtentKey key = new HFSPlusExtentKey(data, offset);
             final HFSPlusExtentRecord recordData = new HFSPlusExtentRecord(data, offset+key.length());
 
@@ -65,7 +65,7 @@ public abstract class CommonHFSExtentLeafNode extends CommonBTNode {
         }
         
         @Override
-        protected CommonBTRecord createBTRecord(byte[] data, int offset, int length) {
+        protected CommonBTRecord createBTRecord(int recordNumber, byte[] data, int offset, int length) {
             final ExtKeyRec key = new ExtKeyRec(data, offset);
             final ExtDataRec recordData = new ExtDataRec(data, offset+key.length());
 

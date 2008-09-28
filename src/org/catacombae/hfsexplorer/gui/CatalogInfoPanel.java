@@ -237,9 +237,10 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
 
     public void expandNode(DefaultMutableTreeNode dmtn, CommonBTNode node, BaseHFSFileSystemView fsView) {
         if(node instanceof CommonHFSCatalogIndexNode) {
+            int nodeSize = fsView.getCatalogHeaderNode().getHeaderRecord().getNodeSize();
             CommonBTIndexRecord[] recs = ((CommonHFSCatalogIndexNode) node).getIndexRecords();
             for(CommonBTIndexRecord rec : recs) {
-                CommonBTNode curNode = fsView.getCatalogNode(rec.getIndex());
+                CommonBTNode curNode = fsView.getCatalogNode(rec.getIndexAsOffset(nodeSize));
                 CommonBTKey key = rec.getKey();
                 if(key instanceof CommonHFSCatalogKey) {
                     CommonHFSCatalogKey trueKey = (CommonHFSCatalogKey) key;

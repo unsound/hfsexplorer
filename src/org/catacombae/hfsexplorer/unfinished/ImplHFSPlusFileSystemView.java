@@ -14,6 +14,7 @@ import org.catacombae.hfsexplorer.types.HFSPlusExtentKey;
 import org.catacombae.hfsexplorer.types.HFSPlusVolumeHeader;
 import org.catacombae.hfsexplorer.types.HFSUniStr255;
 import org.catacombae.hfsexplorer.types.JournalInfoBlock;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonBTHeaderNode;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTHeaderRecord;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTNodeDescriptor;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogIndexNode;
@@ -167,5 +168,11 @@ public class ImplHFSPlusFileSystemView extends BaseHFSFileSystemView {
         }
         else
             throw new RuntimeException("Invalid string type: " + str.getClass());
+    }
+
+    @Override
+    protected CommonBTHeaderNode createCommonBTHeaderNode(byte[] currentNodeData,
+            int offset, int nodeSize) {
+        return CommonBTHeaderNode.createHFSPlus(currentNodeData, offset, nodeSize);
     }
 }

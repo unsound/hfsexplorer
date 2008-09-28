@@ -57,71 +57,78 @@ public abstract class BaseHFSFileSystemView {
 
     /** Internal class. */
     private abstract class InitProcedure {
-	public final CommonHFSVolumeHeader header;
-	public final ReadableRandomAccessStream forkFilterFile;
-	public final CommonBTNodeDescriptor btnd;
-	public final CommonBTHeaderRecord bthr;
-	
-	public InitProcedure() {
-	    this.header = getVolumeHeader();
-	    this.forkFilterFile = getForkFilterFile(header);
-	    
-	    forkFilterFile.seek(0);
-	    //byte[] nodeDescriptorData = new byte[14];
-	    //if(forkFilterFile.read(nodeDescriptorData) != nodeDescriptorData.length)
+
+        public final CommonHFSVolumeHeader header;
+        public final ReadableRandomAccessStream forkFilterFile;
+        public final CommonBTNodeDescriptor btnd;
+        public final CommonBTHeaderRecord bthr;
+
+        public InitProcedure() {
+            this.header = getVolumeHeader();
+            header.print(System.err, "    ");
+            this.forkFilterFile = getForkFilterFile(header);
+
+            forkFilterFile.seek(0);
+            //byte[] nodeDescriptorData = new byte[14];
+            //if(forkFilterFile.read(nodeDescriptorData) != nodeDescriptorData.length)
             //	System.out.println("ERROR: Did not read nodeDescriptor completely.");
-	    this.btnd = getNodeDescriptor(forkFilterFile);
-	    this.bthr = getHeaderRecord(forkFilterFile);
-	    //byte[] headerRec = new byte[BTHeaderRec.length()];
-	    //forkFilterFile.readFully(headerRec);
-	    //this.bthr = new BTHeaderRec(headerRec, 0);
-	    
-	}
-	protected abstract ReadableRandomAccessStream getForkFilterFile(CommonHFSVolumeHeader header);
+            this.btnd = getNodeDescriptor(forkFilterFile);
+            this.bthr = getHeaderRecord(forkFilterFile);
+        //byte[] headerRec = new byte[BTHeaderRec.length()];
+        //forkFilterFile.readFully(headerRec);
+        //this.bthr = new BTHeaderRec(headerRec, 0);
+
+        }
+
+        protected abstract ReadableRandomAccessStream getForkFilterFile(CommonHFSVolumeHeader header);
     }
     
     /** Internal class. */
     private class CatalogInitProcedure extends InitProcedure {
-	public ReadableRandomAccessStream catalogFile;
-	
-	public CatalogInitProcedure() {
-	    this.catalogFile = forkFilterFile;
-	}
-	
-	protected ReadableRandomAccessStream getForkFilterFile(CommonHFSVolumeHeader header) {
-	    if(catalogCache != null)
-		return catalogCache;
-	    CommonHFSExtentDescriptor[] allCatalogFileDescriptors =
-		getAllDataExtentDescriptors(getCommonHFSCatalogNodeID(ReservedID.CATALOG_FILE),
+
+        public final ReadableRandomAccessStream catalogFile;
+
+        public CatalogInitProcedure() {
+            this.catalogFile = forkFilterFile;
+        }
+
+        protected ReadableRandomAccessStream getForkFilterFile(CommonHFSVolumeHeader header) {
+            if(catalogCache != null)
+                return catalogCache;
+            CommonHFSExtentDescriptor[] allCatalogFileDescriptors =
+                    getAllDataExtentDescriptors(getCommonHFSCatalogNodeID(ReservedID.CATALOG_FILE),
                     header.getCatalogFile());
-	    return new ForkFilter(header.getCatalogFile(), allCatalogFileDescriptors,
-				  hfsFile, fsOffset, staticBlockSize);
-	}
+            return new ForkFilter(header.getCatalogFile(), allCatalogFileDescriptors,
+                    hfsFile, fsOffset, staticBlockSize, header.getFirstAllocationBlock());
+        }
     }
     
     /** Internal class. */
     private class ExtentsInitProcedure extends InitProcedure {
-	public ReadableRandomAccessStream extentsFile;
-	
-	public ExtentsInitProcedure() {
-	    this.extentsFile = forkFilterFile;
-	}
-	
-	protected ReadableRandomAccessStream getForkFilterFile(CommonHFSVolumeHeader header) {
-	    return new ForkFilter(header.getExtentsOverflowFile(),
-				  header.getExtentsOverflowFile().getBasicExtents(),
-				  hfsFile, fsOffset, staticBlockSize);
-	}
+        public final ReadableRandomAccessStream extentsFile;
+
+        public ExtentsInitProcedure() {
+            this.extentsFile = forkFilterFile;
+        }
+
+        protected ReadableRandomAccessStream getForkFilterFile(CommonHFSVolumeHeader header) {
+            return new ForkFilter(header.getExtentsOverflowFile(),
+                    header.getExtentsOverflowFile().getBasicExtents(),
+                    hfsFile, fsOffset, staticBlockSize, header.getFirstAllocationBlock());
+        }
     }
-    
+
     protected static interface CatalogOperations {
-	public CommonHFSCatalogIndexNode newCatalogIndexNode(byte[] data,
+        public CommonHFSCatalogIndexNode newCatalogIndexNode(byte[] data,
                 int offset, int nodeSize, CommonBTHeaderRecord bthr);
-	public CommonHFSCatalogKey newCatalogKey(CommonHFSCatalogNodeID nodeID,
+
+        public CommonHFSCatalogKey newCatalogKey(CommonHFSCatalogNodeID nodeID,
                 CommonHFSCatalogString searchString, CommonBTHeaderRecord bthr);
-	public CommonHFSCatalogLeafNode newCatalogLeafNode(byte[] data,
+
+        public CommonHFSCatalogLeafNode newCatalogLeafNode(byte[] data,
                 int offset, int nodeSize, CommonBTHeaderRecord bthr);
-	public CommonHFSCatalogLeafRecord newCatalogLeafRecord(byte[] data,
+
+        public CommonHFSCatalogLeafRecord newCatalogLeafRecord(byte[] data,
                 int offset, CommonBTHeaderRecord bthr);
     }
     /*protected static final CatalogOperations HFS_PLUS_OPERATIONS = new CatalogOperations() {
@@ -151,13 +158,7 @@ public abstract class BaseHFSFileSystemView {
     
     // Variables for reading cached files.
     private ReadableBlockCachingStream catalogCache = null;
-    /*
-    public BaseHFSFileSystemView(ReadableRandomAccessStream hfsFile, long fsOffset) {
-	this(hfsFile, fsOffset, HFS_PLUS_OPERATIONS, false);
-    }
-    public BaseHFSFileSystemView(ReadableRandomAccessStream hfsFile, long fsOffset, boolean cachingEnabled) {
-	this(hfsFile, fsOffset, HFS_PLUS_OPERATIONS, cachingEnabled);
-    }*/
+    
     protected BaseHFSFileSystemView(ReadableRandomAccessStream hfsFile, long fsOffset, CatalogOperations ops, boolean cachingEnabled) {
 	this.hfsFile = hfsFile;
 	this.backingFile = hfsFile;
@@ -191,14 +192,16 @@ public abstract class BaseHFSFileSystemView {
     
     /** Disables cached mode for reading the catalog file. */
     public void releaseCatalogFile() {
-	catalogCache = null;
+        catalogCache = null;
     }
     
     public ReadableRandomAccessStream getStream() {
-	return hfsFile;
+        return hfsFile;
     }
     
     public abstract CommonHFSVolumeHeader getVolumeHeader();
+    protected abstract CommonBTHeaderNode createCommonBTHeaderNode(byte[] currentNodeData,
+            int offset, int nodeSize);
     protected abstract CommonBTNodeDescriptor getNodeDescriptor(Readable rd);
     protected abstract CommonBTHeaderRecord getHeaderRecord(Readable rd);
     protected abstract CommonBTNodeDescriptor createCommonBTNodeDescriptor(
@@ -233,19 +236,25 @@ public abstract class BaseHFSFileSystemView {
         // Search down through the layers of indices to the record with parentID 1.
         CommonHFSCatalogNodeID parentID = getCommonHFSCatalogNodeID(ReservedID.ROOT_PARENT);
         final int nodeSize = init.bthr.getNodeSize();
-        long currentNodeNumber = init.bthr.getRootNodeNumber();
+        long currentNodeOffset = init.bthr.getRootNodeNumber() * init.bthr.getNodeSize();
+
+        System.err.println("Got header record: ");
+        init.bthr.print(System.err, " ");
 
         byte[] currentNodeData = new byte[nodeSize];
-        init.catalogFile.seek(currentNodeNumber * init.bthr.getNodeSize());
+        init.catalogFile.seek(currentNodeOffset);
         init.catalogFile.readFully(currentNodeData);
         CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
         while(nodeDescriptor.getNodeType() == NodeType.INDEX) {
             CommonHFSCatalogIndexNode currentNode =
                     catOps.newCatalogIndexNode(currentNodeData, 0, init.bthr.getNodeSize(), init.bthr);
+            System.err.println("currentNode:");
+            currentNode.print(System.err, "  ");
             CommonBTIndexRecord matchingRecord = findKey(currentNode, parentID);
-
-            currentNodeNumber = matchingRecord.getIndex();
-            init.catalogFile.seek(currentNodeNumber * nodeSize);
+            
+            //currentNodeNumber = matchingRecord.getIndex();
+            currentNodeOffset = matchingRecord.getIndexAsOffset(nodeSize);
+            init.catalogFile.seek(currentNodeOffset);
             init.catalogFile.readFully(currentNodeData);
             nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
         }
@@ -273,9 +282,19 @@ public abstract class BaseHFSFileSystemView {
         }
     }
     
+    public CommonBTHeaderNode getCatalogHeaderNode() {
+        CommonBTNode firstNode = getCatalogNode(0);
+        if(firstNode instanceof CommonBTHeaderNode) {
+            return (CommonBTHeaderNode)firstNode;
+        }
+        else
+            throw new RuntimeException("Unexpected node type at catalog node 0: " +
+                    firstNode.getClass());
+    }
+
     /**
-     * Returns the requested node in the catalog file. If the requested node is not an index node, and not
-     * a leaf node, <code>null</code> is returned because they are the only ones that are implemented at
+     * Returns the requested node in the catalog file. If the requested node is not a header, index or
+     * leaf node, <code>null</code> is returned because they are the only ones that are implemented at
      * the moment. Otherwise the returned BTNode object will be of subtype HFSPlusCatalogIndexNode or
      * HFSPlusCatalogLeafNode.<br>
      * Calling this method with a negative <code>nodeNumber</code> argument returns the root node.
@@ -284,27 +303,29 @@ public abstract class BaseHFSFileSystemView {
      * @return the requested node if it exists and has type index node or leaf node, null otherwise
      */
     public CommonBTNode getCatalogNode(long nodeNumber) {
-	CatalogInitProcedure init = new CatalogInitProcedure();
+        CatalogInitProcedure init = new CatalogInitProcedure();
 
-	long currentNodeNumber;
-	if(nodeNumber < 0) // Means that we should get the root node
-	    currentNodeNumber = init.bthr.getRootNodeNumber();
-	else
-	    currentNodeNumber = nodeNumber;
-	
-	int nodeSize = init.bthr.getNodeSize();
-	
-	byte[] currentNodeData = new byte[init.bthr.getNodeSize()];
-	init.catalogFile.seek(currentNodeNumber*init.bthr.getNodeSize());
-	init.catalogFile.readFully(currentNodeData);
-	CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
-	
-	if(nodeDescriptor.getNodeType() == NodeType.INDEX)
-	    return catOps.newCatalogIndexNode(currentNodeData, 0, init.bthr.getNodeSize(), init.bthr);
-	else if(nodeDescriptor.getNodeType() == NodeType.LEAF)
-	    return catOps.newCatalogLeafNode(currentNodeData, 0, init.bthr.getNodeSize(), init.bthr);
-	else
-	    return null;
+        long currentNodeNumber;
+        if(nodeNumber < 0) // Means that we should get the root node
+            currentNodeNumber = init.bthr.getRootNodeNumber();
+        else
+            currentNodeNumber = nodeNumber;
+
+        int nodeSize = init.bthr.getNodeSize();
+
+        byte[] currentNodeData = new byte[init.bthr.getNodeSize()];
+        init.catalogFile.seek(currentNodeNumber * init.bthr.getNodeSize());
+        init.catalogFile.readFully(currentNodeData);
+        CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
+
+        if(nodeDescriptor.getNodeType() == NodeType.HEADER)
+            return createCommonBTHeaderNode(currentNodeData, 0, init.bthr.getNodeSize());
+        if(nodeDescriptor.getNodeType() == NodeType.INDEX)
+            return catOps.newCatalogIndexNode(currentNodeData, 0, init.bthr.getNodeSize(), init.bthr);
+        else if(nodeDescriptor.getNodeType() == NodeType.LEAF)
+            return catOps.newCatalogLeafNode(currentNodeData, 0, init.bthr.getNodeSize(), init.bthr);
+        else
+            return null;
     }
     
     /**
@@ -367,12 +388,12 @@ public abstract class BaseHFSFileSystemView {
 	
 	final int nodeSize = init.bthr.getNodeSize();
 	
-	long currentNodeNumber = init.bthr.getRootNodeNumber();
+	long currentNodeOffset = init.bthr.getRootNodeNumber()*nodeSize;
 	
 	// Search down through the layers of indices (O(log n) steps, where n is the size of the tree)
 	
 	byte[] currentNodeData = new byte[init.bthr.getNodeSize()];
-	init.catalogFile.seek(currentNodeNumber*nodeSize);
+	init.catalogFile.seek(currentNodeOffset);
 	init.catalogFile.readFully(currentNodeData);
 	CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
 	
@@ -382,8 +403,8 @@ public abstract class BaseHFSFileSystemView {
 	    CommonBTIndexRecord matchingRecord =
                     findLEKey(currentNode, catOps.newCatalogKey(parentID, nodeName, init.bthr));
 	    
-	    currentNodeNumber = matchingRecord.getIndex();
-	    init.catalogFile.seek(currentNodeNumber*nodeSize);
+	    currentNodeOffset = matchingRecord.getIndexAsOffset(nodeSize);
+	    init.catalogFile.seek(currentNodeOffset);
 	    init.catalogFile.readFully(currentNodeData);
 	    nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
 	}
@@ -418,7 +439,8 @@ public abstract class BaseHFSFileSystemView {
     public CommonHFSCatalogLeafRecord[] listRecords(CommonHFSCatalogNodeID folderID) {	
 	CatalogInitProcedure init = new CatalogInitProcedure();
 	final ReadableRandomAccessStream catalogFile = init.forkFilterFile;
-	return collectFilesInDir(folderID, init.bthr.getRootNodeNumber(), hfsFile, fsOffset, init.header, init.bthr, catalogFile);
+	return collectFilesInDir(folderID, init.bthr.getRootNodeNumber()*init.bthr.getNodeSize(),
+            hfsFile, fsOffset, init.header, init.bthr, catalogFile);
     }
 
     public long extractDataForkToStream(CommonHFSCatalogLeafRecord fileRecord, OutputStream os) throws IOException {
@@ -456,8 +478,9 @@ public abstract class BaseHFSFileSystemView {
     public long extractForkToStream(CommonHFSForkData forkData,
             CommonHFSExtentDescriptor[] extentDescriptors, OutputStream os,
             ProgressMonitor pm) throws IOException {
+    CommonHFSVolumeHeader header = getVolumeHeader();
 	ForkFilter forkFilter = new ForkFilter(forkData, extentDescriptors, hfsFile, fsOffset,
-					       staticBlockSize);
+					       staticBlockSize, header.getFirstAllocationBlock());
 	long bytesToRead = forkData.getLogicalSize();
 	byte[] buffer = new byte[4096];
 	while(bytesToRead > 0) {
@@ -514,34 +537,39 @@ public abstract class BaseHFSFileSystemView {
     
     private ReadableRandomAccessStream getReadableForkStream(CommonHFSForkData forkData,
             CommonHFSExtentDescriptor[] extentDescriptors) {
+        CommonHFSVolumeHeader header = getVolumeHeader();
         return new ForkFilter(forkData, extentDescriptors, hfsFile, fsOffset+fileReadOffset,
-                staticBlockSize);
+                staticBlockSize, header.getFirstAllocationBlock());
     }
     
     public CommonHFSExtentLeafRecord getOverflowExtent(CommonHFSExtentKey key) {
-	//System.out.println("getOverflowExtent(..)");
+	System.err.println("getOverflowExtent(..)");
 	//System.err.println("my key:");
 	//key.printFields(System.err, "");
+    System.err.println("  Doing ExtentsInitProcedure...");
 	ExtentsInitProcedure init = new ExtentsInitProcedure();	
+    System.err.println("  ExtentsInitProcedure done!");
 	
 	final int nodeSize = init.bthr.getNodeSize();
 	
-	long currentNodeNumber = init.bthr.getRootNodeNumber();
+	long currentNodeOffset = init.bthr.getRootNodeNumber()*nodeSize;
 	
 	// Search down through the layers of indices (O(log n) steps, where n is the size of the tree)
 	
-	byte[] currentNodeData = new byte[nodeSize];
-	init.extentsFile.seek(currentNodeNumber*nodeSize);
+	final byte[] currentNodeData = new byte[nodeSize];
+	init.extentsFile.seek(currentNodeOffset);
 	init.extentsFile.readFully(currentNodeData);
+    System.err.println("  Calling createCommonBTNodeDescriptor(byte[" + currentNodeData.length + "], 0)...");
 	CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
 	
 	while(nodeDescriptor.getNodeType() == NodeType.INDEX) {
 	    CommonBTIndexNode currentNode = createCommonHFSExtentIndexNode(currentNodeData, 0, nodeSize);
 	    CommonBTIndexRecord matchingRecord = findLEKey(currentNode, key);
 	    
-	    currentNodeNumber = matchingRecord.getIndex();
-	    init.extentsFile.seek(currentNodeNumber*nodeSize);
+	    currentNodeOffset = matchingRecord.getIndexAsOffset(nodeSize);
+	    init.extentsFile.seek(currentNodeOffset);
 	    init.extentsFile.readFully(currentNodeData);
+        System.err.println("  Calling createCommonBTNodeDescriptor(byte[" + currentNodeData.length + "], 0)...");
 	    nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
 	}
 	
@@ -560,6 +588,7 @@ public abstract class BaseHFSFileSystemView {
 // 		dataDump.close();
 // 		System.err.println("A dump of the node has been written to node_dump.dmp");
 // 	    } catch(Exception e) { e.printStackTrace(); }
+        System.err.println("Returning from getOverflowExtent(..)");
 	    return null;
 	}
 	else
@@ -587,46 +616,46 @@ public abstract class BaseHFSFileSystemView {
 
     public CommonHFSExtentDescriptor[] getAllExtents(CommonHFSCatalogNodeID fileID,
             CommonHFSForkData forkData, CommonHFSForkType forkType) {
-	CommonHFSExtentDescriptor[] result;
-	long blockSize = getVolumeHeader().getBlockSize();
+        CommonHFSExtentDescriptor[] result;
+        long blockSize = getVolumeHeader().getBlockSize();
 
-	long basicExtentsBlockCount = 0;
+        long basicExtentsBlockCount = 0;
         {
             CommonHFSExtentDescriptor[] basicExtents = forkData.getBasicExtents();
             for(int i = 0; i < basicExtents.length; ++i)
                 basicExtentsBlockCount += basicExtents[i].getBlockCount();
         }
-        
-	if(basicExtentsBlockCount*blockSize >= forkData.getLogicalSize()) {
+
+        if(basicExtentsBlockCount * blockSize >= forkData.getLogicalSize()) {
             result = forkData.getBasicExtents();
-	}
-	else {
-	    //System.err.println("Reading overflow extent for file " + fileID.toString());
-	    LinkedList<CommonHFSExtentDescriptor> resultList = new LinkedList<CommonHFSExtentDescriptor>();
+        }
+        else {
+            //System.err.println("Reading overflow extent for file " + fileID.toString());
+            LinkedList<CommonHFSExtentDescriptor> resultList = new LinkedList<CommonHFSExtentDescriptor>();
             for(CommonHFSExtentDescriptor descriptor : forkData.getBasicExtents())
                 resultList.add(descriptor);
-	    long currentBlock = basicExtentsBlockCount;
-		
-	    while(currentBlock*blockSize < forkData.getLogicalSize()) {
-		CommonHFSExtentKey extentKey =
-                        createCommonHFSExtentKey(forkType, fileID, (int)currentBlock);
-		
-		CommonHFSExtentLeafRecord currentRecord = getOverflowExtent(extentKey);
-		if(currentRecord == null)
-		    System.err.println("WARNING: currentRecord == null!!");
-		CommonHFSExtentDescriptor[] currentRecordData = currentRecord.getRecordData();
-		for(CommonHFSExtentDescriptor cur : currentRecordData) {
+            long currentBlock = basicExtentsBlockCount;
+
+            while(currentBlock * blockSize < forkData.getLogicalSize()) {
+                CommonHFSExtentKey extentKey =
+                        createCommonHFSExtentKey(forkType, fileID, (int) currentBlock);
+
+                CommonHFSExtentLeafRecord currentRecord = getOverflowExtent(extentKey);
+                if(currentRecord == null)
+                    System.err.println("ERROR: currentRecord == null!!");
+                CommonHFSExtentDescriptor[] currentRecordData = currentRecord.getRecordData();
+                for(CommonHFSExtentDescriptor cur : currentRecordData) {
                     resultList.add(cur);
-		    currentBlock += cur.getBlockCount();
+                    currentBlock += cur.getBlockCount();
                 }
-	    }
-	    //System.err.println("  Finished reading extents... (currentblock: " + currentBlock + " total: " + forkData.getTotalBlocks() + ")");
-		
-	    result = resultList.toArray(new CommonHFSExtentDescriptor[resultList.size()]);
-	}
-	return result;
+            }
+            //System.err.println("  Finished reading extents... (currentblock: " + currentBlock + " total: " + forkData.getTotalBlocks() + ")");
+
+            result = resultList.toArray(new CommonHFSExtentDescriptor[resultList.size()]);
+        }
+        return result;
     }
-    
+
     public CommonHFSExtentDescriptor[] getAllExtentDescriptors(CommonHFSCatalogLeafRecord requestFile,
             CommonHFSForkType forkType) {
 	return getAllExtentDescriptors(getAllExtents(requestFile, forkType));
@@ -688,13 +717,13 @@ public abstract class BaseHFSFileSystemView {
     // Utility methods
     
     private CommonHFSCatalogLeafRecord[] collectFilesInDir(CommonHFSCatalogNodeID dirID,
-            long currentNodeNumber, ReadableRandomAccessStream hfsFile, long fsOffset,
+            long currentNodeOffset, ReadableRandomAccessStream hfsFile, long fsOffset,
             final CommonHFSVolumeHeader header, final CommonBTHeaderRecord bthr,
             final ReadableRandomAccessStream catalogFile) {
         final int nodeSize = bthr.getNodeSize();
         
 	byte[] currentNodeData = new byte[nodeSize];
-	catalogFile.seek(currentNodeNumber*nodeSize);
+	catalogFile.seek(currentNodeOffset);
 	catalogFile.readFully(currentNodeData);
 	
 	CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
@@ -709,7 +738,7 @@ public abstract class BaseHFSFileSystemView {
             
 	    for(CommonBTIndexRecord bir : matchingRecords) {
 		CommonHFSCatalogLeafRecord[] partResult =
-                        collectFilesInDir(dirID, bir.getIndex(), hfsFile, fsOffset,
+                        collectFilesInDir(dirID, bir.getIndexAsOffset(nodeSize), hfsFile, fsOffset,
                         header, bthr, catalogFile);
 		for(CommonHFSCatalogLeafRecord curRes : partResult)
 		    results.addLast(curRes);

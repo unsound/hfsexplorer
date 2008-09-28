@@ -5,6 +5,8 @@
 
 package org.catacombae.hfsexplorer.types.hfscommon;
 
+import java.io.PrintStream;
+import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.hfsexplorer.types.HFSPlusCatalogThread;
 import org.catacombae.hfsexplorer.types.hfs.CdrThdRec;
 
@@ -12,12 +14,17 @@ import org.catacombae.hfsexplorer.types.hfs.CdrThdRec;
  *
  * @author erik
  */
-public abstract class CommonHFSCatalogFolderThread {
+public abstract class CommonHFSCatalogFolderThread implements PrintableStruct {
     public abstract CommonHFSCatalogNodeID getParentID();
     public abstract CommonHFSCatalogString getNodeName();
     public abstract int length();
     public abstract byte[] getBytes();
     
+    public void print(PrintStream ps, String prefix) {
+        ps.println(prefix + getClass().getSimpleName() + ":");
+        printFields(ps, prefix + " ");
+    }
+
     public static CommonHFSCatalogFolderThread create(HFSPlusCatalogThread data) {
         return new HFSPlusImplementation(data);
     }
@@ -52,6 +59,11 @@ public abstract class CommonHFSCatalogFolderThread {
         public byte[] getBytes() {
             return data.getBytes();
         }
+
+        public void printFields(PrintStream ps, String prefix) {
+            ps.println(prefix + "data:");
+            data.print(ps, prefix + " ");
+        }
     }
     
     private static class HFSImplementation extends CommonHFSCatalogFolderThread {
@@ -79,6 +91,11 @@ public abstract class CommonHFSCatalogFolderThread {
         @Override
         public byte[] getBytes() {
             return data.getBytes();
+        }
+
+        public void printFields(PrintStream ps, String prefix) {
+            ps.println(prefix + "data:");
+            data.print(ps, prefix + " ");
         }
     }
 }

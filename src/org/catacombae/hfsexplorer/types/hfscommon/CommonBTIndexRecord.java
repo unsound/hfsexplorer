@@ -5,6 +5,7 @@
 
 package org.catacombae.hfsexplorer.types.hfscommon;
 
+import java.io.PrintStream;
 import org.catacombae.hfsexplorer.Util;
 
 /**
@@ -32,9 +33,11 @@ public abstract class CommonBTIndexRecord extends CommonBTRecord {
         return key;
     }
 
-    public long getIndex() {
+    protected long getIndex() {
         return Util.unsign(Util.readIntBE(index));
     }
+
+    public abstract long getIndexAsOffset(int nodeSize);
 
     public byte[] getBytes() {
         byte[] res = new byte[getSize()];
@@ -53,6 +56,18 @@ public abstract class CommonBTIndexRecord extends CommonBTRecord {
         return res;
     }
 
+    public void print(PrintStream ps, String prefix) {
+        ps.println(prefix + "CommonBTIndexRecord:");
+        printFields(ps, prefix);
+    }
+
+    public void printFields(PrintStream ps, String prefix) {
+        ps.println(prefix + " key:");
+        key.print(ps, prefix + "  ");
+        ps.println(prefix + " index: " + getIndex());
+    }
+
+
     private static class HFSImplementation extends CommonBTIndexRecord {
         
         public HFSImplementation(CommonBTKey key, byte[] data, int offset) {
@@ -61,6 +76,11 @@ public abstract class CommonBTIndexRecord extends CommonBTRecord {
         
         public int getSize() {
             return key.occupiedSize() + index.length;
+        }
+
+        @Override
+        public long getIndexAsOffset(int nodeSize) {
+            return getIndex()*nodeSize;
         }
     }
     
@@ -71,6 +91,11 @@ public abstract class CommonBTIndexRecord extends CommonBTRecord {
         
         public int getSize() {
             return key.occupiedSize() + index.length;
-        }    
+        }
+
+        @Override
+        public long getIndexAsOffset(int nodeSize) {
+            return getIndex()*nodeSize;
+        }
     }
 }

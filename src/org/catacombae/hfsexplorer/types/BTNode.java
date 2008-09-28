@@ -21,11 +21,11 @@ public abstract class BTNode {
     protected final BTNodeDescriptor nodeDescriptor;
     
     public BTNode(byte[] data, int offset, int nodeSize) {
-	nodeDescriptor = new BTNodeDescriptor(data, offset);	
+        nodeDescriptor = new BTNodeDescriptor(data, offset);
     }
     
     public BTNodeDescriptor getNodeDescriptor() {
-	return nodeDescriptor;
+        return nodeDescriptor;
     }
 //     BTRecord[] records;
 }

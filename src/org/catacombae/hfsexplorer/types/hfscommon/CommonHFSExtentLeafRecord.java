@@ -5,6 +5,7 @@
 
 package org.catacombae.hfsexplorer.types.hfscommon;
 
+import java.io.PrintStream;
 import org.catacombae.hfsexplorer.types.HFSPlusExtentDescriptor;
 import org.catacombae.hfsexplorer.types.HFSPlusExtentKey;
 import org.catacombae.hfsexplorer.types.HFSPlusExtentRecord;
@@ -29,6 +30,11 @@ public abstract class CommonHFSExtentLeafRecord extends CommonBTRecord /*impleme
     public abstract CommonHFSExtentKey getKey();
     
     public abstract CommonHFSExtentDescriptor[] getRecordData();
+
+    public void print(PrintStream ps, String prefix) {
+        ps.println(prefix + getClass().getSimpleName() + ":");
+        printFields(ps, prefix + " ");
+    }
     
     /*public int compareTo(CommonHFSExtentLeafRecord o) {
         throw new UnsupporrtedOperationException("Not supported yet.");
@@ -81,6 +87,13 @@ public abstract class CommonHFSExtentLeafRecord extends CommonBTRecord /*impleme
 
             return res;
         }
+
+        public void printFields(PrintStream ps, String prefix) {
+            ps.println(prefix + "key:");
+            key.print(ps, prefix + " ");
+            ps.println(prefix + "recordData:");
+            recordData.print(ps, prefix + " ");
+        }
     }
     
     private static class HFSPlusImplementation extends CommonHFSExtentLeafRecord {
@@ -130,6 +143,12 @@ public abstract class CommonHFSExtentLeafRecord extends CommonBTRecord /*impleme
 
             return res;
         }
-        
+
+        public void printFields(PrintStream ps, String prefix) {
+            ps.println(prefix + "key:");
+            key.print(ps, prefix + " ");
+            ps.println(prefix + "recordData:");
+            recordData.print(ps, prefix + " ");
+        }
     }
 }

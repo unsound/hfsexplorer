@@ -5,13 +5,15 @@
 
 package org.catacombae.hfsexplorer.types.hfscommon;
 
+import java.io.PrintStream;
 import org.catacombae.csjc.DynamicStruct;
+import org.catacombae.csjc.PrintableStruct;
 
 /**
  *
  * @author erik
  */
-public abstract class CommonBTKey implements Comparable<CommonBTKey>, DynamicStruct {
+public abstract class CommonBTKey implements Comparable<CommonBTKey>, DynamicStruct, PrintableStruct {
     //public abstract int getMaxLength();
     //public abstract int length();
     

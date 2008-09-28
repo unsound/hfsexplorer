@@ -5,6 +5,7 @@
 
 package org.catacombae.hfsexplorer.types.hfscommon;
 
+import java.io.PrintStream;
 import org.catacombae.hfsexplorer.types.HFSPlusCatalogKey;
 import org.catacombae.hfsexplorer.types.HFSPlusCatalogThread;
 import org.catacombae.hfsexplorer.types.hfs.CatKeyRec;
@@ -34,6 +35,19 @@ public class CommonHFSCatalogFolderThreadRecord extends CommonHFSCatalogLeafReco
         return data;
     }
     
+    @Override
+    public void print(PrintStream ps, String prefix) {
+        ps.println(prefix + getClass().getSimpleName() + ":");
+        printFields(ps, prefix + " ");
+    }
+
+    public void printFields(PrintStream ps, String prefix) {
+        ps.println(prefix + "key:");
+        key.print(ps, prefix + " ");
+        ps.println(prefix + "data:");
+        data.print(ps, prefix + " ");
+    }
+
     public static CommonHFSCatalogFolderThreadRecord create(HFSPlusCatalogKey key,
             HFSPlusCatalogThread data) {
         return new CommonHFSCatalogFolderThreadRecord(CommonHFSCatalogKey.create(key),

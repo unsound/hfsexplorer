@@ -5,6 +5,8 @@
 
 package org.catacombae.hfsexplorer.types.hfscommon;
 
+import java.io.PrintStream;
+import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.types.BTHeaderRec;
 import org.catacombae.hfsexplorer.types.hfs.BTHdrRec;
@@ -13,7 +15,8 @@ import org.catacombae.hfsexplorer.types.hfs.BTHdrRec;
  *
  * @author erik
  */
-public abstract class CommonBTHeaderRecord {
+public abstract class CommonBTHeaderRecord extends CommonBTRecord implements PrintableStruct {
+
     public enum CompareType {
         CASE_FOLDING, BINARY_COMPARE;
     }
@@ -31,6 +34,11 @@ public abstract class CommonBTHeaderRecord {
     
     public abstract byte[] getBytes();
     
+    public void print(PrintStream ps, String prefix) {
+        ps.println(prefix + getClass().getSimpleName() + ":");
+        printFields(ps, prefix + " ");
+    }
+
     public static CommonBTHeaderRecord create(BTHeaderRec bthr) {
         return new HFSPlusImplementation(bthr);
     }
@@ -105,6 +113,16 @@ public abstract class CommonBTHeaderRecord {
         public byte[] getBytes() {
             return bthr.getBytes();
         }
+
+        public void printFields(PrintStream ps, String prefix) {
+            ps.println(prefix + "bthr:");
+            bthr.print(ps, prefix + " ");
+        }
+
+        @Override
+        public int getSize() {
+            return bthr.length();
+        }
     }
     
     public static class HFSImplementation extends CommonBTHeaderRecord {
@@ -168,6 +186,16 @@ public abstract class CommonBTHeaderRecord {
         @Override
         public byte[] getBytes() {
             return bthr.getBytes();
+        }
+        
+        public void printFields(PrintStream ps, String prefix) {
+            ps.println(prefix + "bthr:");
+            bthr.print(ps, prefix + " ");
+        }
+
+        @Override
+        public int getSize() {
+            return bthr.length();
         }
     }
 }

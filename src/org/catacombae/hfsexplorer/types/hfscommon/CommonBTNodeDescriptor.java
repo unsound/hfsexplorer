@@ -5,6 +5,7 @@
 
 package org.catacombae.hfsexplorer.types.hfscommon;
 
+import java.io.PrintStream;
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.types.BTNodeDescriptor;
 import org.catacombae.hfsexplorer.types.hfs.NodeDescriptor;
@@ -14,6 +15,7 @@ import org.catacombae.hfsexplorer.types.hfs.NodeDescriptor;
  * @author erik
  */
 public abstract class CommonBTNodeDescriptor {
+
     public enum NodeType {
         INDEX, HEADER, MAP, LEAF;
     }
@@ -22,6 +24,12 @@ public abstract class CommonBTNodeDescriptor {
     public abstract NodeType getNodeType();
     public abstract short getHeight();
     public abstract int getNumberOfRecords();
+
+    public void print(PrintStream ps, String prefix) {
+        ps.println(prefix + "CommonBTNodeDescriptor:");
+        printFields(ps, prefix);
+    }
+    public abstract void printFields(PrintStream ps, String prefix);
     
     public static CommonBTNodeDescriptor create(BTNodeDescriptor btnd) {
         return new HFSPlusImplementation(btnd);
@@ -74,6 +82,12 @@ public abstract class CommonBTNodeDescriptor {
         public int getNumberOfRecords() {
             return Util.unsign(btnd.getNumRecords());
         }
+
+        @Override
+        public void printFields(PrintStream ps, String prefix) {
+            ps.println(prefix + " btnd:");
+            btnd.print(ps, prefix + "  ");
+        }
     }
     
     public static class HFSImplementation extends CommonBTNodeDescriptor {
@@ -118,6 +132,12 @@ public abstract class CommonBTNodeDescriptor {
         @Override
         public int getNumberOfRecords() {
             return Util.unsign(nd.getNdNRecs());
+        }
+
+        @Override
+        public void printFields(PrintStream ps, String prefix) {
+            ps.println(prefix + " nd:");
+            nd.print(ps, prefix + "  ");
         }
     }
 }

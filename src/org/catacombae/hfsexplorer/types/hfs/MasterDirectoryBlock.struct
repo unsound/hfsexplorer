@@ -13,7 +13,7 @@ struct MasterDirectoryBlock {
 	UInt32 		drNxtCNID; 	next unused catalog node ID
 	UInt16 		drFreeBks; 	number of unused allocation blocks
 	UInt8		drVNLength;	length of volume name
-	Char   		drVN[27]; 	volume name
+	Char   		drVN[28]; 	volume name
 	UInt32 		drVolBkUp; 	date and time of last backup
 	UInt16 		drVSeqNum; 	volume backup sequence number
 	UInt32 		drWrCnt; 	volume write count
