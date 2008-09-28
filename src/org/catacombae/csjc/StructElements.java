@@ -174,14 +174,13 @@ public interface StructElements {
         private final BigInteger minValue;
 
         /**
-         * We only support value types with bit length divisible by 8.
+         * We only support value types with bit length divisible by 8 (octets).
          * 
-         * @param name
-         * @param value
-         * @param bits
-         * @param signed
-         * @param bigEndian  If true, the variable's contents are stored in big endian form. If
-         *                   false it is stored in little endian form.
+         * @param fieldData the raw bytes that make up the field.
+         * @param signed whether the integer is to be interpreted as a signed or
+         * unsigned value.
+         * @param littleEndian whether the data for this field was stored in
+         * little endian form (true) or big endian form (false).
          */
         public IntegerField(byte[] fieldData, IntegerFieldBits bits, boolean signed,
                 boolean littleEndian) {

@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2006 Erik Larsson
+ * Copyright (C) 2006-2008 Erik Larsson
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,30 +14,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+package org.catacombae.hfsexplorer.io;
+
+import org.catacombae.hfsexplorer.Util;
+import org.catacombae.hfsexplorer.types.HFSPlusExtentDescriptor;
+import org.catacombae.hfsexplorer.types.HFSPlusForkData;
+import org.catacombae.io.ReadableRandomAccessStream;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentDescriptor;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSForkData;
+
 /**
- * Facilitates reading the data of a fork by abstracting the extents and presents it to the
- * programmer as if it was a continious, seekable stream.<br>
- * Note: If you modify the state of the underlying stream while using this filter, the
- * behavior of the filter is undefined. The read methods will not return the correct data.
+ * Facilitates reading the data of a file system fork by abstracting the extents
+ * and presents it to the programmer as if it was a continious, seekable stream.
+ * <br>
+ * Note: If you modify the state of the underlying stream (i.e. adding, removing,
+ * changing extents) while using this filter, the behavior of the filter is
+ * undefined. The read methods will probably not return the correct data.
  * <pre>
  * Model:
- * 
+ *
  * - seeking does not do anything except setting a pointer value
  * - when read is called:
  *   - if logicalPosition is different from our last position
  *     - seek to the right position
  *   - else if file pointer is different from our last file pointer
  *     - seek to last fp
- *   
  * </pre>
  */
-package org.catacombae.hfsexplorer;
-
-import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.hfsexplorer.types.*;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentDescriptor;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSForkData;
-
 public class ForkFilter implements ReadableRandomAccessStream {
 
     private final long forkLength;
@@ -49,10 +53,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
     private long logicalPosition; // The current position in the fork
     private long lastLogicalPos; // The position in the fork where we stopped reading last time
     private long lastPhysicalPos; // The position in the fork where we stopped reading last time
-//     public ForkFilter(HFSPlusForkData forkData, ReadableRandomAccessStream sourceFile, long fsOffset, long blockSize) {
-// 	this(forkData, forkData.getExtents().getExtentDescriptors(), sourceFile, fsOffset, blockSize);
-//     }
-
+    
     public ForkFilter(CommonHFSForkData forkData, CommonHFSExtentDescriptor[] extentDescriptors,
             ReadableRandomAccessStream sourceFile, long fsOffset, long blockSize,
             long firstBlockOffset) {
@@ -79,6 +80,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
         this.lastPhysicalPos = 0; // Set differently from logicalPosition to trigger a seek at first read
     }
 
+    @Deprecated
     public ForkFilter(HFSPlusForkData forkData, HFSPlusExtentDescriptor[] extentDescriptors,
             ReadableRandomAccessStream sourceFile, long fsOffset, long blockSize,
             long firstBlockOffset) {
@@ -99,11 +101,17 @@ public class ForkFilter implements ReadableRandomAccessStream {
         this.lastPhysicalPos = 0; // Set differently from logicalPosition to trigger a seek at first read
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void seek(long pos) {
-        System.err.println("ForkFilter.seek(" + pos + ");");
+        //System.err.println("ForkFilter.seek(" + pos + ");");
         logicalPosition = pos;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int read() {
         byte[] oneByte = new byte[1];
         if(read(oneByte) == 1)
@@ -112,10 +120,16 @@ public class ForkFilter implements ReadableRandomAccessStream {
             return -1;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int read(byte[] data) {
         return read(data, 0, data.length);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int read(byte[] data, int pos, int len) {
         //System.err.println("ForkFilter.read(" + data + ", " + pos + ", " + len);
         long offset = fsOffset;
@@ -124,8 +138,8 @@ public class ForkFilter implements ReadableRandomAccessStream {
         long currentExtentLength;
 
         // Skip all extents whose range is located before the requested position (logicalPosition)
-        System.out.println("ForkFilter.read: skipping extents (bytesToSkip=" +
-                bytesToSkip + ")...");
+        //System.out.println("ForkFilter.read: skipping extents (bytesToSkip=" +
+        //        bytesToSkip + ")...");
         for(extIndex = 0; extIndex < extentDescriptors.length; ++extIndex) {
             CommonHFSExtentDescriptor cur = extentDescriptors[extIndex];
             currentExtentLength = cur.getBlockCount() * blockSize;
@@ -133,12 +147,13 @@ public class ForkFilter implements ReadableRandomAccessStream {
                 if(extIndex < extentDescriptors.length - 1)
                     bytesToSkip -= currentExtentLength;
                 else {
-                    System.err.println("Extent descriptors:");
-                    for(int i = 0; i < extentDescriptors.length; ++i) {
-                        extentDescriptors[i].print(System.err, "");
-                    }
+                    //System.err.println("Extent descriptors:");
+                    //for(int i = 0; i < extentDescriptors.length; ++i) {
+                    //    extentDescriptors[i].print(System.err, "");
+                    //}
 
-                    throw new RuntimeException("Extent out of bounds!");
+                    //throw new RuntimeException("Extent out of bounds!");
+                    return -1; // This is the proper way
                 }
             }
             else {
@@ -202,10 +217,16 @@ public class ForkFilter implements ReadableRandomAccessStream {
             return -1;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void readFully(byte[] data) {
         readFully(data, 0, data.length);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void readFully(byte[] data, int offset, int length) {
         int bytesRead = 0;
         while(bytesRead < length) {
@@ -217,41 +238,33 @@ public class ForkFilter implements ReadableRandomAccessStream {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public long length() {
         return forkLength;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public long getFilePointer() {
         return logicalPosition;
     }
 
+    /**
+     * Returns the underlying stream serving ForkFilter with file system data.
+     * @return the underlying stream serving ForkFilter with file system data.
+     */
     public ReadableRandomAccessStream getUnderlyingStream() {
         return sourceFile;
     }
 
-    /** Closes the underlying stream. Equivalent to <code>getUnderlyingStream().close()</code>. Nothing more is done. */
+    /**
+     * Closes the underlying stream. Equivalent to
+     * <code>getUnderlyingStream().close()</code>.
+     */
     public void close() {
         sourceFile.close();
     }
-
-    //    private int seekLogical(long logicalPosition, HFSPlusExtentDescriptor[] extents) {
-// 	/*
-// 	 * foreach extent e:
-// 	 *   
-// 	 */
-// 	// Seek forward to requested position
-// 	long bytesToSkip = logicalPosition;
-// 	//HFSPlusExtentDescriptor[] extents = forkData.getExtents().getExtentDescriptors();
-// 	for(int extIndex = 0; extIndex < extents.length; ++extIndex) {
-// 	    HFSPlusExtentDescriptor cur = extents[extIndex];
-// 	    long currentExtentLength = Util2.unsign(cur.getBlockCount())*blockSize
-// 	    if(bytesToSkip >= currentExtentLength)
-// 		bytesToSkip -= currentExtentLength;
-// 	    else {
-// 		sourceFile.seek(fsOffset + Util2.unsign(cur.getStartBlock())*blockSize + bytesToSkip);
-// 		return;
-// 	    }
-// 	}
-// 	// If we got here, logical position was not in the main fork data
-//     }
 }

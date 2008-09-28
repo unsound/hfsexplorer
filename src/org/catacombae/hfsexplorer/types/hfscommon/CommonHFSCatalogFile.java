@@ -134,10 +134,7 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
         private CdrFilRec data;
         
         private HFSImplementation(CdrFilRec data) {
-            System.err.println("CommonHFSCatalogFile.HFSImplementation invoked!");
             this.data = data;
-            data.print(System.err, "  ");
-            System.err.println("CommonHFSCatalogFile.HFSImplementation finished.");
         }
 
         @Override

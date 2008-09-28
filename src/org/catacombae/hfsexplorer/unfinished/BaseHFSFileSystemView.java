@@ -16,6 +16,7 @@
  */
 
 package org.catacombae.hfsexplorer.unfinished;
+import org.catacombae.hfsexplorer.io.ForkFilter;
 import org.catacombae.hfsexplorer.*; // until we move it back
 
 import org.catacombae.hfsexplorer.io.ReadableBlockCachingStream;

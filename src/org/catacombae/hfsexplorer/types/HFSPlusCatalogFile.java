@@ -96,11 +96,11 @@ public class HFSPlusCatalogFile extends HFSPlusCatalogLeafRecordData implements 
     public boolean getFileLockedFlag() { return (getFlags() & 0x1) != 0; }
     public boolean getThreadExistsFlag() { return (getFlags() & 0x2) != 0; }
     
-    public Date getCreateDateAsDate() { return HFSPlusDate.toDate(getCreateDate()); }
-    public Date getContentModDateAsDate() { return HFSPlusDate.toDate(getContentModDate()); }
-    public Date getAttributeModDateAsDate() { return HFSPlusDate.toDate(getAttributeModDate()); }
-    public Date getAccessDateAsDate() { return HFSPlusDate.toDate(getAccessDate()); }
-    public Date getBackupDateAsDate() { return HFSPlusDate.toDate(getBackupDate()); }
+    public Date getCreateDateAsDate() { return HFSPlusDate.gmtTimestampToDate(getCreateDate()); }
+    public Date getContentModDateAsDate() { return HFSPlusDate.gmtTimestampToDate(getContentModDate()); }
+    public Date getAttributeModDateAsDate() { return HFSPlusDate.gmtTimestampToDate(getAttributeModDate()); }
+    public Date getAccessDateAsDate() { return HFSPlusDate.gmtTimestampToDate(getAccessDate()); }
+    public Date getBackupDateAsDate() { return HFSPlusDate.gmtTimestampToDate(getBackupDate()); }
 
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " recordType: " + getRecordType());
