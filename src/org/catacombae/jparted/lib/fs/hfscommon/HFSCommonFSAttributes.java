@@ -3,7 +3,7 @@
  *
  * All rights reserved.
  */
-package org.catacombae.jparted.lib.fs.hfsplus;
+package org.catacombae.jparted.lib.fs.hfscommon;
 
 import java.util.Date;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogAttributes;
@@ -15,12 +15,12 @@ import org.catacombae.jparted.lib.fs.WindowsFileAttributes;
  *
  * @author Erik Larsson
  */
-class HFSPlusFSAttributes extends FSAttributes {
+class HFSCommonFSAttributes extends FSAttributes {
     
     private final FSEntry parentEntry;
     private final CommonHFSCatalogAttributes attributes;
     
-    public HFSPlusFSAttributes(FSEntry parentEntry, CommonHFSCatalogAttributes attributes) {
+    public HFSCommonFSAttributes(FSEntry parentEntry, CommonHFSCatalogAttributes attributes) {
         this.parentEntry = parentEntry;
         this.attributes = attributes;
     }

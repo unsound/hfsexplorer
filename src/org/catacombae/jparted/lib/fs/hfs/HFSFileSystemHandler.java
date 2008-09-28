@@ -7,13 +7,13 @@ package org.catacombae.jparted.lib.fs.hfs;
 
 import org.catacombae.hfsexplorer.fs.ImplHFSFileSystemView;
 import org.catacombae.jparted.lib.DataLocator;
-import org.catacombae.jparted.lib.fs.hfsplus.HFSPlusFileSystemHandler;
+import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemHandler;
 
 /**
  *
  * @author erik
  */
-public class HFSFileSystemHandler extends HFSPlusFileSystemHandler {
+public class HFSFileSystemHandler extends HFSCommonFileSystemHandler {
 
     public HFSFileSystemHandler(DataLocator fsLocator, boolean useCaching, String encodingName) {
         super(new ImplHFSFileSystemView(fsLocator.createReadOnlyFile(), 0, useCaching, encodingName),

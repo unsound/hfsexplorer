@@ -24,7 +24,7 @@ import java.awt.*;
 import javax.swing.*;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolder;
 import org.catacombae.jparted.lib.fs.FSFolder;
-import org.catacombae.jparted.lib.fs.hfsplus.HFSPlusFSFolder;
+import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFSFolder;
 
 public class FolderInfoWindow extends JFrame {
 
@@ -62,8 +62,8 @@ public class FolderInfoWindow extends JFrame {
     }
 
     public void setFields(FSFolder folder) {
-        if(folder instanceof HFSPlusFSFolder) {
-            CommonHFSCatalogFolder fld = ((HFSPlusFSFolder) folder).getInternalCatalogFolder();
+        if(folder instanceof HFSCommonFSFolder) {
+            CommonHFSCatalogFolder fld = ((HFSCommonFSFolder) folder).getInternalCatalogFolder();
             if(fld instanceof CommonHFSCatalogFolder.HFSPlusImplementation) {
                 infoPanel.setFields(((CommonHFSCatalogFolder.HFSPlusImplementation)fld).getUnderlying());
             }

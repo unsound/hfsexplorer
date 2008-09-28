@@ -50,7 +50,7 @@ import org.catacombae.jparted.lib.fs.FSForkType;
 import org.catacombae.jparted.lib.fs.FileSystemHandlerFactory;
 import org.catacombae.jparted.lib.fs.FileSystemHandlerFactory.StandardAttribute;
 import org.catacombae.jparted.lib.fs.FileSystemMajorType;
-import org.catacombae.jparted.lib.fs.hfsplus.HFSPlusFileSystemHandler;
+import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemHandler;
 
 public class FileSystemBrowserWindow extends JFrame {
 
@@ -76,7 +76,7 @@ public class FileSystemBrowserWindow extends JFrame {
     private final LinkedList<File> tempFiles = new LinkedList<File>();
     private final JFileChooser fileChooser = new JFileChooser();
     //private HFSPlusFileSystemView fsView;
-    private HFSPlusFileSystemHandler fsHandler = null;
+    private HFSCommonFileSystemHandler fsHandler = null;
 
     public FileSystemBrowserWindow() {
         this(null);
@@ -779,7 +779,7 @@ public class FileSystemBrowserWindow extends JFrame {
             ReadableStreamDataLocator stage2 = new ReadableStreamDataLocator(stage1);
             System.err.println("loadFS(): Creating fsHandler...");
 
-            fsHandler = (HFSPlusFileSystemHandler) factory.createHandler(stage2);
+            fsHandler = (HFSCommonFileSystemHandler) factory.createHandler(stage2);
             FSFolder rootRecord = fsHandler.getRoot();
             //FSEntry[] rootContents = rootRecord.list();
             populateFilesystemGUI(rootRecord);
