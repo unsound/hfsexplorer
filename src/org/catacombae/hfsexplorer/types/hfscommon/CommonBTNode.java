@@ -17,6 +17,7 @@
 
 package org.catacombae.hfsexplorer.types.hfscommon;
 
+import java.io.PrintStream;
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.types.BTNodeDescriptor;
 import org.catacombae.hfsexplorer.types.hfs.NodeDescriptor;
@@ -46,9 +47,9 @@ public abstract class CommonBTNode {
     }
     
     public CommonBTNodeDescriptor getNodeDescriptor() {
-	return ic.getNodeDescriptor();
+        return ic.getNodeDescriptor();
     }
-    
+
     public CommonBTRecord getBTRecord(int index) {
         return ic.getBTRecord(index);
     }
@@ -57,8 +58,15 @@ public abstract class CommonBTNode {
         return ic.getBTRecords();
     }
     
-    protected abstract CommonBTRecord createBTRecord(byte[] data, int offset, int length);
-    
+    protected abstract CommonBTRecord createBTRecord(int recordNumber,
+            byte[] data, int offset, int length);
+
+    public void print(PrintStream ps, String prefix) {
+        ps.println(prefix + "CommonBTNode:");
+        ic.printFields(ps, prefix);
+    }
+
+
     protected abstract class InternalContainer {
         protected final CommonBTNodeDescriptor nodeDescriptor;
         protected final CommonBTRecord[] records;
@@ -74,13 +82,27 @@ public abstract class CommonBTNode {
             records = new CommonBTRecord[offsets.length-1];
             for(int i = 0; i < records.length; ++i) {
                 int len = offsets[i+1] - offsets[i];
-                records[i] = createBTRecord(data, offset+offsets[i], len);
+                records[i] = createBTRecord(i, data, offset+offsets[i], len);
             }
         }
         
         public abstract CommonBTNodeDescriptor getNodeDescriptor();
         public abstract CommonBTRecord getBTRecord(int index);
         public abstract CommonBTRecord[] getBTRecords();
+
+        public void printFields(PrintStream ps, String prefix) {
+            ps.println(prefix + " nodeDescriptor: ");
+            nodeDescriptor.print(ps, prefix + "  ");
+            ps.println(prefix + " records (CommonBTRecord[" + records.length + "]):");
+            for(int i = 0; i < records.length; ++i) {
+                ps.println(prefix + "  [" + i + "]:");
+                records[i].print(ps, prefix + "   ");
+            }
+            ps.println(prefix + " offsets (short[" + offsets.length + "]):");
+            for(int i = 0; i < offsets.length; ++i) {
+                ps.println(prefix + "  [" + i + "]: " + offsets[i]);
+            }
+        }
     }
     
     private class HFSImplementation extends InternalContainer {

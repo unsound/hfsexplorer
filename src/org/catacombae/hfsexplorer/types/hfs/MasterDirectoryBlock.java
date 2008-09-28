@@ -26,7 +26,7 @@ import org.catacombae.hfsexplorer.types.HFSDate;
 public class MasterDirectoryBlock {
     /*
      * struct MasterDirectoryBlock
-     * size: 170 bytes
+     * size: 162 bytes
      * description: 
      * 
      * BP   Size  Type        Identifier  Description                            
@@ -45,7 +45,7 @@ public class MasterDirectoryBlock {
      * 30   4     UInt32      drNxtCNID   next unused catalog node ID            
      * 34   2     UInt16      drFreeBks   number of unused allocation blocks     
      * 36   1     UInt8       drVNLength  length of volume name                  
-     * 37   1*27  Char[27]    drVN        volume name                            
+     * 37   1*27  Char[28]    drVN        volume name
      * 64   4     UInt32      drVolBkUp   date and time of last backup           
      * 68   2     UInt16      drVSeqNum   volume backup sequence number          
      * 70   4     UInt32      drWrCnt     volume write count                     
@@ -59,12 +59,12 @@ public class MasterDirectoryBlock {
      * 126  2     UInt16      drVBMCSize  size (in blocks) of volume bitmap cache
      * 128  2     UInt16      drCtlCSize  size (in blocks) of common volume cache
      * 130  4     UInt32      drXTFlSize  size of extents overflow file          
-     * 134  16    ExtDataRec  drXTExtRec  extent record for extents overflow file
-     * 150  4     UInt32      drCTFlSize  size of catalog file                   
-     * 154  16    ExtDataRec  drCTExtRec  extent record for catalog file         
+     * 134  12    ExtDataRec  drXTExtRec  extent record for extents overflow file
+     * 146  4     UInt32      drCTFlSize  size of catalog file
+     * 150  12    ExtDataRec  drCTExtRec  extent record for catalog file
      */
     
-    public static final int STRUCTSIZE = 170;
+    public static final int STRUCTSIZE = 162;
     
     private final byte[] drSigWord = new byte[2];
     private final byte[] drCrDate = new byte[4];
@@ -80,7 +80,7 @@ public class MasterDirectoryBlock {
     private final byte[] drNxtCNID = new byte[4];
     private final byte[] drFreeBks = new byte[2];
     private final byte[] drVNLength = new byte[1];
-    private final byte[] drVN = new byte[1*27];
+    private final byte[] drVN = new byte[1*28];
     private final byte[] drVolBkUp = new byte[4];
     private final byte[] drVSeqNum = new byte[2];
     private final byte[] drWrCnt = new byte[4];
@@ -113,7 +113,7 @@ public class MasterDirectoryBlock {
 	System.arraycopy(data, offset+30, drNxtCNID, 0, 4);
 	System.arraycopy(data, offset+34, drFreeBks, 0, 2);
 	System.arraycopy(data, offset+36, drVNLength, 0, 1);
-	System.arraycopy(data, offset+37, drVN, 0, 1*27);
+	System.arraycopy(data, offset+37, drVN, 0, 1*28);
 	System.arraycopy(data, offset+64, drVolBkUp, 0, 4);
 	System.arraycopy(data, offset+68, drVSeqNum, 0, 2);
 	System.arraycopy(data, offset+70, drWrCnt, 0, 4);
@@ -128,8 +128,8 @@ public class MasterDirectoryBlock {
 	System.arraycopy(data, offset+128, drCtlCSize, 0, 2);
 	System.arraycopy(data, offset+130, drXTFlSize, 0, 4);
 	drXTExtRec = new ExtDataRec(data, offset+134);
-	System.arraycopy(data, offset+150, drCTFlSize, 0, 4);
-	drCTExtRec = new ExtDataRec(data, offset+154);
+	System.arraycopy(data, offset+146, drCTFlSize, 0, 4);
+	drCTExtRec = new ExtDataRec(data, offset+150);
     }
     
     public static int length() { return STRUCTSIZE; }
@@ -217,7 +217,7 @@ public class MasterDirectoryBlock {
 	ps.println(prefix + " drNxtCNID: " + getDrNxtCNID());
 	ps.println(prefix + " drFreeBks: " + getDrFreeBks());
 	ps.println(prefix + " drVNLength: " + getDrVNLength());
-	ps.println(prefix + " drVN: " + getDrVN());
+	ps.println(prefix + " drVN: \"" + Util.toASCIIString(getDrVN()) + "\"");
 	ps.println(prefix + " drVolBkUp: " + getDrVolBkUp() + " (" + getDrVolBkUpAsDate() + ")");
 	ps.println(prefix + " drVSeqNum: " + getDrVSeqNum());
 	ps.println(prefix + " drWrCnt: " + getDrWrCnt());
@@ -226,7 +226,7 @@ public class MasterDirectoryBlock {
 	ps.println(prefix + " drNmRtDirs: " + getDrNmRtDirs());
 	ps.println(prefix + " drFilCnt: " + getDrFilCnt());
 	ps.println(prefix + " drDirCnt: " + getDrDirCnt());
-	ps.println(prefix + " drFndrInfo: " + getDrFndrInfo());
+	ps.println(prefix + " drFndrInfo: int[" + getDrFndrInfo().length + "]");
 	ps.println(prefix + " drVCSize: " + getDrVCSize());
 	ps.println(prefix + " drVBMCSize: " + getDrVBMCSize());
 	ps.println(prefix + " drCtlCSize: " + getDrCtlCSize());

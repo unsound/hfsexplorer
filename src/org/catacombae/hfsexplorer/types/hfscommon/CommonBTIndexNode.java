@@ -24,8 +24,8 @@ package org.catacombae.hfsexplorer.types.hfscommon;
 public abstract class CommonBTIndexNode extends CommonBTNode {
     
     protected CommonBTIndexNode(byte[] data, int offset, int nodeSize, FSType type) {
-	super(data, offset, nodeSize, type);
-        
+        super(data, offset, nodeSize, type);
+
         validate();
     }
 

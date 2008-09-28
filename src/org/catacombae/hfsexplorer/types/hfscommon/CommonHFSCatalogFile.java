@@ -5,6 +5,7 @@
 
 package org.catacombae.hfsexplorer.types.hfscommon;
 
+import java.io.PrintStream;
 import java.util.Date;
 import org.catacombae.csjc.StaticStruct;
 import org.catacombae.hfsexplorer.types.HFSPlusCatalogFile;
@@ -21,6 +22,15 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
     public abstract CommonHFSForkData getDataFork();
     public abstract CommonHFSForkData getResourceFork();
     public abstract byte[] getBytes();
+
+
+    public void print(PrintStream ps, String prefix) {
+        ps.println(prefix + "CommonHFSCatalogFile:");
+        printFields(ps, prefix + " ");
+    }
+
+
+    public abstract void printFields(PrintStream ps, String string);
     
     public static CommonHFSCatalogFile create(HFSPlusCatalogFile data) {
         return new HFSPlusImplementation(data);
@@ -114,6 +124,12 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
         public Date getBackupDateAsDate() {
             return data.getBackupDateAsDate();
         }
+
+        @Override
+        public void printFields(PrintStream ps, String prefix) {
+            ps.println(prefix + "data:");
+            data.print(ps, prefix + " ");
+        }
     }
     
     public static class HFSImplementation extends CommonHFSCatalogFile {
@@ -194,6 +210,12 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
 
         public Date getBackupDateAsDate() {
             return HFSPlusDate.localTimestampToDate(getBackupDate());
+        }
+
+        @Override
+        public void printFields(PrintStream ps, String prefix) {
+            ps.println(prefix + "data:");
+            data.print(ps, prefix + " ");
         }
     }
 }

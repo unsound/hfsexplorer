@@ -5,6 +5,7 @@
 
 package org.catacombae.hfsexplorer.types.hfscommon;
 
+import java.io.PrintStream;
 import org.catacombae.hfsexplorer.FastUnicodeCompare;
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.types.HFSPlusCatalogKey;
@@ -19,6 +20,11 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey {
     public abstract CommonHFSCatalogNodeID getParentID();
     public abstract CommonHFSCatalogString getNodeName();
     
+    public void print(PrintStream ps, String prefix) {
+        ps.println(prefix + getClass().getSimpleName() + ":");
+        printFields(ps, prefix + " ");
+    }
+
     public static CommonHFSCatalogKey create(HFSPlusCatalogKey key) {
         return new HFSPlusImplementation(key);
     }
@@ -33,8 +39,6 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey {
     
     public static class HFSPlusImplementation extends CommonHFSCatalogKey {
         private final HFSPlusCatalogKey key;
-        private final CommonHFSCatalogNodeID parentID;
-        private final CommonHFSCatalogString nodeName;
         private HFSXKeyCompareType compType;
         
         public HFSPlusImplementation(HFSPlusCatalogKey key) {
@@ -43,19 +47,17 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey {
         protected HFSPlusImplementation(HFSPlusCatalogKey key,
                 HFSXKeyCompareType compType) {
             this.key = key;
-            this.parentID = CommonHFSCatalogNodeID.create(key.getParentID());
-            this.nodeName = CommonHFSCatalogString.create(key.getNodeName());
             this.compType = compType;
         }
 
         @Override
         public CommonHFSCatalogNodeID getParentID() {
-            return parentID;
+            return CommonHFSCatalogNodeID.create(key.getParentID());
         }
 
         @Override
         public CommonHFSCatalogString getNodeName() {
-            return nodeName;
+            return CommonHFSCatalogString.create(key.getNodeName());
         }
 
         @Override
@@ -101,6 +103,11 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey {
         public int occupiedSize() {
             return key.occupiedSize();
         }
+
+        public void printFields(PrintStream ps, String prefix) {
+            ps.println(prefix + "key:");
+            key.print(ps, prefix + " ");
+        }
     }
     
     public static class HFSXImplementation extends HFSPlusImplementation {
@@ -112,23 +119,19 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey {
     
     public static class HFSImplementation extends CommonHFSCatalogKey {
         private final CatKeyRec key;
-        private final CommonHFSCatalogNodeID parentID;
-        private final CommonHFSCatalogString nodeName;
         
         public HFSImplementation(CatKeyRec key) {
             this.key = key;
-            this.parentID = CommonHFSCatalogNodeID.create(key.getCkrParID());
-            this.nodeName = CommonHFSCatalogString.create(key.getCkrCName());
         }
 
         @Override
         public CommonHFSCatalogNodeID getParentID() {
-            return parentID;
+            return CommonHFSCatalogNodeID.create(key.getCkrParID());
         }
 
         @Override
         public CommonHFSCatalogString getNodeName() {
-            return nodeName;
+            return CommonHFSCatalogString.create(key.getCkrCName());
         }
 
         @Override
@@ -165,5 +168,9 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey {
             }
         }
 
+        public void printFields(PrintStream ps, String prefix) {
+            ps.println(prefix + "key:");
+            key.print(ps, prefix + " ");
+        }
     }
 }

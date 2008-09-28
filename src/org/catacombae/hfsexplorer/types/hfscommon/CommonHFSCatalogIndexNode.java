@@ -38,7 +38,7 @@ public abstract class CommonHFSCatalogIndexNode extends CommonBTIndexNode {
                 super(data, offset, nodeSize, FSType.HFS);
             }
             @Override
-            protected CommonBTRecord createBTRecord(byte[] data, int offset, int length) {
+            protected CommonBTRecord createBTRecord(int recordNumber, byte[] data, int offset, int length) {
                 CommonHFSCatalogKey currentKey =
                         CommonHFSCatalogKey.create(new CatKeyRec(data, offset));
                 return CommonBTIndexRecord.createHFS(currentKey, data, offset);
@@ -61,7 +61,7 @@ public abstract class CommonHFSCatalogIndexNode extends CommonBTIndexNode {
                 super(data, offset, nodeSize, FSType.HFS_PLUS);
             }
             @Override
-            protected CommonBTRecord createBTRecord(byte[] data, int offset, int length) {
+            protected CommonBTRecord createBTRecord(int recordNumber, byte[] data, int offset, int length) {
                 CommonHFSCatalogKey currentKey =
                         CommonHFSCatalogKey.create(new HFSPlusCatalogKey(data, offset));
                 return CommonBTIndexRecord.createHFSPlus(currentKey, data, offset);
@@ -85,7 +85,7 @@ public abstract class CommonHFSCatalogIndexNode extends CommonBTIndexNode {
                 super(data, offset, nodeSize, FSType.HFS_PLUS);
             }
             @Override
-            protected CommonBTRecord createBTRecord(byte[] data, int offset, int length) {
+            protected CommonBTRecord createBTRecord(int recordNumber, byte[] data, int offset, int length) {
                 CommonHFSCatalogKey currentKey =
                         CommonHFSCatalogKey.create(new HFSXCatalogKey(data, offset, catalogHeaderRec));
                 return CommonBTIndexRecord.createHFSPlus(currentKey, data, offset);
@@ -101,5 +101,4 @@ public abstract class CommonHFSCatalogIndexNode extends CommonBTIndexNode {
             return i;
         }
     }
-    //public static 
 }

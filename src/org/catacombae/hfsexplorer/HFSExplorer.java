@@ -188,7 +188,7 @@ public class HFSExplorer {
 	    System.out.println();
 	    ForkFilter catalogFile = new ForkFilter(header.getCatalogFile(),
 						    header.getCatalogFile().getExtents().getExtentDescriptors(),
-						    isoRaf, offset, header.getBlockSize());
+						    isoRaf, offset, header.getBlockSize(), 0);
 	    HFSPlusCatalogLeafRecord[] f = HFSPlusFileSystemView.collectFilesInDir(new HFSCatalogNodeID(1), bthr.getRootNode(), isoRaf,
 									       offset, header, bthr, catalogFile);
 	    System.out.println("Found " + f.length + " items in subroot.");

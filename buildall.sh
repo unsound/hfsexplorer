@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#JAVAC_CMD="${JAVA_HOME:+${JAVA_HOME}/bin/}javac"
+JAVAC_CMD="${JAVA_HOME:+${JAVA_HOME}/bin/}javac"
 #JAVAC_DEFAULT_ARGS="-target 1.5 -source 1.5 -encoding iso-8859-1"
 #CLASSPATH=build.~:lib/AppleJavaExtensions.jar:dist/lib/catacombae_io.jar:dist/lib/swing-layout-1.0.3.jar:dist/lib/hfsx_dmglib.jar:lib/java_awt_Desktop.jar
 SOURCES_DIR=src

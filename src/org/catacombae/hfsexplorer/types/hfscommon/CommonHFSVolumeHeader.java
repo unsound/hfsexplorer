@@ -5,6 +5,7 @@
 
 package org.catacombae.hfsexplorer.types.hfscommon;
 
+import java.io.PrintStream;
 import java.util.Date;
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.types.HFSPlusVolumeHeader;
@@ -18,6 +19,7 @@ import org.catacombae.hfsexplorer.types.hfs.MasterDirectoryBlock;
  */
 public abstract class CommonHFSVolumeHeader {
     public abstract short getSignature();
+    public abstract long getFirstAllocationBlock();
     public abstract long getBlockSize();
     public abstract long getTotalBlocks();
     public abstract long getFreeBlocks();
@@ -29,6 +31,8 @@ public abstract class CommonHFSVolumeHeader {
     public abstract CommonHFSForkData getCatalogFile();
     //public abstract long getExtentsOverflowFileSize();
     public abstract CommonHFSForkData getExtentsOverflowFile();
+    
+    public abstract void print(PrintStream err, String prefix);
     
     public static CommonHFSVolumeHeader create(HFSPlusVolumeHeader hdr) {
         return new HFSPlusImplementation(hdr);
@@ -99,6 +103,16 @@ public abstract class CommonHFSVolumeHeader {
         public CommonHFSForkData getExtentsOverflowFile() {
             return CommonHFSForkData.create(hdr.getExtentsFile());
         }
+
+        @Override
+        public void print(PrintStream err, String prefix) {
+            hdr.print(err, prefix);
+        }
+
+        @Override
+        public long getFirstAllocationBlock() {
+            return 0; // N/A for HFS+ volumes. All offsets are relative to fs start.
+        }
     }
     
     public static class HFSImplementation extends CommonHFSVolumeHeader {
@@ -158,6 +172,16 @@ public abstract class CommonHFSVolumeHeader {
         public CommonHFSForkData getExtentsOverflowFile() {
             return CommonHFSForkData.create(hdr.getDrXTExtRec(),
                     Util.unsign(hdr.getDrXTFlSize()));
+        }
+
+        @Override
+        public void print(PrintStream err, String prefix) {
+            hdr.print(err, prefix);
+        }
+
+        @Override
+        public long getFirstAllocationBlock() {
+            return Util.unsign(hdr.getDrAlBlSt());
         }
     }
 }

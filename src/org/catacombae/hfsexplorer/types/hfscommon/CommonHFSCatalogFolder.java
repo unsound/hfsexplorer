@@ -5,7 +5,9 @@
 
 package org.catacombae.hfsexplorer.types.hfscommon;
 
+import java.io.PrintStream;
 import java.util.Date;
+import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.types.HFSPlusCatalogFolder;
 import org.catacombae.hfsexplorer.types.HFSPlusDate;
@@ -15,7 +17,7 @@ import org.catacombae.hfsexplorer.types.hfs.CdrDirRec;
  *
  * @author erik
  */
-public abstract class CommonHFSCatalogFolder implements CommonHFSCatalogAttributes {
+public abstract class CommonHFSCatalogFolder implements CommonHFSCatalogAttributes, PrintableStruct {
     public abstract CommonHFSCatalogNodeID getFolderID();
     
     public static CommonHFSCatalogFolder create(HFSPlusCatalogFolder data) {
@@ -32,6 +34,11 @@ public abstract class CommonHFSCatalogFolder implements CommonHFSCatalogAttribut
 
     public abstract byte[] getBytes();
     
+    public void print(PrintStream ps, String prefix) {
+        ps.println(prefix + getClass().getSimpleName() + ":");
+        printFields(ps, prefix + " ");
+    }
+
     public static class HFSPlusImplementation extends CommonHFSCatalogFolder {
         private HFSPlusCatalogFolder data;
         
@@ -110,6 +117,11 @@ public abstract class CommonHFSCatalogFolder implements CommonHFSCatalogAttribut
         public Date getBackupDateAsDate() {
             return data.getBackupDateAsDate();
         }
+
+        public void printFields(PrintStream ps, String prefix) {
+            ps.println(prefix + "data:");
+            data.print(ps, prefix + " ");
+        }
     }
     
     public static class HFSImplementation extends CommonHFSCatalogFolder {
@@ -185,6 +197,11 @@ public abstract class CommonHFSCatalogFolder implements CommonHFSCatalogAttribut
 
         public Date getBackupDateAsDate() {
             return HFSPlusDate.localTimestampToDate(getBackupDate());
+        }
+
+        public void printFields(PrintStream ps, String prefix) {
+            ps.println(prefix + "data:");
+            data.print(ps, prefix + " ");
         }
     }
 }

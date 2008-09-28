@@ -5,6 +5,7 @@
 
 package org.catacombae.hfsexplorer.types.hfscommon;
 
+import java.io.PrintStream;
 import org.catacombae.hfsexplorer.types.HFSPlusExtentKey;
 import org.catacombae.hfsexplorer.types.hfs.ExtKeyRec;
 
@@ -14,6 +15,11 @@ import org.catacombae.hfsexplorer.types.hfs.ExtKeyRec;
  */
 public abstract class CommonHFSExtentKey extends CommonBTKey {
 
+    public void print(PrintStream ps, String prefix) {
+        ps.println(prefix + getClass().getSimpleName() + ":");
+        printFields(ps, prefix + " ");
+    }
+    
     public static CommonHFSExtentKey create(HFSPlusExtentKey key) {
         return new HFSPlusImplementation(key);
     }
@@ -41,6 +47,11 @@ public abstract class CommonHFSExtentKey extends CommonBTKey {
         public int occupiedSize() {
             return key.length();
         }
+
+        public void printFields(PrintStream ps, String prefix) {
+            ps.println(prefix + "key:");
+            key.print(ps, prefix + " ");
+        }
     }
     
     public static class HFSImplementation extends CommonHFSExtentKey {
@@ -61,6 +72,11 @@ public abstract class CommonHFSExtentKey extends CommonBTKey {
 
         public int occupiedSize() {
             return key.length();
+        }
+
+        public void printFields(PrintStream ps, String prefix) {
+            ps.println(prefix + "key:");
+            key.print(ps, prefix + " ");
         }
     }
 }

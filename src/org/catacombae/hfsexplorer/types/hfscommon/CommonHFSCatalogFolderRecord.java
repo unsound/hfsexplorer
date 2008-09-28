@@ -5,6 +5,7 @@
 
 package org.catacombae.hfsexplorer.types.hfscommon;
 
+import java.io.PrintStream;
 import org.catacombae.hfsexplorer.types.HFSPlusCatalogFolder;
 import org.catacombae.hfsexplorer.types.HFSPlusCatalogKey;
 import org.catacombae.hfsexplorer.types.hfs.CatKeyRec;
@@ -19,6 +20,19 @@ public abstract class CommonHFSCatalogFolderRecord extends CommonHFSCatalogLeafR
     
     public abstract CommonHFSCatalogFolder getData();
     
+    @Override
+    public void print(PrintStream ps, String prefix) {
+        ps.println(prefix + getClass().getSimpleName() + ":");
+        printFields(ps, prefix + " ");
+    }
+
+    public void printFields(PrintStream ps, String prefix) {
+        ps.println(prefix + "key:");
+        getKey().print(ps, prefix + " ");
+        ps.println(prefix + "data:");
+        getData().print(ps, prefix + " ");
+    }
+
     public static CommonHFSCatalogFolderRecord create(HFSPlusCatalogKey key,
             HFSPlusCatalogFolder data) {
         return new HFSPlusImplementation(key, data);

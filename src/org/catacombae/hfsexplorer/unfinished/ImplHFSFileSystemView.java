@@ -12,6 +12,7 @@ import org.catacombae.hfsexplorer.types.hfs.CatKeyRec;
 import org.catacombae.hfsexplorer.types.hfs.ExtKeyRec;
 import org.catacombae.hfsexplorer.types.hfs.MasterDirectoryBlock;
 import org.catacombae.hfsexplorer.types.hfs.NodeDescriptor;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonBTHeaderNode;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTHeaderRecord;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTNodeDescriptor;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolderRecord;
@@ -27,7 +28,6 @@ import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentKey;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentLeafNode;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSForkType;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSVolumeHeader;
-import org.catacombae.hfsexplorer.types.hfscommon.StringDecoder;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.Readable;
 
@@ -60,7 +60,6 @@ public class ImplHFSFileSystemView extends BaseHFSFileSystemView {
         }
     };
 
-    //private String encodingName;
     private CharsetStringDecoder stringDecoder;
 
     public ImplHFSFileSystemView(ReadableRandomAccessStream hfsFile, long fsOffset, boolean cachingEnabled, String encodingName) {
@@ -175,5 +174,11 @@ public class ImplHFSFileSystemView extends BaseHFSFileSystemView {
             return str.decode(stringDecoder);
         else
             throw new RuntimeException("Invalid string type: " + str.getClass());
+    }
+
+    @Override
+    protected CommonBTHeaderNode createCommonBTHeaderNode(byte[] currentNodeData,
+            int offset, int nodeSize) {
+        return CommonBTHeaderNode.createHFS(currentNodeData, offset, nodeSize);
     }
 }

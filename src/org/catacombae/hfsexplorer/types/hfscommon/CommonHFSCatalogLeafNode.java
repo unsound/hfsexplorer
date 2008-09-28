@@ -56,7 +56,7 @@ public abstract class CommonHFSCatalogLeafNode extends CommonBTNode {
         }
         
         @Override
-        protected CommonBTRecord createBTRecord(byte[] data, int offset, int length) {
+        protected CommonBTRecord createBTRecord(int recordNumber, byte[] data, int offset, int length) {
             return CommonHFSCatalogLeafRecord.createHFSPlus(data, offset, length);
         }
     }
@@ -70,7 +70,7 @@ public abstract class CommonHFSCatalogLeafNode extends CommonBTNode {
         }
         
         @Override
-        protected CommonBTRecord createBTRecord(byte[] data, int offset, int length) {
+        protected CommonBTRecord createBTRecord(int recordNumber, byte[] data, int offset, int length) {
             return CommonHFSCatalogLeafRecord.createHFSX(data, offset, length, bthr);
         }
     }
@@ -81,7 +81,7 @@ public abstract class CommonHFSCatalogLeafNode extends CommonBTNode {
         }
 
         @Override
-        protected CommonBTRecord createBTRecord(byte[] data, int offset, int length) {
+        protected CommonBTRecord createBTRecord(int recordNumber, byte[] data, int offset, int length) {
             return CommonHFSCatalogLeafRecord.createHFS(data, offset, length);
         }
     }
