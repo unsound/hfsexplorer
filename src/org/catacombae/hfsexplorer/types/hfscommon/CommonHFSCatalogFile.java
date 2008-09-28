@@ -8,8 +8,8 @@ package org.catacombae.hfsexplorer.types.hfscommon;
 import java.io.PrintStream;
 import java.util.Date;
 import org.catacombae.csjc.StaticStruct;
-import org.catacombae.hfsexplorer.types.HFSPlusCatalogFile;
-import org.catacombae.hfsexplorer.types.HFSPlusDate;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFile;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusDate;
 import org.catacombae.hfsexplorer.types.hfs.CdrFilRec;
 
 /**

@@ -26,7 +26,7 @@ import org.catacombae.hfsexplorer.types.hfscommon.*;
 import java.util.LinkedList;
 import java.io.OutputStream;
 import java.io.IOException;
-import org.catacombae.hfsexplorer.types.JournalInfoBlock;
+import org.catacombae.hfsexplorer.types.hfsplus.JournalInfoBlock;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTNodeDescriptor.NodeType;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogNodeID.ReservedID;
 

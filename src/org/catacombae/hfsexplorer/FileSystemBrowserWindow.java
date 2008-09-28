@@ -35,7 +35,7 @@ import java.awt.event.*;
 import javax.swing.*;
 //import org.catacombae.hfsexplorer.fsframework.FSFile;
 import org.catacombae.hfsexplorer.helpbrowser.HelpBrowserPanel;
-import org.catacombae.hfsexplorer.types.HFSPlusVolumeHeader;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusVolumeHeader;
 import org.catacombae.hfsexplorer.types.hfs.ExtDescriptor;
 import org.catacombae.hfsexplorer.types.hfs.HFSPlusWrapperMDB;
 import org.catacombae.hfsexplorer.FileSystemBrowser.RecordType;

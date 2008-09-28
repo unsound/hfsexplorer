@@ -5,9 +5,9 @@
 
 package org.catacombae.hfsexplorer.types.hfscommon;
 
-import org.catacombae.hfsexplorer.types.HFSPlusExtentKey;
-import org.catacombae.hfsexplorer.types.HFSPlusExtentLeafRecord;
-import org.catacombae.hfsexplorer.types.HFSPlusExtentRecord;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentKey;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentLeafRecord;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentRecord;
 import org.catacombae.hfsexplorer.types.hfs.ExtDataRec;
 import org.catacombae.hfsexplorer.types.hfs.ExtKeyRec;
 

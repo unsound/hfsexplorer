@@ -17,6 +17,7 @@
 
 package org.catacombae.hfsexplorer;
 
+import org.catacombae.hfsexplorer.types.hfsplus.BTNode;
 import org.catacombae.hfsexplorer.types.*;
 import java.util.*;
 

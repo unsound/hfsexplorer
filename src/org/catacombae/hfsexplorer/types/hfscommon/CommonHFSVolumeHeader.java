@@ -8,7 +8,7 @@ package org.catacombae.hfsexplorer.types.hfscommon;
 import java.io.PrintStream;
 import java.util.Date;
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.types.HFSPlusVolumeHeader;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusVolumeHeader;
 import org.catacombae.hfsexplorer.types.hfs.MasterDirectoryBlock;
 
 /**

@@ -6,9 +6,9 @@
 package org.catacombae.hfsexplorer.types.hfscommon;
 
 import java.io.PrintStream;
-import org.catacombae.hfsexplorer.types.HFSPlusExtentDescriptor;
-import org.catacombae.hfsexplorer.types.HFSPlusExtentKey;
-import org.catacombae.hfsexplorer.types.HFSPlusExtentRecord;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentDescriptor;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentKey;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentRecord;
 import org.catacombae.hfsexplorer.types.hfs.ExtDataRec;
 import org.catacombae.hfsexplorer.types.hfs.ExtDescriptor;
 import org.catacombae.hfsexplorer.types.hfs.ExtKeyRec;

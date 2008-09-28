@@ -6,14 +6,14 @@
 package org.catacombae.hfsexplorer.unfinished;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.types.BTHeaderRec;
-import org.catacombae.hfsexplorer.types.BTNodeDescriptor;
-import org.catacombae.hfsexplorer.types.HFSCatalogNodeID;
-import org.catacombae.hfsexplorer.types.HFSPlusCatalogKey;
-import org.catacombae.hfsexplorer.types.HFSPlusExtentKey;
-import org.catacombae.hfsexplorer.types.HFSPlusVolumeHeader;
-import org.catacombae.hfsexplorer.types.HFSUniStr255;
-import org.catacombae.hfsexplorer.types.JournalInfoBlock;
+import org.catacombae.hfsexplorer.types.hfsplus.BTHeaderRec;
+import org.catacombae.hfsexplorer.types.hfsplus.BTNodeDescriptor;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSCatalogNodeID;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogKey;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentKey;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusVolumeHeader;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSUniStr255;
+import org.catacombae.hfsexplorer.types.hfsplus.JournalInfoBlock;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTHeaderNode;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTHeaderRecord;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTNodeDescriptor;

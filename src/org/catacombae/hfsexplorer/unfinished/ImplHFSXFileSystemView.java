@@ -5,10 +5,10 @@
 
 package org.catacombae.hfsexplorer.unfinished;
 
-import org.catacombae.hfsexplorer.types.BTHeaderRec;
-import org.catacombae.hfsexplorer.types.HFSCatalogNodeID;
-import org.catacombae.hfsexplorer.types.HFSUniStr255;
-import org.catacombae.hfsexplorer.types.HFSXCatalogKey;
+import org.catacombae.hfsexplorer.types.hfsplus.BTHeaderRec;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSCatalogNodeID;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSUniStr255;
+import org.catacombae.hfsexplorer.types.hfsx.HFSXCatalogKey;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTHeaderRecord;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogIndexNode;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogKey;

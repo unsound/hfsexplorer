@@ -17,6 +17,17 @@
 
 package org.catacombae.hfsexplorer;
 
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogKey;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogIndexNode;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogLeafNode;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSCatalogNodeID;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSUniStr255;
+import org.catacombae.hfsexplorer.types.hfsx.HFSXCatalogIndexNode;
+import org.catacombae.hfsexplorer.types.hfsx.HFSXCatalogLeafRecord;
+import org.catacombae.hfsexplorer.types.hfsplus.BTHeaderRec;
+import org.catacombae.hfsexplorer.types.hfsx.HFSXCatalogLeafNode;
+import org.catacombae.hfsexplorer.types.hfsx.HFSXCatalogKey;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogLeafRecord;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.types.*;
 

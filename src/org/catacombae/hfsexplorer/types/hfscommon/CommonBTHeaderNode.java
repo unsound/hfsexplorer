@@ -5,7 +5,7 @@
 
 package org.catacombae.hfsexplorer.types.hfscommon;
 
-import org.catacombae.hfsexplorer.types.BTHeaderRec;
+import org.catacombae.hfsexplorer.types.hfsplus.BTHeaderRec;
 import org.catacombae.hfsexplorer.types.hfs.BTHdrRec;
 
 

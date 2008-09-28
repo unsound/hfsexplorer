@@ -6,9 +6,9 @@
 package org.catacombae.jparted.lib.fs.hfsplus;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.types.HFSPlusCatalogFolder;
-import org.catacombae.hfsexplorer.types.HFSPlusCatalogLeafRecord;
-import org.catacombae.hfsexplorer.types.HFSPlusCatalogLeafRecordData;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFolder;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogLeafRecord;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogLeafRecordData;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolder;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolderRecord;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafRecord;
