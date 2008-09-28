@@ -7,7 +7,7 @@ package org.catacombae.jparted.lib.fs.hfsplus;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import org.catacombae.hfsexplorer.ForkFilter;
+import org.catacombae.hfsexplorer.io.ForkFilter;
 import org.catacombae.hfsexplorer.io.ReadableRandomAccessInputStream;
 import org.catacombae.hfsexplorer.io.SynchronizedReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.types.HFSPlusForkData;

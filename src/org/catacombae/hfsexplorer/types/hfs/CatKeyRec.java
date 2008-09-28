@@ -16,8 +16,8 @@ public class CatKeyRec implements DynamicStruct {
      * 0   1     SInt8     ckrKeyLen   key length (SignedByte)      
      * 1   1     SInt8     ckrResrv1   reserved (SignedByte)        
      * 2   4     SInt32    ckrParID    parent directory ID (LongInt)
-     * 1   1     UInt8     ckrCNameLen length of catalog node name (part of Str31)
-     * 6   1*32  Char[31]  ckrCName    catalog node name (part of Str31)
+     * 6   1     UInt8     ckrCNameLen length of catalog node name (part of Str31)
+     * 7   1*31  Char[31]  ckrCName    catalog node name (part of Str31)
      */
     
     private static final int MAX_STRUCTSIZE = 38;

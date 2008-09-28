@@ -20,14 +20,16 @@ public class CdrThdRec extends CatDataRec {
      * 1   1     SInt8      cdrResrv2   reserved (SignedByte)                 
      * 2   4*2   SInt32[2]  thdResrv    reserved (ARRAY[1..2] OF LongInt)     
      * 10  4     SInt32     thdParID    parent ID for this directory (LongInt)
-     * 14  1*32  Char[32]   thdCName    name of this directory (Str31)        
+     * 14  1     UInt8      thdCNameLen length of thdCName (part of Str31)
+     * 15  1*31  Char[31]   thdCName    name of this directory (part of Str31)
      */
     
     public static final int STRUCTSIZE = 46;
     
     private final byte[] thdResrv = new byte[4*2];
     private final byte[] thdParID = new byte[4];
-    private final byte[] thdCName = new byte[1*32];
+    private final byte[] thdCNameLen = new byte[1];
+    private final byte[] thdCName = new byte[1*31];
     
     /**
      * Creates a new HFS folder thread record by reading from the given data at
@@ -38,44 +40,49 @@ public class CdrThdRec extends CatDataRec {
      */
     public CdrThdRec(byte[] data, int offset) {
         super(data, offset);
-	System.arraycopy(data, offset+2, thdResrv, 0, 4*2);
-	System.arraycopy(data, offset+10, thdParID, 0, 4);
-	System.arraycopy(data, offset+14, thdCName, 0, 1*32);
+        System.arraycopy(data, offset + 2, thdResrv, 0, 4 * 2);
+        System.arraycopy(data, offset + 10, thdParID, 0, 4);
+        System.arraycopy(data, offset + 14, thdCNameLen, 0, 1);
+        System.arraycopy(data, offset + 15, thdCName, 0, 1 * 31);
     }
-    
+
     public static int length() { return STRUCTSIZE; }
     
     /** reserved (ARRAY[1..2] OF LongInt) */
     public int[] getThdResrv() { return Util.readIntArrayBE(thdResrv); }
     /** parent ID for this directory (LongInt) */
     public int getThdParID() { return Util.readIntBE(thdParID); }
-    /** name of this directory (Str31) */
+    /** length of thdCName (part of Str31) */
+    public byte getThdCNameLen() { return Util.readByteBE(thdCNameLen); }
+    /** name of this directory (part of Str31) */
     public byte[] getThdCName() { return Util.readByteArrayBE(thdCName); }
     
     @Override
     public void printFields(PrintStream ps, String prefix) {
         super.printFields(ps, prefix);
         ps.println(prefix + " thdResrv: " + getThdResrv());
-	ps.println(prefix + " thdParID: " + getThdParID());
-	ps.println(prefix + " thdCName: " + getThdCName());
+        ps.println(prefix + " thdParID: " + Util.unsign(getThdParID()));
+        ps.println(prefix + " thdCNameLen: " + Util.unsign(getThdCNameLen()));
+        ps.println(prefix + " thdCName: \"" + Util.toASCIIString(getThdCName()) + "\"");
     }
-    
+
     @Override
     public void print(PrintStream ps, String prefix) {
-	ps.println(prefix + "CdrThdRec:");
-	printFields(ps, prefix);
+        ps.println(prefix + "CdrThdRec:");
+        printFields(ps, prefix);
     }
     
     @Override
     public byte[] getBytes() {
-	byte[] result = new byte[STRUCTSIZE];
-	int offset = 0;
+        byte[] result = new byte[STRUCTSIZE];
+        int offset = 0;
         
         byte[] superData = super.getBytes();
         System.arraycopy(superData, 0, result, offset, superData.length); offset += superData.length;
-	System.arraycopy(thdResrv, 0, result, offset, thdResrv.length); offset += thdResrv.length;
-	System.arraycopy(thdParID, 0, result, offset, thdParID.length); offset += thdParID.length;
-	System.arraycopy(thdCName, 0, result, offset, thdCName.length); offset += thdCName.length;
-	return result;
+        System.arraycopy(thdResrv, 0, result, offset, thdResrv.length); offset += thdResrv.length;
+        System.arraycopy(thdParID, 0, result, offset, thdParID.length); offset += thdParID.length;
+        System.arraycopy(thdCNameLen, 0, result, offset, thdCNameLen.length); offset += thdCNameLen.length;
+        System.arraycopy(thdCName, 0, result, offset, thdCName.length); offset += thdCName.length;
+        return result;
     }
 }

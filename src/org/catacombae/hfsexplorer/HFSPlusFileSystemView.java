@@ -17,6 +17,7 @@
 
 package org.catacombae.hfsexplorer;
 
+import org.catacombae.hfsexplorer.io.ForkFilter;
 import org.catacombae.hfsexplorer.io.ReadableBlockCachingStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.types.*;

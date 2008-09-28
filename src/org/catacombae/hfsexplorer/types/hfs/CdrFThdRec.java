@@ -14,20 +14,22 @@ public class CdrFThdRec extends CatDataRec {
      * size: 46 bytes
      * description: 
      * 
-     * BP  Size  Type       Identifier  Description                      
-     * ------------------------------------------------------------------
-     * 0   1     SInt8      cdrType     record type (SignedByte)         
-     * 1   1     SInt8      cdrResrv2   reserved (SignedByte)            
-     * 2   4*2   SInt32[2]  fthdResrv   reserved (ARRAY[1..2] OF LongInt)
-     * 10  4     SInt32     fthdParID   parent ID for this file (LongInt)
-     * 14  1*32  Char[32]   fthdCName   name of this file (Str31)        
+     * BP  Size  Type       Identifier   Description
+     * ---------------------------------------------------------------------
+     * 0   1     SInt8      cdrType      record type (SignedByte)
+     * 1   1     SInt8      cdrResrv2    reserved (SignedByte)
+     * 2   4*2   SInt32[2]  fthdResrv    reserved (ARRAY[1..2] OF LongInt)
+     * 10  4     SInt32     fthdParID    parent ID for this file (LongInt)
+     * 14  1     UInt8      fthdCNameLen length of fthdCName (part of Str31)
+     * 15  1*31  Char[31]   fthdCName    name of this file (part of Str31)
      */
     
     public static final int STRUCTSIZE = 46;
     
     private final byte[] fthdResrv = new byte[4*2];
     private final byte[] fthdParID = new byte[4];
-    private final byte[] fthdCName = new byte[1*32];
+    private final byte[] fthdCNameLen = new byte[1];
+    private final byte[] fthdCName = new byte[1*31];
 
     /**
      * Creates a new HFS file thread record by reading from the given data at
@@ -38,9 +40,10 @@ public class CdrFThdRec extends CatDataRec {
      */
     public CdrFThdRec(byte[] data, int offset) {
         super(data, offset);
-	System.arraycopy(data, offset+2, fthdResrv, 0, 4*2);
-	System.arraycopy(data, offset+10, fthdParID, 0, 4);
-	System.arraycopy(data, offset+14, fthdCName, 0, 1*32);
+        System.arraycopy(data, offset + 2, fthdResrv, 0, 4 * 2);
+        System.arraycopy(data, offset + 10, fthdParID, 0, 4);
+        System.arraycopy(data, offset + 14, fthdCNameLen, 0, 1);
+        System.arraycopy(data, offset + 15, fthdCName, 0, 1 * 31);
     }
     
     public static int length() { return STRUCTSIZE; }
@@ -49,33 +52,37 @@ public class CdrFThdRec extends CatDataRec {
     public int[] getFthdResrv() { return Util.readIntArrayBE(fthdResrv); }
     /** parent ID for this file (LongInt) */
     public int getFthdParID() { return Util.readIntBE(fthdParID); }
-    /** name of this file (Str31) */
+    /** length of fthdCName (part of Str31) */
+    public byte getFthdCNameLen() { return Util.readByteBE(fthdCNameLen); }
+    /** name of this file (part of Str31) */
     public byte[] getFthdCName() { return Util.readByteArrayBE(fthdCName); }
     
     @Override
     public void printFields(PrintStream ps, String prefix) {
         super.printFields(ps, prefix);
         ps.println(prefix + " fthdResrv: " + getFthdResrv());
-	ps.println(prefix + " fthdParID: " + getFthdParID());
-	ps.println(prefix + " fthdCName: " + getFthdCName());
+        ps.println(prefix + " fthdParID: " + Util.unsign(getFthdParID()));
+        ps.println(prefix + " fthdCNameLen: " + Util.unsign(getFthdCNameLen()));
+        ps.println(prefix + " fthdCName: \"" + Util.toASCIIString(getFthdCName()) + "\"");
     }
     
     @Override
     public void print(PrintStream ps, String prefix) {
-	ps.println(prefix + "CdrFThdRec:");
-	printFields(ps, prefix);
+        ps.println(prefix + "CdrFThdRec:");
+        printFields(ps, prefix);
     }
     
     @Override
     public byte[] getBytes() {
-	byte[] result = new byte[STRUCTSIZE];
-	int offset = 0;
+        byte[] result = new byte[STRUCTSIZE];
+        int offset = 0;
 
         byte[] superData = super.getBytes();
         System.arraycopy(superData, 0, result, offset, superData.length); offset += superData.length;
-	System.arraycopy(fthdResrv, 0, result, offset, fthdResrv.length); offset += fthdResrv.length;
-	System.arraycopy(fthdParID, 0, result, offset, fthdParID.length); offset += fthdParID.length;
-	System.arraycopy(fthdCName, 0, result, offset, fthdCName.length); offset += fthdCName.length;
-	return result;
+        System.arraycopy(fthdResrv, 0, result, offset, fthdResrv.length); offset += fthdResrv.length;
+        System.arraycopy(fthdParID, 0, result, offset, fthdParID.length); offset += fthdParID.length;
+        System.arraycopy(fthdCNameLen, 0, result, offset, fthdCNameLen.length); offset += fthdCNameLen.length;
+        System.arraycopy(fthdCName, 0, result, offset, fthdCName.length); offset += fthdCName.length;
+        return result;
     }
 }
