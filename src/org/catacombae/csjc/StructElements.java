@@ -20,6 +20,22 @@ import org.catacombae.hfsexplorer.Util;
  * @author Erik
  */
 public interface StructElements {
+    // Some shorthand constants
+    public static final Endianness BIG_ENDIAN = Endianness.BIG_ENDIAN;
+    public static final Endianness LITTLE_ENDIAN = Endianness.LITTLE_ENDIAN;
+    public static final Signedness SIGNED = Signedness.SIGNED;
+    public static final Signedness UNSIGNED = Signedness.UNSIGNED;
+    public static final FieldType INTEGER = FieldType.INTEGER;
+    public static final FieldType BYTEARRAY = FieldType.BYTEARRAY;
+    public static final FieldType ASCIISTRING = FieldType.ASCIISTRING;
+    public static final FieldType CUSTOM_CHARSET_STRING = FieldType.CUSTOM_CHARSET_STRING;
+    public static final IntegerFieldBits BITS_8 = IntegerFieldBits.BITS_8;
+    public static final IntegerFieldBits BITS_16 = IntegerFieldBits.BITS_16;
+    public static final IntegerFieldBits BITS_32 = IntegerFieldBits.BITS_32;
+    public static final IntegerFieldBits BITS_64 = IntegerFieldBits.BITS_64;
+
+    public Dictionary getStructElements();
+
     public static abstract class StructElement {
         //protected final String name;
         protected final String typeName;
@@ -165,11 +181,14 @@ public interface StructElements {
         }
     }
 
+    public static enum Signedness { SIGNED, UNSIGNED };
+    public static enum Endianness { BIG_ENDIAN, LITTLE_ENDIAN };
+
     public static class IntegerField extends Field {
         private final byte[] fieldData;
         private final IntegerFieldBits bits;
-        private final boolean signed;
-        private final boolean littleEndian;
+        private final Signedness signedness;
+        private final Endianness endianness;
         private final BigInteger maxValue;
         private final BigInteger minValue;
 
@@ -177,19 +196,30 @@ public interface StructElements {
          * We only support value types with bit length divisible by 8 (octets).
          * 
          * @param fieldData the raw bytes that make up the field.
-         * @param signed whether the integer is to be interpreted as a signed or
-         * unsigned value.
-         * @param littleEndian whether the data for this field was stored in
+         * @param signedness whether the integer is to be interpreted as a
+         * signed or unsigned value.
+         * @param endianness whether the data for this field was stored in
          * little endian form (true) or big endian form (false).
          */
-        public IntegerField(byte[] fieldData, IntegerFieldBits bits, boolean signed,
-                boolean littleEndian) {
-            super((signed ? "S" : "U") + "Int" + bits.getBits(), FieldType.INTEGER);
+        public IntegerField(byte[] fieldData, IntegerFieldBits bits, Signedness signedness,
+                Endianness endianness) {
+            super((signedness == Signedness.SIGNED ? "S" : "U") + "Int" + bits.getBits(),
+                    FieldType.INTEGER);
+
+            // Input check
+            if(fieldData == null)
+                throw new IllegalArgumentException("fieldData == null");
+            if(bits == null)
+                throw new IllegalArgumentException("bits == null");
+            if(signedness == null)
+                throw new IllegalArgumentException("signedness == null");
+            if(endianness == null)
+                throw new IllegalArgumentException("endianness == null");
 
             this.fieldData = fieldData;
             this.bits = bits;
-            this.signed = signed;
-            this.littleEndian = littleEndian;
+            this.signedness = signedness;
+            this.endianness = endianness;
 
             byte[] maxValueBytes = new byte[bits.getBytes()];
             byte[] minValueBytes = new byte[bits.getBytes()];
@@ -197,7 +227,7 @@ public interface StructElements {
             Util.set(maxValueBytes, (byte) 0xFF);
             Util.zero(minValueBytes);
 
-            if(signed) {
+            if(signedness == Signedness.SIGNED) {
                 maxValueBytes[0] = (byte) (maxValueBytes[0] & 0x7F);
                 minValueBytes[0] = (byte) 0x80;
             }
@@ -217,8 +247,8 @@ public interface StructElements {
         }
         
         private String validate(BigInteger bi) {
-            if(!signed && bi.signum() == -1) {
-                return "Tried to insert signed integer into unsigned field.";
+            if(signedness != Signedness.SIGNED && bi.signum() == -1) {
+                return "Tried to insert negative value into unsigned field.";
             }
             else if(bi.compareTo(maxValue) > 0) {
                 return "Value too large for field! Maximum value is " +
@@ -235,15 +265,19 @@ public interface StructElements {
 
         public BigInteger getValueAsBigInteger() {
             byte[] data;
-            if(littleEndian)
+            if(endianness == Endianness.LITTLE_ENDIAN)
                 data = Util.createReverseCopy(fieldData);
-            else
+            else if(endianness == Endianness.BIG_ENDIAN)
                 data = Util.createCopy(fieldData);
-            
-            if(signed)
-                return new BigInteger(data);
             else
+                throw new RuntimeException("Illegal endianness value: " + endianness);
+            
+            if(signedness == Signedness.SIGNED)
+                return new BigInteger(data);
+            else if(signedness == Signedness.UNSIGNED)
                 return new BigInteger(1, data);
+            else
+                throw new RuntimeException("Illegal signedness value: " + signedness);
         }
         
         @Override
@@ -263,20 +297,22 @@ public interface StructElements {
                  * and swap endianness, if needed */
                 
                 // First some sanity checks
-                if(signed && ba.length != fieldData.length)
+                if(signedness == Signedness.SIGNED && ba.length != fieldData.length)
                     throw new RuntimeException("UNEXPECTED: ba.length (" + ba.length +
                             ") != fieldData.length(" + fieldData.length + ")");
                 
-                if(!signed && ba.length != (fieldData.length+1))
+                if(signedness == Signedness.UNSIGNED && ba.length != (fieldData.length+1))
                     throw new RuntimeException("UNEXPECTED: ba.length (" + ba.length +
                             ") != (fieldData.length+1)(" + fieldData.length + "+1=" +
                             (fieldData.length+1) + ")");
                 
                 byte[] trueContents;
-                if(littleEndian)
+                if(endianness == Endianness.LITTLE_ENDIAN)
                     trueContents = Util.createReverseCopy(ba, ba.length-fieldData.length, fieldData.length);
-                else
+                else if(endianness == Endianness.BIG_ENDIAN)
                     trueContents = Util.createCopy(ba, ba.length-fieldData.length, fieldData.length);
+                else
+                    throw new RuntimeException("Illegal endianness value: " + endianness);
                 
                 System.arraycopy(trueContents, 0, fieldData, 0, fieldData.length);
             }

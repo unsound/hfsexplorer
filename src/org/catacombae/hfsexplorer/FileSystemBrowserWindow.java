@@ -764,7 +764,7 @@ public class FileSystemBrowserWindow extends JFrame {
                     break;
             }
             
-            FileSystemHandlerFactory factory = fsMajorType.getDefaultHandlerFactory();
+            FileSystemHandlerFactory factory = fsMajorType.createDefaultHandlerFactory();
             if(factory.isSupported(StandardAttribute.CACHING_ENABLED)) {
                 factory.getCreateAttributes().
                         setBooleanAttribute(StandardAttribute.CACHING_ENABLED,

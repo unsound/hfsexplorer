@@ -61,8 +61,8 @@ public enum FileSystemMajorType {
     }
      * */
     
-    private final LinkedList<FileSystemHandlerFactory> factories =
-            new LinkedList<FileSystemHandlerFactory>();
+    private final LinkedList<Class<? extends FileSystemHandlerFactory>> factoryClasses =
+            new LinkedList<Class<? extends FileSystemHandlerFactory>>();
     
     /**
      * Creates a FileSystemMajorType with no file system handler implementations
@@ -78,63 +78,53 @@ public enum FileSystemMajorType {
      * 
      * @param pFactoryClasses
      */
-    /*
     private FileSystemMajorType(Class<? extends FileSystemHandlerFactory> factoryClass) {
         this.factoryClasses.add(factoryClass);
-        //Class<FileSystemHandlerFactory> cls = FileSystemHandlerFactory.class;
-        Class<? extends FileSystemHandlerFactory> cls2 = factoryClass.asSubclass(FileSystemHandlerFactory.class);
     }
+
+    /**
+     * If an external implementor wants to register a factory class for a type,
+     * it calls this method. If there are no current factory classes tied to
+     * this type, the added class will become its default factory.
+     *
+     * @param factoryClass the factory class to register with this type.
      */
-    
-    private FileSystemMajorType(Class... pFactoryClasses) {
-        for(Class factoryClass : pFactoryClasses) {
-            try {
-                @SuppressWarnings("unchecked")
-                Constructor c =
-                    factoryClass.getConstructor();
-                Object o = c.newInstance();
-                if(o instanceof FileSystemHandlerFactory)
-                    factories.add((FileSystemHandlerFactory)o);
-                else
-                    throw new IllegalArgumentException("Factory class " +
-                            factoryClass.getName() + " is not a superclass of " +
-                            FileSystemHandlerFactory.class.getName());
-            } catch(NoSuchMethodException e) {
-                throw new IllegalArgumentException("No zero-argument constructor found!", e);
-            } catch(InstantiationException e) {
-                throw new IllegalArgumentException("Could not instantiate " +
-                        factoryClass.getName() + "!", e);
-            } catch(IllegalAccessException e) {
-                throw new IllegalArgumentException("Inaccessible constructor for " +
-                        factoryClass.getName() + "!", e);
-            } catch(IllegalArgumentException e) {
-                throw new IllegalArgumentException("IllegalArgumentException while " +
-                        "invoking constructor for " + factoryClass.getName() + "!", e);
-            } catch(InvocationTargetException e) {
-                throw new RuntimeException("Constructor for " +
-                        factoryClass.getName() + "threw an Exception!", e);
-            }            
-        }
+    public void addFactoryClass(Class<? extends FileSystemHandlerFactory> factoryClass) {
+        this.factoryClasses.addLast(factoryClass);
     }
-    
-    public List<FileSystemHandlerFactory> getAllHandlers() {
-        return new ArrayList<FileSystemHandlerFactory>(factories);
+
+    /**
+     * Returns all registered factory classes for this type. The first entry in
+     * the list will be the default factory class.
+     * @return all registered factory classes for this type.
+     */
+    public List<Class<? extends FileSystemHandlerFactory>> getFactoryClasses() {
+        return new ArrayList<Class<? extends FileSystemHandlerFactory>>(factoryClasses);
     }
     
     /**
-     * If this file system has an associated file system handler, its
-     * FileSystemHandlerFactory is returned. If there is no file system handler
-     * implementation null is returned.
-     * @return
+     * Returns a newly created factory from the type's default factory class.
+     * If there is no factory classes defined for the type, <code>null</code> is
+     * returned.
+     *
+     * @return a newly created factory from the type's default factory class.
      */
-    public FileSystemHandlerFactory getDefaultHandlerFactory() {
-        if(factories.size() < 1)
+    public FileSystemHandlerFactory createDefaultHandlerFactory() {
+        if(factoryClasses.size() == 0)
             return null;
         else {
-            return factories.getFirst().newInstance();
+            Class<? extends FileSystemHandlerFactory> factoryClass =
+                    factoryClasses.getFirst();
+            return createHandlerFactory(factoryClass);
         }
     }
     
+    /**
+     * Returns a newly created factory from a specified factory class.
+     *
+     * @param factoryClass the factory class of the new object.
+     * @return a newly created factory from a specified factory class.
+     */
     public static FileSystemHandlerFactory createHandlerFactory(Class <? extends FileSystemHandlerFactory> factoryClass) {
         try {
             Constructor<? extends FileSystemHandlerFactory> c =

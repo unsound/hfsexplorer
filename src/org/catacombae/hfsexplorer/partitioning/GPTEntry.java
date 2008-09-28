@@ -103,54 +103,57 @@ public class GPTEntry implements Partition, StructElements {
      *
      *   The enum fields in this implementation should be accurate.
      */
-    private static final Hashtable<LongBuffer,GPTPartitionType> byteMap = new Hashtable<LongBuffer,GPTPartitionType>();
-    public static enum GPTPartitionType {
-	PARTITION_TYPE_UNUSED_ENTRY         ((long)0x0000000000000000L, (long)0x0000000000000000L),
-	PARTITION_TYPE_EFI_SYSTEM           ((long)0x28732AC11FF8D211L, (long)0xBA4B00A0C93EC93BL),
-	PARTITION_TYPE_MICROSOFT_RESERVED   ((long)0x16E3C9E35C0BB84DL, (long)0x817DF92DF00215AEL),
-	PARTITION_TYPE_PRIMARY_PARTITION    ((long)0xA2A0D0EBE5B93344L, (long)0x87C068B6B72699C7L),
-	PARTITION_TYPE_LDM_METADATA         ((long)0xAAC808588F7EE042L, (long)0x85D2E1E90434CFB3L),
-	PARTITION_TYPE_LDM_DATA             ((long)0xA0609BAF3114624FL, (long)0xBC683311714A69ADL),
-	PARTITION_TYPE_APPLE_HFS            ((long)0x005346480000AA11L, (long)0xAA1100306543ECACL),
-	UNKNOWN_PARTITION_TYPE; // Returned when no known type can be matched
-	
-	private Long typeGUIDMsb;
-	private Long typeGUIDLsb;
-	
-	private GPTPartitionType(long typeGUIDMsb, long typeGUIDLsb) {
-	    this.typeGUIDMsb = typeGUIDMsb;
-	    this.typeGUIDLsb = typeGUIDLsb;
-	    byteMap.put(LongBuffer.wrap(new long[] { typeGUIDMsb, typeGUIDLsb }), this);
-	}
-	private GPTPartitionType() {
-	    this.typeGUIDMsb = null;
-	    this.typeGUIDLsb = null;
-	}
-		
-	public static GPTPartitionType getType(long typeGUIDMsb, long typeGUIDLsb) {
-	    GPTPartitionType type = byteMap.get(LongBuffer.wrap(new long[] { typeGUIDMsb, typeGUIDLsb }));
-	    if(type != null)
-		return type;
-	    else
-		return UNKNOWN_PARTITION_TYPE;
-	}
 
-	public byte[] getBytes() {
-	    if(typeGUIDMsb != null && typeGUIDLsb != null) {
-		byte[] result = new byte[16];
-		for(int i = 0; i < 8; ++i) {
-		    result[i] = (byte)((typeGUIDMsb >> ((7-i)*8)) & 0xFF);
-		}
-		for(int i = 0; i < 8; ++i) {
-		    result[8+i] = (byte)((typeGUIDLsb >> ((7-i)*8)) & 0xFF);
-		}
-		return result;
-	    }
-	    else
-		return null;
-	}
+    private static final Hashtable<LongBuffer, GPTPartitionType> byteMap = new Hashtable<LongBuffer, GPTPartitionType>();
+
+    public static enum GPTPartitionType {
+
+        PARTITION_TYPE_UNUSED_ENTRY((long) 0x0000000000000000L, (long) 0x0000000000000000L),
+        PARTITION_TYPE_EFI_SYSTEM((long) 0x28732AC11FF8D211L, (long) 0xBA4B00A0C93EC93BL),
+        PARTITION_TYPE_MICROSOFT_RESERVED((long) 0x16E3C9E35C0BB84DL, (long) 0x817DF92DF00215AEL),
+        PARTITION_TYPE_PRIMARY_PARTITION((long) 0xA2A0D0EBE5B93344L, (long) 0x87C068B6B72699C7L),
+        PARTITION_TYPE_LDM_METADATA((long) 0xAAC808588F7EE042L, (long) 0x85D2E1E90434CFB3L),
+        PARTITION_TYPE_LDM_DATA((long) 0xA0609BAF3114624FL, (long) 0xBC683311714A69ADL),
+        PARTITION_TYPE_APPLE_HFS((long) 0x005346480000AA11L, (long) 0xAA1100306543ECACL),
+        UNKNOWN_PARTITION_TYPE; // Returned when no known type can be matched
+        private Long typeGUIDMsb;
+        private Long typeGUIDLsb;
+
+        private GPTPartitionType(long typeGUIDMsb, long typeGUIDLsb) {
+            this.typeGUIDMsb = typeGUIDMsb;
+            this.typeGUIDLsb = typeGUIDLsb;
+            byteMap.put(LongBuffer.wrap(new long[] { typeGUIDMsb, typeGUIDLsb }), this);
+        }
+
+        private GPTPartitionType() {
+            this.typeGUIDMsb = null;
+            this.typeGUIDLsb = null;
+        }
+
+        public static GPTPartitionType getType(long typeGUIDMsb, long typeGUIDLsb) {
+            GPTPartitionType type = byteMap.get(LongBuffer.wrap(new long[] { typeGUIDMsb, typeGUIDLsb }));
+            if(type != null)
+                return type;
+            else
+                return UNKNOWN_PARTITION_TYPE;
+        }
+
+        public byte[] getBytes() {
+            if(typeGUIDMsb != null && typeGUIDLsb != null) {
+                byte[] result = new byte[16];
+                for(int i = 0; i < 8; ++i) {
+                    result[i] = (byte) ((typeGUIDMsb >> ((7 - i) * 8)) & 0xFF);
+                }
+                for(int i = 0; i < 8; ++i) {
+                    result[8 + i] = (byte) ((typeGUIDLsb >> ((7 - i) * 8)) & 0xFF);
+                }
+                return result;
+            }
+            else
+                return null;
+        }
     }
-    
+
     /*
      * struct GPTEntry
      * size: 128 bytes
@@ -174,29 +177,35 @@ public class GPTEntry implements Partition, StructElements {
     protected final byte[] partitionName = new byte[72];
     
     private final int blockSize;
-    
+
     public GPTEntry(byte[] data, int offset, int blockSize) {
-	this(blockSize);
-	System.arraycopy(data, offset+0, partitionTypeGUID, 0, 16);
-	System.arraycopy(data, offset+16, uniquePartitionGUID, 0, 16);
-	System.arraycopy(data, offset+32, startingLBA, 0, 8);
-	System.arraycopy(data, offset+40, endingLBA, 0, 8);
-	System.arraycopy(data, offset+48, attributeBits, 0, 8);
-	System.arraycopy(data, offset+56, partitionName, 0, 72);
+        this(blockSize);
+        System.arraycopy(data, offset + 0, partitionTypeGUID, 0, 16);
+        System.arraycopy(data, offset + 16, uniquePartitionGUID, 0, 16);
+        System.arraycopy(data, offset + 32, startingLBA, 0, 8);
+        System.arraycopy(data, offset + 40, endingLBA, 0, 8);
+        System.arraycopy(data, offset + 48, attributeBits, 0, 8);
+        System.arraycopy(data, offset + 56, partitionName, 0, 72);
     }
-    
+
+    /**
+     * Used by its evil mutable twin.
+     * @param blockSize
+     */
     protected GPTEntry(int blockSize) { this.blockSize = blockSize; }
+    
     public GPTEntry(GPTEntry source) {
-	this(source.blockSize);
-	copyFields(source);
+        this(source.blockSize);
+        copyFields(source);
     }
+
     protected void copyFields(GPTEntry source) {
- 	System.arraycopy(source.partitionTypeGUID, 0, partitionTypeGUID, 0, partitionTypeGUID.length);
-	System.arraycopy(source.uniquePartitionGUID, 0, uniquePartitionGUID, 0, uniquePartitionGUID.length);
-	System.arraycopy(source.startingLBA, 0, startingLBA, 0, startingLBA.length);
-	System.arraycopy(source.endingLBA, 0, endingLBA, 0, endingLBA.length);
-	System.arraycopy(source.attributeBits, 0, attributeBits, 0, attributeBits.length);
-	System.arraycopy(source.partitionName, 0, partitionName, 0, partitionName.length);
+        System.arraycopy(source.partitionTypeGUID, 0, partitionTypeGUID, 0, partitionTypeGUID.length);
+        System.arraycopy(source.uniquePartitionGUID, 0, uniquePartitionGUID, 0, uniquePartitionGUID.length);
+        System.arraycopy(source.startingLBA, 0, startingLBA, 0, startingLBA.length);
+        System.arraycopy(source.endingLBA, 0, endingLBA, 0, endingLBA.length);
+        System.arraycopy(source.attributeBits, 0, attributeBits, 0, attributeBits.length);
+        System.arraycopy(source.partitionName, 0, partitionName, 0, partitionName.length);
     }
     
     // Defined in Partition
@@ -214,54 +223,53 @@ public class GPTEntry implements Partition, StructElements {
     public byte[] getPartitionName() { return Util.createCopy(partitionName); }
     
     public GPTPartitionType getPartitionTypeGUIDAsEnum() {
-	return GPTPartitionType.getType(Util.readLongBE(partitionTypeGUID, 0), Util.readLongBE(partitionTypeGUID, 8));
+        return GPTPartitionType.getType(Util.readLongBE(partitionTypeGUID, 0), Util.readLongBE(partitionTypeGUID, 8));
     }
     public String getPartitionNameAsString() {
-	// Find null terminator
-	int stringLength = 0;
-	for(int i = 0; i < partitionName.length; i += 2) {
-	    if(partitionName[i] == 0 && partitionName[i+1] == 0)
-		break;
-	    else
-		stringLength += 2;
-	}
-	return Util.readString(partitionName, 0, stringLength, "UTF-16LE");
+        // Find null terminator
+        int stringLength = 0;
+        for(int i = 0; i < partitionName.length; i += 2) {
+            if(partitionName[i] == 0 && partitionName[i + 1] == 0)
+                break;
+            else
+                stringLength += 2;
+        }
+        return Util.readString(partitionName, 0, stringLength, "UTF-16LE");
     }
-    
+
     public boolean isUsed() {
-	return getPartitionTypeGUIDAsEnum() != GPTPartitionType.PARTITION_TYPE_UNUSED_ENTRY;
+        return getPartitionTypeGUIDAsEnum() != GPTPartitionType.PARTITION_TYPE_UNUSED_ENTRY;
     }
     
     public String toString() {
-	return "\"" + getPartitionNameAsString() + "\" (" + getPartitionTypeGUIDAsEnum() + ")";
+        return "\"" + getPartitionNameAsString() + "\" (" + getPartitionTypeGUIDAsEnum() + ")";
     }
 
-    
     public void printFields(PrintStream ps, String prefix) {
-	ps.println(prefix + " partitionTypeGUID: " + getGUIDAsString(getPartitionTypeGUID()) + " (" + getPartitionTypeGUIDAsEnum() + ")");
-	ps.println(prefix + " uniquePartitionGUID: " + getGUIDAsString(getUniquePartitionGUID()));
-	ps.println(prefix + " startingLBA: " + getStartingLBA());
-	ps.println(prefix + " endingLBA: " + getEndingLBA());
-	ps.println(prefix + " attributeBits: " + getAttributeBits());
-	ps.println(prefix + " partitionName: " + getPartitionNameAsString());
+        ps.println(prefix + " partitionTypeGUID: " + getGUIDAsString(getPartitionTypeGUID()) + " (" + getPartitionTypeGUIDAsEnum() + ")");
+        ps.println(prefix + " uniquePartitionGUID: " + getGUIDAsString(getUniquePartitionGUID()));
+        ps.println(prefix + " startingLBA: " + getStartingLBA());
+        ps.println(prefix + " endingLBA: " + getEndingLBA());
+        ps.println(prefix + " attributeBits: " + getAttributeBits());
+        ps.println(prefix + " partitionName: " + getPartitionNameAsString());
     }
-    
+
     public void print(PrintStream ps, String prefix) {
-	ps.println(prefix + "GPTEntry:");
-	printFields(ps, prefix);
+        ps.println(prefix + "GPTEntry:");
+        printFields(ps, prefix);
     }
-    
+
     public byte[] getBytes() {
-	byte[] result = new byte[128];
-	int offset = 0;
-	System.arraycopy(partitionTypeGUID, 0, result, offset, partitionTypeGUID.length); offset += 16;
-	System.arraycopy(uniquePartitionGUID, 0, result, offset, uniquePartitionGUID.length); offset += 16;
-	System.arraycopy(startingLBA, 0, result, offset, startingLBA.length); offset += 8;
-	System.arraycopy(endingLBA, 0, result, offset, endingLBA.length); offset += 8;
-	System.arraycopy(attributeBits, 0, result, offset, attributeBits.length); offset += 8;
-	System.arraycopy(partitionName, 0, result, offset, partitionName.length); offset += 72;
-	
-	return result;
+        byte[] result = new byte[128];
+        int offset = 0;
+        System.arraycopy(partitionTypeGUID, 0, result, offset, partitionTypeGUID.length); offset += 16;
+        System.arraycopy(uniquePartitionGUID, 0, result, offset, uniquePartitionGUID.length); offset += 16;
+        System.arraycopy(startingLBA, 0, result, offset, startingLBA.length); offset += 8;
+        System.arraycopy(endingLBA, 0, result, offset, endingLBA.length); offset += 8;
+        System.arraycopy(attributeBits, 0, result, offset, attributeBits.length); offset += 8;
+        System.arraycopy(partitionName, 0, result, offset, partitionName.length); offset += 72;
+
+        return result;
     }
     
     public boolean equals(Object obj) {
@@ -277,24 +285,24 @@ public class GPTEntry implements Partition, StructElements {
     // Utility methods
     
     public static String getGUIDAsString(byte[] guid) {
-	String res = "{";
-	res += Util.toHexStringLE(Util.readIntBE(guid, 0)) + "-";
-	res += Util.toHexStringLE(Util.readShortBE(guid, 4)) + "-";
-	res += Util.toHexStringLE(Util.readShortBE(guid, 6)) + "-";
-	res += Util.byteArrayToHexString(guid, 8, 2) + "-";
-	res += Util.byteArrayToHexString(guid, 10, 6) + "}";
-	return res.toUpperCase();
+        String res = "{";
+        res += Util.toHexStringLE(Util.readIntBE(guid, 0)) + "-";
+        res += Util.toHexStringLE(Util.readShortBE(guid, 4)) + "-";
+        res += Util.toHexStringLE(Util.readShortBE(guid, 6)) + "-";
+        res += Util.byteArrayToHexString(guid, 8, 2) + "-";
+        res += Util.byteArrayToHexString(guid, 10, 6) + "}";
+        return res.toUpperCase();
     }
     
     public static PartitionType convertPartitionType(GPTPartitionType gpt) {
-	switch(gpt) {
-	case PARTITION_TYPE_APPLE_HFS:
-	    return PartitionType.APPLE_HFS;
-	case PARTITION_TYPE_PRIMARY_PARTITION:
-	    return PartitionType.NTFS;
-	default:
-	    return PartitionType.UNKNOWN;
-	}
+        switch(gpt) {
+            case PARTITION_TYPE_APPLE_HFS:
+                return PartitionType.APPLE_HFS;
+            case PARTITION_TYPE_PRIMARY_PARTITION:
+                return PartitionType.NTFS;
+            default:
+                return PartitionType.UNKNOWN;
+        }
     }
 
     public Dictionary getStructElements() {
@@ -302,10 +310,10 @@ public class GPTEntry implements Partition, StructElements {
         
         dbStruct.add("partitionTypeGUID", new ByteArrayField(partitionTypeGUID));
         dbStruct.add("uniquePartitionGUID", new ByteArrayField(uniquePartitionGUID));
-        dbStruct.add("startingLBA", new IntegerField(startingLBA,
-                IntegerFieldBits.BITS_64, false, true));
-        dbStruct.add("endingLBA", new IntegerField(endingLBA,
-                IntegerFieldBits.BITS_64, false, true));
+        dbStruct.add("startingLBA",
+                new IntegerField(startingLBA, BITS_64, UNSIGNED, LITTLE_ENDIAN));
+        dbStruct.add("endingLBA",
+                new IntegerField(endingLBA, BITS_64, UNSIGNED, LITTLE_ENDIAN));
         dbStruct.add("partitionName", new EncodedStringField(partitionName, "UTF-16LE"));
         
         return dbStruct.getResult();
