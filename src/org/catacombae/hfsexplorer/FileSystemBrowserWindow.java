@@ -16,7 +16,6 @@
  */
 package org.catacombae.hfsexplorer;
 
-import org.catacombae.hfsexplorer.deprecated.HFSPlusFileSystemView;
 import java.net.MalformedURLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,12 +33,12 @@ import java.awt.BorderLayout;
 import java.awt.Toolkit;
 import java.awt.event.*;
 import javax.swing.*;
-//import org.catacombae.hfsexplorer.fsframework.FSFile;
 import org.catacombae.hfsexplorer.helpbrowser.HelpBrowserPanel;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusVolumeHeader;
 import org.catacombae.hfsexplorer.types.hfs.ExtDescriptor;
 import org.catacombae.hfsexplorer.types.hfs.HFSPlusWrapperMDB;
 import org.catacombae.hfsexplorer.FileSystemBrowser.RecordType;
+import org.catacombae.hfsexplorer.fs.BaseHFSFileSystemView;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.io.ReadableConcatenatedStream;
 import org.catacombae.jparted.lib.ReadableStreamDataLocator;
@@ -313,9 +312,9 @@ public class FileSystemBrowserWindow extends JFrame {
 
             public void actionPerformed(ActionEvent ae) {
                 String s = JOptionPane.showInputDialog(FileSystemBrowserWindow.this,
-                        "Enter offset:", HFSPlusFileSystemView.fileReadOffset);
+                        "Enter offset:", BaseHFSFileSystemView.fileReadOffset);
                 if(s != null) {
-                    HFSPlusFileSystemView.fileReadOffset = Long.parseLong(s);
+                    BaseHFSFileSystemView.fileReadOffset = Long.parseLong(s);
                 }
             }
         });
