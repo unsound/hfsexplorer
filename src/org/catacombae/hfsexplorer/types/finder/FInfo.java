@@ -9,75 +9,96 @@ import org.catacombae.hfsexplorer.types.carbon.Point;
 public class FInfo {
     /*
      * struct FInfo
-     * size: 1 bytes
+     * size: 16 bytes
      * description: 
      * 
      * BP  Size  Type    Identifier  Description                                                                                      
      * -------------------------------------------------------------------------------------------------------------------------------
      * 0   4     OSType  fdType      File type.                                                                                       
-     * -1  4     OSType  fdCreator   The signature of the application that created the file.                                          
-     * -2  2     UInt16  fdFlags     Finder flags. See ÒFinder Flags.Ó                                                                
-     * 0   4     Point   fdLocation  The location--specified in coordinates local to the window--of the file's icon within its window.
-     * -1  2     SInt16  fdFldr      The window in which the file's icon appears; this information is meaningful only to the Finder.  
+     * 4   4     OSType  fdCreator   The signature of the application that created the file.                                          
+     * 8   2     UInt16  fdFlags     Finder flags. See ÒFinder Flags.Ó                                                                
+     * 10  4     Point   fdLocation  The location--specified in coordinates local to the window--of the file's icon within its window.
+     * 14  2     SInt16  fdFldr      The window in which the file's icon appears; this information is meaningful only to the Finder.  
      */
-    
-    public static final int STRUCTSIZE = 1;
-    
+
+    public static final int STRUCTSIZE = 16;
+
     private final OSType fdType;
     private final OSType fdCreator;
     private final byte[] fdFlags = new byte[2];
     private final Point fdLocation;
     private final byte[] fdFldr = new byte[2];
-    
+
     public FInfo(byte[] data, int offset) {
-	fdType = new OSType(data, offset+0);
-	fdCreator = new OSType(data, offset+-1);
-	System.arraycopy(data, offset+-2, fdFlags, 0, 2);
-	fdLocation = new Point(data, offset+0);
-	System.arraycopy(data, offset+-1, fdFldr, 0, 2);
+        fdType = new OSType(data, offset + 0);
+        fdCreator = new OSType(data, offset + 4);
+        System.arraycopy(data, offset + 8, fdFlags, 0, 2);
+        fdLocation = new Point(data, offset + 10);
+        System.arraycopy(data, offset + 14, fdFldr, 0, 2);
     }
     
-    public static int length() { return STRUCTSIZE; }
-    
+    public static int length() {
+        return STRUCTSIZE;
+    }
+
     /** File type. */
-    public OSType getFdType() { return fdType; }
-    /** The signature of the application that created the file. */
-    public OSType getFdCreator() { return fdCreator; }
-    /** Finder flags. See ÒFinder Flags.Ó */
-    public short getFdFlags() { return Util.readShortBE(fdFlags); }
-    /** The location--specified in coordinates local to the window--of the file's icon within its window. */
-    public Point getFdLocation() { return fdLocation; }
-    /** The window in which the file's icon appears; this information is meaningful only to the Finder. */
-    public short getFdFldr() { return Util.readShortBE(fdFldr); }
-    
-    public void printFields(PrintStream ps, String prefix) {
-	ps.println(prefix + " fdType: ");
-	getFdType().print(ps, prefix+"  ");
-	ps.println(prefix + " fdCreator: ");
-	getFdCreator().print(ps, prefix+"  ");
-	ps.println(prefix + " fdFlags: " + getFdFlags());
-	ps.println(prefix + " fdLocation: ");
-	getFdLocation().print(ps, prefix+"  ");
-	ps.println(prefix + " fdFldr: " + getFdFldr());
+    public OSType getFdType() {
+        return fdType;
     }
-    
+
+    /** The signature of the application that created the file. */
+    public OSType getFdCreator() {
+        return fdCreator;
+    }
+
+    /** Finder flags. See ÒFinder Flags.Ó */
+    public short getFdFlags() {
+        return Util.readShortBE(fdFlags);
+    }
+
+    /** The location--specified in coordinates local to the window--of the file's icon within its window. */
+    public Point getFdLocation() {
+        return fdLocation;
+    }
+
+    /** The window in which the file's icon appears; this information is meaningful only to the Finder. */
+    public short getFdFldr() {
+        return Util.readShortBE(fdFldr);
+    }
+
+    public void printFields(PrintStream ps, String prefix) {
+        ps.println(prefix + " fdType: ");
+        getFdType().print(ps, prefix + "  ");
+        ps.println(prefix + " fdCreator: ");
+        getFdCreator().print(ps, prefix + "  ");
+        ps.println(prefix + " fdFlags: " + getFdFlags());
+        ps.println(prefix + " fdLocation: ");
+        getFdLocation().print(ps, prefix + "  ");
+        ps.println(prefix + " fdFldr: " + getFdFldr());
+    }
+
     public void print(PrintStream ps, String prefix) {
-	ps.println(prefix + "FInfo:");
-	printFields(ps, prefix);
+        ps.println(prefix + "FInfo:");
+        printFields(ps, prefix);
     }
     
     public byte[] getBytes() {
-	byte[] result = new byte[STRUCTSIZE];
-	byte[] tempData;
-	int offset = 0;
-	tempData = fdType.getBytes();
-	System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
-	tempData = fdCreator.getBytes();
-	System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
-	System.arraycopy(fdFlags, 0, result, offset, fdFlags.length); offset += fdFlags.length;
-	tempData = fdLocation.getBytes();
-	System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
-	System.arraycopy(fdFldr, 0, result, offset, fdFldr.length); offset += fdFldr.length;
-	return result;
+        byte[] result = new byte[length()];
+        int offset = 0;
+        {
+            byte[] tempData = this.fdType.getBytes();
+            System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
+        }
+        {
+            byte[] tempData = this.fdCreator.getBytes();
+            System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
+        }
+        System.arraycopy(this.fdFlags, 0, result, offset, this.fdFlags.length); offset += this.fdFlags.length;
+        {
+            byte[] tempData = this.fdLocation.getBytes();
+            System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
+        }
+        System.arraycopy(this.fdFldr, 0, result, offset, this.fdFldr.length); offset += this.fdFldr.length;
+        return result;
     }
 }
