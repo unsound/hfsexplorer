@@ -17,7 +17,7 @@
 
 package org.catacombae.jparted.lib.fs.hfsx;
 
-import org.catacombae.hfsexplorer.unfinished.ImplHFSXFileSystemView;
+import org.catacombae.hfsexplorer.fs.ImplHFSXFileSystemView;
 import org.catacombae.jparted.lib.DataLocator;
 import org.catacombae.jparted.lib.fs.hfsplus.HFSPlusFileSystemHandler;
 

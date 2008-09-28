@@ -15,8 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer;
+package org.catacombae.hfsexplorer.deprecated;
 
+import org.catacombae.hfsexplorer.*;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentDescriptor;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentLeafRecord;
 import org.catacombae.hfsexplorer.types.hfsplus.BTIndexRecord;
@@ -54,8 +55,8 @@ import java.io.IOException;
  * Provides a view over the data in an HFS Plus file system (HFS and HFSX
  * future support is planned), making data access easier.
  * (Unrelated to javax.swing.jfilechooser.FileSystemView)
+ * @deprecated
  */
-
 public class HFSPlusFileSystemView {
     /*
      * The idea is to make few assumptions about static data in the file system.

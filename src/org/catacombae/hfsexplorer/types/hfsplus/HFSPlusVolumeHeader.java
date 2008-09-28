@@ -163,16 +163,24 @@ public class HFSPlusVolumeHeader extends MutableStruct {
     public HFSPlusForkData getStartupFile()    { return startupFile; } // 0x1B0
 
     public Date getCreateDateAsDate() {
-	return HFSPlusDate.toDate(getCreateDate());
+        /* Dates in the volume header are, contrary to elsewhere is HFS+, stored
+         * in local time. */
+        return HFSPlusDate.localTimestampToDate(getCreateDate());
     }
     public Date getModifyDateAsDate() {
-	return HFSPlusDate.toDate(getModifyDate());
+        /* Dates in the volume header are, contrary to elsewhere is HFS+, stored
+         * in local time. */
+        return HFSPlusDate.localTimestampToDate(getModifyDate());
     }
     public Date getBackupDateAsDate() {
-	return HFSPlusDate.toDate(getBackupDate());
+        /* Dates in the volume header are, contrary to elsewhere is HFS+, stored
+         * in local time. */
+        return HFSPlusDate.localTimestampToDate(getBackupDate());
     }
     public Date getCheckedDateAsDate() {
-	return HFSPlusDate.toDate(getCheckedDate());
+        /* Dates in the volume header are, contrary to elsewhere is HFS+, stored
+         * in local time. */
+        return HFSPlusDate.localTimestampToDate(getCheckedDate());
     }
     
     public boolean getAttributeVolumeHardwareLock()     { return ((getAttributes() >> 7) & 0x1) != 0; }

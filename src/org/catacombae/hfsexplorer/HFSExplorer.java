@@ -17,6 +17,7 @@
 
 package org.catacombae.hfsexplorer;
 
+import org.catacombae.hfsexplorer.deprecated.HFSPlusFileSystemView;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentDescriptor;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFolder;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusVolumeHeader;

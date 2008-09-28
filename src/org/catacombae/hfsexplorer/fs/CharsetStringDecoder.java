@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.catacombae.hfsexplorer.unfinished;
+package org.catacombae.hfsexplorer.fs;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;

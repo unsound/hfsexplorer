@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer;
+package org.catacombae.hfsexplorer.deprecated;
 
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogKey;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogIndexNode;
@@ -34,6 +34,7 @@ import org.catacombae.hfsexplorer.types.*;
 /**
  * Extension to support HFSX file systems. Designed to modify as little
  * as possible to avoid code duplication.
+ * @deprecated
  */
 public class HFSXFileSystemView extends HFSPlusFileSystemView {
     protected static final CatalogOperations HFSX_OPERATIONS = new CatalogOperations() {

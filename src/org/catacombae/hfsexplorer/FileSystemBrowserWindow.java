@@ -16,6 +16,7 @@
  */
 package org.catacombae.hfsexplorer;
 
+import org.catacombae.hfsexplorer.deprecated.HFSPlusFileSystemView;
 import java.net.MalformedURLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;

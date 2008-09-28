@@ -5,6 +5,7 @@
  */
 
 package org.catacombae.hfsexplorer.gui;
+import org.catacombae.hfsexplorer.deprecated.HFSPlusFileSystemView;
 import org.catacombae.hfsexplorer.*;
 import java.awt.event.*;
 import javax.swing.*;
