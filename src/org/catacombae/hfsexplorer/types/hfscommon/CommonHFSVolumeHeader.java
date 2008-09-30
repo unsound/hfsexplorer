@@ -7,6 +7,8 @@ package org.catacombae.hfsexplorer.types.hfscommon;
 
 import java.io.PrintStream;
 import java.util.Date;
+import org.catacombae.csjc.StructElements;
+import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusVolumeHeader;
 import org.catacombae.hfsexplorer.types.hfs.MasterDirectoryBlock;
@@ -17,7 +19,7 @@ import org.catacombae.hfsexplorer.types.hfs.MasterDirectoryBlock;
  *
  * @author Erik Larsson
  */
-public abstract class CommonHFSVolumeHeader {
+public abstract class CommonHFSVolumeHeader implements StructElements {
     public abstract short getSignature();
 
     /**
@@ -127,6 +129,10 @@ public abstract class CommonHFSVolumeHeader {
              */
             return 0;
         }
+
+        public Dictionary getStructElements() {
+            return hdr.getStructElements();
+        }
     }
     
     public static class HFSImplementation extends CommonHFSVolumeHeader {
@@ -196,6 +202,10 @@ public abstract class CommonHFSVolumeHeader {
         @Override
         public long getAllocationBlockStart() {
             return Util.unsign(hdr.getDrAlBlSt());
+        }
+
+        public Dictionary getStructElements() {
+            return hdr.getStructElements();
         }
     }
 }

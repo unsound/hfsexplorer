@@ -19,8 +19,11 @@ package org.catacombae.hfsexplorer.types.hfsplus;
 
 import org.catacombae.hfsexplorer.Util;
 import java.io.PrintStream;
+import org.catacombae.csjc.StructElements;
+import org.catacombae.csjc.structelements.Dictionary;
+import org.catacombae.csjc.structelements.DictionaryBuilder;
 
-public class HFSPlusExtentDescriptor {
+public class HFSPlusExtentDescriptor implements StructElements {
     /*
      * struct HFSPlusExtentDescriptor
      * size: 8 bytes
@@ -35,36 +38,47 @@ public class HFSPlusExtentDescriptor {
     private final byte[] blockCount = new byte[4]; // UInt32
 
     public HFSPlusExtentDescriptor(byte[] data, int offset) {
-	System.arraycopy(data, offset, startBlock, 0, 4);
-	System.arraycopy(data, offset+4, blockCount, 0, 4);
+        System.arraycopy(data, offset, startBlock, 0, 4);
+        System.arraycopy(data, offset + 4, blockCount, 0, 4);
     }
-	
+
     public static int getSize() {
-	return 8;
+        return 8;
     }
 	
     public int getStartBlock() { return Util.readIntBE(startBlock); }
     public int getBlockCount() { return Util.readIntBE(blockCount); }
 	
     public void print(PrintStream ps, int pregap) {
-	String pregapString = "";
-	for(int i = 0; i < pregap; ++i)
-	    pregapString += " ";
-	print(ps, pregapString);
+        String pregapString = "";
+        for(int i = 0; i < pregap; ++i)
+            pregapString += " ";
+        print(ps, pregapString);
     }
+
     public void print(PrintStream ps, String prefix) {
-	ps.println(prefix + "startBlock: " + getStartBlock());
-	ps.println(prefix + "blockCount: " + getBlockCount());
+        ps.println(prefix + "startBlock: " + getStartBlock());
+        ps.println(prefix + "blockCount: " + getBlockCount());
     }
 
     byte[] getBytes() {
         byte[] result = new byte[getSize()];
-	int offset = 0;
+        int offset = 0;
         
         System.arraycopy(startBlock, 0, result, offset, startBlock.length); offset += startBlock.length;
         System.arraycopy(blockCount, 0, result, offset, blockCount.length); offset += blockCount.length;
         
-        return result;    }
+        return result;
+    }
+
+    public Dictionary getStructElements() {
+        DictionaryBuilder sb = new DictionaryBuilder(HFSPlusExtentDescriptor.class.getSimpleName());
+
+        sb.addUIntBE("startBlock", startBlock);
+        sb.addUIntBE("blockCount", blockCount);
+
+        return sb.getResult();
+    }
 }
 
 /* Maximal filstorlek i HFS+ måste vara blockSize*2^32*8. Dvs. vid blockSize = 4096:
