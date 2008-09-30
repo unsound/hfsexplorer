@@ -266,22 +266,27 @@ public class FileSystemBrowserWindow extends JFrame {
                 if(fsHandler != null) {
                     VolumeInfoWindow infoWindow = new VolumeInfoWindow(fsHandler.getFSView());
                     infoWindow.setVisible(true);
+
                     CommonHFSVolumeHeader cvh = fsHandler.getFSView().getVolumeHeader();
+
                     if(cvh instanceof CommonHFSVolumeHeader.HFSPlusImplementation) {
                         HFSPlusVolumeHeader vh =
                                 ((CommonHFSVolumeHeader.HFSPlusImplementation) cvh).getUnderlying();
-                        infoWindow.setVolumeFields(vh);
+                        //infoWindow.setVolumeFields(vh);
                         if(vh.getAttributeVolumeJournaled())
                             infoWindow.setJournalFields(fsHandler.getFSView().getJournalInfoBlock());
-                        else
-                            JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-                                    "No file system loaded.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
+                    /*
                     else
                         JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
                                 "Info window only supported for HFS+/HFSX.", "Error",
                                 JOptionPane.ERROR_MESSAGE);
+                     */
+
                 }
+                else
+                    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+                            "No file system loaded.", "Error", JOptionPane.ERROR_MESSAGE);
 
             }
         });

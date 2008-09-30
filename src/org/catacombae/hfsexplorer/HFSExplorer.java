@@ -162,7 +162,7 @@ public class HFSExplorer {
 	    isoRaf.seek(offset + 1024);
 	    isoRaf.read(currentBlock);
 	    HFSPlusVolumeHeader header = new HFSPlusVolumeHeader(currentBlock);
-	    header.print(System.out, 2);
+	    header.print(System.out, "  ");
 	    long catalogFilePosition = header.getBlockSize()*header.getCatalogFile().getExtents().getExtentDescriptor(0).getStartBlock();
 	    long catalogFileLength = header.getBlockSize()*header.getCatalogFile().getExtents().getExtentDescriptor(0).getBlockCount();
 	    System.out.println("Catalog file offset: " + catalogFilePosition);
