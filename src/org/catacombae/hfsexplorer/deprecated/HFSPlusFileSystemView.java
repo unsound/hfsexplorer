@@ -117,7 +117,7 @@ public class HFSPlusFileSystemView {
 	    HFSPlusExtentDescriptor[] allCatalogFileDescriptors =
 		getAllDataExtentDescriptors(HFSCatalogNodeID.kHFSCatalogFileID, header.getCatalogFile());
 	    return new ForkFilter(header.getCatalogFile(), allCatalogFileDescriptors,
-				  hfsFile, fsOffset, staticBlockSize, 0);
+				  hfsFile, fsOffset, header.getBlockSize(), 0);
 	}
     }
     
@@ -132,7 +132,7 @@ public class HFSPlusFileSystemView {
 	protected ReadableRandomAccessStream getForkFilterFile(HFSPlusVolumeHeader header) {
 	    return new ForkFilter(header.getExtentsFile(),
 				  header.getExtentsFile().getExtents().getExtentDescriptors(),
-				  hfsFile, fsOffset, staticBlockSize, 0);
+				  hfsFile, fsOffset, header.getBlockSize(), 0);
 	}
     }
     
@@ -428,8 +428,9 @@ public class HFSPlusFileSystemView {
     }
     public long extractForkToStream(HFSPlusForkData forkData, HFSPlusExtentDescriptor[] extentDescriptors,
 				    OutputStream os, ProgressMonitor pm) throws IOException {
+        HFSPlusVolumeHeader header = getVolumeHeader();
 	ForkFilter forkFilter = new ForkFilter(forkData, extentDescriptors, hfsFile, fsOffset,
-					       staticBlockSize, 0);
+					       header.getBlockSize(), 0);
 	long bytesToRead = forkData.getLogicalSize();
 	byte[] buffer = new byte[4096];
 	while(bytesToRead > 0) {
@@ -491,8 +492,9 @@ public class HFSPlusFileSystemView {
     
     private ReadableRandomAccessStream getReadableForkStream(HFSPlusForkData forkData,
             HFSPlusExtentDescriptor[] extentDescriptors) {
+        HFSPlusVolumeHeader header = getVolumeHeader();
         return new ForkFilter(forkData, extentDescriptors, hfsFile, fsOffset+fileReadOffset,
-                staticBlockSize, 0);
+                header.getBlockSize(), 0);
     }
     
     public HFSPlusExtentLeafRecord getOverflowExtent(HFSPlusExtentKey key) {
