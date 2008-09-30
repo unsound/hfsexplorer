@@ -23,6 +23,9 @@ import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.zip.CRC32;
 import org.catacombae.csjc.StructElements;
+import org.catacombae.csjc.structelements.ArrayBuilder;
+import org.catacombae.csjc.structelements.Dictionary;
+import org.catacombae.csjc.structelements.DictionaryBuilder;
 
 /**
  * Notes about the structure of GPT:

@@ -18,7 +18,7 @@
 package org.catacombae.csjc;
 
 import org.catacombae.hfsexplorer.Util;
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
 
 public abstract class MutableStruct {
     private final boolean mutable;

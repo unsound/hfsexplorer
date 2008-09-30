@@ -13,10 +13,11 @@ import java.util.List;
 import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
-import org.catacombae.csjc.StructElements.Array;
-import org.catacombae.csjc.StructElements.Dictionary;
-import org.catacombae.csjc.StructElements.Field;
-import org.catacombae.csjc.StructElements.StructElement;
+import org.catacombae.csjc.structelements.Array;
+import org.catacombae.csjc.structelements.Dictionary;
+import org.catacombae.csjc.structelements.Field;
+import org.catacombae.csjc.structelements.StringRepresentableField;
+import org.catacombae.csjc.structelements.StructElement;
 
 /**
  *
@@ -104,8 +105,8 @@ public class ContainerPanel extends javax.swing.JPanel {
             System.err.println("setFields processing key \"" + key + "\"...");
             StructElement curElem = rootDict.getElement(key);
             System.err.println("  curElem = " + curElem);
-            if(curElem instanceof Field) {
-                Field curField = (Field)curElem;
+            if(curElem instanceof StringRepresentableField) {
+                StringRepresentableField curField = (StringRepresentableField)curElem;
                 EditStringValuePanel panel = new EditStringValuePanel();
                 panel.setDecription(key + " (" + curField.getTypeName() + ")");
                 panel.setValue(curField.getValueAsString());
@@ -130,6 +131,8 @@ public class ContainerPanel extends javax.swing.JPanel {
                 addComponent(panel);
                 subPanels.add(panel);
             }
+            else
+                throw new RuntimeException("Unknown StructElement type: " + curElem.getClass());
         }
         contentsPanel.add(Box.createVerticalGlue());
     }
@@ -142,8 +145,8 @@ public class ContainerPanel extends javax.swing.JPanel {
             StructElement curElem = elements[i];
             System.err.println("setFields processing array element...");
             System.err.println("  curElem = " + curElem);
-            if(curElem instanceof Field) {
-                Field curField = (Field)curElem;
+            if(curElem instanceof StringRepresentableField) {
+                StringRepresentableField curField = (StringRepresentableField)curElem;
                 EditStringValuePanel panel = new EditStringValuePanel();
                 panel.setDecription("[" + i + "] (" + curField.getTypeName() + ")");
                 panel.setValue(curField.getValueAsString());
@@ -165,6 +168,8 @@ public class ContainerPanel extends javax.swing.JPanel {
                 System.err.println("  (3)adding " + panel + " to containerpanel");
                 addComponent(panel);
             }
+            else
+                throw new RuntimeException("Unknown StructElement type: " + curElem.getClass());
         }
         contentsPanel.add(Box.createVerticalGlue());
     }
@@ -182,7 +187,7 @@ public class ContainerPanel extends javax.swing.JPanel {
         // Validate their data
         StringBuilder messageBuilder = new StringBuilder();
         for(EditStringValuePanel vp : modifiedFields) {
-            Field field = vp.getUserData();
+            StringRepresentableField field = vp.getUserData();
             String validateRes = field.validateStringValue(vp.getValue());
             if(validateRes != null) {
                 messageBuilder.append(vp.getDescription()).append(": ").append(vp.getValue());
