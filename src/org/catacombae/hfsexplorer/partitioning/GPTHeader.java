@@ -16,10 +16,14 @@
  */
 
 package org.catacombae.hfsexplorer.partitioning;
+import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfsexplorer.Util;
 import java.io.PrintStream;
 import java.util.zip.CRC32;
 import org.catacombae.csjc.StructElements;
+import org.catacombae.csjc.structelements.ByteArrayField;
+import org.catacombae.csjc.structelements.DictionaryBuilder;
+import org.catacombae.csjc.structelements.IntegerField;
 
 public class GPTHeader implements StructElements {
     // Header is 92 bytes long. The rest of the 512 bytes (420 bytes) is reserved.

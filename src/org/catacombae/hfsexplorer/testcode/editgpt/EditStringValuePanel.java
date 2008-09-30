@@ -6,14 +6,15 @@
 
 package org.catacombae.hfsexplorer.testcode.editgpt;
 
-import org.catacombae.csjc.StructElements.Field;
+import org.catacombae.csjc.structelements.Field;
+import org.catacombae.csjc.structelements.StringRepresentableField;
 
 /**
  *
  * @author  Erik
  */
 public class EditStringValuePanel extends javax.swing.JPanel {
-    private Field userData;
+    private StringRepresentableField userData;
     private String originalValue;
     
     /** Creates new form EditStringValuePanel */
@@ -96,11 +97,11 @@ private void lockedCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GE
         return !contentsField.getText().equals(originalValue);
     }
     
-    public void setUserData(Field data) {
+    public void setUserData(StringRepresentableField data) {
         this.userData = data;
     }
     
-    public Field getUserData() {
+    public StringRepresentableField getUserData() {
         return userData;
     }
 
