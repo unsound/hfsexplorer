@@ -19,8 +19,11 @@ package org.catacombae.hfsexplorer.types.hfsplus;
 
 import org.catacombae.hfsexplorer.Util;
 import java.io.PrintStream;
+import org.catacombae.csjc.StructElements;
+import org.catacombae.csjc.structelements.Dictionary;
+import org.catacombae.csjc.structelements.DictionaryBuilder;
 
-public class HFSCatalogNodeID {
+public class HFSCatalogNodeID implements StructElements {
     /*
      * HFSCatalogNodeID (typedef UInt32)
      * size: 4 bytes
@@ -127,6 +130,14 @@ public class HFSCatalogNodeID {
 
     public byte[] getBytes() {
         return Util.createCopy(hfsCatalogNodeID);
+    }
+
+    public Dictionary getStructElements() {
+        DictionaryBuilder db = new DictionaryBuilder(HFSCatalogNodeID.class.getSimpleName());
+
+        db.addUIntBE("hfsCatalogNodeID", hfsCatalogNodeID);
+
+        return db.getResult();
     }
 }
     

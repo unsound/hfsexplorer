@@ -19,8 +19,11 @@ package org.catacombae.hfsexplorer.types.hfsplus;
 
 import org.catacombae.hfsexplorer.Util;
 import java.io.PrintStream;
+import org.catacombae.csjc.StructElements;
+import org.catacombae.csjc.structelements.Dictionary;
+import org.catacombae.csjc.structelements.DictionaryBuilder;
 
-public class HFSPlusForkData {
+public class HFSPlusForkData implements StructElements {
     /*
      * struct HFSPlusForkData
      * size: 80 bytes
@@ -85,5 +88,16 @@ public class HFSPlusForkData {
 	System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
         
         return result;
+    }
+
+    public Dictionary getStructElements() {
+        DictionaryBuilder db = new DictionaryBuilder(HFSPlusForkData.class.getSimpleName());
+
+        db.addUIntBE("logicalSize", logicalSize);
+        db.addUIntBE("clumpSize", clumpSize);
+        db.addUIntBE("totalBlocks", totalBlocks);
+        db.add("extents", extents.getStructElements());
+
+        return db.getResult();
     }
 }

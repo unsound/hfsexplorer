@@ -21,8 +21,12 @@ import org.catacombae.hfsexplorer.Util;
 import org.catacombae.csjc.MutableStruct;
 import java.util.Date;
 import java.io.*;
+import org.catacombae.csjc.StructElements;
+import org.catacombae.csjc.structelements.ASCIIStringField;
+import org.catacombae.csjc.structelements.Dictionary;
+import org.catacombae.csjc.structelements.DictionaryBuilder;
 
-public class HFSPlusVolumeHeader extends MutableStruct {
+public class HFSPlusVolumeHeader extends MutableStruct implements StructElements {
     public static final short SIGNATURE_HFS_PLUS = 0x482B;
     public static final short SIGNATURE_HFSX = 0x4858;
     /* 
@@ -192,76 +196,71 @@ public class HFSPlusVolumeHeader extends MutableStruct {
     public boolean getAttributeVolumeJournaled()        { return ((getAttributes() >> 13) & 0x1) != 0; }
     public boolean getAttributeVolumeSoftwareLock()     { return ((getAttributes() >> 15) & 0x1) != 0; }
 
-    public void print(PrintStream ps, int pregap) {
-	String pregapString = "";
-	for(int i = 0; i < pregap; ++i)
-	    pregapString += " ";
-	print(ps, pregapString);
-    }
     public void print(PrintStream ps, String prefix) {
-	    
-	ps.println(prefix + "signature: \"" + Util.toASCIIString(getSignature()) + "\"");
-	ps.println(prefix + "version: " + getVersion());
-	ps.println(prefix + "attributes: " + getAttributes());
-	printAttributes(ps, prefix + "  ");
-	ps.println(prefix + "lastMountedVersion: " + getLastMountedVersion());
-	ps.println(prefix + "journalInfoBlock: " + getJournalInfoBlock());
-	ps.println(prefix + "createDate: " + getCreateDateAsDate());
-	ps.println(prefix + "modifyDate: " + getModifyDateAsDate());
-	ps.println(prefix + "backupDate: " + getBackupDateAsDate());
-	ps.println(prefix + "checkedDate: " + getCheckedDateAsDate());
-	ps.println(prefix + "fileCount: " + getFileCount());
-	ps.println(prefix + "folderCount: " + getFolderCount());
-	ps.println(prefix + "blockSize: " + getBlockSize());
-	ps.println(prefix + "totalBlocks: " + getTotalBlocks());
-	ps.println(prefix + "freeBlocks: " + getFreeBlocks());
-	ps.println(prefix + "nextAllocation: " + getNextAllocation());
-	ps.println(prefix + "rsrcClumpSize: " + getRsrcClumpSize());
-	ps.println(prefix + "dataClumpSize: " + getDataClumpSize());
-	ps.println(prefix + "nextCatalogID: " + getNextCatalogID().toString());
-	ps.println(prefix + "writeCount: " + getWriteCount());
-	ps.println(prefix + "encodingsBitmap: " + getEncodingsBitmap());
-	ps.println(prefix + "encodingsBitmap (hex): 0x" + Util.toHexStringBE(getEncodingsBitmap()));
 
-	int[] finderInfo = getFinderInfo();
-	for(int i = 0; i < finderInfo.length; ++i)
-	    ps.println(prefix + "finderInfo[" + i + "]: " + finderInfo[i]);
-	    
-	ps.println(prefix + "allocationFile: ");
-	allocationFile.print(ps, prefix + "  ");
-	ps.println(prefix + "extentsFile: ");
-	extentsFile.print(ps, prefix + "  ");
-	ps.println(prefix + "catalogFile: ");
-	catalogFile.print(ps, prefix + "  ");
-	ps.println(prefix + "attributesFile: ");
-	attributesFile.print(ps, prefix + "  ");
-	ps.println(prefix + "startupFile: ");
-	startupFile.print(ps, prefix + "  ");
-	// 	    ps.println(prefix + ": " + );
+        ps.println(prefix + "signature: \"" + Util.toASCIIString(getSignature()) + "\"");
+        ps.println(prefix + "version: " + getVersion());
+        ps.println(prefix + "attributes: " + getAttributes());
+        printAttributes(ps, prefix + "  ");
+        ps.println(prefix + "lastMountedVersion: " + getLastMountedVersion());
+        ps.println(prefix + "journalInfoBlock: " + getJournalInfoBlock());
+        ps.println(prefix + "createDate: " + getCreateDateAsDate());
+        ps.println(prefix + "modifyDate: " + getModifyDateAsDate());
+        ps.println(prefix + "backupDate: " + getBackupDateAsDate());
+        ps.println(prefix + "checkedDate: " + getCheckedDateAsDate());
+        ps.println(prefix + "fileCount: " + getFileCount());
+        ps.println(prefix + "folderCount: " + getFolderCount());
+        ps.println(prefix + "blockSize: " + getBlockSize());
+        ps.println(prefix + "totalBlocks: " + getTotalBlocks());
+        ps.println(prefix + "freeBlocks: " + getFreeBlocks());
+        ps.println(prefix + "nextAllocation: " + getNextAllocation());
+        ps.println(prefix + "rsrcClumpSize: " + getRsrcClumpSize());
+        ps.println(prefix + "dataClumpSize: " + getDataClumpSize());
+        ps.println(prefix + "nextCatalogID: " + getNextCatalogID().toString());
+        ps.println(prefix + "writeCount: " + getWriteCount());
+        ps.println(prefix + "encodingsBitmap: " + getEncodingsBitmap());
+        ps.println(prefix + "encodingsBitmap (hex): 0x" + Util.toHexStringBE(getEncodingsBitmap()));
+
+        int[] finderInfoInts = getFinderInfo();
+        for(int i = 0; i < finderInfoInts.length; ++i)
+            ps.println(prefix + "finderInfo[" + i + "]: " + finderInfoInts[i]);
+
+        ps.println(prefix + "allocationFile: ");
+        allocationFile.print(ps, prefix + "  ");
+        ps.println(prefix + "extentsFile: ");
+        extentsFile.print(ps, prefix + "  ");
+        ps.println(prefix + "catalogFile: ");
+        catalogFile.print(ps, prefix + "  ");
+        ps.println(prefix + "attributesFile: ");
+        attributesFile.print(ps, prefix + "  ");
+        ps.println(prefix + "startupFile: ");
+        startupFile.print(ps, prefix + "  ");
+    // 	    ps.println(prefix + ": " + );
     }
 	
     public void printAttributes(PrintStream ps, int pregap) {
-	String pregapString = "";
-	for(int i = 0; i < pregap; ++i)
-	    pregapString += " ";
+        String pregapString = "";
+        for(int i = 0; i < pregap; ++i)
+            pregapString += " ";
     }
+
     public void printAttributes(PrintStream ps, String prefix) {
-	/* 32 bits of attributes exist. Bits 0-6, 14 and 16-31 are reserved. */
-	    
-	int attributes = getAttributes();
-	ps.println(prefix + "kHFSVolumeHardwareLockBit = " + ((attributes >> 7) & 0x1));
-	ps.println(prefix + "kHFSVolumeUnmountedBit = " + ((attributes >> 8) & 0x1));
-	ps.println(prefix + "kHFSVolumeSparedBlocksBit = " + ((attributes >> 9) & 0x1));
-	ps.println(prefix + "kHFSVolumeNoCacheRequiredBit = " + ((attributes >> 10) & 0x1));
-	ps.println(prefix + "kHFSBootVolumeInconsistentBit = " + ((attributes >> 11) & 0x1));
-	ps.println(prefix + "kHFSCatalogNodeIDsReusedBit = " + ((attributes >> 12) & 0x1));
-	ps.println(prefix + "kHFSVolumeJournaledBit = " + ((attributes >> 13) & 0x1));
-	ps.println(prefix + "kHFSVolumeSoftwareLockBit = " + ((attributes >> 15) & 0x1));	    
+        /* 32 bits of attributes exist. Bits 0-6, 14 and 16-31 are reserved. */
+
+        int attributesInt = getAttributes();
+        ps.println(prefix + "kHFSVolumeHardwareLockBit = " + ((attributesInt >> 7) & 0x1));
+        ps.println(prefix + "kHFSVolumeUnmountedBit = " + ((attributesInt >> 8) & 0x1));
+        ps.println(prefix + "kHFSVolumeSparedBlocksBit = " + ((attributesInt >> 9) & 0x1));
+        ps.println(prefix + "kHFSVolumeNoCacheRequiredBit = " + ((attributesInt >> 10) & 0x1));
+        ps.println(prefix + "kHFSBootVolumeInconsistentBit = " + ((attributesInt >> 11) & 0x1));
+        ps.println(prefix + "kHFSCatalogNodeIDsReusedBit = " + ((attributesInt >> 12) & 0x1));
+        ps.println(prefix + "kHFSVolumeJournaledBit = " + ((attributesInt >> 13) & 0x1));
+        ps.println(prefix + "kHFSVolumeSoftwareLockBit = " + ((attributesInt >> 15) & 0x1));
     }
-    
+
     public static void main(String[] args) throws Exception {
         if(args.length != 2)
-            System.err.println("usage: main <file> <byteposition>");
+            System.err.println("usage: main <file> <byte position>");
         else {
             Long pos = Long.parseLong(args[1]);
             
@@ -273,5 +272,53 @@ public class HFSPlusVolumeHeader extends MutableStruct {
             
             new HFSPlusVolumeHeader(buf).print(System.out, "");
         }
+    }
+
+    private Dictionary getAttributeElements() {
+        DictionaryBuilder db = new DictionaryBuilder("Attributes");
+
+        db.addFlag("kHFSVolumeHardwareLockBit", attributes, 7);
+        db.addFlag("kHFSVolumeUnmountedBit", attributes, 8);
+        db.addFlag("kHFSVolumeSparedBlocksBit", attributes, 9);
+        db.addFlag("kHFSVolumeNoCacheRequiredBit", attributes, 10);
+        db.addFlag("kHFSBootVolumeInconsistentBit", attributes, 11);
+        db.addFlag("kHFSCatalogNodeIDsReusedBit", attributes, 12);
+        db.addFlag("kHFSVolumeJournaledBit", attributes, 13);
+        db.addFlag("kHFSVolumeSoftwareLockBit", attributes, 15);
+
+        return db.getResult();
+    }
+
+    public Dictionary getStructElements() {
+        DictionaryBuilder db = new DictionaryBuilder(HFSPlusVolumeHeader.class.getSimpleName());
+
+        db.add("signature", new ASCIIStringField(signature));
+        db.addUIntBE("version", version);
+        db.add("attributes", getAttributeElements());
+        db.addUIntBE("lastMountedVersion", lastMountedVersion);
+        db.addUIntBE("journalInfoBlock", journalInfoBlock);
+        db.add("createDate", new HFSPlusDateField(createDate, true));
+        db.add("modifyDate", new HFSPlusDateField(modifyDate, true));
+        db.add("backupDate", new HFSPlusDateField(backupDate, true));
+        db.add("checkedDate", new HFSPlusDateField(checkedDate, true));
+        db.addUIntBE("fileCount", fileCount);
+        db.addUIntBE("folderCount", folderCount);
+        db.addUIntBE("blockSize", blockSize);
+        db.addUIntBE("totalBlocks", totalBlocks);
+        db.addUIntBE("freeBlocks", freeBlocks);
+        db.addUIntBE("nextAllocation", nextAllocation);
+        db.addUIntBE("rsrcClumpSize", rsrcClumpSize);
+        db.addUIntBE("dataClumpSize", dataClumpSize);
+        db.add("nextCatalogID", nextCatalogID.getStructElements());
+        db.addUIntBE("writeCount", writeCount);
+        db.addUIntBE("encodingsBitmap", encodingsBitmap);
+        db.addIntArray("finderInfo", finderInfo, BITS_32, SIGNED, BIG_ENDIAN);
+        db.add("allocationFile", allocationFile.getStructElements());
+        db.add("extentsFile", extentsFile.getStructElements());
+        db.add("catalogFile", catalogFile.getStructElements());
+        db.add("attributesFile", attributesFile.getStructElements());
+        db.add("startupFile", startupFile.getStructElements());
+
+        return db.getResult();
     }
 }
