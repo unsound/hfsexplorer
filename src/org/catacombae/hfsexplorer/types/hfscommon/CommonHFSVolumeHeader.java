@@ -19,8 +19,17 @@ import org.catacombae.hfsexplorer.types.hfs.MasterDirectoryBlock;
  */
 public abstract class CommonHFSVolumeHeader {
     public abstract short getSignature();
-    public abstract long getFirstAllocationBlock();
-    public abstract long getBlockSize();
+
+    /**
+     * Returns the <b>physical</b> block number of the first allocation block
+     * (allocation block 0). Since it's a physical block number, it has to be
+     * multiplied with the physical block size (usually 512) and <b>not</b>
+     * the allocation block size.
+     *
+     * @return the physical block number of the first allocation block.
+     */
+    public abstract long getAllocationBlockStart();
+    public abstract long getAllocationBlockSize();
     public abstract long getTotalBlocks();
     public abstract long getFreeBlocks();
     public abstract Date getCreateDate();
@@ -60,7 +69,7 @@ public abstract class CommonHFSVolumeHeader {
         }
 
         @Override
-        public long getBlockSize() {
+        public long getAllocationBlockSize() {
             return Util.unsign(hdr.getBlockSize());
         }
 
@@ -110,8 +119,13 @@ public abstract class CommonHFSVolumeHeader {
         }
 
         @Override
-        public long getFirstAllocationBlock() {
-            return 0; // N/A for HFS+ volumes. All offsets are relative to fs start.
+        public long getAllocationBlockStart() {
+            /*
+             * HFS+ volumes are completely mapped by allocation blocks, from the
+             * start of the volume. Thus the first allocation block starts at
+             * the first physical block (block 0).
+             */
+            return 0;
         }
     }
     
@@ -128,7 +142,7 @@ public abstract class CommonHFSVolumeHeader {
         }
 
         @Override
-        public long getBlockSize() {
+        public long getAllocationBlockSize() {
             return Util.unsign(hdr.getDrAlBlkSiz());
         }
 
@@ -180,7 +194,7 @@ public abstract class CommonHFSVolumeHeader {
         }
 
         @Override
-        public long getFirstAllocationBlock() {
+        public long getAllocationBlockStart() {
             return Util.unsign(hdr.getDrAlBlSt());
         }
     }

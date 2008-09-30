@@ -5,7 +5,6 @@
 
 package org.catacombae.jparted.lib.ps;
 
-import java.util.LinkedList;
 import org.catacombae.jparted.lib.fs.FileSystemMajorType;
 import org.catacombae.jparted.lib.ps.container.ContainerType;
 
@@ -28,7 +27,7 @@ public enum PartitionType {
     APPLE_HFSX(ContentType.FILE_SYSTEM, FileSystemMajorType.APPLE_HFSX),
     APPLE_UNIX_SVR2(ContentType.CONTAINER, ContainerType.APPLE_UNIX_SVR2),
     APPLE_PRODOS(ContentType.FILE_SYSTEM, FileSystemMajorType.APPLE_PRODOS),
-    LINUX_LVM(ContentType.PARTITION_SYSTEM, PartitionSystemType.LINUX_LVM),
+    LINUX_LVM(ContentType.PARTITION_SYSTEM),
     LINUX_SWAP(ContentType.OTHER),
     LINUX_NATIVE(ContentType.CONTAINER, ContainerType.LINUX_NATIVE);
     

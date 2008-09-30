@@ -48,24 +48,24 @@ public class ForkFilter implements ReadableRandomAccessStream {
     private final CommonHFSExtentDescriptor[] extentDescriptors;
     private final ReadableRandomAccessStream sourceFile;
     private final long fsOffset;
-    private final long blockSize;
-    private final long firstBlockOffset;
+    private final long allocationBlockSize;
+    private final long firstBlockByteOffset;
     private long logicalPosition; // The current position in the fork
     private long lastLogicalPos; // The position in the fork where we stopped reading last time
     private long lastPhysicalPos; // The position in the fork where we stopped reading last time
     
     public ForkFilter(CommonHFSForkData forkData, CommonHFSExtentDescriptor[] extentDescriptors,
             ReadableRandomAccessStream sourceFile, long fsOffset, long blockSize,
-            long firstBlockOffset) {
+            long firstBlockByteOffset) {
         this(forkData.getLogicalSize(), extentDescriptors, sourceFile, fsOffset,
-                blockSize, firstBlockOffset);
+                blockSize, firstBlockByteOffset);
     }
 
     public ForkFilter(long forkLength, CommonHFSExtentDescriptor[] extentDescriptors,
-            ReadableRandomAccessStream sourceFile, long fsOffset, long blockSize,
-            long firstBlockOffset) {
-        //System.err.println("ForkFilter.<init>(" + forkData + ", " + extentDescriptors + ", " +
-        //        sourceFile + ", " + fsOffset + ", " + blockSize + ");");
+            ReadableRandomAccessStream sourceFile, long fsOffset, long allocationBlockSize,
+            long firstBlockByteOffset) {
+        System.err.println("ForkFilter.<init>(" + forkLength + ", " + extentDescriptors + ", " +
+                sourceFile + ", " + fsOffset + ", " + allocationBlockSize + ", " + firstBlockByteOffset + ");");
         //System.err.println("  fork has " + extentDescriptors.length + " extents.");
         this.forkLength = forkLength;
         this.extentDescriptors = Util.arrayCopy(extentDescriptors,
@@ -73,8 +73,8 @@ public class ForkFilter implements ReadableRandomAccessStream {
 
         this.sourceFile = sourceFile;
         this.fsOffset = fsOffset;
-        this.blockSize = blockSize;
-        this.firstBlockOffset = firstBlockOffset;
+        this.allocationBlockSize = allocationBlockSize;
+        this.firstBlockByteOffset = firstBlockByteOffset;
         this.logicalPosition = 0;
         this.lastLogicalPos = -1; // Set differently from logicalPosition to trigger a seek at first read
         this.lastPhysicalPos = 0; // Set differently from logicalPosition to trigger a seek at first read
@@ -82,8 +82,8 @@ public class ForkFilter implements ReadableRandomAccessStream {
 
     @Deprecated
     public ForkFilter(HFSPlusForkData forkData, HFSPlusExtentDescriptor[] extentDescriptors,
-            ReadableRandomAccessStream sourceFile, long fsOffset, long blockSize,
-            long firstBlockOffset) {
+            ReadableRandomAccessStream sourceFile, long fsOffset, long allocationBlockSize,
+            long firstBlockByteOffset) {
         //System.err.println("ForkFilter.<init>(" + forkData + ", " + extentDescriptors + ", " +
         //        sourceFile + ", " + fsOffset + ", " + blockSize + ");");
         //System.err.println("  fork has " + extentDescriptors.length + " extents.");
@@ -94,8 +94,8 @@ public class ForkFilter implements ReadableRandomAccessStream {
 
         this.sourceFile = sourceFile;
         this.fsOffset = fsOffset;
-        this.blockSize = blockSize;
-        this.firstBlockOffset = firstBlockOffset;
+        this.allocationBlockSize = allocationBlockSize;
+        this.firstBlockByteOffset = firstBlockByteOffset;
         this.logicalPosition = 0;
         this.lastLogicalPos = -1; // Set differently from logicalPosition to trigger a seek at first read
         this.lastPhysicalPos = 0; // Set differently from logicalPosition to trigger a seek at first read
@@ -105,7 +105,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
      * {@inheritDoc}
      */
     public void seek(long pos) {
-        //System.err.println("ForkFilter.seek(" + pos + ");");
+        System.err.println("ForkFilter.seek(" + pos + ");");
         logicalPosition = pos;
     }
 
@@ -142,7 +142,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
         //        bytesToSkip + ")...");
         for(extIndex = 0; extIndex < extentDescriptors.length; ++extIndex) {
             CommonHFSExtentDescriptor cur = extentDescriptors[extIndex];
-            currentExtentLength = cur.getBlockCount() * blockSize;
+            currentExtentLength = cur.getBlockCount() * allocationBlockSize;
             if(bytesToSkip >= currentExtentLength) {
                 if(extIndex < extentDescriptors.length - 1)
                     bytesToSkip -= currentExtentLength;
@@ -157,7 +157,8 @@ public class ForkFilter implements ReadableRandomAccessStream {
                 }
             }
             else {
-                offset = fsOffset + (firstBlockOffset + cur.getStartBlock()) * blockSize + bytesToSkip;
+                offset = fsOffset + firstBlockByteOffset +
+                        (cur.getStartBlock() * allocationBlockSize) + bytesToSkip;
                 break;
             }
         }
@@ -180,7 +181,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
             //System.out.println("ForkFilter.read: reading extent " + extIndex + ".");
             CommonHFSExtentDescriptor cur = extentDescriptors[extIndex];
 
-            long bytesInExtent = cur.getBlockCount() * blockSize - bytesToSkip;
+            long bytesInExtent = cur.getBlockCount() * allocationBlockSize - bytesToSkip;
             int bytesToReadFromExtent = (bytesInExtent < bytesLeftToRead) ? (int) bytesInExtent : bytesLeftToRead;
 
             int bytesReadFromExtent = 0;

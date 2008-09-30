@@ -75,9 +75,9 @@ public abstract class BaseHFSFileSystemView {
             //	System.out.println("ERROR: Did not read nodeDescriptor completely.");
             this.btnd = getNodeDescriptor(forkFilterFile);
             this.bthr = getHeaderRecord(forkFilterFile);
-        //byte[] headerRec = new byte[BTHeaderRec.length()];
-        //forkFilterFile.readFully(headerRec);
-        //this.bthr = new BTHeaderRec(headerRec, 0);
+            //byte[] headerRec = new byte[BTHeaderRec.length()];
+            //forkFilterFile.readFully(headerRec);
+            //this.bthr = new BTHeaderRec(headerRec, 0);
 
         }
 
@@ -100,7 +100,8 @@ public abstract class BaseHFSFileSystemView {
                     getAllDataExtentDescriptors(getCommonHFSCatalogNodeID(ReservedID.CATALOG_FILE),
                     header.getCatalogFile());
             return new ForkFilter(header.getCatalogFile(), allCatalogFileDescriptors,
-                    hfsFile, fsOffset, staticBlockSize, header.getFirstAllocationBlock());
+                    hfsFile, fsOffset, header.getAllocationBlockSize(),
+                    header.getAllocationBlockStart()*physicalBlockSize);
         }
     }
     
@@ -115,7 +116,8 @@ public abstract class BaseHFSFileSystemView {
         protected ReadableRandomAccessStream getForkFilterFile(CommonHFSVolumeHeader header) {
             return new ForkFilter(header.getExtentsOverflowFile(),
                     header.getExtentsOverflowFile().getBasicExtents(),
-                    hfsFile, fsOffset, staticBlockSize, header.getFirstAllocationBlock());
+                    hfsFile, fsOffset, header.getAllocationBlockSize(),
+                    header.getAllocationBlockStart()*physicalBlockSize);
         }
     }
 
@@ -155,47 +157,56 @@ public abstract class BaseHFSFileSystemView {
     private final ReadableRandomAccessStream backingFile;
     protected final long fsOffset;
     protected final CatalogOperations catOps;
-    protected final long staticBlockSize;
+    protected final long physicalBlockSize;
     
     // Variables for reading cached files.
     private ReadableBlockCachingStream catalogCache = null;
     
     protected BaseHFSFileSystemView(ReadableRandomAccessStream hfsFile, long fsOffset, CatalogOperations ops, boolean cachingEnabled) {
-	this.hfsFile = hfsFile;
-	this.backingFile = hfsFile;
-	this.fsOffset = fsOffset;
-	this.catOps = ops;
-	this.staticBlockSize = getVolumeHeader().getBlockSize();
-	
-	if(cachingEnabled)
-	    enableFileSystemCaching();
+        this.hfsFile = hfsFile;
+        this.backingFile = hfsFile;
+        this.fsOffset = fsOffset;
+        this.catOps = ops;
+        this.physicalBlockSize = 512; // This seems to be a built in assumption of HFSish file systems.
+
+        if(cachingEnabled)
+            enableFileSystemCaching();
     }
+
     public boolean isFileSystemCachingEnabled() {
-	return hfsFile != backingFile && backingFile instanceof ReadableBlockCachingStream;
+        return hfsFile != backingFile && backingFile instanceof ReadableBlockCachingStream;
     }
+
     public void enableFileSystemCaching() {
-	enableFileSystemCaching(256*1024, 64); // 64 pages of 256 KiB each is the default setting
+        enableFileSystemCaching(256 * 1024, 64); // 64 pages of 256 KiB each is the default setting
     }
+
     public void enableFileSystemCaching(int blockSize, int blocksInCache) {
-	hfsFile = new ReadableBlockCachingStream(backingFile, blockSize, blocksInCache);
+        hfsFile = new ReadableBlockCachingStream(backingFile, blockSize, blocksInCache);
     }
+
     public void disableFileSystemCaching() {
-	hfsFile = backingFile;
+        hfsFile = backingFile;
     }
-    
+
     /** Switches to cached mode for reading the catalog file. */
     public void retainCatalogFile() {
-	CatalogInitProcedure init = new CatalogInitProcedure();
-	ReadableRandomAccessStream ff = init.forkFilterFile;
-	catalogCache = new ReadableBlockCachingStream(ff, 512*1024, 32); // 512 KiB blocks, 32 of them
-	catalogCache.preloadBlocks();
+        CatalogInitProcedure init = new CatalogInitProcedure();
+        ReadableRandomAccessStream ff = init.forkFilterFile;
+        catalogCache = new ReadableBlockCachingStream(ff, 512 * 1024, 32); // 512 KiB blocks, 32 of them
+        catalogCache.preloadBlocks();
     }
-    
+
     /** Disables cached mode for reading the catalog file. */
     public void releaseCatalogFile() {
         catalogCache = null;
     }
-    
+
+    /**
+     * Returns the underlying stream, serving the view with HFS+ file system
+     * data.
+     * @return the underlying stream.
+     */
     public ReadableRandomAccessStream getStream() {
         return hfsFile;
     }
@@ -481,7 +492,8 @@ public abstract class BaseHFSFileSystemView {
             ProgressMonitor pm) throws IOException {
     CommonHFSVolumeHeader header = getVolumeHeader();
 	ForkFilter forkFilter = new ForkFilter(forkData, extentDescriptors, hfsFile, fsOffset,
-					       staticBlockSize, header.getFirstAllocationBlock());
+					       header.getAllocationBlockSize(),
+                           header.getAllocationBlockStart()*physicalBlockSize);
 	long bytesToRead = forkData.getLogicalSize();
 	byte[] buffer = new byte[4096];
 	while(bytesToRead > 0) {
@@ -540,7 +552,8 @@ public abstract class BaseHFSFileSystemView {
             CommonHFSExtentDescriptor[] extentDescriptors) {
         CommonHFSVolumeHeader header = getVolumeHeader();
         return new ForkFilter(forkData, extentDescriptors, hfsFile, fsOffset+fileReadOffset,
-                staticBlockSize, header.getFirstAllocationBlock());
+                header.getAllocationBlockSize(),
+                header.getAllocationBlockStart() * physicalBlockSize);
     }
     
     public CommonHFSExtentLeafRecord getOverflowExtent(CommonHFSExtentKey key) {
@@ -618,7 +631,7 @@ public abstract class BaseHFSFileSystemView {
     public CommonHFSExtentDescriptor[] getAllExtents(CommonHFSCatalogNodeID fileID,
             CommonHFSForkData forkData, CommonHFSForkType forkType) {
         CommonHFSExtentDescriptor[] result;
-        long blockSize = getVolumeHeader().getBlockSize();
+        long allocationBlockSize = getVolumeHeader().getAllocationBlockSize();
 
         long basicExtentsBlockCount = 0;
         {
@@ -627,7 +640,7 @@ public abstract class BaseHFSFileSystemView {
                 basicExtentsBlockCount += basicExtents[i].getBlockCount();
         }
 
-        if(basicExtentsBlockCount * blockSize >= forkData.getLogicalSize()) {
+        if(basicExtentsBlockCount * allocationBlockSize >= forkData.getLogicalSize()) {
             result = forkData.getBasicExtents();
         }
         else {
@@ -635,11 +648,11 @@ public abstract class BaseHFSFileSystemView {
             LinkedList<CommonHFSExtentDescriptor> resultList = new LinkedList<CommonHFSExtentDescriptor>();
             for(CommonHFSExtentDescriptor descriptor : forkData.getBasicExtents())
                 resultList.add(descriptor);
-            long currentBlock = basicExtentsBlockCount;
+            long totalBlockCount = basicExtentsBlockCount;
 
-            while(currentBlock * blockSize < forkData.getLogicalSize()) {
+            while(totalBlockCount * allocationBlockSize < forkData.getLogicalSize()) {
                 CommonHFSExtentKey extentKey =
-                        createCommonHFSExtentKey(forkType, fileID, (int) currentBlock);
+                        createCommonHFSExtentKey(forkType, fileID, (int) totalBlockCount);
 
                 CommonHFSExtentLeafRecord currentRecord = getOverflowExtent(extentKey);
                 if(currentRecord == null)
@@ -647,7 +660,7 @@ public abstract class BaseHFSFileSystemView {
                 CommonHFSExtentDescriptor[] currentRecordData = currentRecord.getRecordData();
                 for(CommonHFSExtentDescriptor cur : currentRecordData) {
                     resultList.add(cur);
-                    currentBlock += cur.getBlockCount();
+                    totalBlockCount += cur.getBlockCount();
                 }
             }
             //System.err.println("  Finished reading extents... (currentblock: " + currentBlock + " total: " + forkData.getTotalBlocks() + ")");

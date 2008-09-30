@@ -149,15 +149,15 @@ public class ImplHFSPlusFileSystemView extends BaseHFSFileSystemView {
     @Override
     public JournalInfoBlock getJournalInfoBlock() {
         HFSPlusVolumeHeader vh = getHFSPlusVolumeHeader();
-	if(vh.getAttributeVolumeJournaled()) {
-	    long blockNumber = Util.unsign(vh.getJournalInfoBlock());
-	    hfsFile.seek(fsOffset + blockNumber*staticBlockSize);
-	    byte[] data = new byte[JournalInfoBlock.getStructSize()];
-	    hfsFile.readFully(data);
-	    return new JournalInfoBlock(data, 0);
-	}
-	else
-	    return null;
+        if(vh.getAttributeVolumeJournaled()) {
+            long blockNumber = Util.unsign(vh.getJournalInfoBlock());
+            hfsFile.seek(fsOffset + blockNumber * vh.getBlockSize());
+            byte[] data = new byte[JournalInfoBlock.getStructSize()];
+            hfsFile.readFully(data);
+            return new JournalInfoBlock(data, 0);
+        }
+        else
+            return null;
     }
 
     @Override
