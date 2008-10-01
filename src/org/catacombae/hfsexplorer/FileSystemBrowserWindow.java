@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2006-2007 Erik Larsson
+ * Copyright (C) 2006-2008 Erik Larsson
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -92,7 +92,7 @@ public class FileSystemBrowserWindow extends JFrame {
 
         fsb = new FileSystemBrowser<FSEntry>(new FileSystemProvider());
 
-        final Class objectClass = new Object().getClass();
+        //final Class objectClass = new Object().getClass();
 
         // Menus
         JMenuItem loadFSFromDeviceItem = null;
@@ -101,6 +101,7 @@ public class FileSystemBrowserWindow extends JFrame {
             loadFSFromDeviceItem = new JMenuItem("Load file system from device...");
             loadFSFromDeviceItem.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent ae) {
                     SelectWindowsDeviceDialog deviceDialog =
                             new SelectWindowsDeviceDialog(FileSystemBrowserWindow.this,
@@ -128,6 +129,7 @@ public class FileSystemBrowserWindow extends JFrame {
         JMenuItem loadFSFromFileItem = new JMenuItem("Load file system from file...");
         loadFSFromFileItem.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent ae) {
                 //JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setMultiSelectionEnabled(false);
@@ -156,6 +158,7 @@ public class FileSystemBrowserWindow extends JFrame {
         JMenuItem openUDIFItem = new JMenuItem("Open UDIF disk image (.dmg)...");
         openUDIFItem.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent ae) {
                 //JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setMultiSelectionEnabled(false);
@@ -190,6 +193,7 @@ public class FileSystemBrowserWindow extends JFrame {
         JMenuItem openFromPosItem = new JMenuItem("Read file system from specified position in file...");
         openFromPosItem.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent ae) {
                 //JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setMultiSelectionEnabled(false);
@@ -230,6 +234,7 @@ public class FileSystemBrowserWindow extends JFrame {
             debugConsoleItem = new JMenuItem("Debug console");
             debugConsoleItem.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent ae) {
                     dcw.setVisible(true);
                 }
@@ -242,6 +247,7 @@ public class FileSystemBrowserWindow extends JFrame {
             exitProgramItem = new JMenuItem("Exit");
             exitProgramItem.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent ae) {
                     exitApplication();
                 }
@@ -252,6 +258,7 @@ public class FileSystemBrowserWindow extends JFrame {
         else {
             MacSpecific.registerQuitHandler(new MacSpecific.QuitHandler() {
 
+                @Override
                 public boolean acceptQuit() {
                     exitApplication();
                     return false;
@@ -262,6 +269,7 @@ public class FileSystemBrowserWindow extends JFrame {
         JMenuItem fsInfoItem = new JMenuItem("File system info");
         fsInfoItem.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent ae) {
                 if(fsHandler != null) {
                     VolumeInfoWindow infoWindow = new VolumeInfoWindow(fsHandler.getFSView());
@@ -296,6 +304,7 @@ public class FileSystemBrowserWindow extends JFrame {
         toggleCachingItem.setState(true);
         toggleCachingItem.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent ae) {
                 if(fsHandler != null) {
                     if(toggleCachingItem.getState()) {
@@ -315,6 +324,7 @@ public class FileSystemBrowserWindow extends JFrame {
         JMenuItem setFileReadOffsetItem = new JMenuItem("Set file read offset...");
         setFileReadOffsetItem.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent ae) {
                 String s = JOptionPane.showInputDialog(FileSystemBrowserWindow.this,
                         "Enter offset:", BaseHFSFileSystemView.fileReadOffset);
@@ -328,6 +338,7 @@ public class FileSystemBrowserWindow extends JFrame {
         JMenuItem startHelpBrowserItem = new JMenuItem("Help browser");
         startHelpBrowserItem.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent ae) {
                 File f = new File("doc/html/index.html");
                 if(f.exists()) {
@@ -344,6 +355,7 @@ public class FileSystemBrowserWindow extends JFrame {
         JMenuItem checkUpdatesItem = new JMenuItem("Check for updates...");
         checkUpdatesItem.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent ae) {
                 InputStream infoDictStream = null;
                 for(String s : VERSION_INFO_DICTIONARY) {
@@ -404,6 +416,7 @@ public class FileSystemBrowserWindow extends JFrame {
         JMenuItem aboutItem = new JMenuItem("About...");
         aboutItem.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent ae) {
                 String message = "";
                 message += "HFSExplorer " + HFSExplorer.VERSION + " Build #" + BuildNumber.BUILD_NUMBER + "\n";
@@ -837,157 +850,6 @@ public class FileSystemBrowserWindow extends JFrame {
         fsb.setRoot(rootRecord);
     }
 
-    /*
-    private void populateNode(DefaultMutableTreeNode rootNode, HFSPlusCatalogLeafRecord[] contents) {
-    boolean folderThreadSet = false;
-    boolean hasChildren = false;
-    Object o = rootNode.getUserObject();
-    if(o instanceof RecordNodeStorage) {
-    RecordNodeStorage rootStorage = (RecordNodeStorage)o;
-    LinkedList<HFSPlusCatalogLeafRecord> fileThreads = new LinkedList<HFSPlusCatalogLeafRecord>();
-    for(HFSPlusCatalogLeafRecord rec : contents) {
-    Vector<String> currentRow = new Vector<String>(4);
-
-    HFSPlusCatalogLeafRecordData recData = rec.getData();
-    if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
-    recData instanceof HFSPlusCatalogFile) {
-    HFSPlusCatalogFile catFile = (HFSPlusCatalogFile)recData;
-    if(!hasChildren) hasChildren = true;
-    }
-    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
-    recData instanceof HFSPlusCatalogFolder) {
-    HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder)recData;
-    rootNode.add(new NoLeafMutableTreeNode(new RecordNodeStorage(rec)));
-    if(!hasChildren) hasChildren = true;
-    }
-    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
-    recData instanceof HFSPlusCatalogThread) {
-    HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
-    rootStorage.setThread(rec);
-    if(!folderThreadSet) folderThreadSet = true;
-    }
-    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE_THREAD &&
-    recData instanceof HFSPlusCatalogThread) {
-    HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
-    fileThreads.addLast(rec);
-    }
-    else
-    System.err.println("WARNING: Encountered unexpected record type (" + recData.getRecordType() + ")");
-    }
-    if(hasChildren && !folderThreadSet)
-    System.err.println("ERROR: Found no folder thread!");
-    if(!fileThreads.isEmpty())
-    System.err.println("INFORMATION: Found " + fileThreads.size() + " file threads unexpectedly.");
-    }
-    else
-    JOptionPane.showMessageDialog(this, "Unexpected type in node user object. Type: " + o.getClass(),
-    "Error", JOptionPane.ERROR_MESSAGE);
-    }*/
-    /*
-    public void populateTable(HFSPlusCatalogLeafRecord[] contents) {
-    while(tableModel.getRowCount() > 0) {
-    tableModel.removeRow(tableModel.getRowCount()-1);
-    }
-
-    for(HFSPlusCatalogLeafRecord rec : contents) {
-    Vector<Object> currentRow = new Vector<Object>(4);
-
-    HFSPlusCatalogLeafRecordData recData = rec.getData();
-    if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE &&
-    recData instanceof HFSPlusCatalogFile) {
-    HFSPlusCatalogFile catFile = (HFSPlusCatalogFile)recData;
-    currentRow.add(new RecordContainer(rec));
-    currentRow.add(SpeedUnitUtils.bytesToBinaryUnit(catFile.getDataFork().getLogicalSize()));
-    currentRow.add("File");
-    DateFormat dti = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-    currentRow.add("" + dti.format(catFile.getContentModDateAsDate()));
-    currentRow.add("");
-    }
-    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
-    recData instanceof HFSPlusCatalogFolder) {
-    HFSPlusCatalogFolder catFolder = (HFSPlusCatalogFolder)recData;
-    currentRow.add(new RecordContainer(rec));
-    currentRow.add("");
-    currentRow.add("Folder");
-    DateFormat dti = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-    currentRow.add("" + dti.format(catFolder.getContentModDateAsDate()));
-    currentRow.add("");
-    }
-    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD &&
-    recData instanceof HFSPlusCatalogThread) {
-    HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
-    }
-    else if(recData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE_THREAD &&
-    recData instanceof HFSPlusCatalogThread) {
-    HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
-    }
-    else
-    System.out.println("WARNING: Encountered unexpected record type (" + recData.getRecordType() + ")");
-    if(!currentRow.isEmpty())
-    tableModel.addRow(currentRow);
-
-
-    }
-    adjustTableWidth();
-    }*/
-    /*
-    private FSFolder getDirTreeSelection() {
-    Object o = dirTree.getLastSelectedPathComponent();
-    if(o == null) {
-    return null;
-    }
-    else if(o instanceof DefaultMutableTreeNode) {
-    Object o2 = ((DefaultMutableTreeNode) o).getUserObject();
-    if(o2 instanceof RecordNodeStorage) {
-    return ((RecordNodeStorage) o2).getRecord();
-    }
-    else {
-    throw new RuntimeException("Unexpected data in tree user object. (Internal error, report to " +
-    "developer)" + "\nClass: " + o.getClass().toString());
-    }
-    }
-    else {
-    throw new RuntimeException("Unexpected data in tree model. (Internal error, report to developer)" +
-    "\nClass: " + o.getClass().toString());
-    }
-    }
-     * */
-    /** Never returns null. If nothing is selected, a zero-length array is returned.
-    A RuntimeException may be thrown in case of an implementation error (i.e. should never happen), in which case
-    a detailed explanation is found through Exception.getMessage(). */
-//    private HFSPlusCatalogLeafRecord[] getSelectedRecords() {
-//	if(dirTreeLastFocus > fileTableLastFocus) {
-//            HFSPlusCatalogLeafRecord rec = getDirTreeSelection();
-//            if(rec == null)
-//                return new HFSPlusCatalogLeafRecord[0];
-//            else
-//                return new HFSPlusCatalogLeafRecord[] { rec };
-//	}
-//	else {
-//	    int[] selectedRows = fileTable.getSelectedRows();
-//	    if(selectedRows.length == 0) {
-//		return new HFSPlusCatalogLeafRecord[0];
-//	    }
-//	    else {
-//		final HFSPlusCatalogLeafRecord[] selectedRecords = new HFSPlusCatalogLeafRecord[selectedRows.length];
-//		for(int i = 0; i < selectedRows.length; ++i) {
-//		    int selectedRow = selectedRows[i];
-//		    Object o = tableModel.getValueAt(selectedRow, 0);
-//		    HFSPlusCatalogLeafRecord rec;
-//		    HFSPlusCatalogLeafRecordData recData;
-//		    if(o instanceof RecordContainer) {
-//			rec = ((RecordContainer)o).getRecord();
-//			selectedRecords[i] = rec;
-//		    }
-//		    else {
-//			throw new RuntimeException("Unexpected data in table model. (Internal error, report to developer)" +
-//						   "\nClass: " + o.getClass().toString());
-//		    }
-//		}
-//		return selectedRecords;
-//	    }
-//	}
-//    }
     private void actionDoubleClickFile(final FSFile rec) {
         final JDialog fopFrame = new JDialog(this, rec.getName(), true);
         fopFrame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -998,6 +860,7 @@ public class FileSystemBrowserWindow extends JFrame {
             final String finalCommand = "cmd.exe /c start \"HFSExplorer invoker\" \"" + rec.getName() + "\"";
             alOpen = new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent ae) {
                     File tempDir = new File(System.getProperty("java.io.tmpdir"));
                     if(extract(rec, tempDir, NullProgressMonitor.getInstance()) == 0) {
@@ -1028,7 +891,7 @@ public class FileSystemBrowserWindow extends JFrame {
         else if(Java6Specific.isJava6OrHigher() && Java6Specific.canOpen()) {
             //System.err.println("Java 1.6 detected.");
             alOpen = new ActionListener() {
-
+                @Override
                 public void actionPerformed(ActionEvent ae) {
                     File tempDir = new File(System.getProperty("java.io.tmpdir"));
                     if(extract(rec, tempDir, NullProgressMonitor.getInstance()) == 0) {
@@ -1059,6 +922,7 @@ public class FileSystemBrowserWindow extends JFrame {
             final String[] finalCommand = new String[] { "open", rec.getName() };
             alOpen = new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent ae) {
                     File tempDir = new File(System.getProperty("java.io.tmpdir"));
                     if(extract(rec, tempDir, NullProgressMonitor.getInstance()) == 0) {
@@ -1089,6 +953,7 @@ public class FileSystemBrowserWindow extends JFrame {
 
         ActionListener alSave = new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent ae) {
                 actionExtractToDir(rec);
                 fopFrame.dispose();
@@ -1140,6 +1005,7 @@ public class FileSystemBrowserWindow extends JFrame {
                     final ExtractProgressDialog progress = new ExtractProgressDialog(this);
                     Runnable r = new Runnable() {
 
+                        @Override
                         public void run() {
                             // Caching is now turned on or off manually, either for the entire device/file, or not at all.
                             //fsView.retainCatalogFile(); // Cache the catalog file to speed up operations
@@ -1636,7 +1502,8 @@ public class FileSystemBrowserWindow extends JFrame {
     }
 
     private class FileSystemProvider implements FileSystemBrowser.FileSystemProvider<FSEntry> {
-
+        
+        @Override
         public void actionDoubleClickFile(Record<FSEntry> record) {
             FSEntry entry = record.getUserObject();
             if(entry instanceof FSFile)
@@ -1645,6 +1512,7 @@ public class FileSystemBrowserWindow extends JFrame {
                 throw new RuntimeException("Unexpected FSEntry type: " + entry.getClass());
         }
 
+        @Override
         public void actionExtractToDir(List<Record<FSEntry>> recordList) {
             List<FSEntry> fsEntryList = new ArrayList<FSEntry>(recordList.size());
             for(Record<FSEntry> rec : recordList)
@@ -1652,6 +1520,7 @@ public class FileSystemBrowserWindow extends JFrame {
             FileSystemBrowserWindow.this.actionExtractToDir(fsEntryList, true, false);
         }
 
+        @Override
         public void actionGetInfo(List<Record<FSEntry>> recordList) {
             if(recordList.size() == 1)
                 FileSystemBrowserWindow.this.actionGetInfo(recordList.get(0).getUserObject());
@@ -1661,12 +1530,14 @@ public class FileSystemBrowserWindow extends JFrame {
             }
         }
 
+        @Override
         public JPopupMenu getRightClickRecordPopupMenu(final Record<FSEntry> record) {
             JPopupMenu jpm = new JPopupMenu();
 
             JMenuItem infoItem = new JMenuItem("Information");
             infoItem.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     FileSystemBrowserWindow.this.actionGetInfo(record.getUserObject());
                 }
@@ -1676,6 +1547,7 @@ public class FileSystemBrowserWindow extends JFrame {
             JMenuItem dataExtractItem = new JMenuItem("Extract data");
             dataExtractItem.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     List<FSEntry> oneItemList = new ArrayList<FSEntry>(1);
                     oneItemList.add(record.getUserObject());
@@ -1687,6 +1559,7 @@ public class FileSystemBrowserWindow extends JFrame {
             JMenuItem resExtractItem = new JMenuItem("Extract resource fork(s)");
             resExtractItem.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     List<FSEntry> oneItemList = new ArrayList<FSEntry>(1);
                     oneItemList.add(record.getUserObject());
@@ -1698,6 +1571,7 @@ public class FileSystemBrowserWindow extends JFrame {
             JMenuItem bothExtractItem = new JMenuItem("Extract data and resource fork(s)");
             bothExtractItem.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     List<FSEntry> oneItemList = new ArrayList<FSEntry>(1);
                     oneItemList.add(record.getUserObject());
@@ -1709,10 +1583,12 @@ public class FileSystemBrowserWindow extends JFrame {
             return jpm;
         }
 
+        @Override
         public boolean isFileSystemLoaded() {
             return fsHandler != null;
         }
 
+        @Override
         public List<Record<FSEntry>> getFolderContents(List<Record<FSEntry>> folderRecordPath) {
             FSEntry lastEntry = folderRecordPath.get(folderRecordPath.size() - 1).getUserObject();
             if(lastEntry instanceof FSFolder) {
@@ -1729,6 +1605,7 @@ public class FileSystemBrowserWindow extends JFrame {
                         lastEntry.getClass());
         }
 
+        @Override
         public String getAddressPath(List<String> pathComponents) {
             StringBuilder sb = new StringBuilder("/");
 
@@ -1739,6 +1616,7 @@ public class FileSystemBrowserWindow extends JFrame {
             return sb.toString();
         }
 
+        @Override
         public String[] parseAddressPath(String targetAddress) {
             if(!targetAddress.startsWith("/"))
                 return null;
@@ -1825,9 +1703,17 @@ public class FileSystemBrowserWindow extends JFrame {
         if(args.length > parsedArgs) {
             String filename = args[parsedArgs];
             try {
-                final String pathName = new File(filename).getCanonicalPath();
+                String pathNameTmp;
+                try {
+                    pathNameTmp = new File(filename).getCanonicalPath();
+                } catch(Exception e) {
+                    pathNameTmp = filename; // Just swallow
+                }
+                
+                final String pathName = pathNameTmp;
                 SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         fsbWindow.loadFSWithUDIFAutodetect(pathName);
                     }
