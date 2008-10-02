@@ -38,7 +38,7 @@ public class SynchronizedReadableRandomAccessStream extends BasicReadableRandomA
      
     /** Atomic seek+read. */
     public synchronized int readFrom(long pos, byte[] b, int off, int len) throws RuntimeIOException {
-        //System.err.println("SynchronizedReadableRandomAccessStream.readFrom(" + pos + ", " + b + ", " + off + ", " + len + ");");
+        //System.err.println("SynchronizedReadableRandomAccessStream.readFrom(" + pos + ", byte[" + b.length + "], " + off + ", " + len + ");");
 
 	if(getFilePointer() != pos)
 	    seek(pos);
@@ -99,7 +99,7 @@ public class SynchronizedReadableRandomAccessStream extends BasicReadableRandomA
 
     /** @see java.io.RandomAccessFile */
     public synchronized int read(byte[] b, int off, int len) throws RuntimeIOException {
-        //System.err.println("SynchronizedReadableRandomAccessStream.read(" + b + ", " + off + ", " + len + ");");
+        //System.err.println("SynchronizedReadableRandomAccessStream.read(byte[" + b.length + "], " + off + ", " + len + ");");
 
 	return ras.read(b, off, len);
     }

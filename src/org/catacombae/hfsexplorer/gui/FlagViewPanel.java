@@ -11,6 +11,8 @@
 
 package org.catacombae.hfsexplorer.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import org.catacombae.csjc.structelements.FlagField;
 
 /**
@@ -20,11 +22,19 @@ import org.catacombae.csjc.structelements.FlagField;
 public class FlagViewPanel extends javax.swing.JPanel {
 
     /** Creates new form FlagViewPanel */
-    public FlagViewPanel(String label, FlagField data) {
+    public FlagViewPanel(String label, final FlagField data) {
         initComponents();
+        
+        flagBox.addActionListener(new ActionListener() {
 
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                flagBox.setSelected(data.getValueAsBoolean());
+            }
+            
+        });
         flagBox.setSelected(data.getValueAsBoolean());
-        flagLabel.setText(label);
+        flagBox.setText(label);
     }
 
     /** This method is called from within the constructor to
@@ -36,27 +46,22 @@ public class FlagViewPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        flagBox = new javax.swing.JCheckBox();
         flagLabel = new javax.swing.JLabel();
-
-        flagBox.setEnabled(false);
+        flagBox = new javax.swing.JCheckBox();
 
         flagLabel.setText("jLabel1");
+
+        flagBox.setText(" ");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(flagBox)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(flagLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE))
+            .add(flagBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                .add(flagBox)
-                .add(flagLabel))
+            .add(flagBox)
         );
     }// </editor-fold>//GEN-END:initComponents
     

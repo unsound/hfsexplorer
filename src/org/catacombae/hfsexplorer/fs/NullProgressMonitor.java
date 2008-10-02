@@ -15,7 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer;
+package org.catacombae.hfsexplorer.fs;
+
+import org.catacombae.hfsexplorer.fs.ProgressMonitor;
 
 public class NullProgressMonitor implements ProgressMonitor {
     private static NullProgressMonitor instance = new NullProgressMonitor();

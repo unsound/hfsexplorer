@@ -24,7 +24,7 @@ import org.catacombae.io.ReadableRandomAccessStream;
 
 public class WindowsLowLevelIO implements ReadableRandomAccessStream {
     protected byte[] fileHandle;
-    protected int sectorSize = 512; //Detect this later..
+    protected final int sectorSize; //Detect this later..
     protected long filePointer = 0;
     private static Object loadLibSync = new Object();
     private static boolean libraryLoaded = false;
@@ -121,9 +121,13 @@ public class WindowsLowLevelIO implements ReadableRandomAccessStream {
 	    if(verbose) System.out.println("Sector size determined: " + tmpSectorSize);
 	    sectorSize = tmpSectorSize;
 	}
-	else
+	else {
 	    if(verbose) System.out.println("Could not determine sector size.");
+            sectorSize = 512; // The only reasonable standard value
+        }
     }
+    
+    @Override
     public void seek(long pos) {
         //System.err.println("WindowsLowLevelIO.seek(" + pos + ");");
 
@@ -135,18 +139,25 @@ public class WindowsLowLevelIO implements ReadableRandomAccessStream {
 	else
 	    throw new RuntimeException("File closed!");
     }
+    
+    @Override
     public int read() {
+        //System.err.println("WindowsLowLevelIO.read();");
 	byte[] oneByte = new byte[1];
 	if(read(oneByte) == 1)
 	    return oneByte[0] & 0xFF;
 	else
 	    return -1;
     }
+    @Override
     public int read(byte[] data) {
+        //System.err.println("WindowsLowLevelIO.read(byte[" + data.length + "]);");
 	return read(data, 0, data.length);
     }
+    
+    @Override
     public int read(byte[] data, int pos, int len) {
-        //System.err.println("WindowsLowLevelIO.read(" + data + ", " + pos + ", " + len + ");");
+        //System.err.println("WindowsLowLevelIO.read(byte[" + data.length + "], " + pos + ", " + len + ");");
 	if(fileHandle != null) {
 	    /* First make sure that we are at the beginning of the sector containing
 	       filePointer. */
@@ -164,6 +175,16 @@ public class WindowsLowLevelIO implements ReadableRandomAccessStream {
 	    /* Add the bytes that we will have to skip to the total read length. */
 	    int alignedLen = (int)fpDiff + len;
 	    
+            /*
+            System.err.println("Before crash:");
+            System.err.println("  trueFp=" + trueFp);
+            System.err.println("  fpDiff=" + fpDiff);
+            System.err.println("  alignedLen=" + alignedLen);
+            System.err.println("  sectorSize=" + sectorSize);
+            System.err.println("  alignedLen/sectorSize=" + (alignedLen/sectorSize));
+            System.err.println("  alignedLen%sectorSize=" + (alignedLen%sectorSize));
+            System.err.println("  (alignedLen%sectorSize!=0?1:0))*sectorSize=" + ((alignedLen%sectorSize!=0?1:0))*sectorSize);
+            */
 	    /* Allocate a sufficiently large temp buffer aligned to the sector size. */
 	    byte[] tmp = new byte[(alignedLen/sectorSize+(alignedLen%sectorSize!=0?1:0))*sectorSize];
 	    
@@ -182,10 +203,12 @@ public class WindowsLowLevelIO implements ReadableRandomAccessStream {
 	    throw new RuntimeException("File closed!");
     }
     
+    @Override
     public void readFully(byte[] data) {
 	readFully(data, 0, data.length);
     }
 
+    @Override
     public void readFully(byte[] data, int offset, int length) {
 	if(fileHandle != null) {
 	    int bytesRead = 0;
@@ -200,6 +223,7 @@ public class WindowsLowLevelIO implements ReadableRandomAccessStream {
 	    throw new RuntimeException("File closed!");
     }
     
+    @Override
     public long length() {
         //System.err.println("WindowsLowLevelIO.length();");
 	if(fileHandle != null) {
@@ -210,6 +234,7 @@ public class WindowsLowLevelIO implements ReadableRandomAccessStream {
 	    throw new RuntimeException("File closed!");
     }
 	
+    @Override
     public long getFilePointer() {
         //System.err.println("WindowsLowLevelIO.getFilePointer();");
 	if(fileHandle != null) {
@@ -220,6 +245,7 @@ public class WindowsLowLevelIO implements ReadableRandomAccessStream {
 	    throw new RuntimeException("File closed!");
     }
     
+    @Override
     public void close() {
 	if(fileHandle != null) {
 	    close(fileHandle);

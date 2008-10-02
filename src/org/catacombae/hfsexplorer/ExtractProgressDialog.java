@@ -17,6 +17,7 @@
 
 package org.catacombae.hfsexplorer;
 
+import org.catacombae.hfsexplorer.fs.ProgressMonitor;
 import org.catacombae.hfsexplorer.gui.ExtractProgressPanel;
 import javax.swing.*;
 import java.awt.*;

@@ -68,8 +68,10 @@ import javax.swing.tree.TreeSelectionModel;
 import org.catacombae.hfsexplorer.gui.FilesystemBrowserPanel;
 
 /**
- *
- * @author Erik
+ * A generalization of the file system browser into a very autonomous component with very few
+ * dependencies, so that it can be easily reused in the future.
+ * 
+ * @author Erik Larsson
  */
 public class FileSystemBrowser<A> {
     private final FileSystemProvider<A> controller;
@@ -124,29 +126,34 @@ public class FileSystemBrowser<A> {
         this.dirTree = viewComponent.dirTree;
         
         upButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 actionGotoParentDir();
             }
         });
         extractButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 actionExtractToDir();
             }
         });
 
         infoButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 actionGetInfo();
             }
         });
         
         goButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 actionGotoDir();
             }
         });
         
         addressField.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 actionGotoDir();
             }
@@ -194,7 +201,11 @@ public class FileSystemBrowser<A> {
 		private boolean locked = false;
 		private int[] w1 = null;
 		//public int[] lastWidths = null;
+                
+                @Override
 		public void columnAdded(TableColumnModelEvent e) { /*System.out.println("columnAdded");*/ }
+
+                @Override
 		public void columnMarginChanged(ChangeEvent e) {
 		    if(disableColumnListener[0])
 			return;
@@ -278,9 +289,15 @@ public class FileSystemBrowser<A> {
 		    
 		    synchronized(this) { locked = false; /*System.err.println();*/ }
 		}
-		public void columnMoved(TableColumnModelEvent e) { /*System.out.println("columnMoved");*/ }
-		public void columnRemoved(TableColumnModelEvent e) { /*System.out.println("columnRemoved");*/ }
-		public void columnSelectionChanged(ListSelectionEvent e) { /*System.out.println("columnSelectionChanged");*/ }
+
+                @Override
+                public void columnMoved(TableColumnModelEvent e) { /*System.out.println("columnMoved");*/ }
+
+                @Override
+                public void columnRemoved(TableColumnModelEvent e) { /*System.out.println("columnRemoved");*/ }
+
+                @Override
+                public void columnSelectionChanged(ListSelectionEvent e) { /*System.out.println("columnSelectionChanged");*/ }
 	    };
 	fileTable.getColumnModel().addColumnModelListener(columnListener);
 	
@@ -292,6 +309,7 @@ public class FileSystemBrowser<A> {
 		private ImageIcon folderIcon = new ImageIcon(ClassLoader.getSystemResource("res/folder.png"));
 		private ImageIcon emptyIcon = new ImageIcon(ClassLoader.getSystemResource("res/nothing.png"));
 		
+                @Override
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, final int row, final int column) {
 		    if(value instanceof RecordContainer) {
 			final Component objectComponent = objectRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);			
@@ -333,6 +351,7 @@ public class FileSystemBrowser<A> {
 	    });
     
         fileTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+                @Override
 		public void valueChanged(ListSelectionEvent e) {
                     /* When the selection in the file table changes, update the
                      * selection status field with the new selection count and
@@ -439,37 +458,46 @@ public class FileSystemBrowser<A> {
 	dirTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 	
 	dirTree.addTreeSelectionListener(new TreeSelectionListener() {
+                @Override
 		public void valueChanged(TreeSelectionEvent e) {
 		    TreePath tp = e.getPath();
                     actionTreeNodeSelected(tp);
                 }
 	    });
 	dirTree.addTreeWillExpandListener(new TreeWillExpandListener() {
+                @Override
 		public void treeWillExpand(TreeExpansionEvent e) 
                     throws ExpandVetoException {
 		    //System.out.println("Tree will expand!");
                     actionExpandDirTreeNode(e.getPath());
 		}
 		
+                @Override
 		public void treeWillCollapse(TreeExpansionEvent e) {}
 
 	    });
 	
 	// Focus monitoring
 	fileTable.addFocusListener(new FocusListener() {
+                @Override
 		public void focusGained(FocusEvent e) {
 		    //System.err.println("fileTable gained focus!");
 		    fileTableLastFocus = System.nanoTime();
 		    //dirTree.clearSelection();
 		}
+
+                @Override
 		public void focusLost(FocusEvent e) {}
 	    });
 	dirTree.addFocusListener(new FocusListener() {
+                @Override
 		public void focusGained(FocusEvent e) {
 		    //System.err.println("dirTree gained focus!");
 		    dirTreeLastFocus = System.nanoTime();
 		    //fileTable.clearSelection(); // I'm unsure whether this behaviour is desired
 		}
+
+                @Override
 		public void focusLost(FocusEvent e) {}
 	    });
 	
