@@ -14,34 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.catacombae.hfsexplorer;
 
-import java.net.MalformedURLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.catacombae.hfsexplorer.FileSystemBrowser.Record;
-import org.catacombae.io.ReadableFileStream;
-import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.hfsexplorer.io.ReadableUDIFStream;
-import org.catacombae.hfsexplorer.partitioning.*;
-import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
-import org.catacombae.hfsexplorer.gui.*;
-import java.util.*;
-import java.io.*;
-import java.net.URL;
-import java.awt.BorderLayout;
-import java.awt.Toolkit;
-import java.awt.event.*;
-import javax.swing.*;
-import org.catacombae.hfsexplorer.helpbrowser.HelpBrowserPanel;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusVolumeHeader;
-import org.catacombae.hfsexplorer.types.hfs.ExtDescriptor;
-import org.catacombae.hfsexplorer.types.hfs.HFSPlusWrapperMDB;
 import org.catacombae.hfsexplorer.FileSystemBrowser.RecordType;
 import org.catacombae.hfsexplorer.fs.BaseHFSFileSystemView;
+import org.catacombae.hfsexplorer.fs.NullProgressMonitor;
+import org.catacombae.hfsexplorer.fs.ProgressMonitor;
+import org.catacombae.hfsexplorer.gui.FileOperationsPanel;
+import org.catacombae.hfsexplorer.helpbrowser.HelpBrowserPanel;
+import org.catacombae.hfsexplorer.io.ReadableUDIFStream;
+import org.catacombae.hfsexplorer.partitioning.Partition;
+import org.catacombae.hfsexplorer.partitioning.PartitionSystem;
+import org.catacombae.hfsexplorer.types.hfs.ExtDescriptor;
+import org.catacombae.hfsexplorer.types.hfs.HFSPlusWrapperMDB;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSVolumeHeader;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusVolumeHeader;
+import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
 import org.catacombae.io.ReadableConcatenatedStream;
-import org.catacombae.jparted.lib.ReadableStreamDataLocator;
+import org.catacombae.io.ReadableFileStream;
+import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.jparted.lib.fs.FSEntry;
 import org.catacombae.jparted.lib.fs.FSFile;
 import org.catacombae.jparted.lib.fs.FSFolder;
@@ -51,6 +44,41 @@ import org.catacombae.jparted.lib.fs.FileSystemHandlerFactory;
 import org.catacombae.jparted.lib.fs.FileSystemHandlerFactory.StandardAttribute;
 import org.catacombae.jparted.lib.fs.FileSystemMajorType;
 import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemHandler;
+import org.catacombae.jparted.lib.ReadableStreamDataLocator;
+import java.awt.BorderLayout;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.ImageIcon;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 
 public class FileSystemBrowserWindow extends JFrame {
 
@@ -627,42 +655,53 @@ public class FileSystemBrowserWindow extends JFrame {
                 fsFile = new WindowsLowLevelIO(filename);
             else
                 fsFile = new ReadableFileStream(filename);
-
-            //System.err.println("Trying to autodetect UDIF structure...");
-            if(UDIFRecognizer.isUDIF(fsFile)) {
-                //System.err.println("UDIF structure found! Creating stream...");
-                ReadableUDIFStream stream = null;
-                try {
-                    stream = new ReadableUDIFStream(filename);
-                } catch(Exception e) {
-                    e.printStackTrace();
-                    if(e.getMessage().startsWith("java.lang.RuntimeException: No handler for block type")) {
-                        JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-                                "UDIF file contains unsupported block types!\n" +
-                                "(The file was probably created with BZIP2 or ADC " +
-                                "compression, which is unsupported currently)",
-                                "Error", JOptionPane.ERROR_MESSAGE);
+            
+            try {
+                //System.err.println("Trying to autodetect UDIF structure...");
+                if(UDIFRecognizer.isUDIF(fsFile)) {
+                    //System.err.println("UDIF structure found! Creating stream...");
+                    ReadableUDIFStream stream = null;
+                    try {
+                        stream = new ReadableUDIFStream(filename);
+                    } catch(Exception e) {
+                        e.printStackTrace();
+                        if(e.getMessage().startsWith("java.lang.RuntimeException: No handler for block type")) {
+                            JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+                                    "UDIF file contains unsupported block types!\n" +
+                                    "(The file was probably created with BZIP2 or ADC " +
+                                    "compression, which is unsupported currently)",
+                                    "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                        else {
+                            JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+                                    "UDIF file unsupported or damaged!",
+                                    "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                        return;
                     }
-                    else {
-                        JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-                                "UDIF file unsupported or damaged!",
-                                "Error", JOptionPane.ERROR_MESSAGE);
+                    if(stream != null) {
+                        fsFile.close();
+                        fsFile = stream;
                     }
-                    return;
                 }
-                if(stream != null) {
-                    fsFile.close();
-                    fsFile = stream;
+                else {
+                    System.err.println("UDIF structure not found. Proceeding normally...");
                 }
+            } catch(Exception e) {
+                System.err.println("[INFO] Non-critical exception while trying to detect UDIF structure:");
+                e.printStackTrace();
             }
-            else {
-                System.err.println("UDIF structure not found. Proceeding normally...");
-            }
-
+        
             if(pos != 0)
                 fsFile = new ReadableConcatenatedStream(fsFile, pos, fsFile.length() - pos);
-
-            loadFS(fsFile, new File(filename).getName());
+            
+            String displayName;
+            try {
+                displayName = new File(filename).getCanonicalFile().getName();
+            } catch(Exception e) {
+                displayName = filename;
+            }
+            loadFS(fsFile, displayName);
         } catch(Exception e) {
             System.err.println("Could not open file! Exception thrown:");
             e.printStackTrace();

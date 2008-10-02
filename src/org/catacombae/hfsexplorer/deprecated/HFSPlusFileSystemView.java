@@ -17,6 +17,8 @@
 
 package org.catacombae.hfsexplorer.deprecated;
 
+import org.catacombae.hfsexplorer.fs.NullProgressMonitor;
+import org.catacombae.hfsexplorer.fs.ProgressMonitor;
 import org.catacombae.hfsexplorer.*;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentDescriptor;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentLeafRecord;

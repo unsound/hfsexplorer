@@ -1,6 +1,18 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/*-
+ * Copyright (C) 2006-2008 Erik Larsson
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.catacombae.hfsexplorer.fs;
@@ -40,22 +52,26 @@ public class ImplHFSPlusFileSystemView extends BaseHFSFileSystemView {
     
     protected static final CatalogOperations HFS_PLUS_OPERATIONS = new CatalogOperations() {
 
+        @Override
         public CommonHFSCatalogIndexNode newCatalogIndexNode(
                 byte[] data, int offset, int nodeSize, CommonBTHeaderRecord bthr) {
             return CommonHFSCatalogIndexNode.createHFSPlus(data, offset, nodeSize);
         }
 
+        @Override
         public CommonHFSCatalogKey newCatalogKey(
                 CommonHFSCatalogNodeID nodeID, CommonHFSCatalogString searchString, CommonBTHeaderRecord bthr) {
             return CommonHFSCatalogKey.create(new HFSPlusCatalogKey(
                     new HFSCatalogNodeID(nodeID.toInt()), new HFSUniStr255(searchString.getBytes(), 0)));
         }
-
+        
+        @Override
         public CommonHFSCatalogLeafNode newCatalogLeafNode(
                 byte[] data, int offset, int nodeSize, CommonBTHeaderRecord bthr) {
             return CommonHFSCatalogLeafNode.createHFSPlus(data, offset, nodeSize);
         }
 
+        @Override
         public CommonHFSCatalogLeafRecord newCatalogLeafRecord(
                 byte[] data, int offset, CommonBTHeaderRecord bthr) {
             return CommonHFSCatalogLeafRecord.createHFSPlus(data, offset, data.length-offset);
@@ -71,8 +87,11 @@ public class ImplHFSPlusFileSystemView extends BaseHFSFileSystemView {
     }
 
     private HFSPlusVolumeHeader getHFSPlusVolumeHeader() {
+        //System.err.println("getHFSPlusVolumeHeader()");
 	byte[] currentBlock = new byte[512]; // Could be made a global var? (thread war?)
+        //System.err.println("  hfsFile.seek(" + (fsOffset + 1024) + ")");
 	hfsFile.seek(fsOffset + 1024);
+        //System.err.println("  hfsFile.read(byte[" + currentBlock.length + "])");
 	hfsFile.read(currentBlock);
         return new HFSPlusVolumeHeader(currentBlock);
     }

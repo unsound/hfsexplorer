@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer;
+package org.catacombae.hfsexplorer.fs;
 
 public interface ProgressMonitor {
     public void updateTotalProgress(double fraction, String message);

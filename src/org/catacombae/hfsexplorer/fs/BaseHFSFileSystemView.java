@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2008 Erik Larsson
+ * Copyright (C) 2006-2008 Erik Larsson
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
 
 package org.catacombae.hfsexplorer.fs;
 import org.catacombae.hfsexplorer.io.ForkFilter;
-import org.catacombae.hfsexplorer.*; // until we move it back
-
 import org.catacombae.hfsexplorer.io.ReadableBlockCachingStream;
 import org.catacombae.io.Readable;
 import org.catacombae.io.ReadableRandomAccessStream;
@@ -66,7 +64,7 @@ public abstract class BaseHFSFileSystemView {
 
         public InitProcedure() {
             this.header = getVolumeHeader();
-            header.print(System.err, "    ");
+            //header.print(System.err, "    ");
             this.forkFilterFile = getForkFilterFile(header);
 
             forkFilterFile.seek(0);
@@ -93,6 +91,7 @@ public abstract class BaseHFSFileSystemView {
             this.catalogFile = forkFilterFile;
         }
 
+        @Override
         protected ReadableRandomAccessStream getForkFilterFile(CommonHFSVolumeHeader header) {
             if(catalogCache != null)
                 return catalogCache;
@@ -112,7 +111,8 @@ public abstract class BaseHFSFileSystemView {
         public ExtentsInitProcedure() {
             this.extentsFile = forkFilterFile;
         }
-
+        
+        @Override
         protected ReadableRandomAccessStream getForkFilterFile(CommonHFSVolumeHeader header) {
             return new ForkFilter(header.getExtentsOverflowFile(),
                     header.getExtentsOverflowFile().getBasicExtents(),
@@ -250,8 +250,8 @@ public abstract class BaseHFSFileSystemView {
         final int nodeSize = init.bthr.getNodeSize();
         long currentNodeOffset = init.bthr.getRootNodeNumber() * init.bthr.getNodeSize();
 
-        System.err.println("Got header record: ");
-        init.bthr.print(System.err, " ");
+        //System.err.println("Got header record: ");
+        //init.bthr.print(System.err, " ");
 
         byte[] currentNodeData = new byte[nodeSize];
         init.catalogFile.seek(currentNodeOffset);
@@ -260,8 +260,8 @@ public abstract class BaseHFSFileSystemView {
         while(nodeDescriptor.getNodeType() == NodeType.INDEX) {
             CommonHFSCatalogIndexNode currentNode =
                     catOps.newCatalogIndexNode(currentNodeData, 0, init.bthr.getNodeSize(), init.bthr);
-            System.err.println("currentNode:");
-            currentNode.print(System.err, "  ");
+            //System.err.println("currentNode:");
+            //currentNode.print(System.err, "  ");
             CommonBTIndexRecord matchingRecord = findKey(currentNode, parentID);
             
             //currentNodeNumber = matchingRecord.getIndex();
@@ -557,12 +557,12 @@ public abstract class BaseHFSFileSystemView {
     }
     
     public CommonHFSExtentLeafRecord getOverflowExtent(CommonHFSExtentKey key) {
-	System.err.println("getOverflowExtent(..)");
+	//System.err.println("getOverflowExtent(..)");
 	//System.err.println("my key:");
 	//key.printFields(System.err, "");
-    System.err.println("  Doing ExtentsInitProcedure...");
+        //System.err.println("  Doing ExtentsInitProcedure...");
 	ExtentsInitProcedure init = new ExtentsInitProcedure();	
-    System.err.println("  ExtentsInitProcedure done!");
+        //System.err.println("  ExtentsInitProcedure done!");
 	
 	final int nodeSize = init.bthr.getNodeSize();
 	
@@ -573,7 +573,7 @@ public abstract class BaseHFSFileSystemView {
 	final byte[] currentNodeData = new byte[nodeSize];
 	init.extentsFile.seek(currentNodeOffset);
 	init.extentsFile.readFully(currentNodeData);
-    System.err.println("  Calling createCommonBTNodeDescriptor(byte[" + currentNodeData.length + "], 0)...");
+        //System.err.println("  Calling createCommonBTNodeDescriptor(byte[" + currentNodeData.length + "], 0)...");
 	CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
 	
 	while(nodeDescriptor.getNodeType() == NodeType.INDEX) {
@@ -583,7 +583,7 @@ public abstract class BaseHFSFileSystemView {
 	    currentNodeOffset = matchingRecord.getIndexAsOffset(nodeSize);
 	    init.extentsFile.seek(currentNodeOffset);
 	    init.extentsFile.readFully(currentNodeData);
-        System.err.println("  Calling createCommonBTNodeDescriptor(byte[" + currentNodeData.length + "], 0)...");
+            //System.err.println("  Calling createCommonBTNodeDescriptor(byte[" + currentNodeData.length + "], 0)...");
 	    nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
 	}
 	
@@ -602,7 +602,7 @@ public abstract class BaseHFSFileSystemView {
 // 		dataDump.close();
 // 		System.err.println("A dump of the node has been written to node_dump.dmp");
 // 	    } catch(Exception e) { e.printStackTrace(); }
-        System.err.println("Returning from getOverflowExtent(..)");
+            //System.err.println("Returning from getOverflowExtent(..)");
 	    return null;
 	}
 	else

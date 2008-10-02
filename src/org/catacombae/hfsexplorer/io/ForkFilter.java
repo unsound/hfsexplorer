@@ -64,8 +64,8 @@ public class ForkFilter implements ReadableRandomAccessStream {
     public ForkFilter(long forkLength, CommonHFSExtentDescriptor[] extentDescriptors,
             ReadableRandomAccessStream sourceFile, long fsOffset, long allocationBlockSize,
             long firstBlockByteOffset) {
-        System.err.println("ForkFilter.<init>(" + forkLength + ", " + extentDescriptors + ", " +
-                sourceFile + ", " + fsOffset + ", " + allocationBlockSize + ", " + firstBlockByteOffset + ");");
+        //System.err.println("ForkFilter.<init>(" + forkLength + ", " + extentDescriptors + ", " +
+        //        sourceFile + ", " + fsOffset + ", " + allocationBlockSize + ", " + firstBlockByteOffset + ");");
         //System.err.println("  fork has " + extentDescriptors.length + " extents.");
         this.forkLength = forkLength;
         this.extentDescriptors = Util.arrayCopy(extentDescriptors,
@@ -104,14 +104,16 @@ public class ForkFilter implements ReadableRandomAccessStream {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void seek(long pos) {
-        System.err.println("ForkFilter.seek(" + pos + ");");
+        //System.err.println("ForkFilter.seek(" + pos + ");");
         logicalPosition = pos;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public int read() {
         byte[] oneByte = new byte[1];
         if(read(oneByte) == 1)
@@ -123,6 +125,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int read(byte[] data) {
         return read(data, 0, data.length);
     }
@@ -130,6 +133,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int read(byte[] data, int pos, int len) {
         //System.err.println("ForkFilter.read(" + data + ", " + pos + ", " + len);
         long offset = fsOffset;
@@ -221,6 +225,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void readFully(byte[] data) {
         readFully(data, 0, data.length);
     }
@@ -228,6 +233,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void readFully(byte[] data, int offset, int length) {
         int bytesRead = 0;
         while(bytesRead < length) {
@@ -242,6 +248,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
     /**
      * {@inheritDoc}
      */
+    @Override
     public long length() {
         return forkLength;
     }
@@ -249,6 +256,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
     /**
      * {@inheritDoc}
      */
+    @Override
     public long getFilePointer() {
         return logicalPosition;
     }
@@ -265,6 +273,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
      * Closes the underlying stream. Equivalent to
      * <code>getUnderlyingStream().close()</code>.
      */
+    @Override
     public void close() {
         sourceFile.close();
     }
