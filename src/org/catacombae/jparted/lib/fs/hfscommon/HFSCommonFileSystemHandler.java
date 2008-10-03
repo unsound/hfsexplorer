@@ -148,10 +148,12 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
     }
     
     /**
-     * This method is transitional and will be removed.
+     * Returns the underlying BaseHFSFileSystemView that serves the file system
+     * handler with data.<br>
+     * <b>Don't use this method if you want your code to be file system
+     * independent!</b>
      * 
-     * @deprecated
-     * @return
+     * @return the underlying BaseHFSFileSystemView.
      */
     public BaseHFSFileSystemView getFSView() {
         return view;

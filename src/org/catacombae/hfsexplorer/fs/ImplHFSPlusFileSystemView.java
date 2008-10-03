@@ -18,6 +18,7 @@
 package org.catacombae.hfsexplorer.fs;
 
 import org.catacombae.hfsexplorer.Util;
+import org.catacombae.hfsexplorer.io.ForkFilter;
 import org.catacombae.hfsexplorer.types.hfsplus.BTHeaderRec;
 import org.catacombae.hfsexplorer.types.hfsplus.BTNodeDescriptor;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSCatalogNodeID;
@@ -36,9 +37,11 @@ import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogNodeID;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogNodeID.ReservedID;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogString;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentDescriptor;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentIndexNode;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentKey;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentLeafNode;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSForkData;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSForkType;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.io.Readable;
@@ -86,7 +89,7 @@ public class ImplHFSPlusFileSystemView extends BaseHFSFileSystemView {
         super(hfsFile, fsOffset, catOps, cachingEnabled);
     }
 
-    private HFSPlusVolumeHeader getHFSPlusVolumeHeader() {
+    public HFSPlusVolumeHeader getHFSPlusVolumeHeader() {
         //System.err.println("getHFSPlusVolumeHeader()");
 	byte[] currentBlock = new byte[512]; // Could be made a global var? (thread war?)
         //System.err.println("  hfsFile.seek(" + (fsOffset + 1024) + ")");
@@ -193,5 +196,21 @@ public class ImplHFSPlusFileSystemView extends BaseHFSFileSystemView {
     protected CommonBTHeaderNode createCommonBTHeaderNode(byte[] currentNodeData,
             int offset, int nodeSize) {
         return CommonBTHeaderNode.createHFSPlus(currentNodeData, offset, nodeSize);
+    }
+
+    @Override
+    public BaseHFSAllocationFileView getAllocationFileView() {
+        HFSPlusVolumeHeader vh = getHFSPlusVolumeHeader();
+
+        CommonHFSForkData allocationFileFork = CommonHFSForkData.create(vh.getAllocationFile());
+        CommonHFSExtentDescriptor[] extDescriptors = getAllExtentDescriptors(
+                CommonHFSCatalogNodeID.getHFSPlusReservedID(ReservedID.ALLOCATION_FILE),
+                allocationFileFork,
+                CommonHFSForkType.DATA_FORK);
+
+        ForkFilter allocationFileStream = new ForkFilter(allocationFileFork, extDescriptors,
+                hfsFile, fsOffset, Util.unsign(vh.getBlockSize()), 0);
+
+        return new ImplHFSPlusAllocationFileView(this, allocationFileStream);
     }
 }

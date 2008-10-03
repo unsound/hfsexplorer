@@ -53,16 +53,16 @@ public class DictionaryBuilder {
                 throw new IllegalArgumentException("signedness == null!");
         }
         arrayTypeName += "Int" + bits.getBits() + "[" + (length / bits.getBytes()) + "]";
-        System.err.println("DictionaryBuilder.addIntArray(): length = " + length);
-        System.err.println("DictionaryBuilder.addIntArray(): bits.getBytes() = " + bits.getBytes());
+        //System.err.println("DictionaryBuilder.addIntArray(): length = " + length);
+        //System.err.println("DictionaryBuilder.addIntArray(): bits.getBytes() = " + bits.getBytes());
         ArrayBuilder ab = new ArrayBuilder(arrayTypeName);
         int i;
         for(i = 0; i < length; i += bits.getBytes()) {
-            System.err.println("DictionaryBuilder.addIntArray():  i = " + i);
+            //System.err.println("DictionaryBuilder.addIntArray():  i = " + i);
             ab.add(new IntegerField(data, offset + i, bits, signedness, endianness));
         }
-        System.err.println("DictionaryBuilder.addIntArray():  i = " + i);
-        System.err.println("DictionaryBuilder.addIntArray():  length/bits.getBytes() = " + (length / bits.getBytes()));
+        //System.err.println("DictionaryBuilder.addIntArray():  i = " + i);
+        //System.err.println("DictionaryBuilder.addIntArray():  length/bits.getBytes() = " + (length / bits.getBytes()));
         add(key, ab.getResult());
     }
 

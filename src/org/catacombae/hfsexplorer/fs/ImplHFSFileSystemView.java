@@ -17,6 +17,7 @@
 
 package org.catacombae.hfsexplorer.fs;
 
+import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.types.hfsplus.JournalInfoBlock;
 import org.catacombae.hfsexplorer.types.hfs.BTHdrRec;
 import org.catacombae.hfsexplorer.types.hfs.CatKeyRec;
@@ -38,8 +39,10 @@ import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentKey;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentLeafNode;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSForkType;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSVolumeHeader;
+import org.catacombae.io.ConcatenatedStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.Readable;
+import org.catacombae.io.ReadableConcatenatedStream;
 
 /**
  *
@@ -80,13 +83,18 @@ public class ImplHFSFileSystemView extends BaseHFSFileSystemView {
     protected ImplHFSFileSystemView(ReadableRandomAccessStream hfsFile, long fsOffset, CatalogOperations catOps, boolean cachingEnabled) {
         super(hfsFile, fsOffset, catOps, cachingEnabled);
     }
-    
-    @Override
-    public CommonHFSVolumeHeader getVolumeHeader() {
+
+
+    public MasterDirectoryBlock getMasterDirectoryBlock() {
         byte[] currentBlock = new byte[512]; // Could be made a global var? (thread war?)
         hfsFile.seek(fsOffset + 1024);
         hfsFile.read(currentBlock);
-        return CommonHFSVolumeHeader.create(new MasterDirectoryBlock(currentBlock, 0));
+        return new MasterDirectoryBlock(currentBlock, 0);
+    }
+    
+    @Override
+    public CommonHFSVolumeHeader getVolumeHeader() {
+        return CommonHFSVolumeHeader.create(getMasterDirectoryBlock());
     }
 
     @Override
@@ -190,5 +198,20 @@ public class ImplHFSFileSystemView extends BaseHFSFileSystemView {
     protected CommonBTHeaderNode createCommonBTHeaderNode(byte[] currentNodeData,
             int offset, int nodeSize) {
         return CommonBTHeaderNode.createHFS(currentNodeData, offset, nodeSize);
+    }
+
+    @Override
+    public BaseHFSAllocationFileView getAllocationFileView() {
+        MasterDirectoryBlock mdb = getMasterDirectoryBlock();
+
+        int numAllocationBlocks = Util.unsign(mdb.getDrNmAlBlks());
+        int volumeBitmapSize = numAllocationBlocks/8 + (numAllocationBlocks%8 != 0 ? 1 : 0);
+        
+        ReadableConcatenatedStream volumeBitmapStream =
+                new ReadableConcatenatedStream(hfsFile,
+                fsOffset + 512*Util.unsign(mdb.getDrVBMSt()),
+                volumeBitmapSize);
+        
+        return new ImplHFSAllocationFileView(this, volumeBitmapStream);
     }
 }

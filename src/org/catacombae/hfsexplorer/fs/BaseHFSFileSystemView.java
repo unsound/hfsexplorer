@@ -134,30 +134,12 @@ public abstract class BaseHFSFileSystemView {
         public CommonHFSCatalogLeafRecord newCatalogLeafRecord(byte[] data,
                 int offset, CommonBTHeaderRecord bthr);
     }
-    /*protected static final CatalogOperations HFS_PLUS_OPERATIONS = new CatalogOperations() {
-	    public CommonHFSCatalogIndexNode newCatalogIndexNode(
-                    byte[] data, int offset, int nodeSize, CommonBTHeaderRecord bthr) {
-		return createCommonHFSCatalogIndexNode(data, offset, nodeSize);
-	    }
-	    public CommonHFSCatalogKey newCatalogKey(
-                    CommonHFSCatalogNodeID nodeID, CommonHFSCatalogString searchString, CommonBTHeaderRecord bthr) {
-		return new CommonHFSCatalogKey(nodeID, searchString);
-	    }
-	    public CommonHFSCatalogLeafNode newCatalogLeafNode(
-                    byte[] data, int offset, int nodeSize, CommonBTHeaderRecord bthr) {
-		return new CommonHFSCatalogLeafNode(data, offset, nodeSize);
-	    }
-	    public CommonHFSCatalogLeafRecord newCatalogLeafRecord(
-                    byte[] data, int offset, CommonBTHeaderRecord bthr) {
-		return new CommonHFSCatalogLeafRecord(data, offset);
-	    }
-  	};*/
-
+    
     protected ReadableRandomAccessStream hfsFile;
     private final ReadableRandomAccessStream backingFile;
     protected final long fsOffset;
     protected final CatalogOperations catOps;
-    protected final long physicalBlockSize;
+    protected final int physicalBlockSize;
     
     // Variables for reading cached files.
     private ReadableBlockCachingStream catalogCache = null;
@@ -232,6 +214,8 @@ public abstract class BaseHFSFileSystemView {
             ReservedID requestedNodeID);
     /*protected abstract CommonHFSCatalogString createCommonHFSCatalogString(
             String name);*/
+
+    public abstract BaseHFSAllocationFileView getAllocationFileView();
     
     /**
      * Decodes the supplied CommonHFSCatalogString according to the current
@@ -323,11 +307,22 @@ public abstract class BaseHFSFileSystemView {
         else
             currentNodeNumber = nodeNumber;
 
-        int nodeSize = init.bthr.getNodeSize();
+        final int nodeSize = init.bthr.getNodeSize();
 
-        byte[] currentNodeData = new byte[init.bthr.getNodeSize()];
-        init.catalogFile.seek(currentNodeNumber * init.bthr.getNodeSize());
-        init.catalogFile.readFully(currentNodeData);
+        byte[] currentNodeData = new byte[nodeSize];
+        try {
+            init.catalogFile.seek(currentNodeNumber * nodeSize);
+            init.catalogFile.readFully(currentNodeData);
+        } catch(RuntimeException e) {
+            System.err.println("RuntimeException in getCatalogNode. Printing additional information:");
+            System.err.println("  nodeNumber=" + nodeNumber);
+            System.err.println("  currentNodeNumber=" + currentNodeNumber);
+            System.err.println("  nodeSize=" + nodeSize);
+            System.err.println("  init.catalogFile.length()=" + init.catalogFile.length());
+            System.err.println("  (currentNodeNumber * nodeSize)=" + (currentNodeNumber * nodeSize));
+            //System.err.println("  =" + );
+            throw e;
+        }
         CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
 
         if(nodeDescriptor.getNodeType() == NodeType.HEADER)
@@ -682,7 +677,7 @@ public abstract class BaseHFSFileSystemView {
     
     protected CommonHFSExtentDescriptor[] getAllExtentDescriptors(
             CommonHFSExtentDescriptor[] descriptors) {
-	LinkedList<CommonHFSExtentDescriptor> descTmp = new LinkedList<CommonHFSExtentDescriptor>();
+        LinkedList<CommonHFSExtentDescriptor> descTmp = new LinkedList<CommonHFSExtentDescriptor>();
         for(CommonHFSExtentDescriptor desc : descriptors) {
             if(desc.getStartBlock() == 0 && desc.getBlockCount() == 0) {
                 break;
