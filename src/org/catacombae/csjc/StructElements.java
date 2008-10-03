@@ -32,21 +32,41 @@ import org.catacombae.csjc.structelements.FieldType;
  * @author Erik Larsson
  */
 public interface StructElements {
-    // Some shorthand constants
+    /** Shorthand constant. */
     public static final Endianness BIG_ENDIAN = Endianness.BIG_ENDIAN;
+    /** Shorthand constant. */
     public static final Endianness LITTLE_ENDIAN = Endianness.LITTLE_ENDIAN;
+    /** Shorthand constant. */
     public static final Signedness SIGNED = Signedness.SIGNED;
+    /** Shorthand constant. */
     public static final Signedness UNSIGNED = Signedness.UNSIGNED;
+    /** Shorthand constant. */
     public static final FieldType BOOLEAN = FieldType.BOOLEAN;
+    /** Shorthand constant. */
     public static final FieldType INTEGER = FieldType.INTEGER;
+    /** Shorthand constant. */
     public static final FieldType BYTEARRAY = FieldType.BYTEARRAY;
+    /** Shorthand constant. */
     public static final FieldType ASCIISTRING = FieldType.ASCIISTRING;
+    /** Shorthand constant. */
     public static final FieldType CUSTOM_CHARSET_STRING = FieldType.CUSTOM_CHARSET_STRING;
+    /** Shorthand constant. */
     public static final FieldType DATE = FieldType.DATE;
+    /** Shorthand constant. */
     public static final IntegerFieldBits BITS_8 = IntegerFieldBits.BITS_8;
+    /** Shorthand constant. */
     public static final IntegerFieldBits BITS_16 = IntegerFieldBits.BITS_16;
+    /** Shorthand constant. */
     public static final IntegerFieldBits BITS_32 = IntegerFieldBits.BITS_32;
+    /** Shorthand constant. */
     public static final IntegerFieldBits BITS_64 = IntegerFieldBits.BITS_64;
-
+    
+    /**
+     * Returns a dictionary of the elements of this data structure. The keys in
+     * the dictionary should be the respective variable names, and the elements
+     * should provide access to all the fields of the data structure.
+     * 
+     * @return a dictionary of the elements of this data structure.
+     */
     public Dictionary getStructElements();
 }

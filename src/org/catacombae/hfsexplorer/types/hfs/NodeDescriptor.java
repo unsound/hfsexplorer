@@ -33,7 +33,7 @@ public class NodeDescriptor {
     private final byte[] ndResv2 = new byte[2];
 
     public NodeDescriptor(byte[] data, int offset) {
-        System.err.println("NodeDescriptor(byte[" + data.length + "], " + offset + ");");
+        //System.err.println("NodeDescriptor(byte[" + data.length + "], " + offset + ");");
         System.arraycopy(data, offset + 0, ndFLink, 0, 4);
         System.arraycopy(data, offset + 4, ndBLink, 0, 4);
         System.arraycopy(data, offset + 8, ndType, 0, 1);

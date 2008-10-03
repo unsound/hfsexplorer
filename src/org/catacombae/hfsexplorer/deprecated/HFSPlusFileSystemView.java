@@ -19,7 +19,6 @@ package org.catacombae.hfsexplorer.deprecated;
 
 import org.catacombae.hfsexplorer.fs.NullProgressMonitor;
 import org.catacombae.hfsexplorer.fs.ProgressMonitor;
-import org.catacombae.hfsexplorer.*;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentDescriptor;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentLeafRecord;
 import org.catacombae.hfsexplorer.types.hfsplus.BTIndexRecord;
@@ -52,6 +51,7 @@ import org.catacombae.hfsexplorer.types.*;
 import java.util.LinkedList;
 import java.io.OutputStream;
 import java.io.IOException;
+import org.catacombae.hfsexplorer.Util;
 
 /**
  * Provides a view over the data in an HFS Plus file system (HFS and HFSX

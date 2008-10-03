@@ -17,8 +17,6 @@
 
 package org.catacombae.hfsexplorer.fs;
 
-import org.catacombae.hfsexplorer.fs.ProgressMonitor;
-
 public class NullProgressMonitor implements ProgressMonitor {
     private static NullProgressMonitor instance = new NullProgressMonitor();
     

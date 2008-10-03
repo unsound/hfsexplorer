@@ -42,6 +42,11 @@ public class HFSPlusExtentDescriptor implements StructElements {
         System.arraycopy(data, offset + 4, blockCount, 0, 4);
     }
 
+    public HFSPlusExtentDescriptor(int startBlock, int blockCount) {
+        System.arraycopy(Util.toByteArrayBE(startBlock), 0, this.startBlock, 0, 4);
+        System.arraycopy(Util.toByteArrayBE(blockCount), 0, this.blockCount, 0, 4);
+    }
+
     public static int getSize() {
         return 8;
     }

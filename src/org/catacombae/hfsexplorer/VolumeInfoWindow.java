@@ -24,9 +24,9 @@ import javax.swing.JTabbedPane;
 //import org.catacombae.hfsexplorer.gui.VolumeInfoPanel;
 import org.catacombae.hfsexplorer.gui.CatalogInfoPanel;
 import org.catacombae.hfsexplorer.gui.JournalInfoPanel;
-//import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusVolumeHeader;
 import org.catacombae.hfsexplorer.types.hfsplus.JournalInfoBlock;
 import org.catacombae.hfsexplorer.fs.BaseHFSFileSystemView;
+import org.catacombae.hfsexplorer.gui.AllocationFileInfoPanel;
 import org.catacombae.hfsexplorer.gui.StructViewPanel;
 
 public class VolumeInfoWindow extends JFrame {
@@ -34,10 +34,12 @@ public class VolumeInfoWindow extends JFrame {
     private JScrollPane volumeInfoPanelScroller;
     private JScrollPane catalogInfoPanelScroller;
     private JScrollPane journalInfoPanelScroller;
+    private JScrollPane allocationFileInfoPanelScroller;
     private StructViewPanel volumeInfoPanel;
     private CatalogInfoPanel catalogInfoPanel;
     private JournalInfoPanel journalInfoPanel;
-    
+    private AllocationFileInfoPanel allocationFileInfoPanel;
+
     public VolumeInfoWindow(BaseHFSFileSystemView fsView) {
         super("File system info");
 
@@ -76,6 +78,17 @@ public class VolumeInfoWindow extends JFrame {
             e.printStackTrace();
         }
         
+        try {
+            allocationFileInfoPanel = new AllocationFileInfoPanel(fsView.getAllocationFileView());
+            allocationFileInfoPanelScroller = new JScrollPane(allocationFileInfoPanel,
+                    JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                    JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            tabs.addTab("Allocation file info", allocationFileInfoPanelScroller);
+            allocationFileInfoPanelScroller.getVerticalScrollBar().setUnitIncrement(10);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
         add(tabs, BorderLayout.CENTER);
         
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);

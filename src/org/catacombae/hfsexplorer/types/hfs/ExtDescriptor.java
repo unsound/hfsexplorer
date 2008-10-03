@@ -46,6 +46,12 @@ public class ExtDescriptor implements StructElements {
         System.arraycopy(data, offset + 2, xdrNumABlks, 0, 2);
     }
 
+    public ExtDescriptor(short xdrStABN, short xdrNumABlks) {
+        System.arraycopy(Util.toByteArrayBE(xdrStABN), 0, this.xdrStABN, 0, 2);
+        System.arraycopy(Util.toByteArrayBE(xdrNumABlks), 0, this.xdrNumABlks, 0, 2);
+
+    }
+
     public static int length() { return STRUCTSIZE; }
     
     /** first allocation block */
@@ -54,8 +60,8 @@ public class ExtDescriptor implements StructElements {
     public short getXdrNumABlks() { return Util.readShortBE(xdrNumABlks); }
     
     public void printFields(PrintStream ps, String prefix) {
-        ps.println(prefix + " xdrStABN: " + getXdrStABN());
-        ps.println(prefix + " xdrNumABlks: " + getXdrNumABlks());
+        ps.println(prefix + " xdrStABN: " + Util.unsign(getXdrStABN()));
+        ps.println(prefix + " xdrNumABlks: " + Util.unsign(getXdrNumABlks()));
     }
 
     public void print(PrintStream ps, String prefix) {
