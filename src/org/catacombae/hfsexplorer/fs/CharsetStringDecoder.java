@@ -50,7 +50,7 @@ public class CharsetStringDecoder implements StringDecoder {
     }
     
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     @Override
     public String decode(byte[] data, int off, int len) {
@@ -60,7 +60,11 @@ public class CharsetStringDecoder implements StringDecoder {
             throw new RuntimeException("Could not decode data!", e);
         }
     }
-
+    
+    /**
+     * Returns the charset name as it was passed to the constructor.
+     * @return the charset name as it was passed to the constructor.
+     */
     public String getCharsetName() {
         return charsetName;
     }

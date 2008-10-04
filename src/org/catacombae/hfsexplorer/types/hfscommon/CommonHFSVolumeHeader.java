@@ -44,6 +44,14 @@ public abstract class CommonHFSVolumeHeader implements StructElements {
      */
     public abstract long getAllocationBlockStart();
     public abstract long getAllocationBlockSize();
+    /**
+     * Returns a byte pointer (not block) to the end of the volume, that is,
+     * a pointer to byte following the last byte of the volume. You could call
+     * this method getFileSystemLength if you wanted to.
+     * 
+     * @return a byte pointer to the end of the volume.
+     */
+    public abstract long getFileSystemEnd();
     public abstract long getTotalBlocks();
     public abstract long getFreeBlocks();
     public abstract Date getCreateDate();
@@ -141,9 +149,16 @@ public abstract class CommonHFSVolumeHeader implements StructElements {
              */
             return 0;
         }
-
+        
+        @Override
         public Dictionary getStructElements() {
             return hdr.getStructElements();
+        }
+
+        @Override
+        public long getFileSystemEnd() {
+            // In HFS+, the entire volume is mapped by allocation blocks.
+            return getTotalBlocks()*getAllocationBlockSize();
         }
     }
     
@@ -216,8 +231,15 @@ public abstract class CommonHFSVolumeHeader implements StructElements {
             return Util.unsign(hdr.getDrAlBlSt());
         }
 
+        @Override
         public Dictionary getStructElements() {
             return hdr.getStructElements();
+        }
+
+        @Override
+        public long getFileSystemEnd() {
+            // In HFS, only the "data" part of the volume is mapped by allocation blocks.
+            return getAllocationBlockStart()*512 + getTotalBlocks()*getAllocationBlockSize() + 2*512;
         }
     }
 }

@@ -1,12 +1,18 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * AllocationFileInfoPanel.java
+/*-
+ * Copyright (C) 2008 Erik Larsson
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * Created on 2008-okt-03, 11:29:35
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.catacombae.hfsexplorer.gui;
@@ -16,6 +22,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.catacombae.csjc.structelements.ArrayBuilder;
+import org.catacombae.hfsexplorer.GUIUtil;
 import org.catacombae.hfsexplorer.fs.BaseHFSAllocationFileView;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentDescriptor;
 
@@ -33,9 +40,11 @@ public class AllocationFileInfoPanel extends javax.swing.JPanel {
         initComponents();
 
         Thread t = new Thread(new Runnable() {
+            @Override
             public void run() {
                 final long allocatedBlocks = afView.countAllocatedBlocks();
                 SwingUtilities.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         allocatedBlocksField.setText("" + allocatedBlocks);
                     }
@@ -43,6 +52,7 @@ public class AllocationFileInfoPanel extends javax.swing.JPanel {
 
                 final long freeBlocks = afView.countFreeBlocks();
                 SwingUtilities.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         freeBlocksField.setText("" + freeBlocks);
                     }
@@ -53,27 +63,55 @@ public class AllocationFileInfoPanel extends javax.swing.JPanel {
 
         allocateButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    long l = Long.parseLong(allocateSizeField.getText());
-                    CommonHFSExtentDescriptor[] descs = afView.findFreeSpace(l);
-                    if(descs != null) {
-                        ArrayBuilder ab = new ArrayBuilder("CommonHFSExtentDescriptor[" + descs.length + "]");
-                        for(CommonHFSExtentDescriptor desc : descs) {
-                            System.err.println("Found descriptor: ");
-                            desc.print(System.err, "  ");
-                            ab.add(desc.getStructElements());
+                allocateButton.setEnabled(false);
+                Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            long l = Long.parseLong(allocateSizeField.getText());
+                            CommonHFSExtentDescriptor[] descs = afView.findFreeSpace(l);
+                            if(descs != null) {
+                                final ArrayBuilder ab = new ArrayBuilder("CommonHFSExtentDescriptor[" +
+                                        descs.length + "]");
+                                for(CommonHFSExtentDescriptor desc : descs) {
+                                    System.err.println("Found descriptor: ");
+                                    desc.print(System.err, "  ");
+                                    ab.add(desc.getStructElements());
+                                }
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        resultScroller.setViewportView(new StructViewPanel("Possible allocations",
+                                                ab.getResult()));
+                                    }
+                                });
+                            }
+                            else {
+                                JOptionPane.showMessageDialog(AllocationFileInfoPanel.this,
+                                        "Not enough space on volume!", "Info",
+                                        JOptionPane.INFORMATION_MESSAGE);
+                            }
+                        } catch(NumberFormatException ee) {
+                            JOptionPane.showMessageDialog(AllocationFileInfoPanel.this,
+                                    "Invalid long value.", "Error", JOptionPane.ERROR_MESSAGE);
+                        } catch(Throwable t) {
+                            t.printStackTrace();
+                            GUIUtil.displayExceptionDialog(t, 10, AllocationFileInfoPanel.this,
+                                    "Exception while trying to calculate available free extents:",
+                                    "Exception", JOptionPane.ERROR_MESSAGE);
+                        } finally {
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    allocateButton.setEnabled(true);
+                                }
+                            });
                         }
-                        resultScroller.setViewportView(new StructViewPanel("Possible allocations", ab.getResult()));
                     }
-                    else
-                        JOptionPane.showMessageDialog(AllocationFileInfoPanel.this,
-                                "Not enough space on volume!", "Info",
-                                JOptionPane.INFORMATION_MESSAGE);
-                } catch(NumberFormatException ee) {
-                    JOptionPane.showMessageDialog(AllocationFileInfoPanel.this,
-                            "Invalid long value.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
+                });
+                t.start();
             }
 
         });

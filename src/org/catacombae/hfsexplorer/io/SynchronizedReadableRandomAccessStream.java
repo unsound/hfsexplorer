@@ -36,28 +36,35 @@ public class SynchronizedReadableRandomAccessStream extends BasicReadableRandomA
 	this.ras = ras;
     }
      
-    /** Atomic seek+read. */
-    public synchronized int readFrom(long pos, byte[] b, int off, int len) throws RuntimeIOException {
+    /** Atomic seek+read. Does <b>not</b> change the file pointer of the stream permanently! */
+    public synchronized int readFrom(final long pos, byte[] b, int off, int len) throws RuntimeIOException {
         //System.err.println("SynchronizedReadableRandomAccessStream.readFrom(" + pos + ", byte[" + b.length + "], " + off + ", " + len + ");");
-
-	if(getFilePointer() != pos)
+        final long oldFP = getFilePointer();
+	if(oldFP != pos)
 	    seek(pos);
-	return read(b, off, len);
+	int res = read(b, off, len);
+        
+        if(oldFP != pos)
+            seek(oldFP); // Reset file pointer to previous position
+        return res;
     }
     
-    /** Atomic seek+skip. */
+    /** Atomic seek+skip. Does <b>not</b> change the file pointer of the stream permanently! */
     public synchronized long skipFrom(final long pos, final long length) throws RuntimeIOException {
-	long streamLength = length();
-	long newPos = pos+length;
-
+	final long streamLength = length();
+	final long newPos = pos+length;
+        
+        final long res;
 	if(newPos > streamLength) {
-	    seek(streamLength);
-	    return streamLength-pos;
+	    //seek(streamLength);
+	    res = streamLength-pos;
 	}
 	else {
-	    seek(newPos);
-	    return length;
+	    //seek(newPos);
+	    res = length;
 	}
+        
+        return res;
     }
     
     /** Atomic length() - getFilePointer(). */
