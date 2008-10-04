@@ -38,7 +38,7 @@ public class ImplHFSPlusAllocationFileView extends BaseHFSAllocationFileView {
     }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     @Override
     public boolean isAllocationBlockUsed(long blockNumber) throws IllegalArgumentException {
@@ -49,6 +49,9 @@ public class ImplHFSPlusAllocationFileView extends BaseHFSAllocationFileView {
         return super.isAllocationBlockUsed(blockNumber);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public CommonHFSExtentDescriptor createExtentDescriptor(long startBlock, long blockCount) {
         if(startBlock < 0 || startBlock > ((long)Integer.MAX_VALUE)*2)

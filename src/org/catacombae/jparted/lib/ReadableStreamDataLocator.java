@@ -36,4 +36,8 @@ public class ReadableStreamDataLocator extends DataLocator {
     public boolean isWritable() {
         return false;
     }
+    
+    public SynchronizedReadableRandomAccessStream getBackingStream() {
+        return backingStream;
+    }
 }
