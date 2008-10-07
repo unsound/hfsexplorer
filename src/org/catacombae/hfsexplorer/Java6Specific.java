@@ -23,7 +23,11 @@ import java.io.IOException;
 import java.awt.Desktop;
 import java.awt.Image;
 import java.awt.Window;
+import java.util.Comparator;
 import javax.swing.ImageIcon;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 
 public class Java6Specific {
     public static boolean isJava6OrHigher() {
@@ -40,5 +44,27 @@ public class Java6Specific {
 	for(ImageIcon ii : icons)
 	    iconImages.addLast(ii.getImage());
 	window.setIconImages(iconImages);
+    }
+    
+    /**
+     * Adds a row sorter to <code>table</code> with the specified table model. Optionally, a list of
+     * Comparators can be supplied, one for each column, that specify the correct way of comparing
+     * the objects in that column. Null values means the default comparator will be used.<br>
+     * <b>Only Java 6+ virtual machines will support this, so check first with isJava6OrHigher() or
+     * risk to crash your program.</b>
+     * 
+     * @param fileTable
+     * @param tableModel
+     * @param columnComparators
+     */
+    public static void addRowSorter(JTable table, DefaultTableModel tableModel,
+            Comparator... columnComparators) {
+        TableRowSorter sorter = new TableRowSorter<DefaultTableModel>(tableModel);
+        for(int i = 0; i < columnComparators.length; ++i) {
+            Comparator c = columnComparators[i];
+            if(c != null)
+                sorter.setComparator(i, c);
+        }
+        table.setRowSorter(sorter);
     }
 }

@@ -18,6 +18,7 @@
 // Ripped from TypherTransfer. Relevant changes should be backported.
 
 package org.catacombae.hfsexplorer;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
 public class SpeedUnitUtils {
@@ -40,6 +41,8 @@ public class SpeedUnitUtils {
     }
     public static String bytesToBinaryUnit(long size, DecimalFormat unitFormatter) {
 	String result;
+        RoundingMode oldRm = unitFormatter.getRoundingMode();
+        unitFormatter.setRoundingMode(RoundingMode.DOWN);
 
 	if(size >= exbibyte)
 	    result = unitFormatter.format(size / (double)exbibyte) + " EiB";
@@ -55,7 +58,8 @@ public class SpeedUnitUtils {
 	    result = unitFormatter.format(size / (double)kibibyte) + " KiB";
 	else
 	    result = size + " B";
-	
+	        
+        unitFormatter.setRoundingMode(oldRm);
 	return result;
     }
     
@@ -64,6 +68,8 @@ public class SpeedUnitUtils {
     }
     public static String bytesToBinaryUnit(double size, DecimalFormat unitFormatter) {
 	String result;
+        RoundingMode oldRm = unitFormatter.getRoundingMode();
+        unitFormatter.setRoundingMode(RoundingMode.DOWN);
 
 	if(size >= exbibyte)
 	    result = unitFormatter.format(size / (double)exbibyte) + " EiB";
@@ -79,7 +85,8 @@ public class SpeedUnitUtils {
 	    result = unitFormatter.format(size / (double)kibibyte) + " KiB";
 	else
 	    result = unitFormatter.format(size) + " B";
-	
+        
+        unitFormatter.setRoundingMode(oldRm);
 	return result;
     }
     
@@ -89,7 +96,10 @@ public class SpeedUnitUtils {
     public static String bytesToDecimalBitUnit(long bytes, DecimalFormat unitFormatter) {
 	long bits = bytes*8;
 	String result;
-	if(bits >= exa)
+        RoundingMode oldRm = unitFormatter.getRoundingMode();
+        unitFormatter.setRoundingMode(RoundingMode.DOWN);
+
+        if(bits >= exa)
 	    result = unitFormatter.format(bits / (double)exa) + " Ebit";
 	else if(bits >= peta)
 	    result = unitFormatter.format(bits / (double)peta) + " Pbit";
@@ -103,6 +113,8 @@ public class SpeedUnitUtils {
 	    result = unitFormatter.format(bits / (double)kilo) + " Kbit";
 	else
 	    result = bits + " bit";
+        
+        unitFormatter.setRoundingMode(oldRm);
 	return result;
     }
     
@@ -112,7 +124,10 @@ public class SpeedUnitUtils {
     public static String bytesToDecimalBitUnit(double bytes, DecimalFormat unitFormatter) {
 	double bits = bytes*8;
 	String result;
-	if(bits >= exa)
+        RoundingMode oldRm = unitFormatter.getRoundingMode();
+        unitFormatter.setRoundingMode(RoundingMode.DOWN);
+
+        if(bits >= exa)
 	    result = unitFormatter.format(bits / (double)exa) + " Ebit";
 	else if(bits >= peta)
 	    result = unitFormatter.format(bits / (double)peta) + " Pbit";
@@ -126,6 +141,8 @@ public class SpeedUnitUtils {
 	    result = unitFormatter.format(bits / (double)kilo) + " Kbit";
 	else
 	    result = unitFormatter.format(bits) + " bit";
+        
+        unitFormatter.setRoundingMode(oldRm);
 	return result;
     }
 

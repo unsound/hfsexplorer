@@ -41,3 +41,13 @@
 - FileSystemBrowserWindow.main: A problem similar to the above issue
   occurs with the switch "-dbgconsole". A similar solution should be
   developed. Make sure the two solutions don't invalidate each other.
+
+2008-10-04
+----------
+- Sometimes the title of the backing storage (filename/device
+  path/device path with partition system and number) is displayed
+  incorrectly, for example when we load Partition0 with MBR partition
+  scheme and a partition number, only Partition0 is displayed.
+  Ex. runfsb \\?\GLOBALROOT\Device\Harddisk3\Partition0
+
+- When loading a new file system from an old one, we get an exception.
