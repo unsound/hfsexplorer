@@ -74,6 +74,7 @@ public class ReadableBlockCachingStream extends ReadableFilterStream {
 			    
     public ReadableBlockCachingStream(ReadableRandomAccessStream backing, int blockSize, int maxItemCount) {
 	super(backing);
+        System.err.println("ReadableBlockCachingStream(" + backing + ", " + blockSize + ", " + maxItemCount + ");");
 	if(backing == null)
 	    throw new IllegalArgumentException("backing can not be null");
 	if(blockSize <= 0)
@@ -84,13 +85,14 @@ public class ReadableBlockCachingStream extends ReadableFilterStream {
 	this.blockSize = blockSize;
 	this.virtualLength = backing.length(); // Immutable
 	int actualItemCount = maxItemCount;
-	//System.err.println("ReadableBlockCachingStream created. virtualLength: " + virtualLength + " maxItemCount*blockSize: " + (maxItemCount*blockSize));
+	System.err.println("ReadableBlockCachingStream created. virtualLength: " + virtualLength + " maxItemCount*blockSize: " + (maxItemCount*blockSize));
 	if(actualItemCount*blockSize > virtualLength) {
-	    actualItemCount = (int)( virtualLength/blockSize - ((virtualLength%blockSize == 0) ? 1 : 0) );
-	    //System.err.println("Adjusted actualItemCount to " + actualItemCount);
+	    actualItemCount = (int)( virtualLength/blockSize + ((virtualLength%blockSize != 0) ? 1 : 0) );
+	    System.err.println("Adjusted actualItemCount to " + actualItemCount);
 	}
 	this.cache = new BlockStore[actualItemCount];
     }
+    
     @Override
     public void seek(long pos) {
 	if(closed) throw new RuntimeException("File is closed.");
@@ -216,7 +218,7 @@ public class ReadableBlockCachingStream extends ReadableFilterStream {
 		data = recoveredData;
 	    else // Will only happen if (1) cache isn't full or (2) if we are dealing with the last block
 		data = new byte[dataSize];
-	    //System.err.println("  Seeking to " + blockPos + " (block number: " + blockNumber + ", blockSize: " + blockSize + ", data.length: " + data.length + ")");
+	    System.err.println("  Seeking to " + blockPos + " (block number: " + blockNumber + ", blockSize: " + blockSize + ", data.length: " + data.length + ")");
 	    backingStore.seek(blockPos);
 	    backingStore.read(data, 0, data.length);
 	    

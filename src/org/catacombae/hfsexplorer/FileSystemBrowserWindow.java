@@ -314,7 +314,7 @@ public class FileSystemBrowserWindow extends JFrame {
         fsInfoItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                if(fsHandler != null) {
+                if(ensureFileSystemLoaded()) {
                     VolumeInfoWindow infoWindow = new VolumeInfoWindow(fsHandler.getFSView());
                     infoWindow.setVisible(true);
 
@@ -335,10 +335,6 @@ public class FileSystemBrowserWindow extends JFrame {
                 JOptionPane.ERROR_MESSAGE);
                  */
 
-                }
-                else {
-                    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-                            "No file system loaded.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -380,10 +376,12 @@ public class FileSystemBrowserWindow extends JFrame {
         createDiskImageItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                if(fsHandler != null) {
+                if(ensureFileSystemLoaded()) {
                     actionExtractToDiskImage();
                 }
             }
+
+
         });
 
 
@@ -514,6 +512,17 @@ public class FileSystemBrowserWindow extends JFrame {
         menuBar.add(helpMenu);
         setJMenuBar(menuBar);
     // /Menus
+    }
+
+    private boolean ensureFileSystemLoaded() {
+        if(fsHandler != null) {
+            return true;
+        }
+        else {
+            JOptionPane.showMessageDialog(this, "No file system " +
+                    "loaded.", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
     }
 
     private void exitApplication() {
@@ -730,8 +739,11 @@ public class FileSystemBrowserWindow extends JFrame {
         if(fsType == FileSystemRecognizer.FileSystemType.HFS_PLUS ||
                 fsType == FileSystemRecognizer.FileSystemType.HFSX ||
                 fsType == FileSystemRecognizer.FileSystemType.HFS) {
+            
+            fsb.setRoot(null);
             if(fsHandler != null) {
                 fsHandler.close();
+                fsHandler = null;
             }
 
             final FileSystemMajorType fsMajorType;

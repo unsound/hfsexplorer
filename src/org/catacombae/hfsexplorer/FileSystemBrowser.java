@@ -32,6 +32,7 @@ import java.awt.event.MouseEvent;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -63,6 +64,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.ExpandVetoException;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import org.catacombae.hfsexplorer.gui.FilesystemBrowserPanel;
@@ -196,6 +198,12 @@ public class FileSystemBrowser<A> {
 	totalColumnWidth = 180+96+120+120;
 	fileTable.getColumnModel().getColumn(4).setMinWidth(0);
 	fileTable.getColumnModel().getColumn(4).setResizable(false);
+        
+        if(Java6Specific.isJava6OrHigher()) {
+            
+            Comparator c = new ComparableComparator();
+            Java6Specific.addRowSorter(fileTable, tableModel, c, c, c, c, c);
+        }
 
 	TableColumnModelListener columnListener = new TableColumnModelListener() {
 		private boolean locked = false;
@@ -358,9 +366,11 @@ public class FileSystemBrowser<A> {
                      * selection size. */
                     
 		    int[] selection = fileTable.getSelectedRows();
+                    
+                    //Object[] selection = fileTable.getSelection();
 		    long selectionSize = 0;
 		    for(int selectedRow : selection) {
-			Object o = tableModel.getValueAt(selectedRow, 0);
+			Object o = fileTable.getValueAt(selectedRow, 0);
 			
 			if(o instanceof RecordContainer) {
 			    Record rec = ((RecordContainer)o).getRecord(genericPlaceholder);
@@ -419,7 +429,7 @@ public class FileSystemBrowser<A> {
 			int col = fileTable.columnAtPoint(e.getPoint());
 			if(col == 0 && row >= 0) {
 			    //System.err.println("Double click at (" + row + "," + col + ")");
-			    Object colValue = fileTable.getModel().getValueAt(row, col);
+			    Object colValue = fileTable.getValueAt(row, col);
 			    //System.err.println("  Value class: " + colValue.getClass());
 			    if(colValue instanceof RecordContainer) {
                                 Record<A> rec = ((RecordContainer)colValue).getRecord(genericPlaceholder);
@@ -452,11 +462,10 @@ public class FileSystemBrowser<A> {
 		    }
 		}
 	    });
-	DefaultMutableTreeNode rootNode = new NoLeafMutableTreeNode("No file system loaded");
-	treeModel = new DefaultTreeModel(rootNode);
-	dirTree.setModel(treeModel);
-	dirTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-	
+
+        setRoot(null);
+       	dirTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        
 	dirTree.addTreeSelectionListener(new TreeSelectionListener() {
                 @Override
 		public void valueChanged(TreeSelectionEvent e) {
@@ -625,6 +634,9 @@ public class FileSystemBrowser<A> {
     }
     
     private void actionTreeNodeSelected(TreePath selectionPath) {
+        // System.err.println("actionTreeNodeSelected(" + selectionPath.toString() + ");");
+        // System.err.println("  path count: " + selectionPath.getPathCount());
+        // System.err.println("  type of last component: " + selectionPath.getLastPathComponent().getClass());
         // If we have selected another node type than FolderTreeNode, we don't do anything.
         if(selectionPath.getLastPathComponent() instanceof FolderTreeNode) {
             if(ensureFileSystemLoaded()) {
@@ -865,24 +877,16 @@ public class FileSystemBrowser<A> {
             tableModel.removeRow(tableModel.getRowCount()-1);
 	}
 	
+        DateFormat dti = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+        int i = 0;
 	for(Record<A> rec : contents) {
 	    Vector<Object> currentRow = new Vector<Object>(4);
 	    
             currentRow.add(new RecordContainer(rec));
-            currentRow.add(SpeedUnitUtils.bytesToBinaryUnit(rec.getSize()));
-	    if(rec.getType() == RecordType.FILE) {
-		currentRow.add("File");
-	    }
-	    else if(rec.getType() == RecordType.FOLDER) {
-		currentRow.add("Folder");
-	    }
-	    else
-		throw new RuntimeException("INTERNAL ERROR: Encountered " +
-                        "unexpected record type (" + rec.getType() + ")");
-            
-            DateFormat dti = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-            currentRow.add("" + dti.format(rec.getModifyDate()));
-            currentRow.add("");
+            currentRow.add(new SizeEntry(rec.getSize()));
+            currentRow.add(new RecordTypeEntry(rec.getType()));
+            currentRow.add(new DateEntry(rec.getModifyDate(), dti));
+            currentRow.add(new IndexEntry(i++));
             
             tableModel.addRow(currentRow);
 	}
@@ -998,7 +1002,7 @@ public class FileSystemBrowser<A> {
             ArrayList<Record<A>> actualResult =
                     new ArrayList<Record<A>>(selectedRows.length);
             for(int i = 0; i < selectedRows.length; ++i) {
-                Object o = tableModel.getValueAt(selectedRows[i], 0);
+                Object o = fileTable.getValueAt(selectedRows[i], 0);
                 if(o instanceof RecordContainer) {
                     Record<A> rekk = ((RecordContainer) o).getRecord(genericPlaceholder);
                     actualResult.add(rekk);
@@ -1032,6 +1036,7 @@ public class FileSystemBrowser<A> {
             return true;
         }
         else {
+            new Exception().printStackTrace();
             JOptionPane.showMessageDialog(viewComponent, "No file system " +
                     "loaded.", "Error", JOptionPane.ERROR_MESSAGE);
             return false;
@@ -1039,21 +1044,41 @@ public class FileSystemBrowser<A> {
     }
     
     public void setRoot(Record<A> rootRecord) {
-        List<Record<A>> rootRecordPath = new ArrayList<Record<A>>(1);
-        rootRecordPath.add(rootRecord);
-        
-        FolderTreeNode rootNode =
-                new FolderTreeNode(new RecordContainer(rootRecord));
-        
-	populateTreeNodeFromPath(rootNode, rootRecordPath);
-	treeModel = new DefaultTreeModel(rootNode);
-	dirTree.setModel(treeModel);
+        final TreeNode rootNode;
+        final List<Record<A>> rootRecordPath;
+        if(rootRecord != null) {
+            rootRecordPath = new ArrayList<Record<A>>(1);
+            rootRecordPath.add(rootRecord);
+
+            FolderTreeNode rootTreeNode =
+                    new FolderTreeNode(new RecordContainer(rootRecord));
+
+            populateTreeNodeFromPath(rootTreeNode, rootRecordPath);
+            rootNode = rootTreeNode;
+        }
+        else {
+            rootRecordPath = null;
+            rootNode = new NoLeafMutableTreeNode("No file system loaded");
+        }
+
+        treeModel = new DefaultTreeModel(rootNode);
+        // System.err.print("Setting tree model...");
+        dirTree.setModel(treeModel);
+        // System.err.println("done!");
         
         lastTreeSelectionPath = new TreePath(rootNode);
+        // System.err.print("Doing select in tree...");
         selectInTree(lastTreeSelectionPath);
-
-	populateTableFromPath(rootRecordPath);
+        // System.err.println("done!");
+        if(rootRecordPath != null) {
+            populateTableFromPath(rootRecordPath);
+        }
+        else
+            populateTableFromContents(new ArrayList<Record<A>>(0), "");
+        
+        // System.err.print("Setting selection status...");
         setSelectionStatus(0, 0);
+        // System.err.println("done!");
     }
 
     private void selectInTree(TreePath childPath) {
@@ -1180,7 +1205,7 @@ public class FileSystemBrowser<A> {
     }
     
     public static enum RecordType {
-        FILE, FOLDER, SYMBOLIC_LINK;
+        FILE, FOLDER, FILE_LINK, FOLDER_LINK;
     }
     
     public static class Record<A> {
@@ -1254,7 +1279,7 @@ public class FileSystemBrowser<A> {
     }
     
     /** Aggregation class for storage in the first column of fileTable. */
-    private static class RecordContainer {
+    private static class RecordContainer implements Comparable {
 	private Record rec;
         
 	private RecordContainer() {}
@@ -1272,6 +1297,169 @@ public class FileSystemBrowser<A> {
         }
         
         @Override public String toString() { return rec.getName(); }
+
+        @Override
+        public int compareTo(Object o) {
+            if(o instanceof RecordContainer) {
+                RecordContainer rc = (RecordContainer)o;
+                return toString().compareTo(rc.toString());
+            }
+            else
+                throw new RuntimeException("Can not compare a RecordContainer with a " + o.getClass());
+        }
+    }
+    
+    /**
+     * Wrapper for the size field in the table.
+     */
+    private static class SizeEntry implements Comparable {
+        private final String presentedSize;
+        private final long trueSize;
+
+        public SizeEntry(long trueSize) {
+            this.trueSize = trueSize;
+            this.presentedSize = SpeedUnitUtils.bytesToBinaryUnit(trueSize);
+        }
+        
+        public long getSize() { return trueSize; }
+        
+        @Override
+        public int compareTo(Object o) {
+            if(o instanceof SizeEntry) {
+                SizeEntry se = (SizeEntry) o;
+                long res = trueSize - se.trueSize;
+                if(res > 0)
+                    return 1;
+                else if(res < 0)
+                    return -1;
+                else
+                    return 0;
+            }
+            else
+                throw new RuntimeException("Can not compare a SizeEntry with a " + o.getClass());
+        }
+        
+        @Override
+        public String toString() {
+            return presentedSize;
+        }
+    }
+
+    public static class RecordTypeEntry implements Comparable {
+        private final RecordType recordType;
+        private final String displayString;
+        
+        public RecordTypeEntry(RecordType recordType) {
+            this.recordType = recordType;
+            
+            switch(recordType) {
+                case FILE:
+                    displayString = "File";
+                    break;
+                case FOLDER:
+                    displayString = "Folder";
+                    break;
+                case FILE_LINK:
+                    displayString = "File (symlink)";
+                    break;
+                case FOLDER_LINK:
+                    displayString = "Folder (symlink)";
+                    break;
+                default:
+                    throw new RuntimeException("INTERNAL ERROR: Encountered " +
+                        "unexpected record type (" + recordType + ")");
+            }
+        }
+        
+        public RecordType getRecordType() { return recordType; }
+        
+        @Override
+        public String toString() {
+            return displayString;
+        }
+        
+        private int getPriority() {
+            switch(recordType) {
+                case FILE:
+                    return 1;
+                case FOLDER:
+                    return 0;
+                case FILE_LINK:
+                    return 1;
+                case FOLDER_LINK:
+                    return 0;
+                default:
+                    throw new RuntimeException("INTERNAL ERROR: Encountered " +
+                        "unexpected record type (" + recordType + ")");
+            }
+        }
+
+        @Override
+        public int compareTo(Object o) {
+            if(o instanceof RecordTypeEntry) {
+                RecordTypeEntry rte = (RecordTypeEntry)o;
+                return getPriority()-rte.getPriority();
+            }
+            else
+                throw new RuntimeException("Can not compare a RecordTypeEntry to a " + o.getClass());
+        }
+    }
+    
+    private static class DateEntry implements Comparable {
+        private final Date date;
+        private final String displayString;
+        
+        public DateEntry(Date date, DateFormat formatter) {
+            this.date = date;
+            this.displayString = formatter.format(date);
+        }
+        
+        public Date getDate() { return date; }
+        
+        @Override
+        public String toString() {
+            return displayString;
+        }
+
+        @Override
+        public int compareTo(Object o) {
+            if(o instanceof DateEntry) {
+                DateEntry de = (DateEntry)o;
+                return date.compareTo(de.date);
+            }
+            else
+                throw new RuntimeException("Can not compare a DateEntry to a " + o.getClass());
+        }
+    }
+    
+    private static class IndexEntry implements Comparable<IndexEntry> {
+        private final int index;
+        
+        public IndexEntry(int index) {
+            this.index = index;
+        }
+        
+        @Override
+        public int compareTo(IndexEntry o) {
+            return index-o.index;
+        }
+        
+        @Override
+        public String toString() { return ""; }
+    }
+    
+    private static class ComparableComparator implements Comparator {
+
+        @Override
+        public int compare(Object o1, Object o2) {
+            System.err.println("ComparableComparator comparing a " + o1.getClass() + " and a " + o2.getClass());
+            if(o1 instanceof Comparable && o2 instanceof Comparable) {
+                return ((Comparable)o1).compareTo(o2);
+            }
+            else
+                throw new UnsupportedOperationException("Trying to compare non-Comparables.");
+        }
+        
     }
     
     public static class NoLeafMutableTreeNode extends DefaultMutableTreeNode {

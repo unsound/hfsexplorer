@@ -1,6 +1,32 @@
 HFSExplorer Changelog
 ---------------------
 
+todo
+----
+- Write support.
+- Add support for accessing floppy drives containing HFS file systems. (can floppies be
+  emulated in SheepShaver?)
+- Memory usage when parsing UDIF XML MUST BE REDUCED TO CONSTANT.
+- Opening files with default handler in windows may fail when the file name matches an
+  executable in $PATH (in which case the executable is run instead of the file).
+- Symlink support in FSB.
+- Display error report after extraction, if any errors occurred.
+
+current
+-------
+- Experimental support for older HFS (Mac OS Original) file systems.
+- Ability to create a read/write disk image (.dmg) from a loaded file system.
+- Java 6+ only: Table header sorting for the file table is now working. The last (empty)
+  column will sort on the internal sort order, if you need to abort your sorting choices.
+- Major restructuring/modularization of core components to ease future development.
+- Bugfix: Specifying a device path as argument when launching the app failed previously
+  due to incorrect assumptions about input data.
+- Bugfix: Caching layer was suffering from a logic error, mostly encountered when reading
+  very small filesystems (such as disk images), which then could not be loaded.
+- Bugfix: Corrected a small rounding error that affected the last digit of displayed file
+  sizes, making 4,5 KiB files appear as 5 KiB files instead of 4 KiB (only affected what
+  was presented to the user, and none of the internal workings).
+
 0.19.5
 ------
 - HFSX support can be considered stable as I have got no reports on any related problems.

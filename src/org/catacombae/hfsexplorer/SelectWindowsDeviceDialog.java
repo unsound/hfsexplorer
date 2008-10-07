@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2006 Erik Larsson
+ * Copyright (C) 2006-2008 Erik Larsson
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -77,17 +77,20 @@ public class SelectWindowsDeviceDialog extends JDialog {
 	}
 	
 	autodetectButton.addActionListener(new ActionListener() {
+                @Override
 		public void actionPerformed(ActionEvent ae) {
 		    autodetectFilesystems();
 		}
 	    });
 	detectedDevicesCombo.addItemListener(new ItemListener() {
+                @Override
 		public void itemStateChanged(ItemEvent ie) {
 		    if(ie.getStateChange() == ItemEvent.SELECTED)
 			specifyDeviceNameField.setText(DEVICE_PREFIX + ie.getItem().toString());
 		}
 	    });
 	selectDeviceButton.addActionListener(new ActionListener() {
+                @Override
 		public void actionPerformed(ActionEvent ae) {
 		    detectedDevicesCombo.setEnabled(true);
 		    specifyDeviceNameField.setEnabled(false);
@@ -95,12 +98,14 @@ public class SelectWindowsDeviceDialog extends JDialog {
 		}
 	    });
 	specifyDeviceNameButton.addActionListener(new ActionListener() {
+                @Override
 		public void actionPerformed(ActionEvent ae) {
 		    detectedDevicesCombo.setEnabled(false);
 		    specifyDeviceNameField.setEnabled(true);
 		}
 	    });
 	loadButton.addActionListener(new ActionListener() {
+                @Override
 		public void actionPerformed(ActionEvent ae) {
 		    resultCreatePath = specifyDeviceNameField.getText();
 		    result = new WindowsLowLevelIO(resultCreatePath);
@@ -108,6 +113,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
 		}
 	    });
 	cancelButton.addActionListener(new ActionListener() {
+                @Override
 		public void actionPerformed(ActionEvent ae) {
 		    setVisible(false);
 		}
