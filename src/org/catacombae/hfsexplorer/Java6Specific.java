@@ -30,9 +30,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
 public class Java6Specific {
-    public static boolean isJava6OrHigher() {
-	return System.getProperty("java.vm.version").compareTo("1.6") >= 0;
-    }
     public static boolean canOpen() {
 	return Desktop.getDesktop().isSupported(Desktop.Action.OPEN);
     }
