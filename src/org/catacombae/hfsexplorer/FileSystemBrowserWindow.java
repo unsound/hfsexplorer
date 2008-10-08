@@ -120,7 +120,7 @@ public class FileSystemBrowserWindow extends JFrame {
         super(TITLE_STRING);
         this.dcw = dcw;
 
-        if(Java6Specific.isJava6OrHigher()) {
+        if(Util.isJava6OrHigher()) {
             Java6Specific.setIconImages(WINDOW_ICONS, this);
         }
         else {
@@ -871,7 +871,7 @@ public class FileSystemBrowserWindow extends JFrame {
                 }
             };
         }
-        else if(Java6Specific.isJava6OrHigher() && Java6Specific.canOpen()) {
+        else if(Util.isJava6OrHigher() && Java6Specific.canOpen()) {
             //System.err.println("Java 1.6 detected.");
             alOpen = new ActionListener() {
                 @Override

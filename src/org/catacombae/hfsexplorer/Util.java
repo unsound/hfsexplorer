@@ -23,7 +23,15 @@ import java.io.*;
 
 public class Util {
     public static int sectorSize = 0x800;
-    
+
+    /**
+     * Tests whether the current VM is a Java 6 or higher VM.
+     * @return
+     */
+    public static boolean isJava6OrHigher() {
+    	return System.getProperty("java.vm.version").compareTo("1.6") >= 0;
+    }
+
     public static String byteArrayToHexString(byte[] array) { 
 	return byteArrayToHexString(array, 0, array.length);
     }

@@ -199,7 +199,7 @@ public class FileSystemBrowser<A> {
 	fileTable.getColumnModel().getColumn(4).setMinWidth(0);
 	fileTable.getColumnModel().getColumn(4).setResizable(false);
         
-        if(Java6Specific.isJava6OrHigher()) {
+        if(Util.isJava6OrHigher()) {
             
             Comparator c = new ComparableComparator();
             Java6Specific.addRowSorter(fileTable, tableModel, c, c, c, c, c);
