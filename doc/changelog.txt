@@ -13,13 +13,14 @@ todo
   make links of unknown kind (resource fork has data, data fork hasn't).
 - Display error report after extraction, if any errors occurred.
 - Changing character encoding for HFS.
-- Create a proper password dialog for typing CEncryptedEncoding password.
+- Fix all graphical glitches related to HFS vs. HFS+ vs. Common.
 
 current
 -------
-- Experimental support for reading encrypted UDIF and raw disk images (.dmg) on the fly.
-  Feedback is much appreciated, as I can only generate a certain amount of test cases.
-- Experimental support for older HFS (Mac OS Original) file systems.
+- Experimental support for reading encrypted UDIF and raw disk images (.dmg). Feedback
+  is much appreciated, as I can only generate a certain amount of test cases.
+- Experimental support for older HFS (Mac OS Original) file systems. Feedback is much
+  appreciated here as well.
 - Ability to create a read/write disk image (.dmg) from a loaded file system.
 - Java 6+ only: Table header sorting for the file table is now working. The last (empty)
   column will sort on the internal sort order, if you need to abort your sorting choices.
@@ -30,7 +31,9 @@ current
   very small filesystems (such as disk images), which then could not be loaded.
 - Bugfix: Corrected a small rounding error that affected the last digit of displayed file
   sizes, making 4,5 KiB files appear as 5 KiB files instead of 4 KiB (only affected what
-  was presented to the user, and none of the internal workings).
+  was presented to the user, and none of the internal workings). Whether this is the
+  correct way of displaying a file size is arguable, but it's a floor estimate, and
+  usually much more usable.
 
 0.19.5
 ------

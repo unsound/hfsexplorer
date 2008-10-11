@@ -62,7 +62,7 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
         upButton = new javax.swing.JButton();
         infoButton = new javax.swing.JButton();
 
-        treeTableSplit.setDividerLocation(150);
+        treeTableSplit.setDividerLocation(200);
         treeTableSplit.setContinuousLayout(true);
 
         dirTreeScroller.setViewportView(dirTree);
@@ -120,12 +120,12 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .add(pathLabel)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(addressField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 598, Short.MAX_VALUE)
+                .add(addressField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 625, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(goButton)
                 .addContainerGap())
-            .add(statusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 699, Short.MAX_VALUE)
-            .add(treeTableSplit, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 699, Short.MAX_VALUE)
+            .add(statusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 726, Short.MAX_VALUE)
+            .add(treeTableSplit, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 726, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(upButton)
@@ -133,7 +133,7 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
                 .add(extractButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(infoButton)
-                .addContainerGap(512, Short.MAX_VALUE))
+                .addContainerGap(539, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -149,7 +149,7 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
                     .add(addressField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(goButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(treeTableSplit, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE)
+                .add(treeTableSplit, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(statusLabel))
         );

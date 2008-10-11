@@ -19,13 +19,13 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="pathLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="addressField" pref="598" max="32767" attributes="0"/>
+              <Component id="addressField" pref="625" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="goButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="statusLabel" alignment="0" pref="699" max="32767" attributes="0"/>
-          <Component id="treeTableSplit" alignment="0" pref="699" max="32767" attributes="0"/>
+          <Component id="statusLabel" alignment="0" pref="726" max="32767" attributes="0"/>
+          <Component id="treeTableSplit" alignment="0" pref="726" max="32767" attributes="0"/>
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="upButton" min="-2" max="-2" attributes="0"/>
@@ -33,7 +33,7 @@
               <Component id="extractButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="infoButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="512" max="32767" attributes="0"/>
+              <EmptySpace pref="539" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -53,7 +53,7 @@
                   <Component id="goButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="treeTableSplit" pref="359" max="32767" attributes="0"/>
+              <Component id="treeTableSplit" pref="400" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="statusLabel" min="-2" max="-2" attributes="0"/>
           </Group>
@@ -63,7 +63,7 @@
   <SubComponents>
     <Container class="javax.swing.JSplitPane" name="treeTableSplit">
       <Properties>
-        <Property name="dividerLocation" type="int" value="150"/>
+        <Property name="dividerLocation" type="int" value="200"/>
         <Property name="continuousLayout" type="boolean" value="true"/>
       </Properties>
 
