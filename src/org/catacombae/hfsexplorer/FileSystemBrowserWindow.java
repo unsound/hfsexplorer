@@ -23,8 +23,6 @@ import org.catacombae.hfsexplorer.fs.NullProgressMonitor;
 import org.catacombae.hfsexplorer.fs.ProgressMonitor;
 import org.catacombae.hfsexplorer.gui.FileOperationsPanel;
 import org.catacombae.hfsexplorer.helpbrowser.HelpBrowserPanel;
-import org.catacombae.hfsexplorer.io.ReadableUDIFStream;
-import org.catacombae.hfsexplorer.io.SynchronizedReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.partitioning.Partition;
 import org.catacombae.hfsexplorer.partitioning.PartitionSystem;
 import org.catacombae.hfsexplorer.types.hfs.ExtDescriptor;
@@ -81,8 +79,9 @@ import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
-import org.catacombae.dmgextractor.DmgException;
+import org.catacombae.dmgextractor.encodings.encrypted.ReadableCEncryptedEncodingStream;
 import org.catacombae.jparted.lib.DataLocator;
+import org.catacombae.udif.UDIFRandomAccessStream;
 
 public class FileSystemBrowserWindow extends JFrame {
     private static final String TITLE_STRING = "HFSExplorer " + HFSExplorer.VERSION;
@@ -590,12 +589,41 @@ public class FileSystemBrowserWindow extends JFrame {
                 fsFile = new ReadableFileStream(filename);
             }
             try {
-                //System.err.println("Trying to autodetect UDIF structure...");
+                System.err.println("Trying to detect CEncryptedEncoding structure...");
+                if(ReadableCEncryptedEncodingStream.isCEncryptedEncoding(fsFile)) {
+                    System.err.println("CEncryptedEncoding structure found! Creating filter stream...");
+                    String res = JOptionPane.showInputDialog(null,
+                        "The disk image you are trying to read is encrypted.\n" +
+                        "Please type your password:", "Password protected image",
+                        JOptionPane.QUESTION_MESSAGE);
+                    while(res != null) {
+                        try {
+                            ReadableCEncryptedEncodingStream stream =
+                                    new ReadableCEncryptedEncodingStream(fsFile, res.toCharArray());
+                            fsFile = stream;
+                            break;
+                        } catch(Exception e) {
+                            res = JOptionPane.showInputDialog(null,
+                                "Incorrect password, please try again:\n", "Password protected image",
+                                JOptionPane.QUESTION_MESSAGE);
+                        }
+                    }
+                }
+                else {
+                    System.err.println("CEncryptedEncoding structure not found. Proceeding...");
+                }
+            } catch(Exception e) {
+                System.err.println("[INFO] Non-critical exception while trying to detect CEncryptedEncoding structure:");
+                e.printStackTrace();
+            }
+            
+            try {
+                System.err.println("Trying to detect UDIF structure...");
                 if(UDIFRecognizer.isUDIF(fsFile)) {
-                    //System.err.println("UDIF structure found! Creating stream...");
-                    ReadableUDIFStream stream = null;
+                    System.err.println("UDIF structure found! Creating filter stream...");
+                    UDIFRandomAccessStream stream = null;
                     try {
-                        stream = new ReadableUDIFStream(filename);
+                        stream = new UDIFRandomAccessStream(fsFile);
                     } catch(Exception e) {
                         e.printStackTrace();
                         if(e.getMessage().startsWith("java.lang.RuntimeException: No handler for block type")) {
@@ -613,12 +641,11 @@ public class FileSystemBrowserWindow extends JFrame {
                         return;
                     }
                     if(stream != null) {
-                        fsFile.close();
                         fsFile = stream;
                     }
                 }
                 else {
-                    System.err.println("UDIF structure not found. Proceeding normally...");
+                    System.err.println("UDIF structure not found. Proceeding...");
                 }
             } catch(Exception e) {
                 System.err.println("[INFO] Non-critical exception while trying to detect UDIF structure:");

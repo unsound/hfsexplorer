@@ -9,11 +9,16 @@ todo
 - Memory usage when parsing UDIF XML MUST BE REDUCED TO CONSTANT.
 - Opening files with default handler in windows may fail when the file name matches an
   executable in $PATH (in which case the executable is run instead of the file).
-- Symlink support in FSB.
+- Symlink support in FSB. Especially: Investigate Time Machine backups, as they seem to
+  make links of unknown kind (resource fork has data, data fork hasn't).
 - Display error report after extraction, if any errors occurred.
+- Changing character encoding for HFS.
+- Create a proper password dialog for typing CEncryptedEncoding password.
 
 current
 -------
+- Experimental support for reading encrypted UDIF and raw disk images (.dmg) on the fly.
+  Feedback is much appreciated, as I can only generate a certain amount of test cases.
 - Experimental support for older HFS (Mac OS Original) file systems.
 - Ability to create a read/write disk image (.dmg) from a loaded file system.
 - Java 6+ only: Table header sorting for the file table is now working. The last (empty)
