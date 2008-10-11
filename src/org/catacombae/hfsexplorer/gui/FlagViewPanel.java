@@ -52,6 +52,7 @@ public class FlagViewPanel extends javax.swing.JPanel {
         flagLabel.setText("jLabel1");
 
         flagBox.setText(" ");
+        flagBox.setFocusable(false);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);

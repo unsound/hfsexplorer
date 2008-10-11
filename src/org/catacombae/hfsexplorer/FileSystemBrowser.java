@@ -740,10 +740,10 @@ public class FileSystemBrowser<A> {
     
     private void populateTreeNodeFromContents(FolderTreeNode nodeToPopulate,
             List<Record<A>> childRecords) {
-            System.err.println("populateTreeNodeFromContents called for " + nodeToPopulate.getUserObject().toString());
+        //System.err.println("populateTreeNodeFromContents called for " + nodeToPopulate.getUserObject().toString());
         
         final Queue<Record<A>> remainingQueue;
-        
+
         { // Initialize remainingQueue
             final LinkedList<Record<A>> remainingRecords = new LinkedList<Record<A>>();
             for(Record<A> childRecord : childRecords) {
@@ -753,7 +753,7 @@ public class FileSystemBrowser<A> {
             }
             remainingQueue = remainingRecords;
         }
-        
+
         final List<FolderTreeNode> currentNodes;
         { // Initialize currentNodes
             currentNodes = new ArrayList<FolderTreeNode>(nodeToPopulate.getChildCount());
@@ -812,7 +812,7 @@ public class FileSystemBrowser<A> {
                 insertedRecordIndicesArray[i++] = index;
             }
         }
-        System.err.println("nodesWereInserted: " + insertedRecordIndicesArray.length);
+        //System.err.println("nodesWereInserted: " + insertedRecordIndicesArray.length);
         if(insertedRecordIndicesArray.length > 0) {
             treeModel.nodesWereInserted(nodeToPopulate, insertedRecordIndicesArray);        // 1. Remove those nodes that should be removed
         }
@@ -831,7 +831,7 @@ public class FileSystemBrowser<A> {
             for(int i : removedIndices) {
                 nodeToPopulate.remove(i);
             }
-            System.err.println("nodesWereRemoved: " + removedIndices.length);
+            //System.err.println("nodesWereRemoved: " + removedIndices.length);
             if(removedIndices.length > 0) {
                 treeModel.nodesWereRemoved(nodeToPopulate, removedIndices, removedChildren);
             }
@@ -849,13 +849,13 @@ public class FileSystemBrowser<A> {
                 }
                 ++index;
             }
-            System.err.println("nodesChanged: " + updatedIndices.length);
+            //System.err.println("nodesChanged: " + updatedIndices.length);
             if(updatedIndices.length > 0) {
                 treeModel.nodesChanged(nodeToPopulate, updatedIndices);
             }
         }
     }
-    
+  
     private List<String> asNameList(List<Record<A>> recordList) {
         ArrayList<String> res = new ArrayList<String>();
         for(Record<A> rec : recordList)
@@ -1452,7 +1452,7 @@ public class FileSystemBrowser<A> {
 
         @Override
         public int compare(Object o1, Object o2) {
-            System.err.println("ComparableComparator comparing a " + o1.getClass() + " and a " + o2.getClass());
+            //System.err.println("ComparableComparator comparing a " + o1.getClass() + " and a " + o2.getClass());
             if(o1 instanceof Comparable && o2 instanceof Comparable) {
                 return ((Comparable)o1).compareTo(o2);
             }
