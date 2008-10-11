@@ -52,16 +52,18 @@ public class Java6Specific {
      * 
      * @param fileTable
      * @param tableModel
+     * @param defaultSortColumn
      * @param columnComparators
      */
     public static void addRowSorter(JTable table, DefaultTableModel tableModel,
-            Comparator... columnComparators) {
+            int defaultSortColumn, Comparator... columnComparators) {
         TableRowSorter sorter = new TableRowSorter<DefaultTableModel>(tableModel);
         for(int i = 0; i < columnComparators.length; ++i) {
             Comparator c = columnComparators[i];
             if(c != null)
                 sorter.setComparator(i, c);
         }
+        sorter.toggleSortOrder(defaultSortColumn);
         table.setRowSorter(sorter);
     }
 }

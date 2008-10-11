@@ -202,7 +202,7 @@ public class FileSystemBrowser<A> {
         if(Util.isJava6OrHigher()) {
             
             Comparator c = new ComparableComparator();
-            Java6Specific.addRowSorter(fileTable, tableModel, c, c, c, c, c);
+            Java6Specific.addRowSorter(fileTable, tableModel, 4, c, c, c, c, c);
         }
 
 	TableColumnModelListener columnListener = new TableColumnModelListener() {

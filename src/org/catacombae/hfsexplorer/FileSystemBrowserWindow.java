@@ -80,6 +80,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import org.catacombae.dmgextractor.encodings.encrypted.ReadableCEncryptedEncodingStream;
+import org.catacombae.dmgextractor.ui.PasswordDialog;
 import org.catacombae.jparted.lib.DataLocator;
 import org.catacombae.udif.UDIFRandomAccessStream;
 
@@ -592,20 +593,22 @@ public class FileSystemBrowserWindow extends JFrame {
                 System.err.println("Trying to detect CEncryptedEncoding structure...");
                 if(ReadableCEncryptedEncodingStream.isCEncryptedEncoding(fsFile)) {
                     System.err.println("CEncryptedEncoding structure found! Creating filter stream...");
-                    String res = JOptionPane.showInputDialog(null,
-                        "The disk image you are trying to read is encrypted.\n" +
-                        "Please type your password:", "Password protected image",
-                        JOptionPane.QUESTION_MESSAGE);
-                    while(res != null) {
-                        try {
-                            ReadableCEncryptedEncodingStream stream =
-                                    new ReadableCEncryptedEncodingStream(fsFile, res.toCharArray());
-                            fsFile = stream;
-                            break;
-                        } catch(Exception e) {
-                            res = JOptionPane.showInputDialog(null,
-                                "Incorrect password, please try again:\n", "Password protected image",
-                                JOptionPane.QUESTION_MESSAGE);
+                    while(true) {
+                        char[] res = PasswordDialog.showDialog(null, "Reading encrypted disk image...",
+                                "You need to enter a password to unlock this disk image:");
+                        if(res == null)
+                            return;
+                        else {
+                            try {
+                                ReadableCEncryptedEncodingStream stream =
+                                        new ReadableCEncryptedEncodingStream(fsFile, res);
+                                fsFile = stream;
+                                break;
+                            } catch(Exception e) {
+                                JOptionPane.showMessageDialog(null,
+                                        "Incorrect password.", "Reading encrypted disk image...",
+                                        JOptionPane.ERROR_MESSAGE);
+                            }
                         }
                     }
                 }
