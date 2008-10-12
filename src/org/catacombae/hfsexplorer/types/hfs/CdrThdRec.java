@@ -1,6 +1,8 @@
 package org.catacombae.hfsexplorer.types.hfs;
 
 import java.io.PrintStream;
+import org.catacombae.csjc.structelements.ASCIIStringField;
+import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfsexplorer.Util;
 
 /**
@@ -84,5 +86,23 @@ public class CdrThdRec extends CatDataRec {
         System.arraycopy(thdCNameLen, 0, result, offset, thdCNameLen.length); offset += thdCNameLen.length;
         System.arraycopy(thdCName, 0, result, offset, thdCName.length); offset += thdCName.length;
         return result;
+    }
+    
+    @Override
+    public int size() {
+        return length();
+    }
+    
+    @Override
+    public Dictionary getStructElements() {
+        DictionaryBuilder db = new DictionaryBuilder(CdrThdRec.class.getSimpleName());
+        
+        db.addAll(super.getSuperStructElements());
+        db.addIntArray("thdResrv", thdResrv, BITS_32, UNSIGNED, BIG_ENDIAN);
+        db.addUIntBE("thdParID", thdParID);
+        db.addUIntBE("thdCNameLen", thdCNameLen);
+        db.add("thdCName", new ASCIIStringField(thdCName));
+        
+        return db.getResult();
     }
 }

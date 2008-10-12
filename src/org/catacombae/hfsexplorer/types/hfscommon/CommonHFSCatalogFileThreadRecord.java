@@ -6,6 +6,8 @@
 package org.catacombae.hfsexplorer.types.hfscommon;
 
 import java.io.PrintStream;
+import org.catacombae.csjc.PrintableStruct;
+import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogKey;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogThread;
 import org.catacombae.hfsexplorer.types.hfs.CatKeyRec;
@@ -15,7 +17,7 @@ import org.catacombae.hfsexplorer.types.hfs.CdrFThdRec;
  *
  * @author erik
  */
-public class CommonHFSCatalogFileThreadRecord extends CommonHFSCatalogLeafRecord {
+public class CommonHFSCatalogFileThreadRecord extends CommonHFSCatalogLeafRecord implements PrintableStruct {
     private CommonHFSCatalogKey key;
     private CommonHFSCatalogFileThread data;
     
@@ -36,15 +38,26 @@ public class CommonHFSCatalogFileThreadRecord extends CommonHFSCatalogLeafRecord
     
     @Override
     public void print(PrintStream ps, String prefix) {
-        ps.println(prefix + getClass().getSimpleName() + ":");
+        ps.println(prefix + CommonHFSCatalogFileThreadRecord.class.getSimpleName() + ":");
         printFields(ps, prefix + " ");
     }
 
+    @Override
     public void printFields(PrintStream ps, String prefix) {
         ps.println(prefix + "key:");
         key.print(ps, prefix + " ");
         ps.println(prefix + "data:");
         data.print(ps, prefix + " ");
+    }
+
+    @Override
+    public Dictionary getStructElements() {
+        DictionaryBuilder db = new DictionaryBuilder(CommonHFSCatalogFileThreadRecord.class.getSimpleName());
+
+        db.add("key", key.getStructElements());
+        db.add("data", data.getStructElements());
+            
+        return db.getResult();
     }
 
     public static CommonHFSCatalogFileThreadRecord create(HFSPlusCatalogKey key,

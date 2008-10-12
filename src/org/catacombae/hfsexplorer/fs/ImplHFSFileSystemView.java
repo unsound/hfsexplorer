@@ -18,6 +18,7 @@
 package org.catacombae.hfsexplorer.fs;
 
 import org.catacombae.hfsexplorer.Util;
+import org.catacombae.hfsexplorer.types.hfscommon.StringDecoder;
 import org.catacombae.hfsexplorer.types.hfsplus.JournalInfoBlock;
 import org.catacombae.hfsexplorer.types.hfs.BTHdrRec;
 import org.catacombae.hfsexplorer.types.hfs.CatKeyRec;
@@ -52,36 +53,40 @@ public class ImplHFSFileSystemView extends BaseHFSFileSystemView {
     
     protected static final CatalogOperations HFS_OPERATIONS = new CatalogOperations() {
 
+        @Override
         public CommonHFSCatalogIndexNode newCatalogIndexNode(
                 byte[] data, int offset, int nodeSize, CommonBTHeaderRecord bthr) {
             return CommonHFSCatalogIndexNode.createHFS(data, offset, nodeSize);
         }
 
+        @Override
         public CommonHFSCatalogKey newCatalogKey(
                 CommonHFSCatalogNodeID nodeID, CommonHFSCatalogString searchString, CommonBTHeaderRecord bthr) {
             return CommonHFSCatalogKey.create(new CatKeyRec(nodeID.toInt(), searchString.getBytes()));
         }
 
+        @Override
         public CommonHFSCatalogLeafNode newCatalogLeafNode(
                 byte[] data, int offset, int nodeSize, CommonBTHeaderRecord bthr) {
             return CommonHFSCatalogLeafNode.createHFS(data, offset, nodeSize);
         }
 
+        @Override
         public CommonHFSCatalogLeafRecord newCatalogLeafRecord(
                 byte[] data, int offset, CommonBTHeaderRecord bthr) {
             return CommonHFSCatalogLeafRecord.createHFS(data, offset, data.length-offset);
         }
     };
 
-    private CharsetStringDecoder stringDecoder;
+    private final MutableStringDecoder<CharsetStringDecoder> stringDecoder;
 
     public ImplHFSFileSystemView(ReadableRandomAccessStream hfsFile, long fsOffset, boolean cachingEnabled, String encodingName) {
-        this(hfsFile, fileReadOffset, HFS_OPERATIONS, cachingEnabled);
-        this.stringDecoder = new CharsetStringDecoder(encodingName);
+        this(hfsFile, fileReadOffset, HFS_OPERATIONS, cachingEnabled, encodingName);
     }
     
-    protected ImplHFSFileSystemView(ReadableRandomAccessStream hfsFile, long fsOffset, CatalogOperations catOps, boolean cachingEnabled) {
+    protected ImplHFSFileSystemView(ReadableRandomAccessStream hfsFile, long fsOffset, CatalogOperations catOps, boolean cachingEnabled, String encodingName) {
         super(hfsFile, fsOffset, catOps, cachingEnabled);
+        this.stringDecoder = new MutableStringDecoder(new CharsetStringDecoder(encodingName));
     }
 
 
@@ -179,15 +184,15 @@ public class ImplHFSFileSystemView extends BaseHFSFileSystemView {
      * @param encodingName the charset to use
      */
     public void setStringEncoding(String encodingName) {
-        this.stringDecoder = new CharsetStringDecoder(encodingName);
+        this.stringDecoder.setDecoder(new CharsetStringDecoder(encodingName));
     }
 
     public String getStringEncoding() {
-        return stringDecoder.getCharsetName();
+        return stringDecoder.getDecoder().getCharsetName();
     }
 
     @Override
-    public String getString(CommonHFSCatalogString str) {
+    public String decodeString(CommonHFSCatalogString str) {
         if(str instanceof CommonHFSCatalogString.HFSImplementation)
             return str.decode(stringDecoder);
         else

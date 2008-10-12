@@ -183,7 +183,7 @@ public class ImplHFSPlusFileSystemView extends BaseHFSFileSystemView {
     }
 
     @Override
-    public String getString(CommonHFSCatalogString str) {
+    public String decodeString(CommonHFSCatalogString str) {
         if(str instanceof CommonHFSCatalogString.HFSPlusImplementation) {
             char[] ca = Util.readCharArrayBE(str.getBytes());
             return new String(ca);

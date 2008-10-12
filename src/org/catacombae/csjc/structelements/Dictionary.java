@@ -24,19 +24,37 @@ public class Dictionary extends StructElement {
 
     private final String[] keys;
     private final Hashtable<String,StructElement> mappings;
-
-    Dictionary(String typeName, String[] keys, Hashtable<String,StructElement> mappings) {
+    private final Hashtable<String,String> descriptions;
+        
+    Dictionary(String typeName, String[] keys, Hashtable<String,StructElement> mappings,
+            Hashtable<String,String> descriptions) {
         super(typeName);
         this.keys = new String[keys.length];
         System.arraycopy(keys, 0, this.keys, 0, keys.length);
         this.mappings = new Hashtable<String,StructElement>();
+        this.descriptions = new Hashtable<String,String>();
         for(String key : keys) {
             this.mappings.put(key, mappings.get(key));
+            String description = descriptions.get(key);
+            if(description != null)
+                descriptions.put(key, description);
         }
     }
 
     public StructElement getElement(String name) {
         return mappings.get(name);
+    }
+    
+    /**
+     * Returns the associated description with variable <code>name</code> if there exists any, and
+     * <code>null</code> otherwise.
+     * 
+     * @param name the variable name, which must be equal to one of the elements in the array
+     * returned by <code>getKeys()</code>.
+     * @return the associated description, if any, or null if no description exists.
+     */
+    public String getDescription(String name) {
+        return descriptions.get(name);
     }
 
     public int getElementCount() {

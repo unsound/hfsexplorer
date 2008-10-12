@@ -18,9 +18,10 @@
 package org.catacombae.hfsexplorer.types.hfsplus;
 
 import org.catacombae.hfsexplorer.Util;
-import java.io.PrintStream;
+import org.catacombae.csjc.PrintableStruct;
+import org.catacombae.csjc.StructElements;
 
-public abstract class HFSPlusCatalogLeafRecordData {
+public abstract class HFSPlusCatalogLeafRecordData implements PrintableStruct, StructElements {
     public static final int RECORD_TYPE_FOLDER = 0x0001;
     public static final int RECORD_TYPE_FILE = 0x0002;
     public static final int RECORD_TYPE_FOLDER_THREAD = 0x0003;
@@ -35,6 +36,4 @@ public abstract class HFSPlusCatalogLeafRecordData {
 	else if(recordType == RECORD_TYPE_FILE_THREAD) return "kHFSPlusFileThreadRecord";
 	else return "UNKNOWN!";
     }
-    public abstract void printFields(PrintStream ps, String prefix);
-    public abstract void print(PrintStream ps, String prefix);
 }

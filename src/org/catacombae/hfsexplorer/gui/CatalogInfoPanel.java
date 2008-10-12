@@ -23,9 +23,11 @@
 package org.catacombae.hfsexplorer.gui;
 
 import java.awt.CardLayout;
+import java.io.PrintStream;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.event.TreeExpansionEvent;
@@ -36,6 +38,9 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.TreePath;
+import org.catacombae.csjc.PrintableStruct;
+import org.catacombae.csjc.StructElements;
+import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfsexplorer.FileSystemBrowser.NoLeafMutableTreeNode;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFile;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFolder;
@@ -54,55 +59,20 @@ import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogKey;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafNode;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.hfsexplorer.fs.BaseHFSFileSystemView;
+import org.catacombae.hfsexplorer.io.JTextAreaOutputStream;
+import org.catacombae.hfsexplorer.types.hfscommon.StringDecoder;
 
 /**
  *
  * @author  Erik
  */
 public class CatalogInfoPanel extends javax.swing.JPanel {
-
-    private static class BTNodeStorage {
-
-        private CommonBTNode node;
-        private String text;
-
-        public BTNodeStorage(CommonBTNode node, String text) {
-            this.node = node;
-            this.text = text;
-        }
-
-        public CommonBTNode getNode() {
-            return node;
-        }
-
-        @Override
-        public String toString() {
-            return text;
-        }
-    }
-
-    private static class BTLeafStorage {
-
-        private CommonHFSCatalogLeafRecord rec;
-        private String text;
-
-        public BTLeafStorage(CommonHFSCatalogLeafRecord rec, String text) {
-            this.rec = rec;
-            this.text = text;
-        }
-
-        public CommonHFSCatalogLeafRecord getRecord() {
-            return rec;
-        }
-
-        @Override
-        public String toString() {
-            return text;
-        }
-    }
-
+    
+    private static final int UNIT_INCREMENT = 10;
+    
     /** Creates new form CatalogInfoPanel */
     public CatalogInfoPanel(final BaseHFSFileSystemView fsView) {
+        
         initComponents();
 
         JTree dirTree = catalogTree;
@@ -143,28 +113,56 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
             public void treeWillCollapse(TreeExpansionEvent e) {
             }
         });
-
-        //final JPanel infoPanel = new JPanel();
-        final JPanel leafPanel = new JPanel();
-        final FileInfoPanel fileInfoPanel = new FileInfoPanel();
-        final FolderInfoPanel folderInfoPanel = new FolderInfoPanel();
+        
+        final String INDEX_NAME = "index";
+        final String LEAF_NAME = "leaf";
+        final String PRINT_FIELDS_AREA_NAME = "printfieldsarea";
+        final String OTHER_NAME = "other";
+        final String FILE_NAME = "file";
+        final String FOLDER_NAME = "folder";
+        final String FILE_THREAD_NAME = "filethread";
+        final String FOLDER_THREAD_NAME = "folderthread";
+        final String STRUCT_VIEW_PANEL_NAME = "structview";
+        
         final CardLayout clRoot = new CardLayout();
+        final JPanel leafPanel = new JPanel();
+        
         final CardLayout clLeaf = new CardLayout();
         leafPanel.setLayout(clLeaf);
-        leafPanel.add(new JLabel("INTERNAL ERROR!", SwingConstants.CENTER), "other");
-        leafPanel.add(new JLabel("Displaying file thread information is not yet supported.", SwingConstants.CENTER), "filethread");
-        leafPanel.add(new JLabel("Displaying folder thread information is not yet supported.", SwingConstants.CENTER), "folderthread");
+        
+        leafPanel.add(new JLabel("INTERNAL ERROR!", SwingConstants.CENTER), OTHER_NAME);
+        leafPanel.add(new JLabel("Displaying file thread information is not yet supported.", SwingConstants.CENTER), FILE_THREAD_NAME);
+        leafPanel.add(new JLabel("Displaying folder thread information is not yet supported.", SwingConstants.CENTER), FOLDER_THREAD_NAME);
+        
+        final JScrollPane structViewPanelScroller = new JScrollPane();
+        structViewPanelScroller.getVerticalScrollBar().setUnitIncrement(UNIT_INCREMENT);
+        structViewPanelScroller.getHorizontalScrollBar().setUnitIncrement(UNIT_INCREMENT);
+        leafPanel.add(structViewPanelScroller, STRUCT_VIEW_PANEL_NAME);
+        
+        final FileInfoPanel fileInfoPanel = new FileInfoPanel();
         JScrollPane fileInfoPanelScroller = new JScrollPane(fileInfoPanel);
-        fileInfoPanelScroller.getVerticalScrollBar().setUnitIncrement(5);
-        leafPanel.add(fileInfoPanelScroller, "file");
+        fileInfoPanelScroller.getVerticalScrollBar().setUnitIncrement(UNIT_INCREMENT);
+        fileInfoPanelScroller.getHorizontalScrollBar().setUnitIncrement(UNIT_INCREMENT);
+        leafPanel.add(fileInfoPanelScroller, FILE_NAME);
+        
+        final FolderInfoPanel folderInfoPanel = new FolderInfoPanel();
         JScrollPane folderInfoPanelScroller = new JScrollPane(folderInfoPanel);
-        folderInfoPanelScroller.getVerticalScrollBar().setUnitIncrement(5);
-        leafPanel.add(folderInfoPanelScroller, "folder");
+        folderInfoPanelScroller.getVerticalScrollBar().setUnitIncrement(UNIT_INCREMENT);
+        folderInfoPanelScroller.getHorizontalScrollBar().setUnitIncrement(UNIT_INCREMENT);
+        leafPanel.add(folderInfoPanelScroller, FOLDER_NAME);
+        
+        final JTextArea printFieldsTextArea = new JTextArea(0, 0);
+        printFieldsTextArea.setEditable(false);
+        printFieldsTextArea.setLineWrap(false);
+        JScrollPane printFieldsTextAreaScroller = new JScrollPane(printFieldsTextArea);
+        printFieldsTextAreaScroller.getVerticalScrollBar().setUnitIncrement(UNIT_INCREMENT);
+        printFieldsTextAreaScroller.getHorizontalScrollBar().setUnitIncrement(UNIT_INCREMENT);
+        leafPanel.add(printFieldsTextAreaScroller, PRINT_FIELDS_AREA_NAME);
 
         infoPanel.setLayout(clRoot);
         final JLabel indexNodeLabel = new JLabel("No selection.", SwingConstants.CENTER);
-        infoPanel.add(indexNodeLabel, "index");
-        infoPanel.add(leafPanel, "leaf");
+        infoPanel.add(indexNodeLabel, INDEX_NAME);
+        infoPanel.add(leafPanel, LEAF_NAME);
         //infoScroller.setViewportView(infoPanel);
 
         catalogTree.addTreeSelectionListener(new TreeSelectionListener() {
@@ -190,40 +188,61 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
                                 indexNodeLabel.setText("Unknown error!");
                         }
 
-                        clRoot.show(infoPanel, "index");
+                        clRoot.show(infoPanel, INDEX_NAME);
                     }
                     else if(o2 instanceof BTLeafStorage) {
                         CommonHFSCatalogLeafRecord rec = ((BTLeafStorage) o2).getRecord();
                         //HFSPlusCatalogLeafRecordData data = rec.getData();
-                        if(rec instanceof CommonHFSCatalogFileRecord) {
+                        if(rec instanceof CommonHFSCatalogFileRecord.HFSPlusImplementation) {
                             CommonHFSCatalogFile fil = ((CommonHFSCatalogFileRecord)rec).getData();
                             if(fil instanceof CommonHFSCatalogFile.HFSPlusImplementation) {
                                 HFSPlusCatalogFile underlying =
                                         ((CommonHFSCatalogFile.HFSPlusImplementation)fil).getUnderlying();
                                 fileInfoPanel.setFields(underlying);
-                                clLeaf.show(leafPanel, "file");
+                                clLeaf.show(leafPanel, FILE_NAME);
                             }
-                            else
-                                clLeaf.show(leafPanel, "other");
+                            else {
+                                System.err.println("CatalogInfoPanel: Could not show file record type " + fil.getClass());
+                                clLeaf.show(leafPanel, OTHER_NAME);
+                            }
                         }
-                        else if(rec instanceof CommonHFSCatalogFolderRecord) {
+                        else if(rec instanceof CommonHFSCatalogFolderRecord.HFSPlusImplementation) {
                             CommonHFSCatalogFolder fld = ((CommonHFSCatalogFolderRecord)rec).getData();
                             if(fld instanceof CommonHFSCatalogFolder.HFSPlusImplementation) {
                                 HFSPlusCatalogFolder underlying =
                                         ((CommonHFSCatalogFolder.HFSPlusImplementation)fld).getUnderlying();
                                 folderInfoPanel.setFields(underlying);
-                                clLeaf.show(leafPanel, "folder");
+                                clLeaf.show(leafPanel, FOLDER_NAME);
                             }
-                            else
-                                clLeaf.show(leafPanel, "other");
+                            else {
+                                System.err.println("CatalogInfoPanel: Could not show folder record type " + fld.getClass());
+                                clLeaf.show(leafPanel, OTHER_NAME);
+                            }
+                        }
+                        else if(rec instanceof StructElements) {
+                            Dictionary dict = ((StructElements) rec).getStructElements();
+                            structViewPanelScroller.setViewportView(
+                                    new StructViewPanel("Record (" + rec.getClass().toString() + "):", dict));
+                            clLeaf.show(leafPanel, STRUCT_VIEW_PANEL_NAME);
+                        }
+                        else if(rec instanceof PrintableStruct) {
+                            PrintStream ps = new PrintStream(new JTextAreaOutputStream(printFieldsTextArea));
+                            printFieldsTextArea.setText("");
+                            ((PrintableStruct) rec).print(ps, "");
+                            ps.close();
+                            printFieldsTextArea.setCaretPosition(0);
+                            clLeaf.show(leafPanel, PRINT_FIELDS_AREA_NAME);
+                            
                         }
                         else if(rec instanceof CommonHFSCatalogFileThreadRecord)
-                            clLeaf.show(leafPanel, "filethread");
+                            clLeaf.show(leafPanel, FILE_THREAD_NAME);
                         else if(rec instanceof CommonHFSCatalogFolderThreadRecord)
-                            clLeaf.show(leafPanel, "folderthread");
-                        else
-                            clLeaf.show(leafPanel, "other");
-                        clRoot.show(infoPanel, "leaf");
+                            clLeaf.show(leafPanel, FOLDER_THREAD_NAME);
+                        else {
+                            System.err.println("CatalogInfoPanel: Could not show record type " + rec.getClass());
+                            clLeaf.show(leafPanel, OTHER_NAME);
+                        }
+                        clRoot.show(infoPanel, LEAF_NAME);
 
                     }
                     else
@@ -237,14 +256,15 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
 
     public void expandNode(DefaultMutableTreeNode dmtn, CommonBTNode node, BaseHFSFileSystemView fsView) {
         if(node instanceof CommonHFSCatalogIndexNode) {
-            int nodeSize = fsView.getCatalogHeaderNode().getHeaderRecord().getNodeSize();
             CommonBTIndexRecord[] recs = ((CommonHFSCatalogIndexNode) node).getIndexRecords();
             for(CommonBTIndexRecord rec : recs) {
-                CommonBTNode curNode = fsView.getCatalogNode(rec.getIndexAsOffset(nodeSize));
+                
+                CommonBTNode curNode = fsView.getCatalogNode(rec.getIndex());
                 CommonBTKey key = rec.getKey();
                 if(key instanceof CommonHFSCatalogKey) {
                     CommonHFSCatalogKey trueKey = (CommonHFSCatalogKey) key;
-                    dmtn.add(new NoLeafMutableTreeNode(new BTNodeStorage(curNode, trueKey.getParentID().toString() + ":" + trueKey.getNodeName().toString())));
+                    dmtn.add(new NoLeafMutableTreeNode(new BTNodeStorage(curNode,
+                            trueKey.getParentID().toLong() + ":" + fsView.decodeString(trueKey.getNodeName()))));
                 }
                 else
                     throw new RuntimeException("Wrong key type in catalog tree");
@@ -252,13 +272,55 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
         }
         else if(node instanceof CommonHFSCatalogLeafNode) {
             CommonHFSCatalogLeafRecord[] recs = ((CommonHFSCatalogLeafNode) node).getLeafRecords();
-            for(CommonHFSCatalogLeafRecord rec : recs)
-                dmtn.add(new DefaultMutableTreeNode(new BTLeafStorage(rec, rec.getKey().getParentID().toString() + ":" + rec.getKey().getNodeName().toString())));
+            for(CommonHFSCatalogLeafRecord rec : recs) {
+                dmtn.add(new DefaultMutableTreeNode(new BTLeafStorage(rec, rec.getKey().getParentID().toLong()
+                + ":" + fsView.decodeString(rec.getKey().getNodeName()))));
+            }
         }
         else
             throw new RuntimeException("Invalid node type in tree.");
     }
 
+    private static class BTNodeStorage {
+
+        private CommonBTNode node;
+        private String text;
+
+        public BTNodeStorage(CommonBTNode node, String text) {
+            this.node = node;
+            this.text = text;
+        }
+
+        public CommonBTNode getNode() {
+            return node;
+        }
+
+        @Override
+        public String toString() {
+            return text;
+        }
+    }
+
+    private static class BTLeafStorage {
+
+        private CommonHFSCatalogLeafRecord rec;
+        private String text;
+
+        public BTLeafStorage(CommonHFSCatalogLeafRecord rec, String text) {
+            this.rec = rec;
+            this.text = text;
+        }
+
+        public CommonHFSCatalogLeafRecord getRecord() {
+            return rec;
+        }
+
+        @Override
+        public String toString() {
+            return text;
+        }
+    }
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is

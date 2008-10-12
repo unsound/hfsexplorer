@@ -23,6 +23,7 @@ import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFile;
 //import org.catacombae.hfsexplorer.types.JournalInfoBlock;
 import java.awt.*;
 import javax.swing.*;
+import org.catacombae.hfsexplorer.gui.StructViewPanel;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFile;
 import org.catacombae.jparted.lib.fs.FSFile;
 import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFSFile;
@@ -31,19 +32,36 @@ public class FileInfoWindow extends JFrame {
     private JTabbedPane tabs;
     private JScrollPane infoPanelScroller;
     //private JScrollPane journalInfoPanelScroller;
-    private FileInfoPanel infoPanel;
+    //private FileInfoPanel infoPanel;
     //private JournalInfoPanel journalInfoPanel;
     
-    public FileInfoWindow(String filename) {
-	super("Info - " + filename);
+    public FileInfoWindow(FSFile fsFile) {
+	super("Info - " + fsFile.getName());
 	
 	tabs = new JTabbedPane();
-	infoPanel = new FileInfoPanel();
+                    
 	//journalInfoPanel = new JournalInfoPanel();
 	
-	infoPanelScroller = new JScrollPane(infoPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+	infoPanelScroller = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 	//journalInfoPanelScroller = new JScrollPane(journalInfoPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-	tabs.addTab("Detailed", infoPanelScroller);
+
+        if(fsFile instanceof HFSCommonFSFile) {
+            CommonHFSCatalogFile hfsFile = ((HFSCommonFSFile) fsFile).getInternalCatalogFile();
+            if(hfsFile instanceof CommonHFSCatalogFile.HFSPlusImplementation) {
+                FileInfoPanel infoPanel = new FileInfoPanel();
+                infoPanel.setFields(((CommonHFSCatalogFile.HFSPlusImplementation)hfsFile).getUnderlying());
+                infoPanelScroller.setViewportView(infoPanel);
+            }
+            else {
+                StructViewPanel svp = new StructViewPanel("File", hfsFile.getStructElements());
+                infoPanelScroller.setViewportView(svp);
+            }
+        }
+        else
+            throw new IllegalArgumentException("FSFolder type " + fsFile.getClass() +
+                    " not yet supported!");
+        
+        tabs.addTab("Detailed", infoPanelScroller);
 	//tabs.addTab("Journal info", journalInfoPanelScroller);
 	add(tabs, BorderLayout.CENTER);
 	
@@ -61,23 +79,31 @@ public class FileInfoWindow extends JFrame {
 	setLocationRelativeTo(null);
     }
     
+    /*
     public void setFields(FSFile file) {
         if(file instanceof HFSCommonFSFile) {
-            CommonHFSCatalogFile fld = ((HFSCommonFSFile) file).getInternalCatalogFile();
-            if(fld instanceof CommonHFSCatalogFile.HFSPlusImplementation) {
-                infoPanel.setFields(((CommonHFSCatalogFile.HFSPlusImplementation)fld).getUnderlying());
+            CommonHFSCatalogFile hfsFile = ((HFSCommonFSFile) file).getInternalCatalogFile();
+            if(hfsFile instanceof CommonHFSCatalogFile.HFSPlusImplementation) {
+                FileInfoPanel infoPanel = new FileInfoPanel();
+                infoPanel.setFields(((CommonHFSCatalogFile.HFSPlusImplementation)hfsFile).getUnderlying());
+                infoPanelScroller.setViewportView(infoPanel);
             }
-            else
-                throw new IllegalArgumentException("No HFSPlusImplementation...");
+            else {
+                StructViewPanel svp = new StructViewPanel("Folder:", hfsFile.getStructElements());
+                infoPanelScroller.setViewportView(svp);
+            }
         }
         else
             throw new RuntimeException("FSFolder type " + file.getClass() +
                     " not yet supported!");
     }
+     * */
     
+    /*
     public void setFields(HFSPlusCatalogFile vh) {
 	infoPanel.setFields(vh);
     }
+     * */
 //     public void setJournalFields(JournalInfoBlock jib) {
 // 	journalInfoPanel.setFields(jib);
 //     }

@@ -15,6 +15,7 @@ todo
 - Changing character encoding for HFS.
 - Fix all graphical glitches related to HFS vs. HFS+ vs. Common.
 - Option to show or hide all "hidden" files. Default may be to have it turned off.
+- Only one "Open file" option, with different file filters.
 
 current
 -------

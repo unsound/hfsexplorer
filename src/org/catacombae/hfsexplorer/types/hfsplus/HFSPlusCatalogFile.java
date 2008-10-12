@@ -5,6 +5,7 @@
 
 package org.catacombae.hfsexplorer.types.hfsplus;
 
+import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfsexplorer.types.finder.ExtendedFileInfo;
 import org.catacombae.hfsexplorer.types.finder.FileInfo;
 import org.catacombae.hfsexplorer.Util;
@@ -102,6 +103,31 @@ public class HFSPlusCatalogFile extends HFSPlusCatalogLeafRecordData implements 
     public Date getAccessDateAsDate() { return HFSPlusDate.gmtTimestampToDate(getAccessDate()); }
     public Date getBackupDateAsDate() { return HFSPlusDate.gmtTimestampToDate(getBackupDate()); }
 
+
+    @Override
+    public Dictionary getStructElements() {
+        DictionaryBuilder db = new DictionaryBuilder(HFSPlusCatalogFile.class.getSimpleName());
+        
+        db.addFlag("fileLocked", flags, 0);
+        db.addFlag("threadExists", flags, 1);
+        db.addUIntBE("reserved1", reserved1);
+        db.add("fileID", fileID.getStructElements());
+        db.add("createDate", new HFSPlusDateField(createDate, false));
+        db.add("contentModDate", new HFSPlusDateField(contentModDate, false));
+        db.add("attributeModDate", new HFSPlusDateField(attributeModDate, false));
+        db.add("accessDate", new HFSPlusDateField(accessDate, false));
+        db.add("backupDate", new HFSPlusDateField(backupDate, false));
+        db.add("permissions", permissions.getStructElements());
+        db.add("userInfo", userInfo.getStructElements());
+        db.add("finderInfo", finderInfo.getStructElements());
+        db.addUIntBE("textEncoding", textEncoding);
+        db.addUIntBE("reserved2", reserved2);
+        db.add("dataFork", dataFork.getStructElements());
+        db.add("resourceFork", resourceFork.getStructElements());
+        
+        return db.getResult();
+    }
+    
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " recordType: " + getRecordType());
 	ps.println(prefix + " flags: " + getFlags());

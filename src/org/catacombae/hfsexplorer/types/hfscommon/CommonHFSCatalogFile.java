@@ -8,6 +8,8 @@ package org.catacombae.hfsexplorer.types.hfscommon;
 import java.io.PrintStream;
 import java.util.Date;
 import org.catacombae.csjc.StaticStruct;
+import org.catacombae.csjc.StructElements;
+import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFile;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusDate;
 import org.catacombae.hfsexplorer.types.hfs.CdrFilRec;
@@ -16,7 +18,7 @@ import org.catacombae.hfsexplorer.types.hfs.CdrFilRec;
  *
  * @author erik
  */
-public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCatalogAttributes {
+public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCatalogAttributes, StructElements {
     
     public abstract CommonHFSCatalogNodeID getFileID();
     public abstract CommonHFSForkData getDataFork();
@@ -24,7 +26,7 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
     public abstract byte[] getBytes();
     
     public void print(PrintStream ps, String prefix) {
-        ps.println(prefix + "CommonHFSCatalogFile:");
+        ps.println(prefix + CommonHFSCatalogFile.class.getSimpleName() + ":");
         printFields(ps, prefix + " ");
     }
 
@@ -128,6 +130,11 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
             ps.println(prefix + "data:");
             data.print(ps, prefix + " ");
         }
+
+        @Override
+        public Dictionary getStructElements() {
+            return data.getStructElements();
+        }
     }
     
     public static class HFSImplementation extends CommonHFSCatalogFile {
@@ -214,6 +221,11 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
         public void printFields(PrintStream ps, String prefix) {
             ps.println(prefix + "data:");
             data.print(ps, prefix + " ");
+        }
+
+        @Override
+        public Dictionary getStructElements() {
+            return data.getStructElements();
         }
     }
 }

@@ -28,12 +28,19 @@ public class EncodedStringField extends StringRepresentableField {
 
     private final byte[] fieldData;
     private final Charset charset;
+    private final int offset;
+    private final int length;
 
     public EncodedStringField(byte[] fieldData, String encoding) {
-        super("Byte[" + fieldData.length + "]", FieldType.CUSTOM_CHARSET_STRING);
+        this(fieldData, 0, fieldData.length, encoding);
+    }
+    public EncodedStringField(byte[] fieldData, int offset, int length, String encoding) {
+        super("Byte[" + length + "]", FieldType.CUSTOM_CHARSET_STRING);
         this.fieldData = fieldData;
+        this.offset = offset;
+        this.length = length;
         this.charset = Charset.forName(encoding);
-        String validateMsg = validate(fieldData);
+        String validateMsg = validate(this.fieldData, offset, length);
         if(validateMsg != null) {
             throw new IllegalArgumentException("Invalid value passed to constructor! Message: " + validateMsg);
         }
@@ -44,19 +51,20 @@ public class EncodedStringField extends StringRepresentableField {
         try {
             CharsetEncoder enc = charset.newEncoder();
             ByteBuffer bb = enc.encode(CharBuffer.wrap(s));
-            return validate(bb.array());
+            byte[] array = bb.array();
+            return validate(array, 0, array.length);
         } catch(CharacterCodingException cce) {
             return "Exception while encoding string data: " + cce.toString();
         }
     }
 
-    private String validate(byte[] data) {
-        if(data.length != fieldData.length)
-            return "Invalid length for string. Was: " + data.length + " Should be: " + fieldData.length;
+    private String validate(byte[] data, int offset, int length) {
+        if(length != fieldData.length)
+            return "Invalid length for string. Was: " + length + " Should be: " + fieldData.length;
         // Attempt to decode data
         try {
             CharsetDecoder dec = charset.newDecoder();
-            dec.decode(ByteBuffer.wrap(data));
+            dec.decode(ByteBuffer.wrap(data, offset, length));
         } catch(Exception e) {
             return "Decode operation failed! Exception: " + e.toString();
         }
@@ -67,7 +75,7 @@ public class EncodedStringField extends StringRepresentableField {
     public String getValueAsString() {
         try {
             CharsetDecoder dec = charset.newDecoder();
-            return dec.decode(ByteBuffer.wrap(fieldData)).toString();
+            return dec.decode(ByteBuffer.wrap(fieldData, offset, length)).toString();
         } catch(CharacterCodingException cce) {
             throw new RuntimeException("Exception while decoding data...", cce);
         }
@@ -81,9 +89,9 @@ public class EncodedStringField extends StringRepresentableField {
                 CharsetEncoder enc = charset.newEncoder();
                 ByteBuffer bb = enc.encode(CharBuffer.wrap(value));
                 byte[] encodedData = bb.array();
-                if(encodedData.length != fieldData.length)
+                if(encodedData.length != length)
                     throw new RuntimeException("You should not see this.");
-                System.arraycopy(encodedData, 0, fieldData, 0, fieldData.length);
+                System.arraycopy(encodedData, 0, fieldData, offset, length);
             } catch(CharacterCodingException cce) {
                 throw new RuntimeException("Exception while encoding string data: ", cce);
             }
