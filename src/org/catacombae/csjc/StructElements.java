@@ -61,6 +61,15 @@ public interface StructElements {
     /** Shorthand constant. */
     public static final IntegerFieldBits BITS_64 = IntegerFieldBits.BITS_64;
     
+    public class DictionaryBuilder extends org.catacombae.csjc.structelements.DictionaryBuilder {
+        /**
+         * {@inheritDoc}
+         */
+        public DictionaryBuilder(String typeName) {
+            super(typeName);
+        }
+    }
+    
     /**
      * Returns a dictionary of the elements of this data structure. The keys in
      * the dictionary should be the respective variable names, and the elements

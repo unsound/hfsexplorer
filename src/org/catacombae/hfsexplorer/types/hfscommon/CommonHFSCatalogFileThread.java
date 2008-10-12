@@ -7,6 +7,8 @@ package org.catacombae.hfsexplorer.types.hfscommon;
 
 import java.io.PrintStream;
 import org.catacombae.csjc.PrintableStruct;
+import org.catacombae.csjc.StructElements;
+import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogThread;
 import org.catacombae.hfsexplorer.types.hfs.CdrFThdRec;
 
@@ -14,14 +16,15 @@ import org.catacombae.hfsexplorer.types.hfs.CdrFThdRec;
  *
  * @author erik
  */
-public abstract class CommonHFSCatalogFileThread implements PrintableStruct {
+public abstract class CommonHFSCatalogFileThread implements PrintableStruct, StructElements {
     public abstract CommonHFSCatalogNodeID getParentID();
     public abstract CommonHFSCatalogString getNodeName();
     public abstract int length();
     public abstract byte[] getBytes();
 
+    @Override
     public void print(PrintStream ps, String prefix) {
-        ps.println(prefix + getClass().getSimpleName() + ":");
+        ps.println(prefix + CommonHFSCatalogFileThread.class.getSimpleName() + ":");
         printFields(ps, prefix + " ");
     }
 
@@ -51,7 +54,7 @@ public abstract class CommonHFSCatalogFileThread implements PrintableStruct {
 
         @Override
         public CommonHFSCatalogString getNodeName() {
-            return CommonHFSCatalogString.create(data.getNodeName());
+            return CommonHFSCatalogString.createHFSPlus(data.getNodeName());
         }
 
         @Override
@@ -62,6 +65,11 @@ public abstract class CommonHFSCatalogFileThread implements PrintableStruct {
         public void printFields(PrintStream ps, String prefix) {
             ps.println(prefix + "data:");
             data.print(ps, prefix + " ");
+        }
+
+        @Override
+        public Dictionary getStructElements() {
+            return data.getStructElements();
         }
     }
     
@@ -83,7 +91,7 @@ public abstract class CommonHFSCatalogFileThread implements PrintableStruct {
 
         @Override
         public CommonHFSCatalogString getNodeName() {
-            return CommonHFSCatalogString.create(data.getFthdCName());
+            return CommonHFSCatalogString.createHFS(data.getFthdCName());
         }
 
         @Override
@@ -94,6 +102,11 @@ public abstract class CommonHFSCatalogFileThread implements PrintableStruct {
         public void printFields(PrintStream ps, String prefix) {
             ps.println(prefix + "data:");
             data.print(ps, prefix + " ");
+        }
+
+        @Override
+        public Dictionary getStructElements() {
+            return data.getStructElements();
         }
     }
 }

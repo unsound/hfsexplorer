@@ -80,7 +80,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
         //    return record.getKey().getNodeName().decode(COMPOSED_UTF16_DECODER);
         //else
         //    return record.getKey().getNodeName().decode(DECOMPOSED_UTF16_DECODER);
-        String nodeNameRaw = view.getString(record.getKey().getNodeName());
+        String nodeNameRaw = view.decodeString(record.getKey().getNodeName());
         if(doUnicodeFileNameComposition)
             return UnicodeNormalizationToolkit.getDefaultInstance().compose(nodeNameRaw);
         else

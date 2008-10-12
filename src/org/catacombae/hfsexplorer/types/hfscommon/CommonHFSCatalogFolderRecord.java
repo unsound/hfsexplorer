@@ -6,6 +6,7 @@
 package org.catacombae.hfsexplorer.types.hfscommon;
 
 import java.io.PrintStream;
+import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFolder;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogKey;
 import org.catacombae.hfsexplorer.types.hfs.CatKeyRec;
@@ -22,7 +23,7 @@ public abstract class CommonHFSCatalogFolderRecord extends CommonHFSCatalogLeafR
     
     @Override
     public void print(PrintStream ps, String prefix) {
-        ps.println(prefix + getClass().getSimpleName() + ":");
+        ps.println(prefix + CommonHFSCatalogFolderRecord.class.getSimpleName() + ":");
         printFields(ps, prefix + " ");
     }
 
@@ -78,6 +79,16 @@ public abstract class CommonHFSCatalogFolderRecord extends CommonHFSCatalogLeafR
             System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
             return result;
         }
+
+        @Override
+        public Dictionary getStructElements() {
+            DictionaryBuilder db = new DictionaryBuilder(CommonHFSCatalogFolderRecord.class.getSimpleName());
+
+            db.add("key", key.getStructElements());
+            db.add("data", data.getStructElements());
+
+            return db.getResult();
+        }
     }
     
     public static class HFSImplementation extends CommonHFSCatalogFolderRecord {
@@ -115,6 +126,16 @@ public abstract class CommonHFSCatalogFolderRecord extends CommonHFSCatalogLeafR
             tempData = data.getBytes();
             System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
             return result;
+        }
+
+        @Override
+        public Dictionary getStructElements() {
+            DictionaryBuilder db = new DictionaryBuilder(CommonHFSCatalogFolderRecord.class.getSimpleName());
+
+            db.add("key", key.getStructElements());
+            db.add("data", data.getStructElements());
+
+            return db.getResult();
         }
     }
 }

@@ -16,7 +16,7 @@
  */
 
 /*
- * VolumeInfoPanel.java
+ * HFSPlusVolumeInfoPanel.java
  *
  * Created on den 11 februari 2007, 14:42
  */
@@ -33,17 +33,18 @@ import java.text.DateFormat;
  * way.
  * @author  Erik Larsson, erik82@kth.se
  */
-public class VolumeInfoPanel extends javax.swing.JPanel {
+public class HFSPlusVolumeInfoPanel extends javax.swing.JPanel {
     private final DateFormat dti =
             DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
     
-    /** Creates new form VolumeInfoPanel */
-    public VolumeInfoPanel() {
+    /** Creates new form HFSPlusVolumeInfoPanel */
+    public HFSPlusVolumeInfoPanel(HFSPlusVolumeHeader vh) {
         initComponents();
+        setFields(vh);
     }
     
     /**
-     * Sets the fields of this VolumeInfoPanel to the values in the structure
+     * Sets the fields of this HFSPlusVolumeInfoPanel to the values in the structure
      * <code>vh</code>.
      * @param vh the structure containing the values to set.
      */

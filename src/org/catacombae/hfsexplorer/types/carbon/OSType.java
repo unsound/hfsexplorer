@@ -18,8 +18,10 @@
 package org.catacombae.hfsexplorer.types.carbon;
 
 import java.io.PrintStream;
+import org.catacombae.csjc.StructElements;
+import org.catacombae.csjc.structelements.Dictionary;
 
-public class OSType {
+public class OSType implements StructElements {
     /*
      * struct OSType
      * size: 4 bytes
@@ -57,5 +59,14 @@ public class OSType {
     
     public byte[] getBytes() {
         return osType.getBytes();
+    }
+
+    @Override
+    public Dictionary getStructElements() {
+        DictionaryBuilder db = new DictionaryBuilder(OSType.class.getSimpleName());
+        
+        db.add("osType", osType.getStructElements());
+        
+        return db.getResult();
     }
 }

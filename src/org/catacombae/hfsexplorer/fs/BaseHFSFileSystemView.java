@@ -218,13 +218,22 @@ public abstract class BaseHFSFileSystemView {
     public abstract BaseHFSAllocationFileView getAllocationFileView();
     
     /**
+     * Returns the default StringDecoder instance for this view. For HFS file systems the decoder
+     * can be set in the HFS-specific subclass, but in HFS+ and HFSX file systems it will always
+     * return a UTF-16BE string decoder.
+     * 
+     * @return the default StringDecoder instance for this view.
+     */
+    //public abstract StringDecoder getDefaultStringDecoder();
+    
+    /**
      * Decodes the supplied CommonHFSCatalogString according to the current
      * settings of the view.
      * 
      * @param str
      * @return
      */
-    public abstract String getString(CommonHFSCatalogString str);
+    public abstract String decodeString(CommonHFSCatalogString str);
     
     public CommonHFSCatalogFolderRecord getRoot() {
         CatalogInitProcedure init = new CatalogInitProcedure();
@@ -249,7 +258,7 @@ public abstract class BaseHFSFileSystemView {
             CommonBTIndexRecord matchingRecord = findKey(currentNode, parentID);
             
             //currentNodeNumber = matchingRecord.getIndex();
-            currentNodeOffset = matchingRecord.getIndexAsOffset(nodeSize);
+            currentNodeOffset = matchingRecord.getIndex()*nodeSize;
             init.catalogFile.seek(currentNodeOffset);
             init.catalogFile.readFully(currentNodeData);
             nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
@@ -410,7 +419,7 @@ public abstract class BaseHFSFileSystemView {
 	    CommonBTIndexRecord matchingRecord =
                     findLEKey(currentNode, catOps.newCatalogKey(parentID, nodeName, init.bthr));
 	    
-	    currentNodeOffset = matchingRecord.getIndexAsOffset(nodeSize);
+	    currentNodeOffset = matchingRecord.getIndex()*nodeSize;
 	    init.catalogFile.seek(currentNodeOffset);
 	    init.catalogFile.readFully(currentNodeData);
 	    nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
@@ -446,7 +455,7 @@ public abstract class BaseHFSFileSystemView {
     public CommonHFSCatalogLeafRecord[] listRecords(CommonHFSCatalogNodeID folderID) {	
 	CatalogInitProcedure init = new CatalogInitProcedure();
 	final ReadableRandomAccessStream catalogFile = init.forkFilterFile;
-	return collectFilesInDir(folderID, init.bthr.getRootNodeNumber()*init.bthr.getNodeSize(),
+	return collectFilesInDir(folderID, init.bthr.getRootNodeNumber(),
             hfsFile, fsOffset, init.header, init.bthr, catalogFile);
     }
 
@@ -575,7 +584,7 @@ public abstract class BaseHFSFileSystemView {
 	    CommonBTIndexNode currentNode = createCommonHFSExtentIndexNode(currentNodeData, 0, nodeSize);
 	    CommonBTIndexRecord matchingRecord = findLEKey(currentNode, key);
 	    
-	    currentNodeOffset = matchingRecord.getIndexAsOffset(nodeSize);
+	    currentNodeOffset = matchingRecord.getIndex()*nodeSize;
 	    init.extentsFile.seek(currentNodeOffset);
 	    init.extentsFile.readFully(currentNodeData);
             //System.err.println("  Calling createCommonBTNodeDescriptor(byte[" + currentNodeData.length + "], 0)...");
@@ -710,29 +719,18 @@ public abstract class BaseHFSFileSystemView {
     }
 
     /** Returns the journal info block if a journal is present, null otherwise. */
-    public abstract JournalInfoBlock getJournalInfoBlock();/* {
-	HFSPlusVolumeHeader vh = getVolumeHeader();
-	if(vh.getAttributeVolumeJournaled()) {
-	    long blockNumber = Util2.unsign(vh.getJournalInfoBlock());
-	    hfsFile.seek(fsOffset + blockNumber*staticBlockSize);
-	    byte[] data = new byte[JournalInfoBlock.getStructSize()];
-	    hfsFile.readFully(data);
-	    return new JournalInfoBlock(data, 0);
-	}
-	else
-	    return null;
-    }*/
+    public abstract JournalInfoBlock getJournalInfoBlock();
     
     // Utility methods
     
     private CommonHFSCatalogLeafRecord[] collectFilesInDir(CommonHFSCatalogNodeID dirID,
-            long currentNodeOffset, ReadableRandomAccessStream hfsFile, long fsOffset,
+            long currentNodeIndex, ReadableRandomAccessStream hfsFile, long fsOffset,
             final CommonHFSVolumeHeader header, final CommonBTHeaderRecord bthr,
             final ReadableRandomAccessStream catalogFile) {
         final int nodeSize = bthr.getNodeSize();
         
 	byte[] currentNodeData = new byte[nodeSize];
-	catalogFile.seek(currentNodeOffset);
+	catalogFile.seek(currentNodeIndex*nodeSize);
 	catalogFile.readFully(currentNodeData);
 	
 	CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
@@ -747,7 +745,7 @@ public abstract class BaseHFSFileSystemView {
             
 	    for(CommonBTIndexRecord bir : matchingRecords) {
 		CommonHFSCatalogLeafRecord[] partResult =
-                        collectFilesInDir(dirID, bir.getIndexAsOffset(nodeSize), hfsFile, fsOffset,
+                        collectFilesInDir(dirID, bir.getIndex(), hfsFile, fsOffset,
                         header, bthr, catalogFile);
 		for(CommonHFSCatalogLeafRecord curRes : partResult)
 		    results.addLast(curRes);

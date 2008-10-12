@@ -19,7 +19,7 @@ package org.catacombae.csjc.structelements;
 
 public abstract class BooleanRepresentableField extends Field {
 
-    public BooleanRepresentableField(String typeName, FieldType type) {
+    protected BooleanRepresentableField(String typeName, FieldType type) {
         super(typeName, type);
     }
 

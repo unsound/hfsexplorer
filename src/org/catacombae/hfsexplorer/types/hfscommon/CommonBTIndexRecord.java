@@ -33,12 +33,11 @@ public abstract class CommonBTIndexRecord extends CommonBTRecord {
         return key;
     }
 
-    protected long getIndex() {
+    public long getIndex() {
         return Util.unsign(Util.readIntBE(index));
     }
 
-    public abstract long getIndexAsOffset(int nodeSize);
-
+    @Override
     public byte[] getBytes() {
         byte[] res = new byte[getSize()];
         Util.zero(res);
@@ -56,11 +55,13 @@ public abstract class CommonBTIndexRecord extends CommonBTRecord {
         return res;
     }
 
+    @Override
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + "CommonBTIndexRecord:");
         printFields(ps, prefix);
     }
-
+    
+    @Override
     public void printFields(PrintStream ps, String prefix) {
         ps.println(prefix + " key:");
         key.print(ps, prefix + "  ");
@@ -74,14 +75,16 @@ public abstract class CommonBTIndexRecord extends CommonBTRecord {
             super(key, data, offset);
         }
         
+        @Override
         public int getSize() {
             return key.occupiedSize() + index.length;
         }
-
+        /*
         @Override
         public long getIndexAsOffset(int nodeSize) {
             return getIndex()*nodeSize;
         }
+         * */
     }
     
     private static class HFSPlusImplementation extends CommonBTIndexRecord {
@@ -89,13 +92,16 @@ public abstract class CommonBTIndexRecord extends CommonBTRecord {
             super(key, data, offset);
         }
         
+        @Override
         public int getSize() {
             return key.occupiedSize() + index.length;
         }
-
+        
+        /*
         @Override
         public long getIndexAsOffset(int nodeSize) {
             return getIndex()*nodeSize;
         }
+         * */
     }
 }

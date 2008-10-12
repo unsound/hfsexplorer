@@ -8,6 +8,8 @@ package org.catacombae.hfsexplorer.types.hfscommon;
 import java.io.PrintStream;
 import java.util.Date;
 import org.catacombae.csjc.PrintableStruct;
+import org.catacombae.csjc.StructElements;
+import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFolder;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusDate;
@@ -17,7 +19,7 @@ import org.catacombae.hfsexplorer.types.hfs.CdrDirRec;
  *
  * @author erik
  */
-public abstract class CommonHFSCatalogFolder implements CommonHFSCatalogAttributes, PrintableStruct {
+public abstract class CommonHFSCatalogFolder implements CommonHFSCatalogAttributes, PrintableStruct, StructElements {
     public abstract CommonHFSCatalogNodeID getFolderID();
     
     public static CommonHFSCatalogFolder create(HFSPlusCatalogFolder data) {
@@ -35,7 +37,7 @@ public abstract class CommonHFSCatalogFolder implements CommonHFSCatalogAttribut
     public abstract byte[] getBytes();
     
     public void print(PrintStream ps, String prefix) {
-        ps.println(prefix + getClass().getSimpleName() + ":");
+        ps.println(prefix + CommonHFSCatalogFolder.class.getSimpleName() + ":");
         printFields(ps, prefix + " ");
     }
 
@@ -122,6 +124,11 @@ public abstract class CommonHFSCatalogFolder implements CommonHFSCatalogAttribut
             ps.println(prefix + "data:");
             data.print(ps, prefix + " ");
         }
+
+        @Override
+        public Dictionary getStructElements() {
+            return data.getStructElements();
+        }
     }
     
     public static class HFSImplementation extends CommonHFSCatalogFolder {
@@ -202,6 +209,11 @@ public abstract class CommonHFSCatalogFolder implements CommonHFSCatalogAttribut
         public void printFields(PrintStream ps, String prefix) {
             ps.println(prefix + "data:");
             data.print(ps, prefix + " ");
+        }
+
+        @Override
+        public Dictionary getStructElements() {
+            return data.getStructElements();
         }
     }
 }

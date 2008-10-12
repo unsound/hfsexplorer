@@ -17,10 +17,12 @@
 
 package org.catacombae.hfsexplorer.types.carbon;
 
+import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfsexplorer.Util;
 import java.io.PrintStream;
+import org.catacombae.csjc.StructElements;
 
-public class FourCharCode {
+public class FourCharCode implements StructElements {
     /*
      * struct FourCharCode
      * size: 4 bytes
@@ -56,5 +58,14 @@ public class FourCharCode {
 
     public byte[] getBytes() {
         return Util.createCopy(fourCharCode);
+    }
+
+    @Override
+    public Dictionary getStructElements() {
+        DictionaryBuilder db = new DictionaryBuilder(FourCharCode.class.getSimpleName());
+        
+        db.addEncodedString("fourCharCode", fourCharCode, "US-ASCII");
+        
+        return db.getResult();
     }
 }

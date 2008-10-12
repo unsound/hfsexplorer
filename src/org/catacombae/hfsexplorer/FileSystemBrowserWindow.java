@@ -324,9 +324,11 @@ public class FileSystemBrowserWindow extends JFrame {
                         HFSPlusVolumeHeader vh =
                                 ((CommonHFSVolumeHeader.HFSPlusImplementation) cvh).getUnderlying();
                         //infoWindow.setVolumeFields(vh);
+                        /*
                         if(vh.getAttributeVolumeJournaled()) {
                             infoWindow.setJournalFields(fsHandler.getFSView().getJournalInfoBlock());
                         }
+                         * */
                     }
                 /*
                 else
@@ -468,19 +470,7 @@ public class FileSystemBrowserWindow extends JFrame {
         aboutItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                String message = "";
-                message += "HFSExplorer " + HFSExplorer.VERSION + " Build #" + BuildNumber.BUILD_NUMBER + "\n";
-                message += HFSExplorer.COPYRIGHT + "\n";
-                for(String notice : HFSExplorer.NOTICES) {
-                    message += notice + "\n";
-                // System.out.println("Message now: " + message);
-                }
-                message += "\n Operating system: " + System.getProperty("os.name") + " " + System.getProperty("os.version");
-                message += "\n Architecture: " + System.getProperty("os.arch");
-                message += "\n Virtual machine: " + System.getProperty("java.vm.vendor") + " " +
-                        System.getProperty("java.vm.name") + " " + System.getProperty("java.vm.version");
-                JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, message,
-                        "About", JOptionPane.INFORMATION_MESSAGE);
+                actionShowAboutDialog();
             }
         });
 
@@ -1234,18 +1224,33 @@ public class FileSystemBrowserWindow extends JFrame {
 
         return res;
     }
-
+    
+    private void actionShowAboutDialog() {
+        String message = "";
+        message += "HFSExplorer " + HFSExplorer.VERSION + " Build #" + BuildNumber.BUILD_NUMBER + "\n";
+        message += HFSExplorer.COPYRIGHT + "\n";
+        for(String notice : HFSExplorer.NOTICES) {
+            message += notice + "\n";
+        }
+        message += "\nOperating system: " + System.getProperty("os.name") + " " + System.getProperty("os.version");
+        message += "\nArchitecture: " + System.getProperty("os.arch");
+        message += "\nJava Runtime Environment: " + System.getProperty("java.version");
+        message += "\nVirtual machine: " + System.getProperty("java.vm.vendor") + " " +
+                System.getProperty("java.vm.name") + " " + System.getProperty("java.vm.version");
+        
+        JOptionPane.showMessageDialog(this, message, "About", JOptionPane.INFORMATION_MESSAGE);
+        
+    }
+    
     private void actionGetInfo(FSEntry entry) {
         if(entry instanceof FSFile) {
             FSFile file = (FSFile) entry;
-            FileInfoWindow fiw = new FileInfoWindow(entry.getName());
-            fiw.setFields(file);
+            FileInfoWindow fiw = new FileInfoWindow(file);
             fiw.setVisible(true);
         }
         else if(entry instanceof FSFolder) {
             FSFolder folder = (FSFolder) entry;
-            FolderInfoWindow fiw = new FolderInfoWindow(entry.getName());
-            fiw.setFields(folder);
+            FolderInfoWindow fiw = new FolderInfoWindow(folder);
             fiw.setVisible(true);
         }
         else {
@@ -1811,8 +1816,8 @@ public class FileSystemBrowserWindow extends JFrame {
         final FileSystemBrowserWindow fsbWindow;
         if(args.length > 0 && args[0].equals(DEBUG_CONSOLE_ARG)) {
             DebugConsoleWindow dcw = new DebugConsoleWindow();
-            System.setOut(new PrintStream(dcw.debugStream));
-            System.setErr(new PrintStream(dcw.debugStream));
+            System.setOut(new PrintStream(dcw.getDebugStream()));
+            System.setErr(new PrintStream(dcw.getDebugStream()));
             fsbWindow = new FileSystemBrowserWindow(dcw);
             ++parsedArgs;
         }

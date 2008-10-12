@@ -5,6 +5,7 @@
 
 package org.catacombae.hfsexplorer.types.hfscommon;
 
+import org.catacombae.csjc.StructElements;
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.types.hfsplus.BTHeaderRec;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFile;
@@ -24,7 +25,7 @@ import org.catacombae.hfsexplorer.types.hfs.CdrThdRec;
  *
  * @author erik
  */
-public abstract class CommonHFSCatalogLeafRecord extends CommonBTRecord {
+public abstract class CommonHFSCatalogLeafRecord extends CommonBTRecord implements StructElements {
 
     public static CommonHFSCatalogLeafRecord createHFS(byte[] data, int offset, int length) {
         final CatKeyRec key;

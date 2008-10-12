@@ -35,8 +35,14 @@ public class StructViewPanel extends javax.swing.JPanel {
         for(int i = 0; i < keys.length; ++i) {
             String curKey = keys[i];
             StructElement curElement = dict.getElement(curKey);
+            String curDescription = dict.getDescription(curKey);
+            String subLabel;
+            if(curDescription != null)
+                subLabel = curDescription;
+            else
+                subLabel = curKey;
 
-            subPanels[i] = createPanel(curKey, curElement);
+            subPanels[i] = createPanel(subLabel, curElement);
             subPanels[i].setBorder(new EmptyBorder(0, 0, 5, 0));
         }
 

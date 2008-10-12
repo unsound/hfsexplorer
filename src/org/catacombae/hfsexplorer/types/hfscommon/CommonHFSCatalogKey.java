@@ -6,6 +6,8 @@
 package org.catacombae.hfsexplorer.types.hfscommon;
 
 import java.io.PrintStream;
+import org.catacombae.csjc.StructElements;
+import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfsexplorer.FastUnicodeCompare;
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogKey;
@@ -16,12 +18,13 @@ import org.catacombae.hfsexplorer.types.hfs.CatKeyRec;
  *
  * @author erik
  */
-public abstract class CommonHFSCatalogKey extends CommonBTKey {
+public abstract class CommonHFSCatalogKey extends CommonBTKey implements StructElements {
     public abstract CommonHFSCatalogNodeID getParentID();
     public abstract CommonHFSCatalogString getNodeName();
     
+    @Override
     public void print(PrintStream ps, String prefix) {
-        ps.println(prefix + getClass().getSimpleName() + ":");
+        ps.println(prefix + CommonHFSCatalogKey.class.getSimpleName() + ":");
         printFields(ps, prefix + " ");
     }
 
@@ -57,7 +60,7 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey {
 
         @Override
         public CommonHFSCatalogString getNodeName() {
-            return CommonHFSCatalogString.create(key.getNodeName());
+            return CommonHFSCatalogString.createHFSPlus(key.getNodeName());
         }
 
         @Override
@@ -104,9 +107,15 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey {
             return key.occupiedSize();
         }
 
+        @Override
         public void printFields(PrintStream ps, String prefix) {
             ps.println(prefix + "key:");
             key.print(ps, prefix + " ");
+        }
+
+        @Override
+        public Dictionary getStructElements() {
+            return key.getStructElements();
         }
     }
     
@@ -131,7 +140,7 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey {
 
         @Override
         public CommonHFSCatalogString getNodeName() {
-            return CommonHFSCatalogString.create(key.getCkrCName());
+            return CommonHFSCatalogString.createHFS(key.getCkrCName());
         }
 
         @Override
@@ -168,9 +177,15 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey {
             }
         }
 
+        @Override
         public void printFields(PrintStream ps, String prefix) {
             ps.println(prefix + "key:");
             key.print(ps, prefix + " ");
+        }
+        
+        @Override
+        public Dictionary getStructElements() {
+            return key.getStructElements();
         }
     }
 }
