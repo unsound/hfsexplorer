@@ -19,13 +19,13 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="pathLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="addressField" pref="625" max="32767" attributes="0"/>
+              <Component id="addressField" pref="635" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="goButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="statusLabel" alignment="0" pref="726" max="32767" attributes="0"/>
-          <Component id="treeTableSplit" alignment="0" pref="726" max="32767" attributes="0"/>
+          <Component id="statusLabel" alignment="0" pref="736" max="32767" attributes="0"/>
+          <Component id="treeTableSplit" alignment="0" pref="736" max="32767" attributes="0"/>
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="upButton" min="-2" max="-2" attributes="0"/>
@@ -33,7 +33,7 @@
               <Component id="extractButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="infoButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="539" max="32767" attributes="0"/>
+              <EmptySpace pref="549" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
