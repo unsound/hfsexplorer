@@ -190,12 +190,17 @@ public class FileSystemBrowser<A> {
 	fileTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 	// AUTO_RESIZE_SUBSEQUENT_COLUMNS AUTO_RESIZE_OFF AUTO_RESIZE_LAST_COLUMN
 	fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-	fileTable.getColumnModel().getColumn(0).setPreferredWidth(180);
-	fileTable.getColumnModel().getColumn(1).setPreferredWidth(96);
-	fileTable.getColumnModel().getColumn(2).setPreferredWidth(120);
-	fileTable.getColumnModel().getColumn(3).setPreferredWidth(120);
+	
+	final int WIDTH_NAME_COLUMN = 180;
+	final int WIDTH_SIZE_COLUMN = 96;
+	final int WIDTH_TYPE_COLUMN = 120;
+	final int WIDTH_DATE_COLUMN = 130;
+	fileTable.getColumnModel().getColumn(0).setPreferredWidth(WIDTH_NAME_COLUMN);
+	fileTable.getColumnModel().getColumn(1).setPreferredWidth(WIDTH_SIZE_COLUMN);
+	fileTable.getColumnModel().getColumn(2).setPreferredWidth(WIDTH_TYPE_COLUMN);
+	fileTable.getColumnModel().getColumn(3).setPreferredWidth(WIDTH_DATE_COLUMN);
 	fileTable.getColumnModel().getColumn(4).setPreferredWidth(0);
-	totalColumnWidth = 180+96+120+120;
+	totalColumnWidth = WIDTH_NAME_COLUMN+WIDTH_SIZE_COLUMN+WIDTH_TYPE_COLUMN+WIDTH_DATE_COLUMN;
 	fileTable.getColumnModel().getColumn(4).setMinWidth(0);
 	fileTable.getColumnModel().getColumn(4).setResizable(false);
         
