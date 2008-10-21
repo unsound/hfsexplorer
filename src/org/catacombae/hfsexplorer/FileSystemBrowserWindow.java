@@ -120,7 +120,7 @@ public class FileSystemBrowserWindow extends JFrame {
         super(TITLE_STRING);
         this.dcw = dcw;
 
-        if(Util.isJava6OrHigher()) {
+        if(Java6Util.isJava6OrHigher()) {
             Java6Specific.setIconImages(WINDOW_ICONS, this);
         }
         else {
@@ -725,8 +725,8 @@ public class FileSystemBrowserWindow extends JFrame {
                     Partition selectedPartition = (Partition) selectedValue;
                     fsOffset = selectedPartition.getStartOffset();//getPmPyPartStart()+selectedPartition.getPmLgDataStart())*blockSize;
                     fsLength = selectedPartition.getLength();//getPmDataCnt()*blockSize;
-                //System.err.println("DEBUG Selected partition:");
-                //selectedPartition.print(System.err, "  ");
+		    //System.err.println("DEBUG Selected partition:");
+		    //selectedPartition.print(System.err, "  ");
                 }
                 else {
                     throw new RuntimeException("Impossible error!");
@@ -891,7 +891,7 @@ public class FileSystemBrowserWindow extends JFrame {
                 }
             };
         }
-        else if(Util.isJava6OrHigher() && Java6Specific.canOpen()) {
+        else if(Java6Util.isJava6OrHigher() && Java6Specific.canOpen()) {
             //System.err.println("Java 1.6 detected.");
             alOpen = new ActionListener() {
                 @Override
