@@ -29,13 +29,50 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
+/**
+ * This class should encapsulate all of the logic in HFSExplorer that is
+ * Java 6-specific. I.E. when compiling the source code using a JDK 1.5, the
+ * only class that should fail to compile would be this one.
+ * 
+ * @author Erik Larsson
+ */
 public class Java6Specific {
+    /**
+     * Checks whether openFile can be invoked for this platform. (Internally,
+     * checks whether the Java 6 operation Desktop.open(..) is supported for the
+     * currently running platform.<br>
+     * <b>Invoking this method on a non-Java 6 JRE will cause a class loading
+     * exception.</b>
+     * 
+     * @return whether openFile can be invoked for this platform.
+     */
     public static boolean canOpen() {
 	return Desktop.getDesktop().isSupported(Desktop.Action.OPEN);
     }
+    
+    /**
+     * Sends an OS signal via Java6's Desktop.open() method to open the
+     * specified file with its default handler.<br>
+     * <b>Invoking this method on a non-Java 6 JRE will cause a class loading
+     * exception.</b>
+     * 
+     * @param f the file to open.
+     * @throws java.io.IOException if the file could not be opened.
+     */
     public static void openFile(File f) throws IOException {
 	Desktop.getDesktop().open(f);
     }
+    
+    /**
+     * Sets the icon images for the specified Window. Java 6 supports icon
+     * images of multiple sizes to better adapt across platforms.<br>
+     * <b>Invoking this method on a non-Java 6 JRE will cause a class loading
+     * exception.</b>
+     * 
+     * @param icons the different sizes of icon images that should be displayed
+     * for the window.
+     * @param window the window that the icons should be applied to.
+     */
     public static void setIconImages(ImageIcon[] icons, Window window) {
 	LinkedList<Image> iconImages = new LinkedList<Image>();
 	for(ImageIcon ii : icons)
