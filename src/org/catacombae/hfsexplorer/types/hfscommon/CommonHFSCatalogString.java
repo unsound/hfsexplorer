@@ -13,7 +13,7 @@ import org.catacombae.hfsexplorer.types.hfsplus.HFSUniStr255;
  * @author erik
  */
 public abstract class CommonHFSCatalogString {
-    public static final CommonHFSCatalogString EMPTY = createHFS(new byte[0]);
+    //public static final CommonHFSCatalogString EMPTY = createHFS(new byte[0]);
 
     public static CommonHFSCatalogString createHFSPlus(HFSUniStr255 nodeName) {
         return new HFSPlusImplementation(nodeName);
@@ -32,7 +32,7 @@ public abstract class CommonHFSCatalogString {
      * @return the string data, decoded with the specified StringDecoder.
      */
     public String decode(StringDecoder sd) {
-        byte[] data = getBytes();
+        byte[] data = getStringBytes();
         return sd.decode(data, 0, data.length);
     }
     
@@ -42,8 +42,16 @@ public abstract class CommonHFSCatalogString {
      * 
      * @return the raw bytes that make up this string.
      */
-    public abstract byte[] getBytes();
+    public abstract byte[] getStringBytes();
     
+    /**
+     * Returns the bytes that make up the struct. May include string size and
+     * padding in addition to the bytes that make up the string.
+     * @return the bytes that make up the struct.
+     */
+    public abstract byte[] getStructBytes();
+
+
     public static class HFSPlusImplementation extends CommonHFSCatalogString {
         private HFSUniStr255 nodeName;
         
@@ -52,8 +60,13 @@ public abstract class CommonHFSCatalogString {
         }
         
         @Override
-        public byte[] getBytes() {
+        public byte[] getStringBytes() {
             return nodeName.getRawUnicode();
+        }
+
+        @Override
+        public byte[] getStructBytes() {
+            return nodeName.getBytes();
         }
     }
     
@@ -65,7 +78,12 @@ public abstract class CommonHFSCatalogString {
         }
 
         @Override
-        public byte[] getBytes() {
+        public byte[] getStringBytes() {
+            return Util.createCopy(ckrCName);
+        }
+
+        @Override
+        public byte[] getStructBytes() {
             return Util.createCopy(ckrCName);
         }
     }

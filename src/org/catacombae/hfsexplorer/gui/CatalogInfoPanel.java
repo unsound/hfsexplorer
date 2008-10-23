@@ -222,7 +222,7 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
                         else if(rec instanceof StructElements) {
                             Dictionary dict = ((StructElements) rec).getStructElements();
                             structViewPanelScroller.setViewportView(
-                                    new StructViewPanel("Record (" + rec.getClass().toString() + "):", dict));
+                                    new StructViewPanel("Record (" + rec.getClass().getSimpleName() + "):", dict));
                             clLeaf.show(leafPanel, STRUCT_VIEW_PANEL_NAME);
                         }
                         else if(rec instanceof PrintableStruct) {

@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.catacombae.hfsexplorer;
 
 import org.catacombae.hfsexplorer.FileSystemBrowser.Record;
@@ -82,6 +83,7 @@ import javax.swing.filechooser.FileFilter;
 import org.catacombae.dmgextractor.encodings.encrypted.ReadableCEncryptedEncodingStream;
 import org.catacombae.dmgextractor.ui.PasswordDialog;
 import org.catacombae.jparted.lib.DataLocator;
+import org.catacombae.jparted.lib.fs.FSLink;
 import org.catacombae.udif.UDIFRandomAccessStream;
 
 public class FileSystemBrowserWindow extends JFrame {
@@ -1259,88 +1261,7 @@ public class FileSystemBrowserWindow extends JFrame {
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
-//    private void actionGotoDir() {
-//	String requestedPath = addressField.getText();
-//	String[] components = requestedPath.split("/");
-//	LinkedList<HFSPlusCatalogLeafRecord> recordPath = new LinkedList<HFSPlusCatalogLeafRecord>();
-//	HFSPlusCatalogLeafRecord currentRecord = fsView.getRoot();
-//	HFSPlusCatalogLeafRecordData currentRecordData = currentRecord.getData();
-//	//recordPath.addLast(currentRecord);
-//	for(String s : components) {
-//	    if(!s.trim().equals("")) {
-//		if(currentRecordData.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER &&
-//		   currentRecordData instanceof HFSPlusCatalogFolder) {
-//		    HFSPlusCatalogFolder folder = (HFSPlusCatalogFolder) currentRecordData;
-//		    HFSPlusCatalogLeafRecord nextRecord = fsView.getRecord(folder.getFolderID(), new HFSUniStr255(s));
-//		    
-//		    if(nextRecord == null) {
-//			currentRecord = null;
-//			break;
-//		    }
-//		    else {
-//			currentRecord = nextRecord;
-//			currentRecordData = currentRecord.getData();
-//			recordPath.addLast(currentRecord);
-//		    }
-//
-//		}
-//		else {
-//		    currentRecord = null;
-//		    break;
-//		}
-//	    }
-//	}
-//	
-//	if(currentRecord == null)
-//	    JOptionPane.showMessageDialog(this, "Path not found!", "Error", JOptionPane.ERROR_MESSAGE);
-//	else if(currentRecordData.getRecordType() != HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER)
-//	    JOptionPane.showMessageDialog(this, "Requested path points to a file. Can only browse folders...", "Error", JOptionPane.ERROR_MESSAGE);
-//	else {
-//	    setTreePath(recordPath);
-//	}
-//	
-//    }
-
-//    private void setTreePath(List<HFSPlusCatalogLeafRecord> recordPath) {
-//	Object root = dirTree.getModel().getRoot();
-//	DefaultMutableTreeNode rootNode;
-//	if(root instanceof DefaultMutableTreeNode)
-//	    rootNode = (DefaultMutableTreeNode)root;
-//	else
-//	    throw new RuntimeException("Invalid type in tree");
-//	TreePath treePath = new TreePath(rootNode);
-//	//System.out.println("Children:");
-//	
-//	for(HFSPlusCatalogLeafRecord rec : recordPath) {
-//	    DefaultMutableTreeNode rootNodeBefore = rootNode;
-//	    LinkedList<String> debug = new LinkedList<String>();
-//	    for(Enumeration e = rootNode.children() ; e.hasMoreElements() ;) {
-//		Object o = e.nextElement();
-//		if(o instanceof DefaultMutableTreeNode) {
-//		    DefaultMutableTreeNode currentNode = (DefaultMutableTreeNode)o;
-//		    Object o2 = currentNode.getUserObject();
-//		    debug.addLast(o2.toString());
-//		    if(o2.toString().equals(rec.getKey().getNodeName().toString())) {
-//			rootNode = currentNode;
-//			treePath = treePath.pathByAddingChild(rootNode);
-//			break;
-//		    }
-//		}
-//	    }
-//	    if(rootNode == rootNodeBefore) {
-//		System.err.println("Record string: \"" + rec.getKey().getNodeName().toString() + "\"");
-//		System.err.println("Contents:");
-//		for(String s : debug)
-//		    System.err.println("    " + s);
-//		throw new RuntimeException("Could not find record in tree!");
-//	    }
-//	}
-//	
-//	dirTree.setSelectionPath(treePath);
-//	
-//	//JOptionPane.showMessageDialog(this, "Found path, and path is folder! :)\nRoot of the tree has class: " + root.getClass(), "YEA", JOptionPane.INFORMATION_MESSAGE);
-//    }
+    
     /** <code>progressDialog</code> may NOT be null. */
     protected int extract(FSEntry rec, File outDir, ProgressMonitor progressDialog) {
         return extract(Arrays.asList(rec), outDir, progressDialog, true, false);
@@ -1636,6 +1557,17 @@ public class FileSystemBrowserWindow extends JFrame {
             if(entry instanceof FSFile) {
                 FileSystemBrowserWindow.this.actionDoubleClickFile((FSFile) entry);
             }
+            else if(entry instanceof FSLink) {
+                FSLink link = (FSLink)entry;
+                FSEntry linkTarget = link.getLinkTarget();
+                if(linkTarget == null)
+                    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+                            "The link you clicked is broken.", "Error", JOptionPane.ERROR_MESSAGE);
+                else if(linkTarget instanceof FSFile)
+                    FileSystemBrowserWindow.this.actionDoubleClickFile((FSFile) linkTarget);
+                else
+                    throw new RuntimeException("Unexpected FSEntry link target: " + entry.getClass());
+            }
             else {
                 throw new RuntimeException("Unexpected FSEntry type: " + entry.getClass());
             }
@@ -1718,6 +1650,21 @@ public class FileSystemBrowserWindow extends JFrame {
         @Override
         public List<Record<FSEntry>> getFolderContents(List<Record<FSEntry>> folderRecordPath) {
             FSEntry lastEntry = folderRecordPath.get(folderRecordPath.size() - 1).getUserObject();
+            
+            if(lastEntry instanceof FSLink) {
+                FSEntry linkTarget = ((FSLink)lastEntry).getLinkTarget();
+                if(linkTarget == null) {
+                    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+                            "The link you clicked is broken.", "Error", JOptionPane.ERROR_MESSAGE);
+                    throw new RuntimeException("Broken link");
+                }
+                else if(linkTarget instanceof FSFolder)
+                    lastEntry = linkTarget;
+                else
+                    throw new RuntimeException("Tried to get folder contents for link target type " +
+                        lastEntry.getClass());
+            }
+
             if(lastEntry instanceof FSFolder) {
                 FSEntry[] entryArray = ((FSFolder) lastEntry).list();
                 ArrayList<Record<FSEntry>> entryList = new ArrayList<Record<FSEntry>>(entryArray.length);
@@ -1738,7 +1685,7 @@ public class FileSystemBrowserWindow extends JFrame {
             StringBuilder sb = new StringBuilder("/");
 
             for(String name : pathComponents) {
-                sb.append(name);
+                sb.append(fsHandler.generatePosixPathnameComponent(name));
                 sb.append("/");
             }
             return sb.toString();
@@ -1756,6 +1703,8 @@ public class FileSystemBrowserWindow extends JFrame {
                 }
                 else {
                     String[] res = remainder.split("/");
+                    for(int i = 0; i < res.length; ++i)
+                        res[i] = fsHandler.parsePosixPathnameComponent(res[i]);
                     return res;
                 }
             }
@@ -1775,6 +1724,21 @@ public class FileSystemBrowserWindow extends JFrame {
             else if(entry instanceof FSFolder) {
                 return RecordType.FOLDER;
             }
+            else if(entry instanceof FSLink) {
+                FSLink fsl = (FSLink)entry;
+                FSEntry linkTarget = fsl.getLinkTarget();
+                if(linkTarget == null) {
+                    return RecordType.FILE; // BROKEN_LINK might be a future constant.
+                }
+                if(linkTarget instanceof FSFile) {
+                    return RecordType.FILE_LINK;
+                }
+                else if(linkTarget instanceof FSFolder) {
+                    return RecordType.FOLDER_LINK;
+                }
+                else
+                    throw new IllegalArgumentException("Unsupported FSEntry link target: " + entry.getClass());
+            }
             else {
                 throw new IllegalArgumentException("Unsupported FSEntry type: " + entry.getClass());
             }
@@ -1786,6 +1750,21 @@ public class FileSystemBrowserWindow extends JFrame {
             }
             else if(entry instanceof FSFolder) {
                 return 0;
+            }
+            else if(entry instanceof FSLink) {
+                FSLink fsl = (FSLink)entry;
+                FSEntry linkTarget = fsl.getLinkTarget();
+                if(linkTarget == null) {
+                    return 0;
+                }
+                else if(linkTarget instanceof FSFile) {
+                    return ((FSFile)linkTarget).getMainFork().getLength();
+                }
+                else if(linkTarget instanceof FSFolder) {
+                    return 0;
+                }
+                else
+                    throw new IllegalArgumentException("Unsupported FSEntry link target: " + entry.getClass());
             }
             else {
                 throw new IllegalArgumentException("Unsupported FSEntry type: " + entry.getClass());

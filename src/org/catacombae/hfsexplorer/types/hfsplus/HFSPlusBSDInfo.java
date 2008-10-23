@@ -47,15 +47,15 @@ public class HFSPlusBSDInfo implements StructElements {
     public static final byte MASK_OWNER_IMMUTABLE = 0x2;
     public static final byte MASK_OWNER_APPEND = 0x4;
     public static final byte MASK_OWNER_OPAQUE = 0x8;
-    public static final byte MASK_FILETYPE_UNDEFINED = 00;
-    public static final byte MASK_FILETYPE_FIFO = 01;
-    public static final byte MASK_FILETYPE_CHARACTER_SPECIAL = 02;
-    public static final byte MASK_FILETYPE_DIRECTORY = 04;
-    public static final byte MASK_FILETYPE_BLOCK_SPECIAL = 06;
-    public static final byte MASK_FILETYPE_REGULAR = 010;
-    public static final byte MASK_FILETYPE_SYMBOLIC_LINK = 012;
-    public static final byte MASK_FILETYPE_SOCKET = 014;
-    public static final byte MASK_FILETYPE_WHITEOUT = 016;
+    public static final byte FILETYPE_UNDEFINED = 00;
+    public static final byte FILETYPE_FIFO = 01;
+    public static final byte FILETYPE_CHARACTER_SPECIAL = 02;
+    public static final byte FILETYPE_DIRECTORY = 04;
+    public static final byte FILETYPE_BLOCK_SPECIAL = 06;
+    public static final byte FILETYPE_REGULAR = 010;
+    public static final byte FILETYPE_SYMBOLIC_LINK = 012;
+    public static final byte FILETYPE_SOCKET = 014;
+    public static final byte FILETYPE_WHITEOUT = 016;
     
     
     private final byte[] ownerID = new byte[4];
@@ -110,103 +110,136 @@ public class HFSPlusBSDInfo implements StructElements {
     public boolean getFileModeOtherWrite()   { return ((getFileMode() >> 0) & 0x2) != 0; }
     public boolean getFileModeOtherExecute() { return ((getFileMode() >> 0) & 0x1) != 0; }
     //public boolean getFileMode() {}
-    
-    public String getFileModeString() {
-	String result;
-	byte fileType = getFileModeFileType();
-	switch(fileType) {
-	case MASK_FILETYPE_UNDEFINED: // This one appears at the root node (CNID 2) sometimes. dunno what it would look like in ls -l
-	    result = "?"; break;
-	case MASK_FILETYPE_FIFO:
-	    result = "p"; break;
-	case MASK_FILETYPE_CHARACTER_SPECIAL:
-	    result = "c"; break;
-	case MASK_FILETYPE_DIRECTORY:
-	    result = "d"; break;
-	case MASK_FILETYPE_BLOCK_SPECIAL:
-	    result = "b"; break;
-	case MASK_FILETYPE_REGULAR:
-	    result = "-"; break;
-	case MASK_FILETYPE_SYMBOLIC_LINK:
-	    result = "l"; break;
-	case MASK_FILETYPE_SOCKET:
-	    result = "s"; break;
-	case MASK_FILETYPE_WHITEOUT:
-	    result = "w"; break; // How does this appear in "ls -l" ? and what is it?
-	default:
-	    throw new RuntimeException("Unknown file type (read: " + fileType + " REGULAR: " + MASK_FILETYPE_REGULAR + " MODE: 0x" + Util.toHexStringBE(getFileMode()) + ")!");
-	}
-	
-	if(getFileModeOwnerRead()) result += "r"; else result += "-";
-	if(getFileModeOwnerWrite()) result += "w"; else result += "-";
-	if(getFileModeOwnerExecute()) {
-	    if(getFileModeSetUserID())
-		result += "s";
-	    else
-		result += "x";
-	}
-	else {
-	    if(getFileModeSetUserID())
-		result += "S";
-	    else
-		result += "-";
-	}
-	if(getFileModeGroupRead()) result += "r"; else result += "-";
-	if(getFileModeGroupWrite()) result += "w"; else result += "-";
-	if(getFileModeGroupExecute()) {
-	    if(getFileModeSetGroupID())
-		result += "s";
-	    else
-		result += "x";
-	}
-	else {
-	    if(getFileModeSetGroupID())
-		result += "S";
-	    else
-		result += "-";
-	}
-	if(getFileModeOtherRead()) result += "r"; else result += "-";
-	if(getFileModeOtherWrite()) result += "w"; else result += "-";
-	if(getFileModeOtherExecute()) {
-	    if(getFileModeSticky())
-		result += "t";
-	    else
-		result += "x";
-	}
-	else {
-	    if(getFileModeSticky())
-		result += "T";
-	    else
-		result += "-";
-	}
 
-	return result;
+    /**
+     * Returns the POSIX-type file mode string for this file, as it would appear
+     * when listing it with 'ls -l'. Example: <code>drwxr-x---</code>.
+     * 
+     * @return the POSIX-type file mode string for this file.
+     */
+    public String getFileModeString() {
+        String result;
+        byte fileType = getFileModeFileType();
+        switch(fileType) {
+            case FILETYPE_UNDEFINED: // This one appears at the root node (CNID 2) sometimes. dunno what it would look like in ls -l
+                result = "?";
+                break;
+            case FILETYPE_FIFO:
+                result = "p";
+                break;
+            case FILETYPE_CHARACTER_SPECIAL:
+                result = "c";
+                break;
+            case FILETYPE_DIRECTORY:
+                result = "d";
+                break;
+            case FILETYPE_BLOCK_SPECIAL:
+                result = "b";
+                break;
+            case FILETYPE_REGULAR:
+                result = "-";
+                break;
+            case FILETYPE_SYMBOLIC_LINK:
+                result = "l";
+                break;
+            case FILETYPE_SOCKET:
+                result = "s";
+                break;
+            case FILETYPE_WHITEOUT:
+                result = "w";
+                break; // How does this appear in "ls -l" ? and what is it?
+            default:
+                throw new RuntimeException("Unknown file type (read: " + fileType + " REGULAR: " + FILETYPE_REGULAR + " MODE: 0x" + Util.toHexStringBE(getFileMode()) + ")!");
+        }
+
+        if(getFileModeOwnerRead())
+            result += "r";
+        else
+            result += "-";
+        if(getFileModeOwnerWrite())
+            result += "w";
+        else
+            result += "-";
+        if(getFileModeOwnerExecute()) {
+            if(getFileModeSetUserID())
+                result += "s";
+            else
+                result += "x";
+        }
+        else {
+            if(getFileModeSetUserID())
+                result += "S";
+            else
+                result += "-";
+        }
+        if(getFileModeGroupRead())
+            result += "r";
+        else
+            result += "-";
+        if(getFileModeGroupWrite())
+            result += "w";
+        else
+            result += "-";
+        if(getFileModeGroupExecute()) {
+            if(getFileModeSetGroupID())
+                result += "s";
+            else
+                result += "x";
+        }
+        else {
+            if(getFileModeSetGroupID())
+                result += "S";
+            else
+                result += "-";
+        }
+        if(getFileModeOtherRead())
+            result += "r";
+        else
+            result += "-";
+        if(getFileModeOtherWrite())
+            result += "w";
+        else
+            result += "-";
+        if(getFileModeOtherExecute()) {
+            if(getFileModeSticky())
+                result += "t";
+            else
+                result += "x";
+        }
+        else {
+            if(getFileModeSticky())
+                result += "T";
+            else
+                result += "-";
+        }
+
+        return result;
     }
-    
+
     public void printFields(PrintStream ps, String prefix) {
-	ps.println(prefix + " ownerID: " + getOwnerID());
-	ps.println(prefix + " groupID: " + getGroupID());
-	ps.println(prefix + " adminFlags: " + getAdminFlags());
-	ps.println(prefix + " ownerFlags: " + getOwnerFlags());
-	ps.println(prefix + " fileMode: " + getFileMode());
-	ps.println(prefix + " special: " + getSpecial());
+        ps.println(prefix + " ownerID: " + getOwnerID());
+        ps.println(prefix + " groupID: " + getGroupID());
+        ps.println(prefix + " adminFlags: " + getAdminFlags());
+        ps.println(prefix + " ownerFlags: " + getOwnerFlags());
+        ps.println(prefix + " fileMode: " + getFileMode());
+        ps.println(prefix + " special: " + getSpecial());
     }
-    
+
     public void print(PrintStream ps, String prefix) {
-	ps.println(prefix + "HFSPlusBSDInfo:");
-	printFields(ps, prefix);
+        ps.println(prefix + "HFSPlusBSDInfo:");
+        printFields(ps, prefix);
     }
 
     byte[] getBytes() {
         byte[] result = new byte[length()];
-	int offset = 0;
+        int offset = 0;
         
-	System.arraycopy(ownerID, 0, result, offset, ownerID.length); offset += ownerID.length;
-	System.arraycopy(groupID, 0, result, offset, groupID.length); offset += groupID.length;
-	System.arraycopy(adminFlags, 0, result, offset, adminFlags.length); offset += adminFlags.length;
-	System.arraycopy(ownerFlags, 0, result, offset, ownerFlags.length); offset += ownerFlags.length;
-	System.arraycopy(fileMode, 0, result, offset, fileMode.length); offset += fileMode.length;
-	System.arraycopy(special, 0, result, offset, special.length); offset += special.length;
+        System.arraycopy(ownerID, 0, result, offset, ownerID.length); offset += ownerID.length;
+        System.arraycopy(groupID, 0, result, offset, groupID.length); offset += groupID.length;
+        System.arraycopy(adminFlags, 0, result, offset, adminFlags.length); offset += adminFlags.length;
+        System.arraycopy(ownerFlags, 0, result, offset, ownerFlags.length); offset += ownerFlags.length;
+        System.arraycopy(fileMode, 0, result, offset, fileMode.length); offset += fileMode.length;
+        System.arraycopy(special, 0, result, offset, special.length); offset += special.length;
         
         return result;
     }
@@ -275,23 +308,23 @@ public class HFSPlusBSDInfo implements StructElements {
         public String getValueAsString() {
             byte fileTypeByte = getFileModeFileType();
             switch(fileTypeByte) {
-                case MASK_FILETYPE_UNDEFINED: // This one appears at the root node (CNID 2) sometimes. dunno what it would look like in ls -l
+                case FILETYPE_UNDEFINED: // This one appears at the root node (CNID 2) sometimes. dunno what it would look like in ls -l
                     return "Undefined";
-                case MASK_FILETYPE_FIFO:
+                case FILETYPE_FIFO:
                     return "FIFO";
-                case MASK_FILETYPE_CHARACTER_SPECIAL:
+                case FILETYPE_CHARACTER_SPECIAL:
                     return "Character special file";
-                case MASK_FILETYPE_DIRECTORY:
+                case FILETYPE_DIRECTORY:
                     return "Directory";
-                case MASK_FILETYPE_BLOCK_SPECIAL:
+                case FILETYPE_BLOCK_SPECIAL:
                     return "Block special file";
-                case MASK_FILETYPE_REGULAR:
+                case FILETYPE_REGULAR:
                     return "Regular file";
-                case MASK_FILETYPE_SYMBOLIC_LINK:
+                case FILETYPE_SYMBOLIC_LINK:
                     return "Symbolic link";
-                case MASK_FILETYPE_SOCKET:
+                case FILETYPE_SOCKET:
                     return "Socket";
-                case MASK_FILETYPE_WHITEOUT:
+                case FILETYPE_WHITEOUT:
                     return "Whiteout";
                 default:
                     return "[Unknown file type: " + fileTypeByte + "]";

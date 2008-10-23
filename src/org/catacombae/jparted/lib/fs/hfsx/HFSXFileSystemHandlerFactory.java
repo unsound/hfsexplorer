@@ -15,7 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package org.catacombae.jparted.lib.fs.hfsx;
 
 import org.catacombae.jparted.lib.fs.*;

@@ -17,6 +17,8 @@
 
 package org.catacombae.jparted.lib.fs;
 
+import java.util.LinkedList;
+
 /**
  * A file system entry in our hierarchical file system model. This corresponds
  * to one of the nodes in a file system that denote a file, folder, device,
@@ -122,5 +124,35 @@ public abstract class FSEntry {
             return (FSFolder) this;
         else
             throw new RuntimeException("Not a folder!");
+    }
+
+    /**
+     * Returns the absolute path to this entry in the context of its file system.
+     * @return the absolute path to this entry in the context of its file system.
+     */
+    public String[] getAbsolutePath() {
+        LinkedList<String> pathBuilder = new LinkedList<String>();
+        getCanonicalPathInternal(pathBuilder);
+        return pathBuilder.toArray(new String[pathBuilder.size()]);
+    }
+
+    void getCanonicalPathInternal(LinkedList<String> components) {
+        FSFolder parentFolder = getParent();
+        if(parentFolder != null)
+            parentFolder.getCanonicalPathInternal(components);
+        
+        components.addLast(getName());
+    }
+
+    public String getAbsolutePosixPath() {
+        String[] fsPath = getAbsolutePath();
+        StringBuilder sb = new StringBuilder();
+
+        for(String s : fsPath) {
+            sb.append("/");
+            sb.append(parentFileSystem.generatePosixPathnameComponent(s));
+        }
+
+        return sb.toString();
     }
 }

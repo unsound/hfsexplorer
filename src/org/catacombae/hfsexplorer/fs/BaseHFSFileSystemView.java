@@ -216,7 +216,9 @@ public abstract class BaseHFSFileSystemView {
             String name);*/
 
     public abstract BaseHFSAllocationFileView getAllocationFileView();
-    
+
+    public abstract CommonHFSCatalogString getEmptyString();
+
     /**
      * Returns the default StringDecoder instance for this view. For HFS file systems the decoder
      * can be set in the HFS-specific subclass, but in HFS+ and HFSX file systems it will always
@@ -355,7 +357,7 @@ public abstract class BaseHFSFileSystemView {
      * <code>leaf</code> as tail.
      */
     public LinkedList<CommonHFSCatalogLeafRecord> getPathTo(CommonHFSCatalogNodeID leafID) {
-	CommonHFSCatalogLeafRecord leafRec = getRecord(leafID, CommonHFSCatalogString.EMPTY);
+	CommonHFSCatalogLeafRecord leafRec = getRecord(leafID, getEmptyString());
 	if(leafRec != null)
 	    return getPathTo(leafRec);
 	else
@@ -381,7 +383,7 @@ public abstract class BaseHFSFileSystemView {
 	pathList.addLast(leaf);
 	CommonHFSCatalogNodeID parentID = leaf.getKey().getParentID();
 	while(!parentID.equals(parentID.getReservedID(ReservedID.ROOT_PARENT))) {
-	    CommonHFSCatalogLeafRecord parent = getRecord(parentID, CommonHFSCatalogString.EMPTY); // Look for the thread record associated with the parent dir
+	    CommonHFSCatalogLeafRecord parent = getRecord(parentID, getEmptyString()); // Look for the thread record associated with the parent dir
 	    if(parent == null)
 		throw new RuntimeException("No folder thread found!");
 	    //CommonHFSCatalogLeafRecord data = parent.getData();

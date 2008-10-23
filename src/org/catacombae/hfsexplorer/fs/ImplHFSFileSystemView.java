@@ -51,6 +51,8 @@ import org.catacombae.io.ReadableConcatenatedStream;
  */
 public class ImplHFSFileSystemView extends BaseHFSFileSystemView {
     
+    private static final CommonHFSCatalogString EMPTY_STRING =
+            CommonHFSCatalogString.createHFS(new byte[0]);
     protected static final CatalogOperations HFS_OPERATIONS = new CatalogOperations() {
 
         @Override
@@ -62,7 +64,7 @@ public class ImplHFSFileSystemView extends BaseHFSFileSystemView {
         @Override
         public CommonHFSCatalogKey newCatalogKey(
                 CommonHFSCatalogNodeID nodeID, CommonHFSCatalogString searchString, CommonBTHeaderRecord bthr) {
-            return CommonHFSCatalogKey.create(new CatKeyRec(nodeID.toInt(), searchString.getBytes()));
+            return CommonHFSCatalogKey.create(new CatKeyRec(nodeID.toInt(), searchString.getStringBytes()));
         }
 
         @Override
@@ -218,5 +220,10 @@ public class ImplHFSFileSystemView extends BaseHFSFileSystemView {
                 volumeBitmapSize);
         
         return new ImplHFSAllocationFileView(this, volumeBitmapStream);
+    }
+
+    @Override
+    public CommonHFSCatalogString getEmptyString() {
+        return EMPTY_STRING;
     }
 }

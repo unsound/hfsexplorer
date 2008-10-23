@@ -13,6 +13,7 @@ import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFile;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusDate;
 import org.catacombae.hfsexplorer.types.hfs.CdrFilRec;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusBSDInfo;
 
 /**
  *
@@ -24,6 +25,7 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
     public abstract CommonHFSForkData getDataFork();
     public abstract CommonHFSForkData getResourceFork();
     public abstract byte[] getBytes();
+    public abstract boolean isSymbolicLink();
     
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + CommonHFSCatalogFile.class.getSimpleName() + ":");
@@ -47,7 +49,7 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
             this.data = data;
         }
 
-        @Deprecated
+        //@Deprecated
         public HFSPlusCatalogFile getUnderlying() {
             return data;
         }
@@ -69,7 +71,7 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
 
         @Override
         public int size() {
-            return data.length();
+            return data.size();
         }
 
         @Override
@@ -77,50 +79,62 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
             return data.getBytes();
         }
 
+        @Override
         public short getRecordType() {
             return data.getRecordType();
         }
 
+        @Override
         public short getFlags() {
             return data.getFlags();
         }
 
+        @Override
         public int getCreateDate() {
             return data.getCreateDate();
         }
 
+        @Override
         public int getContentModDate() {
             return data.getContentModDate();
         }
 
+        @Override
         public int getAttributeModDate() {
             return data.getAttributeModDate();
         }
 
+        @Override
         public int getAccessDate() {
             return data.getAccessDate();
         }
 
+        @Override
         public int getBackupDate() {
             return data.getBackupDate();
         }
 
+        @Override
         public Date getCreateDateAsDate() {
             return data.getCreateDateAsDate();
         }
 
+        @Override
         public Date getContentModDateAsDate() {
             return data.getContentModDateAsDate();
         }
 
+        @Override
         public Date getAttributeModDateAsDate() {
             return data.getAttributeModDateAsDate();
         }
 
+        @Override
         public Date getAccessDateAsDate() {
             return data.getAccessDateAsDate();
         }
 
+        @Override
         public Date getBackupDateAsDate() {
             return data.getBackupDateAsDate();
         }
@@ -129,6 +143,11 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
         public void printFields(PrintStream ps, String prefix) {
             ps.println(prefix + "data:");
             data.print(ps, prefix + " ");
+        }
+
+        @Override
+        public boolean isSymbolicLink() {
+            return data.getPermissions().getFileModeFileType() == HFSPlusBSDInfo.FILETYPE_SYMBOLIC_LINK;
         }
 
         @Override
@@ -161,7 +180,7 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
 
         @Override
         public int size() {
-            return data.length();
+            return data.size();
         }
 
         @Override
@@ -169,50 +188,62 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
             return data.getBytes();
         }
 
+        @Override
         public short getRecordType() {
             return data.getCdrType();
         }
 
+        @Override
         public short getFlags() {
             return data.getFilFlags();
         }
 
+        @Override
         public int getCreateDate() {
             return data.getFilCrDat();
         }
 
+        @Override
         public int getContentModDate() {
             return data.getFilMdDat();
         }
 
+        @Override
         public int getAttributeModDate() {
             return data.getFilMdDat();
         }
 
+        @Override
         public int getAccessDate() {
             return data.getFilMdDat();
         }
 
+        @Override
         public int getBackupDate() {
             return data.getFilBkDat();
         }
 
+        @Override
         public Date getCreateDateAsDate() {
             return HFSPlusDate.localTimestampToDate(getCreateDate());
         }
 
+        @Override
         public Date getContentModDateAsDate() {
             return HFSPlusDate.localTimestampToDate(getContentModDate());
         }
 
+        @Override
         public Date getAttributeModDateAsDate() {
             return HFSPlusDate.localTimestampToDate(getAttributeModDate());
         }
 
+        @Override
         public Date getAccessDateAsDate() {
             return HFSPlusDate.localTimestampToDate(getAccessDate());
         }
 
+        @Override
         public Date getBackupDateAsDate() {
             return HFSPlusDate.localTimestampToDate(getBackupDate());
         }
@@ -221,6 +252,12 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
         public void printFields(PrintStream ps, String prefix) {
             ps.println(prefix + "data:");
             data.print(ps, prefix + " ");
+        }
+
+        @Override
+        public boolean isSymbolicLink() {
+            // HFS doesn't support symbolic links.
+            return false;
         }
 
         @Override

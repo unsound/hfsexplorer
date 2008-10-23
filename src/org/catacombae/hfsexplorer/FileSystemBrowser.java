@@ -328,9 +328,9 @@ public class FileSystemBrowser<A> {
 			final Component objectComponent = objectRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);			
 			final JLabel jl = theOne;
 			Record rec = ((RecordContainer)value).getRecord(genericPlaceholder);
-			if(rec.getType() == RecordType.FOLDER)
+			if(rec.getType() == RecordType.FOLDER || rec.getType() == RecordType.FOLDER_LINK)
 			    jl.setIcon(folderIcon);
-			else if(rec.getType() == RecordType.FILE)
+			else if(rec.getType() == RecordType.FILE || rec.getType() == RecordType.FILE_LINK)
 			    jl.setIcon(documentIcon);
 			else
 			    jl.setIcon(emptyIcon);
@@ -379,7 +379,7 @@ public class FileSystemBrowser<A> {
 			
 			if(o instanceof RecordContainer) {
 			    Record rec = ((RecordContainer)o).getRecord(genericPlaceholder);
-			    if(rec.getType() == RecordType.FILE)
+			    if(rec.getType() == RecordType.FILE || rec.getType() == RecordType.FILE_LINK)
 				selectionSize += rec.getSize();
 			}
 		    }
@@ -438,9 +438,9 @@ public class FileSystemBrowser<A> {
 			    //System.err.println("  Value class: " + colValue.getClass());
 			    if(colValue instanceof RecordContainer) {
                                 Record<A> rec = ((RecordContainer)colValue).getRecord(genericPlaceholder);
-                                if(rec.getType() == RecordType.FILE)
+                                if(rec.getType() == RecordType.FILE || rec.getType() == RecordType.FILE_LINK)
                                     controller.actionDoubleClickFile(rec);
-                                else if(rec.getType() == RecordType.FOLDER)
+                                else if(rec.getType() == RecordType.FOLDER || rec.getType() == RecordType.FOLDER_LINK)
                                     actionChangeDir(rec);
 			    }
 			    else
@@ -671,7 +671,7 @@ public class FileSystemBrowser<A> {
                 if(userObj instanceof RecordContainer) {
                     Record<A> rec = ((RecordContainer) userObj).getRecord(genericPlaceholder);
 
-                    if(rec.getType() == RecordType.FOLDER) {
+                    if(rec.getType() == RecordType.FOLDER || rec.getType() == RecordType.FOLDER_LINK) {
                         recordPath.add(rec);
                     }
                     else {
@@ -752,7 +752,7 @@ public class FileSystemBrowser<A> {
         { // Initialize remainingQueue
             final LinkedList<Record<A>> remainingRecords = new LinkedList<Record<A>>();
             for(Record<A> childRecord : childRecords) {
-                if(childRecord.getType() == RecordType.FOLDER) {
+                if(childRecord.getType() == RecordType.FOLDER || childRecord.getType() == RecordType.FOLDER_LINK) {
                     remainingRecords.add(childRecord);
                 }
             }
