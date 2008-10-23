@@ -270,11 +270,10 @@ public class ForkFilter implements ReadableRandomAccessStream {
     }
 
     /**
-     * Closes the underlying stream. Equivalent to
-     * <code>getUnderlyingStream().close()</code>.
+     * Does nothing.
      */
     @Override
     public void close() {
-        sourceFile.close();
+        //sourceFile.close(); // <- bad idea.
     }
 }

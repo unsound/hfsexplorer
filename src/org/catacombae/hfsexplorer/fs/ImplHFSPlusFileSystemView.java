@@ -52,6 +52,8 @@ import org.catacombae.io.ReadableRandomAccessStream;
  * @author erik
  */
 public class ImplHFSPlusFileSystemView extends BaseHFSFileSystemView {
+    private static final CommonHFSCatalogString EMPTY_STRING =
+            CommonHFSCatalogString.createHFSPlus(new HFSUniStr255(""));
     
     protected static final CatalogOperations HFS_PLUS_OPERATIONS = new CatalogOperations() {
 
@@ -65,7 +67,7 @@ public class ImplHFSPlusFileSystemView extends BaseHFSFileSystemView {
         public CommonHFSCatalogKey newCatalogKey(
                 CommonHFSCatalogNodeID nodeID, CommonHFSCatalogString searchString, CommonBTHeaderRecord bthr) {
             return CommonHFSCatalogKey.create(new HFSPlusCatalogKey(
-                    new HFSCatalogNodeID(nodeID.toInt()), new HFSUniStr255(searchString.getBytes(), 0)));
+                    new HFSCatalogNodeID(nodeID.toInt()), new HFSUniStr255(searchString.getStructBytes(), 0)));
         }
         
         @Override
@@ -185,7 +187,7 @@ public class ImplHFSPlusFileSystemView extends BaseHFSFileSystemView {
     @Override
     public String decodeString(CommonHFSCatalogString str) {
         if(str instanceof CommonHFSCatalogString.HFSPlusImplementation) {
-            char[] ca = Util.readCharArrayBE(str.getBytes());
+            char[] ca = Util.readCharArrayBE(str.getStringBytes());
             return new String(ca);
         }
         else
@@ -212,5 +214,10 @@ public class ImplHFSPlusFileSystemView extends BaseHFSFileSystemView {
                 hfsFile, fsOffset, Util.unsign(vh.getBlockSize()), 0);
 
         return new ImplHFSPlusAllocationFileView(this, allocationFileStream);
+    }
+
+    @Override
+    public CommonHFSCatalogString getEmptyString() {
+        return EMPTY_STRING;
     }
 }

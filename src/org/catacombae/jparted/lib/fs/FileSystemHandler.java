@@ -17,6 +17,8 @@
 
 package org.catacombae.jparted.lib.fs;
 
+import java.util.LinkedList;
+
 /**
  *
  * @author erik
@@ -58,7 +60,150 @@ public abstract class FileSystemHandler {
      * @return the root folder of the file system hierarchy.
      */
     public abstract FSFolder getRoot();
+
+    /**
+     * Returns the FSEntry present on the location <code>path</code>. If the
+     * path is invalid in this file system, <code>null</code> is returned.
+     *
+     * @param path the file system path to the requested entry, path element by
+     * path element (ex. <code>getEntry("usr", "local", "bin", "java");</code>).
+     * @return the FSEntry present on the location <code>path</code>, or
+     * <code>null</code> if no such entry exists.
+     */
+    public abstract FSEntry getEntry(String... path);
     
+    /**
+     * Looks up the FSEntry denoted by the supplied POSIX path. Since POSIX
+     * paths may be relative, a root folder is needed to resolve the relative
+     * path structure. If the POSIX pathname is absolute, the root folder
+     * parameter will not be used.
+     *
+     * @param posixPath the POSIX pathname.
+     * @param rootFolder the root folder from which we should start resolving
+     * the path.
+     * @return the FSEntry corresponding to the supplied POSIX path, or <code>
+     * null</code> if no such pathname could be found.
+     * @throws java.lang.IllegalArgumentException if <code>posixPath</code> is
+     * an invalid pathname.
+     */
+    public FSEntry getEntryByPosixPath(final String posixPath,
+            final FSFolder rootFolder) throws IllegalArgumentException {
+        String[] components = posixPath.split("/");
+
+        int i = 0;
+        FSEntry curEntry;
+        LinkedList<String[]> visitedLinks = null;
+
+        // If we encounter a '/' as the first character, we have an absolute path
+        if(components[0].length() == 0) {
+            i = 1;
+            curEntry = getRoot();
+        }
+        else
+            curEntry = rootFolder;
+
+        for(; i < components.length; ++i) {
+            FSFolder curFolder;
+            if(curEntry instanceof FSFolder)
+                curFolder = (FSFolder) curEntry;
+            else if(curEntry instanceof FSLink) {
+                FSLink curLink = (FSLink) curEntry;
+                // Resolve links.
+                if(visitedLinks == null)
+                    visitedLinks = new LinkedList<String[]>();
+                else
+                    visitedLinks.clear();
+
+                visitedLinks.add(curEntry.getAbsolutePath());
+                FSEntry linkTarget = curLink.getLinkTarget();
+                while(linkTarget != null && linkTarget instanceof FSLink) {
+                    curLink = (FSLink) linkTarget;
+                    String[] curPath = curLink.getAbsolutePath();
+                    for(String[] visitedPath : visitedLinks) {
+                        if(curPath.length == visitedPath.length) {
+                            int j = 0;
+                            for(; j < curPath.length; ++j) {
+                                if(!curPath[j].equals(visitedPath[j]))
+                                    break;
+                            }
+                            if(j == curPath.length)
+                                return null; // We have been here before! Circular linking...
+                        }
+                    }
+
+                    visitedLinks.add(curPath);
+                    linkTarget = curLink.getLinkTarget();
+                }
+
+                if(linkTarget == null)
+                    return null; // Invalid link target.
+                if(linkTarget instanceof FSFolder)
+                    curFolder = (FSFolder) linkTarget;
+                else
+                    return null; // Link is pointing to a file or some unknown creature from the future
+
+                visitedLinks.clear();
+            }
+            else
+                return null; // Invalid pathname
+
+            String curPathComponent = components[i];
+
+            if(curPathComponent.length() == 0 || curPathComponent.equals(".")) {
+                // We allow empty components (multiple slashes between components)
+            }
+            else if(curPathComponent.equals("..")) {
+                curFolder = curFolder.getParent();
+            }
+            else {
+                String fsPathnameComponent = parsePosixPathnameComponent(curPathComponent);
+
+                FSEntry nextEntry = null;
+                for(FSEntry entry : curFolder.list()) {
+                    if(entry.getName().equals(fsPathnameComponent)) {
+                        nextEntry = entry;
+                        break;
+                    }
+
+                }
+
+                if(nextEntry != null)
+                    curEntry = nextEntry;
+                else
+                    return null; // Invalid pathname
+            }
+        }
+
+        return curEntry;
+    }
+
+    /**
+     * Converts the supplied POSIX pathname component into the proper file
+     * system pathname component form. For example, the ':' character in HFS+
+     * POSIX pathname components represent the character '/' in the file system.
+     * <br>
+     * For a strictly POSIX file system, this method should just bounce the
+     * input string.
+     *
+     * @param posixPathnameComponent
+     * @return
+     */
+    public abstract String parsePosixPathnameComponent(String posixPathnameComponent);
+
+    /**
+     * Converts the supplied file system pathname component into a corresponding
+     * POSIX pathname component. This may involve converting certain
+     * POSIX-incompatible characters into suitable replacements, such as
+     * pathname components containing the character '/'.
+     * <br>
+     * For a strictly POSIX file system, this method should just bounce the
+     * input string.
+     *
+     * @param fsPathnameComponent
+     * @return
+     */
+    public abstract String generatePosixPathnameComponent(String fsPathnameComponent);
+
     /**
      * Returns the predefined fork types that this file system recognizes and
      * supports. Note that this does not mean that every file in the file system

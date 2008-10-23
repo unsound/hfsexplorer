@@ -17,6 +17,8 @@
 
 package org.catacombae.hfsexplorer;
 import java.io.*;
+import org.catacombae.io.ReadableRandomAccessStream;
+import org.catacombae.io.RuntimeIOException;
 
 //package org.catacombae.rarx;
 // Ripped from junrarlib
@@ -271,29 +273,33 @@ public class Util {
 	return true;
     }
     
-    public static void zero(byte[] ba) {
-	set(ba, 0, ba.length, (byte)0);
+    public static void zero(byte[]... arrays) {
+        for(byte[] ba : arrays)
+            set(ba, 0, ba.length, (byte)0);
     }
     public static void zero(byte[] ba, int offset, int length) {
-	set(ba, offset, length, (byte)0);
+        set(ba, offset, length, (byte)0);
     }
-    public static void zero(short[] ba) {
-	set(ba, 0, ba.length, (short)0);
+    public static void zero(short[]... arrays) {
+        for(short[] array : arrays)
+            set(array, 0, array.length, (short)0);
     }
     public static void zero(short[] ba, int offset, int length) {
-	set(ba, offset, length, (short)0);
+        set(ba, offset, length, (short)0);
     }
-    public static void zero(int[] ba) {
-	set(ba, 0, ba.length, (int)0);
+    public static void zero(int[]... arrays) {
+        for(int[] array : arrays)
+            set(array, 0, array.length, (int) 0);
     }
     public static void zero(int[] ba, int offset, int length) {
-	set(ba, offset, length, (int)0);
+        set(ba, offset, length, (int) 0);
     }
-    public static void zero(long[] ba) {
-	set(ba, 0, ba.length, (long)0);
+    public static void zero(long[]... arrays) {
+        for(long[] array : arrays)
+            set(array, 0, array.length, (long) 0);
     }
     public static void zero(long[] ba, int offset, int length) {
-	set(ba, offset, length, (long)0);
+        set(ba, offset, length, (long) 0);
     }
     
     public static void set(boolean[] array, boolean value) {
@@ -693,5 +699,53 @@ public class Util {
     }
     public static long unsign(int i) {
 	return i & 0xFFFFFFFFL;
+    }
+
+    /**
+     * Reads the supplied ReadableRandomAccessStream from its current position
+     * until the end of the stream.
+     *
+     * @param s
+     * @return the contents of the remainder of the stream.
+     * @throws org.catacombae.io.RuntimeIOException if an I/O error occurred
+     * when reading the stream.
+     */
+    public static byte[] readFully(ReadableRandomAccessStream s) throws RuntimeIOException {
+        if(s.length() < 0 || s.length() > Integer.MAX_VALUE)
+            throw new IllegalArgumentException("Length of s is out of range: " + s.length());
+
+        byte[] res = new byte[(int)(s.length()-s.getFilePointer())];
+        s.readFully(res);
+        return res;
+    }
+
+    // Added 2007-06-24 for DMGExtractor
+    public static String readFully(Reader r) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        char[] temp = new char[512];
+        long bytesRead = 0;
+        int curBytesRead = r.read(temp, 0, temp.length);
+        while(curBytesRead >= 0) {
+            sb.append(temp, 0, curBytesRead);
+            curBytesRead = r.read(temp, 0, temp.length);
+        }
+        return sb.toString();
+    }
+
+    // Added 2007-06-26 for DMGExtractor
+    public static String[] concatenate(String[] a, String[] b) {
+        String[] c = new String[a.length + b.length];
+        System.arraycopy(a, 0, c, 0, a.length);
+        System.arraycopy(b, 0, c, a.length, b.length);
+        return c;
+    }
+
+    // From IRCForME
+    public static byte[] encodeString(String string, String encoding) {
+        try {
+            return string.getBytes(encoding);
+        } catch(Exception e) {
+            return null;
+        }
     }
 }
