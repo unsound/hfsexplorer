@@ -84,6 +84,8 @@ import org.catacombae.dmgextractor.encodings.encrypted.ReadableCEncryptedEncodin
 import org.catacombae.dmgextractor.ui.PasswordDialog;
 import org.catacombae.jparted.lib.DataLocator;
 import org.catacombae.jparted.lib.fs.FSLink;
+import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFSFile;
+import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFSLink;
 import org.catacombae.udif.UDIFRandomAccessStream;
 
 public class FileSystemBrowserWindow extends JFrame {
@@ -1245,9 +1247,14 @@ public class FileSystemBrowserWindow extends JFrame {
     }
     
     private void actionGetInfo(FSEntry entry) {
-        if(entry instanceof FSFile) {
-            FSFile file = (FSFile) entry;
+        if(entry instanceof HFSCommonFSFile) {
+            HFSCommonFSFile file = (HFSCommonFSFile) entry;
             FileInfoWindow fiw = new FileInfoWindow(file);
+            fiw.setVisible(true);
+        }
+        else if(entry instanceof HFSCommonFSLink) {
+            HFSCommonFSLink link = (HFSCommonFSLink) entry;
+            FileInfoWindow fiw = new FileInfoWindow(link.getName(), link.getInternalCatalogFileRecord().getData());
             fiw.setVisible(true);
         }
         else if(entry instanceof FSFolder) {
