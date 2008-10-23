@@ -25,8 +25,10 @@ import java.awt.*;
 import javax.swing.*;
 import org.catacombae.hfsexplorer.gui.StructViewPanel;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFile;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFileRecord;
 import org.catacombae.jparted.lib.fs.FSFile;
 import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFSFile;
+import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFSLink;
 
 public class FileInfoWindow extends JFrame {
     private JTabbedPane tabs;
@@ -34,49 +36,45 @@ public class FileInfoWindow extends JFrame {
     //private JScrollPane journalInfoPanelScroller;
     //private FileInfoPanel infoPanel;
     //private JournalInfoPanel journalInfoPanel;
-    
-    public FileInfoWindow(FSFile fsFile) {
-	super("Info - " + fsFile.getName());
-	
-	tabs = new JTabbedPane();
-                    
-	//journalInfoPanel = new JournalInfoPanel();
-	
-	infoPanelScroller = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-	//journalInfoPanelScroller = new JScrollPane(journalInfoPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    public FileInfoWindow(HFSCommonFSFile fsFile) {
+        this(fsFile.getName(), fsFile.getInternalCatalogFile());
+    }
 
-        if(fsFile instanceof HFSCommonFSFile) {
-            CommonHFSCatalogFile hfsFile = ((HFSCommonFSFile) fsFile).getInternalCatalogFile();
-            if(hfsFile instanceof CommonHFSCatalogFile.HFSPlusImplementation) {
-                FileInfoPanel infoPanel = new FileInfoPanel();
-                infoPanel.setFields(((CommonHFSCatalogFile.HFSPlusImplementation)hfsFile).getUnderlying());
-                infoPanelScroller.setViewportView(infoPanel);
-            }
-            else {
-                StructViewPanel svp = new StructViewPanel("File", hfsFile.getStructElements());
-                infoPanelScroller.setViewportView(svp);
-            }
+    public FileInfoWindow(String fileName, CommonHFSCatalogFile hfsFile) {
+        super("Info - " + fileName);
+
+        tabs = new JTabbedPane();
+
+        //journalInfoPanel = new JournalInfoPanel();
+
+        infoPanelScroller = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        //journalInfoPanelScroller = new JScrollPane(journalInfoPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+        if (hfsFile instanceof CommonHFSCatalogFile.HFSPlusImplementation) {
+            FileInfoPanel infoPanel = new FileInfoPanel();
+            infoPanel.setFields(((CommonHFSCatalogFile.HFSPlusImplementation) hfsFile).getUnderlying());
+            infoPanelScroller.setViewportView(infoPanel);
+        } else {
+            StructViewPanel svp = new StructViewPanel("File", hfsFile.getStructElements());
+            infoPanelScroller.setViewportView(svp);
         }
-        else
-            throw new IllegalArgumentException("FSFolder type " + fsFile.getClass() +
-                    " not yet supported!");
-        
+
         tabs.addTab("Detailed", infoPanelScroller);
-	//tabs.addTab("Journal info", journalInfoPanelScroller);
-	add(tabs, BorderLayout.CENTER);
-	
-	infoPanelScroller.getVerticalScrollBar().setUnitIncrement(10);
-	
-	setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-	pack();
-	int width = getSize().width;
-	int height = getSize().height;
-	int adjustedHeight = width + width/2;
-	
-	if(adjustedHeight < height)
-	    setSize(width, adjustedHeight);
-	
-	setLocationRelativeTo(null);
+        //tabs.addTab("Journal info", journalInfoPanelScroller);
+        add(tabs, BorderLayout.CENTER);
+
+        infoPanelScroller.getVerticalScrollBar().setUnitIncrement(10);
+
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        pack();
+        int width = getSize().width;
+        int height = getSize().height;
+        int adjustedHeight = width + width / 2;
+
+        if (adjustedHeight < height)
+            setSize(width, adjustedHeight);
+
+        setLocationRelativeTo(null);
     }
     
     /*

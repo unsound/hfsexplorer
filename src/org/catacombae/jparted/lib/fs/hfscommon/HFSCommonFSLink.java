@@ -76,4 +76,8 @@ public class HFSCommonFSLink extends FSLink {
     public FSFolder getParent() {
         return fsHandler.lookupParentFolder(linkRecord);
     }
+
+    public CommonHFSCatalogFileRecord getInternalCatalogFileRecord() {
+        return linkRecord;
+    }
 }
