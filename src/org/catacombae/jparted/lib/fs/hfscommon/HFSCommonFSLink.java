@@ -44,8 +44,17 @@ public class HFSCommonFSLink extends FSLink {
             throw new IllegalArgumentException("linkRecord is no symbolic link!");
     }
 
-    static String[] getLinkTargetPath(HFSCommonFileSystemHandler fsHandler,
-            CommonHFSCatalogFileRecord linkRecord) {
+    public String getLinkTargetPosixPath() {
+        // Read the data associated with the link.
+        ReadableRandomAccessStream linkDataStream =
+                fsHandler.getReadableDataForkStream(linkRecord);
+        byte[] linkBytes = Util.readFully(linkDataStream);
+        linkDataStream.close();
+
+        return Util.readString(linkBytes, "UTF-8");
+    }
+    /*
+    String[] getLinkTargetPath() {
         // Read the data associated with the link.
         ReadableRandomAccessStream linkDataStream =
                 fsHandler.getReadableDataForkStream(linkRecord);
@@ -55,12 +64,12 @@ public class HFSCommonFSLink extends FSLink {
 
         return HFSCommonFileSystemHandler.splitPOSIXUTF8Path(linkBytes);
     }
+     * */
 
     @Override
     public FSEntry getLinkTarget() {
-        return fsHandler.getEntry(
-                fsHandler.lookupParentFolder(linkRecord).getInternalCatalogFolderRecord(),
-                getLinkTargetPath(fsHandler, linkRecord));
+        return fsHandler.getEntryByPosixPath(getLinkTargetPosixPath(),
+                fsHandler.lookupParentFolder(linkRecord));
     }
 
     @Override
@@ -84,7 +93,6 @@ public class HFSCommonFSLink extends FSLink {
 
     @Override
     public String getLinkTargetString() {
-        byte[] b = Util.readFully(fsHandler.getReadableDataForkStream(linkRecord));
-        return Util.readString(b, "UTF-8");
+        return getLinkTargetPosixPath();
     }
 }
