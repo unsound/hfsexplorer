@@ -9,9 +9,10 @@ todo
 - Memory usage when parsing UDIF XML MUST BE REDUCED TO CONSTANT.
 - Opening files with default handler in windows may fail when the file name matches an
   executable in $PATH (in which case the executable is run instead of the file).
-- Symlink support in FSB. Especially: Investigate Time Machine backups, as they seem to
-  make links of unknown kind (resource fork has data, data fork hasn't).
+- Investigate Time Machine backups, as they seem to make links of unknown kind
+  (resource fork has data, data fork hasn't).
 - Display error report after extraction, if any errors occurred.
+- Extract process WILL get stuck in circular symlinks.
 - Changing character encoding for HFS.
 - Fix all graphical glitches related to HFS vs. HFS+ vs. Common.
 - Option to show or hide all "hidden" files. Default may be to have it turned off.
@@ -24,6 +25,7 @@ current
 - Experimental support for older HFS (Mac OS Original) file systems. Feedback is much
   appreciated here as well.
 - Ability to create a read/write disk image (.dmg) from a loaded file system.
+- Support for POSIX-style symbolic links.
 - Java 6+ only: Table header sorting for the file table is now working. The last (empty)
   column will sort on the internal sort order, if you need to abort your sorting choices.
 - Major restructuring/modularization of core components to ease future development.
