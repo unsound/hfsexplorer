@@ -17,4 +17,10 @@ public abstract class FSLink extends FSEntry {
 
     /** Returns the target for this link (may be null). */
     public abstract FSEntry getLinkTarget();
+    
+    /**
+     * Returns a debug string which shows the intended target for this link.
+     * @return a debug string which shows the intended target for this link.
+     */
+    public abstract String getLinkTargetString();
 }

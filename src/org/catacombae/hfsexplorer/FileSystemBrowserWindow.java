@@ -1201,6 +1201,17 @@ public class FileSystemBrowserWindow extends JFrame {
     private long calculateForkSizeRecursive(FSEntry[] selection, FSForkType... forkTypes) {
         long res = 0;
         for(FSEntry curEntry : selection) {
+            if(curEntry instanceof FSLink) {
+                FSLink curLink = (FSLink)curEntry;
+                FSEntry linkTarget = curLink.getLinkTarget();
+                if(linkTarget != null) {
+                    System.err.println("Happily resolved link \"" + curLink.getLinkTargetString() + "\"");
+                    curEntry = linkTarget;
+                }
+                else
+                    System.err.println("WARNING: Could not resolve link \"" + curLink.getLinkTargetString() + "\"");
+            }
+            
             if(curEntry instanceof FSFile) {
                 FSFile curFile = (FSFile) curEntry;
 
@@ -1337,7 +1348,12 @@ public class FileSystemBrowserWindow extends JFrame {
                 }
             }
         }
-
+        
+        if(rec instanceof FSLink) {
+            FSEntry linkTarget = ((FSLink) rec).getLinkTarget();
+            if(linkTarget != null)
+                rec = linkTarget;
+        }
 
         if(rec instanceof FSFile) {
             if(dataFork) {
