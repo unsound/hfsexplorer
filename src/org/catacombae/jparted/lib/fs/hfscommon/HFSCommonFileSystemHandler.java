@@ -255,7 +255,9 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
                     ((CommonHFSCatalogFolderThreadRecord)parent).getData();
             CommonHFSCatalogLeafRecord rec =
                     view.getRecord(data.getParentID(), data.getNodeName());
-            if(rec instanceof CommonHFSCatalogFolderRecord)
+            if(rec == null)
+                return null;
+            else if(rec instanceof CommonHFSCatalogFolderRecord)
                 return (CommonHFSCatalogFolderRecord)rec;
             else
                 throw new RuntimeException("Internal error: rec not instanceof " +
