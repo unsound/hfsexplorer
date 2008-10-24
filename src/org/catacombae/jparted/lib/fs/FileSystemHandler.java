@@ -95,7 +95,7 @@ public abstract class FileSystemHandler {
         LinkedList<String[]> visitedLinks = null;
 
         // If we encounter a '/' as the first character, we have an absolute path
-        if(components[0].length() == 0) {
+        if(posixPath.startsWith("/")) {
             i = 1;
             curEntry = getRoot();
         }

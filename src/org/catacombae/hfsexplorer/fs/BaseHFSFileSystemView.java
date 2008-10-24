@@ -421,6 +421,8 @@ public abstract class BaseHFSFileSystemView {
 	    CommonBTIndexRecord matchingRecord =
                     findLEKey(currentNode, catOps.newCatalogKey(parentID, nodeName, init.bthr));
 	    
+            if(matchingRecord == null)
+                return null;
 	    currentNodeOffset = matchingRecord.getIndex()*nodeSize;
 	    init.catalogFile.seek(currentNodeOffset);
 	    init.catalogFile.readFully(currentNodeData);
