@@ -22,7 +22,10 @@ public abstract class Field extends StructElement {
     private final FieldType type;
 
     protected Field(String typeName, FieldType type) {
-        super(typeName);
+        this(typeName, null, type);
+    }
+    protected Field(String typeName, String typeDescription, FieldType type) {
+        super(typeName, typeDescription);
         this.type = type;
     }
 

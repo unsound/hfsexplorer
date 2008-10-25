@@ -50,10 +50,12 @@ public abstract class CommonHFSCatalogFileRecord extends CommonHFSCatalogLeafRec
 
     @Override
     public Dictionary getStructElements() {
-        DictionaryBuilder db = new DictionaryBuilder(CommonHFSCatalogFileRecord.class.getSimpleName());
+        DictionaryBuilder db =
+                new DictionaryBuilder(CommonHFSCatalogFileRecord.class.getSimpleName(),
+                "File record");
 
-        db.add("key", key.getStructElements());
-        db.add("data", data.getStructElements());
+        db.add("key", key.getStructElements(), "Catalog key");
+        db.add("data", data.getStructElements(), "File data");
             
         return db.getResult();
     }

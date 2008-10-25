@@ -52,10 +52,12 @@ public class CommonHFSCatalogFileThreadRecord extends CommonHFSCatalogLeafRecord
 
     @Override
     public Dictionary getStructElements() {
-        DictionaryBuilder db = new DictionaryBuilder(CommonHFSCatalogFileThreadRecord.class.getSimpleName());
+        DictionaryBuilder db =
+                new DictionaryBuilder(CommonHFSCatalogFileThreadRecord.class.getSimpleName(),
+                "File thread record");
 
-        db.add("key", key.getStructElements());
-        db.add("data", data.getStructElements());
+        db.add("key", key.getStructElements(), "Catalog key");
+        db.add("data", data.getStructElements(), "File thread data");
             
         return db.getResult();
     }

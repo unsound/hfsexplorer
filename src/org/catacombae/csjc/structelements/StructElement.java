@@ -20,12 +20,21 @@ package org.catacombae.csjc.structelements;
 public abstract class StructElement {
 
     protected final String typeName;
+    protected final String typeDescription;
 
-    public StructElement(String typeName) {
+    protected StructElement(String typeName) {
+        this(typeName, null);
+    }
+    protected StructElement(String typeName, String typeDescription) {
         this.typeName = typeName;
+        this.typeDescription = typeDescription;
     }
 
     public String getTypeName() {
         return typeName;
+    }
+
+    public String getTypeDescription() {
+        return typeDescription;
     }
 }

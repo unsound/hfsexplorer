@@ -193,25 +193,25 @@ public class CdrFilRec extends CatDataRec {
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(CdrThdRec.class.getSimpleName());
         
-        db.addAll(super.getSuperStructElements());
-        db.addUIntBE("filFlags", filFlags);
-        db.addUIntBE("filTyp", filTyp);
-        db.add("filUsrWds", filUsrWds.getStructElements());
-        db.addUIntBE("filFlNum", filFlNum);
-        db.addUIntBE("filStBlk", filStBlk);
-        db.addUIntBE("filLgLen", filLgLen);
-        db.addUIntBE("filPyLen", filPyLen);
-        db.addUIntBE("filRStBlk", filRStBlk);
-        db.addUIntBE("filRLgLen", filRLgLen);
-        db.addUIntBE("filRPyLen", filRPyLen);
-        db.add("filCrDat", new HFSDateField(filCrDat));
-        db.add("filMdDat", new HFSDateField(filMdDat));
-        db.add("filBkDat", new HFSDateField(filBkDat));
-        db.add("filFndrInfo", filFndrInfo.getStructElements());
-        db.addUIntBE("filClpSize", filClpSize);
-        db.add("filExtRec", filExtRec.getStructElements());
-        db.add("filRExtRec", filRExtRec.getStructElements());
-        db.addUIntBE("filResrv", filResrv);
+        super.addSuperStructElements(db);
+        db.addUIntBE("filFlags", filFlags, "File flags");
+        db.addUIntBE("filTyp", filTyp, "File type");
+        db.add("filUsrWds", filUsrWds.getStructElements(), "Finder info");
+        db.addUIntBE("filFlNum", filFlNum, "File ID");
+        db.addUIntBE("filStBlk", filStBlk, "First allocation block in data fork");
+        db.addUIntBE("filLgLen", filLgLen, "Logical length of data fork", "bytes");
+        db.addUIntBE("filPyLen", filPyLen, "Physical length of data fork", "bytes");
+        db.addUIntBE("filRStBlk", filRStBlk, "First allocation block in resource fork");
+        db.addUIntBE("filRLgLen", filRLgLen, "Logical length of resource fork", "bytes");
+        db.addUIntBE("filRPyLen", filRPyLen, "Physical length of resource fork", "bytes");
+        db.add("filCrDat", new HFSDateField(filCrDat), "Creation date");
+        db.add("filMdDat", new HFSDateField(filMdDat), "Modify date");
+        db.add("filBkDat", new HFSDateField(filBkDat), "Backup date");
+        db.add("filFndrInfo", filFndrInfo.getStructElements(), "Extended Finder info");
+        db.addUIntBE("filClpSize", filClpSize, "File clump size");
+        db.add("filExtRec", filExtRec.getStructElements(), "First data fork extent record");
+        db.add("filRExtRec", filRExtRec.getStructElements(), "First resource fork extent record");
+        db.addUIntBE("filResrv", filResrv, "Reserved", HEXADECIMAL);
         
         return db.getResult();
     }

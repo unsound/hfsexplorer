@@ -81,8 +81,8 @@ public class ExtDescriptor implements StructElements {
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(ExtDescriptor.class.getName());
 
-        db.addUIntBE("xdrStABN", xdrStABN);
-        db.addUIntBE("xdrNumABlks", xdrNumABlks);
+        db.addUIntBE("xdrStABN", xdrStABN, "Start block");
+        db.addUIntBE("xdrNumABlks", xdrNumABlks, "Number of blocks");
 
         return db.getResult();
     }

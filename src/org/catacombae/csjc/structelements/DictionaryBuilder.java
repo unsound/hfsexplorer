@@ -22,24 +22,44 @@ import java.util.LinkedList;
 import static org.catacombae.csjc.structelements.IntegerFieldBits.*;
 import static org.catacombae.csjc.structelements.Signedness.*;
 import static org.catacombae.csjc.structelements.Endianness.*;
+import static org.catacombae.csjc.structelements.IntegerFieldRepresentation.*;
 
 public class DictionaryBuilder {
 
     private final String typeName;
+    private final String typeDescription;
     private final LinkedList<String> keys = new LinkedList<String>();
     private final Hashtable<String,StructElement> mappings = new Hashtable<String,StructElement>();
     private final Hashtable<String,String> descriptions = new Hashtable<String,String>();
 
     public DictionaryBuilder(String typeName) {
-        super();
+        this(typeName, null);
+    }
+    
+    public DictionaryBuilder(String typeName, String typeDescription) {
         this.typeName = typeName;
+        this.typeDescription = typeDescription;
     }
 
-    public void addIntArray(String key, byte[] data, IntegerFieldBits bits, Signedness signedness, Endianness endianness) {
+    public void addIntArray(String key, byte[] data, IntegerFieldBits bits,
+            Signedness signedness, Endianness endianness) {
         addIntArray(key, data, 0, data.length, bits, signedness, endianness);
     }
 
-    public void addIntArray(String key, byte[] data, int offset, int length, IntegerFieldBits bits, Signedness signedness, Endianness endianness) {
+    public void addIntArray(String key, byte[] data, IntegerFieldBits bits,
+            Signedness signedness, Endianness endianness, String description,
+            IntegerFieldRepresentation rep) {
+        addIntArray(key, data, 0, data.length, bits, signedness, endianness, description, rep);
+    }
+
+    public void addIntArray(String key, byte[] data, int offset, int length,
+            IntegerFieldBits bits, Signedness signedness, Endianness endianness) {
+        addIntArray(key, data, offset, length, bits, signedness, endianness, null, DECIMAL);
+    }
+    
+    public void addIntArray(String key, byte[] data, int offset, int length,
+            IntegerFieldBits bits, Signedness signedness, Endianness endianness, String description,
+            IntegerFieldRepresentation rep) {
         if(length % bits.getBytes() != 0)
             throw new RuntimeException("Supplied data is not aligned to size of type.");
         String arrayTypeName;
@@ -60,15 +80,15 @@ public class DictionaryBuilder {
         int i;
         for(i = 0; i < length; i += bits.getBytes()) {
             //System.err.println("DictionaryBuilder.addIntArray():  i = " + i);
-            ab.add(new IntegerField(data, offset + i, bits, signedness, endianness));
+            ab.add(new IntegerField(data, offset + i, bits, signedness, endianness, rep, null));
         }
         //System.err.println("DictionaryBuilder.addIntArray():  i = " + i);
         //System.err.println("DictionaryBuilder.addIntArray():  length/bits.getBytes() = " + (length / bits.getBytes()));
-        add(key, ab.getResult());
+        add(key, ab.getResult(), description);
     }
 
     public Dictionary getResult() {
-        return new Dictionary(typeName, keys.toArray(new String[keys.size()]), mappings, descriptions);
+        return new Dictionary(typeName, typeDescription, keys.toArray(new String[keys.size()]), mappings, descriptions);
     }
 
     public void add(String key, StructElement mapping) {
@@ -76,6 +96,7 @@ public class DictionaryBuilder {
     }
     
     public void add(String key, StructElement mapping, String description) {
+        //System.err.println(this + ": add(" + key + ", " + mapping + ", " + description + ");");
         if(mappings.get(key) != null)
             throw new IllegalArgumentException("A mapping already exists for key \"" + key + "\"!");
         mappings.put(key, mapping);
@@ -88,51 +109,103 @@ public class DictionaryBuilder {
      * Only braindead convenience methods below!
      */
     public void addSIntBE(String key, byte[] data) {
-        addSIntBE(key, data, 0, data.length);
+        addSIntBE(key, data, null);
     }
 
     public void addSIntLE(String key, byte[] data) {
-        addSIntLE(key, data, 0, data.length);
+        addSIntLE(key, data, null);
     }
 
     public void addUIntBE(String key, byte[] data) {
-        addUIntBE(key, data, 0, data.length);
+        addUIntBE(key, data, null);
     }
 
     public void addUIntLE(String key, byte[] data) {
-        addUIntLE(key, data, 0, data.length);
+        addUIntLE(key, data, null);
     }
 
-    public void addSIntBE(String key, byte[] data, int offset, int length) {
-        addInt(key, data, offset, length, SIGNED, BIG_ENDIAN);
+    public void addSIntBE(String key, byte[] data, String description) {
+        addSIntBE(key, data, 0, data.length, description, null, DECIMAL);
     }
 
-    public void addSIntLE(String key, byte[] data, int offset, int length) {
-        addInt(key, data, offset, length, SIGNED, LITTLE_ENDIAN);
+    public void addSIntLE(String key, byte[] data, String description) {
+        addSIntLE(key, data, 0, data.length, description, null, DECIMAL);
     }
 
-    public void addUIntBE(String key, byte[] data, int offset, int length) {
-        addInt(key, data, offset, length, UNSIGNED, BIG_ENDIAN);
+    public void addUIntBE(String key, byte[] data, String description) {
+        addUIntBE(key, data, 0, data.length, description, null, DECIMAL);
     }
 
-    public void addUIntLE(String key, byte[] data, int offset, int length) {
-        addInt(key, data, offset, length, UNSIGNED, LITTLE_ENDIAN);
+    public void addUIntLE(String key, byte[] data, String description) {
+        addUIntLE(key, data, 0, data.length, description, null, DECIMAL);
+    }
+
+    public void addSIntBE(String key, byte[] data, String description, String unit) {
+        addSIntBE(key, data, 0, data.length, description, unit, DECIMAL);
+    }
+
+    public void addSIntLE(String key, byte[] data, String description, String unit) {
+        addSIntLE(key, data, 0, data.length, description, unit, DECIMAL);
+    }
+
+    public void addUIntBE(String key, byte[] data, String description, String unit) {
+        addUIntBE(key, data, 0, data.length, description, unit, DECIMAL);
+    }
+
+    public void addUIntLE(String key, byte[] data, String description, String unit) {
+        addUIntLE(key, data, 0, data.length, description, unit, DECIMAL);
+    }
+
+    public void addSIntBE(String key, byte[] data, String description, IntegerFieldRepresentation rep) {
+        addSIntBE(key, data, 0, data.length, description, null, rep);
+    }
+
+    public void addSIntLE(String key, byte[] data, String description, IntegerFieldRepresentation rep) {
+        addSIntLE(key, data, 0, data.length, description, null, rep);
+    }
+
+    public void addUIntBE(String key, byte[] data, String description, IntegerFieldRepresentation rep) {
+        addUIntBE(key, data, 0, data.length, description, null, rep);
+    }
+
+    public void addUIntLE(String key, byte[] data, String description, IntegerFieldRepresentation rep) {
+        addUIntLE(key, data, 0, data.length, description, null, rep);
+    }
+
+    public void addSIntBE(String key, byte[] data, int offset, int length, String description, String unit, IntegerFieldRepresentation rep) {
+        addInt(key, data, offset, length, SIGNED, BIG_ENDIAN, description, unit, rep);
+    }
+
+    public void addSIntLE(String key, byte[] data, int offset, int length, String description, String unit, IntegerFieldRepresentation rep) {
+        addInt(key, data, offset, length, SIGNED, LITTLE_ENDIAN, description, unit, rep);
+    }
+
+    public void addUIntBE(String key, byte[] data, int offset, int length, String description, String unit, IntegerFieldRepresentation rep) {
+        addInt(key, data, offset, length, UNSIGNED, BIG_ENDIAN, description, unit, rep);
+    }
+
+    public void addUIntLE(String key, byte[] data, int offset, int length, String description, String unit, IntegerFieldRepresentation rep) {
+        addInt(key, data, offset, length, UNSIGNED, LITTLE_ENDIAN, description, unit, rep);
     }
 
     private void addInt(String key, byte[] data, int offset, int length,
-            Signedness signedness, Endianness endianness) {
+            Signedness signedness, Endianness endianness, String description, String unit, IntegerFieldRepresentation rep) {
         switch(length) {
             case 1:
-                add(key, new IntegerField(data, offset, BITS_8, signedness, endianness));
+                add(key, new IntegerField(data, offset, BITS_8, signedness,
+                        endianness, rep, unit), description);
                 break;
             case 2:
-                add(key, new IntegerField(data, offset, BITS_16, signedness, endianness));
+                add(key, new IntegerField(data, offset, BITS_16, signedness,
+                        endianness, rep, unit), description);
                 break;
             case 4:
-                add(key, new IntegerField(data, offset, BITS_32, signedness, endianness));
+                add(key, new IntegerField(data, offset, BITS_32, signedness,
+                        endianness, rep, unit), description);
                 break;
             case 8:
-                add(key, new IntegerField(data, offset, BITS_64, signedness, endianness));
+                add(key, new IntegerField(data, offset, BITS_64, signedness,
+                        endianness, rep, unit), description);
                 break;
             default:
                 throw new IllegalArgumentException("You supplied a " + (length * 8) +
@@ -231,7 +304,11 @@ public class DictionaryBuilder {
     }
 
     public void addByteArray(String key, byte[] data, int offset, int length) {
-        add(key, new ByteArrayField(data, offset, length));
+        addByteArray(key, data, offset, length, null);
+    }
+
+    public void addByteArray(String key, byte[] data, int offset, int length, String description) {
+        add(key, new ByteArrayField(data, offset, length), description);
     }
 
     public void addFlag(String key, byte[] data, int bitOffset, String description) {
@@ -260,7 +337,11 @@ public class DictionaryBuilder {
     /** Adds all the key-value mappings present in <code>d</code> in order. */
     public void addAll(Dictionary d) {
         for(String key : d.getKeys()) {
-            add(key, d.getElement(key));
+            String description = d.getDescription(key);
+            if(description != null)
+                add(key, d.getElement(key), description);
+            else
+                add(key, d.getElement(key));
         }
     }
 }

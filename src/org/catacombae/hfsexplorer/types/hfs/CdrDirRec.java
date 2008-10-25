@@ -78,16 +78,16 @@ public class CdrDirRec extends CatDataRec {
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(CdrDirRec.class.getSimpleName());
         
-        db.addAll(super.getSuperStructElements());
-        db.addUIntBE("dirFlags", dirFlags);
-        db.addUIntBE("dirVal", dirVal);
-        db.addUIntBE("dirDirID", dirDirID);
-        db.add("dirCrDat", new HFSDateField(dirCrDat));
-        db.add("dirMdDat", new HFSDateField(dirMdDat));
-        db.add("dirBkDat", new HFSDateField(dirBkDat));
-        db.add("dirUsrInfo", dirUsrInfo.getStructElements());
-        db.add("dirFndrInfo", dirFndrInfo.getStructElements());
-        db.addIntArray("dirResrv", dirResrv, BITS_32, UNSIGNED, BIG_ENDIAN);
+        super.addSuperStructElements(db);
+        db.addUIntBE("dirFlags", dirFlags, "Directory flags", BINARY);
+        db.addUIntBE("dirVal", dirVal, "Valence");
+        db.addUIntBE("dirDirID", dirDirID, "Directory ID");
+        db.add("dirCrDat", new HFSDateField(dirCrDat), "Creation date");
+        db.add("dirMdDat", new HFSDateField(dirMdDat), "Modification date");
+        db.add("dirBkDat", new HFSDateField(dirBkDat), "Backup date");
+        db.add("dirUsrInfo", dirUsrInfo.getStructElements(), "Finder info");
+        db.add("dirFndrInfo", dirFndrInfo.getStructElements(), "Extended Finder info");
+        db.addIntArray("dirResrv", dirResrv, BITS_32, UNSIGNED, BIG_ENDIAN, "Reserved", HEXADECIMAL);
         
         return db.getResult();
     }

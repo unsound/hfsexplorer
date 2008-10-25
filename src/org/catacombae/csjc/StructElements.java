@@ -22,6 +22,7 @@ import org.catacombae.csjc.structelements.Endianness;
 import org.catacombae.csjc.structelements.IntegerFieldBits;
 import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.csjc.structelements.FieldType;
+import org.catacombae.csjc.structelements.IntegerFieldRepresentation;
 
 /**
  * Interface to implement when a struct wants to present detailed information on
@@ -60,6 +61,14 @@ public interface StructElements {
     public static final IntegerFieldBits BITS_32 = IntegerFieldBits.BITS_32;
     /** Shorthand constant. */
     public static final IntegerFieldBits BITS_64 = IntegerFieldBits.BITS_64;
+    /** Shorthand constant. */
+    public static final IntegerFieldRepresentation DECIMAL = IntegerFieldRepresentation.DECIMAL;
+    /** Shorthand constant. */
+    public static final IntegerFieldRepresentation HEXADECIMAL = IntegerFieldRepresentation.HEXADECIMAL;
+    /** Shorthand constant. */
+    public static final IntegerFieldRepresentation OCTAL = IntegerFieldRepresentation.OCTAL;
+    /** Shorthand constant. */
+    public static final IntegerFieldRepresentation BINARY = IntegerFieldRepresentation.BINARY;
     
     public class DictionaryBuilder extends org.catacombae.csjc.structelements.DictionaryBuilder {
         /**
@@ -67,6 +76,12 @@ public interface StructElements {
          */
         public DictionaryBuilder(String typeName) {
             super(typeName);
+        }
+        /**
+         * {@inheritDoc}
+         */
+        public DictionaryBuilder(String typeName, String typeDescription) {
+            super(typeName, typeDescription);
         }
     }
     

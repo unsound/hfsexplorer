@@ -65,12 +65,8 @@ public abstract class CatDataRec implements StaticStruct, PrintableStruct, Struc
     }
     
     //@Override
-    protected Dictionary getSuperStructElements() {
-        DictionaryBuilder db = new DictionaryBuilder(CdrDirRec.class.getSimpleName());
-        
-        db.addUIntBE("cdrType", cdrType);
-        db.addUIntBE("cdrResrv2", cdrResrv2);
-        
-        return db.getResult();
+    protected void addSuperStructElements(DictionaryBuilder db) {
+        db.addUIntBE("cdrType", cdrType, "Record type", HEXADECIMAL);
+        db.addUIntBE("cdrResrv2", cdrResrv2, "Reserved", HEXADECIMAL);
     }
 }

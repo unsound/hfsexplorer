@@ -221,8 +221,12 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
                         }
                         else if(rec instanceof StructElements) {
                             Dictionary dict = ((StructElements) rec).getStructElements();
+                            String label = dict.getTypeDescription();
+                            if(label == null)
+                                label = dict.getTypeName();
+                            
                             structViewPanelScroller.setViewportView(
-                                    new StructViewPanel("Record (" + rec.getClass().getSimpleName() + "):", dict));
+                                    new StructViewPanel(label + ":", dict));
                             clLeaf.show(leafPanel, STRUCT_VIEW_PANEL_NAME);
                         }
                         else if(rec instanceof PrintableStruct) {
