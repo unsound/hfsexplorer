@@ -29,13 +29,24 @@ public class IntegerField extends StringRepresentableField {
     private final Endianness endianness;
     private final BigInteger maxValue;
     private final BigInteger minValue;
+    private final IntegerFieldRepresentation representation;
 
-    public IntegerField(byte[] fieldData, IntegerFieldBits bits, Signedness signedness, Endianness endianness) {
+    public IntegerField(byte[] fieldData, IntegerFieldBits bits,
+            Signedness signedness, Endianness endianness) {
         this(fieldData, 0, bits, signedness, endianness);
     }
 
-    public IntegerField(byte[] fieldData, int offset, IntegerFieldBits bits, Signedness signedness, Endianness endianness) {
-        super((signedness == Signedness.SIGNED ? "S" : "U") + "Int" + bits.getBits(), FieldType.INTEGER);
+    public IntegerField(byte[] fieldData, int offset, IntegerFieldBits bits,
+            Signedness signedness, Endianness endianness) {
+        this(fieldData, offset, bits, signedness, endianness,
+                IntegerFieldRepresentation.DECIMAL, null);
+    }
+    
+    public IntegerField(byte[] fieldData, int offset, IntegerFieldBits bits,
+            Signedness signedness, Endianness endianness,
+            IntegerFieldRepresentation representation, String unitComponent) {
+        super((signedness == Signedness.SIGNED ? "S" : "U") + "Int" + bits.getBits(),
+                FieldType.INTEGER, unitComponent);
         // Input check
         if(fieldData == null)
             throw new IllegalArgumentException("fieldData == null");
@@ -45,6 +56,8 @@ public class IntegerField extends StringRepresentableField {
             throw new IllegalArgumentException("signedness == null");
         if(endianness == null)
             throw new IllegalArgumentException("endianness == null");
+        if(representation == null)
+            throw new IllegalArgumentException("representation == null");
         if(fieldData.length - offset < bits.getBytes())
             throw new IllegalArgumentException("Not enough data left in fieldData!");
         this.fieldData = fieldData;
@@ -52,6 +65,7 @@ public class IntegerField extends StringRepresentableField {
         this.bits = bits;
         this.signedness = signedness;
         this.endianness = endianness;
+        this.representation = representation;
         byte[] maxValueBytes = new byte[bits.getBytes()];
         byte[] minValueBytes = new byte[bits.getBytes()];
         Util.set(maxValueBytes, (byte) 255);
@@ -105,7 +119,8 @@ public class IntegerField extends StringRepresentableField {
 
     @Override
     public String getValueAsString() {
-        return getValueAsBigInteger().toString();
+        return representation.getPrefix() +
+                getValueAsBigInteger().toString(representation.getRadix());
     }
 
     @Override

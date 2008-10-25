@@ -4,33 +4,21 @@
  */
 
 /*
- * StructViewPanel.java
+ * FSEntrySummaryPanel.java
  *
- * Created on 2008-okt-25, 02:56:49
+ * Created on 2008-okt-25, 06:02:01
  */
 
 package org.catacombae.hfsexplorer.gui;
-
-import org.catacombae.csjc.structelements.Dictionary;
-import org.catacombae.csjc.structelements.Array;
 
 /**
  *
  * @author erik
  */
-public class StructViewPanel extends javax.swing.JPanel {
+public class FSEntrySummaryPanel extends javax.swing.JPanel {
 
-    public StructViewPanel(String label, Dictionary dict) {
-        this();
-        containerPanel.add(new InternalStructViewPanel(label, dict));
-    }
-    public StructViewPanel(String label, Array array) {
-        this();
-        containerPanel.add(new InternalStructViewPanel(label, array));
-    }
-    
-    /** Creates new form StructViewPanel */
-    private StructViewPanel() {
+    /** Creates new form FSEntrySummaryPanel */
+    public FSEntrySummaryPanel() {
         initComponents();
     }
 
@@ -43,9 +31,9 @@ public class StructViewPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        containerPanel = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
 
-        containerPanel.setLayout(new java.awt.BorderLayout());
+        jLabel1.setText("Name:");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -53,21 +41,21 @@ public class StructViewPanel extends javax.swing.JPanel {
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(containerPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
-                .addContainerGap())
+                .add(jLabel1)
+                .addContainerGap(340, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(containerPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
-                .addContainerGap())
+                .add(jLabel1)
+                .addContainerGap(264, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel containerPanel;
+    private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
 
 }

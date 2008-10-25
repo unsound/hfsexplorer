@@ -53,10 +53,12 @@ public class CommonHFSCatalogFolderThreadRecord extends CommonHFSCatalogLeafReco
 
     @Override
     public Dictionary getStructElements() {
-        DictionaryBuilder db = new DictionaryBuilder(CommonHFSCatalogFolderThreadRecord.class.getSimpleName());
+        DictionaryBuilder db =
+                new DictionaryBuilder(CommonHFSCatalogFolderThreadRecord.class.getSimpleName(),
+                "Folder thread record");
 
-        db.add("key", key.getStructElements());
-        db.add("data", data.getStructElements());
+        db.add("key", key.getStructElements(), "Catalog key");
+        db.add("data", data.getStructElements(), "Folder thread data");
             
         return db.getResult();
     }

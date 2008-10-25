@@ -28,7 +28,11 @@ public class Dictionary extends StructElement {
         
     Dictionary(String typeName, String[] keys, Hashtable<String,StructElement> mappings,
             Hashtable<String,String> descriptions) {
-        super(typeName);
+        this(typeName, null, keys, mappings, descriptions);
+    }
+    Dictionary(String typeName, String typeDescription, String[] keys,
+            Hashtable<String,StructElement> mappings, Hashtable<String,String> descriptions) {
+        super(typeName, typeDescription);
         this.keys = new String[keys.length];
         System.arraycopy(keys, 0, this.keys, 0, keys.length);
         this.mappings = new Hashtable<String,StructElement>();
@@ -36,8 +40,10 @@ public class Dictionary extends StructElement {
         for(String key : keys) {
             this.mappings.put(key, mappings.get(key));
             String description = descriptions.get(key);
-            if(description != null)
-                descriptions.put(key, description);
+            if(description != null) {
+                this.descriptions.put(key, description);
+
+            }
         }
     }
 

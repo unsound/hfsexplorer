@@ -24,10 +24,12 @@ public class ASCIIStringField extends StringRepresentableField {
     public ASCIIStringField(byte[] fieldData) {
         super("Char[" + fieldData.length + "]", FieldType.ASCIISTRING);
         this.fieldData = fieldData;
-        String validateMsg = validate(fieldData);
+        //String validateMsg = validate(fieldData);
+        /*
         if(validateMsg != null) {
             throw new IllegalArgumentException("Invalid value passed to constructor! Message: " + validateMsg);
         }
+         * */
     }
 
     @Override
@@ -60,8 +62,12 @@ public class ASCIIStringField extends StringRepresentableField {
     @Override
     public String getValueAsString() {
         int[] codepoints = new int[fieldData.length];
-        for(int i = 0; i < codepoints.length; ++i)
-            codepoints[i] = fieldData[i] & 127;
+        for(int i = 0; i < codepoints.length; ++i) {
+            int cp = fieldData[i] & 127;
+            if(cp != fieldData[i])
+                cp = '?';
+            codepoints[i] = cp;
+        }
         return new String(codepoints, 0, codepoints.length);
     }
 

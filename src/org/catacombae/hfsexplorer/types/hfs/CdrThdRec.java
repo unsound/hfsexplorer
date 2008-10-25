@@ -97,11 +97,11 @@ public class CdrThdRec extends CatDataRec {
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(CdrThdRec.class.getSimpleName());
         
-        db.addAll(super.getSuperStructElements());
-        db.addIntArray("thdResrv", thdResrv, BITS_32, UNSIGNED, BIG_ENDIAN);
-        db.addUIntBE("thdParID", thdParID);
-        db.addUIntBE("thdCNameLen", thdCNameLen);
-        db.add("thdCName", new ASCIIStringField(thdCName));
+        super.addSuperStructElements(db);
+        db.addIntArray("thdResrv", thdResrv, BITS_32, UNSIGNED, BIG_ENDIAN, "Reserved", HEXADECIMAL);
+        db.addUIntBE("thdParID", thdParID, "Parent ID");
+        db.addUIntBE("thdCNameLen", thdCNameLen, "Length of record name");
+        db.add("thdCName", new ASCIIStringField(thdCName), "Record name");
         
         return db.getResult();
     }

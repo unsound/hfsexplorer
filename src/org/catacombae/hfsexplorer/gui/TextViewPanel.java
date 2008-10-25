@@ -23,8 +23,14 @@ public class TextViewPanel extends javax.swing.JPanel {
     public TextViewPanel(String label, StringRepresentableField field) {
         initComponents();
 
-        fieldLabel.setText(label + ":");
-        fieldContents.setText(field.getValueAsString());
+        fieldLabel.setText(label);
+
+        String fieldContentsText = field.getValueAsString();
+        String suffix = field.getUnitComponent();
+        if(suffix != null)
+            fieldContentsText += " " + suffix;
+
+        fieldContents.setText(fieldContentsText);
 
         jLabel1.setVisible(false);
     }

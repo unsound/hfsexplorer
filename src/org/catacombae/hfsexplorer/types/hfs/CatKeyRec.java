@@ -145,11 +145,11 @@ public class CatKeyRec implements DynamicStruct, StructElements {
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(CatKeyRec.class.getSimpleName());
         
-        db.addUIntBE("ckrKeyLen", ckrKeyLen);
-        db.addUIntBE("ckrResrv1", ckrResrv1);
-        db.addUIntBE("ckrParID", ckrParID);
-        db.addUIntBE("ckrCNameLen", ckrCNameLen);
-        db.add("ckrCName", new ASCIIStringField(ckrCName));
+        db.addUIntBE("ckrKeyLen", ckrKeyLen, "Key length", "bytes");
+        db.addUIntBE("ckrResrv1", ckrResrv1, "Reserved", HEXADECIMAL);
+        db.addUIntBE("ckrParID", ckrParID, "Parent ID");
+        db.addUIntBE("ckrCNameLen", ckrCNameLen, "Length of record name", "bytes");
+        db.add("ckrCName", new ASCIIStringField(ckrCName), "Record name");
         
         return db.getResult();
     }

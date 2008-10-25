@@ -18,9 +18,19 @@
 package org.catacombae.csjc.structelements;
 
 public abstract class StringRepresentableField extends Field {
+    private final String unitComponent;
 
     public StringRepresentableField(String typeName, FieldType type) {
-        super(typeName, type);
+        this(typeName, null, type, null);
+    }
+
+    public StringRepresentableField(String typeName, FieldType type, String unitComponent) {
+        this(typeName, null, type, unitComponent);
+    }
+
+    public StringRepresentableField(String typeName, String typeDescription, FieldType type, String unitComponent) {
+        super(typeName, typeDescription, type);
+        this.unitComponent = unitComponent;
     }
 
     public abstract String getValueAsString();
@@ -28,4 +38,15 @@ public abstract class StringRepresentableField extends Field {
     public abstract void setStringValue(String value) throws IllegalArgumentException;
 
     public abstract String validateStringValue(String s);
+
+    /**
+     * Returns the unit for this field, if applicable. For instance, a field
+     * with an integer value might have "bytes" as units, or "inches". The unit
+     * property is non-mandatory, so this method may return <code>null</code>.
+     *
+     * @return the unit for this field, or <code>null</code> if none is defined.
+     */
+    public String getUnitComponent() {
+        return unitComponent;
+    }
 }
