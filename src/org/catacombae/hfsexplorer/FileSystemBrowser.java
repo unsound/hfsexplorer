@@ -32,6 +32,7 @@ import java.awt.event.MouseEvent;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.LinkedList;
@@ -116,18 +117,19 @@ public class FileSystemBrowser<A> {
     public FileSystemBrowser(FileSystemProvider<A> iController) {
         this.controller = iController;
         this.viewComponent = new FilesystemBrowserPanel();
-        
+
         this.addressField = viewComponent.addressField;
-	this.upButton = viewComponent.upButton;
+        this.upButton = viewComponent.upButton;
         this.infoButton = viewComponent.infoButton;
-	this.extractButton = viewComponent.extractButton;
-	this.goButton = viewComponent.goButton;
-	this.statusLabel = viewComponent.statusLabel;
+        this.extractButton = viewComponent.extractButton;
+        this.goButton = viewComponent.goButton;
+        this.statusLabel = viewComponent.statusLabel;
         this.fileTable = viewComponent.fileTable;
         this.fileTableScroller = viewComponent.fileTableScroller;
         this.dirTree = viewComponent.dirTree;
-        
+
         upButton.addActionListener(new ActionListener() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 actionGotoParentDir();
@@ -161,7 +163,7 @@ public class FileSystemBrowser<A> {
             }
         });
         /*
-	addressField.addKeyListener(new KeyAdapter() {
+        addressField.addKeyListener(new KeyAdapter() {
                 @Override
 		public void keyPressed(KeyEvent e) {
                     if(e.getKeyCode() == KeyEvent.VK_ENTER)
@@ -174,297 +176,312 @@ public class FileSystemBrowser<A> {
         
         final Class objectClass = new Object().getClass();
         colNames.add("Name");
-	colNames.add("Size");
-	colNames.add("Type");
-	colNames.add("Date Modified");
-	colNames.add("");
-	
-	tableModel = new DefaultTableModel(colNames, 0)  {
-                @Override
-		public boolean isCellEditable(int rowIndex, int columnIndex) {
-		    return false;
-		}
- 	    };
-	
-	fileTable.setModel(tableModel);
-	fileTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-	// AUTO_RESIZE_SUBSEQUENT_COLUMNS AUTO_RESIZE_OFF AUTO_RESIZE_LAST_COLUMN
-	fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-	
-	final int WIDTH_NAME_COLUMN = 180;
-	final int WIDTH_SIZE_COLUMN = 96;
-	final int WIDTH_TYPE_COLUMN = 120;
-	final int WIDTH_DATE_COLUMN = 130;
-	fileTable.getColumnModel().getColumn(0).setPreferredWidth(WIDTH_NAME_COLUMN);
-	fileTable.getColumnModel().getColumn(1).setPreferredWidth(WIDTH_SIZE_COLUMN);
-	fileTable.getColumnModel().getColumn(2).setPreferredWidth(WIDTH_TYPE_COLUMN);
-	fileTable.getColumnModel().getColumn(3).setPreferredWidth(WIDTH_DATE_COLUMN);
-	fileTable.getColumnModel().getColumn(4).setPreferredWidth(0);
-	totalColumnWidth = WIDTH_NAME_COLUMN+WIDTH_SIZE_COLUMN+WIDTH_TYPE_COLUMN+WIDTH_DATE_COLUMN;
-	fileTable.getColumnModel().getColumn(4).setMinWidth(0);
-	fileTable.getColumnModel().getColumn(4).setResizable(false);
-        
+        colNames.add("Size");
+        colNames.add("Type");
+        colNames.add("Date Modified");
+        colNames.add("");
+
+        tableModel = new DefaultTableModel(colNames, 0) {
+
+            @Override
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return false;
+            }
+        };
+
+        fileTable.setModel(tableModel);
+        fileTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        // AUTO_RESIZE_SUBSEQUENT_COLUMNS AUTO_RESIZE_OFF AUTO_RESIZE_LAST_COLUMN
+        fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+        final int WIDTH_NAME_COLUMN = 180;
+        final int WIDTH_SIZE_COLUMN = 96;
+        final int WIDTH_TYPE_COLUMN = 120;
+        final int WIDTH_DATE_COLUMN = 130;
+        fileTable.getColumnModel().getColumn(0).setPreferredWidth(WIDTH_NAME_COLUMN);
+        fileTable.getColumnModel().getColumn(1).setPreferredWidth(WIDTH_SIZE_COLUMN);
+        fileTable.getColumnModel().getColumn(2).setPreferredWidth(WIDTH_TYPE_COLUMN);
+        fileTable.getColumnModel().getColumn(3).setPreferredWidth(WIDTH_DATE_COLUMN);
+        fileTable.getColumnModel().getColumn(4).setPreferredWidth(0);
+        totalColumnWidth = WIDTH_NAME_COLUMN + WIDTH_SIZE_COLUMN + WIDTH_TYPE_COLUMN + WIDTH_DATE_COLUMN;
+        fileTable.getColumnModel().getColumn(4).setMinWidth(0);
+        fileTable.getColumnModel().getColumn(4).setResizable(false);
+
         if(Java6Util.isJava6OrHigher()) {
             
             Comparator c = new ComparableComparator();
             Java6Specific.addRowSorter(fileTable, tableModel, 4, c, c, c, c, c);
         }
 
-	TableColumnModelListener columnListener = new TableColumnModelListener() {
-		private boolean locked = false;
-		private int[] w1 = null;
-		//public int[] lastWidths = null;
-                
-                @Override
-		public void columnAdded(TableColumnModelEvent e) { /*System.out.println("columnAdded");*/ }
+        TableColumnModelListener columnListener = new TableColumnModelListener() {
 
-                @Override
-		public void columnMarginChanged(ChangeEvent e) {
-		    if(disableColumnListener[0])
-			return;
-		    synchronized(this) {
-			if(!locked)
-			    locked = true;
-			else {
+            private boolean locked = false;
+            private int[] w1 = null;
+            //public int[] lastWidths = null;
+
+            @Override
+            public void columnAdded(TableColumnModelEvent e) { /*System.out.println("columnAdded");*/ }
+
+            @Override
+            public void columnMarginChanged(ChangeEvent e) {
+                if (disableColumnListener[0]) {
+                    return;
+                }
+                synchronized (this) {
+                    if (!locked)
+                        locked = true;
+                    else {
 // 			    System.err.println("    BOUNCING!");
-			    return;
-			}
-		    }
-// 		    System.err.print("columnMarginChanged");
-// 		    System.err.print("  Width diff:");
- 		    int columnCount = fileTable.getColumnModel().getColumnCount();
-		    TableColumn lastColumn = fileTable.getColumnModel().getColumn(columnCount-1);
-		    if(lastWidths.o == null)
-			lastWidths.o = new int[columnCount];
-		    if(w1 == null || w1.length != columnCount)
-			w1 = new int[columnCount];
-		    int diffSum = 0;
-		    int currentWidth = 0;
- 		    for(int i = 0; i < w1.length; ++i) {
- 			w1[i] = fileTable.getColumnModel().getColumn(i).getWidth();
-			currentWidth += w1[i];
-			int diff = (w1[i] - lastWidths.o[i]);
-// 			System.err.print(" " + (w1[i] - lastWidths.o[i]));
-			if(i < w1.length-1)
-			    diffSum += diff;
-			
-		    }
-		    int lastDiff = (w1[columnCount-1] - lastWidths.o[columnCount-1]);
-// 		    System.err.print("  Diff sum: " + diffSum);
-// 		    System.err.println("  Last diff: " + (w1[columnCount-1] - lastWidths.o[columnCount-1]));
-		    if(lastDiff != -diffSum) {
-			int importantColsWidth = currentWidth - w1[columnCount-1];
+                        return;
+                    }
+                }
+//              System.err.print("columnMarginChanged");
+//              System.err.print("  Width diff:");
+ 		             int columnCount = fileTable.getColumnModel().getColumnCount();
+                TableColumn lastColumn = fileTable.getColumnModel().getColumn(columnCount - 1);
+                if (lastWidths.o == null) {
+                    lastWidths.o = new int[columnCount];
+                }
+                if (w1 == null || w1.length != columnCount) {
+                    w1 = new int[columnCount];
+                }
+                int diffSum = 0;
+                int currentWidth = 0;
+                for (int i = 0; i < w1.length; ++i) {
+                    w1[i] = fileTable.getColumnModel().getColumn(i).getWidth();
+                    currentWidth += w1[i];
+                    int diff = (w1[i] - lastWidths.o[i]);
+//                  System.err.print(" " + (w1[i] - lastWidths.o[i]));
+                    if (i < w1.length - 1) {
+                        diffSum += diff;
+                    }
 
-			//int newLastColumnWidth = lastWidths.o[columnCount-1] - diffSum;
-			int newLastColumnWidth = totalColumnWidth-importantColsWidth;
-			
-			int nextTotalWidth = importantColsWidth + newLastColumnWidth;
-// 			System.err.println("  totalColumnWidth=" + totalColumnWidth + " currentWidth=" + currentWidth + " nextTotalWidth=" + nextTotalWidth + " newLast..=" + newLastColumnWidth);
-			
-			if(newLastColumnWidth >= 0) {
-			    if((nextTotalWidth <= totalColumnWidth || diffSum > 0)) {
-				//if(currentWidth > totalColumnWidth)
-				
-// 				System.err.println("  (1)Adjusting last column from " + w1[columnCount-1] + " to " + newLastColumnWidth + "!");
-				
-				lastColumn.setPreferredWidth(newLastColumnWidth);
-				lastColumn.setWidth(newLastColumnWidth);
-				//fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-// 				System.err.println("  (1)Last column width: " + lastColumn.getWidth() + "  revalidating...");
-				fileTableScroller.invalidate();
-				fileTableScroller.validate();
-// 				System.err.println("  (1)Adjustment complete. Final last column width: " + lastColumn.getWidth());
-			    }
-// 			    else
-// 				System.err.println("  Outside bounds. Idling.");
-			}
-			else {
-			    if(lastColumn.getWidth() != 0) {
-				// System.err.println("  (2)Adjusting last column from " + w1[columnCount-1] + " to zero!");
-				lastColumn.setPreferredWidth(0);
-				lastColumn.setWidth(0);
-				//fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-// 				System.err.println("  (2)Last column width: " + lastColumn.getWidth() + "  revalidating...");
-				fileTableScroller.invalidate();
-				fileTableScroller.validate();
-// 				System.err.println("  (2)Adjustment complete. Final last column width: " + lastColumn.getWidth());
-			    }
-			}
-		    }
+                }
+                int lastDiff = (w1[columnCount - 1] - lastWidths.o[columnCount - 1]);
+                // System.err.print("  Diff sum: " + diffSum);
+                // System.err.println("  Last diff: " + (w1[columnCount-1] - lastWidths.o[columnCount-1]));
+                if (lastDiff != -diffSum) {
+                    int importantColsWidth = currentWidth - w1[columnCount - 1];
 
-		    
- 		    for(int i = 0; i < w1.length; ++i) {
- 			w1[i] = fileTable.getColumnModel().getColumn(i).getWidth();
-		    }
-		    int[] usedArray = lastWidths.o;
-		    lastWidths.o = w1;
-		    w1 = usedArray; // Switch arrays.
-		    
-		    synchronized(this) { locked = false; /*System.err.println();*/ }
-		}
+                    //int newLastColumnWidth = lastWidths.o[columnCount-1] - diffSum;
+                    int newLastColumnWidth = totalColumnWidth - importantColsWidth;
 
-                @Override
-                public void columnMoved(TableColumnModelEvent e) { /*System.out.println("columnMoved");*/ }
+                    int nextTotalWidth = importantColsWidth + newLastColumnWidth;
+                    // System.err.println("  totalColumnWidth=" + totalColumnWidth + " currentWidth=" + currentWidth + " nextTotalWidth=" + nextTotalWidth + " newLast..=" + newLastColumnWidth);
 
-                @Override
-                public void columnRemoved(TableColumnModelEvent e) { /*System.out.println("columnRemoved");*/ }
+                    if (newLastColumnWidth >= 0) {
+                        if ((nextTotalWidth <= totalColumnWidth || diffSum > 0)) {
+                            //if(currentWidth > totalColumnWidth)
 
-                @Override
-                public void columnSelectionChanged(ListSelectionEvent e) { /*System.out.println("columnSelectionChanged");*/ }
-	    };
-	fileTable.getColumnModel().addColumnModelListener(columnListener);
-	
-	final TableCellRenderer objectRenderer = fileTable.getDefaultRenderer(objectClass);
-	fileTable.setDefaultRenderer(objectClass, new TableCellRenderer() {
-		private JLabel theOne = new JLabel();
-		private JLabel theTwo = new JLabel("", SwingConstants.RIGHT);
-		private ImageIcon documentIcon = new ImageIcon(ClassLoader.getSystemResource("res/emptydocument.png"));
-		private ImageIcon folderIcon = new ImageIcon(ClassLoader.getSystemResource("res/folder.png"));
-		private ImageIcon emptyIcon = new ImageIcon(ClassLoader.getSystemResource("res/nothing.png"));
+                            // System.err.println("  (1)Adjusting last column from " + w1[columnCount-1] + " to " + newLastColumnWidth + "!");
+
+                            lastColumn.setPreferredWidth(newLastColumnWidth);
+                            lastColumn.setWidth(newLastColumnWidth);
+                            //fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+                            // System.err.println("  (1)Last column width: " + lastColumn.getWidth() + "  revalidating...");
+                            fileTableScroller.invalidate();
+                            fileTableScroller.validate();
+                        // System.err.println("  (1)Adjustment complete. Final last column width: " + lastColumn.getWidth());
+                        }
+                    // else
+                    // System.err.println("  Outside bounds. Idling.");
+                    } else {
+                        if (lastColumn.getWidth() != 0) {
+                            // System.err.println("  (2)Adjusting last column from " + w1[columnCount-1] + " to zero!");
+                            lastColumn.setPreferredWidth(0);
+                            lastColumn.setWidth(0);
+                            //fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+                            // System.err.println("  (2)Last column width: " + lastColumn.getWidth() + "  revalidating...");
+                            fileTableScroller.invalidate();
+                            fileTableScroller.validate();
+                        // System.err.println("  (2)Adjustment complete. Final last column width: " + lastColumn.getWidth());
+                        }
+                    }
+                }
+
+
+                for (int i = 0; i < w1.length; ++i) {
+                    w1[i] = fileTable.getColumnModel().getColumn(i).getWidth();
+                }
+                int[] usedArray = lastWidths.o;
+                lastWidths.o = w1;
+                w1 = usedArray; // Switch arrays.
+
+                synchronized (this) {
+                    locked = false; /*System.err.println();*/ }
+            }
+
+            @Override
+            public void columnMoved(TableColumnModelEvent e) { /*System.out.println("columnMoved");*/ }
+
+            @Override
+            public void columnRemoved(TableColumnModelEvent e) { /*System.out.println("columnRemoved");*/ }
+
+            @Override
+            public void columnSelectionChanged(ListSelectionEvent e) { /*System.out.println("columnSelectionChanged");*/ }
+        };
+        fileTable.getColumnModel().addColumnModelListener(columnListener);
+
+        final TableCellRenderer objectRenderer = fileTable.getDefaultRenderer(objectClass);
+        fileTable.setDefaultRenderer(objectClass, new TableCellRenderer() {
+
+            private JLabel theOne = new JLabel();
+            private JLabel theTwo = new JLabel("", SwingConstants.RIGHT);
+            private ImageIcon documentIcon = new ImageIcon(ClassLoader.getSystemResource("res/emptydocument.png"));
+            private ImageIcon folderIcon = new ImageIcon(ClassLoader.getSystemResource("res/folder.png"));
+            private ImageIcon emptyIcon = new ImageIcon(ClassLoader.getSystemResource("res/nothing.png"));
 		
-                @Override
-		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, final int row, final int column) {
-		    if(value instanceof RecordContainer) {
-			final Component objectComponent = objectRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);			
-			final JLabel jl = theOne;
-			Record rec = ((RecordContainer)value).getRecord(genericPlaceholder);
-			if(rec.getType() == RecordType.FOLDER || rec.getType() == RecordType.FOLDER_LINK)
-			    jl.setIcon(folderIcon);
-			else if(rec.getType() == RecordType.FILE || rec.getType() == RecordType.FILE_LINK)
-			    jl.setIcon(documentIcon);
-			else
-			    jl.setIcon(emptyIcon);
-			jl.setVisible(true);
-			Component c = new Component() {
-				{
-				    jl.setSize(jl.getPreferredSize());
-				    jl.setLocation(0, 0);
-				    objectComponent.setSize(objectComponent.getPreferredSize());
-				    objectComponent.setLocation(jl.getWidth(), 0);
-				    setSize(jl.getWidth()+objectComponent.getWidth(), Math.max(jl.getHeight(), objectComponent.getHeight()));
-				}
-                                @Override
-				public void paint(Graphics g) {
- 				    jl.paint(g);
-				    int translatex = jl.getWidth();
-				    g.translate(translatex, 0);
-				    objectComponent.paint(g);
-				    g.translate(-translatex, 0);
-				}
-			    };
-			return c;
-		    }
-		    else if(column == 1) {
-			theTwo.setText(value.toString());
-			return theTwo;
-		    }
-		    else
-			return objectRenderer.getTableCellRendererComponent(table, value, false, false, row, column);
-		}
-	    });
-    
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, final int row, final int column) {
+                if(value instanceof RecordContainer) {
+                    final Component objectComponent = objectRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                    final JLabel jl = theOne;
+                    Record rec = ((RecordContainer) value).getRecord(genericPlaceholder);
+                    if(rec.getType() == RecordType.FOLDER || rec.getType() == RecordType.FOLDER_LINK)
+                        jl.setIcon(folderIcon);
+                    else if(rec.getType() == RecordType.FILE || rec.getType() == RecordType.FILE_LINK)
+                        jl.setIcon(documentIcon);
+                    else
+                        jl.setIcon(emptyIcon);
+
+                    jl.setVisible(true);
+                    Component c = new Component() {
+                        {
+                            jl.setSize(jl.getPreferredSize());
+                            jl.setLocation(0, 0);
+                            objectComponent.setSize(objectComponent.getPreferredSize());
+                            objectComponent.setLocation(jl.getWidth(), 0);
+                            setSize(jl.getWidth() + objectComponent.getWidth(), Math.max(jl.getHeight(), objectComponent.getHeight()));
+                        }
+
+                        @Override
+                        public void paint(Graphics g) {
+                            jl.paint(g);
+                            int translatex = jl.getWidth();
+                            g.translate(translatex, 0);
+                            objectComponent.paint(g);
+                            g.translate(-translatex, 0);
+                        }
+                    };
+                    return c;
+                } else if(column == 1) {
+                    theTwo.setText(value.toString());
+                    return theTwo;
+                } else{
+                    return objectRenderer.getTableCellRendererComponent(table, value, false, false, row, column);
+                }
+            }
+        });
+
         fileTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-                @Override
-		public void valueChanged(ListSelectionEvent e) {
-                    /* When the selection in the file table changes, update the
-                     * selection status field with the new selection count and
-                     * selection size. */
-                    
-		    int[] selection = fileTable.getSelectedRows();
-                    
-                    //Object[] selection = fileTable.getSelection();
-		    long selectionSize = 0;
-		    for(int selectedRow : selection) {
-			Object o = fileTable.getValueAt(selectedRow, 0);
-			
-			if(o instanceof RecordContainer) {
-			    Record rec = ((RecordContainer)o).getRecord(genericPlaceholder);
-			    if(rec.getType() == RecordType.FILE || rec.getType() == RecordType.FILE_LINK)
-				selectionSize += rec.getSize();
-			}
-		    }
-		    setSelectionStatus(selection.length, selectionSize);
-		}
-	    });
-        
-	fileTableScroller.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                     /* If we click outside the table, i.e. in the JScrollPane,
-                      * clear selection in table. */
-                    
-		    int row = fileTable.rowAtPoint(e.getPoint());
-		    if(row == -1)
-			fileTable.clearSelection();
-		}
-	    });
-        
-	fileTable.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-		    if(e.getButton() == MouseEvent.BUTTON3) {
-                        /* When the user clicks the secondary mouse button
-                         * (usually the right mouse button) in the table,
-                         * possibly open a JPopupMenu with some options. */
-                        
-                        int row = fileTable.rowAtPoint(e.getPoint());
-			int col = fileTable.columnAtPoint(e.getPoint());
-			if(col == 0 && row >= 0) {
-			    /* These lines are here because right-clicking
-                             * doesn't change focus or selection. */
-			    fileTable.clearSelection();
-			    fileTable.changeSelection(row, col, false, false);
-			    fileTable.requestFocus();
-			    
-                            List<Record<A>> selection = getTableSelection();
-                            if(selection.size() != 1)
-                                throw new RuntimeException("Right click selection with more than " +
-                                        "one entry! (" + selection.size() + " entries)");
-                            
-                            controller.getRightClickRecordPopupMenu(selection.get(0))
-                                    .show(fileTable, e.getX(), e.getY());
-			}
-		    }
-		    else if(e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
-                        /* When the user double-clicks using the primary mouse
-                         * button, send the event on to the controller, which
-                         * may handle it as it likes. */
-                        
-			int row = fileTable.rowAtPoint(e.getPoint());
-			int col = fileTable.columnAtPoint(e.getPoint());
-			if(col == 0 && row >= 0) {
-			    //System.err.println("Double click at (" + row + "," + col + ")");
-			    Object colValue = fileTable.getValueAt(row, col);
-			    //System.err.println("  Value class: " + colValue.getClass());
-			    if(colValue instanceof RecordContainer) {
-                                Record<A> rec = ((RecordContainer)colValue).getRecord(genericPlaceholder);
-                                if(rec.getType() == RecordType.FILE || rec.getType() == RecordType.FILE_LINK)
-                                    controller.actionDoubleClickFile(rec);
-                                else if(rec.getType() == RecordType.FOLDER || rec.getType() == RecordType.FOLDER_LINK)
-                                    actionChangeDir(rec);
-			    }
-			    else
-				throw new RuntimeException("Invalid type in column 0 in fileTable!");
-			}
-		    }
-		}
-	    });
+
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                /* When the selection in the file table changes, update the
+                 * selection status field with the new selection count and
+                 * selection size. */
+
+                int[] selection = fileTable.getSelectedRows();
+
+                //Object[] selection = fileTable.getSelection();
+                long selectionSize = 0;
+                for(int selectedRow : selection) {
+                    Object o = fileTable.getValueAt(selectedRow, 0);
+
+                    if(o instanceof RecordContainer) {
+                        Record rec = ((RecordContainer) o).getRecord(genericPlaceholder);
+                        if(rec.getType() == RecordType.FILE || rec.getType() == RecordType.FILE_LINK)
+                            selectionSize += rec.getSize();
+                    }
+                }
+                setSelectionStatus(selection.length, selectionSize);
+            }
+        });
+
+        fileTableScroller.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                /* If we click outside the table, i.e. in the JScrollPane,
+                 * clear selection in table. */
+
+                int row = fileTable.rowAtPoint(e.getPoint());
+                if(row == -1)
+                    fileTable.clearSelection();
+            }
+        });
+
+        fileTable.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if(e.getButton() == MouseEvent.BUTTON3) {
+                    /* When the user clicks the secondary mouse button
+                     * (usually the right mouse button) in the table,
+                     * possibly open a JPopupMenu with some options. */
+
+                    int row = fileTable.rowAtPoint(e.getPoint());
+                    int col = fileTable.columnAtPoint(e.getPoint());
+                    if(col == 0 && row >= 0) {
+                        /* These lines are here because right-clicking
+                         * doesn't change focus or selection. */
+                        int[] currentSelection = fileTable.getSelectedRows();
+                        if(!Util.contains(currentSelection, row)) {
+                            fileTable.clearSelection();
+                            fileTable.changeSelection(row, col, false, false);
+                        }
+                        fileTable.requestFocus();
+
+                        List<Record<A>> selection = getTableSelection();
+                        /*if(selection.size() != 1)
+                            throw new RuntimeException("Right click selection with more than " +
+                                    "one entry! (" + selection.size() + " entries)");*/
+
+
+                        controller.getRightClickRecordPopupMenu(selection).show(fileTable, e.getX(), e.getY());
+                    }
+                }
+                else if(e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
+                    /* When the user double-clicks using the primary mouse
+                     * button, send the event on to the controller, which
+                     * may handle it as it likes. */
+
+                    int row = fileTable.rowAtPoint(e.getPoint());
+                    int col = fileTable.columnAtPoint(e.getPoint());
+                    if(col == 0 && row >= 0) {
+                        //System.err.println("Double click at (" + row + "," + col + ")");
+                        Object colValue = fileTable.getValueAt(row, col);
+                        //System.err.println("  Value class: " + colValue.getClass());
+                        if(colValue instanceof RecordContainer) {
+                            Record<A> rec = ((RecordContainer) colValue).getRecord(genericPlaceholder);
+                            if(rec.getType() == RecordType.FILE || rec.getType() == RecordType.FILE_LINK)
+                                controller.actionDoubleClickFile(rec);
+                            else if(rec.getType() == RecordType.FOLDER || rec.getType() == RecordType.FOLDER_LINK)
+                                actionChangeDir(rec);
+                        }
+                        else
+                            throw new RuntimeException("Invalid type in column 0 in fileTable!");
+                    }
+                }
+            }
+        });
 	
 	dirTree.addMouseListener(new MouseAdapter() {
             @Override
-            public void mousePressed(MouseEvent e) {
-		    if(e.getButton() == MouseEvent.BUTTON3 &&
-                            controller.isFileSystemLoaded()) {
-			TreePath tp = dirTree.getPathForLocation(e.getX(), e.getY());
-			if(tp != null) {
-			    dirTree.clearSelection();
-			    dirTree.setSelectionPath(tp);
-			    dirTree.requestFocus();
-			    
-			    controller.getRightClickRecordPopupMenu(getTreeSelection())
-                                    .show(dirTree, e.getX(), e.getY());
-			}
-		    }
+        public void mousePressed(MouseEvent e) {
+            if(e.getButton() == MouseEvent.BUTTON3 &&
+                    controller.isFileSystemLoaded()) {
+                TreePath tp = dirTree.getPathForLocation(e.getX(), e.getY());
+                if(tp != null) {
+                    dirTree.clearSelection();
+                    dirTree.setSelectionPath(tp);
+                    dirTree.requestFocus();
+
+                    List<Record<A>> recList = Arrays.asList(getTreeSelection());
+                    controller.getRightClickRecordPopupMenu(recList).show(dirTree,
+                            e.getX(), e.getY());
+                }
+            }
 		}
 	    });
 
@@ -1258,7 +1275,7 @@ public class FileSystemBrowser<A> {
         
         public void actionGetInfo(List<Record<A>> recordList);
 
-        public JPopupMenu getRightClickRecordPopupMenu(Record<A> record);
+        public JPopupMenu getRightClickRecordPopupMenu(List<Record<A>> selectedRecords);
         
         public boolean isFileSystemLoaded();
         

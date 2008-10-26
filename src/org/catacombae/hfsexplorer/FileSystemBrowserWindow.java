@@ -1257,7 +1257,15 @@ public class FileSystemBrowserWindow extends JFrame {
         
     }
     
-    private void actionGetInfo(FSEntry entry) {
+    private void actionGetInfo(List<FSEntry> entries) {
+        if(entries.size() != 1) {
+            JOptionPane.showMessageDialog(this, "Get info for multiple selections not yet possible.\n" +
+                    "Please select one item at a time.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        FSEntry entry = entries.get(0);
         if(entry instanceof HFSCommonFSFile) {
             HFSCommonFSFile file = (HFSCommonFSFile) entry;
             FileInfoWindow fiw = new FileInfoWindow(file);
@@ -1607,24 +1615,25 @@ public class FileSystemBrowserWindow extends JFrame {
 
         @Override
         public void actionGetInfo(List<Record<FSEntry>> recordList) {
-            if(recordList.size() == 1) {
-                FileSystemBrowserWindow.this.actionGetInfo(recordList.get(0).getUserObject());
-            }
-            else if(recordList.size() > 1) {
-                JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-                        "Please select one entry at a time.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
+            List<FSEntry> entryList = new ArrayList<FSEntry>(recordList.size());
+            for(Record<FSEntry> rec : recordList)
+                entryList.add(rec.getUserObject());
+            FileSystemBrowserWindow.this.actionGetInfo(entryList);
         }
 
         @Override
-        public JPopupMenu getRightClickRecordPopupMenu(final Record<FSEntry> record) {
+        public JPopupMenu getRightClickRecordPopupMenu(final List<Record<FSEntry>> recordList) {
+            final ArrayList<FSEntry> userObjectList = new ArrayList<FSEntry>(recordList.size());
+            for(Record<FSEntry> rec : recordList)
+                userObjectList.add(rec.getUserObject());
+
             JPopupMenu jpm = new JPopupMenu();
 
             JMenuItem infoItem = new JMenuItem("Information");
             infoItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    FileSystemBrowserWindow.this.actionGetInfo(record.getUserObject());
+                    FileSystemBrowserWindow.this.actionGetInfo(userObjectList);
                 }
             });
             jpm.add(infoItem);
@@ -1633,9 +1642,7 @@ public class FileSystemBrowserWindow extends JFrame {
             dataExtractItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    List<FSEntry> oneItemList = new ArrayList<FSEntry>(1);
-                    oneItemList.add(record.getUserObject());
-                    FileSystemBrowserWindow.this.actionExtractToDir(oneItemList, true, false);
+                    FileSystemBrowserWindow.this.actionExtractToDir(userObjectList, true, false);
                 }
             });
             jpm.add(dataExtractItem);
@@ -1644,9 +1651,7 @@ public class FileSystemBrowserWindow extends JFrame {
             resExtractItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    List<FSEntry> oneItemList = new ArrayList<FSEntry>(1);
-                    oneItemList.add(record.getUserObject());
-                    FileSystemBrowserWindow.this.actionExtractToDir(oneItemList, false, true);
+                    FileSystemBrowserWindow.this.actionExtractToDir(userObjectList, false, true);
                 }
             });
             jpm.add(resExtractItem);
@@ -1655,9 +1660,7 @@ public class FileSystemBrowserWindow extends JFrame {
             bothExtractItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    List<FSEntry> oneItemList = new ArrayList<FSEntry>(1);
-                    oneItemList.add(record.getUserObject());
-                    FileSystemBrowserWindow.this.actionExtractToDir(oneItemList, true, true);
+                    FileSystemBrowserWindow.this.actionExtractToDir(userObjectList, true, true);
                 }
             });
             jpm.add(bothExtractItem);

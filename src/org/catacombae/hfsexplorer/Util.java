@@ -748,4 +748,21 @@ public class Util {
             return null;
         }
     }
+
+    /**
+     * Checks if the given <code>array</code> contains the specified <code>element</code> at least
+     * once.
+     * 
+     * @param array the array to search.
+     * @param element the element to look for.
+     * @return true if <code>element</code> was present in <code>array</code>, and false otherwise.
+     */
+    public static boolean contains(int[] array, int element) {
+        for(int i : array) {
+            if(i == element)
+                return true;
+        }
+        return false;
+
+    }
 }
