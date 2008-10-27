@@ -65,7 +65,7 @@ public abstract class FSEntry {
     
     public abstract String getName();
     
-    public abstract FSFolder getParent();
+    //public abstract FSFolder getParent();
     
     protected FileSystemHandler getParentFileSystem() {
         return parentFileSystem;
@@ -130,6 +130,7 @@ public abstract class FSEntry {
      * Returns the absolute path to this entry in the context of its file system.
      * @return the absolute path to this entry in the context of its file system.
      */
+    /*
     public String[] getAbsolutePath() {
         LinkedList<String> pathBuilder = new LinkedList<String>();
         getCanonicalPathInternal(pathBuilder);
@@ -143,7 +144,9 @@ public abstract class FSEntry {
         
         components.addLast(getName());
     }
+     * */
 
+    /*
     public String getAbsolutePosixPath() {
         String[] fsPath = getAbsolutePath();
         StringBuilder sb = new StringBuilder();
@@ -155,4 +158,5 @@ public abstract class FSEntry {
 
         return sb.toString();
     }
+     * */
 }

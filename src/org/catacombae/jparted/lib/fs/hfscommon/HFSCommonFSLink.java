@@ -30,16 +30,16 @@ import org.catacombae.jparted.lib.fs.FSLink;
  * @author erik
  */
 public class HFSCommonFSLink extends FSLink {
-    private CommonHFSCatalogFileRecord linkRecord;
-    private HFSCommonFileSystemHandler fsHandler;
-
+    private final CommonHFSCatalogFileRecord linkRecord;
+    private final HFSCommonFileSystemHandler fsHandler;
+    
     public HFSCommonFSLink(HFSCommonFileSystemHandler fsHandler,
             CommonHFSCatalogFileRecord linkRecord) {
         super(fsHandler);
 
         this.fsHandler = fsHandler;
         this.linkRecord = linkRecord;
-
+        
         if(!linkRecord.getData().isSymbolicLink())
             throw new IllegalArgumentException("linkRecord is no symbolic link!");
     }
@@ -66,10 +66,19 @@ public class HFSCommonFSLink extends FSLink {
     }
      * */
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public FSEntry getLinkTarget() {
-        return fsHandler.getEntryByPosixPath(getLinkTargetPosixPath(),
-                fsHandler.lookupParentFolder(linkRecord));
+    public FSEntry getLinkTarget(String[] parentDir) {
+        String posixPath = getLinkTargetPosixPath();
+        FSEntry res = fsHandler.getEntryByPosixPath(posixPath, parentDir);
+        if(res == null) {
+            System.err.println("getLinkTarget(): FAILED to get entry by posix path for:");
+            System.err.println("getLinkTarget():   posixPath=\"" + posixPath + "\"");
+            System.err.println("getLinkTarget():   parentDir=\"" + Util.concatenateStrings(parentDir, "/") + "\"");
+        }
+        return res;
     }
 
     @Override
@@ -82,10 +91,12 @@ public class HFSCommonFSLink extends FSLink {
         return fsHandler.getProperNodeName(linkRecord);
     }
 
+    /*
     @Override
     public FSFolder getParent() {
         return fsHandler.lookupParentFolder(linkRecord);
     }
+     * */
 
     public CommonHFSCatalogFileRecord getInternalCatalogFileRecord() {
         return linkRecord;

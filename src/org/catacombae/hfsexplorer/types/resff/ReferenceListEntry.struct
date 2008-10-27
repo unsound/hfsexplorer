@@ -1,0 +1,7 @@
+struct ReferenceListEntry {
+    UInt16      resourceID;             // Resource ID
+    UInt16      resourceNameOffset;     // Offset from beginning of resource name list to resource name
+    UInt8       resourceAttributes;     // Resource attributes
+    UInt8       resourceDataOffset[3];  // Offset from beginning of resource data to data for this resource.
+    UInt32      reserved1;              // Reserved for handle to resource.
+};

@@ -63,6 +63,7 @@ import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -856,7 +857,7 @@ public class FileSystemBrowserWindow extends JFrame {
         fsb.setRoot(rootRecord);
     }
 
-    private void actionDoubleClickFile(final FSFile rec) {
+    private void actionDoubleClickFile(final String[] parentPath, final FSFile rec) {
         final JDialog fopFrame = new JDialog(this, rec.getName(), true);
         fopFrame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
@@ -868,7 +869,7 @@ public class FileSystemBrowserWindow extends JFrame {
                 @Override
                 public void actionPerformed(ActionEvent ae) {
                     File tempDir = new File(System.getProperty("java.io.tmpdir"));
-                    if(extract(rec, tempDir, NullProgressMonitor.getInstance()) == 0) {
+                    if(extract(parentPath, rec, tempDir, NullProgressMonitor.getInstance()) == 0) {
                         tempFiles.add(new File(tempDir, rec.getName()));
                         try {
 // 				System.err.print("Trying to execute:");
@@ -901,7 +902,7 @@ public class FileSystemBrowserWindow extends JFrame {
                 @Override
                 public void actionPerformed(ActionEvent ae) {
                     File tempDir = new File(System.getProperty("java.io.tmpdir"));
-                    if(extract(rec, tempDir, NullProgressMonitor.getInstance()) == 0) {
+                    if(extract(parentPath, rec, tempDir, NullProgressMonitor.getInstance()) == 0) {
                         File extractedFile = new File(tempDir, rec.getName());
                         tempFiles.add(new File(tempDir, rec.getName()));
                         try {
@@ -932,7 +933,7 @@ public class FileSystemBrowserWindow extends JFrame {
                 @Override
                 public void actionPerformed(ActionEvent ae) {
                     File tempDir = new File(System.getProperty("java.io.tmpdir"));
-                    if(extract(rec, tempDir, NullProgressMonitor.getInstance()) == 0) {
+                    if(extract(parentPath, rec, tempDir, NullProgressMonitor.getInstance()) == 0) {
                         tempFiles.add(new File(tempDir, rec.getName()));
                         try {
 // 				System.err.print("Trying to execute:");
@@ -963,7 +964,7 @@ public class FileSystemBrowserWindow extends JFrame {
         ActionListener alSave = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                actionExtractToDir(rec);
+                actionExtractToDir(parentPath, rec);
                 fopFrame.dispose();
             }
         };
@@ -1080,16 +1081,16 @@ public class FileSystemBrowserWindow extends JFrame {
         }
     }
 
-    private void actionExtractToDir(FSEntry entry) {
-        actionExtractToDir(Arrays.asList(entry));
+    private void actionExtractToDir(final String[] parentPath, FSEntry entry) {
+        actionExtractToDir(parentPath, Arrays.asList(entry));
     }
 
-    private void actionExtractToDir(List<FSEntry> selection) {
-        actionExtractToDir(selection, true, false);
+    private void actionExtractToDir(final String[] parentPath, List<FSEntry> selection) {
+        actionExtractToDir(parentPath, selection, true, false);
     }
     
-    private void actionExtractToDir(final List<FSEntry> selection, final boolean dataFork,
-            final boolean resourceFork) {
+    private void actionExtractToDir(final String[] parentPath, final List<FSEntry> selection,
+            final boolean dataFork, final boolean resourceFork) {
         if(!dataFork && !resourceFork) {
             throw new IllegalArgumentException("Can't choose to extract nothing!");
         }
@@ -1117,10 +1118,16 @@ public class FileSystemBrowserWindow extends JFrame {
                                 if(resourceFork) {
                                     forkTypes.add(FSForkType.MACOS_RESOURCE);
                                 }
-                                dataSize += calculateForkSizeRecursive(selection, forkTypes);
+
+                                LinkedList<String> dirStack = new LinkedList<String>();
+                                for(String pathComponent : parentPath)
+                                    dirStack.addLast(pathComponent);
+
+                                dataSize += calculateForkSizeRecursive(selection, dirStack,
+                                        forkTypes);
                                 progress.setDataSize(dataSize);
 
-                                int errorCount = extract(selection, outDir, progress, dataFork, resourceFork);
+                                int errorCount = extract(parentPath, selection, outDir, progress, dataFork, resourceFork);
                                 if(!progress.cancelSignaled()) {
                                     if(errorCount == 0) {
                                         JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
@@ -1184,9 +1191,10 @@ public class FileSystemBrowserWindow extends JFrame {
      * @param forkTypes
      * @return
      */
-    private long calculateForkSizeRecursive(List<FSEntry> selection, List<FSForkType> forkTypes) {
+    private long calculateForkSizeRecursive(List<FSEntry> selection, LinkedList<String> pathStack,
+            List<FSForkType> forkTypes) {
         return calculateForkSizeRecursive(selection.toArray(new FSEntry[selection.size()]),
-                forkTypes.toArray(new FSForkType[forkTypes.size()]));
+                pathStack, forkTypes.toArray(new FSForkType[forkTypes.size()]));
     }
 
     /**
@@ -1198,12 +1206,13 @@ public class FileSystemBrowserWindow extends JFrame {
      * @param forkTypes
      * @return
      */
-    private long calculateForkSizeRecursive(FSEntry[] selection, FSForkType... forkTypes) {
+    private long calculateForkSizeRecursive(FSEntry[] selection, LinkedList<String> pathStack,
+            FSForkType... forkTypes) {
         long res = 0;
         for(FSEntry curEntry : selection) {
             if(curEntry instanceof FSLink) {
                 FSLink curLink = (FSLink)curEntry;
-                FSEntry linkTarget = curLink.getLinkTarget();
+                FSEntry linkTarget = curLink.getLinkTarget(pathStack.toArray(new String[pathStack.size()]));
                 if(linkTarget != null) {
                     System.err.println("Happily resolved link \"" + curLink.getLinkTargetString() + "\"");
                     curEntry = linkTarget;
@@ -1229,7 +1238,10 @@ public class FileSystemBrowserWindow extends JFrame {
             }
             else if(curEntry instanceof FSFolder) {
                 FSFolder curFolder = (FSFolder) curEntry;
-                res += calculateForkSizeRecursive(curFolder.list(), forkTypes);
+                pathStack.push(curFolder.getName());
+                try {
+                    res += calculateForkSizeRecursive(curFolder.list(), pathStack, forkTypes);
+                } finally { pathStack.pop(); }
             }
             else {
                 System.err.println("INFO: Silently ignoring FSEntry subtype " +
@@ -1289,40 +1301,45 @@ public class FileSystemBrowserWindow extends JFrame {
     }
     
     /** <code>progressDialog</code> may NOT be null. */
-    protected int extract(FSEntry rec, File outDir, ProgressMonitor progressDialog) {
-        return extract(Arrays.asList(rec), outDir, progressDialog, true, false);
+    protected int extract(String[] parentPath, FSEntry rec, File outDir, ProgressMonitor progressDialog) {
+        return extract(parentPath, Arrays.asList(rec), outDir, progressDialog, true, false);
     }
 
     /** <code>progressDialog</code> may NOT be null. */
-    protected int extract(FSEntry rec, File outDir, ProgressMonitor progressDialog, boolean dataFork, boolean resourceFork) {
-        return extract(Arrays.asList(rec), outDir, progressDialog, dataFork, resourceFork);
+    protected int extract(String[] parentPath, FSEntry rec, File outDir, ProgressMonitor progressDialog, boolean dataFork, boolean resourceFork) {
+        return extract(parentPath, Arrays.asList(rec), outDir, progressDialog, dataFork, resourceFork);
     }
 
     /** <code>progressDialog</code> may NOT be null. */
-    protected int extract(FSEntry[] recs, File outDir, ProgressMonitor progressDialog) {
-        return extract(Arrays.asList(recs), outDir, progressDialog, true, false);
+    protected int extract(String[] parentPath, FSEntry[] recs, File outDir, ProgressMonitor progressDialog) {
+        return extract(parentPath, Arrays.asList(recs), outDir, progressDialog, true, false);
     }
 
     /** <code>progressDialog</code> may NOT be null. */
-    protected int extract(FSEntry[] recs, File outDir, ProgressMonitor progressDialog, boolean dataFork, boolean resourceFork) {
-        return extract(Arrays.asList(recs), outDir, progressDialog, dataFork, resourceFork);
+    protected int extract(String[] parentPath, FSEntry[] recs, File outDir, ProgressMonitor progressDialog, boolean dataFork, boolean resourceFork) {
+        return extract(parentPath, Arrays.asList(recs), outDir, progressDialog, dataFork, resourceFork);
     }
 
     /** <code>progressDialog</code> may NOT be null. */
-    protected int extract(List<FSEntry> recs, File outDir, ProgressMonitor progressDialog) {
-        return extract(recs, outDir, progressDialog, true, false);
+    protected int extract(String[] parentPath, List<FSEntry> recs, File outDir, ProgressMonitor progressDialog) {
+        return extract(parentPath, recs, outDir, progressDialog, true, false);
     }
 
     /** <code>progressDialog</code> may NOT be null. */
-    protected int extract(List<FSEntry> recs, File outDir, ProgressMonitor progressDialog, boolean dataFork, boolean resourceFork) {
+    protected int extract(String[] parentPath, List<FSEntry> recs, File outDir, ProgressMonitor progressDialog, boolean dataFork, boolean resourceFork) {
         int errorCount = 0;
+        LinkedList<String> pathStack = new LinkedList<String>();
+        for(String pathComponent : parentPath)
+            pathStack.push(pathComponent);
+
         for(FSEntry rec : recs) {
-            errorCount += extractRecursive(rec, outDir, progressDialog, new ObjectContainer<Boolean>(false), dataFork, resourceFork);
+            errorCount += extractRecursive(rec, pathStack, outDir, progressDialog,
+                    new ObjectContainer<Boolean>(false), dataFork, resourceFork);
         }
         return errorCount;
     }
 
-    private int extractRecursive(FSEntry rec, File outDir, ProgressMonitor progressDialog,
+    private int extractRecursive(FSEntry rec, LinkedList<String> pathStack, File outDir, ProgressMonitor progressDialog,
             ObjectContainer<Boolean> overwriteAll, boolean dataFork, boolean resourceFork) {
         if(!dataFork && !resourceFork) {
             throw new IllegalArgumentException("Neither the data fork or resource fork were selected for extraction. Won't do nothing...");
@@ -1334,7 +1351,7 @@ public class FileSystemBrowserWindow extends JFrame {
 
         int errorCount = 0;
         if(!outDir.exists()) {
-            String[] options = new String[]{"Create directory", "Cancel"};
+            String[] options = new String[] { "Create directory", "Cancel" };
             int reply =
                     JOptionPane.showOptionDialog(this, "Warning! Target directory:\n    \"" + outDir.getAbsolutePath() + "\"\n" +
                     "does not exist. Do you want to create this directory?",
@@ -1358,7 +1375,9 @@ public class FileSystemBrowserWindow extends JFrame {
         }
         
         if(rec instanceof FSLink) {
-            FSEntry linkTarget = ((FSLink) rec).getLinkTarget();
+            String[] pathStackArray = pathStack.toArray(new String[pathStack.size()]);
+
+            FSEntry linkTarget = ((FSLink) rec).getLinkTarget(pathStackArray);
             if(linkTarget != null)
                 rec = linkTarget;
         }
@@ -1393,9 +1412,13 @@ public class FileSystemBrowserWindow extends JFrame {
             }
 
             if(thisDir.mkdir() || thisDir.exists()) {
-                for(FSEntry outRec : contents) {
-                    errorCount += extractRecursive(outRec, thisDir, progressDialog, overwriteAll, dataFork, resourceFork);
-                }
+                pathStack.push(rec.getName());
+                try {
+                    for(FSEntry outRec : contents) {
+                        errorCount += extractRecursive(outRec, pathStack, thisDir, progressDialog,
+                                overwriteAll, dataFork, resourceFork);
+                    }
+                } finally { pathStack.pop(); }
             }
             else {
                 int reply = JOptionPane.showConfirmDialog(this, "Could not create directory:\n  " +
@@ -1583,19 +1606,33 @@ public class FileSystemBrowserWindow extends JFrame {
 
     private class FileSystemProvider implements FileSystemBrowser.FileSystemProvider<FSEntry> {
         @Override
-        public void actionDoubleClickFile(Record<FSEntry> record) {
+        public void actionDoubleClickFile(List<Record<FSEntry>> recordPath) {
+            if(recordPath.size() < 1)
+                throw new IllegalArgumentException("Empty path to file!");
+
+            String[] parentPath = new String[recordPath.size() - 1];
+            int i = 0;
+            for(Record<FSEntry> curEntry : recordPath) {
+                if(i < parentPath.length)
+                    parentPath[i++] = curEntry.getUserObject().getName();
+                else
+                    break;
+            }
+
+            Record<FSEntry> record = recordPath.get(recordPath.size()-1);
             FSEntry entry = record.getUserObject();
             if(entry instanceof FSFile) {
-                FileSystemBrowserWindow.this.actionDoubleClickFile((FSFile) entry);
+                FileSystemBrowserWindow.this.actionDoubleClickFile(parentPath, (FSFile) entry);
             }
             else if(entry instanceof FSLink) {
                 FSLink link = (FSLink)entry;
-                FSEntry linkTarget = link.getLinkTarget();
+
+                FSEntry linkTarget = link.getLinkTarget(parentPath);
                 if(linkTarget == null)
                     JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
                             "The link you clicked is broken.", "Error", JOptionPane.ERROR_MESSAGE);
                 else if(linkTarget instanceof FSFile)
-                    FileSystemBrowserWindow.this.actionDoubleClickFile((FSFile) linkTarget);
+                    FileSystemBrowserWindow.this.actionDoubleClickFile(parentPath, (FSFile) linkTarget);
                 else
                     throw new RuntimeException("Unexpected FSEntry link target: " + entry.getClass());
             }
@@ -1605,12 +1642,15 @@ public class FileSystemBrowserWindow extends JFrame {
         }
 
         @Override
-        public void actionExtractToDir(List<Record<FSEntry>> recordList) {
+        public void actionExtractToDir(List<Record<FSEntry>> parentPathList, List<Record<FSEntry>> recordList) {
+            String[] parentPath = getFSPath(parentPathList);
+            
             List<FSEntry> fsEntryList = new ArrayList<FSEntry>(recordList.size());
             for(Record<FSEntry> rec : recordList) {
                 fsEntryList.add(rec.getUserObject());
             }
-            FileSystemBrowserWindow.this.actionExtractToDir(fsEntryList, true, false);
+
+            FileSystemBrowserWindow.this.actionExtractToDir(parentPath, fsEntryList, true, false);
         }
 
         @Override
@@ -1622,7 +1662,10 @@ public class FileSystemBrowserWindow extends JFrame {
         }
 
         @Override
-        public JPopupMenu getRightClickRecordPopupMenu(final List<Record<FSEntry>> recordList) {
+        public JPopupMenu getRightClickRecordPopupMenu(final List<Record<FSEntry>> parentPathList,
+                final List<Record<FSEntry>> recordList) {
+            final String[] parentPath = getFSPath(parentPathList);
+
             final ArrayList<FSEntry> userObjectList = new ArrayList<FSEntry>(recordList.size());
             for(Record<FSEntry> rec : recordList)
                 userObjectList.add(rec.getUserObject());
@@ -1642,7 +1685,7 @@ public class FileSystemBrowserWindow extends JFrame {
             dataExtractItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    FileSystemBrowserWindow.this.actionExtractToDir(userObjectList, true, false);
+                    FileSystemBrowserWindow.this.actionExtractToDir(parentPath, userObjectList, true, false);
                 }
             });
             jpm.add(dataExtractItem);
@@ -1651,7 +1694,7 @@ public class FileSystemBrowserWindow extends JFrame {
             resExtractItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    FileSystemBrowserWindow.this.actionExtractToDir(userObjectList, false, true);
+                    FileSystemBrowserWindow.this.actionExtractToDir(parentPath, userObjectList, false, true);
                 }
             });
             jpm.add(resExtractItem);
@@ -1660,7 +1703,7 @@ public class FileSystemBrowserWindow extends JFrame {
             bothExtractItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    FileSystemBrowserWindow.this.actionExtractToDir(userObjectList, true, true);
+                    FileSystemBrowserWindow.this.actionExtractToDir(parentPath, userObjectList, true, true);
                 }
             });
             jpm.add(bothExtractItem);
@@ -1678,7 +1721,9 @@ public class FileSystemBrowserWindow extends JFrame {
             FSEntry lastEntry = folderRecordPath.get(folderRecordPath.size() - 1).getUserObject();
             
             if(lastEntry instanceof FSLink) {
-                FSEntry linkTarget = ((FSLink)lastEntry).getLinkTarget();
+                String[] parentPath = getFSPath(folderRecordPath, folderRecordPath.size()-1);
+
+                FSEntry linkTarget = ((FSLink)lastEntry).getLinkTarget(parentPath);
                 if(linkTarget == null) {
                     JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
                             "The link you clicked is broken.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -1692,10 +1737,12 @@ public class FileSystemBrowserWindow extends JFrame {
             }
 
             if(lastEntry instanceof FSFolder) {
+                String[] folderPath = getFSPath(folderRecordPath);
+                
                 FSEntry[] entryArray = ((FSFolder) lastEntry).list();
                 ArrayList<Record<FSEntry>> entryList = new ArrayList<Record<FSEntry>>(entryArray.length);
                 for(FSEntry entry : entryArray) {
-                    Record<FSEntry> rec = new FSEntryRecord(entry);
+                    Record<FSEntry> rec = new FSEntryRecord(entry, folderPath);
                     entryList.add(rec);
                 }
                 return entryList;
@@ -1735,15 +1782,45 @@ public class FileSystemBrowserWindow extends JFrame {
                 }
             }
         }
+
+        /**
+         * Converts a FileSystemBrowser parent path into a FSFramework compatible raw string path.
+         *
+         * @param parentPathList
+         * @return
+         */
+        private String[] getFSPath(List<Record<FSEntry>> fsbPathList) {
+            return getFSPath(fsbPathList, fsbPathList.size());
+        }
+
+        private String[] getFSPath(List<Record<FSEntry>> fsbPathList, int len) {
+            if(len < 1)
+                throw new IllegalArgumentException("A FileSystemBrowser parent path list must " +
+                        "have at least one component (the root folder).");
+
+            String[] res = new String[len-1];
+            Iterator<Record<FSEntry>> it = fsbPathList.iterator();
+
+            it.next(); // Skip over the root entry
+
+            for(int i = 0; i < res.length; ++i) {
+                res[i] = it.next().getUserObject().getName();
+            }
+
+            while(it.hasNext())
+                it.next(); // Finish the iterator
+            
+            return res;
+        }
     }
 
     private static class FSEntryRecord extends Record<FSEntry> {
-        public FSEntryRecord(FSEntry entry) {
-            super(entryTypeToRecordType(entry), entry.getName(), getEntrySize(entry),
-                    entry.getAttributes().getModifyDate(), entry);
+        public FSEntryRecord(FSEntry entry, String[] parentDirPath) {
+            super(entryTypeToRecordType(entry, parentDirPath), entry.getName(),
+                    getEntrySize(entry, parentDirPath), entry.getAttributes().getModifyDate(), entry);
         }
 
-        public static RecordType entryTypeToRecordType(FSEntry entry) {
+        public static RecordType entryTypeToRecordType(FSEntry entry, String[] parentDirPath) {
             if(entry instanceof FSFile) {
                 return RecordType.FILE;
             }
@@ -1752,7 +1829,7 @@ public class FileSystemBrowserWindow extends JFrame {
             }
             else if(entry instanceof FSLink) {
                 FSLink fsl = (FSLink)entry;
-                FSEntry linkTarget = fsl.getLinkTarget();
+                FSEntry linkTarget = fsl.getLinkTarget(parentDirPath);
                 if(linkTarget == null) {
                     return RecordType.FILE; // BROKEN_LINK might be a future constant.
                 }
@@ -1770,7 +1847,7 @@ public class FileSystemBrowserWindow extends JFrame {
             }
         }
 
-        public static long getEntrySize(FSEntry entry) {
+        public static long getEntrySize(FSEntry entry, String[] parentDirPath) {
             if(entry instanceof FSFile) {
                 return ((FSFile) entry).getMainFork().getLength();
             }
@@ -1779,7 +1856,7 @@ public class FileSystemBrowserWindow extends JFrame {
             }
             else if(entry instanceof FSLink) {
                 FSLink fsl = (FSLink)entry;
-                FSEntry linkTarget = fsl.getLinkTarget();
+                FSEntry linkTarget = fsl.getLinkTarget(parentDirPath);
                 if(linkTarget == null) {
                     return 0;
                 }

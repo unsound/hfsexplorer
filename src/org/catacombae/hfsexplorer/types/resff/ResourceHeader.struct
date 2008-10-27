@@ -1,0 +1,6 @@
+struct ResourceHeader {
+    UInt32      dataOffset;         // Offset from the beginning of the resource fork to the beginning of the resource data.
+    UInt32      mapOffset;          // Offset from the beginning of the resource fork to the beginning of the resource map.
+    UInt32      dataLength;         // Length of resource data.
+    UInt32      mapLength;          // Length of resource map.
+}
