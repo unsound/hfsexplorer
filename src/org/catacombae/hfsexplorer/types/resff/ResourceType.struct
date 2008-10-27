@@ -1,0 +1,5 @@
+struct ResourceType {
+    Char    type[4];                // Resource type.
+    UInt16  instanceCount;          // Number of resources of this type in map minus 1.
+    UInt16  referenceListOffset;    // Offset from beginning of resource type list to reference list for this type.
+};

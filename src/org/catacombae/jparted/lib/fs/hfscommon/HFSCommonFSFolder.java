@@ -17,8 +17,10 @@
 
 package org.catacombae.jparted.lib.fs.hfscommon;
 
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFileRecord;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolder;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolderRecord;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.jparted.lib.fs.FSAttributes;
 import org.catacombae.jparted.lib.fs.FSEntry;
 import org.catacombae.jparted.lib.fs.FSFolder;
@@ -29,12 +31,14 @@ import org.catacombae.jparted.lib.fs.FSFolder;
  */
 public class HFSCommonFSFolder extends FSFolder {
     private final HFSCommonFileSystemHandler fsHandler;
+    private final CommonHFSCatalogLeafRecord keyRecord;
     private final CommonHFSCatalogFolderRecord folderRecord;
     private final CommonHFSCatalogFolder catalogFolder;
     private final HFSCommonFSAttributes attributes;
     
     public HFSCommonFSFolder(HFSCommonFileSystemHandler iParent, CommonHFSCatalogFolderRecord iFolderRecord) {
-        super(iParent);
+        this(iParent, null, iFolderRecord);
+        /*super(iParent);
         
         // Input check
         if(iParent == null)
@@ -43,6 +47,27 @@ public class HFSCommonFSFolder extends FSFolder {
             throw new IllegalArgumentException("iFolderRecord must not be null!");
         
         this.fsHandler = iParent;
+        this.folderRecord = iFolderRecord;
+        //CommonHFSCatalogLeafRecordData data = folderRecord.getData();
+        this.catalogFolder = folderRecord.getData();
+        this.attributes = new HFSCommonFSAttributes(this, catalogFolder);
+         * */
+    }
+
+    HFSCommonFSFolder(HFSCommonFileSystemHandler iParent, CommonHFSCatalogFileRecord iHardLinkFileRecord, CommonHFSCatalogFolderRecord iFolderRecord) {
+        super(iParent);
+
+        // Input check
+        if(iParent == null)
+            throw new IllegalArgumentException("iParent must not be null!");
+        if(iFolderRecord == null)
+            throw new IllegalArgumentException("iFolderRecord must not be null!");
+
+        this.fsHandler = iParent;
+        if(iHardLinkFileRecord != null)
+            this.keyRecord = iHardLinkFileRecord;
+        else
+            this.keyRecord = iFolderRecord;
         this.folderRecord = iFolderRecord;
         //CommonHFSCatalogLeafRecordData data = folderRecord.getData();
         this.catalogFolder = folderRecord.getData();
@@ -66,13 +91,15 @@ public class HFSCommonFSFolder extends FSFolder {
 
     @Override
     public String getName() {
-        return fsHandler.getProperNodeName(folderRecord);
+        return fsHandler.getProperNodeName(keyRecord);
     }
 
+    /*
     @Override
     public FSFolder getParent() {
-        return fsHandler.lookupParentFolder(folderRecord);
+        return fsHandler.lookupParentFolder(keyRecord);
     }
+     * */
     
     public CommonHFSCatalogFolder getInternalCatalogFolder() {
         return catalogFolder;

@@ -433,12 +433,14 @@ public class FileSystemBrowser<A> {
                         fileTable.requestFocus();
 
                         List<Record<A>> selection = getTableSelection();
+                        List<Record<A>> selectionParentPath = getRecordPath(lastTreeSelectionPath);
                         /*if(selection.size() != 1)
                             throw new RuntimeException("Right click selection with more than " +
                                     "one entry! (" + selection.size() + " entries)");*/
 
 
-                        controller.getRightClickRecordPopupMenu(selection).show(fileTable, e.getX(), e.getY());
+                        JPopupMenu jpm = controller.getRightClickRecordPopupMenu(selectionParentPath, selection);
+                        jpm.show(fileTable, e.getX(), e.getY());
                     }
                 }
                 else if(e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
@@ -454,8 +456,13 @@ public class FileSystemBrowser<A> {
                         //System.err.println("  Value class: " + colValue.getClass());
                         if(colValue instanceof RecordContainer) {
                             Record<A> rec = ((RecordContainer) colValue).getRecord(genericPlaceholder);
-                            if(rec.getType() == RecordType.FILE || rec.getType() == RecordType.FILE_LINK)
-                                controller.actionDoubleClickFile(rec);
+                            if(rec.getType() == RecordType.FILE || rec.getType() == RecordType.FILE_LINK) {
+                                List<Record<A>> dirPath = getRecordPath(lastTreeSelectionPath);
+                                ArrayList<Record<A>> completePath = new ArrayList<Record<A>>(dirPath.size()+1);
+                                completePath.addAll(dirPath);
+                                completePath.add(rec);
+                                controller.actionDoubleClickFile(completePath);
+                            }
                             else if(rec.getType() == RecordType.FOLDER || rec.getType() == RecordType.FOLDER_LINK)
                                 actionChangeDir(rec);
                         }
@@ -478,7 +485,8 @@ public class FileSystemBrowser<A> {
                     dirTree.requestFocus();
 
                     List<Record<A>> recList = Arrays.asList(getTreeSelection());
-                    controller.getRightClickRecordPopupMenu(recList).show(dirTree,
+                    List<Record<A>> selectionParentPath = getRecordPath(lastTreeSelectionPath.getParentPath());
+                    controller.getRightClickRecordPopupMenu(selectionParentPath, recList).show(dirTree,
                             e.getX(), e.getY());
                 }
             }
@@ -558,7 +566,7 @@ public class FileSystemBrowser<A> {
      */
     private void actionExtractToDir() {
         if(ensureFileSystemLoaded()) {
-            controller.actionExtractToDir(getSelection());
+            controller.actionExtractToDir(getSelectionParentPath(), getSelection());
         }
     }
 
@@ -954,17 +962,24 @@ public class FileSystemBrowser<A> {
      */
     public List<Record<A>> getSelection() {
         final List<Record<A>> result;
-	if(dirTreeLastFocus > fileTableLastFocus) {
-	    Record<A> treeSelection = getTreeSelection();
+        if(dirTreeLastFocus > fileTableLastFocus) {
+            Record<A> treeSelection = getTreeSelection();
             result = new ArrayList<Record<A>>(1);
             result.add(treeSelection);
-	}
-	else {
-	    result = getTableSelection();
-	}
+        }
+        else {
+            result = getTableSelection();
+        }
         return result;
     }
-    
+
+    public List<Record<A>> getSelectionParentPath() {
+        if(dirTreeLastFocus > fileTableLastFocus)
+            return getRecordPath(lastTreeSelectionPath.getParentPath());
+        else
+            return getRecordPath(lastTreeSelectionPath);
+    }
+
     /**
      * Returns the current user selection for the folder tree.
      * 
@@ -1005,7 +1020,49 @@ public class FileSystemBrowser<A> {
         
         return result;
     }
-    
+
+    /*
+    private List<Record<A>> getTreeSelectionPath() {
+        //List<Record<A>> result;
+        TreePath tmpLastTreeSelectionPath = lastTreeSelectionPath;
+        ArrayList<Record<A>> result = new ArrayList<Record<A>>(tmpLastTreeSelectionPath.getPathCount());
+        for(Object o : tmpLastTreeSelectionPath.getPath()) {
+            if(o == null) {
+                JOptionPane.showMessageDialog(viewComponent, "No file or folder selected.",
+                        "Information", JOptionPane.INFORMATION_MESSAGE);
+                result = null;
+                break;
+            }
+            else if(o instanceof DefaultMutableTreeNode) {
+                Object o2 = ((DefaultMutableTreeNode) o).getUserObject();
+                if(o2 instanceof RecordContainer) {
+                    Record<A> rec = ((RecordContainer) o2).getRecord(genericPlaceholder);
+                    //result = new ArrayList<Record<A>>(1);
+                    //result.add(rec);
+                    result.add(rec);
+                }
+                else {
+                    JOptionPane.showMessageDialog(viewComponent,
+                            "[getTreeSelection()] Unexpected data in tree model: " +
+                            o2.getClass() + ". (Internal error, report to " +
+                            "developer)", "Error", JOptionPane.ERROR_MESSAGE);
+                    result = null;
+                    break;
+                }
+            }
+            else {
+                JOptionPane.showMessageDialog(viewComponent,
+                        "[getTreeSelection()] Unexpected tree node type: " +
+                        o.getClass() + "! (Internal error, report to developer)",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                result = null;
+                break;
+            }
+        }
+
+        return result;
+    }*/
+
     /**
      * Returns the current user selection for the folder contents table.
      * 
@@ -1269,13 +1326,13 @@ public class FileSystemBrowser<A> {
         
     public static interface FileSystemProvider<A> {
         
-        public void actionDoubleClickFile(Record<A> record);
+        public void actionDoubleClickFile(List<Record<A>> fileRecordPath);
 
-        public void actionExtractToDir(List<Record<A>> recordList);
+        public void actionExtractToDir(List<Record<A>> parentPath, List<Record<A>> recordList);
         
         public void actionGetInfo(List<Record<A>> recordList);
 
-        public JPopupMenu getRightClickRecordPopupMenu(List<Record<A>> selectedRecords);
+        public JPopupMenu getRightClickRecordPopupMenu(List<Record<A>> parentPath, List<Record<A>> selectedRecords);
         
         public boolean isFileSystemLoaded();
         

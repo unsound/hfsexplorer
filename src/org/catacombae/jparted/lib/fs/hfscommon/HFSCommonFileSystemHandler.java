@@ -33,8 +33,10 @@ import org.catacombae.hfsexplorer.fs.BaseHFSFileSystemView;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.jparted.lib.fs.FSFolder;
 import org.catacombae.jparted.lib.fs.FSForkType;
+import org.catacombae.jparted.lib.fs.FSLink;
 import org.catacombae.jparted.lib.fs.FileSystemHandler;
 import org.catacombae.jparted.lib.fs.FSEntry;
+import org.catacombae.jparted.lib.fs.FSFile;
 
 /**
  * HFS+ implementation of a FileSystemHandler. This implementation can be used
@@ -43,6 +45,10 @@ import org.catacombae.jparted.lib.fs.FSEntry;
  * @author Erik Larsson
  */
 public class HFSCommonFileSystemHandler extends FileSystemHandler {
+    private static final String FILE_HARD_LINK_DIR = "\u0000\u0000\u0000\u0000HFS+ Private Data";
+    private static final String FILE_HARD_LINK_PREFIX = "iNode";
+    public static final String DIRECTORY_HARD_LINK_DIR = ".HFS+ Private Directory Data" + (char)0x0d;
+    private static final String DIRECTORY_HARD_LINK_PREFIX = "dir_";
     private BaseHFSFileSystemView view;
     private boolean doUnicodeFileNameComposition;
     
@@ -83,7 +89,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
     }
 
     CommonHFSCatalogLeafRecord getRecord(CommonHFSCatalogFolderRecord rootRecord, String... path) {
-
+        //System.err.println("getRecord(" + rootRecord + ", { \"" + Util.concatenateStrings(path, "\", \"") + "\" });");
         // All path components before the last one must be of type "folder" or
         // "folder symlink".
         CommonHFSCatalogFolderRecord curFolder = rootRecord;
@@ -104,22 +110,38 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
                     else if(subRecord instanceof CommonHFSCatalogFileRecord) {
                         CommonHFSCatalogFileRecord fr =
                                 (CommonHFSCatalogFileRecord)subRecord;
-                        
+
+                        final String[] absPath;
                         if(fr.getData().isSymbolicLink()) {
                             byte[] data = Util.readFully(getReadableDataForkStream(fr));
-                            String targetPath = Util.readString(data, "UTF-8");
-                            String[] absPath =
-                                    getEntryByPosixPath(targetPath, new HFSCommonFSFolder(this, curFolder)).getAbsolutePath();
+                            String posixPath = Util.readString(data, "UTF-8");
+                            String[] basePath = Util.arrayCopy(path, 0, new String[path.length], 0, i+1);
+                            absPath =
+                                    getTruePathFromPosixPath(posixPath, basePath);
 
-                            CommonHFSCatalogLeafRecord linkTarget =
-                                    getRecord(curFolder, absPath);
-                            if(linkTarget instanceof CommonHFSCatalogFolderRecord)
-                                curFolder = (CommonHFSCatalogFolderRecord)linkTarget;
-                            else
-                                return null; // A symlink that doesn't point to a folder -> invalid path
+                        }
+                        else if(fr.getData().isHardFileLink()) {
+                            absPath = new String[] {
+                                        FILE_HARD_LINK_DIR,
+                                        FILE_HARD_LINK_PREFIX + fr.getData().getHardLinkInode()
+                            };
+                        }
+                        else if(fr.getData().isHardDirectoryLink()) {
+                            absPath = new String[] {
+                                        DIRECTORY_HARD_LINK_DIR,
+                                        DIRECTORY_HARD_LINK_PREFIX + fr.getData().getHardLinkInode()
+                            };
                         }
                         else
-                            return null; // A file which is not a symlink -> invalid path
+                            return null; // A file which is not a symlink or hard link -> invalid path
+
+                        CommonHFSCatalogLeafRecord linkTarget =
+                                getRecord(curFolder, absPath);
+                        if(linkTarget instanceof CommonHFSCatalogFolderRecord)
+                            curFolder = (CommonHFSCatalogFolderRecord) linkTarget;
+                        else
+                            return null; // A link that doesn't point to a folder -> invalid path
+
                     }
                 }
             }
@@ -128,7 +150,10 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
                 return null; // Invalid path, no matching child was found.
         }
 
-        throw new RuntimeException("Not supposed to get here.");
+        if(path.length == 0)
+            return rootRecord;
+        else
+            throw new RuntimeException("Not supposed to get here.");
     }
 
     private FSEntry entryFromRecord(CommonHFSCatalogLeafRecord rec) {
@@ -138,8 +163,13 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
 
             if(fileRecord.getData().isSymbolicLink())
                 return new HFSCommonFSLink(this, fileRecord);
+            else if(fileRecord.getData().isHardFileLink())
+                return new HFSCommonFSFile(this, fileRecord, lookupFileInode(fileRecord.getData().getHardLinkInode()));
+            else if(fileRecord.getData().isHardDirectoryLink())
+                return new HFSCommonFSFolder(this, fileRecord, lookupDirectoryInode(fileRecord.getData().getHardLinkInode()));
             else
                 return new HFSCommonFSFile(this, fileRecord);
+
         }
         else if(rec instanceof CommonHFSCatalogFolderRecord) {
             return new HFSCommonFSFolder(this, (CommonHFSCatalogFolderRecord)rec);
@@ -148,6 +178,32 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
             /*throw new RuntimeException("Did not expect a " + rec.getClass() +
                     " here.");*/
             return null;
+    }
+    
+    private CommonHFSCatalogFileRecord lookupFileInode(int inodeNumber) {
+        long trueInodeNumber = Util.unsign(inodeNumber);
+        CommonHFSCatalogLeafRecord res = getRecord(view.getRoot(), FILE_HARD_LINK_DIR,
+                FILE_HARD_LINK_PREFIX + trueInodeNumber);
+        if(res == null)
+            return null; // Could not find any inode
+        else if(res instanceof CommonHFSCatalogFileRecord)
+            return (CommonHFSCatalogFileRecord) res;
+        else
+            throw new RuntimeException("Error in HFS+ file system structure: Found a " +
+                    res.getClass() + " in file hard link dir for iNode" + trueInodeNumber);
+    }
+
+    private CommonHFSCatalogFolderRecord lookupDirectoryInode(int inodeNumber) {
+        long trueInodeNumber = Util.unsign(inodeNumber);
+        CommonHFSCatalogLeafRecord res = getRecord(view.getRoot(), DIRECTORY_HARD_LINK_DIR,
+                DIRECTORY_HARD_LINK_PREFIX + trueInodeNumber);
+        if(res == null)
+            return null; // Could not find any inode
+        else if(res instanceof CommonHFSCatalogFolderRecord)
+            return (CommonHFSCatalogFolderRecord) res;
+        else
+            throw new RuntimeException("Error in HFS+ file system structure: Found a " +
+                    res.getClass() + " in directory hard link dir for dir_" + trueInodeNumber);
     }
 
     @Override
@@ -305,5 +361,15 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
     @Override
     public String generatePosixPathnameComponent(String fsPathnameComponent) {
         return fsPathnameComponent.replace("/", ":");
+    }
+
+    @Override
+    public String[] getTargetPath(FSLink link, String[] parentDir) {
+        if(link instanceof HFSCommonFSLink) {
+            HFSCommonFSLink hfsLink = (HFSCommonFSLink) link;
+            return getTruePathFromPosixPath(hfsLink.getLinkTargetPosixPath(), parentDir);
+        }
+        else
+            throw new RuntimeException("Invalid type: " + link.getClass());
     }
 }

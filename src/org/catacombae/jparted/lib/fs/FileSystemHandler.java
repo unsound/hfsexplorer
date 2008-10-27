@@ -18,6 +18,7 @@
 package org.catacombae.jparted.lib.fs;
 
 import java.util.LinkedList;
+import org.catacombae.hfsexplorer.Util;
 
 /**
  *
@@ -87,60 +88,86 @@ public abstract class FileSystemHandler {
      * an invalid pathname.
      */
     public FSEntry getEntryByPosixPath(final String posixPath,
-            final FSFolder rootFolder) throws IllegalArgumentException {
+            final String... rootFolderPath) throws IllegalArgumentException {
+        String[] path = getTruePathFromPosixPath(posixPath, rootFolderPath);
+        if(path != null)
+            return getEntry(path);
+        else
+            return null;
+    }
+
+    public String[] getTruePathFromPosixPath(final String posixPath,
+            final String... rootFolderPath) throws IllegalArgumentException {
         String[] components = posixPath.split("/");
 
         int i = 0;
-        FSEntry curEntry;
+        //FSEntry curEntry;
+        LinkedList<String> pathStack = new LinkedList<String>();
         LinkedList<String[]> visitedLinks = null;
 
         // If we encounter a '/' as the first character, we have an absolute path
         if(posixPath.startsWith("/")) {
             i = 1;
-            curEntry = getRoot();
+            //curEntry = getRoot();
         }
-        else
-            curEntry = rootFolder;
+        else {
+            //curEntry = rootFolder;
+            for(String pathComponent : rootFolderPath)
+                pathStack.addLast(pathComponent);
+        }
 
         for(; i < components.length; ++i) {
+            String[] curPath = pathStack.toArray(new String[pathStack.size()]);
+            FSEntry curEntry2 = getEntry(curPath);
             FSFolder curFolder;
-            if(curEntry instanceof FSFolder)
-                curFolder = (FSFolder) curEntry;
-            else if(curEntry instanceof FSLink) {
-                FSLink curLink = (FSLink) curEntry;
+            if(curEntry2 instanceof FSFolder)
+                curFolder = (FSFolder) curEntry2;
+            else if(curEntry2 instanceof FSLink) {
+                FSLink curLink = (FSLink) curEntry2;
                 // Resolve links.
                 if(visitedLinks == null)
                     visitedLinks = new LinkedList<String[]>();
                 else
                     visitedLinks.clear();
 
-                visitedLinks.add(curEntry.getAbsolutePath());
-                FSEntry linkTarget = curLink.getLinkTarget();
-                while(linkTarget != null && linkTarget instanceof FSLink) {
-                    curLink = (FSLink) linkTarget;
-                    String[] curPath = curLink.getAbsolutePath();
-                    for(String[] visitedPath : visitedLinks) {
-                        if(curPath.length == visitedPath.length) {
-                            int j = 0;
-                            for(; j < curPath.length; ++j) {
-                                if(!curPath[j].equals(visitedPath[j]))
-                                    break;
+                FSEntry linkTarget = null;
+                String[] curLinkPath = curPath;
+                while(curLinkPath != null) {
+                    visitedLinks.add(curLinkPath);
+                    String[] parentPath =
+                            Util.arrayCopy(curLinkPath, 0, new String[curLinkPath.length-1], 0, curLinkPath.length-1);
+                    linkTarget =
+                            curLink.getLinkTarget(parentPath);
+
+                    if(linkTarget != null && linkTarget instanceof FSLink) {
+                        curLink = (FSLink) linkTarget;
+                        curLinkPath = getTargetPath(curLink, parentPath);
+
+                        // Check the visited list to see if we have been here before.
+                        for(String[] visitedPath : visitedLinks) {
+                            if(curLinkPath.length == visitedPath.length) {
+                                int j = 0;
+                                for(; j < curLinkPath.length; ++j) {
+                                    if(!curLinkPath[j].equals(visitedPath[j]))
+                                        break;
+                                }
+                                if(j == curLinkPath.length)
+                                    return null; // We have been here before! Circular linking...
                             }
-                            if(j == curPath.length)
-                                return null; // We have been here before! Circular linking...
                         }
                     }
-
-                    visitedLinks.add(curPath);
-                    linkTarget = curLink.getLinkTarget();
+                    else
+                        curLinkPath = null;
                 }
 
                 if(linkTarget == null)
                     return null; // Invalid link target.
                 if(linkTarget instanceof FSFolder)
                     curFolder = (FSFolder) linkTarget;
+                else if(linkTarget instanceof FSFile)
+                    return null; // Invalid intermediate path component
                 else
-                    return null; // Link is pointing to a file or some unknown creature from the future
+                    throw new RuntimeException("Unknown type: " + linkTarget.getClass());
 
                 visitedLinks.clear();
             }
@@ -153,7 +180,7 @@ public abstract class FileSystemHandler {
                 // We allow empty components (multiple slashes between components)
             }
             else if(curPathComponent.equals("..")) {
-                curFolder = curFolder.getParent();
+                pathStack.removeLast();
             }
             else {
                 String fsPathnameComponent = parsePosixPathnameComponent(curPathComponent);
@@ -168,13 +195,13 @@ public abstract class FileSystemHandler {
                 }
 
                 if(nextEntry != null)
-                    curEntry = nextEntry;
+                    pathStack.add(nextEntry.getName());
                 else
                     return null; // Invalid pathname
             }
         }
 
-        return curEntry;
+        return pathStack.toArray(new String[pathStack.size()]);
     }
 
     /**
@@ -203,6 +230,13 @@ public abstract class FileSystemHandler {
      * @return
      */
     public abstract String generatePosixPathnameComponent(String fsPathnameComponent);
+
+    /**
+     * Returns path to the link's target in absolute form.
+     * @param link
+     * @return
+     */
+    public abstract String[] getTargetPath(FSLink link, String[] parentDir);
 
     /**
      * Returns the predefined fork types that this file system recognizes and

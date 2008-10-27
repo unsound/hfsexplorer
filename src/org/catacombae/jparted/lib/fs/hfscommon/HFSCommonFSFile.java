@@ -19,6 +19,7 @@ package org.catacombae.jparted.lib.fs.hfscommon;
 
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFile;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFileRecord;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.jparted.lib.fs.FSAttributes;
 import org.catacombae.jparted.lib.fs.FSFile;
@@ -33,6 +34,7 @@ import org.catacombae.jparted.lib.fs.FSForkType;
  */
 public class HFSCommonFSFile extends FSFile {
     private final HFSCommonFileSystemHandler parent;
+    private final CommonHFSCatalogLeafRecord keyRecord;
     private final CommonHFSCatalogFileRecord fileRecord;
     private final CommonHFSCatalogFile catalogFile;
     private final HFSCommonFSAttributes attributes;
@@ -40,6 +42,10 @@ public class HFSCommonFSFile extends FSFile {
     private final FSFork resourceFork;
     
     HFSCommonFSFile(HFSCommonFileSystemHandler iParent, CommonHFSCatalogFileRecord iFileRecord) {
+        this(iParent, null, iFileRecord);
+    }
+    
+    HFSCommonFSFile(HFSCommonFileSystemHandler iParent, CommonHFSCatalogLeafRecord iHardLinkRecord, CommonHFSCatalogFileRecord iFileRecord) {
         super(iParent);
         
         // Input check
@@ -50,6 +56,10 @@ public class HFSCommonFSFile extends FSFile {
         
         this.parent = iParent;
         this.fileRecord = iFileRecord;
+        if(iHardLinkRecord != null)
+            this.keyRecord = iHardLinkRecord;
+        else
+            this.keyRecord = iFileRecord;
         this.catalogFile = fileRecord.getData();
         this.attributes = new HFSCommonFSAttributes(this, catalogFile);
         this.dataFork = new HFSCommonFSFork(this, FSForkType.DATA, catalogFile.getDataFork());
@@ -63,13 +73,15 @@ public class HFSCommonFSFile extends FSFile {
 
     @Override
     public String getName() {
-        return parent.getProperNodeName(fileRecord);
+        return parent.getProperNodeName(keyRecord);
     }
 
+    /*
     @Override
     public FSFolder getParent() {
-        return parent.lookupParentFolder(fileRecord);
+        return parent.lookupParentFolder(keyRecord);
     }
+     * */
 
     @Override
     public FSFork getMainFork() {

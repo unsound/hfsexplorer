@@ -1,0 +1,11 @@
+struct ResourceMap {
+    UInt8           reserved1[16];          // Reserved for copy of resource header.
+    UInt32          reserved2;              // Reserved for handle to next resource map.
+    UInt16          reserved3;              // Reserved for file reference number.
+    UInt16          resourceForkAttributes; // Resource fork attributes
+    UInt16          typeListOffset;         // Offset from beginning of map to resource type list.
+    UInt16          nameListOffset;         // Offset from beginning of map to resource name list.
+    UInt16          typeCount;              // Number of types in the map minus 1.
+    ResourceType    resourceTypeList[2];    // Resource type list.
+
+};

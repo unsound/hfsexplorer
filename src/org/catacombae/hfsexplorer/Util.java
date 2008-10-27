@@ -40,7 +40,7 @@ public class Util {
 	}
 	return result;
     }
-    
+
     public static String toHexStringBE(char[] array) {
 	return toHexStringBE(array, 0, array.length);
     }
@@ -417,12 +417,18 @@ public class Util {
     }
     
     public static <T> T[] arrayCopy(T[] source, T[] dest, int destPos) {
-        if(dest.length-destPos < source.length)
-	    throw new RuntimeException("Destination array not large enough.");
-	System.arraycopy(source, 0, dest, 0, source.length);
-        return dest;
+        return arrayCopy(source, 0, dest, destPos, source.length);
     }
     
+    public static <T> T[] arrayCopy(T[] source, int sourcePos, T[] dest, int destPos, int length) {
+        if(source.length - sourcePos < length)
+            throw new RuntimeException("Source array not large enough.");
+        if(dest.length - destPos < length)
+            throw new RuntimeException("Destination array not large enough.");
+        System.arraycopy(source, sourcePos, dest, destPos, length);
+        return dest;
+    }
+
     public static boolean arraysEqual(boolean[] a, boolean[] b) {
 	return arrayRegionsEqual(a, 0, a.length, b, 0, b.length);
     }
@@ -765,4 +771,26 @@ public class Util {
         return false;
 
     }
+
+    /**
+     * Concatenates the <code>strings</code> into one big string, putting <code>glueString</code>
+     * between each pair. Example:
+     * <code>concatenateStrings(new String[] {"joe", "lisa", "bob"}, " and ");</code> yields the
+     * string "joe and lisa and bob".
+     * 
+     * @param parentDir
+     * @param string
+     * @return
+     */
+    public static String concatenateStrings(String[] strings, String glueString) {
+        if(strings.length > 0) {
+            StringBuilder sb = new StringBuilder(strings[0]);
+            for(int i = 1; i < strings.length; ++i)
+                sb.append(glueString).append(strings[i]);
+            return sb.toString();
+        }
+        else
+            return "";
+    }
+
 }

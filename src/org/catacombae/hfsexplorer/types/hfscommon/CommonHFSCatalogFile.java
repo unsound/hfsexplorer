@@ -25,7 +25,12 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
     public abstract CommonHFSForkData getDataFork();
     public abstract CommonHFSForkData getResourceFork();
     public abstract byte[] getBytes();
+
+    public abstract boolean isHardFileLink();
+    public abstract boolean isHardDirectoryLink();
     public abstract boolean isSymbolicLink();
+
+    public abstract int getHardLinkInode();
     
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + CommonHFSCatalogFile.class.getSimpleName() + ":");
@@ -43,6 +48,10 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
     }
 
     public static class HFSPlusImplementation extends CommonHFSCatalogFile {
+        private static final int HARD_FILE_LINK_FILE_TYPE = 0x686C6E6B; // "hlnk"
+        private static final int HARD_FILE_LINK_CREATOR = 0x6866732B; // "hfs+"
+        private static final int HARD_DIRECTORY_LINK_FILE_TYPE = 0x66647270; // "fdrp"
+        private static final int HARD_DIRECTORY_LINK_CREATOR = 0x4d414353; // "MACS"
         private HFSPlusCatalogFile data;
         
         private HFSPlusImplementation(HFSPlusCatalogFile data) {
@@ -154,6 +163,25 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
         public Dictionary getStructElements() {
             return data.getStructElements();
         }
+
+        @Override
+        public boolean isHardFileLink() {
+            int fileType = data.getUserInfo().getFileType().getOSType().getFourCharCode();
+            int creator = data.getUserInfo().getFileCreator().getOSType().getFourCharCode();
+            return fileType == HARD_FILE_LINK_FILE_TYPE && creator == HARD_FILE_LINK_CREATOR;
+        }
+
+        @Override
+        public boolean isHardDirectoryLink() {
+            int fileType = data.getUserInfo().getFileType().getOSType().getFourCharCode();
+            int creator = data.getUserInfo().getFileCreator().getOSType().getFourCharCode();
+            return fileType == HARD_DIRECTORY_LINK_FILE_TYPE && creator == HARD_DIRECTORY_LINK_CREATOR;
+        }
+
+        @Override
+        public int getHardLinkInode() {
+            return data.getPermissions().getSpecial();
+        }
     }
     
     public static class HFSImplementation extends CommonHFSCatalogFile {
@@ -263,6 +291,21 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
         @Override
         public Dictionary getStructElements() {
             return data.getStructElements();
+        }
+
+        @Override
+        public boolean isHardFileLink() {
+            return false; // No such thing in HFS.
+        }
+
+        @Override
+        public boolean isHardDirectoryLink() {
+            return false; // No such thing in HFS.
+        }
+
+        @Override
+        public int getHardLinkInode() {
+            throw new UnsupportedOperationException("Not supported for HFS.");
         }
     }
 }
