@@ -1831,7 +1831,7 @@ public class FileSystemBrowserWindow extends JFrame {
                 FSLink fsl = (FSLink)entry;
                 FSEntry linkTarget = fsl.getLinkTarget(parentDirPath);
                 if(linkTarget == null) {
-                    return RecordType.FILE; // BROKEN_LINK might be a future constant.
+                    return RecordType.BROKEN_LINK;
                 }
                 if(linkTarget instanceof FSFile) {
                     return RecordType.FILE_LINK;

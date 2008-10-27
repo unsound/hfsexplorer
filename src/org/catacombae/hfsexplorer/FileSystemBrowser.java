@@ -337,13 +337,23 @@ public class FileSystemBrowser<A> {
                     final Component objectComponent = objectRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                     final JLabel jl = theOne;
                     Record rec = ((RecordContainer) value).getRecord(genericPlaceholder);
-                    if(rec.getType() == RecordType.FOLDER || rec.getType() == RecordType.FOLDER_LINK)
-                        jl.setIcon(folderIcon);
-                    else if(rec.getType() == RecordType.FILE || rec.getType() == RecordType.FILE_LINK)
-                        jl.setIcon(documentIcon);
-                    else
-                        jl.setIcon(emptyIcon);
-
+                    
+                    switch(rec.getType()) {
+                        case FOLDER:
+                        case FOLDER_LINK:
+                            jl.setIcon(folderIcon);
+                            break;
+                        case FILE:
+                        case FILE_LINK:
+                            jl.setIcon(documentIcon);
+                            break;
+                        case BROKEN_LINK:
+                            jl.setIcon(emptyIcon);
+                            break;
+                        default:
+                            throw new RuntimeException("Unhandled RecordType: " + rec.getType());
+                    }
+                    
                     jl.setVisible(true);
                     Component c = new Component() {
                         {
@@ -1284,7 +1294,7 @@ public class FileSystemBrowser<A> {
     }
     
     public static enum RecordType {
-        FILE, FOLDER, FILE_LINK, FOLDER_LINK;
+        FILE, FOLDER, FILE_LINK, FOLDER_LINK, BROKEN_LINK;
     }
     
     public static class Record<A> {
@@ -1444,6 +1454,9 @@ public class FileSystemBrowser<A> {
                 case FOLDER_LINK:
                     displayString = "Folder (symlink)";
                     break;
+                case BROKEN_LINK:
+                    displayString = "Broken link";
+                    break;
                 default:
                     throw new RuntimeException("INTERNAL ERROR: Encountered " +
                         "unexpected record type (" + recordType + ")");
@@ -1467,6 +1480,8 @@ public class FileSystemBrowser<A> {
                     return 1;
                 case FOLDER_LINK:
                     return 0;
+                case BROKEN_LINK:
+                    return 2;
                 default:
                     throw new RuntimeException("INTERNAL ERROR: Encountered " +
                         "unexpected record type (" + recordType + ")");
