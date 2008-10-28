@@ -17,6 +17,8 @@
 
 package org.catacombae.hfsexplorer;
 import java.io.*;
+import java.util.Arrays;
+import java.util.List;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.RuntimeIOException;
 
@@ -773,6 +775,25 @@ public class Util {
     }
 
     /**
+     * Checks if the given list of arrays contains an array that is equal to <code>array</code> by
+     * the definition of Arrays.equal(..) (both arrays must have the same number of elements, and
+     * every pair of elements must be equal according to Object.equals).
+     *
+     * @param <A> the type of the array.
+     * @param listOfArrays the list of arrays to search.
+     * @param array the array to match.
+     * @return <code>true</code> if an equal to <code>array</code> was found in
+     * <code>listOfArrays</code>, otherwise <code>false</code>.
+     */
+    public static <A> boolean contains(List<A[]> listOfArrays, A[] array) {
+        for(A[] curArray : listOfArrays) {
+            if(Arrays.equals(curArray, array))
+                return true;
+        }
+        return false;
+    }
+
+    /**
      * Concatenates the <code>strings</code> into one big string, putting <code>glueString</code>
      * between each pair. Example:
      * <code>concatenateStrings(new String[] {"joe", "lisa", "bob"}, " and ");</code> yields the
@@ -782,15 +803,31 @@ public class Util {
      * @param string
      * @return
      */
-    public static String concatenateStrings(String[] strings, String glueString) {
+    public static String concatenateStrings(Object[] strings, String glueString) {
         if(strings.length > 0) {
-            StringBuilder sb = new StringBuilder(strings[0]);
+            StringBuilder sb = new StringBuilder(strings[0].toString());
             for(int i = 1; i < strings.length; ++i)
-                sb.append(glueString).append(strings[i]);
+                sb.append(glueString).append(strings[i].toString());
             return sb.toString();
         }
         else
             return "";
     }
 
+    public static String concatenateStrings(List<? extends Object> strings, String glueString) {
+        if(strings.size() > 0) {
+            StringBuilder sb = new StringBuilder();
+            boolean first = true;
+            for(Object s : strings) {
+                if(!first)
+                    sb.append(glueString);
+                else
+                    first = false;
+                sb.append(s.toString());
+            }
+            return sb.toString();
+        }
+        else
+            return "";
+    }
 }

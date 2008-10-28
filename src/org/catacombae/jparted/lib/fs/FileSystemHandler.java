@@ -92,16 +92,16 @@ public abstract class FileSystemHandler {
         final String prefix = globalPrefix;
         globalPrefix += "    ";
         try {
-            System.err.println(prefix + "getEntryByPosixPath(" + posixPath + ", " + Util.concatenateStrings(rootFolderPath, "/") + ");");
+            log(prefix + "getEntryByPosixPath(" + posixPath + ", " + Util.concatenateStrings(rootFolderPath, "/") + ");");
             String[] path = getTruePathFromPosixPath(posixPath, rootFolderPath);
 
             if(path != null) {
-                System.err.println(prefix + "  getEntryByPosixPath: path = " + Util.concatenateStrings(path, "/"));
+                log(prefix + "  getEntryByPosixPath: path = " + Util.concatenateStrings(path, "/"));
                 return getEntry(path);
             }
             else
                 return null;
-        } finally { System.err.println(prefix + "Returning from getEntryByPosixPath"); globalPrefix = prefix; }
+        } finally { log(prefix + "Returning from getEntryByPosixPath"); globalPrefix = prefix; }
     }
 
     public String globalPrefix = "";
@@ -109,7 +109,7 @@ public abstract class FileSystemHandler {
             final String... rootFolderPath) throws IllegalArgumentException {
         final String prefix = globalPrefix;
         globalPrefix += "    ";
-        System.err.println(prefix + "getTruePathFromPosixPath(\"" + posixPath + "\", { \"" +
+        log(prefix + "getTruePathFromPosixPath(\"" + posixPath + "\", { \"" +
                 Util.concatenateStrings(rootFolderPath, "\", \"") + "\" });");
         try {
         String[] components = posixPath.split("/");
@@ -132,10 +132,10 @@ public abstract class FileSystemHandler {
 
         for(; i < components.length; ++i) {
             String[] curPath = pathStack.toArray(new String[pathStack.size()]);
-            System.err.println(prefix + "  gtpfpp: curPath=\"" + Util.concatenateStrings(curPath, "\", \"") + "\"");
+            log(prefix + "  gtpfpp: curPath=\"" + Util.concatenateStrings(curPath, "\", \"") + "\"");
             if(curEntry2 == null) {
                 curEntry2 = getEntry(curPath);
-                System.err.println(prefix + "  gtpfpp: curEntry2=" + curEntry2);
+                log(prefix + "  gtpfpp: curEntry2=" + curEntry2);
             }
             
             FSFolder curFolder;
@@ -143,7 +143,7 @@ public abstract class FileSystemHandler {
                 curFolder = (FSFolder) curEntry2;
             else if(curEntry2 instanceof FSLink) {
                 FSLink curLink = (FSLink) curEntry2;
-                System.err.println(prefix + "  gtpfpp: It was a link!");
+                log(prefix + "  gtpfpp: It was a link!");
                 // Resolve links.
                 if(visitedLinks == null)
                     visitedLinks = new LinkedList<String[]>();
@@ -156,34 +156,25 @@ public abstract class FileSystemHandler {
                     visitedLinks.add(curLinkPath);
                     String[] parentPath =
                             Util.arrayCopy(curLinkPath, 0, new String[curLinkPath.length-1], 0, curLinkPath.length-1);
-                    System.err.println(prefix + "  gtpfpp:   Resolving link target against " + Util.concatenateStrings(parentPath, "/"));
+                    log(prefix + "  gtpfpp:   Resolving link target against " + Util.concatenateStrings(parentPath, "/"));
                     linkTarget =
                             curLink.getLinkTarget(parentPath);
 
-                    System.err.println(prefix + "  gtpfpp:   Result: " + linkTarget);
+                    log(prefix + "  gtpfpp:   Result: " + linkTarget);
 
                     if(linkTarget != null && linkTarget instanceof FSLink) {
                         curLink = (FSLink) linkTarget;
                         curLinkPath = getTargetPath(curLink, parentPath);
 
                         // Check the visited list to see if we have been here before.
-                        for(String[] visitedPath : visitedLinks) {
-                            if(curLinkPath.length == visitedPath.length) {
-                                int j = 0;
-                                for(; j < curLinkPath.length; ++j) {
-                                    if(!curLinkPath[j].equals(visitedPath[j]))
-                                        break;
-                                }
-                                if(j == curLinkPath.length)
-                                    return null; // We have been here before! Circular linking...
-                            }
-                        }
+                        if(Util.contains(visitedLinks, curLinkPath))
+                            return null; // We have been here before! Circular linking...
                     }
                     else
                         curLinkPath = null;
                 }
 
-                System.err.println(prefix + "  gtpfpp: Before test.");
+                log(prefix + "  gtpfpp: Before test.");
                 if(linkTarget == null)
                     return null; // Invalid link target.
                 if(linkTarget instanceof FSFolder)
@@ -199,7 +190,7 @@ public abstract class FileSystemHandler {
                 return null; // Invalid pathname
 
             String curPathComponent = components[i];
-            System.err.println(prefix + "  gtpfpp: curPathComponent=" + curPathComponent);
+            log(prefix + "  gtpfpp: curPathComponent=" + curPathComponent);
 
             if(curPathComponent.length() == 0 || curPathComponent.equals(".")) {
                 // We allow empty components (multiple slashes between components)
@@ -210,20 +201,20 @@ public abstract class FileSystemHandler {
             }
             else {
                 String fsPathnameComponent = parsePosixPathnameComponent(curPathComponent);
-                System.err.println(prefix + "  gtpfpp: fsPathnameComponent=" + fsPathnameComponent);
+                log(prefix + "  gtpfpp: fsPathnameComponent=" + fsPathnameComponent);
 
                 FSEntry nextEntry = null;
                 for(FSEntry entry : curFolder.list()) {
-                    System.err.println(prefix + "  gtpfpp:   Checking if " + entry.getName() + " matches...");
+                    log(prefix + "  gtpfpp:   Checking if " + entry.getName() + " matches...");
 
                     if(entry.getName().equals(fsPathnameComponent)) {
                         nextEntry = entry;
-                        System.err.println(prefix + "  gtpfpp:     Match found!!");
+                        log(prefix + "  gtpfpp:     Match found!!");
                         break;
                     }
                 }
 
-                System.err.println(prefix + "  gtpfpp: nextEntry=" + nextEntry);
+                log(prefix + "  gtpfpp: nextEntry=" + nextEntry);
                 if(nextEntry != null) {
                     curEntry2 = nextEntry;
                     pathStack.add(nextEntry.getName());
@@ -234,9 +225,9 @@ public abstract class FileSystemHandler {
         }
 
         final String[] res = pathStack.toArray(new String[pathStack.size()]);
-        System.err.println(prefix + "  gtpfpp: Returning " + Util.concatenateStrings(res, "/"));
+        log(prefix + "  gtpfpp: Returning " + Util.concatenateStrings(res, "/"));
         return res;
-        } finally { System.err.println(prefix + "Returning from getTruePathFromPosixPath."); globalPrefix = prefix; }
+        } finally { log(prefix + "Returning from getTruePathFromPosixPath."); globalPrefix = prefix; }
     }
 
     /**
@@ -291,4 +282,8 @@ public abstract class FileSystemHandler {
      * Closes the file system handler and frees allocated resources.
      */
     public abstract void close();
+
+    public void log(String message) {
+        //System.err.println(message);
+    }
 }
