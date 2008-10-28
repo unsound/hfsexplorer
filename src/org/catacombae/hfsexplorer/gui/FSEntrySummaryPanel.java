@@ -11,11 +11,45 @@
 
 package org.catacombae.hfsexplorer.gui;
 
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+
 /**
  *
  * @author erik
  */
 public class FSEntrySummaryPanel extends javax.swing.JPanel {
+
+    /* NOTES
+     *
+     * An FSEntry always has:
+     * - Name (every FSEntry must have a name, even if it may be blank)
+     * - Location (the parent to the FSEntry). A POSIX pathname (possibly translated) must also
+     *   exist.
+     * - Type (Folder, Link or File)
+     * - Size _can_ be derived from all FSEntries (through recursive search or by looking up a file
+     *   entry) and should be considered a must-have field.
+     *
+     * An FSEntry may optionally have:
+     * - Various date variables.
+     * - POSIX permissions.
+     * - Global attributes such as "hidden", "write protected", "bundle"...
+     *
+     * An FSFile always has:
+     * - A number of forks (possibly 0), where each fork has
+     *   - Identifier
+     *   - Length
+     *
+     * An FSFolder always has:
+     * - Valence
+     *
+     * An FSLink always has:
+     * - Link target
+     *
+     * Note to self: The file system model does not support forks tied to folders. This is a
+     * limitation. Some file system out there may be using this method to store metadata about
+     * folders.
+     */
 
     /** Creates new form FSEntrySummaryPanel */
     public FSEntrySummaryPanel() {
@@ -30,10 +64,20 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
-        jLabel1 = new javax.swing.JLabel();
+        contentsPanel = new javax.swing.JPanel();
 
-        jLabel1.setText("Name:");
+        org.jdesktop.layout.GroupLayout contentsPanelLayout = new org.jdesktop.layout.GroupLayout(contentsPanel);
+        contentsPanel.setLayout(contentsPanelLayout);
+        contentsPanelLayout.setHorizontalGroup(
+            contentsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 253, Short.MAX_VALUE)
+        );
+        contentsPanelLayout.setVerticalGroup(
+            contentsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 227, Short.MAX_VALUE)
+        );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -41,21 +85,29 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel {
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jLabel1)
-                .addContainerGap(340, Short.MAX_VALUE))
+                .add(contentsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jLabel1)
-                .addContainerGap(264, Short.MAX_VALUE))
+                .add(contentsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel contentsPanel;
     // End of variables declaration//GEN-END:variables
 
+    public static void main(String[] args) {
+        JFrame jf = new JFrame("Test");
+        jf.add(new JScrollPane(new FSEntrySummaryPanel()));
+        jf.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        jf.pack();
+        jf.setLocationRelativeTo(null);
+        jf.setVisible(true);
+    }
 }

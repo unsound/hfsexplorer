@@ -1119,12 +1119,14 @@ public class FileSystemBrowserWindow extends JFrame {
                                     forkTypes.add(FSForkType.MACOS_RESOURCE);
                                 }
 
+                                System.err.println("parentPath: " + Util.concatenateStrings(parentPath, "/"));
                                 LinkedList<String> dirStack = new LinkedList<String>();
                                 for(String pathComponent : parentPath)
                                     dirStack.addLast(pathComponent);
 
                                 dataSize += calculateForkSizeRecursive(selection, dirStack,
                                         forkTypes);
+                                JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "dataSize=" + dataSize);
                                 progress.setDataSize(dataSize);
 
                                 int errorCount = extract(parentPath, selection, outDir, progress, dataFork, resourceFork);
@@ -1204,17 +1206,18 @@ public class FileSystemBrowserWindow extends JFrame {
      * 
      * @param selection
      * @param forkTypes
-     * @return
+     * @return the total combined size of the data in the tree for the specified fork types.
      */
     private long calculateForkSizeRecursive(FSEntry[] selection, LinkedList<String> pathStack,
             FSForkType... forkTypes) {
+        //System.err.println("calculateForkSizeRecursive")
         long res = 0;
         for(FSEntry curEntry : selection) {
             if(curEntry instanceof FSLink) {
                 FSLink curLink = (FSLink)curEntry;
                 FSEntry linkTarget = curLink.getLinkTarget(pathStack.toArray(new String[pathStack.size()]));
                 if(linkTarget != null) {
-                    System.err.println("Happily resolved link \"" + curLink.getLinkTargetString() + "\"");
+                    System.err.println("Happily resolved link \"" + curLink.getLinkTargetString() + "\" to an FSEntry by the name \"" + linkTarget.getName() + "\"");
                     curEntry = linkTarget;
                 }
                 else
@@ -1238,10 +1241,10 @@ public class FileSystemBrowserWindow extends JFrame {
             }
             else if(curEntry instanceof FSFolder) {
                 FSFolder curFolder = (FSFolder) curEntry;
-                pathStack.push(curFolder.getName());
+                pathStack.addLast(curFolder.getName());
                 try {
                     res += calculateForkSizeRecursive(curFolder.list(), pathStack, forkTypes);
-                } finally { pathStack.pop(); }
+                } finally { pathStack.removeLast(); }
             }
             else {
                 System.err.println("INFO: Silently ignoring FSEntry subtype " +
@@ -1330,7 +1333,7 @@ public class FileSystemBrowserWindow extends JFrame {
         int errorCount = 0;
         LinkedList<String> pathStack = new LinkedList<String>();
         for(String pathComponent : parentPath)
-            pathStack.push(pathComponent);
+            pathStack.addLast(pathComponent);
 
         for(FSEntry rec : recs) {
             errorCount += extractRecursive(rec, pathStack, outDir, progressDialog,
@@ -1341,6 +1344,8 @@ public class FileSystemBrowserWindow extends JFrame {
 
     private int extractRecursive(FSEntry rec, LinkedList<String> pathStack, File outDir, ProgressMonitor progressDialog,
             ObjectContainer<Boolean> overwriteAll, boolean dataFork, boolean resourceFork) {
+        System.err.println("exctractRecursive: pathStack=" + Util.concatenateStrings(pathStack, "/"));
+
         if(!dataFork && !resourceFork) {
             throw new IllegalArgumentException("Neither the data fork or resource fork were selected for extraction. Won't do nothing...");
         }
@@ -1412,13 +1417,13 @@ public class FileSystemBrowserWindow extends JFrame {
             }
 
             if(thisDir.mkdir() || thisDir.exists()) {
-                pathStack.push(rec.getName());
+                pathStack.addLast(rec.getName());
                 try {
                     for(FSEntry outRec : contents) {
                         errorCount += extractRecursive(outRec, pathStack, thisDir, progressDialog,
                                 overwriteAll, dataFork, resourceFork);
                     }
-                } finally { pathStack.pop(); }
+                } finally { pathStack.removeLast(); }
             }
             else {
                 int reply = JOptionPane.showConfirmDialog(this, "Could not create directory:\n  " +
