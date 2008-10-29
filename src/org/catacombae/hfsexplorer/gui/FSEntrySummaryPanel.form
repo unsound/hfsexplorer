@@ -16,26 +16,26 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" attributes="0">
+          <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jSeparator1" alignment="0" pref="355" max="32767" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Component id="extendedInfoStackPanel" alignment="0" pref="350" max="32767" attributes="0"/>
+                  <Component id="jSeparator1" alignment="0" pref="350" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="nameField" pref="305" max="32767" attributes="0"/>
+                      <Component id="nameField" pref="300" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="typeField" pref="311" max="32767" attributes="0"/>
+                      <Component id="typeField" pref="306" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="sizeField" pref="316" max="32767" attributes="0"/>
+                      <Component id="sizeField" pref="311" max="32767" attributes="0"/>
                   </Group>
-                  <Component id="posixPermissionsPanel" alignment="1" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -61,8 +61,8 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jSeparator1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="364" max="32767" attributes="0"/>
-              <Component id="posixPermissionsPanel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="extendedInfoStackPanel" pref="107" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -76,7 +76,9 @@
     </Component>
     <Component class="javax.swing.JTextField" name="nameField">
       <Properties>
+        <Property name="editable" type="boolean" value="false"/>
         <Property name="text" type="java.lang.String" value="jTextField1"/>
+        <Property name="opaque" type="boolean" value="false"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">
@@ -86,7 +88,9 @@
     </Component>
     <Component class="javax.swing.JTextField" name="typeField">
       <Properties>
+        <Property name="editable" type="boolean" value="false"/>
         <Property name="text" type="java.lang.String" value="jTextField2"/>
+        <Property name="opaque" type="boolean" value="false"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel3">
@@ -96,260 +100,18 @@
     </Component>
     <Component class="javax.swing.JTextField" name="sizeField">
       <Properties>
+        <Property name="editable" type="boolean" value="false"/>
         <Property name="text" type="java.lang.String" value="jTextField3"/>
+        <Property name="opaque" type="boolean" value="false"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JSeparator" name="jSeparator1">
     </Component>
-    <Container class="javax.swing.JPanel" name="posixPermissionsPanel">
+    <Container class="javax.swing.JPanel" name="extendedInfoStackPanel">
 
-      <Layout>
-        <DimensionLayout dim="0">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" attributes="0">
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
-                      <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jLabel10" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="permissionStringField" pref="191" max="32767" attributes="0"/>
-                      </Group>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-              </Group>
-              <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace pref="3" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="groupLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="userLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="otherLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="otherReadBox" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="otherWriteBox" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="otherExecuteBox" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="groupReadBox" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="groupWriteBox" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="groupExecuteBox" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="userReadBox" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="userWriteBox" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="userExecuteBox" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                          </Group>
-                      </Group>
-                      <Component id="jCheckBox10" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="jCheckBox11" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="jCheckBox12" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="ownerIDLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="groupIDLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="groupIDField" alignment="0" pref="249" max="32767" attributes="0"/>
-                              <Component id="ownerIDField" alignment="0" pref="249" max="32767" attributes="0"/>
-                          </Group>
-                      </Group>
-                  </Group>
-                  <EmptySpace min="-2" pref="17" max="-2" attributes="0"/>
-              </Group>
-          </Group>
-        </DimensionLayout>
-        <DimensionLayout dim="1">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
-                  <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jLabel10" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="permissionStringField" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
-                          <Component id="userLabel" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="groupLabel" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="otherLabel" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="102" alignment="0" attributes="0">
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="userReadBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="userWriteBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="userExecuteBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="groupReadBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="groupWriteBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="groupExecuteBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="otherReadBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="otherWriteBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="otherExecuteBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                      </Group>
-                  </Group>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="jCheckBox10" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jCheckBox11" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jCheckBox12" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="ownerIDLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="ownerIDField" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="groupIDLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="groupIDField" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="32767" attributes="0"/>
-              </Group>
-          </Group>
-        </DimensionLayout>
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBoxLayout">
+        <Property name="axis" type="int" value="3"/>
       </Layout>
-      <SubComponents>
-        <Component class="javax.swing.JLabel" name="jLabel4">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="POSIX permissions:"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="userReadBox">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Read"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="userWriteBox">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Write"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="userExecuteBox">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Execute"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JLabel" name="userLabel">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="User:"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JLabel" name="groupLabel">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Group:"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="groupReadBox">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Read"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="groupWriteBox">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Write"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="groupExecuteBox">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Execute"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JLabel" name="otherLabel">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Other:"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="otherReadBox">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Read"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="otherWriteBox">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Write"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="otherExecuteBox">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Execute"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JLabel" name="ownerIDLabel">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Owner ID:"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JTextField" name="ownerIDField">
-          <Properties>
-            <Property name="editable" type="boolean" value="false"/>
-            <Property name="text" type="java.lang.String" value="jTextField4"/>
-            <Property name="opaque" type="boolean" value="false"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JLabel" name="groupIDLabel">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Group ID:"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JTextField" name="groupIDField">
-          <Properties>
-            <Property name="editable" type="boolean" value="false"/>
-            <Property name="text" type="java.lang.String" value="jTextField5"/>
-            <Property name="opaque" type="boolean" value="false"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="jCheckBox10">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Set user ID on execution"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="jCheckBox11">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Set group ID on execution"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="jCheckBox12">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Sticky bit"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JLabel" name="jLabel10">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Permission string:"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JTextField" name="permissionStringField">
-          <Properties>
-            <Property name="editable" type="boolean" value="false"/>
-            <Property name="text" type="java.lang.String" value="jTextField6"/>
-            <Property name="opaque" type="boolean" value="false"/>
-          </Properties>
-        </Component>
-      </SubComponents>
     </Container>
   </SubComponents>
 </Form>
