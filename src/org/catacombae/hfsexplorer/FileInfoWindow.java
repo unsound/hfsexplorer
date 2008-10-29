@@ -17,61 +17,99 @@
 
 package org.catacombae.hfsexplorer;
 
+import java.awt.BorderLayout;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import org.catacombae.hfsexplorer.gui.FileInfoPanel;
-//import org.catacombae.hfsexplorer.gui.JournalInfoPanel;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFile;
-//import org.catacombae.hfsexplorer.types.JournalInfoBlock;
-import java.awt.*;
-import javax.swing.*;
+import org.catacombae.hfsexplorer.gui.FSEntrySummaryPanel;
+import org.catacombae.hfsexplorer.gui.FolderInfoPanel;
 import org.catacombae.hfsexplorer.gui.StructViewPanel;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFile;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFileRecord;
-import org.catacombae.jparted.lib.fs.FSFile;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolder;
+import org.catacombae.jparted.lib.fs.FSEntry;
 import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFSFile;
+import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFSFolder;
 import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFSLink;
 
 public class FileInfoWindow extends JFrame {
-    private JTabbedPane tabs;
-    private JScrollPane infoPanelScroller;
-    //private JScrollPane journalInfoPanelScroller;
-    //private FileInfoPanel infoPanel;
-    //private JournalInfoPanel journalInfoPanel;
-    public FileInfoWindow(HFSCommonFSFile fsFile) {
-        this(fsFile.getName(), fsFile.getInternalCatalogFile());
-    }
+    
+    public FileInfoWindow(FSEntry fsEntry, String[] parentPath) {
+        super("Info - " + fsEntry.getName());
 
-    public FileInfoWindow(String fileName, CommonHFSCatalogFile hfsFile) {
-        super("Info - " + fileName);
+        JScrollPane summaryPanelScroller = null;
+        JScrollPane infoPanelScroller = null;
 
-        tabs = new JTabbedPane();
+        JTabbedPane tabs = new JTabbedPane();
 
-        //journalInfoPanel = new JournalInfoPanel();
+        // Summary panel
+        try {
+            final FSEntrySummaryPanel summaryPanel = new FSEntrySummaryPanel(this, fsEntry, parentPath);
+            summaryPanelScroller = new JScrollPane(summaryPanel,
+                    JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                    JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
-        infoPanelScroller = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        //journalInfoPanelScroller = new JScrollPane(journalInfoPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            tabs.addTab("Summary", summaryPanelScroller);
+        } catch(Exception e) { e.printStackTrace(); }
 
-        if (hfsFile instanceof CommonHFSCatalogFile.HFSPlusImplementation) {
-            FileInfoPanel infoPanel = new FileInfoPanel();
-            infoPanel.setFields(((CommonHFSCatalogFile.HFSPlusImplementation) hfsFile).getUnderlying());
-            infoPanelScroller.setViewportView(infoPanel);
-        } else {
-            StructViewPanel svp = new StructViewPanel("File", hfsFile.getStructElements());
-            infoPanelScroller.setViewportView(svp);
-        }
+        // Details panel
+        try {
+            JPanel infoPanel = null;
+            if(fsEntry instanceof HFSCommonFSFile || fsEntry instanceof HFSCommonFSLink) {
+                CommonHFSCatalogFile hfsFile;
+                if(fsEntry instanceof HFSCommonFSFile)
+                    hfsFile = ((HFSCommonFSFile) fsEntry).getInternalCatalogFile();
+                else if(fsEntry instanceof HFSCommonFSLink)
+                    hfsFile = ((HFSCommonFSLink) fsEntry).getInternalCatalogFileRecord().getData();
+                else
+                    throw new RuntimeException();
 
-        tabs.addTab("Detailed", infoPanelScroller);
-        //tabs.addTab("Journal info", journalInfoPanelScroller);
+                if(hfsFile instanceof CommonHFSCatalogFile.HFSPlusImplementation) {
+                    FileInfoPanel fip = new FileInfoPanel();
+                    fip.setFields(((CommonHFSCatalogFile.HFSPlusImplementation) hfsFile).getUnderlying());
+                    infoPanel = fip;
+                }
+                else {
+                    StructViewPanel svp = new StructViewPanel("File", hfsFile.getStructElements());
+                    infoPanel = svp;
+                }
+            }
+            else if(fsEntry instanceof HFSCommonFSFolder) {
+                CommonHFSCatalogFolder fld = ((HFSCommonFSFolder) fsEntry).getInternalCatalogFolder();
+                if(fld instanceof CommonHFSCatalogFolder.HFSPlusImplementation) {
+                    FolderInfoPanel fip = new FolderInfoPanel();
+                    fip.setFields(((CommonHFSCatalogFolder.HFSPlusImplementation) fld).getUnderlying());
+                    infoPanel = fip;
+                }
+                else {
+                    StructViewPanel svp = new StructViewPanel("Folder", fld.getStructElements());
+                    infoPanel = svp;
+                }
+            }
+
+            if(infoPanel != null) {
+                infoPanelScroller = new JScrollPane(infoPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+                tabs.addTab("Detailed", infoPanelScroller);
+            }
+
+        } catch(Exception e) { e.printStackTrace(); }
+
         add(tabs, BorderLayout.CENTER);
 
-        infoPanelScroller.getVerticalScrollBar().setUnitIncrement(10);
+        if(summaryPanelScroller != null)
+            summaryPanelScroller.getVerticalScrollBar().setUnitIncrement(10);
+        if(infoPanelScroller != null)
+            infoPanelScroller.getVerticalScrollBar().setUnitIncrement(10);
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         pack();
         int width = getSize().width;
         int height = getSize().height;
         int adjustedHeight = width + width / 2;
-
-        if (adjustedHeight < height)
+        
+        if(adjustedHeight < height)
             setSize(width, adjustedHeight);
 
         setLocationRelativeTo(null);

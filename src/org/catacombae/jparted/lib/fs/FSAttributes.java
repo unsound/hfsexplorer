@@ -18,18 +18,196 @@
 package org.catacombae.jparted.lib.fs;
 
 import java.util.Date;
+import org.catacombae.hfsexplorer.Util;
 
 /**
  *
  * @author <a href="mailto:erik82@kth.se">Erik Larsson</a>
  */
 public abstract class FSAttributes {
-    public static class POSIXFileAttributes {}
+
+    public abstract boolean hasPOSIXFileAttributes();
+    public abstract POSIXFileAttributes getPOSIXFileAttributes();
     
-    public abstract POSIXFileAttributes getPOSIXAttributes();
-    
+    public abstract boolean hasWindowsFileAttributes();
     public abstract WindowsFileAttributes getWindowsFileAttributes();
     
     public abstract Date getModifyDate();
     //public abstract FSAccessControlList getAccessControlList();
+
+    public static abstract class POSIXFileAttributes {
+
+        public static final byte FILETYPE_UNDEFINED = 00;
+        public static final byte FILETYPE_FIFO = 01;
+        public static final byte FILETYPE_CHARACTER_SPECIAL = 02;
+        public static final byte FILETYPE_DIRECTORY = 04;
+        public static final byte FILETYPE_BLOCK_SPECIAL = 06;
+        public static final byte FILETYPE_REGULAR = 010;
+        public static final byte FILETYPE_SYMBOLIC_LINK = 012;
+        public static final byte FILETYPE_SOCKET = 014;
+        public static final byte FILETYPE_WHITEOUT = 016;
+
+        public abstract long getUserID();
+        public abstract long getGroupID();
+
+        public abstract byte getFileType();
+
+        public abstract boolean canUserRead();
+        public abstract boolean canUserWrite();
+        public abstract boolean canUserExecute();
+        public abstract boolean canGroupRead();
+        public abstract boolean canGroupWrite();
+        public abstract boolean canGroupExecute();
+        public abstract boolean canOthersRead();
+        public abstract boolean canOthersWrite();
+        public abstract boolean canOthersExecute();
+        public abstract boolean isSetUID();
+        public abstract boolean isSetGID();
+        public abstract boolean isStickyBit();
+
+        public abstract String getPermissionString();
+    }
+
+    public static class DefaultPOSIXFileAttributes extends POSIXFileAttributes {
+        private final short fileMode;
+        private final long userID;
+        private final long groupID;
+        
+        public DefaultPOSIXFileAttributes(long userID, long groupID, short fileMode) {
+            this.userID = userID;
+            this.groupID = groupID;
+            this.fileMode = fileMode;
+        }
+
+        public long getUserID() { return userID; }
+        public long getGroupID() { return groupID; }
+
+        public byte getFileType() {
+            int type = (fileMode >> 12) & 017;
+            return (byte) type;
+        }
+
+        public boolean isSetUID() { return Util.getBit(fileMode, 11); }
+        public boolean isSetGID() { return Util.getBit(fileMode, 10); }
+        public boolean isStickyBit() { return Util.getBit(fileMode, 9); }
+        public boolean canUserRead() { return Util.getBit(fileMode, 8); }
+        public boolean canUserWrite() { return Util.getBit(fileMode, 7); }
+        public boolean canUserExecute() { return Util.getBit(fileMode, 6); }
+        public boolean canGroupRead() { return Util.getBit(fileMode, 5); }
+        public boolean canGroupWrite() { return Util.getBit(fileMode, 4); }
+        public boolean canGroupExecute() { return Util.getBit(fileMode, 3); }
+        public boolean canOthersRead() { return Util.getBit(fileMode, 2); }
+        public boolean canOthersWrite() { return Util.getBit(fileMode, 1); }
+        public boolean canOthersExecute() { return Util.getBit(fileMode, 0); }
+
+        /**
+         * Returns the POSIX-type file mode string for this file, as it would appear
+         * when listing it with 'ls -l'. Example: <code>drwxr-x---</code>.
+         *
+         * @return the POSIX-type file mode string for this file.
+         */
+        public String getPermissionString() {
+            String result;
+            byte fileType = getFileType();
+            switch(fileType) {
+                case FILETYPE_UNDEFINED: // This one appears at the root node (CNID 2) sometimes. dunno what it would look like in ls -l
+                    result = "?";
+                    break;
+                case FILETYPE_FIFO:
+                    result = "p";
+                    break;
+                case FILETYPE_CHARACTER_SPECIAL:
+                    result = "c";
+                    break;
+                case FILETYPE_DIRECTORY:
+                    result = "d";
+                    break;
+                case FILETYPE_BLOCK_SPECIAL:
+                    result = "b";
+                    break;
+                case FILETYPE_REGULAR:
+                    result = "-";
+                    break;
+                case FILETYPE_SYMBOLIC_LINK:
+                    result = "l";
+                    break;
+                case FILETYPE_SOCKET:
+                    result = "s";
+                    break;
+                case FILETYPE_WHITEOUT:
+                    result = "w";
+                    break; // How does this appear in "ls -l" ? and what is it?
+                default:
+                    result = " ";
+                    System.err.println(
+                            "[FSAttributes.POSIXFileAttributes.getFileModeString()] " +
+                            "Unknown file type:  " + fileType +
+                            " Mode: 0x" + Util.toHexStringBE(fileMode));
+            }
+
+            if(canUserRead())
+                result += "r";
+            else
+                result += "-";
+            if(canUserWrite())
+                result += "w";
+            else
+                result += "-";
+            if(canUserExecute()) {
+                if(isSetUID())
+                    result += "s";
+                else
+                    result += "x";
+            }
+            else {
+                if(isSetUID())
+                    result += "S";
+                else
+                    result += "-";
+            }
+
+            if(canGroupRead())
+                result += "r";
+            else
+                result += "-";
+            if(canGroupWrite())
+                result += "w";
+            else
+                result += "-";
+            if(canGroupExecute()) {
+                if(isSetGID())
+                    result += "s";
+                else
+                    result += "x";
+            }
+            else {
+                if(isSetGID())
+                    result += "S";
+                else
+                    result += "-";
+            }
+            if(canOthersRead())
+                result += "r";
+            else
+                result += "-";
+            if(canOthersWrite())
+                result += "w";
+            else
+                result += "-";
+            if(canOthersExecute()) {
+                if(isStickyBit())
+                    result += "t";
+                else
+                    result += "x";
+            }
+            else {
+                if(isStickyBit())
+                    result += "T";
+                else
+                    result += "-";
+            }
+
+            return result;
+        }
+    }
 }

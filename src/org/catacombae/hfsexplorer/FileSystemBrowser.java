@@ -630,7 +630,7 @@ public class FileSystemBrowser<A> {
      */
     private void actionGetInfo() {
         if(ensureFileSystemLoaded()) {
-            controller.actionGetInfo(getSelection());
+            controller.actionGetInfo(getSelectionParentPath(), getSelection());
         }
     }
 
@@ -1340,7 +1340,7 @@ public class FileSystemBrowser<A> {
 
         public void actionExtractToDir(List<Record<A>> parentPath, List<Record<A>> recordList);
         
-        public void actionGetInfo(List<Record<A>> recordList);
+        public void actionGetInfo(List<Record<A>> parentPath, List<Record<A>> recordList);
 
         public JPopupMenu getRightClickRecordPopupMenu(List<Record<A>> parentPath, List<Record<A>> selectedRecords);
         

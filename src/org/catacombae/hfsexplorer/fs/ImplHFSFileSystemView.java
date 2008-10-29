@@ -88,7 +88,8 @@ public class ImplHFSFileSystemView extends BaseHFSFileSystemView {
     
     protected ImplHFSFileSystemView(ReadableRandomAccessStream hfsFile, long fsOffset, CatalogOperations catOps, boolean cachingEnabled, String encodingName) {
         super(hfsFile, fsOffset, catOps, cachingEnabled);
-        this.stringDecoder = new MutableStringDecoder(new CharsetStringDecoder(encodingName));
+
+        this.stringDecoder = new MutableStringDecoder<CharsetStringDecoder>(new CharsetStringDecoder(encodingName));
     }
 
 

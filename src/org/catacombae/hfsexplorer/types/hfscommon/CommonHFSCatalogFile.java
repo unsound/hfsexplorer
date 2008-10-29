@@ -164,6 +164,14 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
             return data.getStructElements();
         }
 
+        public boolean hasPermissions() {
+            return true;
+        }
+
+        public HFSPlusBSDInfo getPermissions() {
+            return data.getPermissions();
+        }
+
         @Override
         public boolean isHardFileLink() {
             int fileType = data.getUserInfo().getFileType().getOSType().getFourCharCode();
@@ -291,6 +299,14 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
         @Override
         public Dictionary getStructElements() {
             return data.getStructElements();
+        }
+
+        public boolean hasPermissions() {
+            return false;
+        }
+
+        public HFSPlusBSDInfo getPermissions() {
+            throw new UnsupportedOperationException("Not supported.");
         }
 
         @Override

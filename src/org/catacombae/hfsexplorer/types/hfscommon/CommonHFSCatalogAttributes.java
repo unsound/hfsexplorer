@@ -6,6 +6,7 @@
 package org.catacombae.hfsexplorer.types.hfscommon;
 
 import java.util.Date;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusBSDInfo;
 
 /**
  * Generalization of the common attributes of CommonHFSCatalogFolder and CommonHFSCatalogFile.
@@ -25,7 +26,13 @@ public interface CommonHFSCatalogAttributes {
     public int getAttributeModDate();
     public int getAccessDate();
     public int getBackupDate();
-    //public HFSPlusBSDInfo getPermissions();
+
+    /**
+     * Returns whether or not this object contains HFS+ permissions.
+     * @return whether or not this object contains HFS+ permissions.
+     */
+    public boolean hasPermissions();
+    public HFSPlusBSDInfo getPermissions();
     //public int getTextEncoding();
     
     public Date getCreateDateAsDate();

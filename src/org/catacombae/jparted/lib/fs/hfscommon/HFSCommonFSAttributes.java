@@ -18,7 +18,9 @@
 package org.catacombae.jparted.lib.fs.hfscommon;
 
 import java.util.Date;
+import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogAttributes;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusBSDInfo;
 import org.catacombae.jparted.lib.fs.FSAttributes;
 import org.catacombae.jparted.lib.fs.FSEntry;
 import org.catacombae.jparted.lib.fs.WindowsFileAttributes;
@@ -31,25 +33,49 @@ class HFSCommonFSAttributes extends FSAttributes {
     
     private final FSEntry parentEntry;
     private final CommonHFSCatalogAttributes attributes;
+    private POSIXFileAttributes posixAttributes = null;
     
     public HFSCommonFSAttributes(FSEntry parentEntry, CommonHFSCatalogAttributes attributes) {
         this.parentEntry = parentEntry;
         this.attributes = attributes;
     }
-    
+
     @Override
-    public POSIXFileAttributes getPOSIXAttributes() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public boolean hasPOSIXFileAttributes() {
+        return attributes.hasPermissions();
+    }
+
+    @Override
+    public POSIXFileAttributes getPOSIXFileAttributes() {
+        if(attributes.hasPermissions()) {
+            if(posixAttributes == null) {
+                HFSPlusBSDInfo permissions = attributes.getPermissions();
+
+                posixAttributes = new DefaultPOSIXFileAttributes(
+                        Util.unsign(permissions.getOwnerID()),
+                        Util.unsign(permissions.getGroupID()),
+                        permissions.getFileMode());
+            }
+            return posixAttributes;
+        }
+        else
+            throw new UnsupportedOperationException("Not supported.");
     }
 
     @Override
     public WindowsFileAttributes getWindowsFileAttributes() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported.");
     }
 
     @Override
     public Date getModifyDate() {
         return attributes.getContentModDateAsDate();
+    }
+
+
+    @Override
+    public boolean hasWindowsFileAttributes() {
+        return false;
     }
 
 }
