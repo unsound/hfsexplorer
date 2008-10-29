@@ -71,20 +71,22 @@ public class HFSCommonFSLink extends FSLink {
      */
     @Override
     public FSEntry getLinkTarget(String[] parentDir) {
+        /*
         String prefix = parentFileSystem.globalPrefix;
         parentFileSystem.globalPrefix += "   ";
         try {
-        parentFileSystem.log(prefix + "getLinkTarget(" + Util.concatenateStrings(parentDir, "/") + ");");
+        */
+        //parentFileSystem.log(prefix + "getLinkTarget(" + Util.concatenateStrings(parentDir, "/") + ");");
         String posixPath = getLinkTargetPosixPath();
-        parentFileSystem.log(prefix + "  getLinkTarget(): posixPath=\"" + posixPath + "\"");
+        //parentFileSystem.log(prefix + "  getLinkTarget(): posixPath=\"" + posixPath + "\"");
         FSEntry res = fsHandler.getEntryByPosixPath(posixPath, parentDir);
         if(res == null) {
-            System.err.println(prefix + "  getLinkTarget(): FAILED to get entry by posix path for:");
-            System.err.println(prefix + "  getLinkTarget():   posixPath=\"" + posixPath + "\"");
-            System.err.println(prefix + "  getLinkTarget():   parentDir=\"" + Util.concatenateStrings(parentDir, "/") + "\"");
+            System.err.println("getLinkTarget(): FAILED to get entry by posix path for:");
+            System.err.println("getLinkTarget():   posixPath=\"" + posixPath + "\"");
+            System.err.println("getLinkTarget():   parentDir=\"" + Util.concatenateStrings(parentDir, "/") + "\"");
         }
         return res;
-        } finally { parentFileSystem.log(prefix + "Returning from getLinkTarget."); parentFileSystem.globalPrefix = prefix; }
+        //} finally { parentFileSystem.log(prefix + "Returning from getLinkTarget."); parentFileSystem.globalPrefix = prefix; }
     }
 
     @Override
