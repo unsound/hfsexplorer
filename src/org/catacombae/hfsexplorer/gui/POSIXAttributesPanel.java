@@ -106,30 +106,42 @@ public class POSIXAttributesPanel extends javax.swing.JPanel {
 
         groupIDLabel.setText("Group ID:");
 
+        stickyBitBox.setBorder(null);
         stickyBitBox.setEnabled(false);
 
+        setGidBox.setBorder(null);
         setGidBox.setEnabled(false);
 
+        setUidBox.setBorder(null);
         setUidBox.setEnabled(false);
 
         otherLabel.setText("Other:");
 
+        otherReadBox.setBorder(null);
         otherReadBox.setEnabled(false);
 
+        otherWriteBox.setBorder(null);
         otherWriteBox.setEnabled(false);
 
+        otherExecuteBox.setBorder(null);
         otherExecuteBox.setEnabled(false);
 
+        groupExecuteBox.setBorder(null);
         groupExecuteBox.setEnabled(false);
 
+        userExecuteBox.setBorder(null);
         userExecuteBox.setEnabled(false);
 
+        userWriteBox.setBorder(null);
         userWriteBox.setEnabled(false);
 
+        groupWriteBox.setBorder(null);
         groupWriteBox.setEnabled(false);
 
+        groupReadBox.setBorder(null);
         groupReadBox.setEnabled(false);
 
+        userReadBox.setBorder(null);
         userReadBox.setEnabled(false);
 
         groupLabel.setText("Group:");
@@ -181,7 +193,7 @@ public class POSIXAttributesPanel extends javax.swing.JPanel {
                             .add(layout.createSequentialGroup()
                                 .add(jLabel10)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(permissionStringField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE))
+                                .add(permissionStringField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE))
                             .add(layout.createSequentialGroup()
                                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                                     .add(userLabel)

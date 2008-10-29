@@ -13,12 +13,15 @@ package org.catacombae.hfsexplorer.gui;
 
 import java.awt.Window;
 import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.text.DecimalFormat;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import org.catacombae.hfsexplorer.ObjectContainer;
+import org.catacombae.hfsexplorer.SpeedUnitUtils;
 import org.catacombae.jparted.lib.fs.FSAttributes;
-import org.catacombae.jparted.lib.fs.FSAttributes.POSIXFileAttributes;
 import org.catacombae.jparted.lib.fs.FSEntry;
 import org.catacombae.jparted.lib.fs.FSFile;
 import org.catacombae.jparted.lib.fs.FSFolder;
@@ -29,8 +32,9 @@ import org.catacombae.jparted.lib.fs.FSLink;
  * @author erik
  */
 public class FSEntrySummaryPanel extends javax.swing.JPanel {
-    private boolean cancelSignaled = false;
-
+    private volatile boolean cancelSignaled = false;
+    private DecimalFormat sizeFormatter = new DecimalFormat("0.00");
+    
     FSEntrySummaryPanel() {
         initComponents();
     }
@@ -71,9 +75,46 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel {
         this();
 
         window.addWindowListener(new WindowAdapter() {
-            public void windowClosing() {
+
+            /*
+            @Override
+            public void windowOpened(WindowEvent e) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+            */
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                //System.err.println("Window closing. Signaling any calculate process to stop.");
                 cancelSignaled = true;
             }
+            
+            /*
+            @Override
+            public void windowClosed(WindowEvent e) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public void windowIconified(WindowEvent e) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent e) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public void windowActivated(WindowEvent e) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent e) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+            */
         });
 
         nameField.setText(entry.getName());
@@ -106,6 +147,7 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel {
                 FSFolder folder = (FSFolder) linkTarget;
                 typeString = "Symbolic link (folder)";
                 sizeString = "Calculating...";
+                startFolderSizeCalculation(folder);
             }
             else {
                 typeString = "Symbolic link (unknown [" +
@@ -225,7 +267,23 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
     private String getSizeString(long result) {
-        return result + " bytes";
+        String baseString = Long.toString(result);
+        if(result >= 1000) {
+            int parts = baseString.length() / 3;
+            StringBuilder sizeStringBuilder = new StringBuilder();
+            String head = baseString.substring(0, baseString.length() - parts * 3);
+            if(head.length() > 0)
+                sizeStringBuilder.append(head).append(" ");
+            for(int i = parts - 1; i >= 0; --i)
+                sizeStringBuilder.append(baseString.substring(baseString.length() - (i + 1) * 3, baseString.length() - i * 3)).append(" ");
+
+            if(result >= 1024)
+                return SpeedUnitUtils.bytesToBinaryUnit(result, sizeFormatter) + " (" + sizeStringBuilder.toString() + "bytes" + ")";
+            else
+                return sizeStringBuilder.toString() + "bytes";
+        }
+        else
+            return baseString + " bytes";
     }
 
     private void startFolderSizeCalculation(final FSFolder folder) {
@@ -263,12 +321,16 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel {
     }
 
     private void calculateFolderSize(FSFolder folder, ObjectContainer<Long> result) {
-        if(cancelSignaled)
+        if(cancelSignaled) {
+            System.err.println("Calculate process stopping for folder \"" + folder.getName() + "\"");
             return;
+        }
 
         for(FSEntry entry : folder.list()) {
-            if(cancelSignaled)
+            if(cancelSignaled) {
+                System.err.println("Calculate process stopping for folder \"" + folder.getName() + "\", entry \"" + entry.getName() + "\"");
                 return;
+            }
 
             if(entry instanceof FSFile) {
                 result.o += ((FSFile) entry).getMainFork().getLength();
