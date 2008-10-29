@@ -34,23 +34,23 @@ public class DebugConsoleWindow extends JFrame {
     private final OutputStream debugStream;
         
     public DebugConsoleWindow() {
-	super("Debug Console");
-	setLayout(new BorderLayout());
-	this.debugArea = new JTextArea(WINDOW_NUMBER_OF_LINES, WINDOW_NUMBER_OF_COLUMNS);
-	this.debugAreaScroller = new JScrollPane(debugArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-					    JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-	this.debugArea.setLineWrap(true);
-	this.debugArea.setEditable(false);
-        
-	add(debugAreaScroller, BorderLayout.CENTER);
-        
-	pack();
-	setLocationRelativeTo(null);
-	setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        
-        this.debugStream = new JTextAreaOutputStream(debugArea, syncObject);        
+        super("Debug Console");
+        setLayout(new BorderLayout());
+        this.debugArea = new JTextArea(WINDOW_NUMBER_OF_LINES, WINDOW_NUMBER_OF_COLUMNS);
+        this.debugAreaScroller = new JScrollPane(debugArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        this.debugArea.setLineWrap(true);
+        this.debugArea.setEditable(false);
+
+        add(debugAreaScroller, BorderLayout.CENTER);
+
+        pack();
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
+        this.debugStream = new JTextAreaOutputStream(debugArea, debugAreaScroller, syncObject, null);
     }
-    
+
     /**
      * Returns an OutputStream which sends its output to the DebugConsoleWindow's JTextArea.
      * @return an OutputStream which sends its output to the DebugConsoleWindow's JTextArea.
