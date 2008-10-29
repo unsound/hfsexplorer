@@ -1272,7 +1272,7 @@ public class FileSystemBrowserWindow extends JFrame {
         
     }
     
-    private void actionGetInfo(List<FSEntry> entries) {
+    private void actionGetInfo(String[] parentPath, List<FSEntry> entries) {
         if(entries.size() != 1) {
             JOptionPane.showMessageDialog(this, "Get info for multiple selections not yet possible.\n" +
                     "Please select one item at a time.",
@@ -1281,19 +1281,8 @@ public class FileSystemBrowserWindow extends JFrame {
         }
 
         FSEntry entry = entries.get(0);
-        if(entry instanceof HFSCommonFSFile) {
-            HFSCommonFSFile file = (HFSCommonFSFile) entry;
-            FileInfoWindow fiw = new FileInfoWindow(file);
-            fiw.setVisible(true);
-        }
-        else if(entry instanceof HFSCommonFSLink) {
-            HFSCommonFSLink link = (HFSCommonFSLink) entry;
-            FileInfoWindow fiw = new FileInfoWindow(link.getName(), link.getInternalCatalogFileRecord().getData());
-            fiw.setVisible(true);
-        }
-        else if(entry instanceof FSFolder) {
-            FSFolder folder = (FSFolder) entry;
-            FolderInfoWindow fiw = new FolderInfoWindow(folder);
+        if(entry instanceof FSFile || entry instanceof FSLink || entry instanceof FSFolder) {
+            FileInfoWindow fiw = new FileInfoWindow(entry, parentPath);
             fiw.setVisible(true);
         }
         else {
@@ -1659,11 +1648,12 @@ public class FileSystemBrowserWindow extends JFrame {
         }
 
         @Override
-        public void actionGetInfo(List<Record<FSEntry>> recordList) {
+        public void actionGetInfo(final List<Record<FSEntry>> parentPathList,
+                final List<Record<FSEntry>> recordList) {
             List<FSEntry> entryList = new ArrayList<FSEntry>(recordList.size());
             for(Record<FSEntry> rec : recordList)
                 entryList.add(rec.getUserObject());
-            FileSystemBrowserWindow.this.actionGetInfo(entryList);
+            FileSystemBrowserWindow.this.actionGetInfo(getFSPath(parentPathList), entryList);
         }
 
         @Override
@@ -1681,7 +1671,7 @@ public class FileSystemBrowserWindow extends JFrame {
             infoItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    FileSystemBrowserWindow.this.actionGetInfo(userObjectList);
+                    FileSystemBrowserWindow.this.actionGetInfo(parentPath, userObjectList);
                 }
             });
             jpm.add(infoItem);
@@ -1877,14 +1867,6 @@ public class FileSystemBrowserWindow extends JFrame {
             else {
                 throw new IllegalArgumentException("Unsupported FSEntry type: " + entry.getClass());
             }
-        }
-    }
-
-    private static class ObjectContainer<A> {
-        public A o;
-
-        public ObjectContainer(A o) {
-            this.o = o;
         }
     }
 

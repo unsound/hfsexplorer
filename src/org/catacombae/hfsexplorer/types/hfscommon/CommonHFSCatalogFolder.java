@@ -11,6 +11,7 @@ import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfsexplorer.Util;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusBSDInfo;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFolder;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusDate;
 import org.catacombae.hfsexplorer.types.hfs.CdrDirRec;
@@ -48,7 +49,7 @@ public abstract class CommonHFSCatalogFolder implements CommonHFSCatalogAttribut
             this.data = data;
         }
 
-        @Deprecated
+        //@Deprecated
         public HFSPlusCatalogFolder getUnderlying() {
             return data;
         }
@@ -128,6 +129,14 @@ public abstract class CommonHFSCatalogFolder implements CommonHFSCatalogAttribut
         @Override
         public Dictionary getStructElements() {
             return data.getStructElements();
+        }
+
+        public boolean hasPermissions() {
+            return true;
+        }
+
+        public HFSPlusBSDInfo getPermissions() {
+            return data.getPermissions();
         }
     }
     
@@ -214,6 +223,14 @@ public abstract class CommonHFSCatalogFolder implements CommonHFSCatalogAttribut
         @Override
         public Dictionary getStructElements() {
             return data.getStructElements();
+        }
+
+        public boolean hasPermissions() {
+            return false;
+        }
+
+        public HFSPlusBSDInfo getPermissions() {
+            throw new UnsupportedOperationException("Not supported.");
         }
     }
 }
