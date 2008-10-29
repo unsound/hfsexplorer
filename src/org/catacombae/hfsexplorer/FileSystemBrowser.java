@@ -698,6 +698,8 @@ public class FileSystemBrowser<A> {
     }
                 
     private List<Record<A>> getRecordPath(TreePath tp) {
+        if(tp == null)
+            return null;
         List<Record<A>> recordPath = new ArrayList<Record<A>>(tp.getPathCount());
         for(Object obj : tp.getPath()) {
             if(obj instanceof FolderTreeNode) {
