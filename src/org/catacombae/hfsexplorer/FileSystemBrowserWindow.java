@@ -85,8 +85,6 @@ import org.catacombae.dmgextractor.encodings.encrypted.ReadableCEncryptedEncodin
 import org.catacombae.dmgextractor.ui.PasswordDialog;
 import org.catacombae.jparted.lib.DataLocator;
 import org.catacombae.jparted.lib.fs.FSLink;
-import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFSFile;
-import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFSLink;
 import org.catacombae.udif.UDIFRandomAccessStream;
 
 public class FileSystemBrowserWindow extends JFrame {
@@ -1110,7 +1108,6 @@ public class FileSystemBrowserWindow extends JFrame {
                             //fsView.retainCatalogFile(); // Cache the catalog file to speed up operations
                             //fsView.enableFileSystemCache();
                             try {
-                                long dataSize = 0;
                                 LinkedList<FSForkType> forkTypes = new LinkedList<FSForkType>();
                                 if(dataFork) {
                                     forkTypes.add(FSForkType.DATA);
@@ -1119,42 +1116,50 @@ public class FileSystemBrowserWindow extends JFrame {
                                     forkTypes.add(FSForkType.MACOS_RESOURCE);
                                 }
 
-                                System.err.println("parentPath: " + Util.concatenateStrings(parentPath, "/"));
                                 LinkedList<String> dirStack = new LinkedList<String>();
-                                for(String pathComponent : parentPath)
-                                    dirStack.addLast(pathComponent);
+                                if(parentPath != null) {
+                                    System.err.println("parentPath: " + Util.concatenateStrings(parentPath, "/"));
+                                    for(String pathComponent : parentPath)
+                                        dirStack.addLast(pathComponent);
+                                }
 
-                                dataSize += calculateForkSizeRecursive(selection, dirStack,
+                                long dataSize = calculateForkSizeRecursive(selection, dirStack, progress,
                                         forkTypes);
-                                JOptionPane.showMessageDialog(FileSystemBrowserWindow.this, "dataSize=" + dataSize);
-                                progress.setDataSize(dataSize);
+                                if(progress.cancelSignaled())
+                                    progress.confirmCancel();
+                                else {
+                                    progress.setDataSize(dataSize);
 
-                                int errorCount = extract(parentPath, selection, outDir, progress, dataFork, resourceFork);
-                                if(!progress.cancelSignaled()) {
-                                    if(errorCount == 0) {
-                                        JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-                                                "Extraction finished.\n",
-                                                "Information",
-                                                JOptionPane.INFORMATION_MESSAGE);
+                                    int errorCount = extract(parentPath, selection, outDir, progress, dataFork, resourceFork);
+                                    if(!progress.cancelSignaled()) {
+                                        if(errorCount == 0) {
+                                            JOptionPane.showMessageDialog(progress,
+                                                    "Extraction finished.\n",
+                                                    "Information",
+                                                    JOptionPane.INFORMATION_MESSAGE);
+                                        }
+                                        else {
+                                            JOptionPane.showMessageDialog(progress,
+                                                    errorCount + " errors were encountered " +
+                                                    "during the extraction.\n",
+                                                    "Information",
+                                                    JOptionPane.WARNING_MESSAGE);
+                                        }
                                     }
                                     else {
-                                        JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-                                                errorCount + " errors were encountered " +
-                                                "during the extraction.\n",
-                                                "Information",
+                                        JOptionPane.showMessageDialog(progress,
+                                                "Extraction was aborted.\n" +
+                                                "Please remove the extracted files " +
+                                                "manually.\n",
+                                                "Aborted extraction",
                                                 JOptionPane.WARNING_MESSAGE);
+                                        progress.confirmCancel();
                                     }
                                 }
-                                else {
-                                    JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
-                                            "Extraction was aborted.\n" +
-                                            "Please remove the extracted files " +
-                                            "manually.\n",
-                                            "Aborted extraction",
-                                            JOptionPane.WARNING_MESSAGE);
-                                }
-                                progress.setVisible(false);
+                            } catch(Throwable t) {
+                                GUIUtil.displayExceptionDialog(t, progress);
                             } finally {
+                                progress.dispose();
                                 //fsView.disableFileSystemCache();
                                 //fsView.releaseCatalogFile(); // Always release memory
                             }
@@ -1194,9 +1199,9 @@ public class FileSystemBrowserWindow extends JFrame {
      * @return
      */
     private long calculateForkSizeRecursive(List<FSEntry> selection, LinkedList<String> pathStack,
-            List<FSForkType> forkTypes) {
+            ProgressMonitor pm, List<FSForkType> forkTypes) {
         return calculateForkSizeRecursive(selection.toArray(new FSEntry[selection.size()]),
-                pathStack, forkTypes.toArray(new FSForkType[forkTypes.size()]));
+                pathStack, pm, forkTypes.toArray(new FSForkType[forkTypes.size()]));
     }
 
     /**
@@ -1209,10 +1214,13 @@ public class FileSystemBrowserWindow extends JFrame {
      * @return the total combined size of the data in the tree for the specified fork types.
      */
     private long calculateForkSizeRecursive(FSEntry[] selection, LinkedList<String> pathStack,
-            FSForkType... forkTypes) {
+            ProgressMonitor pm, FSForkType... forkTypes) {
         //System.err.println("calculateForkSizeRecursive")
         long res = 0;
         for(FSEntry curEntry : selection) {
+            if(pm.cancelSignaled()) {
+                break;
+            }
             if(curEntry instanceof FSLink) {
                 FSLink curLink = (FSLink)curEntry;
                 FSEntry linkTarget = curLink.getLinkTarget(pathStack.toArray(new String[pathStack.size()]));
@@ -1243,7 +1251,7 @@ public class FileSystemBrowserWindow extends JFrame {
                 FSFolder curFolder = (FSFolder) curEntry;
                 pathStack.addLast(curFolder.getName());
                 try {
-                    res += calculateForkSizeRecursive(curFolder.list(), pathStack, forkTypes);
+                    res += calculateForkSizeRecursive(curFolder.list(), pathStack, pm, forkTypes);
                 } finally { pathStack.removeLast(); }
             }
             else {
@@ -1298,7 +1306,8 @@ public class FileSystemBrowserWindow extends JFrame {
     }
 
     /** <code>progressDialog</code> may NOT be null. */
-    protected int extract(String[] parentPath, FSEntry rec, File outDir, ProgressMonitor progressDialog, boolean dataFork, boolean resourceFork) {
+    protected int extract(String[] parentPath, FSEntry rec, File outDir, ProgressMonitor progressDialog,
+            boolean dataFork, boolean resourceFork) {
         return extract(parentPath, Arrays.asList(rec), outDir, progressDialog, dataFork, resourceFork);
     }
 
@@ -1308,7 +1317,8 @@ public class FileSystemBrowserWindow extends JFrame {
     }
 
     /** <code>progressDialog</code> may NOT be null. */
-    protected int extract(String[] parentPath, FSEntry[] recs, File outDir, ProgressMonitor progressDialog, boolean dataFork, boolean resourceFork) {
+    protected int extract(String[] parentPath, FSEntry[] recs, File outDir, ProgressMonitor progressDialog,
+            boolean dataFork, boolean resourceFork) {
         return extract(parentPath, Arrays.asList(recs), outDir, progressDialog, dataFork, resourceFork);
     }
 
@@ -1318,11 +1328,14 @@ public class FileSystemBrowserWindow extends JFrame {
     }
 
     /** <code>progressDialog</code> may NOT be null. */
-    protected int extract(String[] parentPath, List<FSEntry> recs, File outDir, ProgressMonitor progressDialog, boolean dataFork, boolean resourceFork) {
+    protected int extract(String[] parentPath, List<FSEntry> recs, File outDir, ProgressMonitor progressDialog,
+            boolean dataFork, boolean resourceFork) {
         int errorCount = 0;
         LinkedList<String> pathStack = new LinkedList<String>();
-        for(String pathComponent : parentPath)
-            pathStack.addLast(pathComponent);
+        if(parentPath != null) {
+            for(String pathComponent : parentPath)
+                pathStack.addLast(pathComponent);
+        }
 
         for(FSEntry rec : recs) {
             errorCount += extractRecursive(rec, pathStack, outDir, progressDialog,
@@ -1339,7 +1352,7 @@ public class FileSystemBrowserWindow extends JFrame {
             throw new IllegalArgumentException("Neither the data fork or resource fork were selected for extraction. Won't do nothing...");
         }
         if(progressDialog.cancelSignaled()) {
-            progressDialog.confirmCancel();
+            //progressDialog.confirmCancel(); // Done by caller.
             return 0;
         }
 
@@ -1715,6 +1728,7 @@ public class FileSystemBrowserWindow extends JFrame {
         public List<Record<FSEntry>> getFolderContents(List<Record<FSEntry>> folderRecordPath) {
             FSEntry lastEntry = folderRecordPath.get(folderRecordPath.size() - 1).getUserObject();
             
+            // Resolve any links first
             if(lastEntry instanceof FSLink) {
                 String[] parentPath = getFSPath(folderRecordPath, folderRecordPath.size()-1);
 
@@ -1730,7 +1744,8 @@ public class FileSystemBrowserWindow extends JFrame {
                     throw new RuntimeException("Tried to get folder contents for link target type " +
                         lastEntry.getClass());
             }
-
+            
+            // Then check for folder
             if(lastEntry instanceof FSFolder) {
                 String[] folderPath = getFSPath(folderRecordPath);
                 
@@ -1785,13 +1800,18 @@ public class FileSystemBrowserWindow extends JFrame {
          * @return
          */
         private String[] getFSPath(List<Record<FSEntry>> fsbPathList) {
-            return getFSPath(fsbPathList, fsbPathList.size());
+            if(fsbPathList == null)
+                return null;
+            else
+                return getFSPath(fsbPathList, fsbPathList.size());
         }
 
         private String[] getFSPath(List<Record<FSEntry>> fsbPathList, int len) {
             if(len < 1)
                 throw new IllegalArgumentException("A FileSystemBrowser parent path list must " +
                         "have at least one component (the root folder).");
+            else if(fsbPathList == null)
+                return null;
 
             String[] res = new String[len-1];
             Iterator<Record<FSEntry>> it = fsbPathList.iterator();
