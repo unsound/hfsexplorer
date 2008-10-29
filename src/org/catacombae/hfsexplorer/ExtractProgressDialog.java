@@ -81,12 +81,12 @@ public class ExtractProgressDialog extends JDialog implements ProgressMonitor {
     }
     public void confirmCancel() {
 	if(isVisible())
-	    setVisible(false);
+	    dispose();
     }
     private synchronized void requestCloseWindow() {
         if(!cancelSignaled)
             signalCancel();
-        setVisible(false);
+        dispose();
     }
 //     public void addCancelListener(ActionListener al) {
 // 	cancelListener = al;
