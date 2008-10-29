@@ -16,20 +16,18 @@
   <property name="resources.srcdir" value="resource"/>
   <property name="resources.destdir" value="${builddir}/res"/>
   
-  <property name="target.all.jarmanifest" value="${manifest.source.dir}/MANIFEST.MF"/>
-  <property name="target.all.outjar" value="${java.runtime.library.dir}/hfsx.jar"/>
-  
+  <property name="target.all.jarmanifest" value="${manifest.source.dir}/MANIFEST.MF"/> 
+  <property name="target.all.outjarname" value="hfsx.jar"/>
+  <property name="target.all.outjar" value="${java.runtime.library.dir}/${target.all.outjarname}"/>
+ 
   <property name="target.jparted.jarmanifest" value="${manifest.source.dir}/jparted/MANIFEST.MF"/>
   <property name="target.jparted.outjar" value="targets/jparted/lib/jparted.jar"/>
   
-  <path id="java.runtime.classpath">
+  <path id="java.build.classpath">
     <fileset dir="${java.runtime.library.dir}">
       <include name="**/*.jar"/>
+      <exclude name="**/${target.all.outjarname}"/>
     </fileset>
-  </path>
-  
-  <path id="java.build.classpath">
-    <path refid="java.runtime.classpath"/>
     <fileset dir="${java.build.library.dir}">
       <include name="**/*.jar"/>
     </fileset>
