@@ -38,20 +38,6 @@ public class HFSCommonFSFolder extends FSFolder {
     
     public HFSCommonFSFolder(HFSCommonFileSystemHandler iParent, CommonHFSCatalogFolderRecord iFolderRecord) {
         this(iParent, null, iFolderRecord);
-        /*super(iParent);
-        
-        // Input check
-        if(iParent == null)
-            throw new IllegalArgumentException("iParent must not be null!");
-        if(iFolderRecord == null)
-            throw new IllegalArgumentException("iFolderRecord must not be null!");
-        
-        this.fsHandler = iParent;
-        this.folderRecord = iFolderRecord;
-        //CommonHFSCatalogLeafRecordData data = folderRecord.getData();
-        this.catalogFolder = folderRecord.getData();
-        this.attributes = new HFSCommonFSAttributes(this, catalogFolder);
-         * */
     }
 
     HFSCommonFSFolder(HFSCommonFileSystemHandler iParent, CommonHFSCatalogFileRecord iHardLinkFileRecord, CommonHFSCatalogFolderRecord iFolderRecord) {

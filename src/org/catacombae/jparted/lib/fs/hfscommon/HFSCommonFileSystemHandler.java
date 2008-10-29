@@ -88,9 +88,6 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
         return entryFromRecord(getRecord(rootRecord, path));
     }
 
-    public void log(String msg) {
-        System.err.println(msg);
-    }
     CommonHFSCatalogLeafRecord getRecord(final CommonHFSCatalogFolderRecord rootRecord, final String... path) {
         /*
          * currentRoot = root
@@ -105,6 +102,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
          *
          * return currentRoot
          */
+        /*
         String prefix = globalPrefix;
         globalPrefix += "    ";
         log(prefix + "getRecord(" + (rootRecord != null ? rootRecord.getKey().getParentID().toLong() +
@@ -112,178 +110,121 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
                 (path != null && path.length > 0 ? "\"" + Util.concatenateStrings(path, "\", \"") +
                 "\"" : path == null ? "null" : "" ) + " });");
         try {
+        */
             if(rootRecord == null)
-                throw new IllegalArgumentException("rootRecord == null");
-            if(path == null)
-                throw new IllegalArgumentException("path == null");
-            
-            LinkedList<String[]> visitedList = null;
-            CommonHFSCatalogLeafRecord currentRoot = rootRecord;
+            throw new IllegalArgumentException("rootRecord == null");
+        if(path == null)
+            throw new IllegalArgumentException("path == null");
 
-            // We iterate over all records except the last one, which is our target.
-            for(int i = 0; i < path.length; ++i) {
-                String curPathComponent = path[i];
-                log(prefix + "  getRecord: Processing path element " + (i + 1) + "/" +
-                        path.length + ": \"" + curPathComponent + "\"");
+        LinkedList<String[]> visitedList = null;
+        CommonHFSCatalogLeafRecord currentRoot = rootRecord;
 
-                if(currentRoot instanceof CommonHFSCatalogFileRecord) {
+        // We iterate over all records except the last one, which is our target.
+        for(int i = 0; i < path.length; ++i) {
+            String curPathComponent = path[i];
+            //log(prefix + "  getRecord: Processing path element " + (i + 1) + "/" +
+            //        path.length + ": \"" + curPathComponent + "\"");
 
-                    // Reset visited list
-                    if(visitedList == null)
-                        visitedList = new LinkedList<String[]>();
-                    else
-                        visitedList.clear();
-                    
-                    while(currentRoot instanceof CommonHFSCatalogFileRecord) {
-                        CommonHFSCatalogFileRecord fr =
+            if(currentRoot instanceof CommonHFSCatalogFileRecord) {
+
+                // Reset visited list
+                if(visitedList == null)
+                    visitedList = new LinkedList<String[]>();
+                else
+                    visitedList.clear();
+
+                while(currentRoot instanceof CommonHFSCatalogFileRecord) {
+                    CommonHFSCatalogFileRecord fr =
                             (CommonHFSCatalogFileRecord) currentRoot;
-                        final String[] absPath;
+                    final String[] absPath;
 
-                        if(fr.getData().isSymbolicLink()) {
-                            byte[] data = Util.readFully(getReadableDataForkStream(fr));
-                            String posixPath = Util.readString(data, "UTF-8");
-                            String[] basePath = Util.arrayCopy(path, 0, new String[i-1], 0, i-1);
-                            absPath =
-                                    getTruePathFromPosixPath(posixPath, basePath);
-                            if(absPath == null) {
-                                // Sorry pal, no luck in findin' yarr link target
-                                log(prefix + " getRecord: no link target found for posix path \"" + posixPath + "\" with base path \"" + Util.concatenateStrings(basePath, "/") + "\"");
-                                return null;
-                            }
-                            else
-                                log(prefix + "  getRecord: absPath=" + Util.concatenateStrings(absPath, "/"));
+                    if(fr.getData().isSymbolicLink()) {
+                        byte[] data = Util.readFully(getReadableDataForkStream(fr));
+                        String posixPath = Util.readString(data, "UTF-8");
+                        String[] basePath = Util.arrayCopy(path, 0, new String[i - 1], 0, i - 1);
+                        absPath =
+                                getTruePathFromPosixPath(posixPath, basePath);
+                        if(absPath == null) {
+                            // Sorry pal, no luck in findin' yarr link target
+                            //log(prefix + " getRecord: no link target found for posix path \"" + posixPath + "\" with base path \"" + Util.concatenateStrings(basePath, "/") + "\"");
+                            return null;
                         }
-                        else if(fr.getData().isHardFileLink()) {
-                            absPath = new String[] {
-                                        FILE_HARD_LINK_DIR,
-                                        FILE_HARD_LINK_PREFIX + Util.unsign(fr.getData().getHardLinkInode())
-                                    };
-                        }
-                        else if(fr.getData().isHardDirectoryLink()) {
-                            absPath = new String[] {
-                                        DIRECTORY_HARD_LINK_DIR,
-                                        DIRECTORY_HARD_LINK_PREFIX + Util.unsign(fr.getData().getHardLinkInode())
-                                    };
-                        }
-                        else
-                            break;
-
-                        if(absPath == null)
-                            throw new RuntimeException("CHECK YOUR CODE FFS.");
-                        else if(Util.contains(visitedList, absPath)) {
-                            System.err.println("WARNING: Detected cyclic link structure when resolving link target.");
-                            System.err.println("         Resolve stack:");
-                            for(String[] sa : visitedList)
-                                System.err.println("           " + Util.concatenateStrings(sa, "/"));
-                            System.err.println("           " + Util.concatenateStrings(absPath, "/"));
-                            return null; // Circular linking.
-                        }
-                        else {
-                            visitedList.addLast(absPath);
-                            log(prefix + "  getRecord: Trying to get record for absolute link target...");
-                            CommonHFSCatalogLeafRecord linkTarget =
-                                    getRecord(view.getRoot(), absPath);
-                            log(prefix + "  getRecord: target record = " + linkTarget);
-                            if(linkTarget != null) {
-                                currentRoot = linkTarget;
-                            }
-                        }
+                    //else
+                    //log(prefix + "  getRecord: absPath=" + Util.concatenateStrings(absPath, "/"));
                     }
-                }
-
-                CommonHFSCatalogFolderRecord currentRootFolder;
-                if(currentRoot instanceof CommonHFSCatalogFolderRecord)
-                    currentRootFolder = (CommonHFSCatalogFolderRecord) currentRoot;
-                else {
-                    log(prefix + "  getRecord: Returning with error - currentRoot not instanceof CommonHFSCatalogFolderRecord (" + currentRoot + ")");
-                    return null; // We encountered a pathname component which wasn't a folder.
-                }
-
-                CommonHFSCatalogLeafRecord[] subRecords = view.listRecords(currentRootFolder);
-
-                CommonHFSCatalogLeafRecord newRoot = null;
-                for(final CommonHFSCatalogLeafRecord subRecord : subRecords) {
-                    if(getProperNodeName(subRecord).equals(curPathComponent)) {
-                        newRoot = subRecord;
+                    else if(fr.getData().isHardFileLink()) {
+                        absPath = new String[] {
+                                    FILE_HARD_LINK_DIR,
+                                    FILE_HARD_LINK_PREFIX + Util.unsign(fr.getData().getHardLinkInode())
+                                };
+                    }
+                    else if(fr.getData().isHardDirectoryLink()) {
+                        absPath = new String[] {
+                                    DIRECTORY_HARD_LINK_DIR,
+                                    DIRECTORY_HARD_LINK_PREFIX + Util.unsign(fr.getData().getHardLinkInode())
+                                };
+                    }
+                    else
                         break;
-                        /*
-                        // We have reached our leaf. Any links in the leaf should be resolved by the caller.
-                        if(i == path.length - 1) {
-                            log(prefix + "  getRecord: Returning successfully with " + curRecord);
-                            return curRecord;
-                        }
 
-                        // Resolve any links in structure.
-                        while(true) {
-                            if(curRecord instanceof CommonHFSCatalogFileRecord) {
-                                CommonHFSCatalogFileRecord fr =
-                                        (CommonHFSCatalogFileRecord) curRecord;
-
-                                String[] absPath = null;
-                                if(fr.getData().isSymbolicLink()) {
-                                    byte[] data = Util.readFully(getReadableDataForkStream(fr));
-                                    String posixPath = Util.readString(data, "UTF-8");
-                                    String[] basePath = Util.arrayCopy(path, 0, new String[i], 0, i);
-                                    absPath =
-                                            getTruePathFromPosixPath(posixPath, basePath);
-                                    log(prefix + "  getRecord: absPath=" + Util.concatenateStrings(absPath, "/"));
-                                    if(absPath == null)
-                                        // Sorry pal, no luck in findin' yarr link target
-                                        return null;
-                                }
-                                else if(fr.getData().isHardFileLink()) {
-                                    absPath = new String[] {
-                                                FILE_HARD_LINK_DIR,
-                                                FILE_HARD_LINK_PREFIX + fr.getData().getHardLinkInode()
-                                            };
-                                }
-                                else if(fr.getData().isHardDirectoryLink()) {
-                                    absPath = new String[] {
-                                                DIRECTORY_HARD_LINK_DIR,
-                                                DIRECTORY_HARD_LINK_PREFIX + fr.getData().getHardLinkInode()
-                                            };
-                                }
-
-                                if(absPath != null) {
-                                    log(prefix + "  getRecord: Trying to get record for absolute link target...");
-                                    CommonHFSCatalogLeafRecord linkTarget =
-                                            getRecord(view.getRoot(), absPath);
-                                    log(prefix + "  getRecord: target record = " + linkTarget);
-                                    if(linkTarget != null) {
-                                        curRecord = linkTarget;
-                                        continue;
-                                    }
-                                }
-                            }
-
-                            break;
-                        }
-
-                        if(curRecord instanceof CommonHFSCatalogFolderRecord) {
-                            curFolder = (CommonHFSCatalogFolderRecord) curRecord;
-                            break;
-                        }
-                        else
-                            return null; // A file which is not a symlink or hard link -> invalid path
-                         * */
+                    if(absPath == null)
+                        throw new RuntimeException("CHECK YOUR CODE FFS.");
+                    else if(Util.contains(visitedList, absPath)) {
+                        System.err.println("WARNING: Detected cyclic link structure when resolving link target.");
+                        System.err.println("         Resolve stack:");
+                        for(String[] sa : visitedList)
+                            System.err.println("           " + Util.concatenateStrings(sa, "/"));
+                        System.err.println("           " + Util.concatenateStrings(absPath, "/"));
+                        return null; // Circular linking.
                     }
-                }
-
-                if(newRoot != null)
-                    currentRoot = newRoot;
-                else {
-                    log(prefix + "  getRecord: Returning with error - no match was found for \"" + curPathComponent + "\"");
-                    return null; // Invalid path, no matching child was found.
+                    else {
+                        visitedList.addLast(absPath);
+                        //log(prefix + "  getRecord: Trying to get record for absolute link target...");
+                        CommonHFSCatalogLeafRecord linkTarget =
+                                getRecord(view.getRoot(), absPath);
+                        //log(prefix + "  getRecord: target record = " + linkTarget);
+                        if(linkTarget != null) {
+                            currentRoot = linkTarget;
+                        }
+                    }
                 }
             }
 
+            CommonHFSCatalogFolderRecord currentRootFolder;
+            if(currentRoot instanceof CommonHFSCatalogFolderRecord)
+                currentRootFolder = (CommonHFSCatalogFolderRecord) currentRoot;
+            else {
+                //log(prefix + "  getRecord: Returning with error - currentRoot not instanceof CommonHFSCatalogFolderRecord (" + currentRoot + ")");
+                return null; // We encountered a pathname component which wasn't a folder.
+            }
 
-            log(prefix + "  getRecord: Returning successfully with " + currentRoot + " (" + currentRoot.getKey().getParentID().toLong() + ":\"" + getProperNodeName(currentRoot) + "\")");
-            return currentRoot;
+            CommonHFSCatalogLeafRecord[] subRecords = view.listRecords(currentRootFolder);
+
+            CommonHFSCatalogLeafRecord newRoot = null;
+            for(final CommonHFSCatalogLeafRecord subRecord : subRecords) {
+                if(getProperNodeName(subRecord).equals(curPathComponent)) {
+                    newRoot = subRecord;
+                    break;
+                }
+            }
+
+            if(newRoot != null)
+                currentRoot = newRoot;
+            else {
+                //log(prefix + "  getRecord: Returning with error - no match was found for \"" + curPathComponent + "\"");
+                return null; // Invalid path, no matching child was found.
+            }
+        }
+
+
+        //log(prefix + "  getRecord: Returning successfully with " + currentRoot + " (" + currentRoot.getKey().getParentID().toLong() + ":\"" + getProperNodeName(currentRoot) + "\")");
+        return currentRoot;
+        /*
         } finally {
             log(prefix + "Returning from getRecord.");
             globalPrefix = prefix;
         }
+        */
     }
 
     private FSEntry entryFromRecord(CommonHFSCatalogLeafRecord rec) {
