@@ -381,7 +381,7 @@ public class Util {
      * Creates a copy of the input data reversed byte by byte. This is helpful for endian swapping.
      * 
      * @param data
-     * @return
+     * @return a copy of the input data reversed byte by byte.
      */     
     public static byte[] createReverseCopy(byte[] data) {
 	return createReverseCopy(data, 0, data.length);
@@ -393,7 +393,7 @@ public class Util {
      * @param data
      * @param offset
      * @param length
-     * @return
+     * @return a copy of the input data reversed byte by byte.
      */
     public static byte[] createReverseCopy(byte[] data, int offset, int length) {
 	byte[] copy = new byte[length];
@@ -799,9 +799,10 @@ public class Util {
      * <code>concatenateStrings(new String[] {"joe", "lisa", "bob"}, " and ");</code> yields the
      * string "joe and lisa and bob".
      * 
-     * @param parentDir
-     * @param string
-     * @return
+     * @param strings
+     * @param glueString
+     * @return the input strings concatenated into one string, adding the <code>glueString</code>
+     * between each pair.
      */
     public static String concatenateStrings(Object[] strings, String glueString) {
         if(strings.length > 0) {
@@ -829,5 +830,20 @@ public class Util {
         }
         else
             return "";
+    }
+    
+    public static String addUnitSpaces(String string, int unitSize) {
+        int parts = string.length() / unitSize;
+        StringBuilder sizeStringBuilder = new StringBuilder();
+        String head = string.substring(0, string.length() - parts * unitSize);
+        if(head.length() > 0)
+            sizeStringBuilder.append(head);
+        for(int i = parts - 1; i >= 0; --i) {
+            if(i < parts-1 || (i == parts-1 && head.length() > 0))
+                sizeStringBuilder.append(" ");
+            sizeStringBuilder.append(string.substring(string.length() - (i + 1) * unitSize,
+                    string.length() - i * unitSize));
+        }
+        return sizeStringBuilder.toString();
     }
 }

@@ -318,7 +318,14 @@ public class SelectWindowsDeviceDialog extends JDialog {
 			    result = new ReadableConcatenatedStream(llf, p.getStartOffset(), p.getLength());
 			    setVisible(false);
                         }
-			//else if(embeddedInfo.partition instanceof MBRPartition) {}
+			else if(embeddedInfo.partition instanceof MBRPartition) {
+                            ReadableRandomAccessStream llf = new WindowsLowLevelIO(DEVICE_PREFIX + embeddedInfo.deviceName);
+			    MBRPartitionTable mbt = new MBRPartitionTable(llf, 0);
+                            Partition p = mbt.getPartitionEntry((int)embeddedInfo.partitionNumber);
+			    resultCreatePath = DEVICE_PREFIX + selectedValue.toString();
+			    result = new ReadableConcatenatedStream(llf, p.getStartOffset(), p.getLength());
+			    setVisible(false);
+                        }
                         else
                             throw new RuntimeException("Unexpected partition system: " +
                                     embeddedInfo.partition.getClass());

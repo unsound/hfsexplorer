@@ -20,6 +20,9 @@ package org.catacombae.csjc.structelements;
 import java.math.BigInteger;
 import org.catacombae.hfsexplorer.Util;
 
+/**
+ * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
+ */
 public class IntegerField extends StringRepresentableField {
 
     private final byte[] fieldData;

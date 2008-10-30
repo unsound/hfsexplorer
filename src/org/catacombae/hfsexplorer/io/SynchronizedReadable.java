@@ -15,18 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.fs;
+package org.catacombae.hfsexplorer.io;
 
-import org.catacombae.io.ReadableRandomAccessStream;
+import org.catacombae.io.RuntimeIOException;
 
 /**
- * TODO TODO TODO!
+ * Interface that defines methods to access a ReadableRandomAccessStream in a thread-safe way.
+ * 
  * @author Erik Larsson
  */
-public class ResourceForkReader {
-    public ResourceForkReader(ReadableRandomAccessStream forkData) {
-
-    }
-
-
+public interface SynchronizedReadable {
+    /** Atomic seek+read. Does <b>not</b> change the file pointer of the stream permanently! */
+    public int readFrom(final long pos, byte[] b, int off, int len) throws RuntimeIOException;
+    
+    /** Atomic seek+skip. Does <b>not</b> change the file pointer of the stream permanently! */
+    public long skipFrom(final long pos, final long length) throws RuntimeIOException;
+    
+    /** Atomic length() - getFilePointer(). */
+    public long remainingLength() throws RuntimeIOException;
 }

@@ -30,7 +30,7 @@ import org.catacombae.csjc.structelements.IntegerFieldRepresentation;
  * externally in a controlled way.
  *
  * @see org.catacombae.csjc.structelements.StructElement
- * @author Erik Larsson
+ * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
  */
 public interface StructElements {
     /** Shorthand constant. */
@@ -70,15 +70,19 @@ public interface StructElements {
     /** Shorthand constant. */
     public static final IntegerFieldRepresentation BINARY = IntegerFieldRepresentation.BINARY;
     
+    /**
+     * Shorthand subclass, so the user doesn't have to import DictionaryBuilder in every
+     * implementation of StructElements.
+     */
     public class DictionaryBuilder extends org.catacombae.csjc.structelements.DictionaryBuilder {
         /**
-         * {@inheritDoc}
+         * @see org.catacombae.csjc.structelements.DictionaryBuilder#DictionaryBuilder(java.lang.String) 
          */
         public DictionaryBuilder(String typeName) {
             super(typeName);
         }
         /**
-         * {@inheritDoc}
+         * @see org.catacombae.csjc.structelements.DictionaryBuilder#DictionaryBuilder(java.lang.String, java.lang.String) 
          */
         public DictionaryBuilder(String typeName, String typeDescription) {
             super(typeName, typeDescription);

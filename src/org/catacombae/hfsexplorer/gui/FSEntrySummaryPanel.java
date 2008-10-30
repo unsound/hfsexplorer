@@ -1,12 +1,18 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * FSEntrySummaryPanel.java
+/*-
+ * Copyright (C) 2008 Erik Larsson
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * Created on 2008-okt-25, 06:02:01
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.catacombae.hfsexplorer.gui;
@@ -14,13 +20,13 @@ package org.catacombae.hfsexplorer.gui;
 import java.awt.Window;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.text.DecimalFormat;
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
+//import javax.swing.JFrame;
+//import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import org.catacombae.hfsexplorer.ObjectContainer;
 import org.catacombae.hfsexplorer.SpeedUnitUtils;
+import org.catacombae.hfsexplorer.Util;
 import org.catacombae.jparted.lib.fs.FSAttributes;
 import org.catacombae.jparted.lib.fs.FSEntry;
 import org.catacombae.jparted.lib.fs.FSFile;
@@ -269,18 +275,14 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel {
     private String getSizeString(long result) {
         String baseString = Long.toString(result);
         if(result >= 1000) {
-            int parts = baseString.length() / 3;
-            StringBuilder sizeStringBuilder = new StringBuilder();
-            String head = baseString.substring(0, baseString.length() - parts * 3);
-            if(head.length() > 0)
-                sizeStringBuilder.append(head).append(" ");
-            for(int i = parts - 1; i >= 0; --i)
-                sizeStringBuilder.append(baseString.substring(baseString.length() - (i + 1) * 3, baseString.length() - i * 3)).append(" ");
-
-            if(result >= 1024)
-                return SpeedUnitUtils.bytesToBinaryUnit(result, sizeFormatter) + " (" + sizeStringBuilder.toString() + "bytes" + ")";
+            String spacedString = Util.addUnitSpaces(baseString, 3);
+            
+            if(result >= 1024) {
+                return SpeedUnitUtils.bytesToBinaryUnit(result, sizeFormatter) + " (" +
+                        spacedString + " bytes" + ")";
+            }
             else
-                return sizeStringBuilder.toString() + "bytes";
+                return spacedString + " bytes";
         }
         else
             return baseString + " bytes";
@@ -288,7 +290,8 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel {
 
     private void startFolderSizeCalculation(final FSFolder folder) {
         Runnable r = new Runnable () {
-
+            
+            @Override
             public void run() {
                 String resultString;
                 try {
@@ -309,6 +312,7 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel {
 
                 SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         sizeField.setText(finalResultString);
                     }
@@ -347,6 +351,7 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel {
         }
     }
     
+    /*
     public static void main(String[] args) {
         JFrame jf = new JFrame("Test");
         jf.add(new JScrollPane(new FSEntrySummaryPanel()));
@@ -355,4 +360,5 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel {
         jf.setLocationRelativeTo(null);
         jf.setVisible(true);
     }
+    */
 }

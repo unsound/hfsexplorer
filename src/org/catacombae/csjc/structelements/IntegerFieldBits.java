@@ -17,6 +17,9 @@
 
 package org.catacombae.csjc.structelements;
 
+/**
+ * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
+ */
 public enum IntegerFieldBits {
 
     BITS_8(8), BITS_16(16), BITS_32(32), BITS_64(64);

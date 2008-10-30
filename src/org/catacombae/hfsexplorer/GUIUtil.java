@@ -33,10 +33,8 @@ public class GUIUtil {
      * JOptionPane.ERROR_MESSAGE. Maximum lines shown in the stack trace is set to 10.
      * 
      * @see #displayExceptionDialog(Throwable, int, Component, String, String, int)
-     * @param t
-     * @param maxStackTraceLines
-     * @param c
-     * @param message
+     * @param t the exception thrown.
+     * @param c the dialog's parent component.
      */
     public static void displayExceptionDialog(Throwable t, Component c) {
         displayExceptionDialog(t, 10, c, "", "Exception", JOptionPane.ERROR_MESSAGE);
@@ -48,10 +46,9 @@ public class GUIUtil {
      * JOptionPane.ERROR_MESSAGE.
      * 
      * @see #displayExceptionDialog(Throwable, int, Component, String, String, int)
-     * @param t
-     * @param maxStackTraceLines
-     * @param c
-     * @param message
+     * @param t the exception thrown.
+     * @param maxStackTraceLines the maximum number of lines of the stack trace to display.
+     * @param c the dialog's parent component.
      */
     public static void displayExceptionDialog(Throwable t, int maxStackTraceLines, Component c) {
         displayExceptionDialog(t, maxStackTraceLines, c, "", "Exception", JOptionPane.ERROR_MESSAGE);
@@ -62,10 +59,10 @@ public class GUIUtil {
      * window title to "Exception" and the message type to JOptionPane.ERROR_MESSAGE.
      * 
      * @see #displayExceptionDialog(Throwable, int, Component, String, String, int)
-     * @param t
-     * @param maxStackTraceLines
-     * @param c
-     * @param message
+     * @param t the exception thrown.
+     * @param maxStackTraceLines the maximum number of lines of the stack trace to display.
+     * @param c the dialog's parent component.
+     * @param message the message to be printed above the exception.
      */
     public static void displayExceptionDialog(Throwable t, int maxStackTraceLines, Component c,
             String message) {

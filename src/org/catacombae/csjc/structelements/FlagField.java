@@ -19,6 +19,9 @@ package org.catacombae.csjc.structelements;
 
 import org.catacombae.hfsexplorer.Util;
 
+/**
+ * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
+ */
 public class FlagField extends BooleanRepresentableField {
 
     private final byte[] fieldData;
@@ -69,6 +72,7 @@ public class FlagField extends BooleanRepresentableField {
      * 
      * @param args command line arguments.
      */
+    /*
     public static void main(String[] args) {
         byte[] i = new byte[] { 0x00, (byte) 0xFF, 0x00, (byte) 0xEE };
         System.err.println("(1) 0x" + Util.byteArrayToHexString(i));
@@ -88,4 +92,5 @@ public class FlagField extends BooleanRepresentableField {
         ff.setBooleanValue(true);
         System.err.println("(4) 0x" + Util.byteArrayToHexString(i));
     }
+    */
 }

@@ -1,6 +1,18 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/*-
+ * Copyright (C) 2008 Erik Larsson
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.catacombae.hfsexplorer.types.hfscommon;
@@ -10,7 +22,7 @@ import org.catacombae.hfsexplorer.types.hfsplus.HFSCatalogNodeID;
 
 /**
  *
- * @author erik
+ * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
  */
 public abstract class CommonHFSCatalogNodeID {
     public enum ReservedID {
@@ -27,18 +39,27 @@ public abstract class CommonHFSCatalogNodeID {
         FIRST_USER_CATALOG_NODE_ID
     }
     
-    public abstract int toInt();
-    public abstract long toLong();
+    /**
+     * Returns an <code>int</code> representation of this catalog node ID.
+     * @return an <code>int</code> representation of this catalog node ID.
+     */
+    //public abstract int toInt();
+    
+     /**
+     * Returns an <code>long</code> representation of this catalog node ID.
+     * @return an <code>long</code> representation of this catalog node ID.
+     */
+   public abstract long toLong();
     
     /**
      * Returns a CommonHFSCatalogNodeID for a specified reserved ID, if the
      * reserved ID is supported for the implementation (otherwise null is
      * returned). HFS only supports ROOT_PARENT, ROOT_FOLDER, EXTENTS_FILE,
-     * CATALOG_FILE and BAD_BLOCKS_FILE while HFS+ supports all ReservedID
-     * values.
+     * CATALOG_FILE, BAD_BLOCKS_FILE and FIRST_USER_CATALOG_NODE_ID while
+     * HFS+ supports all ReservedID values.
      * 
-     * @param id
-     * @return
+     * @param id the reserved ID to look up.
+     * @return a CommonHFSCatalogNodeID representing the specified reserved ID.
      */
     public static CommonHFSCatalogNodeID getHFSReservedID(ReservedID id) {
         return HFSImplementation.getReservedIDStatic(id);
@@ -48,11 +69,11 @@ public abstract class CommonHFSCatalogNodeID {
      * Returns a CommonHFSCatalogNodeID for a specified reserved ID, if the
      * reserved ID is supported for the implementation (otherwise null is
      * returned). HFS only supports ROOT_PARENT, ROOT_FOLDER, EXTENTS_FILE,
-     * CATALOG_FILE and BAD_BLOCKS_FILE while HFS+ supports all ReservedID
-     * values.
+     * CATALOG_FILE, BAD_BLOCKS_FILE and FIRST_USER_CATALOG_NODE_ID while
+     * HFS+ supports all ReservedID values.
      * 
      * @param id
-     * @return
+     * @return a CommonHFSCatalogNodeID representing the specified reserved ID.
      */
     public static CommonHFSCatalogNodeID getHFSPlusReservedID(ReservedID id) {
         return HFSImplementation.getReservedIDStatic(id);
@@ -62,11 +83,11 @@ public abstract class CommonHFSCatalogNodeID {
      * Returns a CommonHFSCatalogNodeID for a specified reserved ID, if the
      * reserved ID is supported for the implementation (otherwise null is
      * returned). HFS only supports ROOT_PARENT, ROOT_FOLDER, EXTENTS_FILE,
-     * CATALOG_FILE and BAD_BLOCKS_FILE while HFS+ supports all ReservedID
-     * values.
+     * CATALOG_FILE, BAD_BLOCKS_FILE and FIRST_USER_CATALOG_NODE_ID while
+     * HFS+ supports all ReservedID values.
      * 
      * @param id
-     * @return
+     * @return a CommonHFSCatalogNodeID representing the specified reserved ID.
      */
     public abstract CommonHFSCatalogNodeID getReservedID(ReservedID id);
      
@@ -80,7 +101,7 @@ public abstract class CommonHFSCatalogNodeID {
     
     @Override
     public int hashCode() {
-        return toInt();
+        return (int)toLong();
     }
 
     
@@ -111,16 +132,19 @@ public abstract class CommonHFSCatalogNodeID {
             this.fileID = fileID;
         }
 
+        /*
         @Override
         public int toInt() {
             return fileID.toInt();
         }
+         * */
 
         @Override
         public long toLong() {
             return fileID.toLong();
         }
         
+        @Override
         public CommonHFSCatalogNodeID getReservedID(ReservedID id) {
             return getReservedIDStatic(id);
         }
@@ -169,17 +193,20 @@ public abstract class CommonHFSCatalogNodeID {
         public HFSImplementation(int filFlNum) {
             this.filFlNum = filFlNum;
         }
-
+        
+        /*
         @Override
         public int toInt() {
             return filFlNum;
         }
+         * */
 
         @Override
         public long toLong() {
             return Util.unsign(filFlNum);
         }
 
+        @Override
         public CommonHFSCatalogNodeID getReservedID(ReservedID id) {
             return getReservedIDStatic(id);
         }

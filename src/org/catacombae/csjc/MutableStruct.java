@@ -20,6 +20,10 @@ package org.catacombae.csjc;
 import org.catacombae.hfsexplorer.Util;
 import java.lang.reflect.Field;
 
+/**
+ * 
+ * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
+ */
 public abstract class MutableStruct {
     private final boolean mutable;
     

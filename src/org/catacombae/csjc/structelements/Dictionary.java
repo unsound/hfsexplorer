@@ -20,6 +20,9 @@ package org.catacombae.csjc.structelements;
 import java.util.Hashtable;
 import org.catacombae.hfsexplorer.Util;
 
+/**
+ * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
+ */
 public class Dictionary extends StructElement {
 
     private final String[] keys;

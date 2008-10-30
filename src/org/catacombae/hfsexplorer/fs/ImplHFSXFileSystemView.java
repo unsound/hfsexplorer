@@ -50,7 +50,7 @@ public class ImplHFSXFileSystemView extends ImplHFSPlusFileSystemView {
             byte[] bthrData = bthr.getBytes();
             BTHeaderRec bthr2 = new BTHeaderRec(bthrData, 0); // ugly reconstructing solution
             return CommonHFSCatalogKey.create(new HFSXCatalogKey(
-                    new HFSCatalogNodeID(nodeID.toInt()),
+                    new HFSCatalogNodeID((int)nodeID.toLong()),
                         new HFSUniStr255(searchString.getStructBytes(), 0), bthr2));
         }
 

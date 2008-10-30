@@ -34,7 +34,7 @@ import javax.swing.table.TableRowSorter;
  * Java 6-specific. I.E. when compiling the source code using a JDK 1.5, the
  * only class that should fail to compile would be this one.
  * 
- * @author Erik Larsson
+ * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
  */
 public class Java6Specific {
     /**
@@ -87,7 +87,7 @@ public class Java6Specific {
      * <b>Only Java 6+ virtual machines will support this, so check first with isJava6OrHigher() or
      * risk to crash your program.</b>
      * 
-     * @param fileTable
+     * @param table
      * @param tableModel
      * @param defaultSortColumn
      * @param columnComparators

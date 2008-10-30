@@ -80,8 +80,8 @@ public abstract class FileSystemHandler {
      * parameter will not be used.
      *
      * @param posixPath the POSIX pathname.
-     * @param rootFolder the root folder from which we should start resolving
-     * the path.
+     * @param rootFolderPath path to the root folder from which we should
+     * start resolving the path.
      * @return the FSEntry corresponding to the supplied POSIX path, or <code>
      * null</code> if no such pathname could be found.
      * @throws java.lang.IllegalArgumentException if <code>posixPath</code> is
@@ -252,7 +252,7 @@ public abstract class FileSystemHandler {
      * input string.
      *
      * @param posixPathnameComponent
-     * @return
+     * @return a <b>proper</b> pathname component.
      */
     public abstract String parsePosixPathnameComponent(String posixPathnameComponent);
 
@@ -266,14 +266,15 @@ public abstract class FileSystemHandler {
      * input string.
      *
      * @param fsPathnameComponent
-     * @return
+     * @return a <b>POSIX compatible</b> pathname component.
      */
     public abstract String generatePosixPathnameComponent(String fsPathnameComponent);
 
     /**
-     * Returns path to the link's target in absolute form.
-     * @param link
-     * @return
+     * Returns the path to the link's target in absolute form.
+     * 
+     * @param link the link to resolve.
+     * @return the path to the link's target in absolute form.
      */
     public abstract String[] getTargetPath(FSLink link, String[] parentDir);
 

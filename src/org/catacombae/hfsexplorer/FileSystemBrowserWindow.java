@@ -83,6 +83,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import org.catacombae.dmgextractor.encodings.encrypted.ReadableCEncryptedEncodingStream;
 import org.catacombae.dmgextractor.ui.PasswordDialog;
+import org.catacombae.hfsexplorer.gui.MemoryStatisticsPanel;
 import org.catacombae.jparted.lib.DataLocator;
 import org.catacombae.jparted.lib.fs.FSLink;
 import org.catacombae.udif.UDIFRandomAccessStream;
@@ -179,6 +180,7 @@ public class FileSystemBrowserWindow extends JFrame {
             loadFSFromDeviceItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         }
 
+        /*
         JMenuItem loadFSFromFileItem = new JMenuItem("Load file system from file...");
         loadFSFromFileItem.addActionListener(new ActionListener() {
             @Override
@@ -206,18 +208,33 @@ public class FileSystemBrowserWindow extends JFrame {
             }
         });
         loadFSFromFileItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        */
 
-        JMenuItem openUDIFItem = new JMenuItem("Open UDIF disk image (.dmg)...");
+        JMenuItem openUDIFItem = new JMenuItem("Load file system from file...");
         openUDIFItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 //JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setMultiSelectionEnabled(false);
                 fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                SimpleFileFilter sff = new SimpleFileFilter();
-                sff.addExtension("dmg");
-                sff.setDescription("Disk images");
-                fileChooser.setFileFilter(sff);
+                
+                SimpleFileFilter dmgFilter = new SimpleFileFilter();
+                dmgFilter.addExtension("dmg");
+                dmgFilter.setDescription("Mac OS X disk images (*.dmg)");
+                fileChooser.addChoosableFileFilter(dmgFilter);
+                
+                SimpleFileFilter cdrFilter = new SimpleFileFilter();
+                cdrFilter.addExtension("iso");
+                cdrFilter.addExtension("cdr");
+                cdrFilter.setDescription("CD/DVD image (*.iso,*.cdr)");
+                fileChooser.addChoosableFileFilter(cdrFilter);
+                
+                SimpleFileFilter imgFilter = new SimpleFileFilter();
+                imgFilter.addExtension("img");
+                imgFilter.setDescription("Raw disk image (*.img)");
+                fileChooser.addChoosableFileFilter(imgFilter);
+                
+                fileChooser.setFileFilter(fileChooser.getAcceptAllFileFilter());
                 int res = fileChooser.showOpenDialog(FileSystemBrowserWindow.this);
                 if(res == JFileChooser.APPROVE_OPTION) {
                     try {
@@ -239,8 +256,9 @@ public class FileSystemBrowserWindow extends JFrame {
                 fileChooser.resetChoosableFileFilters();
             }
         });
-        openUDIFItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        openUDIFItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
+        /*
         JMenuItem openFromPosItem = new JMenuItem("Read file system from specified position in file...");
         openFromPosItem.addActionListener(new ActionListener() {
             @Override
@@ -278,6 +296,7 @@ public class FileSystemBrowserWindow extends JFrame {
                 fileChooser.resetChoosableFileFilters();
             }
         });
+        */
 
         JMenuItem debugConsoleItem = null;
         if(dcw != null) {
@@ -364,7 +383,8 @@ public class FileSystemBrowserWindow extends JFrame {
                 }
             }
         });
-
+        
+        /*
         JMenuItem setFileReadOffsetItem = new JMenuItem("Set file read offset...");
         setFileReadOffsetItem.addActionListener(new ActionListener() {
             @Override
@@ -374,6 +394,15 @@ public class FileSystemBrowserWindow extends JFrame {
                 if(s != null) {
                     BaseHFSFileSystemView.fileReadOffset = Long.parseLong(s);
                 }
+            }
+        });
+        */ 
+        
+        JMenuItem memoryStatisticsItem = new JMenuItem("Memory statistics");
+        memoryStatisticsItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                MemoryStatisticsPanel.createMemoryStatisticsWindow().setVisible(true);
             }
         });
 
@@ -483,9 +512,9 @@ public class FileSystemBrowserWindow extends JFrame {
         if(loadFSFromDeviceItem != null) {
             fileMenu.add(loadFSFromDeviceItem);
         }
-        fileMenu.add(loadFSFromFileItem);
+        //fileMenu.add(loadFSFromFileItem);
         fileMenu.add(openUDIFItem);
-        fileMenu.add(openFromPosItem);
+        //fileMenu.add(openFromPosItem);
         if(debugConsoleItem != null) {
             fileMenu.add(debugConsoleItem);
         }
@@ -495,7 +524,8 @@ public class FileSystemBrowserWindow extends JFrame {
         infoMenu.add(fsInfoItem);
         infoMenu.add(toggleCachingItem);
         infoMenu.add(createDiskImageItem);
-        infoMenu.add(setFileReadOffsetItem);
+        //infoMenu.add(setFileReadOffsetItem);
+        infoMenu.add(memoryStatisticsItem);
         helpMenu.add(startHelpBrowserItem);
         helpMenu.add(checkUpdatesItem);
         helpMenu.add(aboutItem);

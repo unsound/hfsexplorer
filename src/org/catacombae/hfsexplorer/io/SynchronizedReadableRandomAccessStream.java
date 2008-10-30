@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2006 Erik Larsson
+ * Copyright (C) 2006-2008 Erik Larsson
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 
 package org.catacombae.hfsexplorer.io;
 
-import java.io.*;
 import org.catacombae.io.BasicReadableRandomAccessStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.RuntimeIOException;
@@ -26,7 +25,7 @@ import org.catacombae.io.RuntimeIOException;
  * This class adds concurrency safety to a random access stream. It includes a seek+read
  * atomic operation. All operations on this object is synchronized on its own monitor.
  */
-public class SynchronizedReadableRandomAccessStream extends BasicReadableRandomAccessStream {
+public class SynchronizedReadableRandomAccessStream extends BasicReadableRandomAccessStream implements SynchronizedReadable {
     /** The underlying stream. */
     private ReadableRandomAccessStream ras;
     private long refCount;
@@ -36,7 +35,8 @@ public class SynchronizedReadableRandomAccessStream extends BasicReadableRandomA
 	this.ras = ras;
     }
      
-    /** Atomic seek+read. Does <b>not</b> change the file pointer of the stream permanently! */
+    /** {@inheritDoc} */
+    @Override
     public synchronized int readFrom(final long pos, byte[] b, int off, int len) throws RuntimeIOException {
         //System.err.println("SynchronizedReadableRandomAccessStream.readFrom(" + pos + ", byte[" + b.length + "], " + off + ", " + len + ");");
         final long oldFP = getFilePointer();
@@ -49,7 +49,8 @@ public class SynchronizedReadableRandomAccessStream extends BasicReadableRandomA
         return res;
     }
     
-    /** Atomic seek+skip. Does <b>not</b> change the file pointer of the stream permanently! */
+    /** {@inheritDoc} */
+    @Override
     public synchronized long skipFrom(final long pos, final long length) throws RuntimeIOException {
 	final long streamLength = length();
 	final long newPos = pos+length;
@@ -67,12 +68,14 @@ public class SynchronizedReadableRandomAccessStream extends BasicReadableRandomA
         return res;
     }
     
-    /** Atomic length() - getFilePointer(). */
+    /** {@inheritDoc} */
+    @Override
     public synchronized long remainingLength() throws RuntimeIOException {
 	return length()-getFilePointer();
     }
     
-    /** @see java.io.RandomAccessFile */
+    /** {@inheritDoc} */
+    @Override
     public synchronized void close() throws RuntimeIOException {
         if(refCount == 0) {
             ras.close();
@@ -82,36 +85,40 @@ public class SynchronizedReadableRandomAccessStream extends BasicReadableRandomA
             throw new RuntimeIOException(refCount + " instances are still using this stream!");
     }
 
-    /** @see java.io.RandomAccessFile */
+    /** {@inheritDoc} */
+    @Override
     public synchronized long getFilePointer() throws RuntimeIOException {
 	return ras.getFilePointer();
     }
 
-    /** @see java.io.RandomAccessFile */
+    /** {@inheritDoc} */
+    @Override
     public synchronized long length() throws RuntimeIOException {
 	return ras.length();
     }
 
-    /** @see java.io.RandomAccessFile */
+    /** {@inheritDoc} */
     @Override
     public synchronized int read() throws RuntimeIOException {
 	return ras.read();
     }
 
-    /** @see java.io.RandomAccessFile */
+    /** {@inheritDoc} */
     @Override
     public synchronized int read(byte[] b) throws RuntimeIOException {
 	return ras.read(b);
     }
 
-    /** @see java.io.RandomAccessFile */
+    /** {@inheritDoc} */
+    @Override
     public synchronized int read(byte[] b, int off, int len) throws RuntimeIOException {
         //System.err.println("SynchronizedReadableRandomAccessStream.read(byte[" + b.length + "], " + off + ", " + len + ");");
 
 	return ras.read(b, off, len);
     }
 
-    /** @see java.io.RandomAccessFile */
+    /** {@inheritDoc} */
+    @Override
     public synchronized void seek(long pos) throws RuntimeIOException {
 	ras.seek(pos);
     }
