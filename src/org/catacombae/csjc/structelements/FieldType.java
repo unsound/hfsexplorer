@@ -17,6 +17,9 @@
 
 package org.catacombae.csjc.structelements;
 
+/**
+ * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
+ */
 public enum FieldType {
 
     BOOLEAN, INTEGER, BYTEARRAY, ASCIISTRING, CUSTOM_CHARSET_STRING, DATE

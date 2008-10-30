@@ -22,7 +22,8 @@ package org.catacombae.hfsexplorer;
  * currently running JRE. Separated from Java6Specific because of class loading
  * issues when invoking its static constructor.
  * 
- * @author Erik Larsson
+ * @see Java6Specific
+ * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
  */
 public class Java6Util {
     /**

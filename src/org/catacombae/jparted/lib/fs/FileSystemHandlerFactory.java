@@ -83,8 +83,8 @@ public abstract class FileSystemHandlerFactory {
      * Returns whether or not this standard attribute is supported by the
      * implementation.
      * 
-     * @param attr
-     * @return
+     * @param attr the standard attribute to query.
+     * @return whether or not <code>attr</code> is supported.
      */
     public boolean isSupported(StandardAttribute attr) {
         for(StandardAttribute sa : getSupportedStandardAttributes()) {
@@ -101,7 +101,7 @@ public abstract class FileSystemHandlerFactory {
      * <b>This method must only be called from within
      * <code>getSupportedStandardAttributes()</code>!</b>
      * 
-     * @param iDefaultValue the new default value for this standard attribute.
+     * @param defaultValue the new default value for this standard attribute.
      */
     protected void setStandardAttributeDefaultValue(StandardAttribute attr,
             Object defaultValue) {
@@ -317,8 +317,8 @@ public abstract class FileSystemHandlerFactory {
          * integer-values are valid (java.lang.Byte, java.lang.Short,
          * java.lang.Integer, java.lang.Long... BigInteger is not supported).
          * 
-         * @param newValue the newValue to check for validity.
-         * @return whether or not the supplied newValue is valid for this type.
+         * @param value the value to check for validity.
+         * @return whether or not the supplied value is valid for this type.
          */
         public boolean isValidValue(Object value) {
             for(Class c : valueSuperClasses)

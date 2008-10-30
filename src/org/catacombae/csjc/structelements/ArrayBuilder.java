@@ -22,6 +22,9 @@ import static org.catacombae.csjc.structelements.IntegerFieldBits.*;
 import static org.catacombae.csjc.structelements.Signedness.*;
 import static org.catacombae.csjc.structelements.Endianness.*;
 
+/**
+ * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
+ */
 public class ArrayBuilder {
 
     private final String typeName;

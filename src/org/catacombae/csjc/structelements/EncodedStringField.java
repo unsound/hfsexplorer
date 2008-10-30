@@ -24,6 +24,9 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 
+/**
+ * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
+ */
 public class EncodedStringField extends StringRepresentableField {
 
     private final byte[] fieldData;

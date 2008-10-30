@@ -17,8 +17,6 @@
 
 package org.catacombae.jparted.lib.fs;
 
-import java.util.LinkedList;
-
 /**
  * A file system entry in our hierarchical file system model. This corresponds
  * to one of the nodes in a file system that denote a file, folder, device,
@@ -59,7 +57,7 @@ public abstract class FSEntry {
      * Returns the attributes of this file system entry. Which attributes are
      * available for a specific file system varies enourmously.
      * 
-     * @return
+     * @return the attributes of this file system entry.
      */
     public abstract FSAttributes getAttributes();
     

@@ -1,7 +1,18 @@
-/*
- * HelpBrowserPanel.java
+/*-
+ * Copyright (C) 2008 Erik Larsson
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * Created on den 17 juni 2008, 11:27
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.catacombae.hfsexplorer.helpbrowser;
@@ -9,7 +20,6 @@ package org.catacombae.hfsexplorer.helpbrowser;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
@@ -41,6 +51,7 @@ public class HelpBrowserPanel extends javax.swing.JPanel {
         initComponents();
         htmlView.setEditable(false);
         htmlView.addHyperlinkListener(new HyperlinkListener() {
+            @Override
             public void hyperlinkUpdate(HyperlinkEvent e) {
                 if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     URL url = e.getURL();
@@ -51,11 +62,13 @@ public class HelpBrowserPanel extends javax.swing.JPanel {
         });
 
         backButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 goBack();
             }
         });
         homeButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 goHome();
             }
@@ -179,14 +192,13 @@ public class HelpBrowserPanel extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
     
-    
+    /*
     public static void main(String[] args) throws MalformedURLException {
         try {
 	    javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
-	    /*
-	     * Description of look&feels:
-	     *   http://java.sun.com/docs/books/tutorial/uiswing/misc/plaf.html
-	     */
+
+            // Description of look&feels:
+	    //   http://java.sun.com/docs/books/tutorial/uiswing/misc/plaf.html
 	}
 	catch(Exception e) {
 	    //It's ok. Non-critical.
@@ -201,4 +213,5 @@ public class HelpBrowserPanel extends javax.swing.JPanel {
         f.setLocationRelativeTo(null);
         f.setVisible(true);
     }
+    */
 }

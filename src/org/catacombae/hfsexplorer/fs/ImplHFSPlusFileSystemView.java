@@ -67,7 +67,7 @@ public class ImplHFSPlusFileSystemView extends BaseHFSFileSystemView {
         public CommonHFSCatalogKey newCatalogKey(
                 CommonHFSCatalogNodeID nodeID, CommonHFSCatalogString searchString, CommonBTHeaderRecord bthr) {
             return CommonHFSCatalogKey.create(new HFSPlusCatalogKey(
-                    new HFSCatalogNodeID(nodeID.toInt()), new HFSUniStr255(searchString.getStructBytes(), 0)));
+                    new HFSCatalogNodeID((int)nodeID.toLong()), new HFSUniStr255(searchString.getStructBytes(), 0)));
         }
         
         @Override
@@ -154,7 +154,7 @@ public class ImplHFSPlusFileSystemView extends BaseHFSFileSystemView {
                 throw new RuntimeException("Invalid fork type");
         }
         HFSPlusExtentKey key = new HFSPlusExtentKey(forkTypeByte,
-                new HFSCatalogNodeID(fileID.toInt()), startBlock);
+                new HFSCatalogNodeID((int)fileID.toLong()), startBlock);
         return CommonHFSExtentKey.create(key);
     }
 

@@ -7,7 +7,13 @@
  *  Erik Larsson, 2006
  */
 
+package org.catacombae.hfsexplorer;
+
 /**
+ * This class implements the FastUnicodeCompare algorithm described in Apple's
+ * <a href="http://developer.apple.com/technotes/tn/tn1150.html#UnicodeSubtleties">Technical Note
+ * TN1150 (HFS Plus Volume Format)</a>. The following description was copied from the TN1150
+ * document:
  * <pre>
  * FastUnicodeCompare - Compare two Unicode strings; produce a relative ordering
  *
@@ -68,10 +74,18 @@
  *         return 1;
  * </pre>
  */
-
-package org.catacombae.hfsexplorer;
-
 public class FastUnicodeCompare {
+    /** Can not be instantiated. */
+    private FastUnicodeCompare() {}
+    
+    /**
+     * Compares two UTF-16 strings using the FastUnicodeCompare algorithm.
+     * 
+     * @param str1 the first string to compare.
+     * @param str2 the second string to compare.
+     * @return 0 if the strings are identical, -1 if <code>str1</code> is considered "less than"
+     * <code>str2</code>, and 1 if <code>str1</code> is considered "greater than" <code>str2</code>.
+     */
     public static int compare(char[] str1, char[] str2) {
 	int length1 = str1.length, length2 = str2.length;
 	int str1ptr = 0, str2ptr = 0;
@@ -113,13 +127,14 @@ public class FastUnicodeCompare {
     }
 
 
-    /** The lower case table consists of a 256-entry high-byte table followed by
-	some number of 256-entry subtables. The high-byte table contains either an
-	offset to the subtable for characters with that high byte or zero, which
-	means that there are no case mappings or ignored characters in that block.
-	Ignored characters are mapped to zero.
-    */
-    protected static int[] gLowerCaseTable = {
+    /**
+     * The lower case table consists of a 256-entry high-byte table followed by
+     * some number of 256-entry subtables. The high-byte table contains either an
+     * offset to the subtable for characters with that high byte or zero, which
+     * means that there are no case mappings or ignored characters in that block.
+     * Ignored characters are mapped to zero.
+     */
+    private static int[] gLowerCaseTable = {
 
 	// High-byte indices ( == 0 iff no case mapping and no ignorables )
 

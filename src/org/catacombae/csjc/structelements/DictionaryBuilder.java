@@ -24,6 +24,9 @@ import static org.catacombae.csjc.structelements.Signedness.*;
 import static org.catacombae.csjc.structelements.Endianness.*;
 import static org.catacombae.csjc.structelements.IntegerFieldRepresentation.*;
 
+/**
+ * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
+ */
 public class DictionaryBuilder {
 
     private final String typeName;

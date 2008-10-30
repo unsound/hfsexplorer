@@ -17,6 +17,9 @@
 
 package org.catacombae.csjc.structelements;
 
+/**
+ * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
+ */
 public abstract class BooleanRepresentableField extends Field {
 
     protected BooleanRepresentableField(String typeName, FieldType type) {

@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2006 Erik Larsson
+ * Copyright (C) 2006-2008 Erik Larsson
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,45 @@
 
 package org.catacombae.hfsexplorer;
 
-import com.apple.eawt.*;
+import com.apple.eawt.Application;
+import com.apple.eawt.ApplicationAdapter;
+import com.apple.eawt.ApplicationEvent;
 
+
+/**
+ * This class implements all the calls in the application that are purely Mac-specific. A static
+ * initialization of this class on other platforms than Mac OS X would probably lead to a
+ * ClassLoader exception.
+ * 
+ * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
+ */
 public class MacSpecific {
+    /**
+     * Interface for a Mac OS X quit handler.
+     */
     public static interface QuitHandler {
+        /**
+         * Returns whether or not this application accepts to be terminated.
+         * @return whether or not this application accepts to be terminated.
+         */
 	public boolean acceptQuit();
     }
-    public static void registerQuitHandler(final QuitHandler qh /*Runnable r*/) {
-	Application thisApplication = Application.getApplication();
-	thisApplication.addApplicationListener(new ApplicationAdapter() {
-		public void handleQuit(ApplicationEvent ae) {
-		    if(qh.acceptQuit())
-			ae.setHandled(true);
-		    else
-			ae.setHandled(false);
-		    //SwingUtilities.invokeLater(r);
-		}
-	    });
+    
+    /**
+     * Registers a QuitHandler with the Mac OS X API:s.
+     * 
+     * @param qh the QuitHandler to register.
+     */
+    public static void registerQuitHandler(final QuitHandler qh) {
+        Application thisApplication = Application.getApplication();
+        thisApplication.addApplicationListener(new ApplicationAdapter() {
+            @Override
+            public void handleQuit(ApplicationEvent ae) {
+                if(qh.acceptQuit())
+                    ae.setHandled(true);
+                else
+                    ae.setHandled(false);
+            }
+        });
     }
 }

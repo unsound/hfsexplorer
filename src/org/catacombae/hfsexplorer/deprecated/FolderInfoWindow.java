@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer;
+package org.catacombae.hfsexplorer.deprecated;
 
 import org.catacombae.hfsexplorer.gui.FolderInfoPanel;
 //import org.catacombae.hfsexplorer.gui.JournalInfoPanel;

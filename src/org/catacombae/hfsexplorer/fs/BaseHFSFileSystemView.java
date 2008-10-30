@@ -232,8 +232,8 @@ public abstract class BaseHFSFileSystemView {
      * Decodes the supplied CommonHFSCatalogString according to the current
      * settings of the view.
      * 
-     * @param str
-     * @return
+     * @param str the CommonHFSCatalogString to decode.
+     * @return a decoded representation of <code>str</code>.
      */
     public abstract String decodeString(CommonHFSCatalogString str);
     
@@ -272,7 +272,7 @@ public abstract class BaseHFSFileSystemView {
                     catOps.newCatalogLeafNode(currentNodeData, 0, nodeSize, init.bthr);
             CommonHFSCatalogLeafRecord[] recs = leaf.getLeafRecords();
             for(CommonHFSCatalogLeafRecord rec : recs) {
-                if(rec.getKey().getParentID().toInt() == parentID.toInt()) {
+                if(rec.getKey().getParentID().toLong() == parentID.toLong()) {
                     if(rec instanceof CommonHFSCatalogFolderRecord)
                         return (CommonHFSCatalogFolderRecord)rec;
                     else
@@ -806,7 +806,7 @@ public abstract class BaseHFSFileSystemView {
 	    CommonBTKey btKey = rec.getKey();
 	    if(btKey instanceof CommonHFSCatalogKey) {
 		CommonHFSCatalogKey key = (CommonHFSCatalogKey)btKey;
-		if(key.getParentID().toInt() == parentID.toInt())
+		if(key.getParentID().toLong() == parentID.toLong())
 		    return rec;
 	    }
 	    else
@@ -841,7 +841,7 @@ public abstract class BaseHFSFileSystemView {
 	CommonHFSCatalogLeafRecord[] records = leafNode.getLeafRecords();
 	for(int i = 0; i < records.length; ++i) {
 	    CommonHFSCatalogLeafRecord curRec = records[i];
-	    if(curRec.getKey().getParentID().toInt() == nodeID.toInt())
+	    if(curRec.getKey().getParentID().toLong() == nodeID.toLong())
 		children.addLast(curRec);
 	}
 	return children.toArray(new CommonHFSCatalogLeafRecord[children.size()]);

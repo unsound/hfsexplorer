@@ -22,7 +22,7 @@ import org.catacombae.hfsexplorer.types.*;
 import java.util.Date;
 import java.util.TimeZone;
 
-/** In the future, this should wrap a 32 bit HFS+ date. */
+/** In the future, this could wrap a 32 bit HFS+ date. */
 public class HFSPlusDate extends HFSDate {
     /** 
      * Pre-calculated. This is the amount of milliseconds between 01-01-1904 00:00:00.0000
@@ -31,21 +31,10 @@ public class HFSPlusDate extends HFSDate {
     //public static final long DIFF_TO_JAVA_DATE_IN_MILLIS = 2082844800000L;
     
     /**
-     * Converts a HFS+ date to a Java Date.
+     * Converts a HFS+ date stored in GMT to a Java Date.
      * 
-     * @deprecated
-     * @param hfsPlusTimestamp
-     * @return
-     */
-    public static Date toDate(int hfsPlusTimestamp) {
-        return gmtTimestampToDate(hfsPlusTimestamp);
-    }
-    
-/**
-     * Converts a HFS+ GMT date stored in GMT to a Java Date.
-     * 
-     * @param hfsPlusTimestamp
-     * @return
+     * @param hfsPlusTimestamp an HFS+ timestamp stored in GMT.
+     * @return a java.util.Date set to the time of the HFS+ GMT timestamp.
      */
     public static Date gmtTimestampToDate(int hfsPlusTimestamp) {
 	Date baseDate = getBaseDate(TimeZone.getTimeZone("GMT"));

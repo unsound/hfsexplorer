@@ -19,6 +19,9 @@ package org.catacombae.csjc.structelements;
 
 import org.catacombae.hfsexplorer.Util;
 
+/**
+ * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
+ */
 public class ByteArrayField extends StringRepresentableField {
 
     private final byte[] fieldData;
