@@ -39,7 +39,7 @@ public abstract class CommonHFSCatalogLeafNode extends CommonBTNode {
     }
     
     public static CommonHFSCatalogLeafNode createHFSX(byte[] data, int offset, int nodeSize, BTHeaderRec bthr) {
-        return new HFSXImplementation(data, offset, nodeSize, bthr);
+        return new HFSXImplementation(data, offset, nodeSize, bthr).getInternal();
     }
     
     public static CommonHFSCatalogLeafNode createHFS(byte[] data, int offset, int nodeSize) {
@@ -61,18 +61,32 @@ public abstract class CommonHFSCatalogLeafNode extends CommonBTNode {
         }
     }
     
-    public static class HFSXImplementation extends CommonHFSCatalogLeafNode {
+    public static class HFSXImplementation {
         private final BTHeaderRec bthr;
+        private final Internal internal;
+        
+        private class Internal extends CommonHFSCatalogLeafNode {
+            public Internal(byte[] data, int offset, int nodeSize) {
+                super(data, offset, nodeSize, FSType.HFS_PLUS);
+                if(bthr == null)
+                    throw new IllegalArgumentException("bthr == null");
+                
+            }
+
+            @Override
+            protected CommonBTRecord createBTRecord(int recordNumber, byte[] data, int offset, int length) {
+                if(bthr == null)
+                    throw new IllegalArgumentException("bthr == null");
+                return CommonHFSCatalogLeafRecord.createHFSX(data, offset, length, bthr);
+            }
+        }
         
         public HFSXImplementation(byte[] data, int offset, int nodeSize, BTHeaderRec bthr) {
-            super(data, offset, nodeSize, FSType.HFS_PLUS);
             this.bthr = bthr;
+            this.internal = new Internal(data, offset, nodeSize);
         }
         
-        @Override
-        protected CommonBTRecord createBTRecord(int recordNumber, byte[] data, int offset, int length) {
-            return CommonHFSCatalogLeafRecord.createHFSX(data, offset, length, bthr);
-        }
+        public Internal getInternal() { return internal; }
     }
     
     public static class HFSImplementation extends CommonHFSCatalogLeafNode {

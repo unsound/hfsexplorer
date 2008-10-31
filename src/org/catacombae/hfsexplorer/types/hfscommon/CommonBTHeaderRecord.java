@@ -114,6 +114,7 @@ public abstract class CommonBTHeaderRecord extends CommonBTRecord implements Pri
             return bthr.getBytes();
         }
 
+        @Override
         public void printFields(PrintStream ps, String prefix) {
             ps.println(prefix + "bthr:");
             bthr.print(ps, prefix + " ");
@@ -122,6 +123,10 @@ public abstract class CommonBTHeaderRecord extends CommonBTRecord implements Pri
         @Override
         public int getSize() {
             return bthr.length();
+        }
+        
+        public BTHeaderRec getInternal() {
+            return bthr;
         }
     }
     

@@ -64,6 +64,11 @@ public class HFSCommonFSFolder extends FSFolder {
     public FSEntry[] list() {
         return fsHandler.listFSEntries(folderRecord);
     }
+    
+    @Override
+    public FSEntry getChild(String name) {
+        return fsHandler.getEntry(folderRecord, name);
+    }
 
     @Override
     public long getValence() {
