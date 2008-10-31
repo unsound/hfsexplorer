@@ -24,6 +24,10 @@ import org.catacombae.hfsexplorer.types.hfscommon.*;
 import java.util.LinkedList;
 import java.io.OutputStream;
 import java.io.IOException;
+import org.catacombae.hfsexplorer.io.ReadableRandomAccessSubstream;
+import org.catacombae.hfsexplorer.io.SynchronizedReadable;
+import org.catacombae.hfsexplorer.io.SynchronizedReadableRandomAccess;
+import org.catacombae.hfsexplorer.io.SynchronizedReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.types.hfsplus.JournalInfoBlock;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTNodeDescriptor.NodeType;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogNodeID.ReservedID;
@@ -52,7 +56,17 @@ public abstract class BaseHFSFileSystemView {
      *             block size.
      */
      
-    public static long fileReadOffset = 0;
+    /**
+     * Debug variable which is mainly used to 
+     */
+    public static volatile long fileReadOffset = 0;
+    
+    /**
+     * Releases all resources associated with this view.
+     */
+    public void close() {
+        
+    }
 
     /** Internal class. */
     private abstract class InitProcedure {
@@ -93,13 +107,13 @@ public abstract class BaseHFSFileSystemView {
 
         @Override
         protected ReadableRandomAccessStream getForkFilterFile(CommonHFSVolumeHeader header) {
-            if(catalogCache != null)
-                return catalogCache;
+            //if(catalogCache != null)
+            //    return catalogCache;
             CommonHFSExtentDescriptor[] allCatalogFileDescriptors =
                     getAllDataExtentDescriptors(getCommonHFSCatalogNodeID(ReservedID.CATALOG_FILE),
                     header.getCatalogFile());
             return new ForkFilter(header.getCatalogFile(), allCatalogFileDescriptors,
-                    hfsFile, fsOffset, header.getAllocationBlockSize(),
+                    new ReadableRandomAccessSubstream(hfsFile), fsOffset, header.getAllocationBlockSize(),
                     header.getAllocationBlockStart()*physicalBlockSize);
         }
     }
@@ -116,7 +130,7 @@ public abstract class BaseHFSFileSystemView {
         protected ReadableRandomAccessStream getForkFilterFile(CommonHFSVolumeHeader header) {
             return new ForkFilter(header.getExtentsOverflowFile(),
                     header.getExtentsOverflowFile().getBasicExtents(),
-                    hfsFile, fsOffset, header.getAllocationBlockSize(),
+                    new ReadableRandomAccessSubstream(hfsFile), fsOffset, header.getAllocationBlockSize(),
                     header.getAllocationBlockStart()*physicalBlockSize);
         }
     }
@@ -135,18 +149,21 @@ public abstract class BaseHFSFileSystemView {
                 int offset, CommonBTHeaderRecord bthr);
     }
     
-    protected ReadableRandomAccessStream hfsFile;
-    private final ReadableRandomAccessStream backingFile;
+    protected volatile SynchronizedReadableRandomAccess hfsFile;
+    private volatile SynchronizedReadableRandomAccessStream hfsStream;
+    //private final SynchronizedReadableRandomAccessStream backingFile;
+    private final ReadableRandomAccessStream sourceStream;
     protected final long fsOffset;
     protected final CatalogOperations catOps;
     protected final int physicalBlockSize;
     
     // Variables for reading cached files.
-    private ReadableBlockCachingStream catalogCache = null;
+    //private ReadableBlockCachingStream catalogCache = null;
     
     protected BaseHFSFileSystemView(ReadableRandomAccessStream hfsFile, long fsOffset, CatalogOperations ops, boolean cachingEnabled) {
-        this.hfsFile = hfsFile;
-        this.backingFile = hfsFile;
+        this.sourceStream = hfsFile;
+        this.hfsStream = new SynchronizedReadableRandomAccessStream(sourceStream);
+        this.hfsFile = hfsStream;
         this.fsOffset = fsOffset;
         this.catOps = ops;
         this.physicalBlockSize = 512; // This seems to be a built in assumption of HFSish file systems.
@@ -154,44 +171,57 @@ public abstract class BaseHFSFileSystemView {
         if(cachingEnabled)
             enableFileSystemCaching();
     }
-
+    
+    /*
     public boolean isFileSystemCachingEnabled() {
-        return hfsFile != backingFile && backingFile instanceof ReadableBlockCachingStream;
+        ReadableRandomAccessStream currentSourceStream = hfsStream.getSourceStream();
+        return currentSourceStream != this.sourceStream &&
+                currentSourceStream instanceof ReadableBlockCachingStream;
     }
+    */
 
     public void enableFileSystemCaching() {
         enableFileSystemCaching(256 * 1024, 64); // 64 pages of 256 KiB each is the default setting
     }
 
     public void enableFileSystemCaching(int blockSize, int blocksInCache) {
-        hfsFile = new ReadableBlockCachingStream(backingFile, blockSize, blocksInCache);
+        hfsStream = new SynchronizedReadableRandomAccessStream(
+                new ReadableBlockCachingStream(sourceStream, blockSize, blocksInCache));
+        hfsFile = hfsStream;
     }
 
     public void disableFileSystemCaching() {
-        hfsFile = backingFile;
+        hfsStream = new SynchronizedReadableRandomAccessStream(sourceStream);
+        hfsFile = hfsStream;
     }
 
     /** Switches to cached mode for reading the catalog file. */
+    /*
     public void retainCatalogFile() {
         CatalogInitProcedure init = new CatalogInitProcedure();
         ReadableRandomAccessStream ff = init.forkFilterFile;
         catalogCache = new ReadableBlockCachingStream(ff, 512 * 1024, 32); // 512 KiB blocks, 32 of them
         catalogCache.preloadBlocks();
     }
+    */
 
     /** Disables cached mode for reading the catalog file. */
+    /*
     public void releaseCatalogFile() {
         catalogCache = null;
     }
+    */
 
     /**
      * Returns the underlying stream, serving the view with HFS+ file system
      * data.
      * @return the underlying stream.
      */
+    /*
     public ReadableRandomAccessStream getStream() {
         return hfsFile;
     }
+     * */
     
     public abstract CommonHFSVolumeHeader getVolumeHeader();
     protected abstract CommonBTHeaderNode createCommonBTHeaderNode(byte[] currentNodeData,
@@ -236,7 +266,16 @@ public abstract class BaseHFSFileSystemView {
      * @return a decoded representation of <code>str</code>.
      */
     public abstract String decodeString(CommonHFSCatalogString str);
-    
+
+   /**
+     * Encodes the supplied CommonHFSCatalogString according to the current
+     * settings of the view.
+     * 
+     * @param str the CommonHFSCatalogString to encode.
+     * @return an encoded representation of <code>str</code>.
+     */
+    public abstract CommonHFSCatalogString encodeString(String str);
+
     public CommonHFSCatalogFolderRecord getRoot() {
         CatalogInitProcedure init = new CatalogInitProcedure();
 
@@ -400,7 +439,17 @@ public abstract class BaseHFSFileSystemView {
 	}
 	return pathList;
     }
-	
+
+    /**
+     * Gets a record from the catalog file's B* tree with the specified parent ID and node name.
+     * If none is found, the method returns <code>null</code>.<br>
+     * If <code>n</code> is the number of elements in the tree, this method should execute in
+     * roughly O(log n) time.
+     * 
+     * @param parentID the parent ID of the requested record.
+     * @param nodeName the node name of the requested record.
+     * @return the requested record, if any, or <code>null</code> if no such record was found.
+     */
     public CommonHFSCatalogLeafRecord getRecord(CommonHFSCatalogNodeID parentID, CommonHFSCatalogString nodeName) {
 	CatalogInitProcedure init = new CatalogInitProcedure();
 	
@@ -460,7 +509,7 @@ public abstract class BaseHFSFileSystemView {
 	CatalogInitProcedure init = new CatalogInitProcedure();
 	final ReadableRandomAccessStream catalogFile = init.forkFilterFile;
 	return collectFilesInDir(folderID, init.bthr.getRootNodeNumber(),
-            hfsFile, fsOffset, init.header, init.bthr, catalogFile);
+            new ReadableRandomAccessSubstream(hfsFile), fsOffset, init.header, init.bthr, catalogFile);
     }
 
     public long extractDataForkToStream(CommonHFSCatalogLeafRecord fileRecord, OutputStream os) throws IOException {
@@ -499,9 +548,10 @@ public abstract class BaseHFSFileSystemView {
             CommonHFSExtentDescriptor[] extentDescriptors, OutputStream os,
             ProgressMonitor pm) throws IOException {
     CommonHFSVolumeHeader header = getVolumeHeader();
-	ForkFilter forkFilter = new ForkFilter(forkData, extentDescriptors, hfsFile, fsOffset,
-					       header.getAllocationBlockSize(),
-                           header.getAllocationBlockStart()*physicalBlockSize);
+	ForkFilter forkFilter = new ForkFilter(forkData, extentDescriptors,
+                new ReadableRandomAccessSubstream(hfsFile), fsOffset,
+                header.getAllocationBlockSize(),
+                header.getAllocationBlockStart()*physicalBlockSize);
 	long bytesToRead = forkData.getLogicalSize();
 	byte[] buffer = new byte[4096];
 	while(bytesToRead > 0) {
@@ -559,7 +609,8 @@ public abstract class BaseHFSFileSystemView {
     private ReadableRandomAccessStream getReadableForkStream(CommonHFSForkData forkData,
             CommonHFSExtentDescriptor[] extentDescriptors) {
         CommonHFSVolumeHeader header = getVolumeHeader();
-        return new ForkFilter(forkData, extentDescriptors, hfsFile, fsOffset+fileReadOffset,
+        return new ForkFilter(forkData, extentDescriptors, new ReadableRandomAccessSubstream(hfsFile),
+                fsOffset + fileReadOffset,
                 header.getAllocationBlockSize(),
                 header.getAllocationBlockStart() * physicalBlockSize);
     }

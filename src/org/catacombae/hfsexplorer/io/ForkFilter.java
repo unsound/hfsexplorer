@@ -54,13 +54,35 @@ public class ForkFilter implements ReadableRandomAccessStream {
     private long lastLogicalPos; // The position in the fork where we stopped reading last time
     private long lastPhysicalPos; // The position in the fork where we stopped reading last time
     
+    /**
+     * Creates a new ForkFilter. This class assumes that it has exclusive access to
+     * <code>sourceFile</code>.
+     * 
+     * @param forkData
+     * @param extentDescriptors
+     * @param sourceFile
+     * @param fsOffset
+     * @param allocationBlockSize
+     * @param firstBlockByteOffset
+     */
     public ForkFilter(CommonHFSForkData forkData, CommonHFSExtentDescriptor[] extentDescriptors,
-            ReadableRandomAccessStream sourceFile, long fsOffset, long blockSize,
+            ReadableRandomAccessStream sourceFile, long fsOffset, long allocationBlockSize,
             long firstBlockByteOffset) {
         this(forkData.getLogicalSize(), extentDescriptors, sourceFile, fsOffset,
-                blockSize, firstBlockByteOffset);
+                allocationBlockSize, firstBlockByteOffset);
     }
+    
+    /**
+     * Creates a new ForkFilter. This class assumes that it has exclusive access to
+     * <code>sourceFile</code>.
 
+     * @param forkLength
+     * @param extentDescriptors
+     * @param sourceFile
+     * @param fsOffset
+     * @param allocationBlockSize
+     * @param firstBlockByteOffset
+     */
     public ForkFilter(long forkLength, CommonHFSExtentDescriptor[] extentDescriptors,
             ReadableRandomAccessStream sourceFile, long fsOffset, long allocationBlockSize,
             long firstBlockByteOffset) {

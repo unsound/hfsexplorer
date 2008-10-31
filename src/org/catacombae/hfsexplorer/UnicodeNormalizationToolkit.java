@@ -17,8 +17,15 @@
 
 package org.catacombae.hfsexplorer;
 
-import java.util.*;
-import java.io.*;
+//import java.io.FileOutputStream;
+//import java.io.IOException;
+//import java.io.PrintStream;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.Map;
+//import java.util.TreeMap;
 
 /**
  * A class implementing a table for handling the decomposition of characters that's necessary when
@@ -127,7 +134,8 @@ public class UnicodeNormalizationToolkit {
 	    this.replacementSequence = seq;
 	}
 	public char[] getReplacementSequence() { return replacementSequence; }
-
+        
+        @Override
 	public String toString() {
 	    return "{" + id + "} 0x" + Util.toHexStringBE(trig) +
 		(replacementSequence == null?"":(" -> 0x" + Util.toHexStringBE(replacementSequence)));
@@ -258,6 +266,7 @@ public class UnicodeNormalizationToolkit {
      * Use org.catacombae.hfsexplorer.testcode.LineCompare to compare the generated text
      * file to decomposition_ref.txt (ignores empty lines and different line endings).
      */
+    /*
     public static void main(String[] args) throws IOException {
 	// Useage of TreeMap is essential to produce a sorted output.
 	UnicodeNormalizationToolkit ud = new UnicodeNormalizationToolkit(new TreeMap<Character, char[]>());
@@ -272,6 +281,7 @@ public class UnicodeNormalizationToolkit {
 	    out.println();
 	}
     }
+    */
 
     private static TrieNode buildCompositionTrie(Map<Character, char[]> decompositionTable) {
 	final TrieNode rootNode = new TrieNode('\0');

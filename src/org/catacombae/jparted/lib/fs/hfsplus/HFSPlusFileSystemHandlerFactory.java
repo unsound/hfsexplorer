@@ -39,6 +39,7 @@ public class HFSPlusFileSystemHandlerFactory extends FileSystemHandlerFactory {
                     "left in their original decomposed form.", true);
     
     
+    @Override
     public FileSystemHandler createHandler(DataLocator data) {
         boolean useCaching =
                 createAttributes.getBooleanAttribute(StandardAttribute.CACHING_ENABLED);
@@ -53,10 +54,12 @@ public class HFSPlusFileSystemHandlerFactory extends FileSystemHandlerFactory {
         return new HFSPlusFileSystemHandler(data, useCaching, composeFilename);
     }
     
+    @Override
     public FileSystemHandlerInfo getHandlerInfo() {
         return handlerInfo;
     }
 
+    @Override
     public StandardAttribute[] getSupportedStandardAttributes() {
         // Set default values for standard attributes
         setStandardAttributeDefaultValue(StandardAttribute.CACHING_ENABLED, true);
@@ -64,6 +67,7 @@ public class HFSPlusFileSystemHandlerFactory extends FileSystemHandlerFactory {
         return new StandardAttribute[] { StandardAttribute.CACHING_ENABLED };
     }
 
+    @Override
     public CustomAttribute[] getSupportedCustomAttributes() {
         return new CustomAttribute[] {
             compositionEnabledAttribute

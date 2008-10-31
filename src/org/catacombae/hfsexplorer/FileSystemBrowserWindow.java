@@ -19,7 +19,6 @@ package org.catacombae.hfsexplorer;
 
 import org.catacombae.hfsexplorer.FileSystemBrowser.Record;
 import org.catacombae.hfsexplorer.FileSystemBrowser.RecordType;
-import org.catacombae.hfsexplorer.fs.BaseHFSFileSystemView;
 import org.catacombae.hfsexplorer.fs.NullProgressMonitor;
 import org.catacombae.hfsexplorer.fs.ProgressMonitor;
 import org.catacombae.hfsexplorer.gui.FileOperationsPanel;

@@ -17,25 +17,53 @@
 
 package org.catacombae.hfsexplorer.fs;
 
-import org.catacombae.hfsexplorer.types.hfscommon.StringDecoder;
-
 /**
- *
- * @author Erik Larsson
+ * An implementation of StringCodec that wraps another StringCodec. Which codec is being wrapped can
+ * be changed over time. This allows you to maintain one StringCodec instance across your app, while
+ * still enabling you to alter the method used for coding.
+ * 
+ * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
  */
-public class MutableStringDecoder <A extends StringDecoder>  implements StringDecoder {
+public class MutableStringCodec <A extends StringCodec> implements StringCodec {
     private A underlying;
     
-    public MutableStringDecoder(A initialDecoder) {
+    public MutableStringCodec(A initialDecoder) {
         if(initialDecoder == null)
             throw new IllegalArgumentException("Can not construct a MutableStringDecoder with a " +
                     "null initial decoder.");
         this.underlying = initialDecoder;
     }
     
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String decode(byte[] data) {
+        return underlying.decode(data);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String decode(byte[] data, int off, int len) {
         return underlying.decode(data, off, len);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public byte[] encode(String str) {
+        return underlying.encode(str);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public byte[] encode(String str, int off, int len) {
+        return underlying.encode(str, off, len);
     }
     
     public void setDecoder(A newDecoder) {

@@ -49,7 +49,9 @@ public class SimpleDictionaryParser {
     
     public String getValue(String key) { return dictionaryTable.get(key); }
     
+    /*
     public static void main(String[] args) {
 	new SimpleDictionaryParser(System.in);
     }
+    */
 }

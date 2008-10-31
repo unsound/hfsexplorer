@@ -18,24 +18,26 @@
 package org.catacombae.hfsexplorer.fs;
 
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
-import org.catacombae.hfsexplorer.types.hfscommon.StringDecoder;
 
 /**
- * StringDecoder that uses a CharsetDecoder internally.
+ * StringCodec that uses a CharsetDecoder internally.
  * 
  * @author Erik Larsson
  */
-public class CharsetStringDecoder implements StringDecoder {
-    private final CharsetDecoder decoder;
+public class CharsetStringCodec implements StringCodec {
     private final String charsetName;
+    private final CharsetDecoder decoder;
+    private final CharsetEncoder encoder;
     
     /**
-     * Creates a new CharsetStringDecoder.
+     * Creates a new CharsetStringCodec.
      * 
      * @param charsetName the name of the charset, for instance "ISO-8859-1", "UTF-16BE", "KOI8-R"
      * @throws java.nio.charset.IllegalCharsetNameException if the charset name doesn't match any
@@ -43,10 +45,19 @@ public class CharsetStringDecoder implements StringDecoder {
      * @throws java.nio.charset.UnsupportedCharsetException if the requested charset is unsupported
      * by the Java libraries.
      */
-    public CharsetStringDecoder(String charsetName) throws IllegalCharsetNameException, UnsupportedCharsetException {
+    public CharsetStringCodec(String charsetName) throws IllegalCharsetNameException, UnsupportedCharsetException {
         this.charsetName = charsetName;
         Charset cs = Charset.forName(charsetName);
         this.decoder = cs.newDecoder();
+        this.encoder = cs.newEncoder();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String decode(byte[] data) {
+        return decode(data, 0, data.length);
     }
     
     /**
@@ -58,6 +69,26 @@ public class CharsetStringDecoder implements StringDecoder {
             return decoder.decode(ByteBuffer.wrap(data, off, len)).toString();
         } catch(CharacterCodingException e) {
             throw new RuntimeException("Could not decode data!", e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public byte[] encode(String str) {
+        return encode(str, 0, str.length());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public byte[] encode(String str, int off, int len) {
+        try {
+            return encoder.encode(CharBuffer.wrap(str.toCharArray(), off, len)).array();
+        } catch(CharacterCodingException e) {
+            throw new RuntimeException("Could not encode data!", e);
         }
     }
     

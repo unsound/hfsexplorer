@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2006-2007 Erik Larsson
+ * Copyright (C) 2006-2008 Erik Larsson
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +16,14 @@
  */
 
 package org.catacombae.hfsexplorer;
-import org.catacombae.io.ReadableFileStream;
+import org.catacombae.hfsexplorer.partitioning.ApplePartitionMap;
+import org.catacombae.hfsexplorer.partitioning.DriverDescriptorRecord;
+import org.catacombae.hfsexplorer.partitioning.GPTHeader;
+import org.catacombae.hfsexplorer.partitioning.GUIDPartitionTable;
+import org.catacombae.hfsexplorer.partitioning.MBRPartitionTable;
+import org.catacombae.hfsexplorer.partitioning.PartitionSystem;
+//import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.hfsexplorer.partitioning.*;
 
 /**
  * This class will contain code to identify which partitioning scheme is used, and methods
@@ -66,7 +71,7 @@ public class PartitionSystemRecognizer {
 		    DriverDescriptorRecord ddr = new DriverDescriptorRecord(piece1, 0);
 		    if(ddr.isValid()) {
 			int blockSize = Util.unsign(ddr.getSbBlkSize());
-			long numberOfBlocksOnDevice = Util.unsign(ddr.getSbBlkCount());
+			//long numberOfBlocksOnDevice = Util.unsign(ddr.getSbBlkCount());
 			//bitStream.seek(blockSize*1); // second block, first partition in list
 			ApplePartitionMap apm = new ApplePartitionMap(bitstream, blockSize*1, blockSize);
 			if(apm.getUsedPartitionCount() > 0)
@@ -127,8 +132,10 @@ public class PartitionSystemRecognizer {
 	}
     }
     
+    /*
     public static void main(String[] args) throws Exception {
 	ReadableRandomAccessStream llf = new ReadableFileStream(args[0]);
 	new PartitionSystemRecognizer(llf).getPartitionSystem().print(System.out, "");
     }
+    */
 }

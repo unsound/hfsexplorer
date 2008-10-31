@@ -60,7 +60,7 @@ import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafNode;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.hfsexplorer.fs.BaseHFSFileSystemView;
 import org.catacombae.hfsexplorer.io.JTextAreaOutputStream;
-import org.catacombae.hfsexplorer.types.hfscommon.StringDecoder;
+import org.catacombae.hfsexplorer.fs.StringCodec;
 
 /**
  *

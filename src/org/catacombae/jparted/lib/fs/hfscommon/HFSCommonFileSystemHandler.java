@@ -28,7 +28,6 @@ import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFileThreadReco
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolderThread;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogNodeID;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogString;
 import org.catacombae.hfsexplorer.fs.BaseHFSFileSystemView;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.jparted.lib.fs.FSFolder;
@@ -36,7 +35,6 @@ import org.catacombae.jparted.lib.fs.FSForkType;
 import org.catacombae.jparted.lib.fs.FSLink;
 import org.catacombae.jparted.lib.fs.FileSystemHandler;
 import org.catacombae.jparted.lib.fs.FSEntry;
-import org.catacombae.jparted.lib.fs.FSFile;
 
 /**
  * HFS+ implementation of a FileSystemHandler. This implementation can be used
@@ -47,7 +45,7 @@ import org.catacombae.jparted.lib.fs.FSFile;
 public class HFSCommonFileSystemHandler extends FileSystemHandler {
     private static final String FILE_HARD_LINK_DIR = "\u0000\u0000\u0000\u0000HFS+ Private Data";
     private static final String FILE_HARD_LINK_PREFIX = "iNode";
-    public static final String DIRECTORY_HARD_LINK_DIR = ".HFS+ Private Directory Data" + (char)0x0d;
+    private static final String DIRECTORY_HARD_LINK_DIR = ".HFS+ Private Directory Data" + (char)0x0d;
     private static final String DIRECTORY_HARD_LINK_PREFIX = "dir_";
     private BaseHFSFileSystemView view;
     private boolean doUnicodeFileNameComposition;
@@ -198,15 +196,17 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
                 return null; // We encountered a pathname component which wasn't a folder.
             }
 
-            CommonHFSCatalogLeafRecord[] subRecords = view.listRecords(currentRootFolder);
+            //CommonHFSCatalogLeafRecord[] subRecords = view.listRecords(currentRootFolder);
+            CommonHFSCatalogLeafRecord newRoot =
+                    view.getRecord(currentRootFolder.getData().getFolderID(), view.encodeString(curPathComponent));
 
-            CommonHFSCatalogLeafRecord newRoot = null;
+            /*CommonHFSCatalogLeafRecord newRoot = null;
             for(final CommonHFSCatalogLeafRecord subRecord : subRecords) {
                 if(getProperNodeName(subRecord).equals(curPathComponent)) {
                     newRoot = subRecord;
                     break;
                 }
-            }
+            }*/
 
             if(newRoot != null)
                 currentRoot = newRoot;
@@ -416,7 +416,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
 
     @Override
     public void close() {
-        view.getStream().close();
+        view.close();
     }
 
     @Override

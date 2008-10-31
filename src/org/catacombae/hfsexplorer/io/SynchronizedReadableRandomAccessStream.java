@@ -25,16 +25,24 @@ import org.catacombae.io.RuntimeIOException;
  * This class adds concurrency safety to a random access stream. It includes a seek+read
  * atomic operation. All operations on this object is synchronized on its own monitor.
  */
-public class SynchronizedReadableRandomAccessStream extends BasicReadableRandomAccessStream implements SynchronizedReadable {
+public class SynchronizedReadableRandomAccessStream extends BasicSynchronizedReadableRandomAccessStream implements SynchronizedReadableRandomAccess {
     /** The underlying stream. */
     private ReadableRandomAccessStream ras;
     private long refCount;
     private boolean closed = false;
     
-    public SynchronizedReadableRandomAccessStream(ReadableRandomAccessStream ras) {
-	this.ras = ras;
+    public SynchronizedReadableRandomAccessStream(ReadableRandomAccessStream sourceStream) {
+	this.ras = sourceStream;
     }
-     
+    
+    /**
+     * Returns the backing stream for this SynchronizedReadableRandomAccessStream.
+     * @return the backing stream for this SynchronizedReadableRandomAccessStream.
+     */
+    public ReadableRandomAccessStream getSourceStream() {
+        return ras;
+    }
+    
     /** {@inheritDoc} */
     @Override
     public synchronized int readFrom(final long pos, byte[] b, int off, int len) throws RuntimeIOException {
@@ -123,6 +131,8 @@ public class SynchronizedReadableRandomAccessStream extends BasicReadableRandomA
 	ras.seek(pos);
     }
     
+    /** {@inheritDoc} */
+    @Override
     public synchronized void addReference(Object referrer) {
         if(!closed)
             ++refCount;
@@ -130,6 +140,8 @@ public class SynchronizedReadableRandomAccessStream extends BasicReadableRandomA
             throw new RuntimeIOException("Stream is closed!");
     }
     
+    /** {@inheritDoc} */
+    @Override
     public synchronized void removeReference(Object referrer) {
         --refCount;
     }
