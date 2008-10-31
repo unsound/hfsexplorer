@@ -18,6 +18,7 @@
 package org.catacombae.hfsexplorer.fs;
 
 import java.util.LinkedList;
+import org.catacombae.hfsexplorer.ObjectContainer;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentDescriptor;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.io.ReadableRandomAccessStream;
@@ -81,9 +82,11 @@ public abstract class BaseHFSAllocationFileView {
      *
      * @return the number of free blocks in the allocation file.
      */
+    /*
     public synchronized long countFreeBlocks() {
         return countBlocks(false);
     }
+    */
     
     /**
      * Loops through the entire allocation file and counts the number of blocks
@@ -91,24 +94,28 @@ public abstract class BaseHFSAllocationFileView {
      *
      * @return the number of allocated blocks in the allocation file.
      */
+    /*
     public synchronized long countAllocatedBlocks() {
         return countBlocks(true);
     }
+    */
 
     /**
-     * Generic block counting algorithm.
+     * Loops through the entire allocation file to count the number of used and free blocks on the
+     * volume. The output is placed in two ObjectContainers
      *
-     * @param usedBlocks whether the algorithm should count used blocks (true)
-     * or unused blocks (false).
-     * @return the number of matching blocks.
+     * @param oFreeBlocks (optional) variable where the algorithm stores the free block count.
+     * @param oUsedBlocks (optional) variable where the algorithm stores the used block count.
+     * @return the total number of allocation blocks on the volume.
      */
-    protected synchronized long countBlocks(boolean usedBlocks) {
+    public synchronized long countBlocks(ObjectContainer<Long> oFreeBlocks, ObjectContainer<Long> oUsedBlocks) {
         CommonHFSVolumeHeader vh = parentView.getVolumeHeader();
-        byte[] currentBlock = new byte[parentView.physicalBlockSize];
+        byte[] currentBlock = new byte[128*1024];
         final long totalBlocks = vh.getTotalBlocks();
         long blockCount = 0;
-        long matchingBlockCount = 0;
-        int blockValue = (usedBlocks?0x1:0x0);
+        //long allocatedBlockCount = 0;
+        long usedBlockCount = 0;
+        //int blockValue = (usedBlocks?0x1:0x0);
 
         System.err.println("countBlocks(): totalBlocks=" + totalBlocks);
         System.err.println("countBlocks(): allocationFileStream.length()=" + allocationFileStream.length());
@@ -118,7 +125,7 @@ public abstract class BaseHFSAllocationFileView {
             System.err.println("countBlocks():   allocationFileStream.getFilePointer()=" + allocationFileStream.getFilePointer());
             //System.err.println("countBlocks():   =" + );
 
-            System.out.println("countBlocks():   Reading a physical block (" + currentBlock.length + " bytes)...");
+            System.out.println("countBlocks():   Reading a blob (" + currentBlock.length + " bytes)...");
             int bytesRead = allocationFileStream.read(currentBlock);
             System.out.println("countBlocks():   ..." + bytesRead + " bytes read.");
 
@@ -126,34 +133,38 @@ public abstract class BaseHFSAllocationFileView {
                 for(int i = 0; i < bytesRead && blockCount < totalBlocks; ++i) {
                     byte currentByte = currentBlock[i];
                     for(int j = 0; j < 8 && blockCount < totalBlocks; ++j) {
-                        if(((currentByte >> (7 - j)) & 0x1) == blockValue)
-                            ++matchingBlockCount;
-
                         ++blockCount;
+                        if(((currentByte >> (7 - j)) & 0x1) == 0x1)
+                            ++usedBlockCount;
                     }
                 }
             }
             else
                 throw new RuntimeException("Could not read all blocks from allocation file!");
         }
-
+        
         if(blockCount != totalBlocks)
             throw new RuntimeException("[INTERNAL ERROR] blockCount(" + blockCount +
                     ") != totalBlocks(" + totalBlocks + ")");
-
-        return matchingBlockCount;
+        
+        if(oFreeBlocks != null)
+            oFreeBlocks.o = blockCount-usedBlockCount;
+        if(oUsedBlocks != null)
+            oUsedBlocks.o = usedBlockCount;
+        
+        return totalBlocks;
     }
 
     /**
      * Creates an implementation specific extent descriptor from the given data.
      *
      * @param startBlock the first block number of the extent.
-     * @param blockCount the number of blocks that the extent ranges over.
+     * @param allocatedBlockCount the number of blocks that the extent ranges over.
      * @return an implementation specific representation of an extent descriptor
-     * created from the <code>startBlock</code> and <code>blockCount</code>
+     * created from the <code>startBlock</code> and <code>allocatedBlockCount</code>
      * parameters.
      * @throws java.lang.IllegalArgumentException if any of the values of <code>
-     * startBlock</code> or <code>blockCount</code> are out of range for the
+     * startBlock</code> or <code>allocatedBlockCount</code> are out of range for the
      * implementation (16-bit signed integer value for HFS, 32-bit signed
      * integer value for HFS+).
      */

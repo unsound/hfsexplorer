@@ -330,7 +330,7 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel {
             return;
         }
 
-        for(FSEntry entry : folder.list()) {
+        for(FSEntry entry : folder.listEntries()) {
             if(cancelSignaled) {
                 System.err.println("Calculate process stopping for folder \"" + folder.getName() + "\", entry \"" + entry.getName() + "\"");
                 return;

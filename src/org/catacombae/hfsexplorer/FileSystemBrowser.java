@@ -1474,16 +1474,16 @@ public class FileSystemBrowser<A> {
         
         private int getPriority() {
             switch(recordType) {
-                case FILE:
-                    return 1;
                 case FOLDER:
                     return 0;
-                case FILE_LINK:
-                    return 1;
                 case FOLDER_LINK:
-                    return 0;
-                case BROKEN_LINK:
+                    return 1;
+                case FILE:
                     return 2;
+                case FILE_LINK:
+                    return 3;
+                case BROKEN_LINK:
+                    return 4;
                 default:
                     throw new RuntimeException("INTERNAL ERROR: Encountered " +
                         "unexpected record type (" + recordType + ")");

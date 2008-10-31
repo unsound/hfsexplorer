@@ -59,9 +59,14 @@ public class HFSCommonFSFolder extends FSFolder {
         this.catalogFolder = folderRecord.getData();
         this.attributes = new HFSCommonFSAttributes(this, catalogFolder);
     }
-
+    
     @Override
-    public FSEntry[] list() {
+    public String[] list() {
+        return fsHandler.listNames(folderRecord);
+    }
+    
+    @Override
+    public FSEntry[] listEntries() {
         return fsHandler.listFSEntries(folderRecord);
     }
     

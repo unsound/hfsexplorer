@@ -747,6 +747,12 @@ public class Util {
         System.arraycopy(b, 0, c, a.length, b.length);
         return c;
     }
+    
+    public static <T> T[] concatenate(T[] a, T[] b, T[] target) {
+        System.arraycopy(a, 0, target, 0, a.length);
+        System.arraycopy(b, 0, target, a.length, b.length);
+        return target;
+    }
 
     // From IRCForME
     public static byte[] encodeString(String string, String encoding) {

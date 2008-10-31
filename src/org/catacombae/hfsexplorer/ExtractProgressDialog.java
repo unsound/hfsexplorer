@@ -28,7 +28,7 @@ public class ExtractProgressDialog extends JDialog implements ProgressMonitor {
     private ExtractProgressPanel progressPanel;
     private JButton cancelButton;
 //     private ActionListener cancelListener = null;
-    private boolean cancelSignaled = false;
+    private volatile boolean cancelSignaled = false;
     private long completedSize = 0;
     private long totalSize = -1;
     private DecimalFormat sizeFormatter = new DecimalFormat("0.00");
@@ -42,7 +42,8 @@ public class ExtractProgressDialog extends JDialog implements ProgressMonitor {
 	progressPanel = new ExtractProgressPanel();
 	cancelButton = progressPanel.cancelButton;
 	cancelButton.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent ae) {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
 		    signalCancel();
 		}
 	    });
@@ -60,25 +61,34 @@ public class ExtractProgressDialog extends JDialog implements ProgressMonitor {
 	setLocationRelativeTo(null);
 	setResizable(false);
     }
-    
+        
+    @Override
     public void updateTotalProgress(double fraction, String message) {
 	progressPanel.updateTotalProgress(fraction, message);
     }
-    
+        
+    @Override
     public void updateCurrentDir(String dirname) {
 	progressPanel.updateCurrentDir(dirname);
     }
+    
+    @Override
     public void updateCurrentFile(String filename, long fileSize) {
 	progressPanel.updateCurrentFile(filename, fileSize);
     }
-    
+        
+    @Override
     public synchronized void signalCancel() {
 	cancelButton.setEnabled(false);
 	cancelSignaled = true;	
     }
+    
+    @Override
     public boolean cancelSignaled() {
 	return cancelSignaled;
     }
+    
+    @Override
     public void confirmCancel() {
 	if(isVisible())
 	    dispose();
@@ -92,10 +102,14 @@ public class ExtractProgressDialog extends JDialog implements ProgressMonitor {
 // 	cancelListener = al;
 // 	cancelButton.addActionListener(al);
 //     }
-    
+        
+    @Override
     public void setDataSize(long totalSize) {
 	this.totalSize = totalSize;
+        addDataProgress(0);
     }
+    
+    @Override
     public void addDataProgress(long dataSize) {
 	completedSize += dataSize;
 	String message = SpeedUnitUtils.bytesToBinaryUnit(completedSize, sizeFormatter) + "/" +
