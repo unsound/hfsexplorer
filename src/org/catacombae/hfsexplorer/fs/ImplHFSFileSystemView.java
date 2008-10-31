@@ -18,7 +18,8 @@
 package org.catacombae.hfsexplorer.fs;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.types.hfscommon.StringDecoder;
+import org.catacombae.hfsexplorer.io.ReadableRandomAccessSubstream;
+import org.catacombae.hfsexplorer.fs.StringCodec;
 import org.catacombae.hfsexplorer.types.hfsplus.JournalInfoBlock;
 import org.catacombae.hfsexplorer.types.hfs.BTHdrRec;
 import org.catacombae.hfsexplorer.types.hfs.CatKeyRec;
@@ -80,7 +81,7 @@ public class ImplHFSFileSystemView extends BaseHFSFileSystemView {
         }
     };
 
-    private final MutableStringDecoder<CharsetStringDecoder> stringDecoder;
+    private final MutableStringCodec<CharsetStringCodec> stringCodec;
 
     public ImplHFSFileSystemView(ReadableRandomAccessStream hfsFile, long fsOffset, boolean cachingEnabled, String encodingName) {
         this(hfsFile, fileReadOffset, HFS_OPERATIONS, cachingEnabled, encodingName);
@@ -89,14 +90,13 @@ public class ImplHFSFileSystemView extends BaseHFSFileSystemView {
     protected ImplHFSFileSystemView(ReadableRandomAccessStream hfsFile, long fsOffset, CatalogOperations catOps, boolean cachingEnabled, String encodingName) {
         super(hfsFile, fsOffset, catOps, cachingEnabled);
 
-        this.stringDecoder = new MutableStringDecoder<CharsetStringDecoder>(new CharsetStringDecoder(encodingName));
+        this.stringCodec = new MutableStringCodec<CharsetStringCodec>(new CharsetStringCodec(encodingName));
     }
 
 
     public MasterDirectoryBlock getMasterDirectoryBlock() {
         byte[] currentBlock = new byte[512]; // Could be made a global var? (thread war?)
-        hfsFile.seek(fsOffset + 1024);
-        hfsFile.read(currentBlock);
+        hfsFile.readFrom(fsOffset + 1024, currentBlock);
         return new MasterDirectoryBlock(currentBlock, 0);
     }
     
@@ -187,17 +187,23 @@ public class ImplHFSFileSystemView extends BaseHFSFileSystemView {
      * @param encodingName the charset to use
      */
     public void setStringEncoding(String encodingName) {
-        this.stringDecoder.setDecoder(new CharsetStringDecoder(encodingName));
+        this.stringCodec.setDecoder(new CharsetStringCodec(encodingName));
     }
 
     public String getStringEncoding() {
-        return stringDecoder.getDecoder().getCharsetName();
+        return stringCodec.getDecoder().getCharsetName();
     }
 
     @Override
+    public CommonHFSCatalogString encodeString(String str) {
+        byte[] bytes = stringCodec.encode(str);
+        return CommonHFSCatalogString.createHFS(bytes);
+    }
+    
+    @Override
     public String decodeString(CommonHFSCatalogString str) {
         if(str instanceof CommonHFSCatalogString.HFSImplementation)
-            return str.decode(stringDecoder);
+            return stringCodec.decode(str.getStringBytes());
         else
             throw new RuntimeException("Invalid string type: " + str.getClass());
     }
@@ -216,7 +222,7 @@ public class ImplHFSFileSystemView extends BaseHFSFileSystemView {
         int volumeBitmapSize = numAllocationBlocks/8 + (numAllocationBlocks%8 != 0 ? 1 : 0);
         
         ReadableConcatenatedStream volumeBitmapStream =
-                new ReadableConcatenatedStream(hfsFile,
+                new ReadableConcatenatedStream(new ReadableRandomAccessSubstream(hfsFile),
                 fsOffset + 512*Util.unsign(mdb.getDrVBMSt()),
                 volumeBitmapSize);
         

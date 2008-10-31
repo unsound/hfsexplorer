@@ -18,7 +18,7 @@
 // Ripped from TypherTransfer. Relevant changes should be backported.
 
 package org.catacombae.hfsexplorer;
-import java.io.PrintStream;
+//import java.io.PrintStream;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
@@ -188,6 +188,7 @@ public class SpeedUnitUtils {
         return result;
     }
 
+    /*
     public static void main(String[] args) {
         PrintStream ps = System.err;
         ps.println("Testing roundDoubleToDecimals:");
@@ -219,5 +220,5 @@ public class SpeedUnitUtils {
             ps.println("    format(rounded Pi)=" + fmt.format(roundDoubleToDecimals(Math.PI, fmt.getMaximumFractionDigits())));
         }
     }
-    
+    */
 }

@@ -124,6 +124,7 @@ public class ApplePartitionMap implements PartitionSystem {
     public String getShortName() { return "APM"; }
     
     /** This main method prints the fields of the DDR and APM in the file specified in args[0], offset 0. */
+    /*
     public static void main(String[] args) {
 	ReadableFileStream fin = new ReadableFileStream(args[0]);
 	byte[] curBlock = new byte[DriverDescriptorRecord.length()];
@@ -138,4 +139,5 @@ public class ApplePartitionMap implements PartitionSystem {
 	ApplePartitionMap apm = new ApplePartitionMap(fin, blockSize, blockSize);
 	apm.print(System.out, "");
     }
+    */
 }

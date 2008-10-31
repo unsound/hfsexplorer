@@ -42,6 +42,7 @@ public class AllocationFileInfoPanel extends javax.swing.JPanel {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
+                // TODO: Make it stop! :<
                 final long allocatedBlocks = afView.countAllocatedBlocks();
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override

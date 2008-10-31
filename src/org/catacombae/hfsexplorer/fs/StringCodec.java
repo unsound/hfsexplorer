@@ -15,14 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.types.hfscommon;
+package org.catacombae.hfsexplorer.fs;
 
 /**
- * Decodes data, byte by byte, into a Java string.
+ * Transforms data between Java strings and their respective encoded byte[] forms.
  * 
  * @author Erik Larsson
  */
-public interface StringDecoder {
+public interface StringCodec {
+    /**
+     * Decodes the specified data into a string.
+     * 
+     * @param data the data to decode.
+     * @return the decoded string.
+     */
+    public String decode(byte[] data);
+    
     /**
      * Decodes the specified data into a string.
      * 
@@ -32,4 +40,22 @@ public interface StringDecoder {
      * @return the decoded string.
      */
     public String decode(byte[] data, int off, int len);
+    
+    /**
+     * Encodes the specified string into bytes.
+     * 
+     * @param str the string to encode.
+     * @return encoded data.
+     */
+    public byte[] encode(String str);
+    
+    /**
+     * Encodes the specified string into bytes.
+     * 
+     * @param str the string to encode.
+     * @param off the position to start reading in the string.
+     * @param len the number of bytes to read from the string.
+     * @return encoded data.
+     */
+    public byte[] encode(String str, int off, int len);
 }

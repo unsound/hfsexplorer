@@ -19,6 +19,7 @@ package org.catacombae.hfsexplorer.fs;
 
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.io.ForkFilter;
+import org.catacombae.hfsexplorer.io.ReadableRandomAccessSubstream;
 import org.catacombae.hfsexplorer.types.hfsplus.BTHeaderRec;
 import org.catacombae.hfsexplorer.types.hfsplus.BTNodeDescriptor;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSCatalogNodeID;
@@ -95,9 +96,8 @@ public class ImplHFSPlusFileSystemView extends BaseHFSFileSystemView {
         //System.err.println("getHFSPlusVolumeHeader()");
 	byte[] currentBlock = new byte[512]; // Could be made a global var? (thread war?)
         //System.err.println("  hfsFile.seek(" + (fsOffset + 1024) + ")");
-	hfsFile.seek(fsOffset + 1024);
         //System.err.println("  hfsFile.read(byte[" + currentBlock.length + "])");
-	hfsFile.read(currentBlock);
+	hfsFile.readFrom(fsOffset + 1024, currentBlock);
         return new HFSPlusVolumeHeader(currentBlock);
     }
     
@@ -175,20 +175,26 @@ public class ImplHFSPlusFileSystemView extends BaseHFSFileSystemView {
         HFSPlusVolumeHeader vh = getHFSPlusVolumeHeader();
         if(vh.getAttributeVolumeJournaled()) {
             long blockNumber = Util.unsign(vh.getJournalInfoBlock());
-            hfsFile.seek(fsOffset + blockNumber * vh.getBlockSize());
+            //hfsFile.seek();
             byte[] data = new byte[JournalInfoBlock.getStructSize()];
-            hfsFile.readFully(data);
+            hfsFile.readFullyFrom(fsOffset + blockNumber * vh.getBlockSize(), data);
             return new JournalInfoBlock(data, 0);
         }
         else
             return null;
     }
-
+    
+    @Override
+    public CommonHFSCatalogString encodeString(String str) {
+        return CommonHFSCatalogString.HFSPlusImplementation.createHFSPlus(new HFSUniStr255(str));
+    }
+    
     @Override
     public String decodeString(CommonHFSCatalogString str) {
         if(str instanceof CommonHFSCatalogString.HFSPlusImplementation) {
-            char[] ca = Util.readCharArrayBE(str.getStringBytes());
-            return new String(ca);
+            CommonHFSCatalogString.HFSPlusImplementation hStr =
+                    (CommonHFSCatalogString.HFSPlusImplementation)str;
+            return new String(hStr.getInternal().getUnicode());
         }
         else
             throw new RuntimeException("Invalid string type: " + str.getClass());
@@ -211,7 +217,7 @@ public class ImplHFSPlusFileSystemView extends BaseHFSFileSystemView {
                 CommonHFSForkType.DATA_FORK);
 
         ForkFilter allocationFileStream = new ForkFilter(allocationFileFork, extDescriptors,
-                hfsFile, fsOffset, Util.unsign(vh.getBlockSize()), 0);
+                new ReadableRandomAccessSubstream(hfsFile), fsOffset, Util.unsign(vh.getBlockSize()), 0);
 
         return new ImplHFSPlusAllocationFileView(this, allocationFileStream);
     }

@@ -34,9 +34,9 @@ public class ExtractProgressDialog extends JDialog implements ProgressMonitor {
     private DecimalFormat sizeFormatter = new DecimalFormat("0.00");
 
     public ExtractProgressDialog(Frame owner) {
-	this(owner, true);
+	this(owner, false);
     }
-    public ExtractProgressDialog(Frame owner, boolean modal) {
+    private ExtractProgressDialog(Frame owner, boolean modal) {
 	super(owner, "Extracting...", modal);
 	
 	progressPanel = new ExtractProgressPanel();

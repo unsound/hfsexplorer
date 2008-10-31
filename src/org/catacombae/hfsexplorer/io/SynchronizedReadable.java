@@ -26,7 +26,19 @@ import org.catacombae.io.RuntimeIOException;
  */
 public interface SynchronizedReadable {
     /** Atomic seek+read. Does <b>not</b> change the file pointer of the stream permanently! */
+    public int readFrom(final long pos) throws RuntimeIOException;
+    
+    /** Atomic seek+read. Does <b>not</b> change the file pointer of the stream permanently! */
+    public int readFrom(final long pos, byte[] b) throws RuntimeIOException;
+    
+    /** Atomic seek+read. Does <b>not</b> change the file pointer of the stream permanently! */
     public int readFrom(final long pos, byte[] b, int off, int len) throws RuntimeIOException;
+    
+    /** Atomic seek+read. Does <b>not</b> change the file pointer of the stream permanently! */
+    public void readFullyFrom(final long pos, byte[] data) throws RuntimeIOException;
+    
+    /** Atomic seek+read. Does <b>not</b> change the file pointer of the stream permanently! */
+    public void readFullyFrom(final long pos, byte[] data, int offset, int length) throws RuntimeIOException;
     
     /** Atomic seek+skip. Does <b>not</b> change the file pointer of the stream permanently! */
     public long skipFrom(final long pos, final long length) throws RuntimeIOException;
