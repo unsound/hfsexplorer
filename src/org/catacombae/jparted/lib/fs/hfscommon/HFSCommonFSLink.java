@@ -22,7 +22,7 @@ import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFileRecord;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.jparted.lib.fs.FSAttributes;
 import org.catacombae.jparted.lib.fs.FSEntry;
-import org.catacombae.jparted.lib.fs.FSFolder;
+//import org.catacombae.jparted.lib.fs.FSFolder;
 import org.catacombae.jparted.lib.fs.FSLink;
 
 /**
@@ -77,14 +77,45 @@ public class HFSCommonFSLink extends FSLink {
         try {
         */
         //parentFileSystem.log(prefix + "getLinkTarget(" + Util.concatenateStrings(parentDir, "/") + ");");
+        //System.err.println();
         String posixPath = getLinkTargetPosixPath();
         //parentFileSystem.log(prefix + "  getLinkTarget(): posixPath=\"" + posixPath + "\"");
-        FSEntry res = fsHandler.getEntryByPosixPath(posixPath, parentDir);
+        String[] targetPath = fsHandler.getTruePathFromPosixPath(posixPath, parentDir);
+        //System.err.println("getLinkTarget(): " + linkRecord.getKey().getParentID().toLong() + ":\"" +
+        //            fsHandler.getProperNodeName(linkRecord) + "\" getting true path for \"" + posixPath + "\"...");
+        FSEntry res;
+        if(targetPath != null) {
+            //System.err.println("getLinkTarget(): got true path \"" + Util.concatenateStrings(targetPath, "/") + "\"");
+            res = fsHandler.getEntry(targetPath);
+            if(res != null && res instanceof FSLink) {
+                //String[] targetParentDir = Util.arrayCopy(targetPath, 0, new String[targetPath.length-1], 0, targetPath.length-1);
+                //System.err.println("getLinkTarget(): trying to resolve inner link using link path \"" + Util.concatenateStrings(targetPath, "/") + "\"");
+                res = fsHandler.resolveLinks(targetPath, (FSLink)res);
+                if(res == null)
+                    System.err.println("\ngetLinkTarget(): Could not resolve inner link \"" +
+                            Util.concatenateStrings(targetPath, "/") + "\"");
+            }
+            else if(res == null)
+                System.err.println("\ngetLinkTarget(): Could not get entry for true path \"" +
+                        Util.concatenateStrings(targetPath, "/") + "\"");
+            
+            if(res != null && res instanceof FSLink)
+                throw new RuntimeException("res still instanceof FSLink!");
+        }
+        else {
+            System.err.println("\ngetLinkTarget(): Could not get true path!");
+            res = null;
+        }
+        
         if(res == null) {
-            System.err.println("getLinkTarget(): FAILED to get entry by posix path for:");
+            System.err.println("getLinkTarget(): FAILED to get entry by posix path for link " +
+                    linkRecord.getKey().getParentID().toLong() + ":\"" +
+                    fsHandler.getProperNodeName(linkRecord) + "\":");
             System.err.println("getLinkTarget():   posixPath=\"" + posixPath + "\"");
             System.err.println("getLinkTarget():   parentDir=\"" + Util.concatenateStrings(parentDir, "/") + "\"");
+            System.err.println();
         }
+        
         return res;
         //} finally { parentFileSystem.log(prefix + "Returning from getLinkTarget."); parentFileSystem.globalPrefix = prefix; }
     }

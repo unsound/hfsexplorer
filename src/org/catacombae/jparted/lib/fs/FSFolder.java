@@ -31,11 +31,20 @@ public abstract class FSFolder extends FSEntry {
     }
     
     /**
-     * Returns the subentries of this folder as an array.
+     * Lists the contents of this folder as an array of the names of its subentries.
      * 
-     * @return the subentries of this folder as an array.
+     * @return the contents of this folder as an array of the names of its subentries.
      */
-    public abstract FSEntry[] list();
+    public abstract String[] list();
+    
+    /**
+     * Returns the contents of this folder as an array of FSEntries. This method is more expensive
+     * than <code>list()</code> since all the attributes of each subentry is also retrieved and
+     * put into an FSEntry object.
+     * 
+     * @return the contents of this folder as an array of FSEntries.
+     */
+    public abstract FSEntry[] listEntries();
     
     public abstract FSEntry getChild(String childName);
     

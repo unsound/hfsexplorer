@@ -23,6 +23,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.catacombae.csjc.structelements.ArrayBuilder;
 import org.catacombae.hfsexplorer.GUIUtil;
+import org.catacombae.hfsexplorer.ObjectContainer;
 import org.catacombae.hfsexplorer.fs.BaseHFSAllocationFileView;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentDescriptor;
 
@@ -43,19 +44,14 @@ public class AllocationFileInfoPanel extends javax.swing.JPanel {
             @Override
             public void run() {
                 // TODO: Make it stop! :<
-                final long allocatedBlocks = afView.countAllocatedBlocks();
+                final ObjectContainer<Long> freeBlocks = new ObjectContainer<Long>((long)-1);
+                final ObjectContainer<Long> usedBlocks = new ObjectContainer<Long>((long)-1);
+                afView.countBlocks(freeBlocks, usedBlocks);
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        allocatedBlocksField.setText("" + allocatedBlocks);
-                    }
-                });
-
-                final long freeBlocks = afView.countFreeBlocks();
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        freeBlocksField.setText("" + freeBlocks);
+                        allocatedBlocksField.setText(usedBlocks.o.toString());
+                        freeBlocksField.setText(freeBlocks.o.toString());
                     }
                 });
             }
