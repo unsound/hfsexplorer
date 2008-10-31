@@ -78,4 +78,49 @@ class HFSCommonFSAttributes extends FSAttributes {
         return false;
     }
 
+    @Override
+    public boolean hasCreateDate() {
+        return attributes.hasCreateDate();
+    }
+
+    @Override
+    public Date getCreateDate() {
+        return attributes.getCreateDateAsDate();
+    }
+
+    @Override
+    public boolean hasModifyDate() {
+        return attributes.hasContentModDate();
+    }
+
+    @Override
+    public boolean hasAttributeModifyDate() {
+        return attributes.hasAttributeModDate();
+    }
+
+    @Override
+    public boolean hasAccessDate() {
+        return attributes.hasAccessDate();
+    }
+
+    @Override
+    public Date getAccessDate() {
+        return attributes.getAccessDateAsDate();
+    }
+
+    @Override
+    public boolean hasBackupDate() {
+        return attributes.hasBackupDate();
+    }
+
+    @Override
+    public Date getBackupDate() {
+        return attributes.getBackupDateAsDate();
+    }
+
+    @Override
+    public Date getAttributeModifyDate() {
+        return attributes.getAttributeModDateAsDate();
+    }
+
 }

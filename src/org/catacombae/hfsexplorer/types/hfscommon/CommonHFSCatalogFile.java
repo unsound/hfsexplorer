@@ -190,6 +190,31 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
         public int getHardLinkInode() {
             return data.getPermissions().getSpecial();
         }
+
+        @Override
+        public boolean hasCreateDate() {
+            return true;
+        }
+
+        @Override
+        public boolean hasContentModDate() {
+            return true;
+        }
+
+        @Override
+        public boolean hasAttributeModDate() {
+            return true;
+        }
+
+        @Override
+        public boolean hasAccessDate() {
+            return true;
+        }
+
+        @Override
+        public boolean hasBackupDate() {
+            return true;
+        }
     }
     
     public static class HFSImplementation extends CommonHFSCatalogFile {
@@ -322,6 +347,31 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
         @Override
         public int getHardLinkInode() {
             throw new UnsupportedOperationException("Not supported for HFS.");
+        }
+
+        @Override
+        public boolean hasCreateDate() {
+            return true;
+        }
+
+        @Override
+        public boolean hasContentModDate() {
+            return true;
+        }
+
+        @Override
+        public boolean hasAttributeModDate() {
+            return false;
+        }
+
+        @Override
+        public boolean hasAccessDate() {
+            return false;
+        }
+
+        @Override
+        public boolean hasBackupDate() {
+            return true;
         }
     }
 }

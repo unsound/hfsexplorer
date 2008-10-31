@@ -19,13 +19,14 @@ package org.catacombae.hfsexplorer.gui;
 
 //import javax.swing.JFrame;
 //import javax.swing.JScrollPane;
+import java.awt.Component;
 import org.catacombae.jparted.lib.fs.FSAttributes.POSIXFileAttributes;
 
 /**
  *
  * @author erik
  */
-public class POSIXAttributesPanel extends javax.swing.JPanel {
+public class POSIXAttributesPanel extends javax.swing.JPanel implements ChainedPanel {
     
     public POSIXAttributesPanel(POSIXFileAttributes attrs) {
         this();
@@ -54,6 +55,12 @@ public class POSIXAttributesPanel extends javax.swing.JPanel {
 
     private POSIXAttributesPanel() {
         initComponents();
+    }
+    
+    @Override
+    public void setChainedContents(Component c) {
+        chainedContentsPanel.removeAll();
+        chainedContentsPanel.add(c);
     }
 
     /** This method is called from within the constructor to
@@ -99,13 +106,17 @@ public class POSIXAttributesPanel extends javax.swing.JPanel {
         jLabel12 = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JSeparator();
+        chainedContentsPanel = new javax.swing.JPanel();
 
         groupIDField.setEditable(false);
         groupIDField.setText("jTextField5");
+        groupIDField.setBorder(null);
         groupIDField.setOpaque(false);
 
         ownerIDField.setEditable(false);
         ownerIDField.setText("jTextField4");
+        ownerIDField.setBorder(null);
         ownerIDField.setOpaque(false);
 
         ownerIDLabel.setText("Owner ID:");
@@ -186,6 +197,8 @@ public class POSIXAttributesPanel extends javax.swing.JPanel {
 
         jLabel14.setText("Sticky bit");
 
+        chainedContentsPanel.setLayout(new java.awt.BorderLayout());
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -194,75 +207,79 @@ public class POSIXAttributesPanel extends javax.swing.JPanel {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jLabel4)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                        .addContainerGap()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(org.jdesktop.layout.GroupLayout.LEADING, jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
                             .add(layout.createSequentialGroup()
-                                .add(jLabel10)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(permissionStringField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE))
-                            .add(layout.createSequentialGroup()
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(userLabel)
-                                    .add(groupLabel)
-                                    .add(otherLabel))
-                                .add(7, 7, 7)
+                                .addContainerGap()
                                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                                     .add(layout.createSequentialGroup()
-                                        .add(otherReadBox)
+                                        .add(jLabel10)
                                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(jLabel11)
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(otherWriteBox)
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(jLabel9)
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(otherExecuteBox)
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(jLabel8))
+                                        .add(permissionStringField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE))
                                     .add(layout.createSequentialGroup()
-                                        .add(groupReadBox)
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(jLabel7)
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(groupWriteBox)
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(jLabel6)
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(groupExecuteBox)
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(jLabel5))
+                                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                            .add(userLabel)
+                                            .add(groupLabel)
+                                            .add(otherLabel))
+                                        .add(7, 7, 7)
+                                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                            .add(layout.createSequentialGroup()
+                                                .add(otherReadBox)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(jLabel11)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(otherWriteBox)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(jLabel9)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(otherExecuteBox)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(jLabel8))
+                                            .add(layout.createSequentialGroup()
+                                                .add(groupReadBox)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(jLabel7)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(groupWriteBox)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(jLabel6)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(groupExecuteBox)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(jLabel5))
+                                            .add(layout.createSequentialGroup()
+                                                .add(userReadBox)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(jLabel3)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(userWriteBox)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(jLabel2)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(userExecuteBox)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(jLabel1))))
                                     .add(layout.createSequentialGroup()
-                                        .add(userReadBox)
+                                        .add(setUidBox)
                                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(jLabel3)
+                                        .add(jLabel12))
+                                    .add(layout.createSequentialGroup()
+                                        .add(setGidBox)
                                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(userWriteBox)
+                                        .add(jLabel13))
+                                    .add(layout.createSequentialGroup()
+                                        .add(stickyBitBox)
                                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(jLabel2)
+                                        .add(jLabel14))
+                                    .add(layout.createSequentialGroup()
+                                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                            .add(ownerIDLabel)
+                                            .add(groupIDLabel))
                                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(userExecuteBox)
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(jLabel1))))
-                            .add(layout.createSequentialGroup()
-                                .add(setUidBox)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jLabel12))
-                            .add(layout.createSequentialGroup()
-                                .add(setGidBox)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jLabel13))
-                            .add(layout.createSequentialGroup()
-                                .add(stickyBitBox)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jLabel14))
-                            .add(layout.createSequentialGroup()
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(ownerIDLabel)
-                                    .add(groupIDLabel))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(ownerIDField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 262, Short.MAX_VALUE)
-                                    .add(groupIDField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 262, Short.MAX_VALUE))))
+                                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                            .add(ownerIDField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 262, Short.MAX_VALUE)
+                                            .add(groupIDField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 262, Short.MAX_VALUE)))))
+                            .add(org.jdesktop.layout.GroupLayout.LEADING, chainedContentsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)))
                 .addContainerGap())
         );
@@ -320,12 +337,17 @@ public class POSIXAttributesPanel extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(groupIDLabel)
-                    .add(groupIDField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                    .add(groupIDField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(chainedContentsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 21, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel chainedContentsPanel;
     private javax.swing.JCheckBox groupExecuteBox;
     private javax.swing.JTextField groupIDField;
     private javax.swing.JLabel groupIDLabel;
@@ -346,6 +368,7 @@ public class POSIXAttributesPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JCheckBox otherExecuteBox;
     private javax.swing.JLabel otherLabel;
     private javax.swing.JCheckBox otherReadBox;
