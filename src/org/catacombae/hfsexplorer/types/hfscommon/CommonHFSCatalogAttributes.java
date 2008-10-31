@@ -28,6 +28,51 @@ public interface CommonHFSCatalogAttributes {
     public int getBackupDate();
 
     /**
+     * Returns whether or not this attribute set has a defined value for the "entry created"
+     * timestamp.
+     * 
+     * @return whether or not this attribute set has a defined value for the "entry created"
+     * timestamp.
+     */
+    public boolean hasCreateDate();
+    
+    /**
+     * Returns whether or not this attribute set has a defined value for the "contents modified"
+     * timestamp.
+     * 
+     * @return whether or not this attribute set has a defined value for the "contents modified"
+     * timestamp.
+     */
+    public boolean hasContentModDate();
+    
+    /**
+     * Returns whether or not this attribute set has a defined value for the "attributes modified"
+     * timestamp.
+     * 
+     * @return whether or not this attribute set has a defined value for the "attribtues modified"
+     * timestamp.
+     */
+    public boolean hasAttributeModDate();
+    
+    /**
+     * Returns whether or not this attribute set has a defined value for the "entry last accessed"
+     * timestamp.
+     * 
+     * @return whether or not this attribute set has a defined value for the "entry last accessed"
+     * timestamp.
+     */
+    public boolean hasAccessDate();
+    
+    /**
+     * Returns whether or not this attribute set has a defined value for the "entry last backuped"
+     * timestamp.
+     * 
+     * @return whether or not this attribute set has a defined value for the "entry last backuped"
+     * timestamp.
+     */
+    public boolean hasBackupDate();
+    
+    /**
      * Returns whether or not this object contains HFS+ permissions.
      * @return whether or not this object contains HFS+ permissions.
      */

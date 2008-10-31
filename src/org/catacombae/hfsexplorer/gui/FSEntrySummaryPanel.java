@@ -17,13 +17,17 @@
 
 package org.catacombae.hfsexplorer.gui;
 
+import java.awt.Component;
 import java.awt.Window;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.DecimalFormat;
 //import javax.swing.JFrame;
 //import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
 import org.catacombae.hfsexplorer.ObjectContainer;
 import org.catacombae.hfsexplorer.SpeedUnitUtils;
 import org.catacombae.hfsexplorer.Util;
@@ -37,7 +41,7 @@ import org.catacombae.jparted.lib.fs.FSLink;
  *
  * @author erik
  */
-public class FSEntrySummaryPanel extends javax.swing.JPanel {
+public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPanel {
     private volatile boolean cancelSignaled = false;
     private DecimalFormat sizeFormatter = new DecimalFormat("0.00");
     
@@ -167,13 +171,34 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel {
         }
         typeField.setText(typeString);
         sizeField.setText(sizeString);
-
+        
+        
         FSAttributes attrs = entry.getAttributes();
+        
+        ChainedPanel currentChain = this;
+        
+        if(entry instanceof FSLink) {
+            LinkTargetPanel ltp = new LinkTargetPanel((FSLink)entry);
+            currentChain.setChainedContents(ltp);
+            currentChain = ltp;
+        }
+        
+        DateSummaryPanel dsp = new DateSummaryPanel(attrs);
+        currentChain.setChainedContents(dsp);
+        currentChain = dsp;
+        
         if(attrs.hasPOSIXFileAttributes()) {
             POSIXAttributesPanel attributesPanel =
                     new POSIXAttributesPanel(attrs.getPOSIXFileAttributes());
-            extendedInfoStackPanel.add(attributesPanel);
+            currentChain.setChainedContents(attributesPanel);
+            currentChain = attributesPanel;
         }
+    }
+
+    @Override
+    public void setChainedContents(Component c) {
+        extendedInfoStackPanel.removeAll();
+        extendedInfoStackPanel.add(c);
     }
     
     /** This method is called from within the constructor to
@@ -204,12 +229,14 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel {
 
         typeField.setEditable(false);
         typeField.setText("jTextField2");
+        typeField.setBorder(null);
         typeField.setOpaque(false);
 
         jLabel3.setText("Size:");
 
         sizeField.setEditable(false);
         sizeField.setText("jTextField3");
+        sizeField.setBorder(null);
         sizeField.setOpaque(false);
 
         extendedInfoStackPanel.setLayout(new javax.swing.BoxLayout(extendedInfoStackPanel, javax.swing.BoxLayout.PAGE_AXIS));
@@ -221,20 +248,18 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel {
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, extendedInfoStackPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 350, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 350, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, extendedInfoStackPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                        .add(jLabel1)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jLabel1)
+                            .add(jLabel2)
+                            .add(jLabel3))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(nameField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE))
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                        .add(jLabel2)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(typeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 306, Short.MAX_VALUE))
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                        .add(jLabel3)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(sizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)))
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(sizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE)
+                            .add(typeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE)
+                            .add(nameField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -255,7 +280,7 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(extendedInfoStackPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
+                .add(extendedInfoStackPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents

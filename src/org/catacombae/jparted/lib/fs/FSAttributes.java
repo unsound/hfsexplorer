@@ -32,19 +32,43 @@ public abstract class FSAttributes {
     public abstract boolean hasWindowsFileAttributes();
     public abstract WindowsFileAttributes getWindowsFileAttributes();
     
+    public abstract boolean hasCreateDate();
+    public abstract Date getCreateDate();
+    
+    public abstract boolean hasModifyDate();
     public abstract Date getModifyDate();
+    
+    public abstract boolean hasAttributeModifyDate();
+    public abstract Date getAttributeModifyDate();
+    
+    public abstract boolean hasAccessDate();
+    public abstract Date getAccessDate();
+    
+    public abstract boolean hasBackupDate();
+    public abstract Date getBackupDate();
+    
     //public abstract FSAccessControlList getAccessControlList();
-
+    
+    
     public static abstract class POSIXFileAttributes {
 
+        /** One of the valid return values for <code>getFileType();</code> */
         public static final byte FILETYPE_UNDEFINED = 00;
+        /** One of the valid return values for <code>getFileType();</code> */
         public static final byte FILETYPE_FIFO = 01;
+        /** One of the valid return values for <code>getFileType();</code> */
         public static final byte FILETYPE_CHARACTER_SPECIAL = 02;
+        /** One of the valid return values for <code>getFileType();</code> */
         public static final byte FILETYPE_DIRECTORY = 04;
+        /** One of the valid return values for <code>getFileType();</code> */
         public static final byte FILETYPE_BLOCK_SPECIAL = 06;
+        /** One of the valid return values for <code>getFileType();</code> */
         public static final byte FILETYPE_REGULAR = 010;
+        /** One of the valid return values for <code>getFileType();</code> */
         public static final byte FILETYPE_SYMBOLIC_LINK = 012;
+        /** One of the valid return values for <code>getFileType();</code> */
         public static final byte FILETYPE_SOCKET = 014;
+        /** One of the valid return values for <code>getFileType();</code> */
         public static final byte FILETYPE_WHITEOUT = 016;
 
         public abstract long getUserID();
@@ -65,6 +89,12 @@ public abstract class FSAttributes {
         public abstract boolean isSetGID();
         public abstract boolean isStickyBit();
 
+        /**
+         * Returns the POSIX-type file mode string for this file, as it would appear
+         * when listing it with 'ls -l'. Example: <code>drwxr-x---</code>.
+         *
+         * @return the POSIX-type file mode string for this file.
+         */
         public abstract String getPermissionString();
     }
 
@@ -78,34 +108,72 @@ public abstract class FSAttributes {
             this.groupID = groupID;
             this.fileMode = fileMode;
         }
-
+        
+        /** {@inheritDoc} */
+        @Override
         public long getUserID() { return userID; }
+        
+        /** {@inheritDoc} */
+        @Override
         public long getGroupID() { return groupID; }
 
+        /** {@inheritDoc} */
+        @Override
         public byte getFileType() {
             int type = (fileMode >> 12) & 017;
             return (byte) type;
         }
 
+        /** {@inheritDoc} */
+        @Override
         public boolean isSetUID() { return Util.getBit(fileMode, 11); }
+
+        /** {@inheritDoc} */
+        @Override
         public boolean isSetGID() { return Util.getBit(fileMode, 10); }
+
+        /** {@inheritDoc} */
+        @Override
         public boolean isStickyBit() { return Util.getBit(fileMode, 9); }
+
+        /** {@inheritDoc} */
+        @Override
         public boolean canUserRead() { return Util.getBit(fileMode, 8); }
+
+        /** {@inheritDoc} */
+        @Override
         public boolean canUserWrite() { return Util.getBit(fileMode, 7); }
+
+        /** {@inheritDoc} */
+        @Override
         public boolean canUserExecute() { return Util.getBit(fileMode, 6); }
+
+        /** {@inheritDoc} */
+        @Override
         public boolean canGroupRead() { return Util.getBit(fileMode, 5); }
+
+        /** {@inheritDoc} */
+        @Override
         public boolean canGroupWrite() { return Util.getBit(fileMode, 4); }
+
+        /** {@inheritDoc} */
+        @Override
         public boolean canGroupExecute() { return Util.getBit(fileMode, 3); }
+
+        /** {@inheritDoc} */
+        @Override
         public boolean canOthersRead() { return Util.getBit(fileMode, 2); }
+
+        /** {@inheritDoc} */
+        @Override
         public boolean canOthersWrite() { return Util.getBit(fileMode, 1); }
+
+        /** {@inheritDoc} */
+        @Override
         public boolean canOthersExecute() { return Util.getBit(fileMode, 0); }
 
-        /**
-         * Returns the POSIX-type file mode string for this file, as it would appear
-         * when listing it with 'ls -l'. Example: <code>drwxr-x---</code>.
-         *
-         * @return the POSIX-type file mode string for this file.
-         */
+        /** {@inheritDoc} */
+        @Override
         public String getPermissionString() {
             String result;
             byte fileType = getFileType();
