@@ -211,8 +211,9 @@ public abstract class FileSystemHandler {
                 String fsPathnameComponent = parsePosixPathnameComponent(curPathComponent);
                 //log(prefix + "  gtpfpp: fsPathnameComponent=" + fsPathnameComponent);
 
-                FSEntry nextEntry = null;
-                for(FSEntry entry : curFolder.list()) {
+                FSEntry nextEntry = curFolder.getChild(fsPathnameComponent);
+                
+                /*for(FSEntry entry : curFolder.list()) {
                     //log(prefix + "  gtpfpp:   Checking if " + entry.getName() + " matches...");
 
                     if(entry.getName().equals(fsPathnameComponent)) {
@@ -220,7 +221,7 @@ public abstract class FileSystemHandler {
                         //log(prefix + "  gtpfpp:     Match found!!");
                         break;
                     }
-                }
+                }*/
 
                 //log(prefix + "  gtpfpp: nextEntry=" + nextEntry);
                 if(nextEntry != null) {

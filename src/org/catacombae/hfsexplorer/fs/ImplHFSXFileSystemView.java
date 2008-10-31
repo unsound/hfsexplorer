@@ -36,38 +36,43 @@ import org.catacombae.io.ReadableRandomAccessStream;
  */
 public class ImplHFSXFileSystemView extends ImplHFSPlusFileSystemView {
     protected static final CatalogOperations HFSX_OPERATIONS = new CatalogOperations() {
+        
+        private BTHeaderRec getBTHeaderRec(CommonBTHeaderRecord bthr) {
+            if(bthr instanceof CommonBTHeaderRecord.HFSPlusImplementation) {
+                return ((CommonBTHeaderRecord.HFSPlusImplementation)bthr).getInternal();
+            }
+            else
+                throw new IllegalArgumentException("Invalid type of bthr: " + bthr);
+        }
 
         public CommonHFSCatalogIndexNode newCatalogIndexNode(byte[] data,
                 int offset, int nodeSize, CommonBTHeaderRecord bthr) {
-            byte[] bthrData = bthr.getBytes();
-            BTHeaderRec bthr2 = new BTHeaderRec(bthrData, 0); // ugly reconstructing solution
             
-            return CommonHFSCatalogIndexNode.createHFSX(data, offset, nodeSize, bthr2);
+            BTHeaderRec trueBthr = getBTHeaderRec(bthr);
+            return CommonHFSCatalogIndexNode.createHFSX(data, offset, nodeSize, trueBthr);
         }
 
         public CommonHFSCatalogKey newCatalogKey(CommonHFSCatalogNodeID nodeID,
                 CommonHFSCatalogString searchString, CommonBTHeaderRecord bthr) {
-            byte[] bthrData = bthr.getBytes();
-            BTHeaderRec bthr2 = new BTHeaderRec(bthrData, 0); // ugly reconstructing solution
+            
+            BTHeaderRec trueBthr = getBTHeaderRec(bthr);
             return CommonHFSCatalogKey.create(new HFSXCatalogKey(
-                    new HFSCatalogNodeID((int)nodeID.toLong()),
-                        new HFSUniStr255(searchString.getStructBytes(), 0), bthr2));
+                    new HFSCatalogNodeID((int) nodeID.toLong()),
+                    new HFSUniStr255(searchString.getStructBytes(), 0), trueBthr));
         }
 
         public CommonHFSCatalogLeafNode newCatalogLeafNode(byte[] data,
                 int offset, int nodeSize, CommonBTHeaderRecord bthr) {
-            byte[] bthrData = bthr.getBytes();
-            BTHeaderRec bthr2 = new BTHeaderRec(bthrData, 0); // ugly reconstructing solution
-
-            return CommonHFSCatalogLeafNode.createHFSX(data, offset, nodeSize, bthr2);
+            
+            BTHeaderRec trueBthr = getBTHeaderRec(bthr);
+            return CommonHFSCatalogLeafNode.createHFSX(data, offset, nodeSize, trueBthr);
         }
 
         public CommonHFSCatalogLeafRecord newCatalogLeafRecord(byte[] data,
                 int offset, CommonBTHeaderRecord bthr) {
-            byte[] bthrData = bthr.getBytes();
-            BTHeaderRec bthr2 = new BTHeaderRec(bthrData, 0); // ugly reconstructing solution
-            
-            return CommonHFSCatalogLeafRecord.createHFSX(data, offset, offset+data.length, bthr2);
+                
+            BTHeaderRec trueBthr = getBTHeaderRec(bthr);
+            return CommonHFSCatalogLeafRecord.createHFSX(data, offset, offset + data.length, trueBthr);
         }
     };
 

@@ -37,6 +37,8 @@ public abstract class FSFolder extends FSEntry {
      */
     public abstract FSEntry[] list();
     
+    public abstract FSEntry getChild(String childName);
+    
     /**
      * Returns the valence of this folder, i.e. how many subentries this folder
      * holds.

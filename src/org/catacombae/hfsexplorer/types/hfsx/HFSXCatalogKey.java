@@ -26,21 +26,36 @@ import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogKey;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSUniStr255;
 
 public class HFSXCatalogKey extends HFSPlusCatalogKey {
-    private final BTHeaderRec catalogHeaderRec;
+    private final byte keyCompareType;
     
     public HFSXCatalogKey(byte[] data, int offset, BTHeaderRec catalogHeaderRec) {
 	super(data, offset);
-	this.catalogHeaderRec = catalogHeaderRec;
+        if(catalogHeaderRec == null)
+            throw new IllegalArgumentException("catalogHeaderRec == null");
+        
+	this.keyCompareType = catalogHeaderRec.getKeyCompareType();
+        if(keyCompareType != BTHeaderRec.kHFSBinaryCompare && keyCompareType != BTHeaderRec.kHFSCaseFolding)
+            throw new IllegalArgumentException("Illegal key compare type: " + keyCompareType);
     }
     
     public HFSXCatalogKey(HFSCatalogNodeID parentID, HFSUniStr255 nodeName, BTHeaderRec catalogHeaderRec) {
 	super(parentID, nodeName);
-	this.catalogHeaderRec = catalogHeaderRec;
+        if(catalogHeaderRec == null)
+            throw new IllegalArgumentException("catalogHeaderRec == null");
+
+        this.keyCompareType = catalogHeaderRec.getKeyCompareType();
+        if(keyCompareType != BTHeaderRec.kHFSBinaryCompare && keyCompareType != BTHeaderRec.kHFSCaseFolding)
+            throw new IllegalArgumentException("Illegal key compare type: " + keyCompareType);
     }
     
     public HFSXCatalogKey(int parentIDInt, String nodeNameString, BTHeaderRec catalogHeaderRec) {
 	super(parentIDInt, nodeNameString);
-	this.catalogHeaderRec = catalogHeaderRec;
+        if(catalogHeaderRec == null)
+            throw new IllegalArgumentException("catalogHeaderRec == null");
+        
+	this.keyCompareType = catalogHeaderRec.getKeyCompareType();
+        if(keyCompareType != BTHeaderRec.kHFSBinaryCompare && keyCompareType != BTHeaderRec.kHFSCaseFolding)
+            throw new IllegalArgumentException("Illegal key compare type: " + keyCompareType);
     }
     
     @Override
@@ -48,14 +63,14 @@ public class HFSXCatalogKey extends HFSPlusCatalogKey {
 	if(btk instanceof HFSPlusCatalogKey) {
 	    HFSPlusCatalogKey catKey = (HFSPlusCatalogKey) btk;
 	    if(Util.unsign(getParentID().toInt()) == Util.unsign(catKey.getParentID().toInt())) {
-		switch(catalogHeaderRec.getKeyCompareType()) {
+		switch(keyCompareType) {
 		case BTHeaderRec.kHFSCaseFolding:
 		    return FastUnicodeCompare.compare(getNodeName().getUnicode(), catKey.getNodeName().getUnicode());
 		case BTHeaderRec.kHFSBinaryCompare:
 		    return Util.unsignedArrayCompareLex(getNodeName().getUnicode(), catKey.getNodeName().getUnicode());
 		default:
-		    throw new RuntimeException("Invalid value in file system structure! BTHeaderRec.getKeyCompareType() = " + 
-					       catalogHeaderRec.getKeyCompareType());
+		    throw new RuntimeException("Invalid value in file system structure! keyCompareType = " + 
+					       keyCompareType);
 		}
 	    }
 	    else return super.compareTo(btk);

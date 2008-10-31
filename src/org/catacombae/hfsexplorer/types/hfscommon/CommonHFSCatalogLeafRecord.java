@@ -87,6 +87,9 @@ public abstract class CommonHFSCatalogLeafRecord extends CommonBTRecord implemen
     }
     
     public static CommonHFSCatalogLeafRecord createHFSX(byte[] data, int offset, int length, BTHeaderRec bthr) {
+        if(bthr == null)
+            throw new IllegalArgumentException("bthr == null");
+        
         HFSXCatalogKey key = new HFSXCatalogKey(data, offset, bthr);
         final HFSPlusCatalogLeafRecordData recordData;
 

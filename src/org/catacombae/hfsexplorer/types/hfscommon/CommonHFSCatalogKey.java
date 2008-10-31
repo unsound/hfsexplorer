@@ -32,9 +32,11 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey implements StructE
         return new HFSPlusImplementation(key);
     }
     
+    /*
     public static CommonHFSCatalogKey create(HFSPlusCatalogKey key, HFSXKeyCompareType compType) {
         return new HFSXImplementation(key, compType);
     }
+     * */
     
     public static CommonHFSCatalogKey create(CatKeyRec key) {
         return new HFSImplementation(key);
@@ -42,16 +44,19 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey implements StructE
     
     public static class HFSPlusImplementation extends CommonHFSCatalogKey {
         private final HFSPlusCatalogKey key;
-        private HFSXKeyCompareType compType;
+        //private HFSXKeyCompareType compType;
         
         public HFSPlusImplementation(HFSPlusCatalogKey key) {
-            this(key, HFSXKeyCompareType.CASE_FOLDING);
+            //this(key, HFSXKeyCompareType.CASE_FOLDING);
+            this.key = key;
         }
+        /*
         protected HFSPlusImplementation(HFSPlusCatalogKey key,
                 HFSXKeyCompareType compType) {
             this.key = key;
             this.compType = compType;
         }
+        */
 
         @Override
         public CommonHFSCatalogNodeID getParentID() {
@@ -72,6 +77,8 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey implements StructE
         public int compareTo(CommonBTKey o) {
             if(o instanceof HFSPlusImplementation) {
                 HFSPlusImplementation k = (HFSPlusImplementation) o;
+                return key.compareTo(k.key);
+                /*
                 long res = getParentID().toLong() - k.getParentID().toLong();
                 if(res == 0) {
                     switch(compType) {
@@ -90,6 +97,7 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey implements StructE
                     return 1;
                 else
                     return -1;
+                */
             }
             else {
                 throw new RuntimeException("Can't compare a " + o.getClass() +
@@ -119,12 +127,14 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey implements StructE
         }
     }
     
+    /*
     public static class HFSXImplementation extends HFSPlusImplementation {
         public HFSXImplementation(HFSPlusCatalogKey key,
                 HFSXKeyCompareType compType) {
             super(key, compType);
         }
     }
+    */
     
     public static class HFSImplementation extends CommonHFSCatalogKey {
         private final CatKeyRec key;

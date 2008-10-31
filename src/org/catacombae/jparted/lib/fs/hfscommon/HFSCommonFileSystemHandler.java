@@ -85,7 +85,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
     FSEntry getEntry(CommonHFSCatalogFolderRecord rootRecord, String... path) {
         return entryFromRecord(getRecord(rootRecord, path));
     }
-
+    
     CommonHFSCatalogLeafRecord getRecord(final CommonHFSCatalogFolderRecord rootRecord, final String... path) {
         /*
          * currentRoot = root
@@ -147,8 +147,8 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
                             //log(prefix + " getRecord: no link target found for posix path \"" + posixPath + "\" with base path \"" + Util.concatenateStrings(basePath, "/") + "\"");
                             return null;
                         }
-                    //else
-                    //log(prefix + "  getRecord: absPath=" + Util.concatenateStrings(absPath, "/"));
+                        //else
+                        //  log(prefix + "  getRecord: absPath=" + Util.concatenateStrings(absPath, "/"));
                     }
                     else if(fr.getData().isHardFileLink()) {
                         absPath = new String[] {
@@ -197,6 +197,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
             }
 
             //CommonHFSCatalogLeafRecord[] subRecords = view.listRecords(currentRootFolder);
+            //log(prefix + "  getting record (" + currentRootFolder.getData().getFolderID().toLong() + ":\"" + curPathComponent + "\")");
             CommonHFSCatalogLeafRecord newRoot =
                     view.getRecord(currentRootFolder.getData().getFolderID(), view.encodeString(curPathComponent));
 
@@ -234,10 +235,30 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
 
             if(fileRecord.getData().isSymbolicLink())
                 return new HFSCommonFSLink(this, fileRecord);
-            else if(fileRecord.getData().isHardFileLink())
-                return new HFSCommonFSFile(this, fileRecord, lookupFileInode(fileRecord.getData().getHardLinkInode()));
-            else if(fileRecord.getData().isHardDirectoryLink())
-                return new HFSCommonFSFolder(this, fileRecord, lookupDirectoryInode(fileRecord.getData().getHardLinkInode()));
+            else if(fileRecord.getData().isHardFileLink()) {
+                CommonHFSCatalogFileRecord iNode = lookupFileInode(fileRecord.getData().getHardLinkInode());
+                if(iNode != null) {
+                    return new HFSCommonFSFile(this, fileRecord, iNode);
+                }
+                else {
+                    System.err.println("Looking up file iNode " + fileRecord.getData().getHardLinkInode() +
+                        " (" + fileRecord.getKey().getParentID().toLong() +
+                        ":\"" + getProperNodeName(fileRecord) + "\") FAILED!");
+                    return new HFSCommonFSFile(this, fileRecord);
+                }
+            }
+            else if(fileRecord.getData().isHardDirectoryLink()) {
+                CommonHFSCatalogFolderRecord iNode = lookupDirectoryInode(fileRecord.getData().getHardLinkInode());
+                if(iNode != null) {
+                    return new HFSCommonFSFolder(this, fileRecord, iNode);
+                }
+                else {
+                    System.err.println("Looking up directory iNode " + fileRecord.getData().getHardLinkInode() +
+                        " (" + fileRecord.getKey().getParentID().toLong() +
+                        ":\"" + getProperNodeName(fileRecord) + "\") FAILED!");
+                    return new HFSCommonFSFile(this, fileRecord);
+                }
+            }
             else
                 return new HFSCommonFSFile(this, fileRecord);
 
