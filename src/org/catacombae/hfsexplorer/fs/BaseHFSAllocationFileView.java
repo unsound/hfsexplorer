@@ -163,7 +163,7 @@ public abstract class BaseHFSAllocationFileView {
      * Creates an implementation specific extent descriptor from the given data.
      *
      * @param startBlock the first block number of the extent.
-     * @param allocatedBlockCount the number of blocks that the extent ranges over.
+     * @param blockCount the number of blocks that the extent ranges over.
      * @return an implementation specific representation of an extent descriptor
      * created from the <code>startBlock</code> and <code>allocatedBlockCount</code>
      * parameters.
