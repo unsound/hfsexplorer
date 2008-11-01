@@ -34,7 +34,7 @@ antbuild() {
 main() {
     increment_buildnumber
     antbuild
-    if [ "$?" == 0 ]; then
+    if [ "$?" -eq 0 ]; then
 	jobCompleted
 	return 0
     else
