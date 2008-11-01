@@ -258,6 +258,7 @@ public class HFSPlusVolumeHeader extends MutableStruct implements StructElements
         ps.println(prefix + "kHFSVolumeSoftwareLockBit = " + ((attributesInt >> 15) & 0x1));
     }
 
+    /*
     public static void main(String[] args) throws Exception {
         if(args.length != 2)
             System.err.println("usage: main <file> <byte position>");
@@ -273,7 +274,8 @@ public class HFSPlusVolumeHeader extends MutableStruct implements StructElements
             new HFSPlusVolumeHeader(buf).print(System.out, "");
         }
     }
-
+    */
+    
     private Dictionary getAttributeElements() {
         DictionaryBuilder db = new DictionaryBuilder("Attributes");
 

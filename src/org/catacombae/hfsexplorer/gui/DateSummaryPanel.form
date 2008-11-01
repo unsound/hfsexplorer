@@ -26,11 +26,11 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="createField" alignment="0" pref="133" max="32767" attributes="1"/>
-                  <Component id="backupField" pref="133" max="32767" attributes="0"/>
-                  <Component id="accessField" pref="133" max="32767" attributes="0"/>
-                  <Component id="contentModField" alignment="1" pref="133" max="32767" attributes="0"/>
-                  <Component id="attributeModField" alignment="0" pref="133" max="32767" attributes="0"/>
+                  <Component id="createField" alignment="0" pref="171" max="32767" attributes="1"/>
+                  <Component id="backupField" pref="171" max="32767" attributes="0"/>
+                  <Component id="accessField" pref="171" max="32767" attributes="0"/>
+                  <Component id="contentModField" alignment="1" pref="171" max="32767" attributes="0"/>
+                  <Component id="attributeModField" alignment="0" pref="171" max="32767" attributes="0"/>
               </Group>
           </Group>
           <Component id="jSeparator1" alignment="0" pref="270" max="32767" attributes="0"/>
