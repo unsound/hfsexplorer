@@ -45,11 +45,11 @@ buildjar() {
 
 main() {
     removeclassfiles
-    if [ "$?" == 0 ]; then
+    if [ "$?" -eq 0 ]; then
 	buildjparted
-	if [ "$?" == 0 ]; then
+	if [ "$?" -eq 0 ]; then
 	    buildjar
-	    if [ "$?" == 0 ]; then
+	    if [ "$?" -eq 0 ]; then
 		jobCompleted
 	    else
 		error
