@@ -1,5 +1,4 @@
 #!/bin/sh
 
-pushd dist > /dev/null
+cd dist
 ./runfsb.sh "$@"
-popd > /dev/null
