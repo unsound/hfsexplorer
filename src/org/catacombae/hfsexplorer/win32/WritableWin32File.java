@@ -20,7 +20,7 @@ import org.catacombae.io.RandomAccessStream;
 import org.catacombae.hfsexplorer.*;
 
 /** BUG: Writing at the end of a file will always expand it to fit the sector size! Not very good. Fixit.
-    Note: Is this fixed? */
+    Note: Is this fixed? TODO ?! */
 
 public class WritableWin32File extends WindowsLowLevelIO implements RandomAccessStream {
     private byte[] sectorBuffer;

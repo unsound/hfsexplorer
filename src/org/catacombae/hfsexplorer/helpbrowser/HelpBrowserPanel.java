@@ -31,8 +31,9 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
 /**
+ * A simple implemetation of a HTML help browser through Java's standard API.
  *
- * @author  erik
+ * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
  */
 public class HelpBrowserPanel extends javax.swing.JPanel {
     private static final String TEST_HOME =
@@ -129,7 +130,7 @@ public class HelpBrowserPanel extends javax.swing.JPanel {
     }
     
     public static void showHelpBrowserWindow(String iTitle, URL iHomePage) {
-	JFrame f = new JFrame(iTitle);
+        JFrame f = new JFrame(iTitle);
         f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         JPanel helpBrowserPanel = new HelpBrowserPanel(iHomePage);
         //helpBrowserPanel.setBorder(new EmptyBorder(5, 5, 5, 5));

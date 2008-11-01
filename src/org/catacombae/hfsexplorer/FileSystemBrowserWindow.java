@@ -88,6 +88,12 @@ import org.catacombae.jparted.lib.DataLocator;
 import org.catacombae.jparted.lib.fs.FSLink;
 import org.catacombae.udif.UDIFRandomAccessStream;
 
+/**
+ * The main window for the graphical part of HFSExplorer. This class contains a lot of
+ * non-presentation code and is very large. Should be restructured in the future.
+ * 
+ * @author Erik
+ */
 public class FileSystemBrowserWindow extends JFrame {
     private static final String TITLE_STRING = "HFSExplorer " + HFSExplorer.VERSION;
     private static final ImageIcon[] WINDOW_ICONS = {
