@@ -135,6 +135,22 @@ public class FileSystemBrowserWindow extends JFrame {
         //final Class objectClass = new Object().getClass();
         setUpMenus();
 
+        if(System.getProperty("os.name").toLowerCase().startsWith("mac os x")) {
+            MacSpecific.registerMacApplicationHandler(new MacSpecific.MacApplicationHandler() {
+                @Override
+                public boolean acceptQuit() {
+                    exitApplication();
+                    return false;
+                }
+
+                public void showAboutDialog() {
+                    actionShowAboutDialog();
+                }
+
+
+            });
+        }
+
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent we) {
@@ -322,15 +338,6 @@ public class FileSystemBrowserWindow extends JFrame {
             exitProgramItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q,
                     Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         }
-        else {
-            MacSpecific.registerQuitHandler(new MacSpecific.QuitHandler() {
-                @Override
-                public boolean acceptQuit() {
-                    exitApplication();
-                    return false;
-                }
-            });
-        }
 
         JMenuItem fsInfoItem = new JMenuItem("File system info");
         fsInfoItem.addActionListener(new ActionListener() {
@@ -498,13 +505,16 @@ public class FileSystemBrowserWindow extends JFrame {
             }
         });
 
-        JMenuItem aboutItem = new JMenuItem("About...");
-        aboutItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                actionShowAboutDialog();
-            }
-        });
+        JMenuItem aboutItem = null;
+        if(!System.getProperty("os.name").toLowerCase().startsWith("mac os x")) {
+            aboutItem = new JMenuItem("About...");
+            aboutItem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent ae) {
+                    actionShowAboutDialog();
+                }
+            });
+        }
 
         JMenu fileMenu = new JMenu("File");
         JMenu infoMenu = new JMenu("Tools");
@@ -528,7 +538,8 @@ public class FileSystemBrowserWindow extends JFrame {
         infoMenu.add(memoryStatisticsItem);
         helpMenu.add(startHelpBrowserItem);
         helpMenu.add(checkUpdatesItem);
-        helpMenu.add(aboutItem);
+        if(aboutItem != null)
+            helpMenu.add(aboutItem);
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(fileMenu);
         menuBar.add(infoMenu);
@@ -2041,6 +2052,9 @@ public class FileSystemBrowserWindow extends JFrame {
     }
 
     public static void main(String[] args) {
+        if(System.getProperty("os.name").toLowerCase().startsWith("mac os x"))
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
+
         try {
             javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
         /*
