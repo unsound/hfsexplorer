@@ -39,10 +39,10 @@
 
   
   <target name="all">
-    <echo message="Currently defined targets:"/>
+    <echo message="Current well defined targets:"/>
     <echo message="  javadoc - Creates the javadoc documentation for the project."/>
-    <echo message="  compilejparted - Compiles the org.catacombae.jparted package, subpackages and dependencies."/>
-    <echo message="  compilehfsexplorer - Compiles the org.catacombae.hfsexplorer package, subpackages and dependencies."/>
+    <echo message="  build-jparted - Compiles the org.catacombae.jparted package, subpackages and dependencies."/>
+    <echo message="  build-hfsexplorer - Compiles the org.catacombae.hfsexplorer package, subpackages and dependencies."/>
   </target>
   
   
@@ -69,6 +69,7 @@
 	   includes="**"
 	   debug="true"
 	   debuglevel="${debuglevel}"
+	   encoding="iso-8859-1"
 	   source="${java.source.level}"
 	   target="${java.target.level}"
 	   deprecation="on">
@@ -87,6 +88,7 @@
 	   includes="org/catacombae/hfsexplorer/**"
 	   debug="true"
 	   debuglevel="${debuglevel}"
+	   encoding="iso-8859-1"
 	   source="${java.source.level}"
 	   target="${java.target.level}">
       <classpath refid="java.build.classpath"/>
@@ -101,6 +103,7 @@
 	   includes="org/catacombae/jparted/**"
 	   debug="true"
 	   debuglevel="${debuglevel}"
+	   encoding="iso-8859-1"
 	   source="${java.source.level}"
 	   target="${java.target.level}">
       <classpath refid="java.build.classpath"/>
@@ -119,6 +122,7 @@
              author="true"
              version="true"
              use="true"
+	     encoding="iso-8859-1"
              windowtitle="HFSExplorer API">
       
       <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
