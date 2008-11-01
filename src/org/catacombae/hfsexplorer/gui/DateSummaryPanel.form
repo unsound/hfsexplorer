@@ -4,9 +4,10 @@
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
     <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
-    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="2"/>
     <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
@@ -25,15 +26,15 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="createField" alignment="0" pref="136" max="32767" attributes="1"/>
-                  <Component id="backupField" pref="136" max="32767" attributes="0"/>
-                  <Component id="accessField" pref="136" max="32767" attributes="0"/>
-                  <Component id="contentModField" alignment="1" pref="136" max="32767" attributes="0"/>
-                  <Component id="attributeModField" alignment="0" pref="136" max="32767" attributes="0"/>
+                  <Component id="createField" alignment="0" pref="133" max="32767" attributes="1"/>
+                  <Component id="backupField" pref="133" max="32767" attributes="0"/>
+                  <Component id="accessField" pref="133" max="32767" attributes="0"/>
+                  <Component id="contentModField" alignment="1" pref="133" max="32767" attributes="0"/>
+                  <Component id="attributeModField" alignment="0" pref="133" max="32767" attributes="0"/>
               </Group>
           </Group>
-          <Component id="jSeparator1" alignment="0" pref="235" max="32767" attributes="0"/>
-          <Component id="chainedContentsPanel" alignment="0" pref="235" max="32767" attributes="0"/>
+          <Component id="jSeparator1" alignment="0" pref="270" max="32767" attributes="0"/>
+          <Component id="chainedContentsPanel" alignment="0" pref="270" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">

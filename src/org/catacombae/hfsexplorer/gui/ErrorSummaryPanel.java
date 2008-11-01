@@ -6,11 +6,10 @@
 
 package org.catacombae.hfsexplorer.gui;
 
-import java.awt.Dialog.ModalityType;
-import java.awt.Window;
+import java.awt.Dialog;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.LinkedList;
 import java.util.List;
 import javax.swing.JDialog;
 
@@ -41,15 +40,24 @@ public class ErrorSummaryPanel extends javax.swing.JPanel {
         }
     }
     
-    public static JDialog createErrorSummaryDialog(Window owner, List<String> errorMessages) {
-        JDialog dialog = new JDialog(owner, "Error summary", ModalityType.DOCUMENT_MODAL);
+    public static JDialog createErrorSummaryDialog(Dialog owner, List<String> errorMessages) {
+        JDialog dialog = new JDialog(owner, "Error summary", true);
+        fillErrorSummaryDialog(dialog, errorMessages);
+        return dialog;
+    }
+    
+    public static JDialog createErrorSummaryDialog(Frame owner, List<String> errorMessages) {
+        JDialog dialog = new JDialog(owner, "Error summary", true);
+        fillErrorSummaryDialog(dialog, errorMessages);
+        return dialog;
+    }
+
+    private static void fillErrorSummaryDialog(JDialog dialog, List<String> errorMessages) {
         ErrorSummaryPanel esp = new ErrorSummaryPanel(dialog, errorMessages);
         dialog.add(esp);
         
         dialog.pack();
         dialog.setLocationRelativeTo(null);
-        
-        return dialog;
     }
 
     /** This method is called from within the constructor to
@@ -80,27 +88,27 @@ public class ErrorSummaryPanel extends javax.swing.JPanel {
         closeButton.setText("Close");
         closeButtonPanel.add(closeButton);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(contantsAreaScroller, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 655, Short.MAX_VALUE)
-                    .addComponent(titleLabel, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(closeButtonPanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 655, Short.MAX_VALUE))
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, contantsAreaScroller, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 655, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, titleLabel)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, closeButtonPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 655, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(titleLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(contantsAreaScroller, javax.swing.GroupLayout.DEFAULT_SIZE, 255, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(closeButtonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .add(titleLabel)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(contantsAreaScroller, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 258, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(closeButtonPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
