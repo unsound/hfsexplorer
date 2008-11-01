@@ -1,3 +1,8 @@
 #!/bin/sh
 LIB=lib
-java "-Xdock:name=HFSExplorer" -jar "$LIB/hfsx.jar" "$@"
+
+UNAME=`uname`
+if [ "${UNAME}" = "Darwin" ]; then
+    DOCK_NAME="-Xdock:name=HFSExplorer"
+fi
+java ${DOCK_NAME:+"${DOCK_NAME}"} -jar "$LIB/hfsx.jar" "$@"
