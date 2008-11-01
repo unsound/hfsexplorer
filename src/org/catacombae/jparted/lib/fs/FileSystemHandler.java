@@ -114,7 +114,7 @@ public abstract class FileSystemHandler {
      * 
      * @param posixPath
      * @param rootFolderPath
-     * @return
+     * @return an absolute, canonical path name for the given POSIX path.
      * @throws java.lang.IllegalArgumentException
      */
     public String[] getTruePathFromPosixPath(final String posixPath,
