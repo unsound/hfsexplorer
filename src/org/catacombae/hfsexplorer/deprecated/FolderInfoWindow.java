@@ -19,7 +19,6 @@ package org.catacombae.hfsexplorer.deprecated;
 
 import org.catacombae.hfsexplorer.gui.FolderInfoPanel;
 //import org.catacombae.hfsexplorer.gui.JournalInfoPanel;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFolder;
 //import org.catacombae.hfsexplorer.types.JournalInfoBlock;
 import java.awt.*;
 import javax.swing.*;
@@ -28,6 +27,7 @@ import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolder;
 import org.catacombae.jparted.lib.fs.FSFolder;
 import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFSFolder;
 
+@Deprecated
 public class FolderInfoWindow extends JFrame {
 
     private JTabbedPane tabs;
