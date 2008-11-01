@@ -41,8 +41,8 @@
   <target name="all">
     <echo message="Current well defined targets:"/>
     <echo message="  javadoc - Creates the javadoc documentation for the project."/>
-    <echo message="  build-jparted - Compiles the org.catacombae.jparted package, subpackages and dependencies."/>
-    <echo message="  build-hfsexplorer - Compiles the org.catacombae.hfsexplorer package, subpackages and dependencies."/>
+    <echo message="  build-all     - Compiles all files in all packages and puts the result in dist/lib/hfsx.jar."/>
+    <echo message="  build-jparted - Compiles the org.catacombae.jparted package, subpackages and dependencies and puts the result in targets/jparted/lib/jparted.jar."/>
   </target>
   
   
