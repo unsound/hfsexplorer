@@ -19,6 +19,10 @@ package org.catacombae.hfsexplorer.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.catacombae.csjc.structelements.ArrayBuilder;
@@ -33,27 +37,40 @@ import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentDescriptor;
  */
 public class AllocationFileInfoPanel extends javax.swing.JPanel {
     private final BaseHFSAllocationFileView afView;
+    private final ObjectContainer<Boolean> stopCountBlocksProcess =
+            new ObjectContainer<Boolean>(false);
 
     /** Creates new form AllocationFileInfoPanel */
-    public AllocationFileInfoPanel(final BaseHFSAllocationFileView afView) {
+    public AllocationFileInfoPanel(JFrame window, final BaseHFSAllocationFileView afView) {
         this.afView = afView;
 
         initComponents();
+        
+        window.addWindowListener(new WindowAdapter() {
 
+            @Override
+            public void windowClosing(WindowEvent e) {
+                stopCountBlocksProcess.o = true;
+            }
+        });
+        
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                // TODO: Make it stop! :<
                 final ObjectContainer<Long> freeBlocks = new ObjectContainer<Long>((long)-1);
                 final ObjectContainer<Long> usedBlocks = new ObjectContainer<Long>((long)-1);
-                afView.countBlocks(freeBlocks, usedBlocks);
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        allocatedBlocksField.setText(usedBlocks.o.toString());
-                        freeBlocksField.setText(freeBlocks.o.toString());
-                    }
-                });
+                afView.countBlocks(freeBlocks, usedBlocks, stopCountBlocksProcess);
+                if(!stopCountBlocksProcess.o) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            allocatedBlocksField.setText(usedBlocks.o.toString());
+                            freeBlocksField.setText(freeBlocks.o.toString());
+                        }
+                    });
+                }
+                else
+                    System.err.println("AllocationFileInfoPanel thread aborted.");
             }
         });
         t.start();

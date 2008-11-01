@@ -56,8 +56,9 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
      * - Location (the parent to the FSEntry). A POSIX pathname (possibly translated) must also
      *   exist.
      * - Type (Folder, Link or File)
-     * - Size _can_ be derived from all FSEntries (through recursive search or by looking up a file
+     * - Size can be derived from all FSEntries (through recursive search or by looking up a file
      *   entry) and should be considered a must-have field.
+     * - (Size on disk)
      *
      * An FSEntry may optionally have:
      * - Various date variables.

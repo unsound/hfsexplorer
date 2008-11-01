@@ -101,7 +101,8 @@ public class VolumeInfoWindow extends JFrame {
         // The "Allocation file info" tab
         
         try {
-            AllocationFileInfoPanel allocationFileInfoPanel = new AllocationFileInfoPanel(fsView.getAllocationFileView());
+            AllocationFileInfoPanel allocationFileInfoPanel = new AllocationFileInfoPanel(this,
+                    fsView.getAllocationFileView());
             JScrollPane allocationFileInfoPanelScroller = new JScrollPane(allocationFileInfoPanel,
                     JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);

@@ -102,13 +102,15 @@ public abstract class BaseHFSAllocationFileView {
 
     /**
      * Loops through the entire allocation file to count the number of used and free blocks on the
-     * volume. The output is placed in two ObjectContainers
+     * volume. The output is placed in two <code>ObjectContainer</code>s
      *
      * @param oFreeBlocks (optional) variable where the algorithm stores the free block count.
      * @param oUsedBlocks (optional) variable where the algorithm stores the used block count.
+     * @param stop (optional) variable which can be set to abort the block counting process. Must
+     * initally be set to <code>false</code> or no work will be done whatsoever.
      * @return the total number of allocation blocks on the volume.
      */
-    public synchronized long countBlocks(ObjectContainer<Long> oFreeBlocks, ObjectContainer<Long> oUsedBlocks) {
+    public long countBlocks(ObjectContainer<Long> oFreeBlocks, ObjectContainer<Long> oUsedBlocks, ObjectContainer<Boolean> stop) {
         CommonHFSVolumeHeader vh = parentView.getVolumeHeader();
         byte[] currentBlock = new byte[128*1024];
         final long totalBlocks = vh.getTotalBlocks();
@@ -116,23 +118,25 @@ public abstract class BaseHFSAllocationFileView {
         //long allocatedBlockCount = 0;
         long usedBlockCount = 0;
         //int blockValue = (usedBlocks?0x1:0x0);
+        if(stop == null)
+            stop = new ObjectContainer<Boolean>(false);
 
-        System.err.println("countBlocks(): totalBlocks=" + totalBlocks);
-        System.err.println("countBlocks(): allocationFileStream.length()=" + allocationFileStream.length());
+        //System.err.println("countBlocks(): totalBlocks=" + totalBlocks);
+        //System.err.println("countBlocks(): allocationFileStream.length()=" + allocationFileStream.length());
         allocationFileStream.seek(0);
-        while(blockCount < totalBlocks) {
-            System.err.println("countBlocks():   blockCount=" + blockCount);
-            System.err.println("countBlocks():   allocationFileStream.getFilePointer()=" + allocationFileStream.getFilePointer());
+        while(blockCount < totalBlocks && !stop.o) {
+            //System.err.println("countBlocks():   blockCount=" + blockCount);
+            //System.err.println("countBlocks():   allocationFileStream.getFilePointer()=" + allocationFileStream.getFilePointer());
             //System.err.println("countBlocks():   =" + );
 
-            System.out.println("countBlocks():   Reading a blob (" + currentBlock.length + " bytes)...");
+            //System.out.println("countBlocks():   Reading a blob (" + currentBlock.length + " bytes)...");
             int bytesRead = allocationFileStream.read(currentBlock);
-            System.out.println("countBlocks():   ..." + bytesRead + " bytes read.");
+            //System.out.println("countBlocks():   ..." + bytesRead + " bytes read.");
 
             if(bytesRead >= 0) {
-                for(int i = 0; i < bytesRead && blockCount < totalBlocks; ++i) {
+                for(int i = 0; i < bytesRead && blockCount < totalBlocks && !stop.o; ++i) {
                     byte currentByte = currentBlock[i];
-                    for(int j = 0; j < 8 && blockCount < totalBlocks; ++j) {
+                    for(int j = 0; j < 8 && blockCount < totalBlocks && !stop.o; ++j) {
                         ++blockCount;
                         if(((currentByte >> (7 - j)) & 0x1) == 0x1)
                             ++usedBlockCount;
