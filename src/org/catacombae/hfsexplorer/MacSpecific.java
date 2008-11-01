@@ -31,14 +31,20 @@ import com.apple.eawt.ApplicationEvent;
  */
 public class MacSpecific {
     /**
-     * Interface for a Mac OS X quit handler.
+     * Interface for a handler for Mac OS X application events.
      */
-    public static interface QuitHandler {
+    public static interface MacApplicationHandler {
+
         /**
          * Returns whether or not this application accepts to be terminated.
          * @return whether or not this application accepts to be terminated.
          */
-	public boolean acceptQuit();
+        public boolean acceptQuit();
+
+        /**
+         * 
+         */
+        public void showAboutDialog();
     }
     
     /**
@@ -46,7 +52,7 @@ public class MacSpecific {
      * 
      * @param qh the QuitHandler to register.
      */
-    public static void registerQuitHandler(final QuitHandler qh) {
+    public static void registerMacApplicationHandler(final MacApplicationHandler qh) {
         Application thisApplication = Application.getApplication();
         thisApplication.addApplicationListener(new ApplicationAdapter() {
             @Override
@@ -55,6 +61,12 @@ public class MacSpecific {
                     ae.setHandled(true);
                 else
                     ae.setHandled(false);
+            }
+
+            @Override
+            public void handleAbout(ApplicationEvent event) {
+                qh.showAboutDialog();
+                event.setHandled(true);
             }
         });
     }
