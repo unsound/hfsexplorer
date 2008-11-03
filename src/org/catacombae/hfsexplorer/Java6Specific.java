@@ -24,6 +24,7 @@ import java.awt.Desktop;
 import java.awt.Image;
 import java.awt.Window;
 import java.util.Comparator;
+import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
@@ -89,16 +90,17 @@ public class Java6Specific {
      * 
      * @param table
      * @param tableModel
-     * @param defaultSortColumn
+     * @param defaultSortColumn the column on which to sort on by default.
      * @param columnComparators
      */
     public static void addRowSorter(JTable table, DefaultTableModel tableModel,
-            int defaultSortColumn, Comparator... columnComparators) {
-        TableRowSorter sorter = new TableRowSorter<DefaultTableModel>(tableModel);
-        for(int i = 0; i < columnComparators.length; ++i) {
-            Comparator c = columnComparators[i];
+            int defaultSortColumn, List<Comparator<?>> columnComparators) {
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<DefaultTableModel>(tableModel);
+        int i = 0;
+        for(Comparator<?> c : columnComparators) {
             if(c != null)
                 sorter.setComparator(i, c);
+            ++i;
         }
         sorter.toggleSortOrder(defaultSortColumn);
         table.setRowSorter(sorter);

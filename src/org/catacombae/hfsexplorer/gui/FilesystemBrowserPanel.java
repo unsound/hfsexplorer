@@ -55,6 +55,7 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
         extractButton = new javax.swing.JButton();
         upButton = new javax.swing.JButton();
         infoButton = new javax.swing.JButton();
+        boxPanel = new javax.swing.JPanel();
         treeTablePanel = new javax.swing.JPanel();
         treeTableSplit = new javax.swing.JSplitPane();
         dirTreeScroller = new javax.swing.JScrollPane();
@@ -78,6 +79,8 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
         infoButton.setIcon(INFO_ICON);
         infoButton.setText("Info");
 
+        boxPanel.setLayout(new javax.swing.BoxLayout(boxPanel, javax.swing.BoxLayout.PAGE_AXIS));
+
         treeTablePanel.setLayout(new java.awt.BorderLayout());
 
         treeTableSplit.setDividerLocation(200);
@@ -95,7 +98,7 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
                 {null, null, null, null}
             },
             new String [] {
-                "Namn", "Storlek", "Typ", "Senast Šndrad"
+                "Namn", "Storlek", "Typ", "Senast ändrad"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -115,35 +118,37 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
 
         treeTablePanel.add(treeTableSplit, java.awt.BorderLayout.CENTER);
 
+        boxPanel.add(treeTablePanel);
+
         statusLabelPanel.setLayout(new java.awt.BorderLayout());
 
         statusLabel.setText("No file system loaded");
         statusLabel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         statusLabelPanel.add(statusLabel, java.awt.BorderLayout.CENTER);
 
+        boxPanel.add(statusLabelPanel);
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
+                .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
-                        .addContainerGap()
                         .add(pathLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(addressField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE)
+                        .add(addressField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 672, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(goButton))
                     .add(layout.createSequentialGroup()
-                        .addContainerGap()
                         .add(upButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(extractButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(infoButton)))
                 .addContainerGap())
-            .add(statusLabelPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 773, Short.MAX_VALUE)
-            .add(treeTablePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 773, Short.MAX_VALUE)
+            .add(boxPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 773, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -159,15 +164,14 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
                     .add(addressField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(goButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(treeTablePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(statusLabelPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(boxPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 428, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JTextField addressField;
+    private javax.swing.JPanel boxPanel;
     public javax.swing.JTree dirTree;
     private javax.swing.JScrollPane dirTreeScroller;
     public javax.swing.JButton extractButton;

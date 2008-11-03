@@ -33,6 +33,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.LinkedList;
@@ -209,8 +210,11 @@ public class FileSystemBrowser<A> {
 
         if(Java6Util.isJava6OrHigher()) {
             
-            Comparator c = new ComparableComparator();
-            Java6Specific.addRowSorter(fileTable, tableModel, 4, c, c, c, c, c);
+            Comparator<?> c = new ComparableComparator();
+            ArrayList<Comparator<?>> rowComparators = new ArrayList<Comparator<?>>(5);
+            for(int i = 0; i < 5; ++i) // 5 rows currently
+                rowComparators.add(c);
+            Java6Specific.addRowSorter(fileTable, tableModel, 4, rowComparators);
         }
 
         TableColumnModelListener columnListener = new TableColumnModelListener() {
@@ -494,7 +498,7 @@ public class FileSystemBrowser<A> {
                     dirTree.setSelectionPath(tp);
                     dirTree.requestFocus();
 
-                    List<Record<A>> recList = Arrays.asList(getTreeSelection());
+                    List<Record<A>> recList = Collections.singletonList(getTreeSelection());
                     List<Record<A>> selectionParentPath = getRecordPath(lastTreeSelectionPath.getParentPath());
                     controller.getRightClickRecordPopupMenu(selectionParentPath, recList).show(dirTree,
                             e.getX(), e.getY());
@@ -1544,16 +1548,16 @@ public class FileSystemBrowser<A> {
         public String toString() { return ""; }
     }
     
-    private static class ComparableComparator implements Comparator {
+    private static class ComparableComparator implements Comparator<Comparable<Comparable>> {
 
         @Override
-        public int compare(Object o1, Object o2) {
+        public int compare(Comparable<Comparable> o1, Comparable<Comparable> o2) {
             //System.err.println("ComparableComparator comparing a " + o1.getClass() + " and a " + o2.getClass());
-            if(o1 instanceof Comparable && o2 instanceof Comparable) {
-                return ((Comparable)o1).compareTo(o2);
-            }
+            //if(o1 instanceof Comparable && o2 instanceof Comparable) {
+                return o1.compareTo(o2);
+            /*}
             else
-                throw new UnsupportedOperationException("Trying to compare non-Comparables.");
+                throw new UnsupportedOperationException("Trying to compare non-Comparables.");*/
         }
         
     }

@@ -25,6 +25,7 @@ import javax.swing.JTabbedPane;
 import org.catacombae.hfsexplorer.fs.BaseHFSFileSystemView;
 import org.catacombae.hfsexplorer.gui.AllocationFileInfoPanel;
 import org.catacombae.hfsexplorer.gui.CatalogInfoPanel;
+import org.catacombae.hfsexplorer.gui.ExtentsInfoPanel;
 import org.catacombae.hfsexplorer.gui.JournalInfoPanel;
 import org.catacombae.hfsexplorer.gui.StructViewPanel;
 import org.catacombae.hfsexplorer.gui.HFSPlusVolumeInfoPanel;
@@ -74,8 +75,22 @@ public class VolumeInfoWindow extends JFrame {
             JScrollPane catalogInfoPanelScroller = new JScrollPane(catalogInfoPanel,
                     JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-            tabs.addTab("Catalog file info", catalogInfoPanelScroller);
+            tabs.addTab("Catalog file", catalogInfoPanelScroller);
             catalogInfoPanelScroller.getVerticalScrollBar().setUnitIncrement(10);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        
+        
+        // The "Extents overflow file info" tab
+        
+        try {
+            ExtentsInfoPanel extentsInfoPanel = new ExtentsInfoPanel(fsView);
+            JScrollPane scroller = new JScrollPane(extentsInfoPanel,
+                    JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                    JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            tabs.addTab("Extents overflow file", scroller);
+            scroller.getVerticalScrollBar().setUnitIncrement(10);
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -90,7 +105,7 @@ public class VolumeInfoWindow extends JFrame {
                 JScrollPane journalInfoPanelScroller = new JScrollPane(journalInfoPanel,
                         JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                         JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-                tabs.addTab("Journal info", journalInfoPanelScroller);
+                tabs.addTab("Journal", journalInfoPanelScroller);
                 journalInfoPanelScroller.getVerticalScrollBar().setUnitIncrement(10);
             }
         } catch(Exception e) {
@@ -99,7 +114,7 @@ public class VolumeInfoWindow extends JFrame {
         
         
         // The "Allocation file info" tab
-        
+        /*
         try {
             AllocationFileInfoPanel allocationFileInfoPanel = new AllocationFileInfoPanel(this,
                     fsView.getAllocationFileView());
@@ -111,7 +126,7 @@ public class VolumeInfoWindow extends JFrame {
         } catch(Exception e) {
             e.printStackTrace();
         }
-        
+        */
         
         add(tabs, BorderLayout.CENTER);
         

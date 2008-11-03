@@ -93,7 +93,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel4">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Complete max:"/>
+        <Property name="text" type="java.lang.String" value="Total max:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="allocatedMemoryField">

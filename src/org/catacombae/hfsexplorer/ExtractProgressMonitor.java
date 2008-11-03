@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2006 Erik Larsson
+ * Copyright (C) 2008 Erik Larsson
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,21 @@
 
 package org.catacombae.hfsexplorer;
 
-public class BuildNumber {
-    //[BuildEnumerator:Opening] WARNING: The following lines are managed by an external program. Do NOT change.
-    public static final long BUILD_NUMBER = 997L;
-    //[BuildEnumerator:Closing] The lines managed by an external program end here.
+import java.io.File;
+import org.catacombae.hfsexplorer.fs.ProgressMonitor;
+
+/**
+ *
+ * @author Erik
+ */
+public interface ExtractProgressMonitor extends ProgressMonitor {
+
+    public void updateCalculateDir(String dirname);
+    public void updateTotalProgress(double fraction, String message);
+    public void updateCurrentDir(String dirname);
+    public void updateCurrentFile(String filename, long fileSize);
+    public boolean confirmOverwriteDirectory(File dir);
+    public boolean confirmSkipDirectory(String... messageLines);
+    public void setDataSize(long totalSize);
+
 }

@@ -24,26 +24,14 @@ import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogKey;
  *
  * @author erik
  */
-public abstract class CommonHFSCatalogLeafNode extends CommonBTNode {
+public abstract class CommonHFSCatalogLeafNode extends CommonBTNode<CommonHFSCatalogLeafRecord> {
     
     protected CommonHFSCatalogLeafNode(byte[] data, int offset, int nodeSize, FSType type) {
         super(data, offset, nodeSize, type);
     }
     
     public CommonHFSCatalogLeafRecord[] getLeafRecords() {
-        CommonHFSCatalogLeafRecord[] res = new CommonHFSCatalogLeafRecord[ic.records.length];
-
-        for (int i = 0; i < res.length; ++i) {
-            CommonBTRecord rec = ic.records[i];
-            if (rec instanceof CommonHFSCatalogLeafRecord) {
-                res[i] = (CommonHFSCatalogLeafRecord) ic.records[i];
-            } else {
-                throw new RuntimeException("Internal error: Unexpected CommonBTRecord subtype: " +
-                        rec.getClass() + " (expected CommonHFSCatalogLeafRecord)");
-            }
-        }
-
-        return res;
+        return ic.records.toArray(new CommonHFSCatalogLeafRecord[ic.records.size()]);
     }
 
     public static CommonHFSCatalogLeafNode createHFSPlus(byte[] data, int offset, int nodeSize) {
@@ -68,7 +56,7 @@ public abstract class CommonHFSCatalogLeafNode extends CommonBTNode {
         }
         
         @Override
-        protected CommonBTRecord createBTRecord(int recordNumber, byte[] data, int offset, int length) {
+        protected CommonHFSCatalogLeafRecord createBTRecord(int recordNumber, byte[] data, int offset, int length) {
             return CommonHFSCatalogLeafRecord.createHFSPlus(data, offset, length);
         }
     }
@@ -86,7 +74,7 @@ public abstract class CommonHFSCatalogLeafNode extends CommonBTNode {
             }
 
             @Override
-            protected CommonBTRecord createBTRecord(int recordNumber, byte[] data, int offset, int length) {
+            protected CommonHFSCatalogLeafRecord createBTRecord(int recordNumber, byte[] data, int offset, int length) {
                 if(bthr == null)
                     throw new IllegalArgumentException("bthr == null");
                 return CommonHFSCatalogLeafRecord.createHFSX(data, offset, length, bthr);
@@ -98,7 +86,7 @@ public abstract class CommonHFSCatalogLeafNode extends CommonBTNode {
             this.internal = new Internal(data, offset, nodeSize);
         }
         
-        public Internal getInternal() { return internal; }
+        private Internal getInternal() { return internal; }
     }
     
     public static class HFSImplementation extends CommonHFSCatalogLeafNode {
@@ -107,7 +95,7 @@ public abstract class CommonHFSCatalogLeafNode extends CommonBTNode {
         }
 
         @Override
-        protected CommonBTRecord createBTRecord(int recordNumber, byte[] data, int offset, int length) {
+        protected CommonHFSCatalogLeafRecord createBTRecord(int recordNumber, byte[] data, int offset, int length) {
             return CommonHFSCatalogLeafRecord.createHFS(data, offset, length);
         }
     }

@@ -569,6 +569,21 @@ public class Util {
 	return alen-blen; // The shortest array gets higher priority
     }
     
+    public static int unsignedArrayCompareLex(byte[] a, byte[] b) {
+        return unsignedArrayCompareLex(a, 0, a.length, b, 0, b.length);
+    }
+    
+    public static int unsignedArrayCompareLex(byte[] a, int aoff, int alen, byte[] b, int boff, int blen) {
+        int compareLen = alen < blen ? alen : blen; // equiv. Math.min
+	for(int i = 0; i < compareLen; ++i) {
+	    int curA = a[aoff+i] & 0xFF;
+	    int curB = b[boff+i] & 0xFF;
+	    if(curA != curB)
+		return curA - curB;
+	}
+	return alen-blen; // The shortest array gets higher priority
+    }
+    
     public static int unsignedArrayCompareLex(char[] a, char[] b) {
 	return unsignedArrayCompareLex(a, 0, a.length, b, 0, b.length);
     }
@@ -741,7 +756,7 @@ public class Util {
     }
 
     // Added 2007-06-26 for DMGExtractor
-    public static String[] concatenate(String[] a, String[] b) {
+    public static String[] concatenate(String[] a, String... b) {
         String[] c = new String[a.length + b.length];
         System.arraycopy(a, 0, c, 0, a.length);
         System.arraycopy(b, 0, c, a.length, b.length);
@@ -852,4 +867,31 @@ public class Util {
         }
         return sizeStringBuilder.toString();
     }
+    
+    public static void buildStackTrace(Throwable t, int maxStackTraceLines, StringBuilder sb) {
+        int stackTraceLineCount = 0;
+        Throwable curThrowable = t;
+        while(curThrowable != null && stackTraceLineCount < maxStackTraceLines) {
+            sb.append(curThrowable.toString()).append("\n");
+            ++stackTraceLineCount;
+            for(StackTraceElement ste : curThrowable.getStackTrace()) {
+                if(stackTraceLineCount < maxStackTraceLines) {
+                    sb.append("        ").append(ste.toString()).append("\n");
+                }
+                ++stackTraceLineCount;
+            }
+
+            Throwable cause = curThrowable.getCause();
+            if(cause != null) {
+                if(stackTraceLineCount < maxStackTraceLines) {
+                    sb.append("Caused by:\n");
+                    ++stackTraceLineCount;
+                }
+            }
+            curThrowable = cause;
+        }
+        
+        if(stackTraceLineCount >= maxStackTraceLines)
+            sb.append("...and ").append(stackTraceLineCount-maxStackTraceLines).append(" more.");
+    }    
 }

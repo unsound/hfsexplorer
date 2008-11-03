@@ -21,30 +21,16 @@ package org.catacombae.hfsexplorer.types.hfscommon;
  *
  * @author erik
  */
-public abstract class CommonBTIndexNode extends CommonBTNode {
+public abstract class CommonBTIndexNode <K extends CommonBTKey<K>> extends CommonBTNode<CommonBTIndexRecord<K>> {
     
     protected CommonBTIndexNode(byte[] data, int offset, int nodeSize, FSType type) {
         super(data, offset, nodeSize, type);
-
-        validate();
     }
 
-    /**
-     * Runs a validation test on the node data, and throws a RuntimeException if
-     * the data is invalid. Check the message of the exception for more details.
-     *
-     * @throws RuntimeException if the some of the data in the fields is
-     * invalid.
-     */
-    private void validate() throws RuntimeException {
-        for(CommonBTRecord rec : ic.records) {
-            if(!(rec instanceof CommonBTIndexRecord))
-                throw new RuntimeException("Invalid record type: " + rec.getClass());
-        }
-    }
-
-    public CommonBTIndexRecord[] getIndexRecords() {
-        CommonBTIndexRecord[] res = new CommonBTIndexRecord[ic.records.length];
+    /*
+    public CommonBTIndexRecord<K>[] getIndexRecords() {
+        
+        CommonBTIndexRecord<K>[] res = new CommonBTIndexRecord[ic.records.];
         
         for(int i = 0; i < res.length; ++i) {
             CommonBTRecord rec = ic.records[i];
@@ -56,4 +42,5 @@ public abstract class CommonBTIndexNode extends CommonBTNode {
 
         return res;
     }
+    */
 }

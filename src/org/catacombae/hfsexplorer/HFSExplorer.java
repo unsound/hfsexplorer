@@ -17,6 +17,13 @@
 
 package org.catacombae.hfsexplorer;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import org.catacombae.hfsexplorer.deprecated.HFSPlusFileSystemView;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentDescriptor;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFolder;
@@ -34,14 +41,13 @@ import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogThread;
 import org.catacombae.hfsexplorer.io.ForkFilter;
 import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.hfsexplorer.partitioning.*;
-import org.catacombae.hfsexplorer.types.*;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
-import java.util.*;
-import java.io.*;
+import org.catacombae.hfsexplorer.fs.NullProgressMonitor;
+import org.catacombae.hfsexplorer.partitioning.APMPartition;
 
+@SuppressWarnings("deprecation") // TODO: Fix HFSExplorer so it doesn't use deprecated methods...
 public class HFSExplorer {
-    public static final String VERSION = "0.20pre";
+    public static final String VERSION = "0.20";
     public static final String COPYRIGHT = "Copyright \u00A9 Erik Larsson 2006-2008";
     public static final String[] NOTICES =
     {
@@ -465,7 +471,9 @@ public class HFSExplorer {
 			    FileOutputStream dataOut = new FileOutputStream(dataForkFilename);
 			    print("Extracting data fork to file \"" + dataForkFilename + "\"...");
 			    try {
-				long bytesExtracted = fsView.extractDataForkToStream(selectedFileRecord, dataOut);
+				long bytesExtracted =
+                                        fsView.extractDataForkToStream(selectedFileRecord, dataOut,
+                                        NullProgressMonitor.getInstance());
 				println("extracted " + bytesExtracted + " bytes.");
 				dataOut.close();
 			    } catch(IOException ioe) {
@@ -478,7 +486,9 @@ public class HFSExplorer {
 			    FileOutputStream resourceOut = new FileOutputStream(resourceForkFilename);
 			    print("Extracting resource fork to file \"" + resourceForkFilename + "\"...");
 			    try {
-				long bytesExtracted = fsView.extractResourceForkToStream(selectedFileRecord, resourceOut);
+				long bytesExtracted =
+                                        fsView.extractResourceForkToStream(selectedFileRecord,
+                                        resourceOut, NullProgressMonitor.getInstance());
 				println("extracted " + bytesExtracted + " bytes.");
 				resourceOut.close();
 			    } catch(IOException ioe) {

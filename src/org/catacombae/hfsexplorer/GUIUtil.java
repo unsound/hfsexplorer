@@ -87,29 +87,8 @@ public class GUIUtil {
             sb.append(message);
             sb.append("\n\n");
         }
-        sb.append(t.toString()).append("\n");
-        int stackTraceLineCount = 0;
-        Throwable curThrowable = t;
-        while(curThrowable != null) {
-            for(StackTraceElement ste : curThrowable.getStackTrace()) {
-                if(stackTraceLineCount < maxStackTraceLines) {
-                    sb.append("  ").append(ste.toString()).append("\n");
-                }
-                ++stackTraceLineCount;
-            }
-
-            Throwable cause = curThrowable.getCause();
-            if(cause != null) {
-                if(stackTraceLineCount < maxStackTraceLines) {
-                    sb.append("Caused by:\n");
-                }
-                ++stackTraceLineCount;
-            }
-            curThrowable = cause;
-        }
         
-        if(stackTraceLineCount > maxStackTraceLines)
-            sb.append("...and ").append(stackTraceLineCount-maxStackTraceLines).append(" more.");
+        Util.buildStackTrace(t, maxStackTraceLines, sb);
         
         final String finalMessage = sb.toString();
         try {

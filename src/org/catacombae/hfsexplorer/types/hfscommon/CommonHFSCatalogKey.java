@@ -30,7 +30,7 @@ import org.catacombae.hfsexplorer.types.hfs.CatKeyRec;
  *
  * @author erik
  */
-public abstract class CommonHFSCatalogKey extends CommonBTKey implements StructElements {
+public abstract class CommonHFSCatalogKey extends CommonBTKey<CommonHFSCatalogKey> implements StructElements {
     public abstract CommonHFSCatalogNodeID getParentID();
     public abstract CommonHFSCatalogString getNodeName();
     
@@ -86,7 +86,7 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey implements StructE
         }
         
         @Override
-        public int compareTo(CommonBTKey o) {
+        public int compareTo(CommonHFSCatalogKey o) {
             if(o instanceof HFSPlusImplementation) {
                 HFSPlusImplementation k = (HFSPlusImplementation) o;
                 return key.compareTo(k.key);
@@ -181,12 +181,18 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey implements StructE
         }
         
         @Override
-        public int compareTo(CommonBTKey o) {
+        public int compareTo(CommonHFSCatalogKey o) {
             if(o instanceof HFSImplementation) {
                 HFSImplementation k = (HFSImplementation) o;
                 long res = getParentID().toLong() - k.getParentID().toLong();
                 if(res == 0) {
-                    return Util.arrayCompareLex(key.getCkrCName(), k.key.getCkrCName());
+                    int res2 = Util.unsignedArrayCompareLex(key.getCkrCName(), k.key.getCkrCName());
+                    if(res2 == 0)
+                        return 0;
+                    else if(res2 > 0)
+                        return 1;
+                    else
+                        return -1;
                 }
                 else if(res > 0)
                     return 1;

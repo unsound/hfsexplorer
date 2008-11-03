@@ -24,24 +24,24 @@ import org.catacombae.hfsexplorer.Util;
  *
  * @author erik
  */
-public abstract class CommonBTIndexRecord extends CommonBTRecord {
-    protected final CommonBTKey key;
+public abstract class CommonBTIndexRecord <K extends CommonBTKey<K>> extends CommonBTRecord {
+    protected final K key;
     protected final byte[] index = new byte[4];
     
-    public static CommonBTIndexRecord createHFS(CommonBTKey key, byte[] data, int offset) {
-        return new HFSImplementation(key, data, offset);
+    public static <K extends CommonBTKey<K>> CommonBTIndexRecord<K> createHFS(K key, byte[] data, int offset) {
+        return new HFSImplementation<K>(key, data, offset);
     }
     
-    public static CommonBTIndexRecord createHFSPlus(CommonBTKey key, byte[] data, int offset) {
-        return new HFSPlusImplementation(key, data, offset);
+    public static <K extends CommonBTKey<K>> CommonBTIndexRecord<K> createHFSPlus(K key, byte[] data, int offset) {
+        return new HFSPlusImplementation<K>(key, data, offset);
     }
     
-    protected CommonBTIndexRecord(CommonBTKey key, byte[] data, int offset) {
+    protected CommonBTIndexRecord(K key, byte[] data, int offset) {
         this.key = key;
         System.arraycopy(data, offset+key.occupiedSize(), index, 0, index.length);
     }
     
-    public CommonBTKey getKey() {
+    public K getKey() {
         return key;
     }
 
@@ -81,9 +81,9 @@ public abstract class CommonBTIndexRecord extends CommonBTRecord {
     }
 
 
-    private static class HFSImplementation extends CommonBTIndexRecord {
+    private static class HFSImplementation <K extends CommonBTKey<K>> extends CommonBTIndexRecord<K> {
         
-        public HFSImplementation(CommonBTKey key, byte[] data, int offset) {
+        public HFSImplementation(K key, byte[] data, int offset) {
             super(key, data, offset);
         }
         
@@ -99,8 +99,8 @@ public abstract class CommonBTIndexRecord extends CommonBTRecord {
          * */
     }
     
-    private static class HFSPlusImplementation extends CommonBTIndexRecord {
-        public HFSPlusImplementation(CommonBTKey key, byte[] data, int offset) {
+    private static class HFSPlusImplementation <K extends CommonBTKey<K>> extends CommonBTIndexRecord<K> {
+        public HFSPlusImplementation(K key, byte[] data, int offset) {
             super(key, data, offset);
         }
         

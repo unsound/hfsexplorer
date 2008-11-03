@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.3" maxVersion="1.6" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="2"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="1" attributes="0">
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="21" pref="21" max="21" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="dirExistsPanel" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="createDirPanel" alignment="0" min="-2" max="-2" attributes="1"/>
+                      </Group>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="fileExistsPanel" min="-2" max="-2" attributes="1"/>
+                          <Component id="createFilePanel" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                  <Component id="quietModeBox" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="32767" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="quietModeBox" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="createDirPanel" alignment="0" min="-2" max="-2" attributes="1"/>
+                  <Component id="createFilePanel" max="32767" attributes="1"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="fileExistsPanel" alignment="0" min="-2" max="-2" attributes="1"/>
+                  <Component id="dirExistsPanel" alignment="0" min="-2" max="-2" attributes="1"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Component class="javax.swing.JCheckBox" name="quietModeBox">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Quiet mode"/>
+      </Properties>
+    </Component>
+    <Container class="javax.swing.JPanel" name="createDirPanel">
+
+      <Layout>
+        <DimensionLayout dim="0">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Component id="createDirLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+              <Group type="102" alignment="0" attributes="0">
+                  <EmptySpace min="10" pref="10" max="10" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="createDirPromptUserButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="createDirSkipDirectoryButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="createDirAutoRenameButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="createDirCancelButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+          </Group>
+        </DimensionLayout>
+        <DimensionLayout dim="1">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
+                  <Component id="createDirLabel" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="createDirPromptUserButton" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="createDirSkipDirectoryButton" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="createDirAutoRenameButton" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="createDirCancelButton" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace pref="23" max="32767" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+      </Layout>
+      <SubComponents>
+        <Component class="javax.swing.JLabel" name="createDirLabel">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Create directory failed:"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="createDirPromptUserButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Prompt user"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="createDirSkipDirectoryButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Skip directory"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="createDirAutoRenameButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Auto-rename"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="createDirCancelButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Cancel"/>
+          </Properties>
+        </Component>
+      </SubComponents>
+    </Container>
+    <Container class="javax.swing.JPanel" name="createFilePanel">
+
+      <Layout>
+        <DimensionLayout dim="0">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" attributes="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="createFileLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="10" pref="10" max="10" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="createFileSkipFileButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="createFilePromptUserButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="createFileSkipDirectoryButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="createFileAutoRenameButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="createFileCancelButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                  </Group>
+                  <EmptySpace max="32767" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+        <DimensionLayout dim="1">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
+                  <Component id="createFileLabel" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="createFilePromptUserButton" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="createFileSkipFileButton" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="createFileSkipDirectoryButton" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="createFileAutoRenameButton" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="createFileCancelButton" min="-2" max="-2" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+      </Layout>
+      <SubComponents>
+        <Component class="javax.swing.JLabel" name="createFileLabel">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Create file failed:"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="createFilePromptUserButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Prompt user"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="createFileSkipFileButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Skip file"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="createFileSkipDirectoryButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Skip rest of directory"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="createFileAutoRenameButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Auto-rename"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="createFileCancelButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Cancel"/>
+          </Properties>
+        </Component>
+      </SubComponents>
+    </Container>
+    <Container class="javax.swing.JPanel" name="dirExistsPanel">
+
+      <Layout>
+        <DimensionLayout dim="0">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Component id="dirExistsLabel" min="-2" max="-2" attributes="0"/>
+              <Group type="102" alignment="0" attributes="0">
+                  <EmptySpace min="10" pref="10" max="10" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="dirExistsContinueButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="dirExistsPromptUserButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="dirExistsSkipDirectoryButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="dirExistsAutoRenameButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="dirExistsCancelButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+          </Group>
+        </DimensionLayout>
+        <DimensionLayout dim="1">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
+                  <Component id="dirExistsLabel" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="dirExistsPromptUserButton" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="dirExistsContinueButton" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="dirExistsSkipDirectoryButton" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="dirExistsAutoRenameButton" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="dirExistsCancelButton" min="-2" max="-2" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+      </Layout>
+      <SubComponents>
+        <Component class="javax.swing.JLabel" name="dirExistsLabel">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Directory already exists:"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="dirExistsPromptUserButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Prompt user"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="dirExistsContinueButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Continue"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="dirExistsSkipDirectoryButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Skip directory"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="dirExistsAutoRenameButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Auto-rename"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="dirExistsCancelButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Cancel"/>
+          </Properties>
+        </Component>
+      </SubComponents>
+    </Container>
+    <Container class="javax.swing.JPanel" name="fileExistsPanel">
+
+      <Layout>
+        <DimensionLayout dim="0">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" attributes="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="fileExistsLabel" min="-2" max="-2" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="10" pref="10" max="10" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="fileExistsCancelButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="fileExistsAutoRenameButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="fileExistsSkipFileButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="fileExistsPromptUserButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="fileExistsSkipDirectoryButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="fileExistsOverwriteButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                  </Group>
+                  <EmptySpace max="32767" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+        <DimensionLayout dim="1">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
+                  <Component id="fileExistsLabel" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="fileExistsPromptUserButton" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="fileExistsSkipFileButton" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="fileExistsSkipDirectoryButton" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="fileExistsOverwriteButton" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="fileExistsAutoRenameButton" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="fileExistsCancelButton" min="-2" max="-2" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+      </Layout>
+      <SubComponents>
+        <Component class="javax.swing.JLabel" name="fileExistsLabel">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="File already exists:"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="fileExistsPromptUserButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Prompt user"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="fileExistsSkipFileButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Skip file"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="fileExistsSkipDirectoryButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Skip rest of directory"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="fileExistsOverwriteButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Overwrite existing file"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="fileExistsAutoRenameButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Auto-rename"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="fileExistsCancelButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Cancel"/>
+          </Properties>
+        </Component>
+      </SubComponents>
+    </Container>
+  </SubComponents>
+</Form>

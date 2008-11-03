@@ -161,7 +161,7 @@ public class MemoryStatisticsPanel extends javax.swing.JPanel {
 
         jLabel3.setText("Current max:");
 
-        jLabel4.setText("Complete max:");
+        jLabel4.setText("Total max:");
 
         allocatedMemoryField.setEditable(false);
         allocatedMemoryField.setBorder(null);

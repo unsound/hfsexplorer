@@ -18,6 +18,9 @@
 package org.catacombae.hfsexplorer.types.hfscommon;
 
 import java.io.PrintStream;
+import org.catacombae.csjc.StructElements;
+import org.catacombae.csjc.structelements.Dictionary;
+import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentKey;
 import org.catacombae.hfsexplorer.types.hfs.ExtKeyRec;
 
@@ -25,8 +28,9 @@ import org.catacombae.hfsexplorer.types.hfs.ExtKeyRec;
  *
  * @author erik
  */
-public abstract class CommonHFSExtentKey extends CommonBTKey {
+public abstract class CommonHFSExtentKey extends CommonBTKey<CommonHFSExtentKey> implements StructElements {
 
+    @Override
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + getClass().getSimpleName() + ":");
         printFields(ps, prefix + " ");
@@ -40,6 +44,39 @@ public abstract class CommonHFSExtentKey extends CommonBTKey {
         return new HFSImplementation(key);
     }
     
+    private static int commonCompare(CommonHFSExtentKey k1, CommonHFSExtentKey k2) {
+        int forkType1 = k1.getForkType();
+        int forkType2 = k2.getForkType();
+        if(forkType1 == forkType2) {
+            long fileID1 = k1.getFileID().toLong();
+            long fileID2 = k2.getFileID().toLong();
+            if(fileID1 == fileID2) {
+                long startBlock1 = k1.getStartBlock();
+                long startBlock2 = k2.getStartBlock();
+                if(startBlock1 == startBlock2)
+                    return 0;
+                else if(startBlock1 < startBlock2)
+                    return -1;
+                else
+                    return 1;
+            }
+            else if(fileID1 < fileID2)
+                return -1;
+            else
+                return 1;
+        }
+        else if(forkType1 < forkType2)
+            return -1;
+        else
+            return 1;
+    }
+    
+    public abstract int getForkType();
+
+    public abstract CommonHFSCatalogNodeID getFileID();
+
+    public abstract long getStartBlock();
+    
     public static class HFSPlusImplementation extends CommonHFSExtentKey {
         private final HFSPlusExtentKey key;
         
@@ -48,21 +85,58 @@ public abstract class CommonHFSExtentKey extends CommonBTKey {
         }
         
         @Override
+        public int getForkType() {
+            return key.getUnsignedForkType();
+        }
+        
+        @Override
+        public CommonHFSCatalogNodeID getFileID() {
+            return CommonHFSCatalogNodeID.create(key.getFileID());
+        }
+        
+        @Override
+        public long getStartBlock() {
+            return key.getUnsignedStartBlock();
+        }
+        
+        @Override
         public byte[] getBytes() {
             return key.getBytes();
         }
 
+        @Override
         public int maxSize() {
             return key.length();
         }
 
+        @Override
         public int occupiedSize() {
             return key.length();
         }
 
+        @Override
         public void printFields(PrintStream ps, String prefix) {
             ps.println(prefix + "key:");
             key.print(ps, prefix + " ");
+        }
+
+        @Override
+        public Dictionary getStructElements() {
+            return key.getStructElements();
+        }
+
+        @Override
+        public int compareTo(CommonHFSExtentKey o) {
+            if(o instanceof HFSPlusImplementation) {
+                return commonCompare(this, o);
+            }
+            else {
+                if(o != null)
+                    throw new RuntimeException("Can't compare a " + o.getClass() +
+                            " with a " + this.getClass());
+                else
+                    throw new RuntimeException("o == null !!");
+            }
         }
     }
     
@@ -74,21 +148,58 @@ public abstract class CommonHFSExtentKey extends CommonBTKey {
         }
         
         @Override
+        public int getForkType() {
+            return Util.unsign(key.getXkrFkType());
+        }
+
+        @Override
+        public CommonHFSCatalogNodeID getFileID() {
+            return CommonHFSCatalogNodeID.create(key.getXkrFNum());
+        }
+
+        @Override
+        public long getStartBlock() {
+            return Util.unsign(key.getXkrFABN());
+        }
+        
+        @Override
         public byte[] getBytes() {
             return key.getBytes();
         }
 
+        @Override
         public int maxSize() {
             return key.length();
         }
 
+        @Override
         public int occupiedSize() {
             return key.length();
         }
 
+        @Override
         public void printFields(PrintStream ps, String prefix) {
             ps.println(prefix + "key:");
             key.print(ps, prefix + " ");
+        }
+
+        @Override
+        public Dictionary getStructElements() {
+            return key.getStructElements();
+        }
+
+        @Override
+        public int compareTo(CommonHFSExtentKey o) {
+            if(o instanceof HFSImplementation) {
+                return commonCompare(this, o);
+            }
+            else {
+                if(o != null)
+                    throw new RuntimeException("Can't compare a " + o.getClass() +
+                            " with a " + this.getClass());
+                else
+                    throw new RuntimeException("o == null !!");
+            }
         }
     }
 }

@@ -18,6 +18,7 @@
 package org.catacombae.hfsexplorer;
 import java.awt.BorderLayout;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -33,7 +34,7 @@ public class DebugConsoleWindow extends JFrame {
     private final Object syncObject = new Object();
     private final OutputStream debugStream;
         
-    public DebugConsoleWindow() {
+    public DebugConsoleWindow(PrintStream stdErr) {
         super("Debug Console");
         setLayout(new BorderLayout());
         this.debugArea = new JTextArea(WINDOW_NUMBER_OF_LINES, WINDOW_NUMBER_OF_COLUMNS);
@@ -48,7 +49,7 @@ public class DebugConsoleWindow extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        this.debugStream = new JTextAreaOutputStream(debugArea, debugAreaScroller, syncObject, null);
+        this.debugStream = new JTextAreaOutputStream(stdErr, debugArea, debugAreaScroller, syncObject, null);
     }
 
     /**

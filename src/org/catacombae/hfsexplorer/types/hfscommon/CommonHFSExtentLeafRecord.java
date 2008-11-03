@@ -18,6 +18,8 @@
 package org.catacombae.hfsexplorer.types.hfscommon;
 
 import java.io.PrintStream;
+import org.catacombae.csjc.StructElements;
+import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentDescriptor;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentKey;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentRecord;
@@ -29,20 +31,21 @@ import org.catacombae.hfsexplorer.types.hfs.ExtKeyRec;
  *
  * @author erik
  */
-public abstract class CommonHFSExtentLeafRecord extends CommonBTRecord /*implements Comparable<CommonHFSExtentLeafRecord>*/ {
+public abstract class CommonHFSExtentLeafRecord extends CommonBTRecord implements StructElements {
 
-    public static CommonBTRecord create(ExtKeyRec key, ExtDataRec recordData) {
+    public static CommonHFSExtentLeafRecord create(ExtKeyRec key, ExtDataRec recordData) {
         return new HFSImplementation(key, recordData);
     }
 
-    public static CommonBTRecord create(HFSPlusExtentKey key, HFSPlusExtentRecord recordData) {
+    public static CommonHFSExtentLeafRecord create(HFSPlusExtentKey key, HFSPlusExtentRecord recordData) {
         return new HFSPlusImplementation(key, recordData);
     }
 
     public abstract CommonHFSExtentKey getKey();
     
     public abstract CommonHFSExtentDescriptor[] getRecordData();
-
+    
+    @Override
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + getClass().getSimpleName() + ":");
         printFields(ps, prefix + " ");
@@ -100,11 +103,23 @@ public abstract class CommonHFSExtentLeafRecord extends CommonBTRecord /*impleme
             return res;
         }
 
+        @Override
         public void printFields(PrintStream ps, String prefix) {
             ps.println(prefix + "key:");
             key.print(ps, prefix + " ");
             ps.println(prefix + "recordData:");
             recordData.print(ps, prefix + " ");
+        }
+
+        @Override
+        public Dictionary getStructElements() {
+            DictionaryBuilder db = new DictionaryBuilder("CommonHFSExtentLeafRecord.HFSImplementation",
+                    "HFS extents overflow file leaf record");
+            
+            db.add("key", key.getStructElements(), "Key");
+            db.add("recordData", recordData.getStructElements(), "Record data");
+            
+            return db.getResult();
         }
     }
     
@@ -156,11 +171,23 @@ public abstract class CommonHFSExtentLeafRecord extends CommonBTRecord /*impleme
             return res;
         }
 
+        @Override
         public void printFields(PrintStream ps, String prefix) {
             ps.println(prefix + "key:");
             key.print(ps, prefix + " ");
             ps.println(prefix + "recordData:");
             recordData.print(ps, prefix + " ");
+        }
+
+        @Override
+        public Dictionary getStructElements() {
+            DictionaryBuilder db = new DictionaryBuilder("CommonHFSExtentLeafRecord.HFSPlusImplementation",
+                    "HFS+ extents overflow file leaf record");
+            
+            db.add("key", key.getStructElements(), "Key");
+            db.add("recordData", recordData.getStructElements(), "Record data");
+            
+            return db.getResult();
         }
     }
 }

@@ -26,10 +26,13 @@ public abstract class BTKey implements Comparable<BTKey> {
     public int compareTo(BTKey btk) {
 	byte[] thisData = getBytes();
 	byte[] thatData = btk.getBytes();
+        
 	for(int i = 0; i < Math.min(thisData.length, thatData.length); ++i) {
-	    if(thisData[i] < thatData[i])
+            int a = thisData[i] & 0xFF;
+            int b = thatData[i] & 0xff;
+	    if(a < b)
 		return -1;
-	    else if(thisData[i] > thatData[i])
+	    else if(a > b)
 		return 1;
 	}
 	if(thisData.length < thatData.length)
