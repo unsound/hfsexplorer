@@ -24,7 +24,7 @@ import org.catacombae.hfsexplorer.types.hfs.ExtKeyRec;
  *
  * @author erik
  */
-public abstract class CommonHFSExtentIndexNode extends CommonBTIndexNode {
+public abstract class CommonHFSExtentIndexNode extends CommonBTIndexNode<CommonHFSExtentKey> {
 
     protected CommonHFSExtentIndexNode(byte[] data, int offset, int nodeSize, FSType type) {
         super(data, offset, nodeSize, type);
@@ -44,7 +44,7 @@ public abstract class CommonHFSExtentIndexNode extends CommonBTIndexNode {
         }
 
         @Override
-        protected CommonBTRecord createBTRecord(int recordNumber, byte[] data, int offset, int length) {
+        protected CommonBTIndexRecord<CommonHFSExtentKey> createBTRecord(int recordNumber, byte[] data, int offset, int length) {
             final CommonHFSExtentKey key = CommonHFSExtentKey.create(new ExtKeyRec(data, offset));
             
             return CommonBTIndexRecord.createHFS(key, data, offset);
@@ -57,7 +57,7 @@ public abstract class CommonHFSExtentIndexNode extends CommonBTIndexNode {
         }
         
         @Override
-        protected CommonBTRecord createBTRecord(int recordNumber, byte[] data, int offset, int length) {
+        protected CommonBTIndexRecord<CommonHFSExtentKey> createBTRecord(int recordNumber, byte[] data, int offset, int length) {
             final CommonHFSExtentKey key = CommonHFSExtentKey.create(new HFSPlusExtentKey(data, offset));
             
             return CommonBTIndexRecord.createHFSPlus(key, data, offset);

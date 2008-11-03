@@ -18,6 +18,10 @@
 package org.catacombae.hfsexplorer.types.hfscommon;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.types.hfsplus.BTNodeDescriptor;
 import org.catacombae.hfsexplorer.types.hfs.NodeDescriptor;
@@ -28,7 +32,7 @@ import org.catacombae.hfsexplorer.types.hfs.NodeDescriptor;
  * 
  * @author Erik Larsson
  */
-public abstract class CommonBTNode {
+public abstract class CommonBTNode <R extends CommonBTRecord> {
     protected final InternalContainer ic;
     
     protected static enum FSType { HFS, HFS_PLUS };
@@ -50,15 +54,15 @@ public abstract class CommonBTNode {
         return ic.getNodeDescriptor();
     }
 
-    public CommonBTRecord getBTRecord(int index) {
+    public R getBTRecord(int index) {
         return ic.getBTRecord(index);
     }
     
-    public CommonBTRecord[] getBTRecords() {
+    public List<R> getBTRecords() {
         return ic.getBTRecords();
     }
     
-    protected abstract CommonBTRecord createBTRecord(int recordNumber,
+    protected abstract R createBTRecord(int recordNumber,
             byte[] data, int offset, int length);
 
     public void print(PrintStream ps, String prefix) {
@@ -69,7 +73,7 @@ public abstract class CommonBTNode {
 
     protected abstract class InternalContainer {
         protected final CommonBTNodeDescriptor nodeDescriptor;
-        protected final CommonBTRecord[] records;
+        protected final List<R> records;
         protected final short[] offsets;
         
         protected InternalContainer(CommonBTNodeDescriptor nodeDescriptor,
@@ -79,27 +83,37 @@ public abstract class CommonBTNode {
             for(int i = 0; i < offsets.length; ++i) {
                 offsets[i] = Util.readShortBE(data, offset+nodeSize-((i+1)*2));
             }
-            records = new CommonBTRecord[offsets.length-1];
-            for(int i = 0; i < records.length; ++i) {
+            ArrayList<R> tmpRecords = new ArrayList<R>(offsets.length-1);
+            for(int i = 0; i < offsets.length-1; ++i) {
                 int len = offsets[i+1] - offsets[i];
-                records[i] = createBTRecord(i, data, offset+offsets[i], len);
+                tmpRecords.add(createBTRecord(i, data, offset+offsets[i], len));
             }
+            this.records = Collections.unmodifiableList(tmpRecords);
         }
         
-        public abstract CommonBTNodeDescriptor getNodeDescriptor();
-        public abstract CommonBTRecord getBTRecord(int index);
-        public abstract CommonBTRecord[] getBTRecords();
+        public CommonBTNodeDescriptor getNodeDescriptor() {
+            return nodeDescriptor;
+        }
+                
+        public R getBTRecord(int index) {
+            return records.get(index);
+        }
 
+        public List<R> getBTRecords() {
+            return records;
+        }
+        
         public void printFields(PrintStream ps, String prefix) {
             ps.println(prefix + " nodeDescriptor: ");
             nodeDescriptor.print(ps, prefix + "  ");
-            ps.println(prefix + " records (CommonBTRecord[" + records.length + "]):");
-            for(int i = 0; i < records.length; ++i) {
-                ps.println(prefix + "  [" + i + "]:");
-                records[i].print(ps, prefix + "   ");
+            ps.println(prefix + " records (CommonBTRecord[" + records.size() + "]):");
+            int i = 0;
+            for(R record : records) {
+                ps.println(prefix + "  [" + i++ + "]:");
+                record.print(ps, prefix + "   ");
             }
             ps.println(prefix + " offsets (short[" + offsets.length + "]):");
-            for(int i = 0; i < offsets.length; ++i) {
+            for(i = 0; i < offsets.length; ++i) {
                 ps.println(prefix + "  [" + i + "]: " + offsets[i]);
             }
         }
@@ -110,42 +124,12 @@ public abstract class CommonBTNode {
             super(CommonBTNodeDescriptor.create(new NodeDescriptor(data, offset)),
                     data, offset, nodeSize);
         }
-        
-        public CommonBTNodeDescriptor getNodeDescriptor() {
-            return nodeDescriptor;
-        }
-        
-        public CommonBTRecord getBTRecord(int index) {
-            return records[index];
-        }
-
-        public CommonBTRecord[] getBTRecords() {
-            CommonBTRecord[] copy = new CommonBTRecord[records.length];
-            for(int i = 0; i < copy.length; ++i)
-                copy[i] = records[i];
-            return copy;
-        }
     }
 
     private class HFSPlusImplementation extends InternalContainer {
         public HFSPlusImplementation(byte[] data, int offset, int nodeSize) {
             super(CommonBTNodeDescriptor.create(new BTNodeDescriptor(data, offset)),
                     data, offset, nodeSize);
-        }
-        
-        public CommonBTNodeDescriptor getNodeDescriptor() {
-            return nodeDescriptor;
-        }
-        
-        public CommonBTRecord getBTRecord(int index) {
-            return records[index];
-        }
-
-        public CommonBTRecord[] getBTRecords() {
-            CommonBTRecord[] copy = new CommonBTRecord[records.length];
-            for(int i = 0; i < copy.length; ++i)
-                copy[i] = records[i];
-            return copy;
         }
     }
 }

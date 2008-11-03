@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2006-2007 Erik Larsson
+ * Copyright (C) 2006-2008 Erik Larsson
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,103 +17,156 @@
 
 package org.catacombae.hfsexplorer;
 
-import org.catacombae.hfsexplorer.fs.ProgressMonitor;
-import org.catacombae.hfsexplorer.gui.ExtractProgressPanel;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
 import java.text.DecimalFormat;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import org.catacombae.hfsexplorer.gui.ExtractProgressPanel;
+import org.catacombae.hfsexplorer.gui.ExtractSettingsPanel;
 
-public class ExtractProgressDialog extends JDialog implements ProgressMonitor {
-    private ExtractProgressPanel progressPanel;
-    private JButton cancelButton;
-//     private ActionListener cancelListener = null;
+public class ExtractProgressDialog extends JDialog implements ExtractProgressMonitor {
+
+    private final ExtractProgressPanel progressPanel;
+    private final ExtractSettingsPanel settingsPanel;
+    private final JButton cancelButton;
     private volatile boolean cancelSignaled = false;
     private long completedSize = 0;
     private long totalSize = -1;
     private DecimalFormat sizeFormatter = new DecimalFormat("0.00");
 
     public ExtractProgressDialog(Frame owner) {
-	this(owner, false);
+        this(owner, false);
     }
+
     private ExtractProgressDialog(Frame owner, boolean modal) {
-	super(owner, "Extracting...", modal);
-	
-	progressPanel = new ExtractProgressPanel();
-	cancelButton = progressPanel.cancelButton;
-	cancelButton.addActionListener(new ActionListener() {
+        super(owner, "Extracting...", modal);
+        
+        final JPanel backgroundPanel = new JPanel();
+        
+        progressPanel = new ExtractProgressPanel();
+        settingsPanel = new ExtractSettingsPanel();
+        
+        cancelButton = progressPanel.cancelButton;
+        cancelButton.addActionListener(new ActionListener() {
+
             @Override
             public void actionPerformed(ActionEvent ae) {
-		    signalCancel();
-		}
-	    });
-	
-	setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-	addWindowListener(new WindowAdapter() {
-                @Override
-		public void windowClosing(WindowEvent we) {
-		    requestCloseWindow();
-		}
-	    });
-	
-	add(progressPanel, BorderLayout.CENTER);
-	pack();
-	setLocationRelativeTo(null);
-	setResizable(false);
-    }
+                signalCancel();
+            }
+        });
         
+        progressPanel.addShowSettingsButtonListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean selected = progressPanel.getShowSettingsButtonSelected();
+                if(selected)
+                    backgroundPanel.add(settingsPanel);
+                else
+                    backgroundPanel.remove(settingsPanel);
+                pack();
+            }
+            
+        });
+
+        backgroundPanel.setLayout(new BoxLayout(backgroundPanel, BoxLayout.PAGE_AXIS));
+        backgroundPanel.add(progressPanel);
+        
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+
+            @Override
+            public void windowClosing(WindowEvent we) {
+                requestCloseWindow();
+            }
+        });
+        
+        add(backgroundPanel);
+        pack();
+        setLocationRelativeTo(null);
+        setResizable(false);
+    }
+
+    @Override
+    public void updateCalculateDir(String dirname) {
+        progressPanel.updateCalculateDir(dirname);
+    }
+
     @Override
     public void updateTotalProgress(double fraction, String message) {
-	progressPanel.updateTotalProgress(fraction, message);
+        progressPanel.updateTotalProgress(fraction, message);
     }
-        
+
     @Override
     public void updateCurrentDir(String dirname) {
-	progressPanel.updateCurrentDir(dirname);
+        progressPanel.updateCurrentDir(dirname);
     }
-    
+
     @Override
     public void updateCurrentFile(String filename, long fileSize) {
-	progressPanel.updateCurrentFile(filename, fileSize);
+        progressPanel.updateCurrentFile(filename, fileSize);
     }
-        
+
     @Override
     public synchronized void signalCancel() {
-	cancelButton.setEnabled(false);
-	cancelSignaled = true;	
+        cancelButton.setEnabled(false);
+        cancelSignaled = true;
     }
-    
+
     @Override
     public boolean cancelSignaled() {
-	return cancelSignaled;
+        return cancelSignaled;
     }
-    
+
     @Override
     public void confirmCancel() {
-	if(isVisible())
-	    dispose();
+        if(isVisible())
+            dispose();
     }
+
     private synchronized void requestCloseWindow() {
         if(!cancelSignaled)
             signalCancel();
         dispose();
     }
-//     public void addCancelListener(ActionListener al) {
-// 	cancelListener = al;
-// 	cancelButton.addActionListener(al);
-//     }
-        
+
     @Override
     public void setDataSize(long totalSize) {
-	this.totalSize = totalSize;
+        this.totalSize = totalSize;
         addDataProgress(0);
     }
-    
+
     @Override
     public void addDataProgress(long dataSize) {
-	completedSize += dataSize;
-	String message = SpeedUnitUtils.bytesToBinaryUnit(completedSize, sizeFormatter) + "/" +
-	    SpeedUnitUtils.bytesToBinaryUnit(totalSize, sizeFormatter);
-	updateTotalProgress(((double)completedSize)/totalSize, message);
+        completedSize += dataSize;
+        String message = SpeedUnitUtils.bytesToBinaryUnit(completedSize, sizeFormatter) + "/" +
+                SpeedUnitUtils.bytesToBinaryUnit(totalSize, sizeFormatter);
+        updateTotalProgress(((double) completedSize) / totalSize, message);
+    }
+
+    @Override
+    public boolean confirmOverwriteDirectory(File dir) {
+        return SimpleGUIProgressMonitor.confirmOverwriteDirectory(this, dir);
+    }
+
+    @Override
+    public boolean confirmSkipDirectory(String... messageLines) {
+        return SimpleGUIProgressMonitor.confirmSkipDirectory(this, messageLines);
+    }
+    
+    public static void main(String[] args) {
+        ExtractProgressDialog d = new ExtractProgressDialog(null);
+        d.pack();
+        d.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        d.setLocationRelativeTo(null);
+        d.setVisible(true);
     }
 }

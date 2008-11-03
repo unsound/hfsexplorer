@@ -1,34 +1,32 @@
 /*-
- * Copyright (C) 2007 Erik Larsson
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright (C) Erik Larsson
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * All rights reserved.
  */
-
 package org.catacombae.hfsexplorer.fs;
 
+/**
+ *
+ * @author Erik Larsson
+ */
 public class NullProgressMonitor implements ProgressMonitor {
-    private static NullProgressMonitor instance = new NullProgressMonitor();
+
+    private static final NullProgressMonitor INSTANCE = new NullProgressMonitor();
     
-    private NullProgressMonitor() {}
-    public static NullProgressMonitor getInstance() { return instance; }
+    public static NullProgressMonitor getInstance() { return INSTANCE; }
     
-    public void updateTotalProgress(double fraction, String message) {}
-    public void updateCurrentDir(String dirname) {}
-    public void updateCurrentFile(String filename, long fileSize) {}
+    protected NullProgressMonitor() {}
+    
+    @Override
     public void signalCancel() {}
+
+    @Override
     public boolean cancelSignaled() { return false; }
+
+    @Override
     public void confirmCancel() {}
-    public void setDataSize(long totalSize) {}
+
+    @Override
     public void addDataProgress(long dataSize) {}
+
 }

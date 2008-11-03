@@ -394,9 +394,6 @@ public class HFSPlusFileSystemView {
 	return collectFilesInDir(folderID, init.bthr.getRootNode(), hfsFile, fsOffset, init.header, init.bthr, catalogFile, catOps);
     }
 
-    public long extractDataForkToStream(HFSPlusCatalogLeafRecord fileRecord, OutputStream os) throws IOException {
-	return extractDataForkToStream(fileRecord, os, NullProgressMonitor.getInstance());
-    }
     public long extractDataForkToStream(HFSPlusCatalogLeafRecord fileRecord, OutputStream os,
 					ProgressMonitor pm) throws IOException {
 	HFSPlusCatalogLeafRecordData recData = fileRecord.getData();
@@ -409,9 +406,7 @@ public class HFSPlusFileSystemView {
 	else
 	    throw new IllegalArgumentException("fileRecord.getData() it not of type RECORD_TYPE_FILE");
     }
-    public long extractResourceForkToStream(HFSPlusCatalogLeafRecord fileRecord, OutputStream os) throws IOException {
-	return extractResourceForkToStream(fileRecord, os, NullProgressMonitor.getInstance());
-    }
+    
     public long extractResourceForkToStream(HFSPlusCatalogLeafRecord fileRecord, OutputStream os,
 					    ProgressMonitor pm) throws IOException {
 	HFSPlusCatalogLeafRecordData recData = fileRecord.getData();
@@ -424,10 +419,7 @@ public class HFSPlusFileSystemView {
 	else
 	    throw new IllegalArgumentException("fileRecord.getData() it not of type RECORD_TYPE_FILE");
     }
-    public long extractForkToStream(HFSPlusForkData forkData, HFSPlusExtentDescriptor[] extentDescriptors,
-				    OutputStream os) throws IOException {
-	return extractForkToStream(forkData, extentDescriptors, os, NullProgressMonitor.getInstance());
-    }
+    
     public long extractForkToStream(HFSPlusForkData forkData, HFSPlusExtentDescriptor[] extentDescriptors,
 				    OutputStream os, ProgressMonitor pm) throws IOException {
         HFSPlusVolumeHeader header = getVolumeHeader();

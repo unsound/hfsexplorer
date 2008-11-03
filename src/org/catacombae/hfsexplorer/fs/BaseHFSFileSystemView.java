@@ -24,6 +24,7 @@ import org.catacombae.hfsexplorer.types.hfscommon.*;
 import java.util.LinkedList;
 import java.io.OutputStream;
 import java.io.IOException;
+import java.util.List;
 import org.catacombae.hfsexplorer.io.ReadableRandomAccessSubstream;
 import org.catacombae.hfsexplorer.io.SynchronizedReadable;
 import org.catacombae.hfsexplorer.io.SynchronizedReadableRandomAccess;
@@ -385,6 +386,43 @@ public abstract class BaseHFSFileSystemView {
             return null;
     }
     
+    public CommonBTNode getExtentsOverflowNode(long nodeNumber) {
+        ExtentsInitProcedure init = new ExtentsInitProcedure();
+
+        long currentNodeNumber;
+        if(nodeNumber < 0) // Means that we should get the root node
+            currentNodeNumber = init.bthr.getRootNodeNumber();
+        else
+            currentNodeNumber = nodeNumber;
+
+        final int nodeSize = init.bthr.getNodeSize();
+
+        byte[] currentNodeData = new byte[nodeSize];
+        try {
+            init.extentsFile.seek(currentNodeNumber * nodeSize);
+            init.extentsFile.readFully(currentNodeData);
+        } catch(RuntimeException e) {
+            System.err.println("RuntimeException in getCatalogNode. Printing additional information:");
+            System.err.println("  nodeNumber=" + nodeNumber);
+            System.err.println("  currentNodeNumber=" + currentNodeNumber);
+            System.err.println("  nodeSize=" + nodeSize);
+            System.err.println("  init.extentsFile.length()=" + init.extentsFile.length());
+            System.err.println("  (currentNodeNumber * nodeSize)=" + (currentNodeNumber * nodeSize));
+            //System.err.println("  =" + );
+            throw e;
+        }
+        CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
+
+        if(nodeDescriptor.getNodeType() == NodeType.HEADER)
+            return createCommonBTHeaderNode(currentNodeData, 0, nodeSize);
+        if(nodeDescriptor.getNodeType() == NodeType.INDEX)
+            return createCommonHFSExtentIndexNode(currentNodeData, 0, nodeSize);
+        else if(nodeDescriptor.getNodeType() == NodeType.LEAF)
+            return createCommonHFSExtentLeafNode(currentNodeData, 0, nodeSize);
+        else
+            return null;
+    }
+    
     /**
      * Calculates the path in the file system hierarchy to <code>leaf</code>.
      * The path will be returned as a list where the first element is the root
@@ -511,10 +549,11 @@ public abstract class BaseHFSFileSystemView {
 	return collectFilesInDir(folderID, init.bthr.getRootNodeNumber(),
             new ReadableRandomAccessSubstream(hfsFile), fsOffset, init.header, init.bthr, catalogFile);
     }
-
+    /*
     public long extractDataForkToStream(CommonHFSCatalogLeafRecord fileRecord, OutputStream os) throws IOException {
 	return extractDataForkToStream(fileRecord, os, NullProgressMonitor.getInstance());
     }
+    */
     public long extractDataForkToStream(CommonHFSCatalogLeafRecord fileRecord, OutputStream os,
 					ProgressMonitor pm) throws IOException {
 	// = fileRecord.getData();
@@ -526,9 +565,10 @@ public abstract class BaseHFSFileSystemView {
 	else
 	    throw new IllegalArgumentException("fileRecord.getData() it not of type RECORD_TYPE_FILE");
     }
-    public long extractResourceForkToStream(CommonHFSCatalogLeafRecord fileRecord, OutputStream os) throws IOException {
+    /*
+    public long exdtractResourceForkToStream(CommonHFSCatalogLeafRecord fileRecord, OutputStream os) throws IOException {
 	return extractResourceForkToStream(fileRecord, os, NullProgressMonitor.getInstance());
-    }
+    }*/
     public long extractResourceForkToStream(CommonHFSCatalogLeafRecord fileRecord, OutputStream os,
 					    ProgressMonitor pm) throws IOException {
 	//CommonHFSCatalogLeafRecordData recData = fileRecord.getData();
@@ -540,10 +580,12 @@ public abstract class BaseHFSFileSystemView {
 	else
 	    throw new IllegalArgumentException("fileRecord.getData() it not of type RECORD_TYPE_FILE");
     }
+    /*
     public long extractForkToStream(CommonHFSForkData forkData, CommonHFSExtentDescriptor[] extentDescriptors,
 				    OutputStream os) throws IOException {
 	return extractForkToStream(forkData, extentDescriptors, os, NullProgressMonitor.getInstance());
     }
+    */
     public long extractForkToStream(CommonHFSForkData forkData,
             CommonHFSExtentDescriptor[] extentDescriptors, OutputStream os,
             ProgressMonitor pm) throws IOException {
@@ -615,6 +657,10 @@ public abstract class BaseHFSFileSystemView {
                 header.getAllocationBlockStart() * physicalBlockSize);
     }
     
+    private static String getDebugString(CommonHFSExtentKey key) {
+        return key.getForkType() + ":" + key.getFileID().toLong() + ":" + key.getStartBlock();
+    }
+    
     public CommonHFSExtentLeafRecord getOverflowExtent(CommonHFSExtentKey key) {
 	//System.err.println("getOverflowExtent(..)");
 	//System.err.println("my key:");
@@ -636,8 +682,13 @@ public abstract class BaseHFSFileSystemView {
 	CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
 	
 	while(nodeDescriptor.getNodeType() == NodeType.INDEX) {
-	    CommonBTIndexNode currentNode = createCommonHFSExtentIndexNode(currentNodeData, 0, nodeSize);
-	    CommonBTIndexRecord matchingRecord = findLEKey(currentNode, key);
+            //System.err.println("getOverflowExtent(): Processing index node...");
+	    CommonBTIndexNode<CommonHFSExtentKey> currentNode = createCommonHFSExtentIndexNode(currentNodeData, 0, nodeSize);
+            
+	    CommonBTIndexRecord<CommonHFSExtentKey> matchingRecord = findLEKey(currentNode, key);
+            //System.err.println("getOverflowExtent(): findLEKey found a child node with key: " +
+            //        getDebugString(matchingRecord.getKey()));
+            //matchingRecord.getKey().printFields(System.err, "getOverflowExtent():   ");
 	    
 	    currentNodeOffset = matchingRecord.getIndex()*nodeSize;
 	    init.extentsFile.seek(currentNodeOffset);
@@ -649,10 +700,14 @@ public abstract class BaseHFSFileSystemView {
 	// Leaf node reached. Find record.
 	if(nodeDescriptor.getNodeType() == NodeType.LEAF) {
 	    CommonHFSExtentLeafNode leaf = createCommonHFSExtentLeafNode(currentNodeData, 0, nodeSize);
+            //System.err.println("getOverflowExtent(): Processing leaf node...");
 	    CommonHFSExtentLeafRecord[] recs = leaf.getLeafRecords();
 	    for(CommonHFSExtentLeafRecord rec : recs) {
-		//rec.getKey().print(System.err, "");
-		if(rec.getKey().compareTo(key) == 0)
+                CommonHFSExtentKey curKey = rec.getKey();
+                //System.err.print("getOverflowExtent(): checking how " + getDebugString(curKey));
+                //System.err.print(" compares to " + getDebugString(key));
+                //System.err.println("...");
+		if(curKey.compareTo(key) == 0)
 		    return rec;
 	    }
 // 	    try {
@@ -689,6 +744,13 @@ public abstract class BaseHFSFileSystemView {
 
     public CommonHFSExtentDescriptor[] getAllExtents(CommonHFSCatalogNodeID fileID,
             CommonHFSForkData forkData, CommonHFSForkType forkType) {
+        if(fileID == null)
+            throw new IllegalArgumentException("fileID == null");
+        if(forkData == null)
+            throw new IllegalArgumentException("forkData == null");
+        if(forkType == null)
+            throw new IllegalArgumentException("forkType == null");
+        
         CommonHFSExtentDescriptor[] result;
         long allocationBlockSize = getVolumeHeader().getAllocationBlockSize();
 
@@ -714,8 +776,16 @@ public abstract class BaseHFSFileSystemView {
                         createCommonHFSExtentKey(forkType, fileID, (int) totalBlockCount);
 
                 CommonHFSExtentLeafRecord currentRecord = getOverflowExtent(extentKey);
-                if(currentRecord == null)
+                if(currentRecord == null) {
                     System.err.println("ERROR: currentRecord == null!!");
+                    System.err.print(  "       extentKey");
+                    if(extentKey != null) {
+                        System.err.println(":");
+                        extentKey.print(System.err, "         ");
+                    }
+                    else
+                        System.err.println(" == null!!");
+                }
                 CommonHFSExtentDescriptor[] currentRecordData = currentRecord.getRecordData();
                 for(CommonHFSExtentDescriptor cur : currentRecordData) {
                     resultList.add(cur);
@@ -790,9 +860,10 @@ public abstract class BaseHFSFileSystemView {
 	
 	CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
 	if(nodeDescriptor.getNodeType() == NodeType.INDEX) {
-	    CommonBTIndexNode currentNode =
+	    CommonBTIndexNode<CommonHFSCatalogKey> currentNode =
                     catOps.newCatalogIndexNode(currentNodeData, 0, nodeSize, bthr);
-	    CommonBTIndexRecord[] matchingRecords = findLEChildKeys(currentNode, dirID);
+	    List<CommonBTIndexRecord<CommonHFSCatalogKey>> matchingRecords =
+                    findLEChildKeys(currentNode, dirID);
 	    //System.out.println("Matching records: " + matchingRecords.length);
 	    
 	    LinkedList<CommonHFSCatalogLeafRecord> results =
@@ -817,30 +888,29 @@ public abstract class BaseHFSFileSystemView {
 	    throw new RuntimeException("Illegal type for node! (" + nodeDescriptor.getNodeType() + ")");
     }
     
-    private static CommonBTIndexRecord[] findLEChildKeys(CommonBTIndexNode indexNode,
-            CommonHFSCatalogNodeID rootFolderID) {
-	LinkedList<CommonBTIndexRecord> result = new LinkedList<CommonBTIndexRecord>();
-	CommonBTIndexRecord records[] = indexNode.getIndexRecords();
-	CommonBTIndexRecord largestMatchingRecord = null;//records[0];
+    private static List<CommonBTIndexRecord<CommonHFSCatalogKey>> findLEChildKeys(
+            CommonBTIndexNode<CommonHFSCatalogKey> indexNode, CommonHFSCatalogNodeID rootFolderID) {
+        
+	LinkedList<CommonBTIndexRecord<CommonHFSCatalogKey>> result =
+                new LinkedList<CommonBTIndexRecord<CommonHFSCatalogKey>>();
+        
+	//CommonBTIndexRecord records[] = indexNode.getIndexRecords();
+	CommonBTIndexRecord<CommonHFSCatalogKey> largestMatchingRecord = null;//records[0];
 	CommonHFSCatalogKey largestMatchingKey = null;
-	for(int i = 0; i < records.length; ++i) {
-	    if(records[i].getKey() instanceof CommonHFSCatalogKey) {
-		CommonHFSCatalogKey key = (CommonHFSCatalogKey)records[i].getKey();
-		if( key.getParentID().toLong() < rootFolderID.toLong() && 
-		    (largestMatchingKey == null || key.compareTo(largestMatchingKey) > 0) ) {
-		    largestMatchingKey = key;
-		    largestMatchingRecord = records[i];
-		}
-		else if(key.getParentID().toLong() == rootFolderID.toLong())
-		    result.addLast(records[i]);
-	    }
-	    else
-		throw new RuntimeException("UNKNOWN KEY TYPE IN findLEChildKeys");
+	for(CommonBTIndexRecord<CommonHFSCatalogKey> record : indexNode.getBTRecords()) {
+            CommonHFSCatalogKey key = record.getKey();
+            if(key.getParentID().toLong() < rootFolderID.toLong() &&
+                    (largestMatchingKey == null || key.compareTo(largestMatchingKey) > 0)) {
+                largestMatchingKey = key;
+                largestMatchingRecord = record;
+            }
+            else if(key.getParentID().toLong() == rootFolderID.toLong())
+                result.addLast(record);
 	}
 	
 	if(largestMatchingKey != null)
 	    result.addFirst(largestMatchingRecord);
-	return result.toArray(new CommonBTIndexRecord[result.size()]);
+	return result;
     }
     
     /**
@@ -851,22 +921,18 @@ public abstract class BaseHFSFileSystemView {
      * So this method is actually too complicated for its purpose. (: But whatever...
      * @return the corresponding index record if found, null otherwise
      */
-    private static CommonBTIndexRecord findKey(CommonHFSCatalogIndexNode indexNode,
+    private static CommonBTIndexRecord<CommonHFSCatalogKey> findKey(CommonHFSCatalogIndexNode indexNode,
             CommonHFSCatalogNodeID parentID) {
-	for(CommonBTIndexRecord rec : indexNode.getIndexRecords()) {
-	    CommonBTKey btKey = rec.getKey();
-	    if(btKey instanceof CommonHFSCatalogKey) {
-		CommonHFSCatalogKey key = (CommonHFSCatalogKey)btKey;
-		if(key.getParentID().toLong() == parentID.toLong())
-		    return rec;
-	    }
-	    else
-		throw new RuntimeException("Unexpected key in HFSPlusCatalogIndexNode record.");
+        
+	for(CommonBTIndexRecord<CommonHFSCatalogKey> rec : indexNode.getBTRecords()) {
+	    CommonHFSCatalogKey key = rec.getKey();
+            if(key.getParentID().toLong() == parentID.toLong())
+                return rec;
 	}
 	return null;
     }
     
-    private static CommonBTIndexRecord findLEKey(CommonBTIndexNode indexNode, CommonBTKey searchKey) {
+    private static <K extends CommonBTKey<K>> CommonBTIndexRecord<K> findLEKey(CommonBTIndexNode<K> indexNode, K searchKey) {
 	/* 
 	 * Algorithm:
 	 *   input: Key searchKey
@@ -875,14 +941,28 @@ public abstract class BaseHFSFileSystemView {
 	 *     If n.key <= searchKey && n.key > greatestMatchingKey
 	 *       greatestMatchingKey = n.key
 	 */
-	CommonBTIndexRecord records[] = indexNode.getIndexRecords();
-	CommonBTIndexRecord largestMatchingRecord = null;
-	for(int i = 0; i < records.length; ++i) {
-	    if(records[i].getKey().compareTo(searchKey) <= 0 && 
-	       (largestMatchingRecord == null || records[i].getKey().compareTo(largestMatchingRecord.getKey()) > 0)) {
-		largestMatchingRecord = records[i];
+	CommonBTIndexRecord<K> largestMatchingRecord = null;
+        
+        //System.err.println("findLEKey(): Entering loop...");
+        for(CommonBTIndexRecord<K> record : indexNode.getBTRecords()) {
+            K recordKey = record.getKey();
+            
+            //System.err.print("findLEKey():   Processing record");
+            //if(recordKey instanceof CommonHFSExtentKey)
+            //    System.err.print(" with key " + getDebugString((CommonHFSExtentKey)recordKey));
+            //System.err.print("...");
+            
+	    if(recordKey.compareTo(searchKey) <= 0 && 
+	       (largestMatchingRecord == null || recordKey.compareTo(largestMatchingRecord.getKey()) > 0)) {
+		largestMatchingRecord = record;
+                //System.err.print("match!");
 	    }
+            //else
+            //    System.err.print("no match.");
+            //System.err.println();
 	}
+        
+        //System.err.println("findLEKey(): Returning...");
 	return largestMatchingRecord;
     }
     

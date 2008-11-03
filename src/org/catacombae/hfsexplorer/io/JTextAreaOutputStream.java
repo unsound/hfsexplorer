@@ -19,10 +19,15 @@ package org.catacombae.hfsexplorer.io;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.GapContent;
+import javax.swing.text.PlainDocument;
+import org.catacombae.hfsexplorer.Util;
 
 /**
  * An implementation of OutputStream that writes all output to a JTextArea, decoded with the
@@ -31,11 +36,20 @@ import javax.swing.SwingUtilities;
  * @author Erik Larsson
  */
 public class JTextAreaOutputStream extends OutputStream {
+    /**
+     * Maximum size of the document. 1000 filled lines 80 characters wide => 80000*2 bytes =
+     * 160000 bytes (not considering possible UTF-16 surrogate pairs).
+     */
+    private static final int MAX_LENGTH = /*10;//*/80*1000;
+    
+    private final PrintStream stdErr;
     private final JTextArea textArea;
     private final JScrollPane textAreaScroller;
     private final Object syncObject;
     private final String encoding;
+    private final GapContent content;
     private boolean updateRequested = false;
+    private PlainDocument document;
     
     /**
      * Creates a new JTextAreaOutputStream which writes to <code>textArea</code> and synchronizes
@@ -43,8 +57,8 @@ public class JTextAreaOutputStream extends OutputStream {
      * 
      * @param textArea the text area to write to (non-null).
      */
-    public JTextAreaOutputStream(JTextArea textArea) {
-        this(textArea, textArea);
+    public JTextAreaOutputStream(PrintStream stdErr, JTextArea textArea) {
+        this(stdErr, textArea, textArea);
     }
     
     /**
@@ -54,8 +68,8 @@ public class JTextAreaOutputStream extends OutputStream {
      * @param textArea the text area to write to (non-null).
      * @param syncObject the object to synchronize on (non-null).
      */
-    public JTextAreaOutputStream(JTextArea textArea, Object syncObject) {
-        this(textArea, syncObject, null);
+    public JTextAreaOutputStream(PrintStream stdErr, JTextArea textArea, Object syncObject) {
+        this(stdErr, textArea, syncObject, null);
     }
     
     /**
@@ -66,8 +80,8 @@ public class JTextAreaOutputStream extends OutputStream {
      * @param syncObject the object to synchronize on (non-null).
      * @param encoding the encoding to use when decoding the stream data into Unicode characters.
      */
-    public JTextAreaOutputStream(JTextArea textArea, Object syncObject, String encoding) {
-        this(textArea, null, syncObject, encoding);
+    public JTextAreaOutputStream(PrintStream stdErr, JTextArea textArea, Object syncObject, String encoding) {
+        this(stdErr, textArea, null, syncObject, encoding);
     }
 
     /**
@@ -77,22 +91,30 @@ public class JTextAreaOutputStream extends OutputStream {
      * <code>textAreaScroller</code>, accordingly so that the view always follows the latest written
      * text.
      *
+     * @param stdErr a reliable System.err stream where this stream can write error messages.
      * @param textArea the text area to write to (non-null).
      * @param textAreaScroller the scroll pane to adjust when updating <code>textArea</code>.
      * @param syncObject the object to synchronize on (non-null).
      * @param encoding the encoding to use when decoding the stream data into Unicode characters.
      */
-    public JTextAreaOutputStream(JTextArea textArea, JScrollPane textAreaScroller,
+    public JTextAreaOutputStream(PrintStream stdErr, JTextArea textArea, JScrollPane textAreaScroller,
             Object syncObject, String encoding) {
+        if(stdErr == null)
+            throw new IllegalArgumentException("stdErr == null");
         if(textArea == null)
             throw new IllegalArgumentException("textArea == null");
         if(syncObject == null)
             throw new IllegalArgumentException("syncObject == null");
         
+        this.stdErr = stdErr;
         this.textArea = textArea;
         this.textAreaScroller = textAreaScroller;
         this.syncObject = syncObject;
         this.encoding = encoding;
+        
+        this.content = new GapContent();
+        this.document = new PlainDocument(content);
+        textArea.setDocument(document);
     }
     
     /**
@@ -119,31 +141,62 @@ public class JTextAreaOutputStream extends OutputStream {
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         synchronized(syncObject) {
-            final String s;
-            if(encoding == null)
-                s = new String(b, off, len);
-            else
-                s = new String(b, off, len, encoding);
+            try {
+                String s;
+                if(encoding == null)
+                    s = new String(b, off, len);
+                else
+                    s = new String(b, off, len, encoding);
+                try {
+                
+                    //textArea.append(s);
+                    //curBuilder.append(s);
+                    if(s.length() > MAX_LENGTH) {
+                        //stdErr.print("adjusting s.length() from " + s.length());
 
-            textArea.append(s);
-            //curBuilder.append(s);
+                        s = s.substring(s.length()-MAX_LENGTH);
+                        //stdErr.println(" to " + s.length());
+                        
+                    }
+                    int overrun = (document.getLength()-2+s.length()) - MAX_LENGTH;
+                    //stdErr.println("overrun=" + overrun);
+                    //stdErr.println("document.getLength()=" + document.getLength());
+                    //stdErr.println("s.length()=" + s.length());
+                    //stdErr.println("MAX_LENGTH=" + MAX_LENGTH);
+                    if(overrun > 0) {
+                        //content.remove(0, overrun);
+                        //stdErr.println("Removing " + overrun + " bytes at the start.");
+                        document.remove(0, overrun);
+                    }
+                    //content.insertString(content.length() - 1, s);
+                    //stdErr.println("insertString(" + (document.getLength()) + ", \"" + s + "\", null);");
+                    document.insertString(document.getLength(), s, null);
+                } catch(BadLocationException ex) {
+                    throw new RuntimeException("Exception while updating content", ex);
+                }
 
-            if(textAreaScroller != null && !updateRequested) {
-                updateRequested = true;
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        synchronized(syncObject) {
-                            //textArea.append(curBuilder.toString());
-                            //curBuilder.setLength(0);
-                            updateRequested = false;
-                            JScrollBar sb = textAreaScroller.getVerticalScrollBar();
-                            sb.setValue(sb.getMaximum() - sb.getVisibleAmount());
-                        }
+                if(textAreaScroller != null && !updateRequested) {
+                    updateRequested = true;
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            synchronized(syncObject) {
+                                //textArea.append(curBuilder.toString());
+                                //curBuilder.setLength(0);
+                                updateRequested = false;
+                                JScrollBar sb = textAreaScroller.getVerticalScrollBar();
+                                sb.setValue(sb.getMaximum() - sb.getVisibleAmount());
+                            }
                         //textArea.append(s);
                         //textArea.append(" [Update!] ");
-                    }
-                });
+                        }
+                    });
+                }
+            } catch(Exception e) {
+                StringBuilder sb = new StringBuilder();
+                Util.buildStackTrace(e, Integer.MAX_VALUE, sb);
+                stdErr.println(sb.toString());
+                //GUIUtil.displayExceptionDialog(e, 100, null);
             }
         }
     }

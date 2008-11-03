@@ -18,12 +18,9 @@
 package org.catacombae.hfsexplorer.fs;
 
 public interface ProgressMonitor {
-    public void updateTotalProgress(double fraction, String message);
-    public void updateCurrentDir(String dirname);
-    public void updateCurrentFile(String filename, long fileSize);
+
     public void signalCancel();
     public boolean cancelSignaled();
     public void confirmCancel();
-    public void setDataSize(long totalSize);
     public void addDataProgress(long dataSize);
 }

@@ -25,7 +25,7 @@ import org.catacombae.hfsexplorer.types.hfs.BTHdrRec;
  *
  * @author erik
  */
-public abstract class CommonBTHeaderNode extends CommonBTNode {
+public abstract class CommonBTHeaderNode extends CommonBTNode<CommonBTRecord> {
     protected CommonBTHeaderNode(byte[] data, int offset, int nodeSize, FSType type) {
         super(data, offset, nodeSize, type);
 
@@ -41,28 +41,28 @@ public abstract class CommonBTHeaderNode extends CommonBTNode {
     }
 
     private void validate() throws IllegalArgumentException {
-        if(ic.records.length != 3)
+        if(ic.records.size() != 3)
             throw new IllegalArgumentException("Illegal length of record array: " +
-                    ic.records.length + " (expected 3)");
+                    ic.records.size() + " (expected 3)");
         
-        if(!(ic.records[0] instanceof CommonBTHeaderRecord)) {
+        if(!(ic.records.get(0) instanceof CommonBTHeaderRecord)) {
             throw new IllegalArgumentException("Illegal record type at index 0: " +
-                    ic.records[0].getClass());
+                    ic.records.get(0).getClass());
         }
 
-        if(!(ic.records[1] instanceof CommonBTGenericDataRecord)) {
+        if(!(ic.records.get(1) instanceof CommonBTGenericDataRecord)) {
             throw new IllegalArgumentException("Illegal record type at index 0: " +
-                    ic.records[1].getClass());
+                    ic.records.get(1).getClass());
         }
 
-        if(!(ic.records[2] instanceof CommonBTGenericDataRecord)) {
+        if(!(ic.records.get(1) instanceof CommonBTGenericDataRecord)) {
             throw new IllegalArgumentException("Illegal record type at index 0: " +
-                    ic.records[2].getClass());
+                    ic.records.get(1).getClass());
         }
     }
 
     public CommonBTHeaderRecord getHeaderRecord() {
-        CommonBTRecord btr = ic.records[0];
+        CommonBTRecord btr = ic.records.get(0);
         if(btr instanceof CommonBTHeaderRecord) {
             return (CommonBTHeaderRecord)btr;
         }
@@ -71,7 +71,7 @@ public abstract class CommonBTHeaderNode extends CommonBTNode {
     }
 
     public CommonBTGenericDataRecord getUserDataRecord() {
-        CommonBTRecord btr = ic.records[1];
+        CommonBTRecord btr = ic.records.get(1);
         if(btr instanceof CommonBTGenericDataRecord) {
             return (CommonBTGenericDataRecord)btr;
         }
@@ -80,7 +80,7 @@ public abstract class CommonBTHeaderNode extends CommonBTNode {
     }
 
     public CommonBTGenericDataRecord getBTreeMapRecord() {
-        CommonBTRecord btr = ic.records[2];
+        CommonBTRecord btr = ic.records.get(2);
         if(btr instanceof CommonBTGenericDataRecord) {
             return (CommonBTGenericDataRecord)btr;
         }
