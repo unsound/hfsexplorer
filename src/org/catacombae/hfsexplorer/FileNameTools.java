@@ -44,21 +44,21 @@ public class FileNameTools {
 
         char[] filenameChars = filename.toCharArray();
 
-        System.err.println("filenameChars before: " + new String(filenameChars));
+        //System.err.println("filenameChars before: " + new String(filenameChars));
         // Clean out all the usual suspects
         for(int i = 0; i < filenameChars.length; ++i) {
             int c = Util.unsign(filenameChars[i]);
 
             if(c < 32 || c == 127 || (c >= 0x80 && c <= 0x9F)) {// ASCII/ISO-8859 control characters
                 filenameChars[i] = substituteChar;
-                System.err.println("'" + (char)c + "' (" + c + ") matches control character criteria.");
+                //System.err.println("'" + (char)c + "' (" + c + ") matches control character criteria.");
             }
             else if(FileNameTools.isIllegalWindowsCharacter(c)) {
                 filenameChars[i] = substituteChar;
-                System.err.println("'" + (char)c + "' (" + c + ") is an illegal Windows character.");
+                //System.err.println("'" + (char)c + "' (" + c + ") is an illegal Windows character.");
             }
         }
-        System.err.println("filenameChars middle: " + new String(filenameChars));
+        //System.err.println("filenameChars middle: " + new String(filenameChars));
         
         // Check for trailing dots and spaces
         for(int i = filenameChars.length-1; i >= 0; --i) {
@@ -68,7 +68,7 @@ public class FileNameTools {
             else
                 break;
         }
-        System.err.println("filenameChars after: " + new String(filenameChars));
+        //System.err.println("filenameChars after: " + new String(filenameChars));
 
         filename = new String(filenameChars);
 
