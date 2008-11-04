@@ -46,7 +46,6 @@ import org.catacombae.hfsexplorer.FileSystemBrowser.NoLeafMutableTreeNode;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFile;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFolder;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTIndexRecord;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonBTKey;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTNode;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTNodeDescriptor;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFile;
@@ -61,7 +60,6 @@ import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafNode;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.hfsexplorer.fs.BaseHFSFileSystemView;
 import org.catacombae.hfsexplorer.io.JTextAreaOutputStream;
-import org.catacombae.hfsexplorer.fs.StringCodec;
 
 /**
  *
@@ -83,7 +81,13 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
          * A B-tree starts with a header node,
          */
         CommonBTNode iNode = fsView.getCatalogNode(-1); // Get root index node.
-
+        
+        if(iNode == null) {
+            DefaultTreeModel model = new DefaultTreeModel(new NoLeafMutableTreeNode("<empty>"));
+            dirTree.setModel(model);
+            return;
+        }
+        
         DefaultMutableTreeNode rootNode = new NoLeafMutableTreeNode(new BTNodeStorage(iNode, "Catalog root"));
         expandNode(rootNode, iNode, fsView);
 
