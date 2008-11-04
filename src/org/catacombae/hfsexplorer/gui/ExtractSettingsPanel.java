@@ -24,6 +24,13 @@ import java.util.Enumeration;
 import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
+import javax.swing.SwingUtilities;
+import org.catacombae.hfsexplorer.ExtractProgressMonitor.CreateDirectoryFailedAction;
+import org.catacombae.hfsexplorer.ExtractProgressMonitor.CreateFileFailedAction;
+import org.catacombae.hfsexplorer.ExtractProgressMonitor.DirectoryExistsAction;
+import org.catacombae.hfsexplorer.ExtractProgressMonitor.ExtractProperties;
+import org.catacombae.hfsexplorer.ExtractProgressMonitor.ExtractPropertiesListener;
+import org.catacombae.hfsexplorer.ExtractProgressMonitor.FileExistsAction;
 
 /**
  *
@@ -35,8 +42,164 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
     private final ButtonGroup dirExistsButtonGroup = new ButtonGroup();
     private final ButtonGroup fileExistsButtonGroup = new ButtonGroup();
     
+    public ExtractSettingsPanel(final ExtractProperties p) {
+        this();
+        
+        p.addListener(new ExtractPropertiesListener() {
+            @Override
+            public void propertyChanged(Object changedProperty) {
+                //System.err.println("Received a propertyChanged for " + changedProperty);
+                final AbstractButton theButton;
+                if(changedProperty instanceof CreateDirectoryFailedAction) {
+                    switch((CreateDirectoryFailedAction)changedProperty) {
+                        case PROMPT_USER:
+                            theButton = createDirPromptUserButton;
+                            break;
+                        case AUTO_RENAME:
+                            theButton = createDirAutoRenameButton;
+                            break;
+                        case SKIP_DIRECTORY:
+                            theButton = createDirSkipDirectoryButton;
+                            break;
+                        case CANCEL:
+                            theButton = createDirCancelButton;
+                            break;
+                        default:
+                            throw new RuntimeException("Unknown property: " + changedProperty);
+                    }
+                }
+                else if(changedProperty instanceof CreateFileFailedAction) {
+                    switch((CreateFileFailedAction)changedProperty) {
+                        case PROMPT_USER:
+                            theButton = createFilePromptUserButton;
+                            break;
+                        case SKIP_FILE:
+                            theButton = createFileSkipFileButton;
+                            break;
+                        case AUTO_RENAME:
+                            theButton = createFileAutoRenameButton;
+                            break;
+                        case SKIP_DIRECTORY:
+                            theButton = createFileSkipDirectoryButton;
+                            break;
+                        case CANCEL:
+                            theButton = createFileCancelButton;
+                            break;
+                        default:
+                            throw new RuntimeException("Unknown property: " + changedProperty);
+                    }
+                }
+                else if(changedProperty instanceof DirectoryExistsAction) {
+                    switch((DirectoryExistsAction)changedProperty) {
+                        case PROMPT_USER:
+                            theButton = dirExistsPromptUserButton;
+                            break;
+                        case CONTINUE:
+                            theButton = dirExistsContinueButton;
+                            break;
+                        case AUTO_RENAME:
+                            theButton = dirExistsAutoRenameButton;
+                            break;
+                        case SKIP_DIRECTORY:
+                            theButton = dirExistsSkipDirectoryButton;
+                            break;
+                        case CANCEL:
+                            theButton = dirExistsCancelButton;
+                            break;
+                        default:
+                            throw new RuntimeException("Unknown property: " + changedProperty);
+                    }
+                }
+                else if(changedProperty instanceof FileExistsAction) {
+                    switch((FileExistsAction)changedProperty) {
+                        case PROMPT_USER:
+                            theButton = fileExistsPromptUserButton;
+                            break;
+                        case OVERWRITE:
+                            theButton = fileExistsOverwriteButton;
+                            break;
+                        case AUTO_RENAME:
+                            theButton = fileExistsAutoRenameButton;
+                            break;
+                        case SKIP_FILE:
+                            theButton = fileExistsSkipFileButton;
+                            break;
+                        case SKIP_DIRECTORY:
+                            theButton = fileExistsSkipDirectoryButton;
+                            break;
+                        case CANCEL:
+                            theButton = fileExistsCancelButton;
+                            break;
+                        default:
+                            throw new RuntimeException("Unknown property: " + changedProperty);
+                    }
+                }
+                else
+                    throw new RuntimeException("Unknown property: " +
+                            (changedProperty != null?changedProperty.getClass():"null"));
+                
+                if(theButton != null) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            theButton.setSelected(true);
+                        }
+                    });
+                }
+            }
+        });
+        
+        createDirPromptUserButton.doClick();
+        createFilePromptUserButton.doClick();
+        dirExistsPromptUserButton.doClick();
+        fileExistsPromptUserButton.doClick();
+
+        createDirPromptUserButton.addActionListener(new CreateDirListener(createDirPromptUserButton,
+                p, CreateDirectoryFailedAction.PROMPT_USER));
+        createDirSkipDirectoryButton.addActionListener(new CreateDirListener(createDirSkipDirectoryButton,
+                p, CreateDirectoryFailedAction.SKIP_DIRECTORY));
+        createDirAutoRenameButton.addActionListener(new CreateDirListener(createDirAutoRenameButton,
+                p, CreateDirectoryFailedAction.AUTO_RENAME));
+        createDirCancelButton.addActionListener(new CreateDirListener(createDirCancelButton,
+                p, CreateDirectoryFailedAction.CANCEL));
+        
+        createFilePromptUserButton.addActionListener(new CreateFileListener(createFilePromptUserButton,
+                p, CreateFileFailedAction.PROMPT_USER));
+        createFileSkipFileButton.addActionListener(new CreateFileListener(createFileSkipFileButton,
+                p, CreateFileFailedAction.SKIP_FILE));
+        createFileSkipDirectoryButton.addActionListener(new CreateFileListener(createFileSkipDirectoryButton,
+                p, CreateFileFailedAction.SKIP_DIRECTORY));
+        createFileAutoRenameButton.addActionListener(new CreateFileListener(createFileAutoRenameButton,
+                p, CreateFileFailedAction.AUTO_RENAME));
+        createFileCancelButton.addActionListener(new CreateFileListener(createFileCancelButton,
+                p, CreateFileFailedAction.CANCEL));
+        
+        dirExistsPromptUserButton.addActionListener(new DirExistsListener(dirExistsPromptUserButton,
+                p, DirectoryExistsAction.PROMPT_USER));
+        dirExistsContinueButton.addActionListener(new DirExistsListener(dirExistsContinueButton,
+                p, DirectoryExistsAction.CONTINUE));
+        dirExistsSkipDirectoryButton.addActionListener(new DirExistsListener(dirExistsSkipDirectoryButton,
+                p, DirectoryExistsAction.SKIP_DIRECTORY));
+        dirExistsAutoRenameButton.addActionListener(new DirExistsListener(dirExistsAutoRenameButton,
+                p, DirectoryExistsAction.AUTO_RENAME));
+        dirExistsCancelButton.addActionListener(new DirExistsListener(dirExistsCancelButton,
+                p, DirectoryExistsAction.CANCEL));
+        
+        fileExistsPromptUserButton.addActionListener(new FileExistsListener(fileExistsPromptUserButton,
+                p, FileExistsAction.PROMPT_USER));
+        fileExistsSkipFileButton.addActionListener(new FileExistsListener(fileExistsSkipFileButton,
+                p, FileExistsAction.SKIP_FILE));
+        fileExistsSkipDirectoryButton.addActionListener(new FileExistsListener(fileExistsSkipDirectoryButton,
+                p, FileExistsAction.SKIP_DIRECTORY));
+        fileExistsOverwriteButton.addActionListener(new FileExistsListener(fileExistsOverwriteButton,
+                p, FileExistsAction.OVERWRITE));
+        fileExistsAutoRenameButton.addActionListener(new FileExistsListener(fileExistsAutoRenameButton,
+                p, FileExistsAction.AUTO_RENAME));
+        fileExistsCancelButton.addActionListener(new FileExistsListener(fileExistsCancelButton,
+                p, FileExistsAction.CANCEL));
+    }
     /** Creates new form ExtractSettingsPanel */
-    public ExtractSettingsPanel() {
+    private ExtractSettingsPanel() {
         initComponents();
         
         createDirButtonGroup.add(createDirPromptUserButton);
@@ -69,6 +232,13 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent e) {
                 boolean selected = quietModeBox.isSelected();
                 
+                if(selected) {
+                    createDirSkipDirectoryButton.doClick();
+                    createFileSkipFileButton.doClick();
+                    dirExistsSkipDirectoryButton.doClick();
+                    fileExistsSkipFileButton.doClick();
+                }
+                
                 List<ButtonGroup> buttonGroups = Arrays.asList(createDirButtonGroup,
                         createFileButtonGroup, dirExistsButtonGroup, fileExistsButtonGroup);
                 for(ButtonGroup bg : buttonGroups) {
@@ -77,13 +247,6 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
                         AbstractButton b = buttonEnum.nextElement();
                         b.setEnabled(!selected);
                     }
-                }
-                
-                if(selected) {
-                    createDirSkipDirectoryButton.setSelected(true);
-                    createFileSkipFileButton.setSelected(true);
-                    dirExistsSkipDirectoryButton.setSelected(true);
-                    fileExistsSkipFileButton.setSelected(true);
                 }
             }
             
@@ -375,6 +538,72 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
     private javax.swing.JCheckBox quietModeBox;
     // End of variables declaration//GEN-END:variables
 
+    private abstract class AbstractListener<A> implements ActionListener {
+        protected final AbstractButton button;
+        protected final ExtractProperties p;
+        protected final A action;
+        
+        public AbstractListener(AbstractButton button, ExtractProperties p, A action) {
+            this.button = button;
+            this.p = p;
+            this.action = action;
+        }
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if(button.isSelected()) {
+                //System.err.println("Setting action " + action.getClass().getSimpleName() + "." +
+                //        action);
+                setAction(action);
+            }
+        }
+        
+        protected abstract void setAction(A action);
+    }
+    
+    private class CreateDirListener extends AbstractListener<CreateDirectoryFailedAction> {
+        public CreateDirListener(AbstractButton button, ExtractProperties p, CreateDirectoryFailedAction action) {
+            super(button, p, action);
+        }
+
+        @Override
+        protected void setAction(CreateDirectoryFailedAction action) {
+            p.setCreateDirectoryFailedAction(action);
+        }
+    }
+    
+    private class CreateFileListener extends AbstractListener<CreateFileFailedAction> {
+        public CreateFileListener(AbstractButton button, ExtractProperties p, CreateFileFailedAction action) {
+            super(button, p, action);
+        }
+
+        @Override
+        protected void setAction(CreateFileFailedAction action) {
+            p.setCreateFileFailedAction(action);
+        }
+    }
+    
+    private class DirExistsListener extends AbstractListener<DirectoryExistsAction> {
+        public DirExistsListener(AbstractButton button, ExtractProperties p, DirectoryExistsAction action) {
+            super(button, p, action);
+        }
+
+        @Override
+        protected void setAction(DirectoryExistsAction action) {
+            p.setDirectoryExistsAction(action);
+        }
+    }
+    
+    private class FileExistsListener extends AbstractListener<FileExistsAction> {
+        public FileExistsListener(AbstractButton button, ExtractProperties p, FileExistsAction action) {
+            super(button, p, action);
+        }
+
+        @Override
+        protected void setAction(FileExistsAction action) {
+            p.setFileExistsAction(action);
+        }
+    }
+    
     /*
     public static void main(String[] args) {
         JFrame jf = new JFrame("Test");
@@ -385,4 +614,4 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
         jf.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
     */
-}
+};

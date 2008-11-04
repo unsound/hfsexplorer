@@ -81,6 +81,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import org.catacombae.dmgextractor.encodings.encrypted.ReadableCEncryptedEncodingStream;
 import org.catacombae.dmgextractor.ui.PasswordDialog;
+import org.catacombae.hfsexplorer.ExtractProgressMonitor.CreateDirectoryFailedAction;
+import org.catacombae.hfsexplorer.ExtractProgressMonitor.CreateFileFailedAction;
+import org.catacombae.hfsexplorer.ExtractProgressMonitor.DirectoryExistsAction;
+import org.catacombae.hfsexplorer.ExtractProgressMonitor.ExtractProperties;
+import org.catacombae.hfsexplorer.ExtractProgressMonitor.FileExistsAction;
 import org.catacombae.hfsexplorer.gui.ErrorSummaryPanel;
 import org.catacombae.hfsexplorer.gui.MemoryStatisticsPanel;
 import org.catacombae.jparted.lib.DataLocator;
@@ -1340,10 +1345,9 @@ public class FileSystemBrowserWindow extends JFrame {
         String[] pathStackArray = pathStack.toArray(new String[pathStack.size()]);
         String pathStackString = Util.concatenateStrings(pathStack, "/");
         
-        System.err.print("Directory: \"");
-        System.err.print(pathStackString);
-        System.err.println("\"...");
-        
+        //System.err.print("Directory: \"");
+        //System.err.print(pathStackString);
+        //System.err.println("\"...");
         
         for(FSEntry curEntry : selection) {
             if(visitor.cancelTraversal()) {
@@ -1654,13 +1658,13 @@ public class FileSystemBrowserWindow extends JFrame {
             }
         }
         else if(rec instanceof FSFolder) {
-            String dirName = rec.getName();
-            progressDialog.updateCurrentDir(dirName);
+            String curDirName = rec.getName();
+            progressDialog.updateCurrentDir(curDirName);
 
             FSEntry[] contents = ((FSFolder) rec).listEntries();
-            //System.out.println("folder: \"" + dirName + "\" valence: " + contents.length + " range: " + fractionLowLimit + "-" + fractionHighLimit);
+            //System.out.println("folder: \"" + curDirName + "\" valence: " + contents.length + " range: " + fractionLowLimit + "-" + fractionHighLimit);
             // We now have the contents of the requested directory
-            File thisDir = new File(outDir, dirName);
+            File thisDir = new File(outDir, curDirName);
             if(!overwriteAll.o && thisDir.exists()) {
                 String[] options = new String[]{"Continue", "Cancel"};
                 int reply = JOptionPane.showOptionDialog(this, "Warning! Directory:\n    \"" + thisDir.getAbsolutePath() + "\"\n" +
@@ -1718,19 +1722,29 @@ public class FileSystemBrowserWindow extends JFrame {
     */
 
     private void extractFile(final FSFile rec, final File outDir, final ExtractProgressMonitor progressDialog,
-            final LinkedList<String> errorMessages, final ObjectContainer<Boolean> overwriteAll,
+            final LinkedList<String> errorMessages, final ExtractProperties extractProperties,
             final ObjectContainer<Boolean> skipDirectory, final FSForkType forkType) {
         //int errorCount = 0;
-        String filename;
+        final String originalFileName;
         
-        if(forkType != FSForkType.DATA)
-            filename = rec.getName();
+        if(forkType == FSForkType.DATA)
+            originalFileName = rec.getName();
         else if(forkType == FSForkType.MACOS_RESOURCE)
-            filename = "._" + rec.getName(); // Special syntax for resource forks in foreign file systems
+            originalFileName = "._" + rec.getName(); // Special syntax for resource forks in foreign file systems
         else 
             throw new RuntimeException("Unexpected fork type: " + forkType);
         
-        while(true) {
+        CreateFileFailedAction defaultCreateFileFailedAction =
+                extractProperties.getCreateFileFailedAction();
+        FileExistsAction defaultFileExistsAction =
+                extractProperties.getFileExistsAction();
+        
+        String fileName = originalFileName;
+        
+        while(fileName != null) {
+            String curFileName = fileName;
+            fileName = null;
+            
             //System.out.println("file: \"" + filename + "\" range: " + fractionLowLimit + "-" + fractionHighLimit);
             final FSFork theFork = rec.getForkByType(forkType);
             
@@ -1739,50 +1753,57 @@ public class FileSystemBrowserWindow extends JFrame {
             else if(forkType == FSForkType.MACOS_RESOURCE && theFork.getLength() == 0)
                 return; // Extracting empty resource forks is really pointless.
             
-            progressDialog.updateCurrentFile(filename, theFork.getLength());
+            progressDialog.updateCurrentFile(curFileName, theFork.getLength());
 
+            final File outFile = new File(outDir, curFileName);
             //progressDialog.updateTotalProgress(fractionLowLimit);
-            final File outFile = new File(outDir, filename);
 
-            if(!overwriteAll.o && outFile.exists()) {
-                String[] options = new String[]{"Overwrite", "Overwrite all", "Skip file and continue", "Skip this directory", "Rename file", "Cancel"};
-                int reply = JOptionPane.showOptionDialog(this, "File:\n    \"" + outFile.getAbsolutePath() + "\"\n" +
-                        "already exists.", "Warning", JOptionPane.YES_NO_CANCEL_OPTION,
-                        JOptionPane.WARNING_MESSAGE, null, options, options[0]);
-                if(reply == 0);
-                else if(reply == 1) {
-                    overwriteAll.o = true;
+            if(defaultFileExistsAction != FileExistsAction.OVERWRITE && outFile.exists()) {
+                FileExistsAction a;
+                if(defaultFileExistsAction == FileExistsAction.PROMPT_USER)
+                    a = progressDialog.fileExists(outFile);
+                else {
+                    a = defaultFileExistsAction;
+                    defaultFileExistsAction = FileExistsAction.PROMPT_USER;
                 }
-                else if(reply == 2) {
+                
+                if(a == FileExistsAction.OVERWRITE) {
+                }
+                else if(a == FileExistsAction.OVERWRITE_ALL) {
+                    extractProperties.setFileExistsAction(FileExistsAction.OVERWRITE);
+                    defaultFileExistsAction = FileExistsAction.OVERWRITE;
+                }
+                else if(a == FileExistsAction.SKIP_FILE) {
                     errorMessages.addLast("Skipped extracting file \"" + outFile.getAbsolutePath() +
                             "\" due to user interaction.");
                     break;
                 }
-                else if(reply == 3) {
+                else if(a == FileExistsAction.SKIP_DIRECTORY) {
                     errorMessages.addLast("Skipping entire directory \"" + outDir.getAbsolutePath() +
                             "\" due to user interaction.");
                     skipDirectory.o = true;
                     break;
                 }
-                else if(reply == 4) {
-                    Object selection = JOptionPane.showInputDialog(this, "Enter the new filename:", "Input filename",
-                            JOptionPane.PLAIN_MESSAGE, null, null, filename);
-                    if(selection == null) {
-                        errorMessages.addLast("Skipped extracting file \"" + outFile.getAbsolutePath() +
-                                "\" due to user interaction.");
-                        progressDialog.signalCancel();
-                        break;
-                    }
-                    else {
-                        filename = selection.toString();
-                        continue;
-                    }
+                else if(a == FileExistsAction.RENAME) {
+                    fileName = progressDialog.displayRenamePrompt(curFileName, outDir);
+                    
+                    if(fileName == null)
+                        fileName = curFileName;
+                    continue;
                 }
-                else {
-                    errorMessages.addLast("Skipped extracting file \"" + outFile.getAbsolutePath() +
-                            "\" due to user interaction.");
+                else if(a == FileExistsAction.AUTO_RENAME) {
+                    fileName = FileNameTools.autoRenameIllegalFilename(curFileName, outDir, false);
+                    
+                    if(fileName == null)
+                        fileName = curFileName;
+                    continue;
+                }
+                else if(a == FileExistsAction.CANCEL) {
                     progressDialog.signalCancel();
                     break;
+                }
+                else {
+                    throw new RuntimeException("Internal error! Did not expect a: " + a);
                 }
             }
             try {
@@ -1805,84 +1826,89 @@ public class FileSystemBrowserWindow extends JFrame {
                     throw new FileNotFoundException();
                 }
 
-                if(!outFile.getParentFile().equals(outDir) || !outFile.getName().equals(filename)) {
+                if(!outFile.getParentFile().equals(outDir) || !outFile.getName().equals(curFileName)) {
                     throw new FileNotFoundException();
                 }
                 FileOutputStream fos = new FileOutputStream(outFile);
                 extractForkToStream(theFork, fos, progressDialog);
                 fos.close();
-            //JOptionPane.showMessageDialog(this, "The file was successfully extracted!\n",
-            //			  "Extraction complete!", JOptionPane.INFORMATION_MESSAGE);
+                
+                if(curFileName != (Object) originalFileName && !curFileName.equals(originalFileName))
+                    errorMessages.addLast("File \"" + originalFileName +
+                            "\" was renamed to \"" + curFileName + "\" in parent folder \"" +
+                            outDir.getAbsolutePath() + "\".");
             } catch(FileNotFoundException fnfe) {
+                // <Debug messages>
                 System.out.println("Could not create file \"" + outFile + "\". The following exception was thrown:");
                 fnfe.printStackTrace();
-                char[] filenameChars = filename.toCharArray();
+                char[] filenameChars = curFileName.toCharArray();
                 System.out.println("Filename in hex (" + filenameChars.length + " UTF-16BE units):");
                 System.out.print("  0x");
                 for(char c : filenameChars) {
                     System.out.print(" " + Util.toHexStringBE(c));
                 }
                 System.out.println();
-
-                String[] options = new String[]{"Skip file and continue", "Skip this directory", "Cancel", "Rename file"};
-                int reply = JOptionPane.showOptionDialog(this, "Could not create file \"" + filename +
-                        "\" in folder:\n  " + outDir.getAbsolutePath() + "\n" //+
-                        /*"Do you want to continue? (The file will be skipped)"*/,
-                        "Error", JOptionPane.YES_NO_CANCEL_OPTION,
-                        JOptionPane.ERROR_MESSAGE, null, options, options[0]);
-                //System.out.println("New optionDialog returned: " + reply);
-                //System.out.println("YES_OPTION: \"" + JOptionPane.YES_OPTION + "\"");
-                //System.out.println("NO_OPTION: \"" + JOptionPane.NO_OPTION + "\"");
-                //System.out.println("CANCEL_OPTION: \"" + JOptionPane.CANCEL_OPTION + "\"");
-                //System.out.println("CLOSED_OPTION: \"" + JOptionPane.CLOSED_OPTION + "\"");
-                //System.out.println("_OPTION: \"" + JOptionPane._OPTION + "\"");
-
-                if(reply == 0) {
+                // </Debug messages>
+                
+                // <Prompt user for action, if needed>
+                CreateFileFailedAction a;
+                if(defaultCreateFileFailedAction == CreateFileFailedAction.PROMPT_USER)
+                    a = progressDialog.createFileFailed(curFileName, outDir);
+                else {
+                    a = defaultCreateFileFailedAction;
+                    defaultCreateFileFailedAction = CreateFileFailedAction.PROMPT_USER;
+                }
+                
+                if(a == CreateFileFailedAction.SKIP_FILE) {
                     errorMessages.addLast("Skipped extracting file \"" + outFile.getAbsolutePath() +
                             "\" due to user interaction.");
+                    break;
                 }
-                else if(reply == 1) {
+                else if(a == CreateFileFailedAction.SKIP_DIRECTORY) {
                     errorMessages.addLast("Skipping entire directory \"" + outDir.getAbsolutePath() +
                             "\" due to user interaction.");
                     skipDirectory.o = true;
                     break;
                 }
-                else if(reply == 3) {
-                    Object selection = JOptionPane.showInputDialog(this, "Enter the new filename:",
-                            "Input filename", JOptionPane.PLAIN_MESSAGE, null, null, filename);
-                    if(selection == null) {
-                        errorMessages.addLast("Skipped extracting file \"" + outFile.getAbsolutePath() +
-                                "\" due to user interaction.");
-                        progressDialog.signalCancel();
-                    }
-                    else {
-                        filename = selection.toString();
-                        continue;
-                    }
+                else if(a == CreateFileFailedAction.RENAME) {
+                    fileName = progressDialog.displayRenamePrompt(curFileName, outDir);
+                    
+                    if(fileName == null)
+                        fileName = curFileName;
+                    continue;
+                }
+                else if(a == CreateFileFailedAction.AUTO_RENAME) {
+                    fileName = FileNameTools.autoRenameIllegalFilename(curFileName, outDir, false);
+
+                    if(fileName == null)
+                        fileName = curFileName;
+                    continue;
+                }
+                else if(a == CreateFileFailedAction.CANCEL) {
+                    progressDialog.signalCancel();
+                    break;
                 }
                 else {
-                    errorMessages.addLast("Skipped extracting file \"" + outFile.getAbsolutePath() +
-                            "\" due to user interaction.");
-                    progressDialog.signalCancel();
+                    throw new RuntimeException("Internal error! Did not expect a: " + a);
                 }
-
+                // </Prompt user for action, if needed>                
             } catch(IOException ioe) {
                 System.err.println("Received I/O exception when trying to write to file \"" + outFile + "\":");
                 ioe.printStackTrace();
                 String msg = ioe.getMessage();
-                int reply = JOptionPane.showConfirmDialog(this, "Could not write to file \"" + filename +
+                int reply = JOptionPane.showConfirmDialog(this, "Could not write to file \"" + curFileName +
                         "\" under folder:\n  " + outDir.getAbsolutePath() +
                         (msg != null ? "\nSystem message: \"" + msg + "\"" : "") +
                         "\nDo you want to continue?",
                         "I/O Error", JOptionPane.YES_NO_OPTION,
                         JOptionPane.ERROR_MESSAGE);
-                errorMessages.addLast("Could not write to file \"" + filename + "\"");
+                errorMessages.addLast("Could not write to file \"" + curFileName + "\"");
                 if(reply == JOptionPane.NO_OPTION) {
                     progressDialog.signalCancel();
                 }
             } catch(Throwable e) {
                 e.printStackTrace();
-                String message = "An exception occurred while extracting \"" + filename + "\"!";
+                String message = "An exception occurred while extracting \"" + curFileName + "\"!";
                 message += "\n  " + e.toString();
                 for(StackTraceElement ste : e.getStackTrace()) {
                     message += "\n    " + ste.toString();
@@ -1893,7 +1919,7 @@ public class FileSystemBrowserWindow extends JFrame {
                         "Error", JOptionPane.YES_NO_OPTION,
                         JOptionPane.ERROR_MESSAGE);
                 errorMessages.addLast("An unhandled exception occurred when exctracting file \"" +
-                        filename + "\". See debug console for more info.");
+                        curFileName + "\". See debug console for more info.");
                 if(reply == JOptionPane.NO_OPTION) {
                     progressDialog.signalCancel();
                 }
@@ -2009,10 +2035,11 @@ public class FileSystemBrowserWindow extends JFrame {
         private final ExtractProgressMonitor pm;
         private final LinkedList<String> errorMessages;
         private final File outRootDir;
-        private final ObjectContainer<Boolean> overwriteAll = new ObjectContainer<Boolean>(false);
+        //private final ObjectContainer<Boolean> overwriteAll = new ObjectContainer<Boolean>(false);
         private final ObjectContainer<Boolean> skipDirectory = new ObjectContainer<Boolean>(false);
+        private final ExtractProperties extractProperties;
         private final FSForkType[] forkTypes;
-        private final LinkedList<File> outDirStack = new LinkedList<File>();;
+        private final LinkedList<File> outDirStack = new LinkedList<File>();
         
         public ExtractVisitor(ExtractProgressMonitor pm, LinkedList<String> errorMessages, File outDir,
                 List<FSForkType> forkTypes) {
@@ -2024,6 +2051,7 @@ public class FileSystemBrowserWindow extends JFrame {
             this.errorMessages = errorMessages;
             this.outRootDir = outDir;
             this.forkTypes = forkTypes;
+            this.extractProperties = this.pm.getExtractProperties();
             
             if(this.pm == null)
                 throw new IllegalArgumentException("pm == null");
@@ -2051,32 +2079,117 @@ public class FileSystemBrowserWindow extends JFrame {
             System.err.println("outDirStack.getLast()=" + outDirStack.getLast());
             final File outDir = outDirStack.getLast();
             
-            final String dirName = folder.getName();
-            pm.updateCurrentDir(dirName);
-            File thisDir = new File(outDir, dirName);
-            if(!overwriteAll.o && thisDir.exists()) {
-                if(!pm.confirmOverwriteDirectory(thisDir)) {
-                    errorMessages.addLast("Skipping all files in \"" + thisDir.getAbsolutePath() +
-                            "\" due to user interaction.");
-                    pm.signalCancel();
-                    return false;
-                }
-            }
+            final CreateDirectoryFailedAction originalCreateDirectoryFailedAction =
+                    extractProperties.getCreateDirectoryFailedAction();
+            final DirectoryExistsAction originalDirectoryExistsAction =
+                    extractProperties.getDirectoryExistsAction();
             
-            if(thisDir.mkdir() || thisDir.exists()) {
-                outDirStack.addLast(thisDir);
-                return true;
-            }
-            else {
-                if(pm.confirmSkipDirectory("Could not create directory:", thisDir.getAbsolutePath())) {
-                    errorMessages.addLast("Could not create directory \"" + thisDir.getAbsolutePath() +
-                            "\". All files under this directory will be skipped.");
-                }
-                else
-                    pm.signalCancel();
+            CreateDirectoryFailedAction defaultCreateDirectoryFailedAction =
+                    originalCreateDirectoryFailedAction;
+            DirectoryExistsAction defaultDirectoryExistsAction =
+                    originalDirectoryExistsAction;
+
+            final String originalDirName = folder.getName();
+            String dirName = originalDirName;
+            while(dirName != null) {
+                String curDirName = dirName;
+                dirName = null;
                 
-                return false;
+                pm.updateCurrentDir(curDirName);
+                File thisDir = new File(outDir, curDirName);
+                
+                if(defaultDirectoryExistsAction != DirectoryExistsAction.CONTINUE && thisDir.exists()) {
+                    DirectoryExistsAction a;
+                    if(defaultDirectoryExistsAction == DirectoryExistsAction.PROMPT_USER)
+                        a = pm.directoryExists(thisDir);
+                    else
+                        a = defaultDirectoryExistsAction;
+                    
+                    boolean resetLoop = false;
+                    switch(a) {
+                        case CONTINUE:
+                            break;
+                        case RENAME:
+                            dirName = pm.displayRenamePrompt(curDirName, outDir);
+                            if(dirName == null)
+                                dirName = curDirName;
+                            resetLoop = true;
+                            break;
+                        case AUTO_RENAME:
+                            dirName = FileNameTools.autoRenameIllegalFilename(curDirName, outDir, true);                            
+                            if(dirName == null)
+                                dirName = curDirName;
+                            resetLoop = true;
+                            break;
+                        case SKIP_DIRECTORY:
+                            resetLoop = true;
+                            break;
+                        case CANCEL:
+                            resetLoop = true;
+                            pm.signalCancel();
+                            break;
+                        default:
+                            throw new RuntimeException("Internal error! Did not expect a: " + a);
+                    }
+                    if(resetLoop)
+                        continue;
+                }
+
+                if(thisDir.mkdir() || thisDir.exists()) {
+                    if(curDirName != (Object)originalDirName && !curDirName.equals(originalDirName))
+                        errorMessages.addLast("Directory \"" + originalDirName +
+                                "\" was renamed to \"" + curDirName + "\" in parent folder \"" +
+                                outDir.getAbsolutePath() + "\".");
+                    
+                    outDirStack.addLast(thisDir);
+                    return true;
+                }
+                else {
+                    CreateDirectoryFailedAction a;
+                    if(defaultCreateDirectoryFailedAction == CreateDirectoryFailedAction.PROMPT_USER)
+                        a = pm.createDirectoryFailed(curDirName, outDir);
+                    else {
+                        a = defaultCreateDirectoryFailedAction;
+                        // Only perform the default action once... or else we would have an endless loop
+                        defaultCreateDirectoryFailedAction = CreateDirectoryFailedAction.PROMPT_USER;
+                    }
+                    
+                    switch(a) {
+                        case SKIP_DIRECTORY:
+                            errorMessages.addLast("Could not create directory \"" + thisDir.getAbsolutePath() +
+                                    "\". All files under this directory will be skipped.");
+                            break;
+                        case RENAME:
+                            dirName = pm.displayRenamePrompt(curDirName, outDir);
+                            if(dirName == null)
+                                dirName = curDirName;
+                            break;
+                        case AUTO_RENAME:
+                            dirName = FileNameTools.autoRenameIllegalFilename(curDirName, outDir, true);                            
+                            if(dirName == null) {
+                                dirName = curDirName;
+                                /*
+                                if(originalCreateDirectoryFailedAction == CreateDirectoryFailedAction.AUTO_RENAME) {
+                                    // If we got here by the default action, we don't want to bother the user...
+                                    errorMessages.addLast("Auto-rename failed for dir name \"" +
+                                            curDirName + "\" in parent directory \"" +
+                                            outDir.getAbsolutePath() +
+                                            "\". All files under this directory will be skipped.");
+                                    defaultCreateDirectoryFailedAction = CreateDirectoryFailedAction.SKIP_DIRECTORY;
+                                }
+                                */
+                            }
+                            break;
+                        case CANCEL:
+                            pm.signalCancel();
+                            break;
+                        default:
+                            throw new RuntimeException("Internal error! Did not expect a: " + a);
+                    }
+                    
+                }
             }
+            return false;
         }
         
         @Override
@@ -2092,13 +2205,14 @@ public class FileSystemBrowserWindow extends JFrame {
             
             File outDir = outDirStack.getLast();
             for(FSForkType forkType : forkTypes)
-                extractFile(fsf, outDir, pm, errorMessages, overwriteAll, skipDirectory, forkType);
+                extractFile(fsf, outDir, pm, errorMessages, extractProperties, skipDirectory, forkType);
         }
 
         @Override
         public void link(FSLink fsl) {
             // Create the link in OS-specific way? Need native code for that... unless we create a
-            // new 'ln -s' process.
+            // new 'ln -s' process, but it will be slow... UNLESS we thread it out, and don't wait
+            // for it to finish. OK, flooding the OS with ln processes isn't good either...
         }
 
         @Override
@@ -2111,7 +2225,7 @@ public class FileSystemBrowserWindow extends JFrame {
             return pm.cancelSignaled();
         }
     }
-
+    
     private class FileSystemProvider implements FileSystemBrowser.FileSystemProvider<FSEntry> {
         @Override
         public void actionDoubleClickFile(List<Record<FSEntry>> recordPath) {

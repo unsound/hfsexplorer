@@ -105,19 +105,43 @@ public class ExtractProgressPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        internalPanel = new javax.swing.JPanel();
+        currentFilenameLabel = new javax.swing.JLabel();
         progressBar = new javax.swing.JProgressBar();
         cancelButton = new javax.swing.JButton();
-        currentFilenameLabel = new javax.swing.JLabel();
         showSettingsButton = new javax.swing.JToggleButton();
+
+        currentFilenameLabel.setText("Calculating selection size...");
 
         progressBar.setString("Calculating selection size...");
         progressBar.setStringPainted(true);
 
         cancelButton.setText("Cancel");
 
-        currentFilenameLabel.setText("Calculating selection size...");
-
         showSettingsButton.setText(">>");
+
+        org.jdesktop.layout.GroupLayout internalPanelLayout = new org.jdesktop.layout.GroupLayout(internalPanel);
+        internalPanel.setLayout(internalPanelLayout);
+        internalPanelLayout.setHorizontalGroup(
+            internalPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(currentFilenameLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 400, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+            .add(internalPanelLayout.createSequentialGroup()
+                .add(progressBar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 274, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(cancelButton)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(showSettingsButton))
+        );
+        internalPanelLayout.setVerticalGroup(
+            internalPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(internalPanelLayout.createSequentialGroup()
+                .add(currentFilenameLabel)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(internalPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(progressBar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 24, Short.MAX_VALUE)
+                    .add(cancelButton)
+                    .add(showSettingsButton)))
+        );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -125,32 +149,21 @@ public class ExtractProgressPanel extends javax.swing.JPanel {
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(currentFilenameLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 393, Short.MAX_VALUE)
-                    .add(layout.createSequentialGroup()
-                        .add(progressBar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(cancelButton)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(showSettingsButton)))
-                .addContainerGap())
+                .add(internalPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+            .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(currentFilenameLabel)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(showSettingsButton)
-                    .add(cancelButton)
-                    .add(progressBar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 24, Short.MAX_VALUE))
-                .addContainerGap())
+                .add(internalPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JButton cancelButton;
     private javax.swing.JLabel currentFilenameLabel;
+    private javax.swing.JPanel internalPanel;
     private javax.swing.JProgressBar progressBar;
     private javax.swing.JToggleButton showSettingsButton;
     // End of variables declaration//GEN-END:variables
