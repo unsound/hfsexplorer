@@ -353,8 +353,11 @@ public abstract class BaseHFSFileSystemView {
         CatalogInitProcedure init = new CatalogInitProcedure();
 
         long currentNodeNumber;
-        if(nodeNumber < 0) // Means that we should get the root node
+        if(nodeNumber < 0) { // Means that we should get the root node
             currentNodeNumber = init.bthr.getRootNodeNumber();
+            if(currentNodeNumber == 0) // There is no index node, or other content. So the node we
+                return null;           // seek does not exist. Return null.
+        }
         else
             currentNodeNumber = nodeNumber;
 
@@ -386,12 +389,25 @@ public abstract class BaseHFSFileSystemView {
             return null;
     }
     
+    /**
+     * Returns extents overflow node number <code>nodeNumber</code> Node number 0 is always the
+     * B*-tree header node. The node numbers of the rest of the node are determined by the contents
+     * of the header node.<br>
+     * A value of -1 for nodeNumber is special and means that the root index node should be
+     * retrieved. If the root index node does not exist, null is returned.
+     * 
+     * @param nodeNumber
+     * @return
+     */
     public CommonBTNode getExtentsOverflowNode(long nodeNumber) {
         ExtentsInitProcedure init = new ExtentsInitProcedure();
 
         long currentNodeNumber;
-        if(nodeNumber < 0) // Means that we should get the root node
+        if(nodeNumber < 0) { // Means that we should get the root index node
             currentNodeNumber = init.bthr.getRootNodeNumber();
+            if(currentNodeNumber == 0) // There is no index node, or other content. So the node we
+                return null;           // seek does not exist. Return null.
+        }
         else
             currentNodeNumber = nodeNumber;
 

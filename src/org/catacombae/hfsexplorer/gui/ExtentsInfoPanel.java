@@ -69,6 +69,12 @@ public class ExtentsInfoPanel extends javax.swing.JPanel {
          * A B-tree starts with a header node,
          */
         CommonBTNode iNode = fsView.getExtentsOverflowNode(-1); // Get root index node.
+        
+        if(iNode == null) {
+            DefaultTreeModel model = new DefaultTreeModel(new NoLeafMutableTreeNode("<empty>"));
+            dirTree.setModel(model);
+            return;
+        }
 
         DefaultMutableTreeNode rootNode = new NoLeafMutableTreeNode(new BTNodeStorage(iNode, "Extents overflow root"));
         expandNode(rootNode, iNode, fsView);
