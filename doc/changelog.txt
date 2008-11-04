@@ -17,16 +17,16 @@ todo
 
 - Option to show or hide all "hidden" files. Default may be to have it turned off.
 
-- Debug console should have a limited number of lines. Modify a backing document?
-
 - Certain directories are VERY slow to open. Probably has something to do with symbolic
   links. Needs to be checked.
+
+- Relative circular symbolic links don't parse. (see circularSymlinksTest.dmg)
 
 
 current
 -------
-- Experimental support for reading encrypted UDIF and raw disk images (.dmg). Feedback
-  is much appreciated, as I can only generate a certain amount of test cases.
+- Experimental support for reading encrypted UDIF/raw disk images (.dmg). Feedback is
+  much appreciated, as I can only generate a certain amount of test cases.
 
 - Experimental support for older HFS (Mac OS Original) file systems. Feedback is much
   appreciated here as well.
@@ -41,6 +41,9 @@ current
 - Java 6+ only: Table header sorting for the file table is now implemented. The last
   (empty) column will sort on the internal sort order, if you need to reset your sorting
   choices.
+
+- More flexible extract options, such as setting default actions for different events
+  that may occur. (Example: "Could not create directory" -> Skip / Auto-rename / ...)
 
 - Major restructuring/modularization of core components to ease future development.
 
@@ -63,6 +66,9 @@ current
 
 - Bugfix: The user previously wasn't able to abort the "Calculating selection size" phase
   when extracting files.
+
+- Bugfix/feature: When extracting resource forks or both forks, empty resource forks are
+  now skipped over, rather than being extracted as 0-byte "._" files.
 
 
 0.19.5

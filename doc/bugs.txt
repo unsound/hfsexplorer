@@ -13,11 +13,10 @@
 - INVALID? Discovered that the dates are incorrect... need to
   revise the date calculation mechanism...
   UPDATE: Can't reproduce this bug, everything seems fine.
-
-- Double-clicking a file in the right pane to enter a new directory
-  takes more time than clicking it in the left pane. Why?
-  (Update 2008-07-18: I can not notice this issue anymore, but I
-  don't think I ever investigated it...)
+  UPDATE2: Experiemented with dates and time zones in Mac OS X and
+  discoverered that sometimes it does behave strangely, with a half
+  hour offset added without reason. This must be investigated at
+  some point.
 
 2008-07-18
 ----------
@@ -49,5 +48,3 @@
   incorrectly, for example when we load Partition0 with MBR partition
   scheme and a partition number, only Partition0 is displayed.
   Ex. runfsb \\?\GLOBALROOT\Device\Harddisk3\Partition0
-
-- When loading a new file system from an old one, we get an exception.

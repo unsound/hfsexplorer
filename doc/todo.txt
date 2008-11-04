@@ -5,24 +5,8 @@ HFSExplorer TODO:
 - Valence of a folder should be read immediatly after expansion so that the user
   doesn't have to click it to see if it contains any children.
 
-- Figure out how to catch mouse clicks in a JTableHeader, so I can sort like
-  Windows Explorer does.
-
 - Create an indeterminate progress monitor window for when opening DMG files
   (reading their structures) takes a long time.
-
-- Implement support for symbolic links. Need to read more about them.
-  "James" <jg193404@ohio.edu> writes:
-    I really like this tool and its a good alternative to other more expensive 
-    solutions, however, one thing I've notived is that it is unable to read files 
-    from the Time Machine directory.  I tried to access a couple of files from my 
-    Time Machine backup drive while my Mac in is for repair, however HFS explorer 
-    doesn't seem to be able to resolve the links that are part of the Time Machine 
-    backup structure.
-    
-    Anyway, thanks for your work and I hope you continue improving your program.
-    
-    James
 
 - Backing store structure view:
   View the different data layers through which the HFS+ file system was loaded.
@@ -35,22 +19,17 @@ HFSExplorer TODO:
 - UDIF menu for UDIF-loaded file systems where the user can convert UDIF to ISO
   and also display properties on the UDIF file, for instance type
   (UDBZ, UDCO, etc.).
+  Update: A similar feature has been added, which only extracts the file system
+  to a raw file (stripped of partition systems).
 
 - Improvements on the extract dialog:
   - "Advanced >>" button which displays checkboxes for default actions when
     encountering Overwrite situations, Rename situations, Directory already
     exists operations... etc.
-  - Show a log file at the end (which can be saved) displaying all errors
-    encountered and which actions were taken in response.
 
 - Tools menu -> Calculate file system fragmentation
   To find out how badly fragmented files are in the file system. Code is already
   there for hfsx command line tool.
-
-- Info dialog summary for files and folders with recursive background calculation
-  of tree weights (like Explorer). Should be the first tab for files and folders.
-
-- Implement file thread and folder thread views in the B-Tree view.
 
 - Complete journal view, in preparation of write mode. We must be able to utilize
   journaling from the beginning, because we can't trust the operating system's
