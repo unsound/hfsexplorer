@@ -844,13 +844,13 @@ public class FileSystemBrowserWindow extends JFrame {
                         toggleCachingItem.getState());
             }
 
-            System.err.println("loadFS(): fsFile=" + fsFile);
-            System.err.println("loadFS(): Creating ReadableConcatenatedStream...");
+            //System.err.println("loadFS(): fsFile=" + fsFile);
+            //System.err.println("loadFS(): Creating ReadableConcatenatedStream...");
             ReadableConcatenatedStream stage1 = new ReadableConcatenatedStream(fsFile, fsOffset,
                     fsLength);
-            System.err.println("loadFS(): Creating ReadableStreamDataLocator...");
+            //System.err.println("loadFS(): Creating ReadableStreamDataLocator...");
             this.fsDataLocator = new ReadableStreamDataLocator(stage1);
-            System.err.println("loadFS(): Creating fsHandler...");
+            //System.err.println("loadFS(): Creating fsHandler...");
 
             fsHandler = (HFSCommonFileSystemHandler) factory.createHandler(fsDataLocator);
             FSFolder rootRecord = fsHandler.getRoot();
@@ -1179,7 +1179,7 @@ public class FileSystemBrowserWindow extends JFrame {
 
                                 LinkedList<String> dirStack = new LinkedList<String>();
                                 if(parentPath != null) {
-                                    System.err.println("parentPath: " + Util.concatenateStrings(parentPath, "/"));
+                                    //System.err.println("parentPath: " + Util.concatenateStrings(parentPath, "/"));
                                     for(String pathComponent : parentPath)
                                         dirStack.addLast(pathComponent);
                                 }
@@ -1255,6 +1255,7 @@ public class FileSystemBrowserWindow extends JFrame {
                                     }
                                 }
                             } catch(Throwable t) {
+                                t.printStackTrace();
                                 GUIUtil.displayExceptionDialog(t, progress);
                             } finally {
                                 progress.dispose();
@@ -1275,7 +1276,8 @@ public class FileSystemBrowserWindow extends JFrame {
                 throw new RuntimeException("wtf?"); // ;-)
             }
         } catch(RuntimeException re) {
-            JOptionPane.showMessageDialog(this, re.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            re.printStackTrace();
+            GUIUtil.displayExceptionDialog(re, this);
         }
     // There is trouble with this approach in OS X... we don't get a proper DIRECTORIES_ONLY dialog. One idea is to use java.awt.FileDialog and see if it works better. (probably not)
     //java.awt.FileDialog fd = new java.awt.FileDialog(FileSystemBrowserWindow.this, "Extract here", SAVE);
@@ -1383,14 +1385,14 @@ public class FileSystemBrowserWindow extends JFrame {
                     }
                     else {
                         String msg = "Could not get link target entry \"" + curLink.getLinkTargetString() + "\"";
-                        System.err.println("  WARNING: " + msg);
+                        System.err.println("WARNING: " + msg);
                         visitor.traversalError(msg);
                     }
                 }
                 else {
                     String msg = "Could not resolve link \"" + curEntryString + "\" -> \"" +
                             curLink.getLinkTargetString() + "\"";
-                    System.err.println("  WARNING: " + msg);
+                    System.err.println("WARNING: " + msg);
                     visitor.traversalError(msg);
                 }
             }
@@ -1435,7 +1437,7 @@ public class FileSystemBrowserWindow extends JFrame {
                     String msg = "Unresolved link \"" + curEntryString + "\" -> \"" +
                             curLink.getLinkTargetString() + "\"";
                     System.err.println(msg);
-                    visitor.traversalError(msg);
+                    //visitor.traversalError(msg);
                 }
                 
                 visitor.link((FSLink) curEntry);
@@ -2070,13 +2072,13 @@ public class FileSystemBrowserWindow extends JFrame {
         
         @Override
         public boolean startDirectory(String[] parentPath, FSFolder folder) {
-            System.err.println("startDirectory(" + Util.concatenateStrings(parentPath, "/") + ", " + folder.getName());
-            if(skipDirectory.o) {
-                System.err.println("  skipping...");
-                return false;
-            }
+            //System.err.println("startDirectory(" + Util.concatenateStrings(parentPath, "/") + ", " + folder.getName());
+            //if(skipDirectory.o) {
+            //    System.err.println("  skipping...");
+            //    return false;
+            //}
                 
-            System.err.println("outDirStack.getLast()=" + outDirStack.getLast());
+            //System.err.println("outDirStack.getLast()=" + outDirStack.getLast());
             final File outDir = outDirStack.getLast();
             
             final CreateDirectoryFailedAction originalCreateDirectoryFailedAction =
