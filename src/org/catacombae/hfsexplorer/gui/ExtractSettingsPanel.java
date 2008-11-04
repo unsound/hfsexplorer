@@ -293,6 +293,7 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
         fileExistsCancelButton = new javax.swing.JRadioButton();
 
         quietModeBox.setText("Quiet mode");
+        quietModeBox.setToolTipText("A non-destructive \"No questions asked\" mode");
 
         createDirLabel.setText("Create directory failed:");
 

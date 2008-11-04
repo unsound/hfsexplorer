@@ -60,6 +60,7 @@
     <Component class="javax.swing.JCheckBox" name="quietModeBox">
       <Properties>
         <Property name="text" type="java.lang.String" value="Quiet mode"/>
+        <Property name="toolTipText" type="java.lang.String" value="A non-destructive &quot;No questions asked&quot; mode"/>
       </Properties>
     </Component>
     <Container class="javax.swing.JPanel" name="createDirPanel">
