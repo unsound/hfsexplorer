@@ -720,6 +720,9 @@ public class Util {
     public static int unsign(short s) {
 	return s & 0xFFFF;
     }
+    public static int unsign(char s) {
+	return s & 0xFFFF;
+    }
     public static long unsign(int i) {
 	return i & 0xFFFFFFFFL;
     }
