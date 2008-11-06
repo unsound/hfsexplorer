@@ -34,3 +34,4 @@ HFSExplorer TODO:
 - Complete journal view, in preparation of write mode. We must be able to utilize
   journaling from the beginning, because we can't trust the operating system's
   write caching features.
+
