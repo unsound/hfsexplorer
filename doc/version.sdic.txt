@@ -1,9 +1,9 @@
 !SimpleDictionary: 1.0
 AppName: HFSExplorer
-Version: 0.20
-Build: 999
-Date: 2008-11-04
-Installer: http://downloads.sourceforge.net/catacombae/hfsexplorer-0_20-setup.exe?use_mirror=
-Binary: http://downloads.sourceforge.net/catacombae/hfsexplorer-0_20-bin.zip?use_mirror=
-Source: http://downloads.sourceforge.net/catacombae/hfsexplorer-0_20-src.zip?use_mirror=
+Version: 0.20.1
+Build: 1000
+Date: 2008-11-06
+Installer: http://downloads.sourceforge.net/catacombae/hfsexplorer-0_20_1-setup.exe?use_mirror=
+Binary: http://downloads.sourceforge.net/catacombae/hfsexplorer-0_20_1-bin.zip?use_mirror=
+Source: http://downloads.sourceforge.net/catacombae/hfsexplorer-0_20_1-src.zip?use_mirror=
 Changelog: http://hem.bredband.net/unsound/hfsx/changelog.txt
