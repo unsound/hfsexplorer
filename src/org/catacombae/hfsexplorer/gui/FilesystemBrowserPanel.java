@@ -34,11 +34,38 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
     private static final ImageIcon BACK_ICON = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/back.png"));
     private static final ImageIcon UP_ICON = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/folderup.png"));
     private static final ImageIcon INFO_ICON = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/info.png"));
+    /*
+    private static final ImageIcon FORWARD_ICON;
+    private static final ImageIcon EXTRACT_ICON;
+    private static final ImageIcon BACK_ICON;
+    private static final ImageIcon UP_ICON;
+    private static final ImageIcon INFO_ICON;
+        
+
+    static {
+        ImageIcon forwardIcon = null, extractIcon = null, backIcon = null, upIcon = null, infoIcon = null;
+        try {
+            
+            forwardIcon = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/forward.png"));
+            extractIcon = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/extract.png"));
+            backIcon = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/back.png"));
+            upIcon = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/folderup.png"));
+            infoIcon = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/info.png"));
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        FORWARD_ICON = forwardIcon;
+        EXTRACT_ICON = extractIcon;
+        BACK_ICON = backIcon;
+        UP_ICON = upIcon;
+        INFO_ICON = infoIcon;
+    }
+    */
     
     /** Creates new form FilesystemBrowserPanel */
     public FilesystemBrowserPanel() {
         initComponents();
-	fileTableScroller.getViewport().setBackground(fileTable.getBackground()); // To remove the grey area below the actual table
+        fileTableScroller.getViewport().setBackground(fileTable.getBackground()); // To remove the grey area below the actual table
     }
     
     /** This method is called from within the constructor to
@@ -48,6 +75,7 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         addressField = new javax.swing.JTextField();
         pathLabel = new javax.swing.JLabel();
@@ -79,7 +107,7 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
         infoButton.setIcon(INFO_ICON);
         infoButton.setText("Info");
 
-        boxPanel.setLayout(new javax.swing.BoxLayout(boxPanel, javax.swing.BoxLayout.PAGE_AXIS));
+        boxPanel.setLayout(new java.awt.BorderLayout());
 
         treeTablePanel.setLayout(new java.awt.BorderLayout());
 
@@ -118,7 +146,7 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
 
         treeTablePanel.add(treeTableSplit, java.awt.BorderLayout.CENTER);
 
-        boxPanel.add(treeTablePanel);
+        boxPanel.add(treeTablePanel, java.awt.BorderLayout.CENTER);
 
         statusLabelPanel.setLayout(new java.awt.BorderLayout());
 
@@ -126,7 +154,7 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
         statusLabel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         statusLabelPanel.add(statusLabel, java.awt.BorderLayout.CENTER);
 
-        boxPanel.add(statusLabelPanel);
+        boxPanel.add(statusLabelPanel, java.awt.BorderLayout.SOUTH);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -138,7 +166,7 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
                     .add(layout.createSequentialGroup()
                         .add(pathLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(addressField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 672, Short.MAX_VALUE)
+                        .add(addressField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 681, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(goButton))
                     .add(layout.createSequentialGroup()
@@ -148,7 +176,7 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(infoButton)))
                 .addContainerGap())
-            .add(boxPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 773, Short.MAX_VALUE)
+            .add(boxPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 782, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -164,7 +192,7 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
                     .add(addressField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(goButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(boxPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 428, Short.MAX_VALUE))
+                .add(boxPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 443, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     
@@ -186,5 +214,15 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
     private javax.swing.JSplitPane treeTableSplit;
     public javax.swing.JButton upButton;
     // End of variables declaration//GEN-END:variables
-    
+
+    /*
+    public static void main(String[] args) {
+        JFrame jf = new JFrame("Test");
+        jf.add(new FilesystemBrowserPanel());
+        jf.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        jf.pack();
+        jf.setLocationRelativeTo(null);
+        jf.setVisible(true);
+    }
+    */
 }
