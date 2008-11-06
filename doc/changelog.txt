@@ -1,6 +1,29 @@
 HFSExplorer Changelog
 ---------------------
 
+
+todo
+----
+- Write support.
+
+- Add support for accessing floppy drives containing HFS file systems. (can floppies be
+  emulated in SheepShaver?)
+
+- Memory usage when parsing UDIF XML MUST BE REDUCED TO CONSTANT.
+
+- Opening files with default handler in windows may fail when the file name matches an
+  executable in $PATH (in which case the executable is run instead of the file).
+
+- Changing character encoding for HFS.
+
+- Option to show or hide all "hidden" files. Default may be to have it turned off.
+
+- Certain directories are VERY slow to open. Probably has something to do with symbolic
+  links. Needs to be checked.
+
+- Relative circular symbolic links don't parse. (see circularSymlinksTest.dmg)
+
+
 0.20
 ----
 - Experimental support for reading encrypted UDIF/raw disk images (.dmg). Feedback is
