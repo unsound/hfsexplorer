@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 match () {
     local SUBFILE="$1"
@@ -51,42 +51,25 @@ recursiveRmdir () {
     done
 }
 
-TEMPDIR=srcdisttemp.~
+TEMPDIR=disttemp.~
 
 echo "Cleaning temp dir..."
 rm -r $TEMPDIR
 mkdir $TEMPDIR
 
 echo "Copying files..."
-cp * $TEMPDIR 
-cp -r dist $TEMPDIR 
-cp -r lib $TEMPDIR 
-cp -r resource $TEMPDIR 
-cp -r src $TEMPDIR 
-cp -r src.META-INF $TEMPDIR 
-cp -r src.win32 $TEMPDIR 
-
-echo "Removing CVS directories..."
-recursiveRmdir "^CVS$" "$TEMPDIR"
-echo "Removing emacs backup files (*~)..."
-recursiveRmdir ".*~$" "$TEMPDIR"
-echo "Removing emacs temporary files (#*#)..."
-recursiveRmdir "^#.*#$" "$TEMPDIR"
-echo "Removing Thumbs.db files..."
-recursiveRmdir "^Thumbs\.db$" "$TEMPDIR"
-echo "Removing .DS_Store files..."
-recursiveRmdir "^\.DS_Store$" "$TEMPDIR"
-echo "Removing .cvsignore files..."
-recursiveRmdir "^\.cvsignore$" "$TEMPDIR"
+cp -r dist/* $TEMPDIR 
 
 echo "Setting execute permissions for shell scripts..."
 chmod a+x $TEMPDIR/*.sh
-chmod a+x $TEMPDIR/dist/*.sh
+
+echo "Removing CVS directories..."
+recursiveRmdir "^CVS$" "$TEMPDIR"
 
 echo "Building zip file..."
 cd $TEMPDIR
-rm ../releases/current-src.zip
-zip -9 -r ../releases/current-src.zip *
+rm ../releases/current-bin.zip
+zip -9 -r ../releases/current-bin.zip *
 cd ..
 
-echo "Done! Zip file generated in releases/current-src.zip"
+echo "Done! Zip file generated in releases/current-bin.zip"
