@@ -20,12 +20,12 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="pathLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="addressField" pref="681" max="32767" attributes="0"/>
+              <Component id="addressField" pref="631" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="goButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="boxPanel" alignment="0" pref="843" max="32767" attributes="0"/>
+          <Component id="boxPanel" alignment="0" pref="732" max="32767" attributes="0"/>
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="upButton" min="-2" max="-2" attributes="0"/>
@@ -33,14 +33,14 @@
               <Component id="extractButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="infoButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="589" max="32767" attributes="0"/>
+              <EmptySpace pref="545" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace min="-2" pref="17" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="upButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="extractButton" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -53,7 +53,7 @@
                   <Component id="pathLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="boxPanel" pref="443" max="32767" attributes="0"/>
+              <Component id="boxPanel" pref="429" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
