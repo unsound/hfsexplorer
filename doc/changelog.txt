@@ -6,6 +6,12 @@ HFSExplorer Changelog
 ------
 - Bugfix: The status field in the main window could expand vertically.
 
+- Installer fix: Uninstalls current version before installing new one.
+
+- Mac OS X fix: Dock icon gets set to the HFSExplorer icon.
+
+- Bugfix: Some annoying debug messages were printed in the debug console.
+
 
 0.20
 ----
