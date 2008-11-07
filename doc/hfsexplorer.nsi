@@ -2,7 +2,7 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "HFSExplorer"
-!define PRODUCT_VERSION "0.20"
+!define PRODUCT_VERSION "0.20.1"
 !define PRODUCT_PUBLISHER "Catacombae Software"
 !define PRODUCT_WEB_SITE "http://hem.bredband.net/catacombae/"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -52,6 +52,34 @@ var ICONS_GROUP
 
 
 ; MUI end ------
+Function .onInit
+
+  ReadRegStr $R0 HKLM \
+  "${PRODUCT_UNINST_KEY}" \
+  "UninstallString"
+  StrCmp $R0 "" done
+
+  MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
+  "${PRODUCT_NAME} is already installed. $\n$\nClick `OK` to remove the \
+  previous version or `Cancel` to cancel this upgrade." \
+  IDOK uninst
+  Abort
+
+;Run the uninstaller
+uninst:
+  ClearErrors
+  ExecWait '$R0 _?=$INSTDIR' ;Do not copy the uninstaller to a temp file
+
+  IfErrors no_remove_uninstaller
+    ;You can either use Delete /REBOOTOK in the uninstaller or add some code
+    ;here to remove the uninstaller. Use a registry key to check
+    ;whether the user has chosen to uninstall. If you are using an uninstaller
+    ;components page, make sure all sections are uninstalled.
+  no_remove_uninstaller:
+
+done:
+
+FunctionEnd
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 OutFile "hfsxsetup.exe"
@@ -78,6 +106,10 @@ Section "HFSExplorer" SEC01
   File "..\dist\lib\*.jar"
   File "..\dist\lib\*.dll"
   
+  SetOutPath "$INSTDIR\res"
+  SetOverwrite ifnewer
+  File "..\dist\res\*.png"
+
   SetOutPath "$INSTDIR\doc\html"
   SetOverwrite ifnewer
   File "..\dist\doc\html\*.html"
@@ -275,6 +307,8 @@ Section Uninstall
 
   Delete "$INSTDIR\lib\*.*"
   RMDir "$INSTDIR\lib"
+  Delete "$INSTDIR\res\*.*"
+  RMDir "$INSTDIR\res"
   Delete "$INSTDIR\doc\html\img\*.*"
   RMDir "$INSTDIR\doc\html\img"
   Delete "$INSTDIR\doc\html\*.*"

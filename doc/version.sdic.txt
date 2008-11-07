@@ -2,7 +2,7 @@
 AppName: HFSExplorer
 Version: 0.20.1
 Build: 1000
-Date: 2008-11-06
+Date: 2008-11-07
 Installer: http://downloads.sourceforge.net/catacombae/hfsexplorer-0_20_1-setup.exe?use_mirror=
 Binary: http://downloads.sourceforge.net/catacombae/hfsexplorer-0_20_1-bin.zip?use_mirror=
 Source: http://downloads.sourceforge.net/catacombae/hfsexplorer-0_20_1-src.zip?use_mirror=
