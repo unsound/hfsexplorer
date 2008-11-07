@@ -1131,7 +1131,7 @@ public class FileSystemBrowser<A> {
             return true;
         }
         else {
-            new Exception().printStackTrace();
+            //new Exception().printStackTrace();
             JOptionPane.showMessageDialog(viewComponent, "No file system " +
                     "loaded.", "Error", JOptionPane.ERROR_MESSAGE);
             return false;
