@@ -21,7 +21,6 @@ import org.catacombae.hfsexplorer.Util;
 import java.io.PrintStream;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.Dictionary;
-import org.catacombae.csjc.structelements.DictionaryBuilder;
 
 public class HFSPlusExtentDescriptor implements StructElements {
     /*
