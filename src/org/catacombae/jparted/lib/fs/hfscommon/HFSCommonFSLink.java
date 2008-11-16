@@ -17,6 +17,7 @@
 
 package org.catacombae.jparted.lib.fs.hfscommon;
 
+import org.catacombae.hfsexplorer.IOUtil;
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFileRecord;
 import org.catacombae.io.ReadableRandomAccessStream;
@@ -48,7 +49,7 @@ public class HFSCommonFSLink extends FSLink {
         // Read the data associated with the link.
         ReadableRandomAccessStream linkDataStream =
                 fsHandler.getReadableDataForkStream(linkRecord);
-        byte[] linkBytes = Util.readFully(linkDataStream);
+        byte[] linkBytes = IOUtil.readFully(linkDataStream);
         linkDataStream.close();
 
         return Util.readString(linkBytes, "UTF-8");
