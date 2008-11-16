@@ -19,6 +19,7 @@ package org.catacombae.jparted.lib.fs.hfscommon;
 
 import java.io.UnsupportedEncodingException;
 import java.util.LinkedList;
+import org.catacombae.hfsexplorer.IOUtil;
 import org.catacombae.hfsexplorer.UnicodeNormalizationToolkit;
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolderRecord;
@@ -147,7 +148,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
                 final String[] absPath;
 
                 if(fr.getData().isSymbolicLink()) {
-                    byte[] data = Util.readFully(getReadableDataForkStream(fr));
+                    byte[] data = IOUtil.readFully(getReadableDataForkStream(fr));
                     String posixPath = Util.readString(data, "UTF-8");
                     String[] basePath = Util.arrayCopy(path, 0, new String[i - 1], 0, i - 1);
                     absPath = getTruePathFromPosixPath(posixPath, basePath);

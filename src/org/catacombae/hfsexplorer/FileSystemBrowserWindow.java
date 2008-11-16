@@ -864,6 +864,7 @@ public class FileSystemBrowserWindow extends JFrame {
                     "    " + FileSystemRecognizer.FileSystemType.HFS_PLUS + "\n" +
                     "    " + FileSystemRecognizer.FileSystemType.HFSX + "\n" +
                     "    " + FileSystemRecognizer.FileSystemType.HFS_WRAPPED_HFS_PLUS + "\n" +
+                    "    " + FileSystemRecognizer.FileSystemType.HFS + "\n" +
                     "\nDetected type is (" + fsType + ").",
                     "Unsupported file system type", JOptionPane.ERROR_MESSAGE);
         }

@@ -18,9 +18,9 @@
 package org.catacombae.hfsexplorer;
 
 /**
- * Utility functions that the GUI designer can use to ease his/her existential suffering.
+ * CatacombaeIO-specific utility class.
  * 
  * @author Erik Larsson
  */
-public class GUIUtil extends org.catacombae.util.GUIUtil {
+public class IOUtil extends org.catacombae.util.IOUtil {
 }
