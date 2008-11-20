@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2007 Erik Larsson
+ * Copyright (C) 2007-2008 Erik Larsson
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,21 +16,21 @@
  */
 
 package org.catacombae.hfsexplorer.testcode;
+import java.io.FileOutputStream;
+import org.catacombae.hfsexplorer.partitioning.MBRPartitionTable;
+import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
 import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.hfsexplorer.partitioning.*;
-import org.catacombae.hfsexplorer.win32.*;
-import java.io.*;
 
-public class PrintMBRPartitionTable {
+public class PrintMBRPartitions {
+
     public static void main(String[] args) throws Exception {
         ReadableRandomAccessStream llf;
-        if(WindowsLowLevelIO.isSystemSupported()) {
+        if(WindowsLowLevelIO.isSystemSupported())
             llf = new WindowsLowLevelIO(args[0]);
-        }
-        else {
+        else
             llf = new ReadableFileStream(args[0]);
-        }
+
         byte[] referencetable = new byte[512];
         llf.seek(0);
         llf.readFully(referencetable);
@@ -38,14 +38,12 @@ public class PrintMBRPartitionTable {
         refFile.write(referencetable);
         refFile.close();
         System.out.println("Wrote the raw MBR table to file: mbr_table.debug");
-            
+
         System.out.println("Length of file: " + llf.length());
-	MBRPartitionTable mbr = new MBRPartitionTable(llf, 0);
-	mbr.print(System.out, "");
-	System.out.println("Is this parititon table valid? " + mbr.isValid() + ".");
-	    
-	llf.close();
-	
+        MBRPartitionTable mbr = new MBRPartitionTable(llf, 0);
+        mbr.print(System.out, "");
+        System.out.println("Is this parititon table valid? " + mbr.isValid() + ".");
+
+        llf.close();
     }
-    
 }
