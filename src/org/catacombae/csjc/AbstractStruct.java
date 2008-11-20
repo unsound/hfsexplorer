@@ -15,31 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.fs;
-
-import org.catacombae.io.ReadableRandomAccessStream;
+package org.catacombae.csjc;
 
 /**
- * TODO TODO TODO!
+ * Abstract struct superinterface.
  * @author Erik Larsson
  */
-public class ResourceForkReader {
-    /*
-     * Resource fork abstract data model:
-     * 
-     * -----------------      -------------
-     * | Resource fork |1----*| Data type | <- fourcc identifer
-     * -----------------      -------------
-     *               1          1
-     *               |          |
-     *               *          +
-     *            -----------------
-     *            | Resource item | <- actual data
-     *            -----------------
+public interface AbstractStruct {
+    /**
+     * Returns a serialized one-to-one representation of the struct's data.
+     *
+     * @return a serialized one-to-one representation of the struct's data.
      */
-    public ResourceForkReader(ReadableRandomAccessStream forkData) {
-        
-    }
-
-
+    public byte[] getBytes();
 }

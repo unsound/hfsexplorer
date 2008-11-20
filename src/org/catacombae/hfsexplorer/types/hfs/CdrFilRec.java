@@ -27,7 +27,7 @@ import org.catacombae.hfsexplorer.Util;
 public class CdrFilRec extends CatDataRec {
         /*
      * struct CdrFilRec
-     * size: 86 bytes
+     * size: 102 bytes
      * description:
      *
      * BP  Size  Type        Identifier   Description
@@ -49,13 +49,12 @@ public class CdrFilRec extends CatDataRec {
      * 52  4     SInt32      filBkDat     date and time of last backup (LongInt)
      * 56  16    FXInfo      filFndrInfo  additional Finder information (FXInfo)
      * 72  2     SInt16      filClpSize   file clump size (Integer)
-     * 74  4     ExtDataRec  filExtRec    first data fork extent record (ExtDataRec)
-     * 78  4     ExtDataRec  filRExtRec   first resource fork extent record (ExtDataRec)
-     * 82  4     SInt32      filResrv     reserved (LongInt)
+     * 74  12    ExtDataRec  filExtRec    first data fork extent record (ExtDataRec)
+     * 86  12    ExtDataRec  filRExtRec   first resource fork extent record (ExtDataRec)
+     * 98  4     SInt32      filResrv     reserved (LongInt)
      */
 
-    
-    public static final int STRUCTSIZE = 86;
+    public static final int STRUCTSIZE = 102;
     
     private final byte[] filFlags = new byte[1];
     private final byte[] filTyp = new byte[1];
@@ -94,8 +93,8 @@ public class CdrFilRec extends CatDataRec {
         filFndrInfo = new FXInfo(data, offset + 56);
         System.arraycopy(data, offset + 72, filClpSize, 0, 2);
         filExtRec = new ExtDataRec(data, offset + 74);
-        filRExtRec = new ExtDataRec(data, offset + 78);
-        System.arraycopy(data, offset + 82, filResrv, 0, 4);
+        filRExtRec = new ExtDataRec(data, offset + 86);
+        System.arraycopy(data, offset + 98, filResrv, 0, 4);
     }
     
     public static int length() { return STRUCTSIZE; }

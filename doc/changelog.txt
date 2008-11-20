@@ -2,6 +2,11 @@ HFSExplorer Changelog
 ---------------------
 
 
+current
+-------
+- HFS bugfix: Incorrect structure definition for CdrFilRec led to inability to
+  extract resource forks and fragmented files.
+
 0.20.1
 ------
 - Bugfix: The status field in the main window could expand vertically.

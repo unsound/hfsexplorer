@@ -21,6 +21,6 @@ package org.catacombae.csjc;
  * Represents a static struct, i.e. a struct with a fixed size.
  * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
  */
-public interface StaticStruct {
+public interface StaticStruct extends AbstractStruct {
     public int size();
 }

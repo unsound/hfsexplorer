@@ -17,13 +17,13 @@
 
 package org.catacombae.hfsexplorer.testcode;
 import java.io.FileOutputStream;
-import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.partitioning.GUIDPartitionTable;
+import org.catacombae.hfsexplorer.partitioning.ApplePartitionMap;
+import org.catacombae.hfsexplorer.partitioning.DriverDescriptorRecord;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
 import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 
-public class PrintGPTPartitions {
+public class PrintAPMPartitions {
 
     public static void main(String[] args) throws Exception {
         ReadableRandomAccessStream llf;
@@ -31,28 +31,32 @@ public class PrintGPTPartitions {
             llf = new WindowsLowLevelIO(args[0]);
         else
             llf = new ReadableFileStream(args[0]);
+
+	final byte[] ddrBlock = new byte[DriverDescriptorRecord.length()];
+	
+        int bytesRead = 0;
+	if((bytesRead = llf.read(ddrBlock)) != ddrBlock.length)
+            throw new RuntimeException("Could not read Driver Descriptor Record (read " + bytesRead + "bytes)");
+	DriverDescriptorRecord ddr = new DriverDescriptorRecord(ddrBlock, 0);
+	ddr.print(System.out, "");
         
-        byte[] referencetable = new byte[16896];
-        llf.seek(512);
-        llf.readFully(referencetable);
-        FileOutputStream refFile = new FileOutputStream("gpt_table_ref.debug");
-        refFile.write(referencetable);
-        refFile.close();
-        System.out.println("Wrote the raw GPT table to file: gpt_table_ref.debug");
+        // Dump DDR to file for debug purposes
+        FileOutputStream ddrFile = new FileOutputStream("ddr.debug");
+        ddrFile.write(ddrBlock);
+        ddrFile.close();
+        System.out.println("Wrote the Driver Descriptor Record to file: ddr.debug");
 
         System.out.println("Length of file: " + llf.length());
-        GUIDPartitionTable gpt = new GUIDPartitionTable(llf, 0);
-        System.out.println("Calculated checksum for header: 0x" + Util.toHexStringBE(gpt.calculatePrimaryHeaderChecksum()));
-        System.out.println("Calculated checksum for entries: 0x" + Util.toHexStringBE(gpt.calculatePrimaryEntriesChecksum()));
-        gpt.print(System.out, "");
-        System.out.println("Is this parititon table valid? " + gpt.isValid() + ".");
-        FileOutputStream debug = new FileOutputStream("gpt_table.debug");
-        debug.write(gpt.getPrimaryTableBytes());
-        debug.close();
-        System.out.println("Wrote the leading GPT table to file: gpt_table.debug");
+
+	final int blockSize = ddr.getSbBlkSize();
+	ApplePartitionMap apm = new ApplePartitionMap(llf, blockSize, blockSize);
+	apm.print(System.out, "");
+        
+        FileOutputStream apmFile = new FileOutputStream("apm.debug");
+        apmFile.write(apm.getData());
+        apmFile.close();
+        System.out.println("Wrote the raw Apple Partition Map to file: apm.debug");
 
         llf.close();
-
     }
-    
 }
