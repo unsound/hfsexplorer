@@ -107,7 +107,6 @@ public abstract class FileSystemHandler {
         //} finally { log(prefix + "Returning from getEntryByPosixPath"); globalPrefix = prefix; }
     }
 
-    //public String globalPrefix = "";
     /**
      * Returns an absolute, canonical path name in the current file system for the given POSIX path
      * string.
@@ -241,28 +240,59 @@ public abstract class FileSystemHandler {
     }
     
     private FSEntry resolveLinks(String[] curPath, FSLink curLink, LinkedList<String[]> visitedLinks) {
+        //String prefix = globalPrefix;
+        /*
+         * Pseudo-code:
+         *
+         * Input:
+         *   curPath : The path to the link we are trying to resolve
+         *   curLink : The link structure
+         * Semi-local:
+         *   visitedLinks : A list of pathnames that we have visited.
+         * Local:
+         *   linkTarget :
+         *
+         *
+         */
+
         //log(prefix + "  gtpfpp: It was a link!");
         // Resolve links.
 
+        // We have visited ourselves.
+        visitedLinks.add(curPath);
+
         FSEntry linkTarget = null;
         String[] curLinkPath = curPath;
+
         while(curLinkPath != null) {
-            visitedLinks.add(curLinkPath);
+            // We must resolve the current link against its parent directory.
             String[] parentPath =
-                    Util.arrayCopy(curLinkPath, 0, new String[curLinkPath.length - 1], 0, curLinkPath.length - 1);
-            //log(prefix + "  gtpfpp:   Resolving link target against " + Util.concatenateStrings(parentPath, "/"));
-            linkTarget =
-                    curLink.getLinkTarget(parentPath);
+                    Util.arrayCopy(curLinkPath, 0, new String[curLinkPath.length - 1], 0,
+                        curLinkPath.length - 1);
+
+            // Resolve the current link target path.
+            String[] linkTargetPath = getTargetPath(curLink, parentPath);
+            if(linkTargetPath == null)
+                return null;
+
+            //log(prefix + "  linkTargetPath=" + Util.concatenateStrings(linkTargetPath, "/"));
+
+            if(Util.contains(visitedLinks, linkTargetPath))
+                return null; // We have been here before! Circular linking...
+
+            linkTarget = getEntry(linkTargetPath); //?
+                    //curLink.getLinkTarget(parentPath);
 
             //log(prefix + "  gtpfpp:   Result: " + linkTarget);
 
             if(linkTarget != null && linkTarget instanceof FSLink) {
                 curLink = (FSLink) linkTarget;
                 curLinkPath = getTargetPath(curLink, parentPath);
+                visitedLinks.add(curLinkPath);
 
                 // Check the visited list to see if we have been here before.
-                if(Util.contains(visitedLinks, curLinkPath))
-                    return null; // We have been here before! Circular linking...
+                //if(Util.contains(visitedLinks, curLinkPath))
+                //    return null; // We have been here before! Circular linking...
             }
             else
                 curLinkPath = null;
@@ -325,9 +355,11 @@ public abstract class FileSystemHandler {
      */
     public abstract void close();
 
+    // Debug stuff... TODO remove 
     /*
+    public String globalPrefix = "";
     public void log(String message) {
-        //System.err.println(message);
+        System.err.println(message);
     }
-     * */
+    */
 }
