@@ -96,7 +96,7 @@ jbyteArray openWin32File(JNIEnv *env,
 			 DWORD dwCreationDisposition,
 			 DWORD dwFlagsAndAttributes,
 			 HANDLE hTemplateFile) {
-  // Microsoft's old-school C compiler forces me to go C90 strict. :( Hopefully WinGW GCC will be 64-bit soon.
+  // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   jsize utf8FilenameLength;
   const jbyte *utf8Filename;
   int wcFilenameSize;

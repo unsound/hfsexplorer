@@ -17,7 +17,7 @@
 
 #define UNICODE
 #define _UNICODE
-#define _WIN32_WINNT 0x0500 // Minimum windows 2000 required, beacuse of GetFileSizeEx. (could be done in a more compatible way, but why care about legacy crap?)
+#define _WIN32_WINNT 0x0500 // Minimum windows 2000 required, beacuse of GetFileSizeEx.
 #include <windows.h>
 #include <winioctl.h>
 #include <tchar.h>
@@ -42,7 +42,7 @@ JNIEXPORT jbyteArray JNICALL Java_org_catacombae_hfsexplorer_win32_WritableWin32
  * Signature: ([BII[B)V
  */
 JNIEXPORT void JNICALL Java_org_catacombae_hfsexplorer_win32_WritableWin32File_write(JNIEnv *env, jclass cls, jbyteArray data, jint offset, jint length, jbyteArray handleData) {
-  // Microsoft's old-school C compiler forces me to go C90 strict. :( Hopefully WinGW GCC will be 64-bit soon.
+  // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
   BYTE *buffer;
   DWORD bytesWritten;
