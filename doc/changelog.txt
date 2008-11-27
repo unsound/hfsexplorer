@@ -4,6 +4,9 @@ HFSExplorer Changelog
 
 current
 -------
+- Symlink bugfix: Symlinks referring to themselves caused infitine recursion and
+  StackOverflowError.
+
 - HFS bugfix: Incorrect structure definition for CdrFilRec led to inability to
   extract resource forks and fragmented files.
 

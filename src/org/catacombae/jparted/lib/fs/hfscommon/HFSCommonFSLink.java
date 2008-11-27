@@ -81,12 +81,12 @@ public class HFSCommonFSLink extends FSLink {
         //System.err.println();
         String posixPath = getLinkTargetPosixPath();
         //parentFileSystem.log(prefix + "  getLinkTarget(): posixPath=\"" + posixPath + "\"");
-        String[] targetPath = fsHandler.getTruePathFromPosixPath(posixPath, parentDir);
         //System.err.println("getLinkTarget(): " + linkRecord.getKey().getParentID().toLong() + ":\"" +
         //            fsHandler.getProperNodeName(linkRecord) + "\" getting true path for \"" + posixPath + "\"...");
+        String[] targetPath = fsHandler.getTruePathFromPosixPath(posixPath, parentDir);
         FSEntry res;
         if(targetPath != null) {
-            //System.err.println("getLinkTarget(): got true path \"" + Util.concatenateStrings(targetPath, "/") + "\"");
+            //parentFileSystem.log(prefix + "getLinkTarget(): got true path \"" + Util.concatenateStrings(targetPath, "/") + "\"");
             res = fsHandler.getEntry(targetPath);
             if(res != null && res instanceof FSLink) {
                 //String[] targetParentDir = Util.arrayCopy(targetPath, 0, new String[targetPath.length-1], 0, targetPath.length-1);
