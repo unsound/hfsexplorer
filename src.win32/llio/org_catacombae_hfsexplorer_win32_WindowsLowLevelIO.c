@@ -17,7 +17,7 @@
 
 #define UNICODE
 #define _UNICODE
-#define _WIN32_WINNT 0x0500 // Minimum windows 2000 required, because of GetFileSizeEx. (could be done in a more compatible way, but why care about legacy crap?)
+#define _WIN32_WINNT 0x0500 // Minimum windows 2000 required, because of GetFileSizeEx.
 #include <windows.h>
 #include <winioctl.h>
 #include <tchar.h>
@@ -42,7 +42,7 @@ JNIEXPORT jbyteArray JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLev
  * Signature: (J[B)V
  */
 JNIEXPORT void JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_seek(JNIEnv *env, jclass cls, jlong pos, jbyteArray handleData) {
-  // Microsoft's old-school C compiler forces me to go C90 strict. :( Hopefully WinGW GCC will be 64-bit soon.
+  // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
   LARGE_INTEGER oldFP, newFP;
   
@@ -60,7 +60,7 @@ JNIEXPORT void JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_s
  */
 JNIEXPORT jint JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_read(JNIEnv *env, jclass cls, jbyteArray data, 
 						   jint offset, jint length, jbyteArray handleData) {
-  // Microsoft's old-school C compiler forces me to go C90 strict. :( Hopefully WinGW GCC will be 64-bit soon.
+  // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
   BYTE *buffer;
   DWORD bytesRead;
@@ -88,7 +88,7 @@ JNIEXPORT jint JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_r
  * Signature: ([B)V
  */
 JNIEXPORT void JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_close(JNIEnv *env, jclass cls, jbyteArray handleData) {
-  // Microsoft's old-school C compiler forces me to go C90 strict. :( Hopefully WinGW GCC will be 64-bit soon.
+  // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
   
   hnd = getHandle(env, handleData);
@@ -103,7 +103,7 @@ JNIEXPORT void JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_c
  * Signature: ([B)V
  */
 JNIEXPORT void JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_ejectMedia(JNIEnv *env, jclass cls, jbyteArray handleData) {
-  // Microsoft's old-school C compiler forces me to go C90 strict. :( Hopefully WinGW GCC will be 64-bit soon.
+  // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
   DWORD bytesReturned;
   
@@ -118,7 +118,7 @@ JNIEXPORT void JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_e
  * Signature: ([B)V
  */
 JNIEXPORT void JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_loadMedia(JNIEnv *env, jclass cls, jbyteArray handleData) {
-  // Microsoft's old-school C compiler forces me to go C90 strict. :( Hopefully WinGW GCC will be 64-bit soon.
+  // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
   DWORD bytesReturned;
   
@@ -133,7 +133,7 @@ JNIEXPORT void JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_l
  * Signature: ([B)J
  */
 JNIEXPORT jlong JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_length(JNIEnv *env, jclass cls, jbyteArray handleData) {
-  // Microsoft's old-school C compiler forces me to go C90 strict. :( Hopefully WinGW GCC will be 64-bit soon.
+  // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
   LARGE_INTEGER length;
   
@@ -161,7 +161,7 @@ JNIEXPORT jlong JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_
  * Signature: ([B)J
  */
 JNIEXPORT jlong JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_getFilePointer(JNIEnv *env, jclass cls, jbyteArray handleData) {
-  // Microsoft's old-school C compiler forces me to go C90 strict. :( Hopefully WinGW GCC will be 64-bit soon.
+  // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
   LARGE_INTEGER distance, fp;
   
@@ -182,7 +182,7 @@ JNIEXPORT jlong JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_
  * Signature: ([B)I
  */
 JNIEXPORT jint JNICALL Java_org_catacombae_hfsexplorer_win32_WindowsLowLevelIO_getSectorSize(JNIEnv *env, jclass cls, jbyteArray handleData) {
-  // Microsoft's old-school C compiler forces me to go C90 strict. :( Hopefully WinGW GCC will be 64-bit soon.
+  // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
   DISK_GEOMETRY_EX geom;
   DWORD bytesReturned;
