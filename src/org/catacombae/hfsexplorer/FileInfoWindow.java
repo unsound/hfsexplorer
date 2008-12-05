@@ -22,13 +22,18 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import org.catacombae.hfsexplorer.fs.ResourceForkReader;
 import org.catacombae.hfsexplorer.gui.FileInfoPanel;
 import org.catacombae.hfsexplorer.gui.FSEntrySummaryPanel;
 import org.catacombae.hfsexplorer.gui.FolderInfoPanel;
+import org.catacombae.hfsexplorer.gui.ResourceForkViewPanel;
 import org.catacombae.hfsexplorer.gui.StructViewPanel;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFile;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolder;
 import org.catacombae.jparted.lib.fs.FSEntry;
+import org.catacombae.jparted.lib.fs.FSFile;
+import org.catacombae.jparted.lib.fs.FSFork;
+import org.catacombae.jparted.lib.fs.FSForkType;
 import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFSFile;
 import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFSFolder;
 import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFSLink;
@@ -95,6 +100,22 @@ public class FileInfoWindow extends JFrame {
             }
 
         } catch(Exception e) { e.printStackTrace(); }
+
+        // Resource fork panel
+        try {
+            if(fsEntry instanceof FSFile) {
+                FSFile fsFile = (FSFile) fsEntry;
+                FSFork resourceFork = fsFile.getForkByType(FSForkType.MACOS_RESOURCE);
+                if(resourceFork != null && resourceFork.getLength() > 0) {
+                    ResourceForkReader resffReader = new ResourceForkReader(resourceFork.getReadableRandomAccessStream());
+                    ResourceForkViewPanel resffPanel = new ResourceForkViewPanel(resffReader);
+                    tabs.addTab("Resource fork", resffPanel);
+                }
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+            GUIUtil.displayExceptionDialog(e, 20, this, "Exception while creating ResourceForkViewPanel.");
+        }
 
         add(tabs, BorderLayout.CENTER);
 

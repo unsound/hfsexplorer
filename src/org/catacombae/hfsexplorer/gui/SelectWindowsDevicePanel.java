@@ -77,7 +77,7 @@ public class SelectWindowsDevicePanel extends javax.swing.JPanel {
 
             cancelButton.setText("Cancel");
 
-            warningLabel.setText("(hybrid CD-ROMs with both HFS(+,X) and ISO filesystems won't work)");
+            warningLabel.setText("(hybrid CD-ROMs with both HFS/+/X and ISO filesystems won't work)");
 
             autodetectButton.setText("Autodetect...");
 

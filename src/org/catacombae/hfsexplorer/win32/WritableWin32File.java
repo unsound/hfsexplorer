@@ -25,8 +25,8 @@ import org.catacombae.hfsexplorer.*;
 public class WritableWin32File extends WindowsLowLevelIO implements RandomAccessStream {
     private byte[] sectorBuffer;
     public WritableWin32File(String filename) {
-	super(filename);
-	sectorBuffer = new byte[sectorSize];
+        super(filename);
+        sectorBuffer = new byte[sectorSize];
     }
     
     public void write(byte[] b) { write(b, 0, b.length); }

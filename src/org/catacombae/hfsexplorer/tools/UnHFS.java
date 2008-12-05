@@ -189,6 +189,7 @@ public class UnHFS {
                 verbose = true;
             }
             else if(curArg.equals("--")) {
+                ++i;
                 break;
             }
             else
@@ -415,6 +416,9 @@ public class UnHFS {
                 FSFolder subFolder = (FSFolder)e;
                 File subFolderFile = new File(targetDir, scrub(subFolder.getName()));
                 if(subFolderFile.exists() || subFolderFile.mkdir()) {
+                    if(verbose)
+                        System.out.println(subFolderFile.getPath());
+                    
                     extractContents(subFolder, subFolderFile, extractResourceForks, verbose);
                 }
                 else {

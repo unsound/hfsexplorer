@@ -17,10 +17,75 @@
 
 package org.catacombae.hfsexplorer;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import org.catacombae.io.InputStreamReadable;
+import org.catacombae.io.OutputStreamWritable;
+import org.catacombae.io.Readable;
+import org.catacombae.io.RuntimeIOException;
+import org.catacombae.io.Writable;
+
 /**
- * CatacombaeIO-specific utility class.
+ * IO-specific utility class.
  * 
  * @author Erik Larsson
  */
 public class IOUtil extends org.catacombae.util.IOUtil {
+    public static long streamCopy(InputStream is, OutputStream os, int bufferSize) throws IOException {
+        try {
+            return streamCopy(new InputStreamReadable(is), new OutputStreamWritable(os), bufferSize);
+        } catch(RuntimeIOException e) {
+            IOException cause = e.getIOCause();
+            if(cause != null)
+                throw cause;
+            else
+                throw e;
+        }
+    }
+
+    public static long streamCopy(Readable is, OutputStream os, int bufferSize) throws IOException {
+        try {
+            return streamCopy(is, new OutputStreamWritable(os), bufferSize);
+        } catch(RuntimeIOException e) {
+            IOException cause = e.getIOCause();
+            if(cause != null)
+                throw cause;
+            else
+                throw e;
+        }
+    }
+
+    public static long streamCopy(InputStream is, Writable os, int bufferSize) throws IOException {
+        try {
+            return streamCopy(new InputStreamReadable(is), os, bufferSize);
+        } catch(RuntimeIOException e) {
+            IOException cause = e.getIOCause();
+            if(cause != null)
+                throw cause;
+            else
+                throw e;
+        }
+    }
+
+    /**
+     * Copies the entire readable stream <code>is</code> to the writable stream <code>os</code>.
+     *
+     * @param is
+     * @param os
+     * @param blockSize
+     * @throws java.io.IOException
+     */
+    public static long streamCopy(Readable is, Writable os, int bufferSize) throws RuntimeIOException {
+        byte[] buffer = new byte[bufferSize];
+        long totalBytesCopied = 0;
+        int bytesRead;
+
+        while((bytesRead = is.read(buffer)) > 0) {
+            os.write(buffer, 0, bytesRead);
+            totalBytesCopied += bytesRead;
+        }
+
+        return totalBytesCopied;
+    }
 }

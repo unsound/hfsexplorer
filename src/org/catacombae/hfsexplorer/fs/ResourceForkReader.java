@@ -17,10 +17,19 @@
 
 package org.catacombae.hfsexplorer.fs;
 
+import org.catacombae.hfsexplorer.Util;
+import org.catacombae.hfsexplorer.io.ReadableRandomAccessSubstream;
+import org.catacombae.hfsexplorer.io.SynchronizedReadableRandomAccess;
+import org.catacombae.hfsexplorer.io.SynchronizedReadableRandomAccessStream;
+import org.catacombae.hfsexplorer.types.resff.ReferenceListEntry;
+import org.catacombae.hfsexplorer.types.resff.ResourceHeader;
+import org.catacombae.hfsexplorer.types.resff.ResourceMap;
+import org.catacombae.io.ReadableConcatenatedStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 
 /**
- * TODO TODO TODO!
+ * Accessor class for the data inside a resource fork.
+ * 
  * @author Erik Larsson
  */
 public class ResourceForkReader {
@@ -36,10 +45,70 @@ public class ResourceForkReader {
      *            -----------------
      *            | Resource item | <- actual data
      *            -----------------
+     *
+     * Or hierarchically represented as example:
+     * <resourceFork>
+     *      <dataType name="typ1">
+     *          <resourceItem name="yada"/>
+     *          <resourceItem name="bada"/>
+     *          <resourceItem name="lada"/>
+     *      </dataType>
+     *      <dataType name="typ2">
+     *          <resourceItem name="sada"/>
+     *          <resourceItem name="gada"/>
+     *      </dataType>
+     * </resourceFork>
      */
-    public ResourceForkReader(ReadableRandomAccessStream forkData) {
-        
+
+    private final SynchronizedReadableRandomAccessStream trueForkStream;
+    private final SynchronizedReadableRandomAccess forkStream;
+
+    public ResourceForkReader(ReadableRandomAccessStream forkStream) {
+        this.trueForkStream = new SynchronizedReadableRandomAccessStream(forkStream);
+        this.forkStream = trueForkStream;
     }
 
+    public void close() {
+        trueForkStream.close();
+    }
 
+    public ResourceHeader getHeader() {
+        byte[] headerData = new byte[ResourceHeader.length()];
+        forkStream.readFullyFrom(0, headerData);
+        return new ResourceHeader(headerData, 0);
+    }
+
+    public ResourceMap getResourceMap() {
+        ResourceHeader header = getHeader();
+        return new ResourceMap(forkStream, Util.unsign(header.getMapOffset()));
+    }
+
+    public long getDataLength(ReferenceListEntry entry) {
+        long dataPos = getDataPos(entry);
+        return getDataLength(dataPos);
+    }
+
+    private long getDataPos(ReferenceListEntry entry) {
+        ResourceHeader header = getHeader();
+        return Util.unsign(header.getDataOffset()) + entry.getResourceDataOffset();
+    }
+
+    private long getDataLength(long dataPos) {
+        byte[] dataLengthBytes = new byte[4];
+        forkStream.readFrom(dataPos, dataLengthBytes);
+        return Util.unsign(Util.readIntBE(dataLengthBytes));
+    }
+
+    public ReadableRandomAccessStream getResourceStream(ReferenceListEntry entry) {
+        long dataPos = getDataPos(entry);
+        long dataLength = getDataLength(dataPos);
+
+        //System.err.println("Creating a new stream for ReferenceListEntry:");
+        //entry.printFields(System.err, "  ");
+        //System.err.println("dataPos=" + dataPos);
+        //System.err.println("dataLength=" + dataLength);
+
+        return new ReadableConcatenatedStream(new ReadableRandomAccessSubstream(forkStream),
+                dataPos + 4, dataLength);
+    }
 }

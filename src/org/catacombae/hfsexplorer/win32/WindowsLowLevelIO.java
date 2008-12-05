@@ -29,6 +29,12 @@ public class WindowsLowLevelIO implements ReadableRandomAccessStream {
     private static final Object loadLibSync = new Object();
     private static boolean libraryLoaded = false;
     
+    /**
+     * Set this variable to true if you want some messages printed to stderr when the library is
+     * loaded.
+     */
+    public static boolean verboseLoadLibrary = false;
+    
     private enum ArchitectureIdentifier {
 
         I386("i386"), AMD64("amd64"), IA64("ia64"),
@@ -94,9 +100,9 @@ public class WindowsLowLevelIO implements ReadableRandomAccessStream {
         else {
             final String libName = "llio_" + archId.getArchitectureString();
             try {
-                System.err.println("Trying to load native library \"" + libName + "\"...");
+                if(verboseLoadLibrary) System.err.println("Trying to load native library \"" + libName + "\"...");
                 System.loadLibrary(libName);
-                System.err.println("Native library \"" + libName + "\" successfully loaded.");
+                if(verboseLoadLibrary) System.err.println("Native library \"" + libName + "\" successfully loaded.");
                 libraryLoaded = true;
             } catch(UnsatisfiedLinkError e) {
                 System.err.println("ERROR: Native library \"" + libName + "\" failed to load!");
@@ -106,15 +112,12 @@ public class WindowsLowLevelIO implements ReadableRandomAccessStream {
         }
     }
     
-    { // Pre-constructor
+    public WindowsLowLevelIO(String filename) {
         synchronized(loadLibSync) {
             if(!libraryLoaded) {
                 loadLibrary();
             }
         }
-    }
-
-    public WindowsLowLevelIO(String filename) {
         boolean verbose = false;
         fileHandle = open(filename);
         //System.out.println("fileHandle: 0x" + Util.byteArrayToHexString(fileHandle));
@@ -240,6 +243,7 @@ public class WindowsLowLevelIO implements ReadableRandomAccessStream {
     public long length() {
         //System.err.println("WindowsLowLevelIO.length();");
         if(fileHandle != null) {
+            //throw new RuntimeException("Could not get file size.");
             //System.err.println("  returning " + length(fileHandle));
             return length(fileHandle);
         }

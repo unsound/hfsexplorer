@@ -162,7 +162,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="warningLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="(hybrid CD-ROMs with both HFS(+,X) and ISO filesystems won&apos;t work)"/>
+        <Property name="text" type="java.lang.String" value="(hybrid CD-ROMs with both HFS/+/X and ISO filesystems won&apos;t work)"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="autodetectButton">

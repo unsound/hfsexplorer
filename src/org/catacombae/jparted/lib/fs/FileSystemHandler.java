@@ -240,6 +240,8 @@ public abstract class FileSystemHandler {
     }
     
     private FSEntry resolveLinks(String[] curPath, FSLink curLink, LinkedList<String[]> visitedLinks) {
+        System.err.println("resolveLinks(" + Util.concatenateStrings(curPath, "/") + ", " +
+                curLink.getLinkTargetString() + ", ...);");
         //String prefix = globalPrefix;
         /*
          * Pseudo-code:
@@ -270,6 +272,9 @@ public abstract class FileSystemHandler {
                     Util.arrayCopy(curLinkPath, 0, new String[curLinkPath.length - 1], 0,
                         curLinkPath.length - 1);
 
+            System.err.println("  Resolving " + curLink.getLinkTargetString() + " from " +
+                    Util.concatenateStrings(parentPath, "/"));
+
             // Resolve the current link target path.
             String[] linkTargetPath = getTargetPath(curLink, parentPath);
             if(linkTargetPath == null)
@@ -287,7 +292,7 @@ public abstract class FileSystemHandler {
 
             if(linkTarget != null && linkTarget instanceof FSLink) {
                 curLink = (FSLink) linkTarget;
-                curLinkPath = getTargetPath(curLink, parentPath);
+                curLinkPath = linkTargetPath;
                 visitedLinks.add(curLinkPath);
 
                 // Check the visited list to see if we have been here before.

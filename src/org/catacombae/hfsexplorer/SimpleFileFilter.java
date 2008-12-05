@@ -17,35 +17,47 @@
 
 package org.catacombae.hfsexplorer;
 
-import java.util.*;
-import java.io.*;
+import java.io.File;
+import java.util.Vector;
+import javax.swing.filechooser.FileFilter;
 
-public class SimpleFileFilter extends javax.swing.filechooser.FileFilter {
-
+public class SimpleFileFilter extends FileFilter {
     private Vector<String> extensions;
     private String description;
-    
+
     public SimpleFileFilter() {
-	extensions = new Vector<String>();
-	description = "";
+        extensions = new Vector<String>();
+        description = "";
     }
-    public void addExtension(String extension) { extensions.add(extension); }
-    public void setDescription(String idescription) { description = idescription; }
+
+    public void addExtension(String extension) {
+        extensions.add(extension);
+    }
+
+    public void setDescription(String idescription) {
+        description = idescription;
+    }
+
     public void removeExtension(String iextension) {
-	for(int i = 0; i < extensions.size(); i++) {
-	    if(extensions.get(i).equals(iextension))
-		extensions.remove(i);
-	}
+        for(int i = 0; i < extensions.size(); i++) {
+            if(extensions.get(i).equals(iextension))
+                extensions.remove(i);
+        }
     }
+
     public boolean accept(File f) {
 
-	if(f.isDirectory()) return true;
+        if(f.isDirectory())
+            return true;
 
-	for(int i = 0; i < extensions.size(); i++) {
-	    if(f.getName().endsWith(extensions.get(i)))
-		return true;
-	}
-	return false;
+        for(int i = 0; i < extensions.size(); i++) {
+            if(f.getName().endsWith(extensions.get(i)))
+                return true;
+        }
+        return false;
     }
-    public String getDescription() { return description; }
+
+    public String getDescription() {
+        return description;
+    }
 }

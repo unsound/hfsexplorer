@@ -17,17 +17,35 @@
 
 package org.catacombae.hfsexplorer;
 
-import org.catacombae.jparted.lib.ps.ebr.EBRPartition;
+import java.awt.BorderLayout;
+import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.LinkedList;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.ReadableConcatenatedStream;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
 import org.catacombae.hfsexplorer.gui.SelectWindowsDevicePanel;
-import org.catacombae.hfsexplorer.partitioning.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
+import org.catacombae.hfsexplorer.partitioning.APMPartition;
+import org.catacombae.hfsexplorer.partitioning.ApplePartitionMap;
+import org.catacombae.hfsexplorer.partitioning.DriverDescriptorRecord;
+import org.catacombae.hfsexplorer.partitioning.GPTEntry;
+import org.catacombae.hfsexplorer.partitioning.GUIDPartitionTable;
+import org.catacombae.hfsexplorer.partitioning.MBRPartition;
+import org.catacombae.hfsexplorer.partitioning.MBRPartitionTable;
+import org.catacombae.hfsexplorer.partitioning.Partition;
+import org.catacombae.hfsexplorer.partitioning.PartitionSystem;
 import org.catacombae.jparted.lib.ps.PartitionType;
+import org.catacombae.jparted.lib.ps.ebr.EBRPartition;
 
 public class SelectWindowsDeviceDialog extends JDialog {
     private static final String DEVICE_PREFIX = "\\\\?\\GLOBALROOT\\Device\\";
