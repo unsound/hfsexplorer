@@ -1,0 +1,5 @@
+struct EntryDescriptor {
+    UInt32 entryId;
+    UInt32 entryOffset;
+    UInt32 entryLength;
+};

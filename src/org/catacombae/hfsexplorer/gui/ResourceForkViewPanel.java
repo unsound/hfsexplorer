@@ -202,14 +202,17 @@ public class ResourceForkViewPanel extends javax.swing.JPanel {
     }
 
     private ListItem[] listAllItems(ResourceForkReader reader) {
+        //System.err.println("listAllItems(): getting resource map");
         ResourceMap resMap = reader.getResourceMap();
 
         LinkedList<ListItem> result = new LinkedList<ListItem>();
 
+        //System.err.println("listAllItems(): getting reference list for " + resMap);
         List<Pair<ResourceType, ReferenceListEntry[]>> refList = resMap.getReferenceList();
         for(Pair<ResourceType, ReferenceListEntry[]> p : refList) {
             ResourceType type = p.getA();
             for(ReferenceListEntry entry : p.getB()) {
+                //System.err.println("listAllItems(): getting name by reflist entry " + entry);
                 ResourceName name = resMap.getNameByReferenceListEntry(entry);
                 long size = reader.getDataLength(entry);
 

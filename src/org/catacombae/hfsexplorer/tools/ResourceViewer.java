@@ -32,8 +32,10 @@ import javax.swing.JFileChooser;
 import javax.swing.KeyStroke;
 import org.catacombae.hfsexplorer.GUIUtil;
 import org.catacombae.hfsexplorer.PrefixFileFilter;
+import org.catacombae.hfsexplorer.fs.AppleSingleHandler;
 import org.catacombae.hfsexplorer.fs.ResourceForkReader;
 import org.catacombae.hfsexplorer.gui.ResourceForkViewPanel;
+import org.catacombae.hfsexplorer.types.applesingle.EntryDescriptor;
 import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 
@@ -78,8 +80,35 @@ public class ResourceViewer extends javax.swing.JFrame {
 
         try {
             fileStream = new ReadableFileStream(f);
+
+            // Detect AppleSingle format
+            //System.err.println("Detecting AppleSingle format...");
+            if(AppleSingleHandler.detectFileFormat(fileStream, 0) != null) {
+                try {
+                    //System.err.println("AppleSingle format found! Creating handler...");
+                    AppleSingleHandler handler = new AppleSingleHandler(fileStream);
+                    //System.err.println("Getting resource entry descriptor...");
+                    EntryDescriptor desc = handler.getResourceEntryDescriptor();
+                    if(desc != null) {
+                        //System.err.println("Getting entry stream...");
+                        fileStream = handler.getEntryStream(desc);
+                        //System.err.println("done!");
+                    }
+                    //else
+                    //    System.err.println("No resource entry found in AppleSingle structure.");
+                } catch(Exception e) {
+                    System.err.println("Unhandled exception while detecting AppleSingle format:");
+                    e.printStackTrace();
+                }
+            }
+
+            //System.err.println("Creating new ResourceForkReader...");
             reader = new ResourceForkReader(fileStream);
+            //System.err.println("Loading resource fork into panel...");
             resourceForkViewPanel.loadResourceFork(reader);
+            //System.err.println("done!");
+
+            setTitle("Resource Viewer - [" + f.getName() + "]");
         } catch(Exception e) {
             e.printStackTrace();
             GUIUtil.displayExceptionDialog(e, this);

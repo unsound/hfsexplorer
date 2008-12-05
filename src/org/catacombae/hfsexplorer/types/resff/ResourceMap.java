@@ -80,7 +80,7 @@ public class ResourceMap implements PrintableStruct {
         {
             long curOffset = offset + resourceTypeListOffset + 2; // +2 for typeCount, which is included in the offset
             byte[] curResTypeData = new byte[ResourceType.length()];
-            resourceTypeList = new ResourceType[Util.unsign(getTypeCount()) + 1];
+            resourceTypeList = new ResourceType[getTypeCount() + 1]; // typeCount is a SIGNED integer.
             for(int i = 0; i < resourceTypeList.length; ++i) {
                 stream.readFullyFrom(curOffset, curResTypeData);
                 resourceTypeList[i] = new ResourceType(curResTypeData, 0);
