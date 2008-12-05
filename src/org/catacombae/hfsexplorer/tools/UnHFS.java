@@ -263,6 +263,7 @@ public class UnHFS {
                             new ReadableCEncryptedEncodingStream(inFileStream, password);
                     inFileStream = stream;
                 } catch(Exception e) {
+                    // TODO: Differentiate between exceptions...
                     System.err.println("Incorrect password for encrypted image.");
                     System.exit(RETVAL_INCORRECT_PASSWORD);
                 }
@@ -280,6 +281,7 @@ public class UnHFS {
                 stream = new UDIFRandomAccessStream(inFileStream);
                 inFileStream = stream;
             } catch(Exception e) {
+                e.printStackTrace();
                 System.err.println("Unhandled exception while trying to load UDIF wrapper.");
                 System.exit(1);
             }
