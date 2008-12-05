@@ -766,7 +766,12 @@ public class FileSystemBrowserWindow extends JFrame {
             if(partitions.length == 0) {
                 // Proceed to detect file system
                 fsOffset = 0;
-                fsLength = fsFile.length();
+                try {
+                    fsLength = fsFile.length();
+                } catch(Exception e) {
+                    e.printStackTrace();
+                    fsLength = -1;
+                }
             }
             else {
                 Object selectedValue;
@@ -814,7 +819,12 @@ public class FileSystemBrowserWindow extends JFrame {
         }
         else {
             fsOffset = 0;
-            fsLength = fsFile.length();
+            try {
+                fsLength = fsFile.length();
+            } catch(Exception e) {
+                e.printStackTrace();
+                fsLength = -1;
+            }
         }
 
         // Detect HFS file system
@@ -870,8 +880,13 @@ public class FileSystemBrowserWindow extends JFrame {
 
             //System.err.println("loadFS(): fsFile=" + fsFile);
             //System.err.println("loadFS(): Creating ReadableConcatenatedStream...");
-            ReadableConcatenatedStream stage1 = new ReadableConcatenatedStream(fsFile, fsOffset,
+
+            ReadableRandomAccessStream stage1;
+            if(fsLength > 0)
+                stage1 = new ReadableConcatenatedStream(fsFile, fsOffset,
                     fsLength);
+            else
+                stage1 = fsFile;
             //System.err.println("loadFS(): Creating ReadableStreamDataLocator...");
             this.fsDataLocator = new ReadableStreamDataLocator(stage1);
             //System.err.println("loadFS(): Creating fsHandler...");
