@@ -1,0 +1,6 @@
+struct AppleSingleHeader {
+    UInt32 magicNumber;
+    UInt32 versionNumber;
+    Char homeFileSystem[16];
+    UInt16 numEntries;
+};
