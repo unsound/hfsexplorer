@@ -4,6 +4,18 @@ HFSExplorer Changelog
 
 current
 -------
+- Feature: Ability to view and extract the contents of resource forks built into the
+  file information dialog (will only appear if there is resource fork data in the file).
+  Also available as an external program which will appear on the start menu for Windows
+  users.
+
+- Feature: New command line utility unhfs added which allows one to extract the contents
+  of a HFS/HFS+/HFSX file system from the command line. Run unhfs.bat/unhfs.sh for
+  instructions on how to use it.
+
+- Feature: New File menu item "Load file system from path", where you can type the path
+  to your disk image or device file.
+
 - Symlink bugfix: Symlinks referring to themselves caused infitine recursion and
   StackOverflowError.
 
