@@ -1,6 +1,6 @@
 /*-
- * Copyright (C) 2006 Erik Larsson
- * 
+ * Copyright (C) 2008 Erik Larsson
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -17,8 +17,35 @@
 
 package org.catacombae.hfsexplorer;
 
-public class BuildNumber {
-    //[BuildEnumerator:Opening] WARNING: The following lines are managed by an external program. Do NOT change.
-    public static final long BUILD_NUMBER = 1059L;
-    //[BuildEnumerator:Closing] The lines managed by an external program end here.
+import java.io.File;
+import javax.swing.filechooser.FileFilter;
+
+/**
+ *
+ * @author Erik Larsson
+ */
+public class PrefixFileFilter extends FileFilter {
+    private final String description;
+    private final String prefix;
+
+    public PrefixFileFilter(String description, String prefix) {
+        this.description = description;
+        this.prefix = prefix;
+    }
+
+    @Override
+    public boolean accept(File f) {
+       if(f.isDirectory())
+            return true;
+
+        if(f.getName().startsWith(prefix))
+            return true;
+        return false;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
 }

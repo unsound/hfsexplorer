@@ -1,3 +1,20 @@
+/*-
+ * Copyright (C) 2008 Erik Larsson
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.catacombae.hfsexplorer.types.resff;
 
 import java.io.PrintStream;
@@ -46,7 +63,14 @@ public class ReferenceListEntry implements StaticStruct, PrintableStruct {
     /** // Resource attributes */
     public byte getResourceAttributes() { return Util.readByteBE(resourceAttributes); }
     /** // Offset from beginning of resource data to data for this resource. */
-    public byte[] getResourceDataOffset() { return Util.readByteArrayBE(resourceDataOffset); }
+    public int getResourceDataOffset() {
+        // 24-bit integers is a somewhat special situation...
+        byte[] temp = new byte[4];
+        temp[0] = 0;
+        System.arraycopy(resourceDataOffset, 0, temp, 1, resourceDataOffset.length);
+        return Util.readIntBE(temp);
+    }
+
     /** // Reserved for handle to resource. */
     public int getReserved1() { return Util.readIntBE(reserved1); }
     

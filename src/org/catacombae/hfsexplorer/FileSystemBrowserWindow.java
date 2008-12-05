@@ -286,6 +286,26 @@ public class FileSystemBrowserWindow extends JFrame {
         });
         openUDIFItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
+        JMenuItem loadFromPathItem = new JMenuItem("Load file system from path...");
+        loadFromPathItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                String path = JOptionPane.showInputDialog(FileSystemBrowserWindow.this,
+                        "Pathname to load:", "Load file system from path", JOptionPane.QUESTION_MESSAGE);
+
+                if(path != null) {
+                    try {
+                        loadFSWithUDIFAutodetect(path);
+                    } catch(Exception e) {
+                        e.printStackTrace();
+                        JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+                                "Could not read contents of partition!",
+                                "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
+        loadFromPathItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         /*
         JMenuItem openFromPosItem = new JMenuItem("Read file system from specified position in file...");
         openFromPosItem.addActionListener(new ActionListener() {
@@ -536,6 +556,7 @@ public class FileSystemBrowserWindow extends JFrame {
         }
         //fileMenu.add(loadFSFromFileItem);
         fileMenu.add(openUDIFItem);
+        fileMenu.add(loadFromPathItem);
         //fileMenu.add(openFromPosItem);
         if(debugConsoleItem != null) {
             fileMenu.add(debugConsoleItem);

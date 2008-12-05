@@ -57,14 +57,18 @@ public class ReadableRandomAccessSubstream extends BasicReadableRandomAccessStre
 
     @Override
     public int read(byte[] b, int pos, int len) throws RuntimeIOException {
-        //System.err.println("ReadableRandomAccessSubstream.read(" + b + ", " + pos + ", " + len + ");");
+        //System.err.println("ReadableRandomAccessSubstream.read(byte[" + b.length + "], " + pos + ", " + len + ");");
+        //System.err.println("  readFrom: " + internalFP);
         int bytesRead = sourceStream.readFrom(internalFP, b, pos, len);
         if(bytesRead > 0) {
             internalFP += bytesRead;
+            //System.err.println("  returning: " + bytesRead);
             return bytesRead;
         }
-        else
+        else {
+            //System.err.println("  returning: -1");
             return -1;
+        }
     }
 
 }
