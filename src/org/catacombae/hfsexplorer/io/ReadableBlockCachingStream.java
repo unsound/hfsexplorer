@@ -83,10 +83,18 @@ public class ReadableBlockCachingStream extends ReadableFilterStream {
 	    throw new IllegalArgumentException("maxItemCount must be at least 1");
 	
 	this.blockSize = blockSize;
-	this.virtualLength = backing.length(); // Immutable
+    long length;
+	try {
+        length = backing.length();
+    } catch(Exception e) { length = -1; }
+    if(length > 0)
+        this.virtualLength = length; // Immutable
+    else
+        this.virtualLength = -1;
+
 	int actualItemCount = maxItemCount;
 	//System.err.println("ReadableBlockCachingStream created. virtualLength: " + virtualLength + " maxItemCount*blockSize: " + (maxItemCount*blockSize));
-	if(actualItemCount*blockSize > virtualLength) {
+	if(virtualLength > 0 && actualItemCount*blockSize > virtualLength) {
 	    actualItemCount = (int)( virtualLength/blockSize + ((virtualLength%blockSize != 0) ? 1 : 0) );
 	    //System.err.println("Adjusted actualItemCount to " + actualItemCount);
 	}
@@ -96,10 +104,11 @@ public class ReadableBlockCachingStream extends ReadableFilterStream {
     @Override
     public void seek(long pos) {
 	if(closed) throw new RuntimeException("File is closed.");
-	if(pos < virtualLength && pos >= 0)
+	if((virtualLength == -1 || pos < virtualLength) && pos >= 0)
 	    virtualFP = pos;
 	else
-	    throw new IllegalArgumentException("pos out of range (pos=" + pos + ")");
+	    throw new IllegalArgumentException("pos out of range (pos=" + pos +
+                ",virtualLength=" + virtualLength + ")");
     }
     @Override
     public int read() {
@@ -217,7 +226,7 @@ public class ReadableBlockCachingStream extends ReadableFilterStream {
 	    if(recoveredData != null && dataSize == recoveredData.length)
 		data = recoveredData;
 	    else // Will only happen if (1) cache isn't full or (2) if we are dealing with the last block
-		data = new byte[dataSize];
+		data = new byte[dataSize <= 0?blockSize:dataSize]; // TODO: Investigate the effect of this approach (setting the array size to blockSize for all block in -1 virtualLength streams).
 	    //System.err.println("  Seeking to " + blockPos + " (block number: " + blockNumber + ", blockSize: " + blockSize + ", data.length: " + data.length + ")");
 	    backingStore.seek(blockPos);
 	    backingStore.read(data, 0, data.length);
