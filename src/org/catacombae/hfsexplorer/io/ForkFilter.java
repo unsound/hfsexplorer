@@ -201,7 +201,11 @@ public class ForkFilter implements ReadableRandomAccessStream {
         //System.out.println("done.");
         }
 
-        int bytesLeftToRead = len;
+        long bytesLeftInStream = forkLength - logicalPosition;
+        //System.err.println("bytesLeftInStream: " + bytesLeftInStream + " len: " + len);
+        int totalBytesToRead = bytesLeftInStream < len ? (int)bytesLeftInStream : len;
+        int bytesLeftToRead = totalBytesToRead;
+        //System.err.println("bytesLeftToRead: " + bytesLeftToRead);
         // Start reading. Extent by extent if needed.
         for(; extIndex < extentDescriptors.length; ++extIndex) {
             //System.out.println("ForkFilter.read: reading extent " + extIndex + ".");
@@ -213,7 +217,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
             int bytesReadFromExtent = 0;
             while(bytesReadFromExtent < bytesToReadFromExtent) {
                 int bytesToRead = bytesToReadFromExtent - bytesReadFromExtent;
-                int positionInArray = pos + (len - bytesLeftToRead) + bytesReadFromExtent;
+                int positionInArray = pos + (totalBytesToRead - bytesLeftToRead) + bytesReadFromExtent;
 
                 int bytesRead = sourceFile.read(data, positionInArray, bytesToRead);
                 if(bytesRead > 0)
@@ -236,10 +240,13 @@ public class ForkFilter implements ReadableRandomAccessStream {
 
         // Update tracker variables before returning
         lastPhysicalPos = sourceFile.getFilePointer();
-        logicalPosition += len - bytesLeftToRead;
+        logicalPosition += totalBytesToRead - bytesLeftToRead;
 
-        if(bytesLeftToRead < len)
-            return len - bytesLeftToRead;
+        if(bytesLeftToRead < totalBytesToRead) {
+            int bytesRead = totalBytesToRead - bytesLeftToRead;
+            //System.err.println("final bytesRead: " + bytesRead);
+            return bytesRead;
+        }
         else
             return -1;
     }
