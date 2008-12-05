@@ -105,7 +105,7 @@ public class UnHFS {
     }
 
     /**
-     * UnHFS entry point. The main method's only responsability is to parse and
+     * UnHFS entry point. The main method's only responsibility is to parse and
      * validate program arguments. It then passes them on to the static method
      * unhfs(...), which contains the actual program logic.
      *
