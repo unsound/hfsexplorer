@@ -23,10 +23,13 @@
 
 package org.catacombae.hfsexplorer.tools;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import javax.swing.JFileChooser;
+import javax.swing.KeyStroke;
 import org.catacombae.hfsexplorer.GUIUtil;
 import org.catacombae.hfsexplorer.PrefixFileFilter;
 import org.catacombae.hfsexplorer.fs.ResourceForkReader;
@@ -47,7 +50,8 @@ public class ResourceViewer extends javax.swing.JFrame {
         this.resourceForkViewPanel = new ResourceForkViewPanel(null);
 
         initComponents();
-        
+
+        openMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         backgroundPanel.add(resourceForkViewPanel);
 
         openMenuItem.addActionListener(new ActionListener() {
@@ -108,7 +112,6 @@ public class ResourceViewer extends javax.swing.JFrame {
 
         openMenu.setText("File");
 
-        openMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
         openMenuItem.setText("Open...");
         openMenu.add(openMenuItem);
 
