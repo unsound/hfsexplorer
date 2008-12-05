@@ -21,6 +21,7 @@ import org.catacombae.hfsexplorer.Util;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.jparted.lib.DataLocator;
 import org.catacombae.jparted.lib.fs.FileSystemMajorType;
+import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemRecognizer;
 import org.catacombae.jparted.lib.ps.PartitionSystemType;
 import org.catacombae.jparted.lib.ps.container.ContainerHandler;
 import org.catacombae.jparted.lib.ps.container.ContainerType;
@@ -42,7 +43,7 @@ public class HFSContainerHandler extends ContainerHandler {
     
     @Override
     public boolean containsFileSystem() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return true;
     }
 
     @Override
@@ -57,37 +58,24 @@ public class HFSContainerHandler extends ContainerHandler {
 
     /**
      * The file system type of an HFS container will be one of HFS or HFS+. If
-     * no signature at all can be found, null is returned and the file system
+     * no signature at all can be found, UNKNOWN is returned and the file system
      * type is undetermined.
      */
     @Override
     public FileSystemMajorType detectFileSystemType() {
         ReadableRandomAccessStream bitstream = partitionData.createReadOnlyFile();
-        bitstream.seek(1024);
-        byte[] signatureData = new byte[2];
-        bitstream.readFully(signatureData);
-        short signature = Util.readShortBE(signatureData);
-        switch(signature) {
-            case SIGNATURE_HFS:
-
-                try {
-                    bitstream.seek(1024 + 124);
-                    bitstream.readFully(signatureData);
-                    short embeddedSignature = Util.readShortBE(signatureData);
-                    if(embeddedSignature == SIGNATURE_HFS_PLUS) {
-                        return FileSystemMajorType.APPLE_HFS_PLUS;
-                    } else {
-                        return FileSystemMajorType.APPLE_HFS;
-                    }
-                } catch(Exception e) {
-                    return FileSystemMajorType.APPLE_HFS;
-                }
-            case SIGNATURE_HFS_PLUS:
+        switch(HFSCommonFileSystemRecognizer.detectFileSystem(bitstream, 0)) {
+            case HFS:
+                return FileSystemMajorType.APPLE_HFS;
+            case HFS_PLUS:
+            case HFS_WRAPPED_HFS_PLUS:
                 return FileSystemMajorType.APPLE_HFS_PLUS;
-            case SIGNATURE_HFSX:
+            case HFSX:
                 return FileSystemMajorType.APPLE_HFSX;
+            case MFS: // Not possible, or probable.
+            default:
+                return FileSystemMajorType.UNKNOWN;
         }
-        return null;
     }
 
     @Override

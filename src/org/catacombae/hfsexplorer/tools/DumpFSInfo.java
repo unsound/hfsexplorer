@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.testcode;
+package org.catacombae.hfsexplorer.tools;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.LinkedList;
@@ -31,6 +31,7 @@ import org.catacombae.hfsexplorer.partitioning.MBRPartitionTable;
 import org.catacombae.hfsexplorer.partitioning.Partition;
 import org.catacombae.hfsexplorer.partitioning.PartitionSystem;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
+import org.catacombae.jparted.lib.ps.PartitionType;
 
 public class DumpFSInfo {
 
@@ -165,7 +166,8 @@ public class DumpFSInfo {
                 int firstPreferredPartition = 0;
                 for(int i = 0; i < partitions.length; ++i) {
                     Partition p = partitions[i];
-                    if(p.getType() == Partition.PartitionType.APPLE_HFS) {
+                    PartitionType pt = p.getType();
+                    if(pt == PartitionType.APPLE_HFS_CONTAINER || pt == PartitionType.APPLE_HFSX) {
                         firstPreferredPartition = i;
                         break;
                     }

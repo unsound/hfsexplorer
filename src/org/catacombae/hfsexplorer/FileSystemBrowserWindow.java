@@ -90,6 +90,7 @@ import org.catacombae.hfsexplorer.gui.ErrorSummaryPanel;
 import org.catacombae.hfsexplorer.gui.MemoryStatisticsPanel;
 import org.catacombae.jparted.lib.DataLocator;
 import org.catacombae.jparted.lib.fs.FSLink;
+import org.catacombae.jparted.lib.ps.PartitionType;
 import org.catacombae.udif.UDIFRandomAccessStream;
 
 /**
@@ -751,7 +752,8 @@ public class FileSystemBrowserWindow extends JFrame {
                 int firstPreferredPartition = 0;
                 for(int i = 0; i < partitions.length; ++i) {
                     Partition p = partitions[i];
-                    if(p.getType() == Partition.PartitionType.APPLE_HFS) {
+                    PartitionType pt = p.getType();
+                    if(pt == PartitionType.APPLE_HFS_CONTAINER || pt == PartitionType.APPLE_HFSX) {
                         firstPreferredPartition = i;
                         break;
                     }
@@ -764,7 +766,8 @@ public class FileSystemBrowserWindow extends JFrame {
                     if(selectedValue != null &&
                             selectedValue instanceof Partition) {
                         Partition selectedPartition = (Partition) selectedValue;
-                        if(selectedPartition.getType() == Partition.PartitionType.APPLE_HFS) {
+                        PartitionType pt = selectedPartition.getType();
+                        if(pt == PartitionType.APPLE_HFS_CONTAINER || pt == PartitionType.APPLE_HFSX) {
                             break;
                         }
                         else {

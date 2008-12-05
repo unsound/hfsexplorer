@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -15,20 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.fs;
+package org.catacombae.jparted.lib.ps;
 
 import org.catacombae.io.ReadableRandomAccessStream;
 
 /**
  *
- * @author erik
+ * @author Erik Larsson
  */
-public interface FileSystemRecognizer {
-
+public interface PartitionSystemRecognizer {
+    /* TODO: detect should take a sectorSize argument... */
     /**
-     * Detects whether there is a file system located at the specified offset in
-     * fsStream. Which file system is being detected is dependent on the
-     * context.
+     * Detects whether there is a partition system located at the specified
+     * offset in fsStream. Which partition system is being detected is dependent
+     * on the context.
      *
      * @param fsStream
      * @param offset the offset in fsStream to the start of the file system.

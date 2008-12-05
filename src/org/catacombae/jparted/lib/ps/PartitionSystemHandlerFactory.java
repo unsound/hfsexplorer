@@ -25,7 +25,8 @@ import org.catacombae.jparted.lib.DataLocator;
  * @author Erik Larsson
  */
 public abstract class PartitionSystemHandlerFactory {
+    public abstract PartitionSystemRecognizer getRecognizer();
     public abstract PartitionSystemHandler createHandler(DataLocator partitionData);
-    public abstract PartitionSystemDetector createDetector(DataLocator partitionData);
+    //public abstract PartitionSystemRecognizer createDetector(DataLocator partitionData);
     public abstract PartitionSystemImplementationInfo getInfo();
 }

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.testcode;
+package org.catacombae.hfsexplorer.tools;
 import java.io.FileOutputStream;
 import org.catacombae.hfsexplorer.partitioning.MBRPartitionTable;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;

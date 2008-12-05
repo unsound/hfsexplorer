@@ -18,7 +18,7 @@
 package org.catacombae.jparted.lib.ps.gpt;
 
 import org.catacombae.jparted.lib.DataLocator;
-import org.catacombae.jparted.lib.ps.PartitionSystemDetector;
+import org.catacombae.jparted.lib.ps.PartitionSystemRecognizer;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.partitioning.GPTHeader;
 
@@ -26,10 +26,10 @@ import org.catacombae.hfsexplorer.partitioning.GPTHeader;
  *
  * @author erik
  */
-public class GPTDetector extends PartitionSystemDetector {
-    private DataLocator data;
+public class GPTRecognizer implements PartitionSystemRecognizer {
+    /*private DataLocator data;
     
-    public GPTDetector(DataLocator pData) {
+    public GPTRecognizer(DataLocator pData) {
         this.data = pData;
     }
     
@@ -52,6 +52,27 @@ public class GPTDetector extends PartitionSystemDetector {
         } catch(Exception e) {
         }
             
+        return false;
+    }*/
+
+    public boolean detect(ReadableRandomAccessStream fsStream, long offset, long length) {
+        try {
+            //ReadableRandomAccessStream llf = data.createReadOnlyFile();
+            byte[] secondBlock = new byte[512];
+            fsStream.seek(512);
+            fsStream.readFully(secondBlock);
+
+            // Look for GPT
+            // Let's assume that blocks are always 512 bytes in size with MBR and GPT. I don't know
+            // how to detect the actual block size (at least when reading from a file, otherwise I
+            // guess there are system specific ways)...
+            GPTHeader gh = new GPTHeader(secondBlock, 0, 512);
+            if(gh.isValid()) {
+                return true;
+            }
+        } catch(Exception e) {
+        }
+
         return false;
     }
 

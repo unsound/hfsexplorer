@@ -38,8 +38,8 @@ public enum FileSystemMajorType {
     APPLE_HFS(HFSFileSystemHandlerFactory.class),
     APPLE_HFS_PLUS(HFSPlusFileSystemHandlerFactory.class),
     APPLE_HFSX(HFSXFileSystemHandlerFactory.class),
-    APPLE_PRODOS, FAT12, FAT16, FAT32, EXFAT, NTFS, HPFS, EXT3, REISERFS,
-    REISER4, XFS, JFS, ZFS, UNKNOWN;
+    APPLE_UFS, APPLE_PRODOS, FAT12, FAT16, FAT32, EXFAT, NTFS, HPFS, EXT3,
+    REISERFS, REISER4, XFS, JFS, ZFS, UNKNOWN;
     
     /*
     private static final Map<String, List<Class<? extends FileSystemHandlerFactory>>> DEFINED_FACTORIES;

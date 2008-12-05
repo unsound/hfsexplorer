@@ -25,10 +25,11 @@ import java.util.Vector;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.jparted.lib.ps.PartitionSystemType;
 import org.catacombae.jparted.lib.RandomAccessFileDataLocator;
 import org.catacombae.jparted.lib.ps.Partition;
-import org.catacombae.jparted.lib.ps.PartitionSystemDetector;
+import org.catacombae.jparted.lib.ps.PartitionSystemRecognizer;
 import org.catacombae.jparted.lib.ps.PartitionSystemHandler;
 import org.catacombae.jparted.lib.ps.PartitionSystemHandlerFactory;
 
@@ -93,9 +94,15 @@ public class MainController {
                         PartitionSystemHandlerFactory fac =
                                 curType.createDefaultHandlerFactory();
                         if(fac != null) {
-                            PartitionSystemDetector detector =
-                                    fac.createDetector(loc);
-                            if(detector.existsPartitionSystem()) {
+                            PartitionSystemRecognizer recognizer =
+                                    fac.getRecognizer();
+                            ReadableRandomAccessStream stream = loc.createReadOnlyFile();
+                            long streamLength = -1;
+                            try {
+                                streamLength = stream.length();
+                            } catch(Exception e) {}
+                                    //fac.createDetector(loc);
+                            if(recognizer.detect(stream, 0, streamLength)) {
                                 PartitionSystemHandler handler = fac.createHandler(loc);
                                 detectedPartitionSystems.add(fac.createHandler(loc));
                                 detectedPartitionSystemDescriptions.add(fac.getInfo().getPartitionSystemName() +

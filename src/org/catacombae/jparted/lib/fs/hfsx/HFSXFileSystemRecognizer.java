@@ -1,6 +1,6 @@
 /*-
- * Copyright (C) 2006 Erik Larsson
- * 
+ * Copyright (C) 2008 Erik Larsson
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -15,15 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.testcode;
+package org.catacombae.jparted.lib.fs.hfsx;
 
-import java.util.regex.Pattern;
+import org.catacombae.io.ReadableRandomAccessStream;
+import org.catacombae.jparted.lib.fs.FileSystemRecognizer;
+import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemRecognizer;
 
-public class TestRegexp {
-    public static void main(String[] args) {
-        String regexp = args[0];
-        String testString = args[1];
+/**
+ *
+ * @author erik
+ */
+public class HFSXFileSystemRecognizer implements FileSystemRecognizer {
 
-        System.out.println(Pattern.matches(regexp, testString));
+    public boolean detect(ReadableRandomAccessStream fsStream, long offset, long length) {
+        switch(HFSCommonFileSystemRecognizer.detectFileSystem(fsStream, offset)) {
+            case HFSX:
+                return true;
+            default:
+                return false;
+        }
     }
+
 }

@@ -19,6 +19,8 @@ package org.catacombae.hfsexplorer.partitioning;
 import org.catacombae.hfsexplorer.Util;
 import java.io.PrintStream;
 import java.util.Hashtable;
+import org.catacombae.jparted.lib.ps.PartitionType;
+import org.catacombae.jparted.lib.ps.mbr.MBRPartitionType;
 
 public class MBRPartition implements Partition {
     protected static final byte PARTITION_NOT_BOOTABLE = (byte)0x00;
@@ -26,7 +28,7 @@ public class MBRPartition implements Partition {
     
     /** By some reason I couldn't put this variable inside MBRPartitionType. Initalizer error. */
     private static final Hashtable<Byte,MBRPartitionType> byteMap = new Hashtable<Byte,MBRPartitionType>();
-    public static enum MBRPartitionType {
+    //public static enum MBRPartitionType {
 	/* Partition type data from microsoft 
          * (http://technet2.microsoft.com/WindowsServer/en/library/bdeda920-1f08-4683-9ffb-7b4b50df0b5a1033.mspx?mfr=true)
          * 
@@ -50,7 +52,7 @@ public class MBRPartition implements Partition {
 	 * 0xEE GPT partition
 	 * 0xEF EFI System partition on an MBR disk
 	 */
-	PARTITION_TYPE_UNUSED               ((byte)0x00),
+	/*PARTITION_TYPE_UNUSED               ((byte)0x00),
 	PARTITION_TYPE_FAT12                ((byte)0x01),
 	PARTITION_TYPE_FAT16_SMALL          ((byte)0x04),
 	PARTITION_TYPE_DOS_EXTENDED         ((byte)0x05),
@@ -95,7 +97,7 @@ public class MBRPartition implements Partition {
 	    else
 		return UNKNOWN_PARTITION_TYPE;
 	}
-    }
+    }*/
     protected final byte[] status = new byte[1];
     protected final byte[] firstSector = new byte[3];
     protected final byte[] partitionType = new byte[1];
@@ -134,7 +136,9 @@ public class MBRPartition implements Partition {
     // Defined in Partition
     public long getStartOffset() { return Util.unsign(getLBAFirstSector())*sectorSize; }
     public long getLength() { return Util.unsign(getLBAPartitionLength())*sectorSize; }
-    public PartitionType getType() { return convertPartitionType(getPartitionTypeAsEnum()); }
+    public PartitionType getType() {
+        return getPartitionTypeAsEnum().getGeneralType();
+    }
 
 	
     public byte getStatus() { return Util.readByteLE(status); }
@@ -149,7 +153,7 @@ public class MBRPartition implements Partition {
     public int getLBAPartitionLength() { return Util.readIntLE(lbaPartitionLength); }
     
     public MBRPartitionType getPartitionTypeAsEnum() {
-	return MBRPartitionType.getType(getPartitionType());
+        return MBRPartitionType.fromMBRType(getPartitionType());
     }
     
     public boolean isBootable() {
@@ -182,13 +186,14 @@ public class MBRPartition implements Partition {
     }
     /** Returns true if isValid() evaluates to true, and partition type is not 0x00 (PARTITION_TYPE_UNUSED). */
     public boolean isUsed() {
-	return isValid() && getPartitionTypeAsEnum() != MBRPartitionType.PARTITION_TYPE_UNUSED;
+	return isValid() && getPartitionTypeAsEnum() != MBRPartitionType.UNUSED;
     }
     
+    @Override
     public String toString() {
 	MBRPartitionType mpt = getPartitionTypeAsEnum();
 	return (isBootable()?"Bootable ":"") + "MBR Partition (" + mpt + 
-	    (mpt == MBRPartitionType.UNKNOWN_PARTITION_TYPE?" [0x"+Util.toHexStringBE(getPartitionType())+"]":"") + ")";
+	    (mpt == null?" [0x"+Util.toHexStringBE(getPartitionType())+"]":"") + ")";
     }
     
     public void printFields(PrintStream ps, String prefix) {
@@ -204,60 +209,61 @@ public class MBRPartition implements Partition {
         ps.println(prefix + this.getClass().getSimpleName() + ":");
 	printFields(ps, prefix);
     }
-    
+
+    /*
     private PartitionType convertPartitionType(MBRPartitionType mpt) {
 	// I haven't bothered to generalize the partition types in detail...
 	switch(mpt) {
-	case PARTITION_TYPE_FAT12:
+	case FAT12:
 	    return PartitionType.FAT12;
-	case PARTITION_TYPE_FAT16_SMALL:
+	case FAT16_SMALL:
 	    return PartitionType.FAT16;
-	case PARTITION_TYPE_DOS_EXTENDED:
+	case DOS_EXTENDED:
 	    return PartitionType.DOS_EXTENDED;
-	case PARTITION_TYPE_FAT16_LARGE:
+	case FAT16_LARGE:
 	    return PartitionType.FAT16;
-	case PARTITION_TYPE_NT_INSTALLABLE_FS:
-	    return PartitionType.NTFS; // Very simplified...
-	case PARTITION_TYPE_FAT32:
+	case NT_INSTALLABLE_FS:
+	    return PartitionType.NT_OS2_IFS; // Very simplified...
+	case FAT32:
 	    return PartitionType.FAT32;
-	case PARTITION_TYPE_FAT32_INT13HX:
+	case FAT32_INT13HX:
 	    return PartitionType.FAT32;
-	case PARTITION_TYPE_FAT16_LARGE_INT13HX:
+	case FAT16_LARGE_INT13HX:
 	    return PartitionType.FAT16;
-	case PARTITION_TYPE_DOS_EXTENDED_INT13HX:
+	case DOS_EXTENDED_INT13HX:
 	    return PartitionType.DOS_EXTENDED;
-	case PARTITION_TYPE_EISA_OR_OEM:
+	case EISA_OR_OEM:
 	    return PartitionType.UNKNOWN;
-	case PARTITION_TYPE_DYNAMIC_VOLUME:
+	case DYNAMIC_VOLUME:
 	    return PartitionType.UNKNOWN;
-	case PARTITION_TYPE_PM_HIBERNATION:
+	case PM_HIBERNATION:
 	    return PartitionType.UNKNOWN;
-	case PARTITION_TYPE_NT_MULTIDISK_FAT16:
+	case NT_MULTIDISK_FAT16:
 	    return PartitionType.UNKNOWN;
-	case PARTITION_TYPE_NT_MULTIDISK_NTFS:
+	case NT_MULTIDISK_NTFS:
 	    return PartitionType.UNKNOWN;
-	case PARTITION_TYPE_LAPTOP_HIBERNATION:
+	case LAPTOP_HIBERNATION:
 	    return PartitionType.UNKNOWN;
-	case PARTITION_TYPE_DELL_OEM:
+	case DELL_OEM:
 	    return PartitionType.UNKNOWN;
-	case PARTITION_TYPE_IBM_OEM:
+	case IBM_OEM:
 	    return PartitionType.UNKNOWN;
-	case PARTITION_TYPE_GPT:
+	case GPT_PROTECTIVE:
 	    return PartitionType.UNKNOWN;
-	case PARTITION_TYPE_EFI_SYSTEM_ON_MBR:
+	case EFI_SYSTEM_ON_MBR:
 	    return PartitionType.UNKNOWN;
-	case PARTITION_TYPE_APPLE_UFS:
+	case APPLE_UFS:
 	    return PartitionType.APPLE_UNIX_SVR2;
-	case PARTITION_TYPE_APPLE_HFS:
-	    return PartitionType.APPLE_HFS;
-	case PARTITION_TYPE_LINUX_NATIVE:
+	case APPLE_HFS:
+	    return PartitionType.APPLE_HFS_CONTAINER;
+	case LINUX_NATIVE:
 	    return PartitionType.LINUX_NATIVE;
-	case PARTITION_TYPE_LINUX_SWAP:
+	case LINUX_SWAP:
 	    return PartitionType.LINUX_SWAP;
 	default:
 	    return PartitionType.UNKNOWN;
 	}
-    }
+    }*/
     
     public byte[] getBytes() {
 	byte[] result = new byte[16];

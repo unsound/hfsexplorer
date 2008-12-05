@@ -41,18 +41,19 @@ public enum APMPartitionType {
     private final PartitionType generalType;
     
     private APMPartitionType(String apmName) {
-	this(apmName, null);
+        this(apmName, null);
     }
+
     private APMPartitionType(String apmName, PartitionType generalType) {
         this.apmName = apmName;
-	this.generalType = generalType;
+        this.generalType = generalType;
     }
-    
+
     public String getAPMName() {
-	return apmName;
+        return apmName;
     }
 
     public PartitionType getGeneralType() {
-	return generalType;
+        return generalType;
     }
- }
+}

@@ -21,35 +21,29 @@ import org.catacombae.hfsexplorer.Util;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.partitioning.ApplePartitionMap;
 import org.catacombae.hfsexplorer.partitioning.DriverDescriptorRecord;
-import org.catacombae.jparted.lib.DataLocator;
-import org.catacombae.jparted.lib.ps.PartitionSystemDetector;
+import org.catacombae.jparted.lib.ps.PartitionSystemRecognizer;
 
 /**
  *
  * @author erik
  */
-public class APMDetector extends PartitionSystemDetector {
-    private DataLocator data;
+public class APMRecognizer implements PartitionSystemRecognizer {
     
-    public APMDetector(DataLocator pData) {
-        this.data = pData;
-    }
-    
-    @Override
-    public boolean existsPartitionSystem() {
+    public boolean detect(ReadableRandomAccessStream fsStream, long offset, long length) {
         try {
-            ReadableRandomAccessStream llf = data.createReadOnlyFile();
+            //ReadableRandomAccessStream llf = data.createReadOnlyFile();
             byte[] firstBlock = new byte[512];
-            
-            llf.readFully(firstBlock);
-            
+
+            fsStream.seek(0);
+            fsStream.readFully(firstBlock);
+
             // Look for APM
             DriverDescriptorRecord ddr = new DriverDescriptorRecord(firstBlock, 0);
             if(ddr.isValid()) {
                 int blockSize = Util.unsign(ddr.getSbBlkSize());
                 //long numberOfBlocksOnDevice = Util.unsign(ddr.getSbBlkCount());
                 //bitStream.seek(blockSize*1); // second block, first partition in list
-                ApplePartitionMap apm = new ApplePartitionMap(llf, blockSize * 1, blockSize);
+                ApplePartitionMap apm = new ApplePartitionMap(fsStream, blockSize * 1, blockSize);
                 if(apm.getUsedPartitionCount() > 0) {
                     return true;
                 }
