@@ -1,6 +1,6 @@
 /*-
- * Copyright (C) 2007 Erik Larsson
- * 
+ * Copyright (C) 2008 Erik Larsson
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -15,12 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.testcode;
-import org.catacombae.hfsexplorer.*;
+package org.catacombae.jparted.lib.fs.hfs;
+
+import org.catacombae.io.ReadableRandomAccessStream;
+import org.catacombae.jparted.lib.fs.FileSystemRecognizer;
+import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemRecognizer;
 
 /**
- * Application that prints out the full path of every file on the volume to stdout.
+ *
+ * @author erik
  */
-public class ListAllFilesOnVolume {
-    
+public class HFSFileSystemRecognizer implements FileSystemRecognizer {
+
+    public boolean detect(ReadableRandomAccessStream fsStream, long offset, long length) {
+        switch(HFSCommonFileSystemRecognizer.detectFileSystem(fsStream, offset)) {
+            case HFS:
+                return true;
+            default:
+                return false;
+        }
+    }
+
 }

@@ -20,6 +20,7 @@ import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.ReadableByteArrayStream;
 import java.io.PrintStream;
 import java.util.LinkedList;
+import org.catacombae.jparted.lib.ps.mbr.MBRPartitionType;
 
 /**
  * This class includes support for the MBR partition scheme, including the
@@ -64,8 +65,8 @@ public class MBRPartitionTable implements PartitionSystem {
             PartitionSystem embeddedPS = null;
 
             if(!parseEmbeddedPartitionSystems); // Disable all other elses
-            else if(p.getPartitionTypeAsEnum() == MBRPartition.MBRPartitionType.PARTITION_TYPE_DOS_EXTENDED ||
-                    p.getPartitionTypeAsEnum() == MBRPartition.MBRPartitionType.PARTITION_TYPE_DOS_EXTENDED_INT13HX) {
+            else if(p.getPartitionTypeAsEnum() == MBRPartitionType.DOS_EXTENDED ||
+                    p.getPartitionTypeAsEnum() == MBRPartitionType.DOS_EXTENDED_INT13HX) {
                 try {
                     embeddedPS =
                         new DOSExtendedPartitionSystem(raf, p.getStartOffset(), p.getLength(), sectorSize);
@@ -199,7 +200,7 @@ public class MBRPartitionTable implements PartitionSystem {
 
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + this.getClass().getSimpleName() + ":");
-	printFields(ps, prefix);
+        printFields(ps, prefix);
     }
 
     

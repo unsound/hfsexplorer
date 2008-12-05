@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -15,24 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.partitioning;
+package org.catacombae.jparted.lib.fs.hfsplus;
 
-public class EBRPartition extends MBRPartition {
-    
-    private long extendedPartitionOffset;
-    
-    public EBRPartition(byte[] data, int offset, long extendedPartitionOffset, int sectorSize) {
-        super(data, offset, sectorSize);
-        this.extendedPartitionOffset = extendedPartitionOffset;
+import org.catacombae.io.ReadableRandomAccessStream;
+import org.catacombae.jparted.lib.fs.FileSystemRecognizer;
+import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemRecognizer;
+
+/**
+ *
+ * @author erik
+ */
+public class HFSPlusFileSystemRecognizer implements FileSystemRecognizer {
+
+    public boolean detect(ReadableRandomAccessStream fsStream, long offset, long length) {
+        switch(HFSCommonFileSystemRecognizer.detectFileSystem(fsStream, offset)) {
+            case HFS_PLUS:
+            case HFS_WRAPPED_HFS_PLUS:
+                return true;
+            default:
+                return false;
+        }
     }
-    
-    /** Copy constructor. */
-    public EBRPartition(EBRPartition source) {
-        super(source);
-        this.extendedPartitionOffset = source.extendedPartitionOffset;
-    }
-    
-    // Defined in Partition
-    @Override
-    public long getStartOffset() { return super.getStartOffset()+extendedPartitionOffset; }
+
 }

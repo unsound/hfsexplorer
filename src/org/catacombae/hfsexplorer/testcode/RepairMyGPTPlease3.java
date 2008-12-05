@@ -22,6 +22,7 @@ import org.catacombae.hfsexplorer.*;
 import org.catacombae.hfsexplorer.partitioning.*;
 import org.catacombae.hfsexplorer.win32.*;
 import java.io.*;
+import org.catacombae.jparted.lib.ps.gpt.GPTPartitionType;
 
 /**
  * This class was specifically written to repair my hard disk GPT table, which had become inconsistent with
@@ -107,10 +108,10 @@ public class RepairMyGPTPlease3 {
 	     * to:
 	     *   Basic Data Partition                       {EBD0A0A2-B9E5-4433-87C0-68B6B72699C7}
 	     */
-	    byte[] efiSystemPartitionType = GPTEntry.GPTPartitionType.PARTITION_TYPE_EFI_SYSTEM.getBytes();
-	    byte[] microsoftBasicDataType = GPTEntry.GPTPartitionType.PARTITION_TYPE_PRIMARY_PARTITION.getBytes();
-	    byte[] appleHfsType = GPTEntry.GPTPartitionType.PARTITION_TYPE_APPLE_HFS.getBytes();
-	    byte[] microsoftReservedType = GPTEntry.GPTPartitionType.PARTITION_TYPE_MICROSOFT_RESERVED.getBytes();
+	    byte[] efiSystemPartitionType = GPTPartitionType.PARTITION_TYPE_EFI_SYSTEM.getBytes();
+	    byte[] microsoftBasicDataType = GPTPartitionType.PARTITION_TYPE_PRIMARY_PARTITION.getBytes();
+	    byte[] appleHfsType = GPTPartitionType.PARTITION_TYPE_APPLE_HFS.getBytes();
+	    byte[] microsoftReservedType = GPTPartitionType.PARTITION_TYPE_MICROSOFT_RESERVED.getBytes();
 	    
 	    // First we verify that the current data is as we expect it to be.
 	    

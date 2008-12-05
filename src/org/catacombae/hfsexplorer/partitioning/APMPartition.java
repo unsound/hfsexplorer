@@ -19,6 +19,7 @@ package org.catacombae.hfsexplorer.partitioning;
 
 import org.catacombae.hfsexplorer.Util;
 import java.io.PrintStream;
+import org.catacombae.jparted.lib.ps.PartitionType;
 
 public class APMPartition implements Partition {
     /*
@@ -70,27 +71,27 @@ public class APMPartition implements Partition {
     private final int blockSize;
     
     public APMPartition(byte[] data, int offset, int blockSize) {
-	System.arraycopy(data, offset+0, pmSig, 0, 2);
-	System.arraycopy(data, offset+2, pmSigPad, 0, 2);
-	System.arraycopy(data, offset+4, pmMapBlkCnt, 0, 4);
-	System.arraycopy(data, offset+8, pmPyPartStart, 0, 4);
-	System.arraycopy(data, offset+12, pmPartBlkCnt, 0, 4);
-	System.arraycopy(data, offset+16, pmPartName, 0, 32);
-	System.arraycopy(data, offset+48, pmParType, 0, 32);
-	System.arraycopy(data, offset+80, pmLgDataStart, 0, 4);
-	System.arraycopy(data, offset+84, pmDataCnt, 0, 4);
-	System.arraycopy(data, offset+88, pmPartStatus, 0, 4);
-	System.arraycopy(data, offset+92, pmLgBootStart, 0, 4);
-	System.arraycopy(data, offset+96, pmBootSize, 0, 4);
-	System.arraycopy(data, offset+100, pmBootAddr, 0, 4);
-	System.arraycopy(data, offset+104, pmBootAddr2, 0, 4);
-	System.arraycopy(data, offset+108, pmBootEntry, 0, 4);
-	System.arraycopy(data, offset+112, pmBootEntry2, 0, 4);
-	System.arraycopy(data, offset+116, pmBootCksum, 0, 4);
-	System.arraycopy(data, offset+120, pmProcessor, 0, 16);
-	System.arraycopy(data, offset+136, pmPad, 0, 2*188);
-	
-	this.blockSize = blockSize;
+        System.arraycopy(data, offset + 0, pmSig, 0, 2);
+        System.arraycopy(data, offset + 2, pmSigPad, 0, 2);
+        System.arraycopy(data, offset + 4, pmMapBlkCnt, 0, 4);
+        System.arraycopy(data, offset + 8, pmPyPartStart, 0, 4);
+        System.arraycopy(data, offset + 12, pmPartBlkCnt, 0, 4);
+        System.arraycopy(data, offset + 16, pmPartName, 0, 32);
+        System.arraycopy(data, offset + 48, pmParType, 0, 32);
+        System.arraycopy(data, offset + 80, pmLgDataStart, 0, 4);
+        System.arraycopy(data, offset + 84, pmDataCnt, 0, 4);
+        System.arraycopy(data, offset + 88, pmPartStatus, 0, 4);
+        System.arraycopy(data, offset + 92, pmLgBootStart, 0, 4);
+        System.arraycopy(data, offset + 96, pmBootSize, 0, 4);
+        System.arraycopy(data, offset + 100, pmBootAddr, 0, 4);
+        System.arraycopy(data, offset + 104, pmBootAddr2, 0, 4);
+        System.arraycopy(data, offset + 108, pmBootEntry, 0, 4);
+        System.arraycopy(data, offset + 112, pmBootEntry2, 0, 4);
+        System.arraycopy(data, offset + 116, pmBootCksum, 0, 4);
+        System.arraycopy(data, offset + 120, pmProcessor, 0, 16);
+        System.arraycopy(data, offset + 136, pmPad, 0, 2 * 188);
+
+        this.blockSize = blockSize;
     }
     public static int structSize() { return 512; }
     // Defined in Partition
@@ -126,108 +127,110 @@ public class APMPartition implements Partition {
     
     public boolean isValid() {
         // Signature check
-        int pmSig = getPmSig() & 0xFFFF;
-        if(pmSig != 0x504D && // Signature "PM", in ASCII
-           pmSig != 0x5453) // Older signature, but still supported.
+        int pmSigInt = getPmSig() & 0xFFFF;
+        if(pmSigInt != 0x504D && // Signature "PM", in ASCII
+           pmSigInt != 0x5453) // Older signature, but still supported.
             return false;
         
         return true;
     }
     
     public void printPartitionInfo(PrintStream ps) {
-	printPartitionInfo(ps, "");
+        printPartitionInfo(ps, "");
     }
+
     public void printPartitionInfo(PrintStream ps, String prefix) {
-	ps.println(prefix + "pmSig: \"" + getPmSigAsString() + "\"");
-	ps.println(prefix + "pmSigPad: " + getPmSigPad());
-	ps.println(prefix + "pmMapBlkCnt: " + getPmMapBlkCnt());
-	ps.println(prefix + "pmPyPartStart: " + getPmPyPartStart());
-	ps.println(prefix + "pmPartBlkCnt: " + getPmPartBlkCnt());
-	ps.println(prefix + "pmPartName: \"" +  getPmPartNameAsString() + "\"");
-	ps.println(prefix + "pmParType: \"" +  getPmParTypeAsString() + "\"");
-	ps.println(prefix + "pmLgDataStart: " + getPmLgDataStart());
-	ps.println(prefix + "pmDataCnt: " + getPmDataCnt());
-	ps.println(prefix + "pmPartStatus: " + getPmPartStatus());
-	ps.println(prefix + "pmLgBootStart: " + getPmLgBootStart());
-	ps.println(prefix + "pmBootSize: " + getPmBootSize());
-	ps.println(prefix + "pmBootAddr: " + getPmBootAddr());
-	ps.println(prefix + "pmBootAddr2: " + getPmBootAddr2());
-	ps.println(prefix + "pmBootEntry: " + getPmBootEntry());
-	ps.println(prefix + "pmBootEntry2: " + getPmBootEntry2());
-	ps.println(prefix + "pmBootCksum: " + getPmBootCksum());
-	ps.println(prefix + "pmProcessor: \"" + getPmProcessorAsString() + "\"");
-	ps.println(prefix + "pmPad: " + getPmPad());
+        ps.println(prefix + "pmSig: \"" + getPmSigAsString() + "\"");
+        ps.println(prefix + "pmSigPad: " + getPmSigPad());
+        ps.println(prefix + "pmMapBlkCnt: " + getPmMapBlkCnt());
+        ps.println(prefix + "pmPyPartStart: " + getPmPyPartStart());
+        ps.println(prefix + "pmPartBlkCnt: " + getPmPartBlkCnt());
+        ps.println(prefix + "pmPartName: \"" + getPmPartNameAsString() + "\"");
+        ps.println(prefix + "pmParType: \"" + getPmParTypeAsString() + "\"");
+        ps.println(prefix + "pmLgDataStart: " + getPmLgDataStart());
+        ps.println(prefix + "pmDataCnt: " + getPmDataCnt());
+        ps.println(prefix + "pmPartStatus: " + getPmPartStatus());
+        ps.println(prefix + "pmLgBootStart: " + getPmLgBootStart());
+        ps.println(prefix + "pmBootSize: " + getPmBootSize());
+        ps.println(prefix + "pmBootAddr: " + getPmBootAddr());
+        ps.println(prefix + "pmBootAddr2: " + getPmBootAddr2());
+        ps.println(prefix + "pmBootEntry: " + getPmBootEntry());
+        ps.println(prefix + "pmBootEntry2: " + getPmBootEntry2());
+        ps.println(prefix + "pmBootCksum: " + getPmBootCksum());
+        ps.println(prefix + "pmProcessor: \"" + getPmProcessorAsString() + "\"");
+        ps.println(prefix + "pmPad: " + getPmPad());
     }
-    
+
     public byte[] getData() {
-	byte[] result = new byte[structSize()];
-	int offset = 0;
-	System.arraycopy(pmSig, 0, result, offset, pmSig.length); offset += pmSig.length;
-	System.arraycopy(pmSigPad, 0, result, offset, pmSigPad.length); offset += pmSigPad.length;
-	System.arraycopy(pmMapBlkCnt, 0, result, offset, pmMapBlkCnt.length); offset += pmMapBlkCnt.length;
-	System.arraycopy(pmPyPartStart, 0, result, offset, pmPyPartStart.length); offset += pmPyPartStart.length;
-	System.arraycopy(pmPartBlkCnt, 0, result, offset, pmPartBlkCnt.length); offset += pmPartBlkCnt.length;
-	System.arraycopy(pmPartName, 0, result, offset, pmPartName.length); offset += pmPartName.length;
-	System.arraycopy(pmParType, 0, result, offset, pmParType.length); offset += pmParType.length;
-	System.arraycopy(pmLgDataStart, 0, result, offset, pmLgDataStart.length); offset += pmLgDataStart.length;
-	System.arraycopy(pmDataCnt, 0, result, offset, pmDataCnt.length); offset += pmDataCnt.length;
-	System.arraycopy(pmPartStatus, 0, result, offset, pmPartStatus.length); offset += pmPartStatus.length;
-	System.arraycopy(pmLgBootStart, 0, result, offset, pmLgBootStart.length); offset += pmLgBootStart.length;
-	System.arraycopy(pmBootSize, 0, result, offset, pmBootSize.length); offset += pmBootSize.length;
-	System.arraycopy(pmBootAddr, 0, result, offset, pmBootAddr.length); offset += pmBootAddr.length;
-	System.arraycopy(pmBootAddr2, 0, result, offset, pmBootAddr2.length); offset += pmBootAddr2.length;
-	System.arraycopy(pmBootEntry, 0, result, offset, pmBootEntry.length); offset += pmBootEntry.length;
-	System.arraycopy(pmBootEntry2, 0, result, offset, pmBootEntry2.length); offset += pmBootEntry2.length;
-	System.arraycopy(pmBootCksum, 0, result, offset, pmBootCksum.length); offset += pmBootCksum.length;
-	System.arraycopy(pmProcessor, 0, result, offset, pmProcessor.length); offset += pmProcessor.length;
-	System.arraycopy(pmPad, 0, result, offset, pmPad.length); offset += pmPad.length;
-	//System.arraycopy(, 0, result, offset, .length); offset += .length;
-	if(offset != result.length)
-	    throw new RuntimeException("Internal miscalculation...");
-	else
-	    return result;
+        byte[] result = new byte[structSize()];
+        int offset = 0;
+        System.arraycopy(pmSig, 0, result, offset, pmSig.length); offset += pmSig.length;
+        System.arraycopy(pmSigPad, 0, result, offset, pmSigPad.length); offset += pmSigPad.length;
+        System.arraycopy(pmMapBlkCnt, 0, result, offset, pmMapBlkCnt.length); offset += pmMapBlkCnt.length;
+        System.arraycopy(pmPyPartStart, 0, result, offset, pmPyPartStart.length); offset += pmPyPartStart.length;
+        System.arraycopy(pmPartBlkCnt, 0, result, offset, pmPartBlkCnt.length); offset += pmPartBlkCnt.length;
+        System.arraycopy(pmPartName, 0, result, offset, pmPartName.length); offset += pmPartName.length;
+        System.arraycopy(pmParType, 0, result, offset, pmParType.length); offset += pmParType.length;
+        System.arraycopy(pmLgDataStart, 0, result, offset, pmLgDataStart.length); offset += pmLgDataStart.length;
+        System.arraycopy(pmDataCnt, 0, result, offset, pmDataCnt.length); offset += pmDataCnt.length;
+        System.arraycopy(pmPartStatus, 0, result, offset, pmPartStatus.length); offset += pmPartStatus.length;
+        System.arraycopy(pmLgBootStart, 0, result, offset, pmLgBootStart.length); offset += pmLgBootStart.length;
+        System.arraycopy(pmBootSize, 0, result, offset, pmBootSize.length); offset += pmBootSize.length;
+        System.arraycopy(pmBootAddr, 0, result, offset, pmBootAddr.length); offset += pmBootAddr.length;
+        System.arraycopy(pmBootAddr2, 0, result, offset, pmBootAddr2.length); offset += pmBootAddr2.length;
+        System.arraycopy(pmBootEntry, 0, result, offset, pmBootEntry.length); offset += pmBootEntry.length;
+        System.arraycopy(pmBootEntry2, 0, result, offset, pmBootEntry2.length); offset += pmBootEntry2.length;
+        System.arraycopy(pmBootCksum, 0, result, offset, pmBootCksum.length); offset += pmBootCksum.length;
+        System.arraycopy(pmProcessor, 0, result, offset, pmProcessor.length); offset += pmProcessor.length;
+        System.arraycopy(pmPad, 0, result, offset, pmPad.length); offset += pmPad.length;
+	       //System.arraycopy(, 0, result, offset, .length); offset += .length;
+        if(offset != result.length)
+            throw new RuntimeException("Internal miscalculation...");
+        else
+            return result;
     }
     
     public void printFields(PrintStream ps, String prefix) {
-	printPartitionInfo(ps, prefix + " ");
-	ps.println(prefix + " Partition methods: ");
-	ps.println(prefix + "  getStartOffset(): " + getStartOffset());
-	ps.println(prefix + "  getLength(): " + getLength());
-	ps.println(prefix + "  getType(): " + getType());
-    }
-    public void print(PrintStream ps, String prefix) {
-	ps.println(prefix + "APMPartition:");
-	printFields(ps, prefix);
+        printPartitionInfo(ps, prefix + " ");
+        ps.println(prefix + " Partition methods: ");
+        ps.println(prefix + "  getStartOffset(): " + getStartOffset());
+        ps.println(prefix + "  getLength(): " + getLength());
+        ps.println(prefix + "  getType(): " + getType());
     }
 
-    public String toString() {
-	return "\"" + getPmPartNameAsString() + "\" (" + getPmParTypeAsString() + ")";
+    public void print(PrintStream ps, String prefix) {
+        ps.println(prefix + "APMPartition:");
+        printFields(ps, prefix);
     }
-    
+
+    @Override
+    public String toString() {
+        return "\"" + getPmPartNameAsString() + "\" (" + getPmParTypeAsString() + ")";
+    }
+
     public PartitionType convertPartitionType(byte[] parTypeData) {
-	String typeString = Util.readNullTerminatedASCIIString(parTypeData);
- 	if(typeString.equals("Apple_partition_map")) // Partition contains a partition map
-	    return PartitionType.APPLE_APM;
- 	else if(typeString.equals("Apple_Driver")) // Partition contains a device driver
-	    return PartitionType.APPLE_DRIVER;
- 	else if(typeString.equals("Apple_Driver43")) // Partition contains a SCSI Manager 4.3 device driver
-	    return PartitionType.APPLE_DRIVER43;
- 	else if(typeString.equals("Apple_MFS")) // Partition uses the original Macintosh File System (64K ROM version)
-	    return PartitionType.APPLE_MFS;
- 	else if(typeString.equals("Apple_HFS")) // Partition uses the Hierarchical File System (128K and later ROM versions)
-	    return PartitionType.APPLE_HFS;
- 	else if(typeString.equals("Apple_HFSX")) // Partition uses HFSX. Presently, we report it as HFS+, and let the mounter decide.
-	    return PartitionType.APPLE_HFS;
- 	else if(typeString.equals("Apple_Unix_SVR2")) // Partition uses the Unix file system
-	    return PartitionType.APPLE_UNIX_SVR2;
- 	else if(typeString.equals("Apple_PRODOS")) // Partition uses the ProDOS file system
-	    return PartitionType.APPLE_PRODOS;
- 	else if(typeString.equals("Apple_Free")) // Partition is unused
-	    return PartitionType.APPLE_FREE;
- 	else if(typeString.equals("Apple_Scratch")) // Partition is empty
-	    return PartitionType.APPLE_SCRATCH;
-	else
-	    return PartitionType.UNKNOWN;
-		    
+        String typeString = Util.readNullTerminatedASCIIString(parTypeData);
+        if(typeString.equals("Apple_partition_map")) // Partition contains a partition map
+            return PartitionType.APPLE_PARTITION_MAP;
+        else if(typeString.equals("Apple_Driver")) // Partition contains a device driver
+            return PartitionType.APPLE_DRIVER;
+        else if(typeString.equals("Apple_Driver43")) // Partition contains a SCSI Manager 4.3 device driver
+            return PartitionType.APPLE_DRIVER43;
+        else if(typeString.equals("Apple_MFS")) // Partition uses the original Macintosh File System (64K ROM version)
+            return PartitionType.APPLE_MFS;
+        else if(typeString.equals("Apple_HFS")) // Partition uses the Hierarchical File System (128K and later ROM versions)
+            return PartitionType.APPLE_HFS_CONTAINER;
+        else if(typeString.equals("Apple_HFSX")) // Partition uses HFSX. Presently, we report it as HFS+, and let the mounter decide.
+            return PartitionType.APPLE_HFSX;
+        else if(typeString.equals("Apple_Unix_SVR2")) // Partition uses the Unix file system
+            return PartitionType.APPLE_UNIX_SVR2;
+        else if(typeString.equals("Apple_PRODOS")) // Partition uses the ProDOS file system
+            return PartitionType.APPLE_PRODOS;
+        else if(typeString.equals("Apple_Free")) // Partition is unused
+            return PartitionType.EMPTY;
+        else if(typeString.equals("Apple_Scratch")) // Partition is empty
+            return PartitionType.EMPTY;
+        else
+            return PartitionType.UNKNOWN;
     }
 }

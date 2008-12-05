@@ -18,6 +18,7 @@
 package org.catacombae.hfsexplorer.partitioning;
 
 import java.io.PrintStream;
+import org.catacombae.jparted.lib.ps.PartitionType;
 
 /**
  * A general implementation of a partition, not bound to any specific partition

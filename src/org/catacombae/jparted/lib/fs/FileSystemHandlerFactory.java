@@ -40,7 +40,13 @@ public abstract class FileSystemHandlerFactory {
        this.createAttributes = new Attributes(getSupportedStandardAttributes(),
                getSupportedCustomAttributes());
     }
-    
+
+    /**
+     * Returns the file system recognizer for the current file system type.
+     * 
+     * @return the file system recognizer for the current file system type.
+     */
+    public abstract FileSystemRecognizer getRecognizer();
     
     public abstract FileSystemHandler createHandler(DataLocator data);
     public abstract FileSystemHandlerInfo getHandlerInfo();

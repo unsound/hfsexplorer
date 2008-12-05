@@ -18,7 +18,7 @@
 package org.catacombae.jparted.lib.ps.gpt;
 
 import org.catacombae.jparted.lib.DataLocator;
-import org.catacombae.jparted.lib.ps.PartitionSystemDetector;
+import org.catacombae.jparted.lib.ps.PartitionSystemRecognizer;
 import org.catacombae.jparted.lib.ps.PartitionSystemHandler;
 import org.catacombae.jparted.lib.ps.PartitionSystemHandlerFactory;
 import org.catacombae.jparted.lib.ps.PartitionSystemImplementationInfo;
@@ -29,20 +29,21 @@ import org.catacombae.jparted.lib.ps.PartitionSystemImplementationInfo;
  */
 public class GPTHandlerFactory extends PartitionSystemHandlerFactory {
 
-    @Override
-    public PartitionSystemHandler createHandler(DataLocator data) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+    private static final GPTRecognizer recognizer = new GPTRecognizer();
 
     @Override
-    public PartitionSystemDetector createDetector(DataLocator partitionData) {
-        return new GPTDetector(partitionData);
+    public PartitionSystemHandler createHandler(DataLocator data) {
+        return new GPTHandler(data);
     }
-    
+
     @Override
     public PartitionSystemImplementationInfo getInfo() {
         return new PartitionSystemImplementationInfo("GUID Partition Table",
                 "Catacombae GPT PS Handler", "1.0", "Catacombae");
     }
 
+    @Override
+    public PartitionSystemRecognizer getRecognizer() {
+        return recognizer;
+    }
 }

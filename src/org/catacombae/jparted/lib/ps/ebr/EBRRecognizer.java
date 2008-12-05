@@ -15,39 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.ps.mbr;
+package org.catacombae.jparted.lib.ps.ebr;
 
-import org.catacombae.jparted.lib.DataLocator;
-import org.catacombae.jparted.lib.ps.PartitionSystemDetector;
+import org.catacombae.jparted.lib.ps.PartitionSystemRecognizer;
 import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.hfsexplorer.partitioning.MBRPartitionTable;
 
 /**
  *
  * @author erik
  */
-public class MBRDetector extends PartitionSystemDetector {
-    private DataLocator data;
-    
-    public MBRDetector(DataLocator pData) {
-        this.data = pData;
-    }
-    
-    @Override
-    public boolean existsPartitionSystem() {
+public class EBRRecognizer implements PartitionSystemRecognizer {
+    public boolean detect(ReadableRandomAccessStream fsStream, long offset, long length) {
         try {
-            ReadableRandomAccessStream llf = data.createReadOnlyFile();
-            byte[] firstBlock = new byte[512];
-            llf.read(firstBlock);
-            
-            // Look for MBR
-            MBRPartitionTable mpt = new MBRPartitionTable(firstBlock, 0);
-            if(mpt.isValid()) {
+            EBRPartitionSystem ps = new EBRPartitionSystem(fsStream, offset, 512);
+            if(ps.isValid()) {
                 return true;
             }
         } catch(Exception e) {
         }
-            
+
         return false;
     }
 }

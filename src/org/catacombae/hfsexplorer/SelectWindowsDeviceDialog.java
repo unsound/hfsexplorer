@@ -17,6 +17,7 @@
 
 package org.catacombae.hfsexplorer;
 
+import org.catacombae.jparted.lib.ps.ebr.EBRPartition;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.ReadableConcatenatedStream;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
@@ -26,6 +27,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
+import org.catacombae.jparted.lib.ps.PartitionType;
 
 public class SelectWindowsDeviceDialog extends JDialog {
     private static final String DEVICE_PREFIX = "\\\\?\\GLOBALROOT\\Device\\";
@@ -229,7 +231,8 @@ public class SelectWindowsDeviceDialog extends JDialog {
                     Partition[] parts = partSys.getUsedPartitionEntries();
                     for(int j = 0; j < parts.length; ++j) {
                         Partition part = parts[j];
-                        if(part.getType() == Partition.PartitionType.APPLE_HFS) {
+                        PartitionType pt = part.getType();
+                        if(pt == PartitionType.APPLE_HFS_CONTAINER || pt == PartitionType.APPLE_HFSX) {
                             FileSystemRecognizer fsr = new FileSystemRecognizer(llf, part.getStartOffset());
                             if(fsr.isTypeSupported(fsr.detectFileSystem())) {
                                 fileSystemFound = true;

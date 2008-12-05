@@ -26,6 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import org.catacombae.jparted.lib.ps.ebr.EBRHandlerFactory;
 
 /**
  * Defines the partition system types that the library knows of, and provides a
@@ -46,7 +47,7 @@ public enum PartitionSystemType {
      * The DOS Extended partition system, designed to work around the
      * 4 partition limit of the PC Master Boot Record partition scheme.
      */
-    DOS_EXTENDED(false);
+    DOS_EXTENDED(false, EBRHandlerFactory.class);
     
     private final boolean isTopLevelCapable;
     

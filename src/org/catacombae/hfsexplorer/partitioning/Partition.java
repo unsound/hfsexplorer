@@ -17,6 +17,7 @@
 
 package org.catacombae.hfsexplorer.partitioning;
 import java.io.PrintStream;
+import org.catacombae.jparted.lib.ps.PartitionType;
 
 /** <pre> 
  * A partition is a string of bytes. It is a substring of some larger string of bytes (usually
@@ -32,11 +33,11 @@ import java.io.PrintStream;
 public interface Partition {
 
     // Just listing the partition types that come to mind...
-    public static enum PartitionType {
+    /*public static enum PartitionType {
 	APPLE_APM, APPLE_DRIVER, APPLE_DRIVER43, APPLE_MFS, APPLE_HFS, APPLE_HFSX, APPLE_UNIX_SVR2, APPLE_PRODOS, APPLE_FREE, APPLE_SCRATCH,  
 	    FAT12, FAT16, FAT32, NTFS, HPFS, DOS_EXTENDED,
 	    LINUX_SWAP, LINUX_NATIVE, XFS, ZFS,
-	    UNKNOWN };
+	    UNKNOWN };*/
     
     /** Returns the start offset in bytes. */
     public long getStartOffset();

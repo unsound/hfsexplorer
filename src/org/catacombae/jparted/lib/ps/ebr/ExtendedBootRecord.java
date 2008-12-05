@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.partitioning;
+package org.catacombae.jparted.lib.ps.ebr;
 
 import java.io.PrintStream;
-import java.util.LinkedList;
+//import java.util.LinkedList;
 import org.catacombae.hfsexplorer.Util;
 
 /**
@@ -27,6 +27,7 @@ import org.catacombae.hfsexplorer.Util;
  */
 public class ExtendedBootRecord {
     public static final short MBR_SIGNATURE = 0x55AA;
+    
     /*
      * struct ExtendedBootRecord
      * size: 512 bytes
@@ -54,34 +55,35 @@ public class ExtendedBootRecord {
     protected final byte[] reserved4 = new byte[32];
     protected final byte[] mbrSignature = new byte[2];
     
-    private final LinkedList<Partition> tempList = new LinkedList<Partition>(); // getUsedPartitionEntries()
+    //private final LinkedList<Partition> tempList = new LinkedList<Partition>(); // getUsedPartitionEntries()
     
     /** <code>data</code> is assumed to be at least (<code>offset</code>+512) bytes in length. */
-    public ExtendedBootRecord(byte[] data, int offset, long extendedPartitionOffset, int sectorSize) {
-	System.arraycopy(data, offset+0, reserved1, 0, reserved1.length);
-	System.arraycopy(data, offset+394, optIBMBootmgrEntry, 0, optIBMBootmgrEntry.length);
-	System.arraycopy(data, offset+403, reserved2, 0, reserved2.length);
-	System.arraycopy(data, offset+440, optDiskSignature, 0, optDiskSignature.length);
-	System.arraycopy(data, offset+444, reserved3, 0, reserved3.length);
-        firstEntry = new EBRPartition(data, offset+446, extendedPartitionOffset, sectorSize);
-        secondEntry = new EBRPartition(data, offset+462, extendedPartitionOffset, sectorSize);        
-	System.arraycopy(data, offset+478, reserved4, 0, reserved4.length);
-	System.arraycopy(data, offset+510, mbrSignature, 0, mbrSignature.length);
-	
-	if(!Util.arrayRegionsEqual(getBytes(), 0, getStructSize(), data, offset, getStructSize()))
-	    throw new RuntimeException("Internal error!");
+    public ExtendedBootRecord(byte[] data, int offset, long extendedPartitionOffset, long thisRecordOffset, int sectorSize) {
+        //System.err.println("ExtendedBootRecord...");
+        System.arraycopy(data, offset + 0, reserved1, 0, reserved1.length);
+        System.arraycopy(data, offset + 394, optIBMBootmgrEntry, 0, optIBMBootmgrEntry.length);
+        System.arraycopy(data, offset + 403, reserved2, 0, reserved2.length);
+        System.arraycopy(data, offset + 440, optDiskSignature, 0, optDiskSignature.length);
+        System.arraycopy(data, offset + 444, reserved3, 0, reserved3.length);
+        firstEntry = new EBRPartition(data, offset + 446, thisRecordOffset, sectorSize);
+        secondEntry = new EBRPartition(data, offset + 462, extendedPartitionOffset, sectorSize);
+        System.arraycopy(data, offset + 478, reserved4, 0, reserved4.length);
+        System.arraycopy(data, offset + 510, mbrSignature, 0, mbrSignature.length);
+
+        if(!Util.arrayRegionsEqual(getBytes(), 0, getStructSize(), data, offset, getStructSize()))
+            throw new RuntimeException("Internal error!");
     }
     
     public ExtendedBootRecord(ExtendedBootRecord source) {
-	System.arraycopy(source.reserved1, 0, reserved1, 0, reserved1.length);
-	System.arraycopy(source.optIBMBootmgrEntry, 0, optIBMBootmgrEntry, 0, optIBMBootmgrEntry.length);
-	System.arraycopy(source.reserved2, 0, reserved2, 0, reserved2.length);
-	System.arraycopy(source.optDiskSignature, 0, optDiskSignature, 0, optDiskSignature.length);
-	System.arraycopy(source.reserved3, 0, reserved3, 0, reserved3.length);
+        System.arraycopy(source.reserved1, 0, reserved1, 0, reserved1.length);
+        System.arraycopy(source.optIBMBootmgrEntry, 0, optIBMBootmgrEntry, 0, optIBMBootmgrEntry.length);
+        System.arraycopy(source.reserved2, 0, reserved2, 0, reserved2.length);
+        System.arraycopy(source.optDiskSignature, 0, optDiskSignature, 0, optDiskSignature.length);
+        System.arraycopy(source.reserved3, 0, reserved3, 0, reserved3.length);
         firstEntry = new EBRPartition(source.firstEntry);
         secondEntry = new EBRPartition(source.secondEntry);
-	System.arraycopy(source.reserved4, 0, reserved3, 0, reserved4.length);
-	System.arraycopy(source.mbrSignature, 0, mbrSignature, 0, mbrSignature.length);
+        System.arraycopy(source.reserved4, 0, reserved3, 0, reserved4.length);
+        System.arraycopy(source.mbrSignature, 0, mbrSignature, 0, mbrSignature.length);
     }
     
     public static int getStructSize() { return 512; }
@@ -99,7 +101,7 @@ public class ExtendedBootRecord {
     public short getMBRSignature() { return Util.readShortBE(mbrSignature); }
     
     public void printFields(PrintStream ps, String prefix) {
-	ps.println(prefix + " diskSignature: 0x" + Util.toHexStringBE(getOptionalDiskSignature()) + " (optional, and possibly incorrect)");
+        ps.println(prefix + " diskSignature: 0x" + Util.toHexStringBE(getOptionalDiskSignature()) + " (optional, and possibly incorrect)");
 
         ps.println(prefix + " firstEntry:");
         if(firstEntry.isValid()) {
@@ -108,7 +110,7 @@ public class ExtendedBootRecord {
         else {
             ps.println(prefix + "  [Invalid data]");
         }
-        
+
         ps.println(prefix + " secondEntry:");
         if(secondEntry.isValid()) {
             secondEntry.print(ps, prefix + "  ");
@@ -116,21 +118,21 @@ public class ExtendedBootRecord {
         else {
             ps.println(prefix + "  [Invalid data]");
         }
-        
+
         ps.println(prefix + " mbrSignature: 0x" + Util.toHexStringBE(getMBRSignature()));
     }
 
     public void print(PrintStream ps, String prefix) {
-	ps.println(prefix + this.getClass().getSimpleName() + ":");
-	printFields(ps, prefix);
+        ps.println(prefix + this.getClass().getSimpleName() + ":");
+        printFields(ps, prefix);
     }
-    
+
     public boolean isValid() {
-	return (getMBRSignature() == MBR_SIGNATURE) && isPartitionInfoValid();
-	// More validity contraints could be added later... like that the partitions should be in order and
-	// that their lengths should be non negative and stay within device borders...
+        // More validity contraints could be added later... like that the partitions should be in order and
+        // that their lengths should be non negative and stay within device borders...
+        return (getMBRSignature() == MBR_SIGNATURE) && isPartitionInfoValid();
     }
-    
+
     public boolean isPartitionInfoValid() {
         if(!firstEntry.isValid() || !secondEntry.isValid())
             return false;
@@ -138,26 +140,29 @@ public class ExtendedBootRecord {
             return true;
     }
     
-
     public byte[] getBytes() {
-	byte[] result = new byte[512];
+        byte[] result = new byte[512];
         byte[] curData;
-	int i = 0;
-	System.arraycopy(reserved1, 0, result, i, reserved1.length); i += reserved1.length;
-	System.arraycopy(optIBMBootmgrEntry, 0, result, i, optIBMBootmgrEntry.length); i += optIBMBootmgrEntry.length;
-	System.arraycopy(reserved2, 0, result, i, reserved2.length); i += reserved2.length;
-	System.arraycopy(optDiskSignature, 0, result, i, optDiskSignature.length); i += optDiskSignature.length;
+        int i = 0;
+        System.arraycopy(reserved1, 0, result, i, reserved1.length); i += reserved1.length;
+        System.arraycopy(optIBMBootmgrEntry, 0, result, i, optIBMBootmgrEntry.length); i += optIBMBootmgrEntry.length;
+        System.arraycopy(reserved2, 0, result, i, reserved2.length); i += reserved2.length;
+        System.arraycopy(optDiskSignature, 0, result, i, optDiskSignature.length); i += optDiskSignature.length;
         System.arraycopy(reserved3, 0, result, i, reserved3.length); i += reserved3.length;
-	curData = firstEntry.getBytes();
+        curData = firstEntry.getBytes();
         System.arraycopy(curData, 0, result, i, curData.length); i += curData.length;
         curData = secondEntry.getBytes();
         System.arraycopy(curData, 0, result, i, curData.length); i += curData.length;
-	System.arraycopy(reserved4, 0, result, i, reserved4.length); i += reserved4.length;
-	System.arraycopy(mbrSignature, 0, result, i, mbrSignature.length); i += mbrSignature.length;
-	
-	if(i != result.length)
-	    throw new RuntimeException("Internal error!");
-	return result;
+        System.arraycopy(reserved4, 0, result, i, reserved4.length); i += reserved4.length;
+        System.arraycopy(mbrSignature, 0, result, i, mbrSignature.length); i += mbrSignature.length;
+
+        if(i != result.length)
+            throw new RuntimeException("Internal error!");
+        return result;
+    }
+
+    public boolean isTerminator() {
+        return secondEntry.getLBAFirstSector() == 0 && secondEntry.getLBAPartitionLength() == 0;
     }
 
 }

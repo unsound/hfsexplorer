@@ -17,8 +17,12 @@
 
 package org.catacombae.jparted.lib.fs.hfsx;
 
-import org.catacombae.jparted.lib.fs.*;
 import org.catacombae.jparted.lib.DataLocator;
+import org.catacombae.jparted.lib.fs.DefaultFileSystemHandlerInfo;
+import org.catacombae.jparted.lib.fs.FileSystemHandler;
+import org.catacombae.jparted.lib.fs.FileSystemHandlerFactory;
+import org.catacombae.jparted.lib.fs.FileSystemHandlerInfo;
+import org.catacombae.jparted.lib.fs.FileSystemRecognizer;
 import org.catacombae.jparted.lib.fs.hfsplus.HFSPlusFileSystemHandlerFactory;
 
 /**
@@ -26,6 +30,8 @@ import org.catacombae.jparted.lib.fs.hfsplus.HFSPlusFileSystemHandlerFactory;
  * @author erik
  */
 public class HFSXFileSystemHandlerFactory extends HFSPlusFileSystemHandlerFactory {
+    private static final FileSystemRecognizer recognizer = new HFSXFileSystemRecognizer();
+
     private static final FileSystemHandlerInfo handlerInfo =
             new DefaultFileSystemHandlerInfo("HFSX file system handler", "1.0",
             0, "Erik Larsson, Catacombae Software");
@@ -44,5 +50,10 @@ public class HFSXFileSystemHandlerFactory extends HFSPlusFileSystemHandlerFactor
     @Override
     public FileSystemHandlerFactory newInstance() {
         return new HFSXFileSystemHandlerFactory();
+    }
+
+    @Override
+    public FileSystemRecognizer getRecognizer() {
+        return recognizer;
     }
 }

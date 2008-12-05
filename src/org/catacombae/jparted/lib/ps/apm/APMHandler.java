@@ -52,7 +52,7 @@ public class APMHandler extends PartitionSystemHandler {
                 apm.getUsedPartitionEntries();
         for(int i = 0; i < result.length; ++i) {
             result[i] = new StandardPartition(apmParts[i].getStartOffset(),
-                    apmParts[i].getLength(), convertType(apmParts[i].getType()).getGeneralType());
+                    apmParts[i].getLength(), apmParts[i].getType());
         }
         return result;
     }
@@ -62,6 +62,7 @@ public class APMHandler extends PartitionSystemHandler {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    /*
     private APMPartitionType convertType(org.catacombae.hfsexplorer.partitioning.Partition.PartitionType type) {
         switch(type) {
             case APPLE_APM:
@@ -88,10 +89,12 @@ public class APMHandler extends PartitionSystemHandler {
                 return null;
         }
     }
+    */
 
     private ApplePartitionMap readPartitionMap() {
+        ReadableRandomAccessStream llf = null;
         try {
-            ReadableRandomAccessStream llf = partitionData.createReadOnlyFile();
+            llf = partitionData.createReadOnlyFile();
             byte[] firstBlock = new byte[512];
             
             llf.readFully(firstBlock);
@@ -103,11 +106,17 @@ public class APMHandler extends PartitionSystemHandler {
                 //long numberOfBlocksOnDevice = Util.unsign(ddr.getSbBlkCount());
                 //bitStream.seek(blockSize*1); // second block, first partition in list
                 ApplePartitionMap apm = new ApplePartitionMap(llf, blockSize * 1, blockSize);
-                return apm;
+                if(apm.getPartitionCount() > 0)
+                    return apm;
+                else
+                    return null;
             }
-        } catch (Exception e) {
+            else
+                return null;
+        } finally {
+            if(llf != null)
+                llf.close();
         }
-        return null;
     }
 
 }

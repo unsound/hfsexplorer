@@ -16,62 +16,75 @@
  */
 
 package org.catacombae.hfsexplorer.testcode;
-import org.catacombae.hfsexplorer.*;
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+
+import java.awt.BorderLayout;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.TreeSet;
+import javax.swing.BoxLayout;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+import org.catacombae.hfsexplorer.UnicodeNormalizationToolkit;
+import org.catacombae.util.Util;
 
 public class VisualizeUnicodeNormalization extends JFrame {
+
     public VisualizeUnicodeNormalization() {
-	super("HFS+ Unicode Decomposition Table");
-	JPanel mainPanel = new JPanel();
-	JScrollPane mainPanelScroller = new JScrollPane(mainPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-	mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-	mainPanelScroller.getVerticalScrollBar().setUnitIncrement(20);
-	
-	UnicodeNormalizationToolkit unt = UnicodeNormalizationToolkit.getDefaultInstance();
-	Map<Character, char[]> table = unt.getDecompositionTable();
-	
-	StringBuilder sb = new StringBuilder();
-	Comparator<Map.Entry<Character, char[]>> cmp = new Comparator<Map.Entry<Character, char[]>>() {
-		public int compare(Map.Entry<Character, char[]> o1, Map.Entry<Character, char[]> o2) {
-		    return o1.getKey().compareTo(o2.getKey());
-		}
-		public boolean equals(Object obj) {
-		    return super.equals(obj);
-		}
-	    };
-	TreeSet<Map.Entry<Character, char[]>> ts = new TreeSet<Map.Entry<Character, char[]>>(cmp);
-	for(Map.Entry<Character, char[]> ent : table.entrySet())
-	    ts.add(ent);
-	//ts.addAll(table.entrySet());
-	for(Map.Entry<Character, char[]> ent : ts) {
-	    Character key = ent.getKey();
-	    char[] value = ent.getValue();
-	    sb.append(Util.toHexStringBE(key.charValue()));
-	    sb.append(": \" ");
-	    sb.append(key.toString());
-	    sb.append(" \" -> \" ");
-	    sb.append(value[0]);
-	    for(int i = 1; i < value.length; ++i) {
-		sb.append(" \", \" ");
-		sb.append(value[i]);
-	    }
-	    sb.append(" \"");
-	    JLabel cur = new JLabel(sb.toString());
-	    cur.setFont(new java.awt.Font("Monospaced", 0, 20));
-	    mainPanel.add(cur);
-	    sb.setLength(0);
-	}
-	
-	add(mainPanelScroller, BorderLayout.CENTER);
-	setDefaultCloseOperation(EXIT_ON_CLOSE);
-	pack();
-	setLocationRelativeTo(null);
+        super("HFS+ Unicode Decomposition Table");
+        JPanel mainPanel = new JPanel();
+        JScrollPane mainPanelScroller = new JScrollPane(mainPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanelScroller.getVerticalScrollBar().setUnitIncrement(20);
+
+        UnicodeNormalizationToolkit unt = UnicodeNormalizationToolkit.getDefaultInstance();
+        Map<Character, char[]> table = unt.getDecompositionTable();
+
+        StringBuilder sb = new StringBuilder();
+        Comparator<Map.Entry<Character, char[]>> cmp = new Comparator<Map.Entry<Character, char[]>>() {
+
+            public int compare(Map.Entry<Character, char[]> o1, Map.Entry<Character, char[]> o2) {
+                return o1.getKey().compareTo(o2.getKey());
+            }
+
+            @Override
+            public boolean equals(Object obj) {
+                return super.equals(obj);
+            }
+        };
+        TreeSet<Map.Entry<Character, char[]>> ts = new TreeSet<Map.Entry<Character, char[]>>(cmp);
+        for(Map.Entry<Character, char[]> ent : table.entrySet())
+            ts.add(ent);
+        //ts.addAll(table.entrySet());
+        for(Map.Entry<Character, char[]> ent : ts) {
+            Character key = ent.getKey();
+            char[] value = ent.getValue();
+            sb.append(Util.toHexStringBE(key.charValue()));
+            sb.append(": \" ");
+            sb.append(key.toString());
+            sb.append(" \" -> \" ");
+            sb.append(value[0]);
+            for(int i = 1; i < value.length; ++i) {
+                sb.append(" \", \" ");
+                sb.append(value[i]);
+            }
+            sb.append(" \"");
+            JLabel cur = new JLabel(sb.toString());
+            cur.setFont(new java.awt.Font("Monospaced", 0, 20));
+            mainPanel.add(cur);
+            sb.setLength(0);
+        }
+
+        add(mainPanelScroller, BorderLayout.CENTER);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        pack();
+        setLocationRelativeTo(null);
     }
+
     public static void main(String[] args) {
-	JFrame frame = new VisualizeUnicodeNormalization();
-	frame.setVisible(true);
+        JFrame frame = new VisualizeUnicodeNormalization();
+        frame.setVisible(true);
     }
 }

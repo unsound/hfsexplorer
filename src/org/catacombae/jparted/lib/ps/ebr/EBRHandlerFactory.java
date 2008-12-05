@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.ps.mbr;
+package org.catacombae.jparted.lib.ps.ebr;
 
 import org.catacombae.jparted.lib.DataLocator;
 import org.catacombae.jparted.lib.ps.PartitionSystemRecognizer;
@@ -27,19 +27,19 @@ import org.catacombae.jparted.lib.ps.PartitionSystemImplementationInfo;
  *
  * @author erik
  */
-public class MBRHandlerFactory extends PartitionSystemHandlerFactory {
+public class EBRHandlerFactory extends PartitionSystemHandlerFactory {
 
-    private static final MBRRecognizer recognizer = new MBRRecognizer();
+    private static final EBRRecognizer recognizer = new EBRRecognizer();
 
     @Override
     public PartitionSystemHandler createHandler(DataLocator data) {
-        return new MBRHandler(data);
+        return new EBRHandler(data);
     }
 
     @Override
     public PartitionSystemImplementationInfo getInfo() {
-        return new PartitionSystemImplementationInfo("Master Boot Record",
-                "Catacombae MBR PS Handler", "1.0", "Catacombae");
+        return new PartitionSystemImplementationInfo("Extended Boot Record",
+                "Catacombae EBR PS Handler", "1.0", "Catacombae");
     }
 
     @Override

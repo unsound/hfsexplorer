@@ -18,4 +18,11 @@
 package org.catacombae.hfsexplorer;
 
 public class Util extends org.catacombae.util.Util {
+    public static <A> boolean contains(A[] array, A element) {
+        for(A a : array) {
+            if(a == element)
+                return true;
+        }
+        return false;
+    }
 }
