@@ -35,6 +35,7 @@ public class EntryDescriptor {
      */
     
     public static final int STRUCTSIZE = 12;
+    private static final long MAX_UINT = 0xFFFFFFFFL;
     
     private final byte[] entryId = new byte[4];
     private final byte[] entryOffset = new byte[4];
@@ -44,6 +45,19 @@ public class EntryDescriptor {
 	System.arraycopy(data, offset+0, entryId, 0, 4);
 	System.arraycopy(data, offset+4, entryOffset, 0, 4);
 	System.arraycopy(data, offset+8, entryLength, 0, 4);
+    }
+
+    public EntryDescriptor(long entryId, long entryOffset, long entryLength) {
+        if(entryId < 0 || entryId > MAX_UINT)
+            throw new IllegalArgumentException("Illegal value for entryId (" + entryId + ")");
+        if(entryOffset < 0 || entryOffset > MAX_UINT)
+            throw new IllegalArgumentException("Illegal value for entryOffset (" + entryOffset + ")");
+        if(entryLength < 0 || entryLength > MAX_UINT)
+            throw new IllegalArgumentException("Illegal value for entryLength (" + entryLength + ")");
+
+        System.arraycopy(Util.toByteArrayBE((int)entryId), 0, this.entryId, 0, 4);
+        System.arraycopy(Util.toByteArrayBE((int)entryOffset), 0, this.entryOffset, 0, 4);
+        System.arraycopy(Util.toByteArrayBE((int)entryLength), 0, this.entryLength, 0, 4);
     }
     
     public static int length() { return STRUCTSIZE; }

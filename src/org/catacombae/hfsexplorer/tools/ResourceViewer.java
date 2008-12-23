@@ -29,6 +29,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import org.catacombae.hfsexplorer.GUIUtil;
 import org.catacombae.hfsexplorer.PrefixFileFilter;
@@ -99,6 +100,16 @@ public class ResourceViewer extends javax.swing.JFrame {
                 } catch(Exception e) {
                     System.err.println("Unhandled exception while detecting AppleSingle format:");
                     e.printStackTrace();
+                }
+            }
+            else {
+                int res = JOptionPane.showConfirmDialog(this, "Invalid AppleDouble file.\n" +
+                        "Do you want to attempt to load the file as raw resource fork data?",
+                        "Invalid file format", JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE);
+                if(res != JOptionPane.YES_OPTION) {
+                    fileStream.close();
+                    return;
                 }
             }
 
