@@ -88,6 +88,7 @@ import org.catacombae.hfsexplorer.ExtractProgressMonitor.DirectoryExistsAction;
 import org.catacombae.hfsexplorer.ExtractProgressMonitor.ExtractProperties;
 import org.catacombae.hfsexplorer.ExtractProgressMonitor.FileExistsAction;
 import org.catacombae.hfsexplorer.fs.AppleSingleBuilder;
+import org.catacombae.hfsexplorer.fs.AppleSingleBuilder.AppleSingleVersion;
 import org.catacombae.hfsexplorer.fs.AppleSingleBuilder.FileSystem;
 import org.catacombae.hfsexplorer.fs.AppleSingleBuilder.FileType;
 import org.catacombae.hfsexplorer.gui.ErrorSummaryPanel;
@@ -943,7 +944,8 @@ public class FileSystemBrowserWindow extends JFrame {
     private long extractResourceForkToAppleDoubleStream(FSFork resourceFork, OutputStream os, ProgressMonitor pm) throws IOException {
         ReadableRandomAccessStream in = null;
         try {
-            AppleSingleBuilder builder = new AppleSingleBuilder(FileType.APPLEDOUBLE, 2, FileSystem.MACOS_X);
+            AppleSingleBuilder builder = new AppleSingleBuilder(FileType.APPLEDOUBLE,
+                    AppleSingleVersion.VERSION_2_0, FileSystem.MACOS_X);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
             in = resourceFork.getReadableRandomAccessStream();

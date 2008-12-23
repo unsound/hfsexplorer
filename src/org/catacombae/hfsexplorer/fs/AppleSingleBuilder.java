@@ -18,6 +18,8 @@
 package org.catacombae.hfsexplorer.fs;
 
 import java.util.LinkedList;
+import org.catacombae.hfsexplorer.types.applesingle.AppleSingleHeader;
+import org.catacombae.hfsexplorer.types.applesingle.EntryDescriptor;
 import org.catacombae.util.Util.Pair;
 
 /**
@@ -56,6 +58,23 @@ public class AppleSingleBuilder {
         }
 
         public int getMagic() { return magic; }
+    }
+
+    public static enum AppleSingleVersion {
+        /** The AppleSingle format used in A/UX and possibly Mac OS Classic / early Mac OS X versions. */
+        VERSION_1_0(0x00010000),
+        /** The version used in Mac OS X Leopard and possibly earlier Mac OS X versions. */
+        VERSION_2_0(0x00020000);
+
+        private final int versionNumber;
+
+        private AppleSingleVersion(int versionNumber) {
+            this.versionNumber = versionNumber;
+        }
+
+        public int getVersionNumber() {
+            return versionNumber;
+        }
     }
     
     public static enum FileSystem {
@@ -104,12 +123,18 @@ public class AppleSingleBuilder {
         public int getTypeNumber() { return typeNumber; }
     }
 
-    private FileType fileType;
-    private int version;
-    private FileSystem homeFileSystem;
-    private LinkedList<Pair<EntryType, byte[]>> entryList = new LinkedList<Pair<EntryType, byte[]>>();
+    private final FileType fileType;
+    private final AppleSingleVersion version;
+    private final FileSystem homeFileSystem;
+    private final LinkedList<Pair<EntryType, byte[]>> entryList = new LinkedList<Pair<EntryType, byte[]>>();
 
-    public AppleSingleBuilder(FileType fileType, int version, FileSystem homeFileSystem) {
+    public AppleSingleBuilder(FileType fileType, AppleSingleVersion version, FileSystem homeFileSystem) {
+        if(fileType == null)
+            throw new IllegalArgumentException("fileType == null");
+        if(version == null)
+            throw new IllegalArgumentException("version == null");
+        if(homeFileSystem == null)
+            throw new IllegalArgumentException("homeFileSystem == null");
         this.fileType = fileType;
         this.version = version;
         this.homeFileSystem = homeFileSystem;
@@ -121,5 +146,57 @@ public class AppleSingleBuilder {
     
     public void addResourceFork(byte[] resourceForkData) {
         entryList.add(new Pair<EntryType, byte[]>(EntryType.RESOURCE_FORK, resourceForkData));
+    }
+
+    /**
+     * Serializes the current state of the builder into a valid AppleSingle data representation that
+     * can be written down to file.
+     *
+     * @return the data of an AppleSingle format file built from the current state of the builder.
+     */
+    public byte[] getResult() {
+        int dataSize = AppleSingleHeader.length();
+        dataSize += EntryDescriptor.length()*entryList.size();
+        int dataStartOffset = dataSize;
+        
+        for(Pair<EntryType, byte[]> p : entryList)
+            dataSize += p.getB().length;
+        
+
+        byte[] result = new byte[dataSize];
+        int pointer = 0;
+        {
+            AppleSingleHeader header = new AppleSingleHeader(fileType.getMagic(),
+                    version.getVersionNumber(), homeFileSystem, entryList.size());
+            byte[] headerData = header.getBytes();
+            System.arraycopy(headerData, 0, result, pointer, headerData.length);
+            pointer += headerData.length;
+        }
+        int dataOffset = dataStartOffset;
+        for(Pair<EntryType, byte[]> p : entryList) {
+            byte[] entryData = p.getB();
+            EntryDescriptor ed = new EntryDescriptor(p.getA().getTypeNumber(), dataOffset, entryData.length);
+            dataOffset += entryData.length;
+            
+            byte[] entryDescriptorData = ed.getBytes();
+            System.arraycopy(entryDescriptorData, 0, result, pointer, entryDescriptorData.length);
+            pointer += entryDescriptorData.length;
+        }
+
+        if(pointer != dataStartOffset)
+            throw new RuntimeException("Internal error: Miscalculation of dataStartOffset (should be: " +
+                    pointer + ", was: " + dataStartOffset + ")");
+
+        for(Pair<EntryType, byte[]> p : entryList) {
+            byte[] entryData = p.getB();
+            System.arraycopy(entryData, 0, result, pointer, entryData.length);
+            pointer += entryData.length;
+        }
+
+        if(pointer != result.length)
+            throw new RuntimeException("Internal error: Miscalculation of result.length (should be: " +
+                    pointer + ", was: " + result.length + ")");
+
+        return result;
     }
 }

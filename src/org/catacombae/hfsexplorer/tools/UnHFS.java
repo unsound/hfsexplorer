@@ -26,6 +26,7 @@ import org.catacombae.dmgextractor.encodings.encrypted.ReadableCEncryptedEncodin
 import org.catacombae.hfsexplorer.IOUtil;
 import org.catacombae.hfsexplorer.UDIFRecognizer;
 import org.catacombae.hfsexplorer.fs.AppleSingleBuilder;
+import org.catacombae.hfsexplorer.fs.AppleSingleBuilder.AppleSingleVersion;
 import org.catacombae.hfsexplorer.fs.AppleSingleBuilder.FileSystem;
 import org.catacombae.hfsexplorer.fs.AppleSingleBuilder.FileType;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
@@ -521,7 +522,8 @@ public class UnHFS {
         FileOutputStream os = null;
         ReadableRandomAccessStream in = null;
         try {
-            AppleSingleBuilder builder = new AppleSingleBuilder(FileType.APPLEDOUBLE, 2, FileSystem.MACOS_X);
+            AppleSingleBuilder builder = new AppleSingleBuilder(FileType.APPLEDOUBLE,
+                    AppleSingleVersion.VERSION_2_0, FileSystem.MACOS_X);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
             in = resourceFork.getReadableRandomAccessStream();
