@@ -49,6 +49,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -86,6 +87,9 @@ import org.catacombae.hfsexplorer.ExtractProgressMonitor.CreateFileFailedAction;
 import org.catacombae.hfsexplorer.ExtractProgressMonitor.DirectoryExistsAction;
 import org.catacombae.hfsexplorer.ExtractProgressMonitor.ExtractProperties;
 import org.catacombae.hfsexplorer.ExtractProgressMonitor.FileExistsAction;
+import org.catacombae.hfsexplorer.fs.AppleSingleBuilder;
+import org.catacombae.hfsexplorer.fs.AppleSingleBuilder.FileSystem;
+import org.catacombae.hfsexplorer.fs.AppleSingleBuilder.FileType;
 import org.catacombae.hfsexplorer.gui.ErrorSummaryPanel;
 import org.catacombae.hfsexplorer.gui.MemoryStatisticsPanel;
 import org.catacombae.jparted.lib.DataLocator;
@@ -934,6 +938,33 @@ public class FileSystemBrowserWindow extends JFrame {
             }
         }
         return originalLength - bytesToRead;
+    }
+
+    private long extractResourceForkToAppleDoubleStream(FSFork resourceFork, OutputStream os, ProgressMonitor pm) throws IOException {
+        ReadableRandomAccessStream in = null;
+        try {
+            AppleSingleBuilder builder = new AppleSingleBuilder(FileType.APPLEDOUBLE, 2, FileSystem.MACOS_X);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            in = resourceFork.getReadableRandomAccessStream();
+            long extractedBytes = IOUtil.streamCopy(in, baos, 128*1024);
+            if(extractedBytes != resourceFork.getLength()) {
+                System.err.println("WARNING: Did not extract intended number of bytes to resource " +
+                        "fork! Intended: " + resourceFork.getLength() +
+                        " Extracted: " + extractedBytes);
+            }
+
+            builder.addResourceFork(baos.toByteArray());
+
+            os.write(builder.getResult());
+            pm.addDataProgress(extractedBytes);
+            return extractedBytes;
+        } finally {
+            if(in != null) {
+                try { in.close(); }
+                catch(Exception e) {}
+            }
+        }
     }
 
     private void populateFilesystemGUI(FSFolder rootFolder) {
@@ -1872,7 +1903,10 @@ public class FileSystemBrowserWindow extends JFrame {
                     throw new FileNotFoundException();
                 }
                 FileOutputStream fos = new FileOutputStream(outFile);
-                extractForkToStream(theFork, fos, progressDialog);
+                if(forkType == FSForkType.MACOS_RESOURCE)
+                    extractResourceForkToAppleDoubleStream(theFork, fos, progressDialog);
+                else
+                    extractForkToStream(theFork, fos, progressDialog);
                 fos.close();
                 
                 if(curFileName != (Object) originalFileName && !curFileName.equals(originalFileName))
