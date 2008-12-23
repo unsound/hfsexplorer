@@ -2,7 +2,7 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "HFSExplorer"
-!define PRODUCT_VERSION "0.20.1"
+!define PRODUCT_VERSION "0.21"
 !define PRODUCT_PUBLISHER "Catacombae Software"
 !define PRODUCT_WEB_SITE "http://hem.bredband.net/catacombae/"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -124,6 +124,8 @@ Section "HFSExplorer" SEC01
   SetOutPath $INSTDIR
   CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\HFSExplorer.lnk" "$INSTDIR\hfsexplorer.exe"
   CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Run HFSExplorer in Administrator mode.lnk" "$INSTDIR\hfsexplorer.exe" "-invokeuac"
+  CreateDirectory "$SMPROGRAMS\$ICONS_GROUP\Tools"
+  CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Tools\Resource Viewer.lnk" "javaw.exe" "-cp lib\hfsx.jar org.catacombae.hfsexplorer.tools.ResourceViewer" "" "" "" "" "An application for displaying the contents of resource forks."
   SetOutPath -
   !insertmacro MUI_STARTMENU_WRITE_END
 SectionEnd
@@ -321,7 +323,7 @@ Section Uninstall
   Delete "$SMPROGRAMS\$ICONS_GROUP\Developer Web Site.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\HFSExplorer.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\Run HFSExplorer in Administrator mode.lnk"
-  RMDir "$SMPROGRAMS\$ICONS_GROUP"
+  RMDir /r "$SMPROGRAMS\$ICONS_GROUP"
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   SetAutoClose false
