@@ -17,12 +17,17 @@
 
 package org.catacombae.hfsexplorer.tools;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import org.catacombae.dmgextractor.encodings.encrypted.ReadableCEncryptedEncodingStream;
+import org.catacombae.hfsexplorer.IOUtil;
 import org.catacombae.hfsexplorer.UDIFRecognizer;
+import org.catacombae.hfsexplorer.fs.AppleSingleBuilder;
+import org.catacombae.hfsexplorer.fs.AppleSingleBuilder.FileSystem;
+import org.catacombae.hfsexplorer.fs.AppleSingleBuilder.FileType;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
 import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
@@ -77,14 +82,17 @@ public class UnHFS {
         ps.println("      should go.");
         ps.println("      When this option is omitted, all files go to the currect working");
         ps.println("      directory.");
-        ps.println("    -fsdir <dir to extract>");
-        ps.println("      A POSIX path in the HFS file system to the directory that should be");
-        ps.println("      extracted.");
+        ps.println("    -fsroot <path to extract>");
+        ps.println("      A POSIX path in the HFS file system that should be extracted.");
         ps.println("      Example which extracts all the contents of joe's user dir from a backup");
         ps.println("      disk image to the current directory:");
-        ps.println("        unhfs -o . -fsdir /Users/joe FullBackup.dmg");
+        ps.println("        unhfs -o . -fsroot /Users/joe FullBackup.dmg");
         ps.println("      When this option is omitted, all the contents of the file system is");
         ps.println("      extracted.");
+        ps.println("    -create");
+        ps.println("      If the -fsroot path refers to a folder, create that folder inside");
+        ps.println("      the output directory, rather than extracting into the output directory");
+        ps.println("      itself.");
         ps.println("    -resforks NONE|APPLEDOUBLE");
         ps.println("      Determines whether resource forks should be extracted, and in what");
         ps.println("      format. Currently only the APPLEDOUBLE format, which puts each resource");
@@ -113,7 +121,8 @@ public class UnHFS {
      */
     public static void main(String[] args) {
         String outputDirname = ".";
-        String fsDirectory = "/";
+        String fsRoot = "/";
+        boolean extractFolderDirectly = true;
         boolean extractResourceForks = false;
         boolean verbose = false;
         int partitionNumber = -1; // -1 means search for first supported partition
@@ -131,13 +140,16 @@ public class UnHFS {
                     System.exit(1);
                 }
             }
-            else if(curArg.equals("-fsdir")) {
+            else if(curArg.equals("-fsroot")) {
                 if(i+1 < args.length)
-                    fsDirectory = args[++i];
+                    fsRoot = args[++i];
                 else {
                     printUsage(System.err);
                     System.exit(1);
                 }
+            }
+            else if(curArg.equals("-create")) {
+            	extractFolderDirectly = false;
             }
             else if(curArg.equals("-resforks")) {
                 if(i+1 < args.length) {
@@ -223,8 +235,8 @@ public class UnHFS {
             inputStream = new ReadableFileStream(inputFilename);
 
         try {
-            unhfs(System.out, inputStream, outputDir, fsDirectory, password,
-                    extractResourceForks, partitionNumber, verbose);
+            unhfs(System.out, inputStream, outputDir, fsRoot, password,
+                    extractFolderDirectly, extractResourceForks, partitionNumber, verbose);
             System.exit(0);
         } catch(RuntimeIOException e) {
             System.err.println("Exception while executing main routine:");
@@ -232,7 +244,7 @@ public class UnHFS {
             System.exit(1);
         }
     }
-    
+
     /**
      * The main routine in the program, which gets invoked after arguments
      * parsing is complete. The routine expects all arguments to be fully parsed
@@ -242,8 +254,9 @@ public class UnHFS {
      * (should normally be System.out).
      * @param inFileStream the stream containing the file system data.
      * @param outputDir
-     * @param fsDirectory
+     * @param fsRoot
      * @param password the password used to unlock an encrypted image.
+     * @param extractFolderDirectly if fsRoot is a folder, extract directly into outputDir?
      * @param extractResourceForks
      * @param partitionNumber
      * @param verbose
@@ -251,8 +264,9 @@ public class UnHFS {
      */
     public static void unhfs(PrintStream outputStream,
             ReadableRandomAccessStream inFileStream, File outputDir,
-            String fsDirectory, char[] password, boolean extractResourceForks,
-            int partitionNumber, boolean verbose) throws RuntimeIOException {
+            String fsRoot, char[] password, boolean extractFolderDirectly,
+            boolean extractResourceForks, int partitionNumber, boolean verbose)
+    		throws RuntimeIOException {
 
         // First detect any outer layers of UDIF and/or encryption.
         logDebug("Trying to detect encrypted structure...");
@@ -292,8 +306,6 @@ public class UnHFS {
         PartitionSystemType[] psTypes =
                 PartitionSystemDetector.detectPartitionSystem(inputDataLocator);
         if(psTypes.length >= 1) {
-
-
 
             outer:
             for(PartitionSystemType chosenType : psTypes) {
@@ -375,66 +387,103 @@ public class UnHFS {
 
         FileSystemHandler fsHandler = fact.createHandler(inputDataLocator);
 
-        logDebug("Getting entry by posix path: \"" + fsDirectory + "\"");
-        FSEntry entry = fsHandler.getEntryByPosixPath(fsDirectory);
+        logDebug("Getting entry by posix path: \"" + fsRoot + "\"");
+        FSEntry entry = fsHandler.getEntryByPosixPath(fsRoot);
         if(entry instanceof FSFolder) {
-            extractContents((FSFolder)entry, outputDir, extractResourceForks, verbose);
+            FSFolder folder = (FSFolder)entry;
+			File dirForFolder;
+            String folderName = folder.getName();
+			if(extractFolderDirectly || folderName.equals("/") || folderName.length() == 0) {
+    			dirForFolder = outputDir;
+            }
+            else {
+            	dirForFolder = getFileForFolder(outputDir, folder, verbose);
+            }
+			if(dirForFolder != null) {
+				extractFolder(folder, dirForFolder, extractResourceForks, verbose);
+			}
+        }
+        else if(entry instanceof FSFile) {
+        	FSFile file = (FSFile)entry;
+        	extractFile(file, outputDir, extractResourceForks, verbose);
         }
         else {
-            System.err.println("Requested path is not a folder!");
+            System.err.println("Requested path is not a folder or a file!");
             System.exit(1);
         }
     }
 
-    private static void extractContents(FSFolder folder, File targetDir,
+    private static void extractFolder(FSFolder folder, File targetDir,
             boolean extractResourceForks, boolean verbose) {
+    	boolean wasEmpty = targetDir.list().length == 0;
         for(FSEntry e : folder.listEntries()) {
             if(e instanceof FSFile) {
                 FSFile file = (FSFile)e;
-                File dataFile = new File(targetDir, scrub(file.getName()));
-                if(!extractForkToFile(file.getMainFork(), dataFile)) {
-                    System.err.println("Failed to extract data " +
-                            "fork to " + dataFile.getPath());
-                }
-                else if(verbose) {
-                    System.out.println(dataFile.getPath());
-                }
-
-                if(extractResourceForks) {
-                    FSFork resourceFork = file.getForkByType(FSForkType.MACOS_RESOURCE);
-                    if(resourceFork.getLength() > 0) {
-                        File resFile = new File(targetDir, "._" + scrub(file.getName()));
-                        if(!extractForkToFile(resourceFork, resFile)) {
-                            System.err.println("Failed to extract resource " +
-                                    "fork to " + resFile.getPath());
-                        }
-                        else if(verbose) {
-                            System.out.println(resFile.getPath());
-                        }
-                    }
-                }
+				extractFile(file, targetDir, extractResourceForks, verbose);
             }
             else if(e instanceof FSFolder) {
                 FSFolder subFolder = (FSFolder)e;
-                File subFolderFile = new File(targetDir, scrub(subFolder.getName()));
-                if(subFolderFile.exists() || subFolderFile.mkdir()) {
-                    if(verbose)
-                        System.out.println(subFolderFile.getPath());
-                    
-                    extractContents(subFolder, subFolderFile, extractResourceForks, verbose);
-                }
-                else {
-                    System.err.println("Failed to create directory " +
-                            subFolderFile.getPath());
+                File subFolderFile = getFileForFolder(targetDir, subFolder, verbose);
+                if(subFolderFile != null) {
+                    extractFolder(subFolder, subFolderFile, extractResourceForks, verbose);
                 }
             }
             else if(e instanceof FSLink) {
                 // We don't currently handle links.
             }
         }
+        if(wasEmpty) {
+			long lastModified = folder.getAttributes().getModifyDate().getTime();
+			targetDir.setLastModified(lastModified);
+        }
     }
 
-    private static boolean extractForkToFile(FSFork fork, File targetFile) throws RuntimeIOException {
+	private static void extractFile(FSFile file, File targetDir,
+			boolean extractResourceForks, boolean verbose)
+			throws RuntimeIOException {
+		long lastModified = file.getAttributes().getModifyDate().getTime();
+		File dataFile = new File(targetDir, scrub(file.getName()));
+		if(!extractRawForkToFile(file.getMainFork(), dataFile)) {
+		    System.err.println("Failed to extract data " +
+		            "fork to " + dataFile.getPath());
+		}
+		else if(verbose) {
+		    System.out.println(dataFile.getPath());
+		}
+		dataFile.setLastModified(lastModified);
+		if(extractResourceForks) {
+		    FSFork resourceFork = file.getForkByType(FSForkType.MACOS_RESOURCE);
+
+		    if(resourceFork.getLength() > 0) {
+		        File resFile = new File(targetDir, "._" + scrub(file.getName()));
+		        if(!extractResourceForkToAppleDoubleFile(resourceFork, resFile)) {
+		            System.err.println("Failed to extract resource " +
+		                    "fork to " + resFile.getPath());
+		        }
+		        else if(verbose) {
+		            System.out.println(resFile.getPath());
+		        }
+		        resFile.setLastModified(lastModified);
+		    }
+		}
+	}
+
+	private static File getFileForFolder(File targetDir, FSFolder folder,
+			boolean verbose) {
+		File folderFile = new File(targetDir, scrub(folder.getName()));
+		if(folderFile.isDirectory() || folderFile.mkdir()) {
+		    if(verbose)
+		        System.out.println(folderFile.getPath());
+		}
+		else {
+		    System.err.println("Failed to create directory " +
+		            folderFile.getPath());
+		    folderFile = null;
+		}
+		return folderFile;
+	}
+
+    private static boolean extractRawForkToFile(FSFork fork, File targetFile) throws RuntimeIOException {
         FileOutputStream os = null;
         ReadableRandomAccessStream in = null;
 
@@ -443,15 +492,55 @@ public class UnHFS {
             
             in = fork.getReadableRandomAccessStream();
             
-            byte[] buffer = new byte[128*1024];
-            int bytesRead;
-            while((bytesRead = in.read(buffer)) > 0) {
-                os.write(buffer, 0, bytesRead);
+            long extractedBytes = IOUtil.streamCopy(in, os, 128*1024);
+            if(extractedBytes != fork.getLength()) {
+                System.err.println("WARNING: Did not extract intended number of bytes to \"" +
+                        targetFile.getPath() + "\"! Intended: " + fork.getLength() +
+                        " Extracted: " + extractedBytes);
             }
+            
             return true;
         } catch(FileNotFoundException fnfe) {
             return false;
         } catch(Exception ioe) {
+            return false;
+            //throw new RuntimeIOException(ioe);
+        } finally {
+            if(os != null) {
+                try { os.close(); }
+                catch(Exception e) {}
+            }
+            if(in != null) {
+                try { in.close(); }
+                catch(Exception e) {}
+            }
+        }
+    }
+
+    private static boolean extractResourceForkToAppleDoubleFile(FSFork resourceFork, File targetFile) {
+        FileOutputStream os = null;
+        ReadableRandomAccessStream in = null;
+        try {
+            AppleSingleBuilder builder = new AppleSingleBuilder(FileType.APPLEDOUBLE, 2, FileSystem.MACOS_X);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            in = resourceFork.getReadableRandomAccessStream();
+            long extractedBytes = IOUtil.streamCopy(in, baos, 128*1024);
+            if(extractedBytes != resourceFork.getLength()) {
+                System.err.println("WARNING: Did not extract intended number of bytes to \"" +
+                        targetFile.getPath() + "\"! Intended: " + resourceFork.getLength() +
+                        " Extracted: " + extractedBytes);
+            }
+
+            builder.addResourceFork(baos.toByteArray());
+
+            os = new FileOutputStream(targetFile);
+            os.write(builder.getResult());
+            return true;
+        } catch(FileNotFoundException fnfe) {
+            return false;
+        } catch(Exception ioe) {
+            ioe.printStackTrace();
             return false;
             //throw new RuntimeIOException(ioe);
         } finally {
