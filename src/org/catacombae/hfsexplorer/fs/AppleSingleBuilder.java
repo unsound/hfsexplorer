@@ -48,8 +48,20 @@ public class AppleSingleBuilder {
      * -------------------------------|
      */
 
+    /**
+     * Type enumerating all valid file types for an AppleSingle file.
+     */
     public static enum FileType {
-        APPLESINGLE(0x00051600), APPLEDOUBLE(0x00051607);
+        /**
+         * Indicates an AppleSingle file, containing both a data fork and a resource fork (and
+         * optionally other attributes).
+         */
+        APPLESINGLE(0x00051600),
+        /**
+         * Indicates an AppleDouble file, containing only a resource fork (and optionally other
+         * attributes). The same file format (AppleSingle) is used, but the data fork is omitted.
+         */
+        APPLEDOUBLE(0x00051607);
 
         private final int magic;
 
@@ -57,6 +69,10 @@ public class AppleSingleBuilder {
             this.magic = magic;
         }
 
+        /**
+         * Returns the magic number associated with this file type.
+         * @return the magic number associated with this file type.
+         */
         public int getMagic() { return magic; }
     }
 
