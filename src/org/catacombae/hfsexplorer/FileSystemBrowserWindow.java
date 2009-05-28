@@ -1911,6 +1911,9 @@ public class FileSystemBrowserWindow extends JFrame {
                     extractForkToStream(theFork, fos, progressDialog);
                 fos.close();
                 
+                if(rec.getAttributes().hasModifyDate())
+                    outFile.setLastModified(rec.getAttributes().getModifyDate().getTime());
+                
                 if(curFileName != (Object) originalFileName && !curFileName.equals(originalFileName))
                     errorMessages.addLast("File \"" + originalFileName +
                             "\" was renamed to \"" + curFileName + "\" in parent folder \"" +
