@@ -24,31 +24,60 @@ package org.catacombae.jparted.lib.fs;
  * @author Erik Larsson
  */
 public class DefaultFileSystemHandlerInfo implements FileSystemHandlerInfo {
+    private final String handlerIdentifier;
     private final String handlerName;
     private final String handlerVersion;
     private final long revision;
     private final String author;
 
-    public DefaultFileSystemHandlerInfo(String iHandlerName, String iHandlerVersion,
-            long iRevision, String iAuthor) {
+    /**
+     * 
+     * @param iHandlerIdentifier a unique identifier for this file system handler.
+     * @param iHandlerName the handler name.
+     * @param iHandlerVersion a free-form user readable version string for this handler.
+     * @param iRevision the revision number of this release of the handler.
+     * @param iAuthor the author of the handler.s
+     */
+    public DefaultFileSystemHandlerInfo(String iHandlerIdentifier, String iHandlerName,
+            String iHandlerVersion, long iRevision, String iAuthor) {
+        this.handlerIdentifier = iHandlerIdentifier;
         this.handlerName = iHandlerName;
         this.handlerVersion = iHandlerVersion;
         this.revision = iRevision;
         this.author = iAuthor;
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String getHandlerIdentifier() {
+        return handlerIdentifier;
+    }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getHandlerName() {
         return handlerName;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getHandlerVersion() {
         return handlerVersion;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public long getRevision() {
         return revision;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getAuthor() {
         return author;
     }
