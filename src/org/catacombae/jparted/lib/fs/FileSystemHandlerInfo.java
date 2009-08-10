@@ -20,11 +20,45 @@ package org.catacombae.jparted.lib.fs;
 /**
  * Contains information about a specific implementation of a file system
  * handler.
- * @author erik
+ * 
+ * @author Erik Larsson
  */
 public interface FileSystemHandlerInfo {
+    /**
+     * Returns the handler name. This is the name of the handler, and not
+     * necessarily the name of the file system itself. If a NTFS file system
+     * handler is called "NTFS-3G", the handler name should be "NTFS-3G".
+     *
+     * @return the handler name;
+     */
     public String getHandlerName();
+
+    /**
+     * Returns a unique identifier for this file system handler. This identifier
+     * should be in reverse-DNS form, just like the naming of java packages.
+     * An example could be: "com.yourcompany.our_filesystem_handler". <br/>
+     * The identifier should be chosen wisely and retained through the entire
+     * lifecycle of the handler.
+     *
+     * @return a unique identifier for this file system handler.
+     */
+    public String getHandlerIdentifier();
+
+    /**
+     * Returns a free-form user readable version string for this handler.
+     * @return a free-form user readable version string for this handler.
+     */
     public String getHandlerVersion();
+
+    /**
+     * Returns the revision number of this release of the handler (striclty
+     * increasing).<br/>
+     * The revision number should be increased for every release of the file
+     * system handler. One should be able to tell a newer version from an older
+     * version by comparing revision numbers.
+     *
+     * @return the revision number of this release of the handler.
+     */
     public long getRevision();
     public String getAuthor();
 }

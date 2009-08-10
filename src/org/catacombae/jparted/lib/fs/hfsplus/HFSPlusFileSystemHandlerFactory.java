@@ -39,8 +39,8 @@ public class HFSPlusFileSystemHandlerFactory extends FileSystemHandlerFactory {
     private static final FileSystemRecognizer recognizer = new HFSPlusFileSystemRecognizer();
 
     private static final FileSystemHandlerInfo handlerInfo =
-            new DefaultFileSystemHandlerInfo("HFS+ file system handler", "1.0",
-            0, "Erik Larsson, Catacombae Software");
+            new DefaultFileSystemHandlerInfo("org.catacombae.hfs_plus_handler",
+            "HFS+ file system handler", "1.0", 0, "Erik Larsson, Catacombae Software");
             
             
     private static final CustomAttribute compositionEnabledAttribute =

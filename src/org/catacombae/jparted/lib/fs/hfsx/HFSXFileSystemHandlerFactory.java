@@ -33,8 +33,8 @@ public class HFSXFileSystemHandlerFactory extends HFSPlusFileSystemHandlerFactor
     private static final FileSystemRecognizer recognizer = new HFSXFileSystemRecognizer();
 
     private static final FileSystemHandlerInfo handlerInfo =
-            new DefaultFileSystemHandlerInfo("HFSX file system handler", "1.0",
-            0, "Erik Larsson, Catacombae Software");
+            new DefaultFileSystemHandlerInfo("org.catacombae.hfsx_handler",
+            "HFSX file system handler", "1.0", 0, "Erik Larsson, Catacombae Software");
     
     @Override
     protected FileSystemHandler createHandlerInternal(DataLocator data,
