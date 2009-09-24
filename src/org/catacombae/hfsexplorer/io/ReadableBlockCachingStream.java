@@ -221,12 +221,16 @@ public class ReadableBlockCachingStream extends ReadableFilterStream {
 	    // Read data from backing store
 	    long blockPos = blockNumber*blockSize;
 	    long remainingSize = length()-blockPos;
-	    int dataSize = (int)(remainingSize < blockSize ? remainingSize : blockSize);
+	    long dataSize = remainingSize < blockSize ? remainingSize : blockSize;
 	    byte[] data;
 	    if(recoveredData != null && dataSize == recoveredData.length)
 		data = recoveredData;
-	    else // Will only happen if (1) cache isn't full or (2) if we are dealing with the last block
-		data = new byte[dataSize <= 0?blockSize:dataSize]; // TODO: Investigate the effect of this approach (setting the array size to blockSize for all block in -1 virtualLength streams).
+	    else { // Will only happen if (1) cache isn't full or (2) if we are dealing with the last block
+                int size = (int)(dataSize <= 0 ? blockSize : dataSize);
+                
+                // TODO: Investigate the effect of this approach (setting the array size to blockSize for all block in -1 virtualLength streams).
+		data = new byte[size];
+            }
 	    //System.err.println("  Seeking to " + blockPos + " (block number: " + blockNumber + ", blockSize: " + blockSize + ", data.length: " + data.length + ")");
 	    backingStore.seek(blockPos);
 	    backingStore.read(data, 0, data.length);

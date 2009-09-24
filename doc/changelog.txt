@@ -2,6 +2,12 @@ HFSExplorer Changelog
 ---------------------
 
 
+current
+-------
+- Bugfix: int overflow bug in caching layer led to OutOfMemoryError in
+  certain situations when reading large disks.
+
+
 0.21
 ----
 - Feature: New command line utility unhfs added which makes it possible to extract the
