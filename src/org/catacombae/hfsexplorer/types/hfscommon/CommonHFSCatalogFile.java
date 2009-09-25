@@ -43,6 +43,10 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
     public abstract boolean isSymbolicLink();
 
     public abstract int getHardLinkInode();
+
+    public CommonHFSCatalogNodeID getCatalogNodeID() {
+        return getFileID();
+    }
     
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + CommonHFSCatalogFile.class.getSimpleName() + ":");

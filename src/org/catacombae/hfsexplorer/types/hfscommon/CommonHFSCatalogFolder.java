@@ -50,6 +50,10 @@ public abstract class CommonHFSCatalogFolder implements CommonHFSCatalogAttribut
 
     public abstract byte[] getBytes();
     
+    public CommonHFSCatalogNodeID getCatalogNodeID() {
+        return getFolderID();
+    }
+
     @Override
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + CommonHFSCatalogFolder.class.getSimpleName() + ":");

@@ -31,6 +31,11 @@ import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusBSDInfo;
  * @author Erik Larsson
  */
 public interface CommonHFSCatalogAttributes {
+    /**
+     * Returns the associated Catalog Node ID (File ID or Folder ID).
+     * @return the associated Catalog Node ID (File ID or Folder ID).
+     */
+    public CommonHFSCatalogNodeID getCatalogNodeID();
     public short getRecordType();
     public short getFlags();
     public int getCreateDate();
