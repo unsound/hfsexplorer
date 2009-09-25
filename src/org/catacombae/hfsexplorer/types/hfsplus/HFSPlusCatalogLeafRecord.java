@@ -49,7 +49,7 @@ public class HFSPlusCatalogLeafRecord {
 	else if(recordType == HFS_PLUS_FILE_THREAD_RECORD)
 	    recordData = new HFSPlusCatalogThread(data, offset+key.length());
 	else
-	    throw new RuntimeException("Ivalid record type!");
+	    throw new RuntimeException("Invalid record type!");
     }
     
     public HFSPlusCatalogKey getKey() { return key; }
