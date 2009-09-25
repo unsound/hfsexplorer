@@ -31,14 +31,17 @@ import javax.swing.JPanel;
  * @author erik
  */
 public class MainWindow extends JFrame {
+    
+    private static final String BASE_TITLE = "jParted";
+    
     private JMenuItem loadFileItem;
+    private JMenuItem loadPathItem;
     private JMenuItem exitItem;
     private JMenuItem aboutItem;
     private JPanel mainPanel;
-
     
     public MainWindow(JPanel mainPanel) {
-        super("jParted");
+        super(BASE_TITLE);
         this.mainPanel = mainPanel;
         
         this.setLayout(new BorderLayout());
@@ -60,12 +63,20 @@ public class MainWindow extends JFrame {
         setAbstractButtonListener(loadFileItem, listener);
     }
     
+    public void setLoadPathItemListener(ActionListener listener) {
+        setAbstractButtonListener(loadPathItem, listener);
+    }
+
     public void setExitItemListener(ActionListener listener) {
         setAbstractButtonListener(exitItem, listener);
     }
 
     public void setAboutItemListener(ActionListener listener) {
         setAbstractButtonListener(aboutItem, listener);
+    }
+
+    public void setCurrentFilename(String filename) {
+        setTitle(MainWindow.BASE_TITLE + " - [" + filename + "]");
     }
     
     private void setupMenus() {
@@ -75,6 +86,8 @@ public class MainWindow extends JFrame {
         // File menu items        
         loadFileItem = new JMenuItem("Load from file...");
         fileMenu.add(loadFileItem);
+        loadPathItem = new JMenuItem("Load from path...");
+        fileMenu.add(loadPathItem);
         exitItem = new JMenuItem("Quit");
         fileMenu.add(exitItem);
         

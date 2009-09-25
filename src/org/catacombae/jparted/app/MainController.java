@@ -26,12 +26,14 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.catacombae.io.ReadableRandomAccessStream;
+import org.catacombae.jparted.lib.DataLocator;
 import org.catacombae.jparted.lib.ps.PartitionSystemType;
 import org.catacombae.jparted.lib.RandomAccessFileDataLocator;
 import org.catacombae.jparted.lib.ps.Partition;
 import org.catacombae.jparted.lib.ps.PartitionSystemRecognizer;
 import org.catacombae.jparted.lib.ps.PartitionSystemHandler;
 import org.catacombae.jparted.lib.ps.PartitionSystemHandlerFactory;
+import org.catacombae.jparted.lib.ps.apm.APMPartition;
 
 /**
  *
@@ -50,6 +52,7 @@ public class MainController {
         this.mainWindow = new MainWindow(this.mainPanel);
         
         mainWindow.setLoadFileItemListener(new LoadFileItemListener());
+        mainWindow.setLoadPathItemListener(new LoadPathItemListener());
         mainWindow.setExitItemListener(new ExitItemListener());
         mainWindow.setAboutItemListener(new AboutItemListener());
         mainPanel.setPartitionSystemsBoxListener(new PartitionSystemsBoxListener());
@@ -74,7 +77,66 @@ public class MainController {
         mainWindow.setVisible(false);
         System.exit(0);
     }
-    
+
+    private void loadPartitionSystem(DataLocator loc) {
+
+        Vector<PartitionSystemHandler> detectedPartitionSystems =
+                new Vector<PartitionSystemHandler>();
+        Vector<String> detectedPartitionSystemDescriptions = new Vector<String>();
+        for (PartitionSystemType curType : PartitionSystemType.values()) {
+            if (curType.isTopLevelCapable()) {
+                PartitionSystemHandlerFactory fac =
+                        curType.createDefaultHandlerFactory();
+                if (fac != null) {
+                    PartitionSystemRecognizer recognizer =
+                            fac.getRecognizer();
+                    ReadableRandomAccessStream stream = loc.createReadOnlyFile();
+                    long streamLength = -1;
+                    try {
+                        streamLength = stream.length();
+                    } catch (Exception e) {
+                    }
+                    //fac.createDetector(loc);
+                    if (recognizer.detect(stream, 0, streamLength)) {
+                        PartitionSystemHandler handler = fac.createHandler(loc);
+                        detectedPartitionSystems.add(fac.createHandler(loc));
+                        detectedPartitionSystemDescriptions.add(
+                                fac.getInfo().getPartitionSystemName() +
+                                " (" + handler.getPartitionCount() +
+                                " partitions)");
+                    }
+                }
+            }
+        }
+
+        if (detectedPartitionSystemDescriptions.size() > 0) {
+            mainPanel.setPartitionSystemsBoxEnabled(true);
+            mainPanel.setPartitionSystemsBoxContents(detectedPartitionSystemDescriptions);
+        } else {
+            mainPanel.setPartitionSystemsBoxEnabled(false);
+        }
+
+        mainPanel.clearPartitionList();
+        if (detectedPartitionSystems.size() > 0) {
+            PartitionSystemHandler handler = detectedPartitionSystems.get(0);
+            Partition[] partitions = handler.getPartitions();
+            int i = 0;
+            for (Partition p : partitions) {
+                String name = "";
+                if(p instanceof APMPartition)
+                    name = ((APMPartition)p).getName();
+                
+                mainPanel.addPartition("" + ((i++) + 1), p.getType().toString(),
+                        name, "" + p.getStartOffset(),
+                        (p.getStartOffset() + p.getLength()) + "");
+            }
+        } else {
+            JOptionPane.showMessageDialog(mainPanel,
+                    "No partition systems found.", "Info",
+                    JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
     private class LoadFileItemListener implements ActionListener {
         public void actionPerformed(ActionEvent evt) {
             JFileChooser fileChooser = new JFileChooser();
@@ -82,59 +144,42 @@ public class MainController {
             fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
             if(fileChooser.showOpenDialog(mainPanel) == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fileChooser.getSelectedFile();
+
+                mainWindow.setCurrentFilename(selectedFile.getPath());
+
                 RandomAccessFileDataLocator loc =
                         new RandomAccessFileDataLocator(selectedFile);
-                
-                
-                Vector<PartitionSystemHandler> detectedPartitionSystems =
-                        new Vector<PartitionSystemHandler>();
-                Vector<String> detectedPartitionSystemDescriptions = new Vector<String>();
-                for(PartitionSystemType curType : PartitionSystemType.values()) {
-                    if(curType.isTopLevelCapable()) {
-                        PartitionSystemHandlerFactory fac =
-                                curType.createDefaultHandlerFactory();
-                        if(fac != null) {
-                            PartitionSystemRecognizer recognizer =
-                                    fac.getRecognizer();
-                            ReadableRandomAccessStream stream = loc.createReadOnlyFile();
-                            long streamLength = -1;
-                            try {
-                                streamLength = stream.length();
-                            } catch(Exception e) {}
-                                    //fac.createDetector(loc);
-                            if(recognizer.detect(stream, 0, streamLength)) {
-                                PartitionSystemHandler handler = fac.createHandler(loc);
-                                detectedPartitionSystems.add(fac.createHandler(loc));
-                                detectedPartitionSystemDescriptions.add(fac.getInfo().getPartitionSystemName() +
-                                        " (" + handler.getPartitionCount() + " partitions)");
-                            }
-                        }
-                    }
-                }
-                
-                if(detectedPartitionSystemDescriptions.size() > 0) {
-                    mainPanel.setPartitionSystemsBoxEnabled(true);
-                    mainPanel.setPartitionSystemsBoxContents(detectedPartitionSystemDescriptions);
-                }
-                else
-                    mainPanel.setPartitionSystemsBoxEnabled(false);
 
-                mainPanel.clearPartitionList();
-                if(detectedPartitionSystems.size() > 0) {
-                    PartitionSystemHandler handler = detectedPartitionSystems.get(0);
-                    Partition[] partitions = handler.getPartitions();
-                    int i = 0;
-                    for(Partition p : partitions) {
-                        mainPanel.addPartition("" + ((i++) + 1), p.getType().toString(), "", ""+p.getStartOffset(), (p.getStartOffset()+p.getLength())+"");
-                    }
-                }
-                else
-                    JOptionPane.showMessageDialog(mainPanel,
-                            "No partition systems found.", "Info",
-                            JOptionPane.INFORMATION_MESSAGE);
+                loadPartitionSystem(loc);
             }
         }
     }
+
+    private class LoadPathItemListener implements ActionListener {
+        public void actionPerformed(ActionEvent evt) {
+            String path = JOptionPane.showInputDialog(mainPanel, "Path:",
+                    "Enter path to partition system",
+                    JOptionPane.PLAIN_MESSAGE);
+            if(path != null) {
+                File selectedFile = new File(path);
+                if(!selectedFile.exists())
+                    JOptionPane.showMessageDialog(mainPanel, "Path:\n    " +
+                            path + "\ndoes not seem to exist.");
+                else if(!selectedFile.canRead())
+                    JOptionPane.showMessageDialog(mainPanel, "Can not read:\n" +
+                            "    " + path);
+                else {
+                    mainWindow.setCurrentFilename(selectedFile.getPath());
+                    
+                    RandomAccessFileDataLocator loc =
+                            new RandomAccessFileDataLocator(selectedFile);
+
+                    loadPartitionSystem(loc);
+                }
+            }
+        }
+    }
+
     private class ExitItemListener implements ActionListener {
         public void actionPerformed(ActionEvent evt) {
             exitProgram();

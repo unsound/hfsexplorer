@@ -51,8 +51,14 @@ public class APMHandler extends PartitionSystemHandler {
         org.catacombae.hfsexplorer.partitioning.Partition[] apmParts =
                 apm.getUsedPartitionEntries();
         for(int i = 0; i < result.length; ++i) {
-            result[i] = new StandardPartition(apmParts[i].getStartOffset(),
-                    apmParts[i].getLength(), apmParts[i].getType());
+            org.catacombae.hfsexplorer.partitioning.Partition p = apmParts[i];
+            if(p instanceof org.catacombae.hfsexplorer.partitioning.APMPartition) {
+                org.catacombae.hfsexplorer.partitioning.APMPartition ap =
+                        (org.catacombae.hfsexplorer.partitioning.APMPartition)p;
+                
+                result[i] = new APMPartition(p.getStartOffset(),
+                        p.getLength(), p.getType(), ap.getPmPartNameAsString());
+            }
         }
         return result;
     }
