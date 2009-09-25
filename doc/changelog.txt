@@ -21,25 +21,26 @@ current
 
 0.21
 ----
-- Feature: New command line utility unhfs added which makes it possible to extract the
-  contents of an HFS/HFS+/HFSX file system from the command line. Run
-  unhfs.bat/unhfs.sh for instructions on how to use it.
-  Thanks to Sebastian Lisken for suggesting this utility and participating in its
-  development.
+- Feature: New command line utility unhfs added which makes it possible to
+  extract the contents of an HFS/HFS+/HFSX file system from the command line.
+  Run unhfs.bat/unhfs.sh for instructions on how to use it.
+  Thanks to Sebastian Lisken for suggesting this utility and participating in
+  its development.
 
-- Feature: Ability to view and extract the contents of resource forks built into the
-  file information dialog (will only appear if there is resource fork data in the file).
-  Also available as an external program, Resource Viewer, which will appear on the start
-  menu for Windows users, and can be accessed through the startup script
-  resview.bat/resview.sh for other users.
+- Feature: Ability to view and extract the contents of resource forks built into
+  the file information dialog (will only appear if there is resource fork data
+  in the file).
+  Also available as an external program, Resource Viewer, which will appear on
+  the start menu for Windows users, and can be accessed through the startup
+  script resview.bat/resview.sh for other users.
 
-- Feature: New File menu item "Load file system from path" added, enabling users to type
-  the pathname to a device file or disk image instead of having to select it with the
-  file chooser dialog. This makes it a lot easier to load devices in Mac OS X and *nix
-  systems.
+- Feature: New File menu item "Load file system from path" added, enabling users
+  to type the pathname to a device file or disk image instead of having to
+  select it with the file chooser dialog. This makes it a lot easier to load
+  devices in Mac OS X and *nix systems.
 
-- Improvement: Increased compatibility with devices that are unwilling to state their
-  size, such as certain iPod devices attached to Windows systems.
+- Improvement: Increased compatibility with devices that are unwilling to state
+  their size, such as certain iPod devices attached to Windows systems.
   Original problem report:
     http://sourceforge.net/forum/message.php?msg_id=5709684
 
@@ -48,13 +49,15 @@ current
   Original problem report:
     http://sourceforge.net/forum/message.php?msg_id=5723203
 
-- HFS bugfix: Incorrect structure definition for CdrFilRec led to an inability to
-  extract resource forks and fragmented files.
+- HFS bugfix: Incorrect structure definition for CdrFilRec led to an inability
+  to extract resource forks and fragmented files.
 
-- Bugfix: Proper resource fork file format now generated when extracting resource forks.
+- Bugfix: Proper resource fork file format now generated when extracting
+  resource forks.
   The earlier versions extracted resource forks as raw resource data, which is
-  incompatible with Mac OS X. Now proper AppleDouble format files are generated, making
-  the resource forks readable through SMB network shares when mounted by Mac OS X.
+  incompatible with Mac OS X. Now proper AppleDouble format files are generated,
+  making the resource forks readable through SMB network shares when mounted by
+  Mac OS X.
 
 
 0.20.1
@@ -70,97 +73,107 @@ current
 
 0.20
 ----
-- Experimental support for reading encrypted UDIF/raw disk images (.dmg). Feedback is
-  much appreciated, as I can only generate a certain amount of test cases.
+- Experimental support for reading encrypted UDIF/raw disk images (.dmg).
+  Feedback is much appreciated, as I can only generate a certain amount of test
+  cases.
 
-- Experimental support for older HFS (Mac OS Original) file systems. Feedback is much
-  appreciated here as well.
+- Experimental support for older HFS (Mac OS Original) file systems. Feedback is
+  much appreciated here as well.
 
-- Support for hard links, both to files and directories (yes, HFS+ supports directory
-  hard links, but so far Apple only uses them for the purpose of Time Machine backups).
+- Support for hard links, both to files and directories (yes, HFS+ supports
+  directory hard links, but so far Apple only uses them for the purpose of Time
+  Machine backups).
 
 - Support for POSIX-style symbolic links.
 
 - Ability to create a read/write disk image (.dmg) from a loaded file system.
 
-- Java 6+ only: Table header sorting for the file table is now implemented. The last
-  (empty) column will sort on the internal sort order, if you need to reset your sorting
-  choices.
+- Java 6+ only: Table header sorting for the file table is now implemented. The
+  last (empty) column will sort on the internal sort order, if you need to reset
+  your sorting choices.
 
-- More flexible extract options, such as setting default actions for different events
-  that may occur. (Example: "Could not create directory" -> Skip / Auto-rename / ...)
+- More flexible extract options, such as setting default actions for different
+  events that may occur.
+  (Example: "Could not create directory" -> Skip / Auto-rename / ...)
 
-- Major restructuring/modularization of core components to ease future development.
+- Major restructuring/modularization of core components to ease future
+  development.
 
-- Bugfix: Thread safety is now a reality within HFSExplorer. The extract progress dialog
-  no longer needs to be modal.
+- Bugfix: Thread safety is now a reality within HFSExplorer. The extract
+  progress dialog no longer needs to be modal.
 
-- Bugfix: Specifying a device path as argument when launching the app failed previously
-  due to incorrect assumptions about input data.
+- Bugfix: Specifying a device path as argument when launching the app failed
+  previously due to incorrect assumptions about input data.
 
-- Bugfix: Caching layer was suffering from a logic error, mostly encountered when reading
-  very small filesystems (such as disk images), which then could not be loaded.
+- Bugfix: Caching layer was suffering from a logic error, mostly encountered
+  when reading very small filesystems (such as disk images), which then could not be loaded.
 
 - Bugfix: Autodetect failed for some MBR partitioned drives.
 
-- Bugfix: Corrected a small rounding error that affected the last digit of displayed file
-  sizes, making 4,5 KiB files appear as 5 KiB files instead of 4 KiB (only affected what
-  was presented to the user, and none of the internal workings). Whether this is the
-  correct way of displaying a file size is arguable, but it's a floor estimate, and
-  usually much more usable.
+- Bugfix: Corrected a small rounding error that affected the last digit of
+  displayed file sizes, making 4,5 KiB files appear as 5 KiB files instead of
+  4 KiB (only affected what was presented to the user, and none of the internal
+  workings). Whether this is the correct way of displaying a file size is
+  arguable, but it's a floor estimate, and usually much more usable.
 
-- Bugfix: The user previously wasn't able to abort the "Calculating selection size" phase
-  when extracting files.
+- Bugfix: The user previously wasn't able to abort the "Calculating selection
+  size" phase when extracting files.
 
-- Bugfix/feature: When extracting resource forks or both forks, empty resource forks are
-  now skipped over, rather than being extracted as 0-byte "._" files.
+- Bugfix/feature: When extracting resource forks or both forks, empty resource
+  forks are now skipped over, rather than being extracted as 0-byte "._" files.
 
 
 0.19.5
 ------
-- HFSX support can be considered stable as I have got no reports on any related problems.
+- HFSX support can be considered stable as I have got no reports on any related
+  problems.
 
-- Bugfix/feature: GPT tables are now explicitly included in the Autodetect scan in the
-  Windows dialog "Load file system from device". If you have a broken MBR but a valid
-  GPT, the GPT partitions will be automatically detected.
+- Bugfix/feature: GPT tables are now explicitly included in the Autodetect scan
+  in the Windows dialog "Load file system from device". If you have a broken MBR
+  but a valid GPT, the GPT partitions will be automatically detected.
 
-- Made the Volume info panel a bit more detailed and replaced JLabels with JTextFields so
-  information easily can be marked up and copied.
+- Made the Volume info panel a bit more detailed and replaced JLabels with
+  JTextFields so information easily can be marked up and copied.
 
-- Added two options in the popup menu displayed when user right clicks a file/folder:
+- Added two options in the popup menu displayed when user right clicks a
+  file/folder:
   - Extract data
   - Extract data and resource fork(s)
 
-- Extract progress window now always closes when user clicks the window's close button,
-  even though the extraction process might not have ended. This enables the user to do
-  error checking if extraction hangs.
+- Extract progress window now always closes when user clicks the window's close
+  button, even though the extraction process might not have ended. This enables
+  the user to do error checking if extraction hangs.
 
-- Windows: Added support for 64-bit JVMs (compiled code now exists for x86_64 and
-  Itanium, though only x86_64 has been tested).
+- Windows: Added support for 64-bit JVMs (compiled code now exists for x86_64
+  and Itanium, though only x86_64 has been tested).
 
-- Launcher improvements and various small bug fixes to cope with 64-bit Windows and WOW64.
+- Launcher improvements and various small bug fixes to cope with 64-bit Windows
+  and WOW64.
 
-- Converted the ever-disabled "Back" button into an "Up"-button to walk upwards (towards
-  the root) in the directory tree.
+- Converted the ever-disabled "Back" button into an "Up"-button to walk upwards
+  (towards the root) in the directory tree.
 
-- Added support for more than 20 partitions per drive, more than 20 drives and more than
-  20 CD-ROMs in "Load file system from device" dialog (not that anyone has actually
-  needed to use that many, but why impose limitations when you don't really have to?).
+- Added support for more than 20 partitions per drive, more than 20 drives and
+  more than 20 CD-ROMs in "Load file system from device" dialog (not that anyone
+  has actually needed to use that many, but why impose limitations when you
+  don't really have to?).
 
-- "Open file" in Windows is now much more usable due to invoking the Windows handler
-  instead of using the Java6 openFile handler when available.
+- "Open file" in Windows is now much more usable due to invoking the Windows
+  handler instead of using the Java6 openFile handler when available.
 
 - Fixed a few user interface bugs and quirks.
 
 
 0.19
 ----
-- Feature: Experimental support for HFSX formatted volumes (Mac OS Extended with case
-  sensitive filenames). Feedback is appreciated for those with HFSX volumes.
+- Feature: Experimental support for HFSX formatted volumes (Mac OS Extended with
+  case sensitive filenames). Feedback is appreciated for those with HFSX
+  volumes.
 
-- Feature: Implemented a caching layer between the file system handler and the media.
-  This makes copying from CDs and DVDs a lot faster, and potentially speeds up operations
-  on other media (hard disks, disk images) as well.
+- Feature: Implemented a caching layer between the file system handler and the
+  media.
+  This makes copying from CDs and DVDs a lot faster, and potentially speeds up
+  operations on other media (hard disks, disk images) as well.
 
 - Feature: bzip2 compressed UDIF .dmg files can now be opened.
 
@@ -173,158 +186,178 @@ current
 
 0.18.3
 ------
-- Bugfix: Parsing of Driver Descriptor Records and GUID Partition Tables could bail out for
-  unexpected values when detecting partition systems, leading to exceptions when trying to
-  load file systems.
+- Bugfix: Parsing of Driver Descriptor Records and GUID Partition Tables could
+  bail out for unexpected values when detecting partition systems, leading to
+  exceptions when trying to load file systems.
 
-- Bugfix: The launcher, hfsexplorer.exe, had a bug leading to access violation and crash
-  under some circumstances due to a non null-terminated string being generated.
+- Bugfix: The launcher, hfsexplorer.exe, had a bug leading to access violation
+  and crash under some circumstances due to a non null-terminated string being
+  generated.
 
 
 0.18.2
 ------
-- Bugfix/feature: Windows autodetect button now handles APM partitioned drives/CDs as well.
+- Bugfix/feature: Windows autodetect button now handles APM partitioned
+  drives/CDs as well.
 
-- Bugfix: HFSExplorer now works with large Apple Partition Map and MBR partitioned drives.
+- Bugfix: HFSExplorer now works with large Apple Partition Map and MBR
+  partitioned drives.
 
 - Bugfix: Update check now checks for build number instead of version number.
 
 
 0.18.1
 ------
-- Implemented support for wrapped HFS+ volumes (HFS+ volumes wrapped inside HFS volumes, as in
-  http://developer.apple.com/technotes/tn/tn1150.html#HFSWrapper).
+- Implemented support for wrapped HFS+ volumes, i.e. HFS+ volumes wrapped inside
+  HFS volumes, as described in:
+    http://developer.apple.com/technotes/tn/tn1150.html#HFSWrapper
 
-- Fixed a minor bug where the user wasn't notified when a file could not be opened.
+- Fixed a minor bug where the user wasn't notified when a file could not be
+  opened.
 
 
 0.18
 ----
-- Huge rework of the libraries from DMGExtractor, due to a lot of wasted memory leading to
-  OutOfMemoryError for huge DMG files. Particulary the XML parser has been seriously
-  reconstructed. Tested with an 11 GiB compressed/25 GiB uncompressed UDIF disk image.
+- Huge rework of the libraries from DMGExtractor, due to a lot of wasted memory
+  leading to OutOfMemoryError for huge DMG files. Particulary the XML parser
+  has been seriously reconstructed. Tested with an 11 GiB compressed/25 GiB
+  uncompressed UDIF disk image.
 
-- Fixed a serious bug leading to a lot of files not beeing seen by HFSExplorer (though I didn't
-  notice it myself). Had to do with the algorithm that collected all files in a directory.
-  (thanks to Mark Wainwright for the valuable test case)
+- Fixed a serious bug leading to a lot of files not beeing seen by HFSExplorer
+  (though I didn't notice it myself). Had to do with the algorithm that
+  collected all files in a directory. (thanks to Mark Wainwright for the
+  valuable test case)
 
-- Implemented a Unicode composition algorithm, for those who have been experiencing strange
-  filenames whenever there are accents and umlauts in them. (thanks to Wolf Mc Even for info)
+- Implemented a Unicode composition algorithm, for those who have been
+  experiencing strange filenames whenever there are accents and umlauts in them.
+  (thanks to Wolf Mc Even for info)
 
-- Improved repsonsiveness and usefulness for the progress dialog displayed when extracting
-  files from the file system.
+- Improved repsonsiveness and usefulness for the progress dialog displayed when
+  extracting files from the file system.
 
-- Improved efficiency when reading UDIF disk images (.dmg files). (In some cases probably up to
-  a million times faster... ;> ) 
+- Improved efficiency when reading UDIF disk images (.dmg files). (In some cases
+  probably up to a million times faster... ;> ) 
 
-- Implemented double-clicking in the right pane to browse a directory, or to extract (or open),
-  a file.
+- Implemented double-clicking in the right pane to browse a directory, or to
+  extract (or open), a file.
 
-- Implemented right-clicking in the left and right pane for bringing up a popup menu. Currently
-  the only option is "Information", which brings up the info window.
+- Implemented right-clicking in the left and right pane for bringing up a popup
+  menu. Currently the only option is "Information", which brings up the info
+  window.
 
 - Made the partition choosing dialog default to the first HFS partition found.
 
-- Fixed a bug when running the application in OS X, related to JFileChooser (all in all,
-  JFileChooser seems very buggy in OS X).
+- Fixed a bug when running the application in OS X, related to JFileChooser (all
+  in all, JFileChooser seems very buggy in OS X).
 
-- Fixed a non critical bug with HFSPlusBSDInfo. Apparently some root nodes (CNID 2) have a
-  special value for "file mode", 0x0, not mentioned in POSIX and such specs (not that I have
-  read them, but I assume...) so file info for the root node could not be displayed..
+- Fixed a non critical bug with HFSPlusBSDInfo. Apparently some root nodes
+  (CNID 2) have a special value for "file mode", 0x0, not mentioned in POSIX and
+  such specs (not that I have read them, but I assume...) so file info for the
+  root node could not be displayed..
 
-- UI is no longer active while the program loads a file at startup (could be confusing when
-  loading large files, where the user might have thought that no operation was in progress)
+- UI is no longer active while the program loads a file at startup (could be
+  confusing when loading large files, where the user might have thought that no
+  operation was in progress)
 
-- Added a debug console window where all the output from System.out and System.err goes when
-  the application is running in pure windowed mode.
+- Added a debug console window where all the output from System.out and
+  System.err goes when the application is running in pure windowed mode.
 
-- Added icons for .dmg files in Windows Explorer. (for source material, thanks to the original
-  creator of the icon for GParted, whoever that is...)
+- Added icons for .dmg files in Windows Explorer. (for source material, thanks
+  to the original creator of the icon for GParted, whoever that is...)
 
 
 0.17
 ----
-- DMG UDIF file support! Most DMG files can now be read directly from within HFSExplorer (no
-  prior extraction needed), thanks to integrating code from DMGExtractor. It is all rather slow
-  at the moment (especially with compressed images), but expect performance enhancements in the
-  future when I implement smarter buffering/caching.
-  What is known not to work are .dmg files with ADC or BZIP2 compression and encrypted images.
-  Additionally, any image that does not contain an HFS+ file system will obviously not work.
+- DMG UDIF file support! Most DMG files can now be read directly from within
+  HFSExplorer (no prior extraction needed), thanks to integrating code from
+  DMGExtractor. It is all rather slow at the moment (especially with compressed
+  images), but expect performance enhancements in the future when I implement
+  smarter buffering/caching. What is known not to work are .dmg files with ADC
+  or BZIP2 compression and encrypted images.
+  Additionally, any image that does not contain an HFS+ file system will
+  obviously not work.
 
-- Created a launcher application for Windows, which automatically locates the Java Runtime
-  Environment and starts the application from an .exe file. This launcher might work poorly
-  with JREs from other vendors than Sun, so feedback is appreciated from those using non-Sun
-  Java Runtime Environments.
+- Created a launcher application for Windows, which automatically locates the
+  Java Runtime Environment and starts the application from an .exe file. This
+  launcher might work poorly with JREs from other vendors than Sun, so feedback
+  is appreciated from those using non-Sun Java Runtime Environments.
 
-- Made a NSIS installer package for Windows users, making it easy to install/uninstall the
-  application. The installer is able to create file associations with .dmg files.
+- Made a NSIS installer package for Windows users, making it easy to
+  install/uninstall the application. The installer is able to create file
+  associations with .dmg files.
 
-- Enabled the address field and "Go" button in HFSExplorer (after many releases where it has
-  been disabled, waiting for implementation).
+- Enabled the address field and "Go" button in HFSExplorer (after many releases
+  where it has been disabled, waiting for implementation).
 
 - Title bar now shows which file is open.
 
 
 0.16
 ----
-- Added automatic detection of partition systems and file systems, so that the user no longer
-  needs to worry about whether it should choose to load them with or without APM.
+- Added automatic detection of partition systems and file systems, so that the
+  user no longer needs to worry about whether it should choose to load them with
+  or without APM.
 
-- Added support for the MBR and GUID Partition Table partitioning schemes, making access to
-  raw disk images or devices from Intel systems possible. (Not very tested, might be buggy...)
+- Added support for the MBR and GUID Partition Table partitioning schemes,
+  making access to raw disk images or devices from Intel systems possible. (Not
+  very tested, might be buggy...)
 
-- Added an "autodetect" button to the "Load file system from device" dialog (only for Windows
-  users), so that the user doesn't have to look for the correct device itself.
+- Added an "autodetect" button to the "Load file system from device" dialog
+  (only for Windows users), so that the user doesn't have to look for the
+  correct device itself.
 
-- Added a progress dialog when extracting files, so that users get some info on what's going on.
+- Added a progress dialog when extracting files, so that users get some info on
+  what's going on.
 
 - Added keyboard shortcuts to menu items.
 
 - Added a menu item to check for newer versions of HFSExplorer.
 
-- Behavior change: When the program encounters an exception while extracting files (for example
-  when the disk is full), the user can now choose to abort the entire extraction, or continue.
+- Behavior change: When the program encounters an exception while extracting
+  files (for example when the disk is full), the user can now choose to abort
+  the entire extraction, or continue.
 
-- Fixed a bug leading to exceptions when failing to load a file system, requiring a restart
-  of the program.
+- Fixed a bug leading to exceptions when failing to load a file system,
+  requiring a restart of the program.
 
 
 0.15.1
 ------
-- Minor Windows Vista fix. The icons were not found when starting HFSExplorer with the
-  runfsb_vista.vbs script. Now the icons are included in the JAR file, so they should always
-  be available.
+- Minor Windows Vista fix. The icons were not found when starting HFSExplorer
+  with the runfsb_vista.vbs script. Now the icons are included in the JAR file,
+  so they should always be available.
 
 
 0.15
 ----
-- Major UI overhaul with a few icons, changed appearance of the file list. Many things left
-  to do though.
+- Major UI overhaul with a few icons, changed appearance of the file list. Many
+  things left to do though.
 
-- Added information dialogs for presenting information about the volume header, the catalog
-  file, detailed file and folder info, some minor info on the journal... (all in preparation
-  for future development work on write support)
+- Added information dialogs for presenting information about the volume header,
+  the catalog file, detailed file and folder info, some minor info on the
+  journal... (all in preparation for future development work on write support)
 
-- Behavior change: Extract button now extracts the entry that was last in focus. If you
-  selected a folder in the left pane most recently, that folder will be extracted and not the
-  selection in the right pane (and vice versa).
+- Behavior change: Extract button now extracts the entry that was last in focus.
+  If you selected a folder in the left pane most recently, that folder will be
+  extracted and not the selection in the right pane (and vice versa).
 
 - Fixed a bug submitted by Gennadiy Bukhmatov related to the behavior of
   org.catacombae.hfsexplorer.types.OSType.
 
-- Added a start script for Windows Vista, automatically bringing up the UAC dialog. It has not
-  been tested more than that, so please mail me about your experiences with Windows Vista.
-  Vista users may run "runfsb_vista.vbs"...
+- Added a start script for Windows Vista, automatically bringing up the UAC
+  dialog. It has not been tested more than that, so please mail me about your
+  experiences with Windows Vista. Vista users may run "runfsb_vista.vbs"...
 
 
 0.11
 ----
-- Fixed a very significant bug, sometimes leading to some files not being seen by HFSExplorer,
-  and sometimes leading to a complete crash.
+- Fixed a very significant bug, sometimes leading to some files not being seen
+  by HFSExplorer, and sometimes leading to a complete crash.
 
 - Made extraction of multiple files, as well as directory trees possible.
 
-- Fixed some uncaught exception when trying to read an Apple Partition Map when it isn't there.
+- Fixed some uncaught exception when trying to read an Apple Partition Map when
+  it isn't there.
 
 - First release of source code.
 
