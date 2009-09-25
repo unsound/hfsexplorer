@@ -92,91 +92,15 @@ public abstract class FSAttributes {
         public abstract boolean isSetGID();
         public abstract boolean isStickyBit();
 
+        public abstract boolean hasInodeNumber();
+        public abstract Long getInodeNumber();
+
         /**
          * Returns the POSIX-type file mode string for this file, as it would appear
          * when listing it with 'ls -l'. Example: <code>drwxr-x---</code>.
          *
          * @return the POSIX-type file mode string for this file.
          */
-        public abstract String getPermissionString();
-    }
-
-    public static class DefaultPOSIXFileAttributes extends POSIXFileAttributes {
-        private final short fileMode;
-        private final long userID;
-        private final long groupID;
-        
-        public DefaultPOSIXFileAttributes(long userID, long groupID, short fileMode) {
-            this.userID = userID;
-            this.groupID = groupID;
-            this.fileMode = fileMode;
-        }
-        
-        /** {@inheritDoc} */
-        @Override
-        public long getUserID() { return userID; }
-        
-        /** {@inheritDoc} */
-        @Override
-        public long getGroupID() { return groupID; }
-
-        /** {@inheritDoc} */
-        @Override
-        public byte getFileType() {
-            int type = (fileMode >> 12) & 017;
-            return (byte) type;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public boolean isSetUID() { return Util.getBit(fileMode, 11); }
-
-        /** {@inheritDoc} */
-        @Override
-        public boolean isSetGID() { return Util.getBit(fileMode, 10); }
-
-        /** {@inheritDoc} */
-        @Override
-        public boolean isStickyBit() { return Util.getBit(fileMode, 9); }
-
-        /** {@inheritDoc} */
-        @Override
-        public boolean canUserRead() { return Util.getBit(fileMode, 8); }
-
-        /** {@inheritDoc} */
-        @Override
-        public boolean canUserWrite() { return Util.getBit(fileMode, 7); }
-
-        /** {@inheritDoc} */
-        @Override
-        public boolean canUserExecute() { return Util.getBit(fileMode, 6); }
-
-        /** {@inheritDoc} */
-        @Override
-        public boolean canGroupRead() { return Util.getBit(fileMode, 5); }
-
-        /** {@inheritDoc} */
-        @Override
-        public boolean canGroupWrite() { return Util.getBit(fileMode, 4); }
-
-        /** {@inheritDoc} */
-        @Override
-        public boolean canGroupExecute() { return Util.getBit(fileMode, 3); }
-
-        /** {@inheritDoc} */
-        @Override
-        public boolean canOthersRead() { return Util.getBit(fileMode, 2); }
-
-        /** {@inheritDoc} */
-        @Override
-        public boolean canOthersWrite() { return Util.getBit(fileMode, 1); }
-
-        /** {@inheritDoc} */
-        @Override
-        public boolean canOthersExecute() { return Util.getBit(fileMode, 0); }
-
-        /** {@inheritDoc} */
-        @Override
         public String getPermissionString() {
             String result;
             byte fileType = getFileType();
@@ -211,9 +135,9 @@ public abstract class FSAttributes {
                 default:
                     result = " ";
                     System.err.println(
-                            "[FSAttributes.POSIXFileAttributes.getFileModeString()] " +
+                            "[FSAttributes.POSIXFileAttributes.getPermissionString()] " +
                             "Unknown file type:  " + fileType +
-                            " Mode: 0x" + Util.toHexStringBE(fileMode));
+                            " Mode: 0x" + Util.toHexStringBE(getFileModeWord()));
             }
 
             if(canUserRead())
@@ -279,6 +203,132 @@ public abstract class FSAttributes {
             }
 
             return result;
+        }
+
+        /**
+         * Returns the raw POSIX file mode word, containing user/group/other rwx
+         * permissions, setuid, setgid, sticky bit and file type.
+         *
+         * @return the raw POSIX file mode word.
+         */
+        public short getFileModeWord() {
+            short result = (short)((getFileType() & 017) << 12);
+
+            result = Util.setBit(result, 11, isSetUID());
+            result = Util.setBit(result, 10, isSetGID());
+            result = Util.setBit(result, 9, isStickyBit());
+            result = Util.setBit(result, 8, canUserRead());
+            result = Util.setBit(result, 7, canUserWrite());
+            result = Util.setBit(result, 6, canUserExecute());
+            result = Util.setBit(result, 5, canGroupRead());
+            result = Util.setBit(result, 4, canGroupWrite());
+            result = Util.setBit(result, 3, canGroupExecute());
+            result = Util.setBit(result, 2, canOthersRead());
+            result = Util.setBit(result, 1, canOthersWrite());
+            result = Util.setBit(result, 0, canOthersExecute());
+
+            return result;
+        }
+    }
+
+    public static class DefaultPOSIXFileAttributes extends POSIXFileAttributes {
+        private final short fileMode;
+        private final long userID;
+        private final long groupID;
+        private final Long inodeNumber;
+        
+        public DefaultPOSIXFileAttributes(long userID, long groupID, short fileMode) {
+            this(userID, groupID, fileMode, null);
+        }
+        
+        public DefaultPOSIXFileAttributes(long userID, long groupID, short fileMode, long inodeNumber) {
+            this(userID, groupID, fileMode, new Long(inodeNumber));
+        }
+
+        private DefaultPOSIXFileAttributes(long userID, long groupID, short fileMode, Long inodeNumber) {
+            this.userID = userID;
+            this.groupID = groupID;
+            this.fileMode = fileMode;
+            this.inodeNumber = inodeNumber;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public long getUserID() { return userID; }
+        
+        /** {@inheritDoc} */
+        @Override
+        public long getGroupID() { return groupID; }
+
+        /** {@inheritDoc} */
+        @Override
+        public byte getFileType() {
+            int type = (fileMode >> 12) & 017;
+            return (byte) type;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public boolean isSetUID() { return Util.getBit(fileMode, 11); }
+
+        /** {@inheritDoc} */
+        @Override
+        public boolean isSetGID() { return Util.getBit(fileMode, 10); }
+
+        /** {@inheritDoc} */
+        @Override
+        public boolean isStickyBit() { return Util.getBit(fileMode, 9); }
+
+        /** {@inheritDoc} */
+        @Override
+        public boolean canUserRead() { return Util.getBit(fileMode, 8); }
+
+        /** {@inheritDoc} */
+        @Override
+        public boolean canUserWrite() { return Util.getBit(fileMode, 7); }
+
+        /** {@inheritDoc} */
+        @Override
+        public boolean canUserExecute() { return Util.getBit(fileMode, 6); }
+
+        /** {@inheritDoc} */
+        @Override
+        public boolean canGroupRead() { return Util.getBit(fileMode, 5); }
+
+        /** {@inheritDoc} */
+        @Override
+        public boolean canGroupWrite() { return Util.getBit(fileMode, 4); }
+
+        /** {@inheritDoc} */
+        @Override
+        public boolean canGroupExecute() { return Util.getBit(fileMode, 3); }
+
+        /** {@inheritDoc} */
+        @Override
+        public boolean canOthersRead() { return Util.getBit(fileMode, 2); }
+
+        /** {@inheritDoc} */
+        @Override
+        public boolean canOthersWrite() { return Util.getBit(fileMode, 1); }
+
+        /** {@inheritDoc} */
+        @Override
+        public boolean canOthersExecute() { return Util.getBit(fileMode, 0); }
+
+        /** {@inheritDoc} */
+        @Override
+        public short getFileModeWord() {
+            return fileMode;
+        }
+
+        @Override
+        public boolean hasInodeNumber() {
+            return inodeNumber != null;
+        }
+
+        @Override
+        public Long getInodeNumber() {
+            return inodeNumber;
         }
     }
 }

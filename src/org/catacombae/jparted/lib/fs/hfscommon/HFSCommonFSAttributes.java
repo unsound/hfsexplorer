@@ -58,7 +58,8 @@ class HFSCommonFSAttributes extends FSAttributes {
                 posixAttributes = new DefaultPOSIXFileAttributes(
                         Util.unsign(permissions.getOwnerID()),
                         Util.unsign(permissions.getGroupID()),
-                        permissions.getFileMode());
+                        permissions.getFileMode(),
+                        attributes.getCatalogNodeID().toLong());
             }
             return posixAttributes;
         }
