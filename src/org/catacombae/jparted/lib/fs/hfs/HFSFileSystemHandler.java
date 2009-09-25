@@ -29,6 +29,6 @@ public class HFSFileSystemHandler extends HFSCommonFileSystemHandler {
 
     public HFSFileSystemHandler(DataLocator fsLocator, boolean useCaching, String encodingName) {
         super(new ImplHFSFileSystemView(fsLocator.createReadOnlyFile(), 0, useCaching, encodingName),
-                false);
+                false, false);
     }
 }

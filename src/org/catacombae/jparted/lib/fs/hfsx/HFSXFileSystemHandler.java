@@ -32,8 +32,8 @@ import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemHandler;
 public class HFSXFileSystemHandler extends HFSCommonFileSystemHandler {
     
     public HFSXFileSystemHandler(DataLocator fsLocator, boolean useCaching, 
-            boolean doUnicodeFileNameComposition) {
+            boolean doUnicodeFileNameComposition, boolean hideProtected) {
         super(new ImplHFSXFileSystemView(fsLocator.createReadOnlyFile(), 0, useCaching),
-                doUnicodeFileNameComposition);
+                doUnicodeFileNameComposition, hideProtected);
     }
 }

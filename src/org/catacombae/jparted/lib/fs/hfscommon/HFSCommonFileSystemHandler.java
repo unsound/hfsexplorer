@@ -30,6 +30,7 @@ import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolderThread;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogNodeID;
 import org.catacombae.hfsexplorer.fs.BaseHFSFileSystemView;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogKey;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.jparted.lib.fs.FSFolder;
 import org.catacombae.jparted.lib.fs.FSForkType;
@@ -48,13 +49,19 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
     private static final String FILE_HARD_LINK_PREFIX = "iNode";
     private static final String DIRECTORY_HARD_LINK_DIR = ".HFS+ Private Directory Data" + (char)0x0d;
     private static final String DIRECTORY_HARD_LINK_PREFIX = "dir_";
+    private static final String JOURNAL_INFO_BLOCK_FILE = ".journal_info_block";
+    private static final String JOURNAL_FILE = ".journal";
+    
     private BaseHFSFileSystemView view;
     private boolean doUnicodeFileNameComposition;
+    private boolean hideProtected;
     
     protected HFSCommonFileSystemHandler(BaseHFSFileSystemView iView,
-                    boolean iDoUnicodeFileNameComposition) {
+                    boolean iDoUnicodeFileNameComposition,
+                    boolean hideProtected) {
         this.view = iView;
         this.doUnicodeFileNameComposition = iDoUnicodeFileNameComposition;
+        this.hideProtected = hideProtected;
     }
     
     @Override
@@ -379,13 +386,42 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
         return doUnicodeFileNameComposition;
     }
      * */
+
+    private boolean shouldHide(CommonHFSCatalogLeafRecord rec) {
+        // For HFS we have nothing to hide.
+        if(rec.getKey() instanceof CommonHFSCatalogKey.HFSImplementation)
+            return false;
+
+        // The only folder that contains hidden files is the root folder.
+        CommonHFSCatalogNodeID parentID = rec.getKey().getParentID();
+        if(!parentID.equals(parentID.getReservedID(CommonHFSCatalogNodeID.ReservedID.ROOT_FOLDER)))
+            return false;
+
+        String name = view.decodeString(rec.getKey().getNodeName());
+        if(rec instanceof CommonHFSCatalogFileRecord) {
+            if(name.equals(JOURNAL_INFO_BLOCK_FILE))
+                return hideProtected;
+            if(name.equals(JOURNAL_FILE))
+                return hideProtected;
+        }
+        else if(rec instanceof CommonHFSCatalogFolderRecord) {
+            if(name.equals(FILE_HARD_LINK_DIR))
+                return hideProtected;
+            if(name.equals(DIRECTORY_HARD_LINK_DIR))
+                return hideProtected;
+        }
+
+        return false;
+    }
     
     String[] listNames(CommonHFSCatalogFolderRecord folderRecord) {
         CommonHFSCatalogLeafRecord[] subRecords = view.listRecords(folderRecord);
         LinkedList<String> result = new LinkedList<String>();
         for(int i = 0; i < subRecords.length; ++i) {
             CommonHFSCatalogLeafRecord curRecord = subRecords[i];
-            result.add(getProperNodeName(curRecord));
+
+            if(!shouldHide(curRecord))
+                result.add(getProperNodeName(curRecord));
         }
         return result.toArray(new String[result.size()]);
     }
@@ -395,9 +431,11 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
         LinkedList<FSEntry> result = new LinkedList<FSEntry>();
         for(int i = 0; i < subRecords.length; ++i) {
             CommonHFSCatalogLeafRecord curRecord = subRecords[i];
+
             FSEntry curEntry = null;
-            
-            if(curRecord instanceof CommonHFSCatalogFileRecord)
+
+            if(shouldHide(curRecord));
+            else if(curRecord instanceof CommonHFSCatalogFileRecord)
                 curEntry = entryFromRecord((CommonHFSCatalogFileRecord)curRecord);
             else if(curRecord instanceof CommonHFSCatalogFolderRecord)
                 curEntry = entryFromRecord((CommonHFSCatalogFolderRecord)curRecord);

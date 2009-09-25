@@ -38,8 +38,9 @@ public class HFSXFileSystemHandlerFactory extends HFSPlusFileSystemHandlerFactor
     
     @Override
     protected FileSystemHandler createHandlerInternal(DataLocator data,
-            boolean useCaching, boolean composeFilename) {
-        return new HFSXFileSystemHandler(data, useCaching, composeFilename);
+            boolean useCaching, boolean composeFilename, boolean hideProtected) {
+        return new HFSXFileSystemHandler(data, useCaching, composeFilename,
+                hideProtected);
     }
     
     @Override
