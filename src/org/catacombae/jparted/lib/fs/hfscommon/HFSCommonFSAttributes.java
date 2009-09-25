@@ -20,7 +20,11 @@ package org.catacombae.jparted.lib.fs.hfscommon;
 import java.util.Date;
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogAttributes;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFileRecord;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolderRecord;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusBSDInfo;
+import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogAttributes;
 import org.catacombae.jparted.lib.fs.FSAttributes;
 import org.catacombae.jparted.lib.fs.FSEntry;
 import org.catacombae.jparted.lib.fs.WindowsFileAttributes;
@@ -31,11 +35,11 @@ import org.catacombae.jparted.lib.fs.WindowsFileAttributes;
  */
 class HFSCommonFSAttributes extends FSAttributes {
     
-    private final FSEntry parentEntry;
+    private final HFSCommonFSEntry parentEntry;
     private final CommonHFSCatalogAttributes attributes;
     private POSIXFileAttributes posixAttributes = null;
     
-    public HFSCommonFSAttributes(FSEntry parentEntry, CommonHFSCatalogAttributes attributes) {
+    public HFSCommonFSAttributes(HFSCommonFSEntry parentEntry, CommonHFSCatalogAttributes attributes) {
         this.parentEntry = parentEntry;
         this.attributes = attributes;
     }
@@ -121,6 +125,40 @@ class HFSCommonFSAttributes extends FSAttributes {
     @Override
     public Date getAttributeModifyDate() {
         return attributes.getAttributeModDateAsDate();
+    }
+
+    @Override
+    public boolean hasLinkCount() {
+        if(attributes instanceof CommonHFSCatalogFileRecord) {
+            CommonHFSCatalogFileRecord fr = (CommonHFSCatalogFileRecord) attributes;
+            if(fr.getData().isHardFileLink() /* || fr.getData().isHardDirectoryLink() */ )
+                return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public Long getLinkCount() {
+        if(attributes instanceof CommonHFSCatalogFileRecord) {
+            CommonHFSCatalogFileRecord fr = (CommonHFSCatalogFileRecord) attributes;
+            if(fr.getData().isHardFileLink()) {
+                int inodeNumber = fr.getData().getHardLinkInode();
+                CommonHFSCatalogFileRecord rec =
+                        parentEntry.getFileSystemHandler().lookupFileInode(inodeNumber);
+
+                return Util.unsign(rec.getData().getPermissions().getSpecial());
+            }
+            else if(fr.getData().isHardDirectoryLink()) {
+                int inodeNumber = fr.getData().getHardLinkInode();
+                CommonHFSCatalogFolderRecord rec =
+                        parentEntry.getFileSystemHandler().lookupDirectoryInode(inodeNumber);
+
+                return Util.unsign(rec.getData().getPermissions().getSpecial());
+            }
+        }
+        
+        return null;
     }
 
 }
