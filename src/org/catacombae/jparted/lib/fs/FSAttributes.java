@@ -46,6 +46,9 @@ public abstract class FSAttributes {
     
     public abstract boolean hasBackupDate();
     public abstract Date getBackupDate();
+
+    public abstract boolean hasLinkCount();
+    public abstract Long getLinkCount();
     
     //public abstract FSAccessControlList getAccessControlList();
     

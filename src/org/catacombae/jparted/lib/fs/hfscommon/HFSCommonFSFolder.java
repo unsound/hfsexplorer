@@ -29,7 +29,7 @@ import org.catacombae.jparted.lib.fs.FSFolder;
  *
  * @author Erik Larsson
  */
-public class HFSCommonFSFolder extends FSFolder {
+public class HFSCommonFSFolder extends FSFolder implements HFSCommonFSEntry {
     private final HFSCommonFileSystemHandler fsHandler;
     private final CommonHFSCatalogLeafRecord keyRecord;
     private final CommonHFSCatalogFolderRecord folderRecord;
@@ -102,5 +102,9 @@ public class HFSCommonFSFolder extends FSFolder {
     }
     CommonHFSCatalogFolderRecord getInternalCatalogFolderRecord() {
         return folderRecord;
+    }
+
+    public HFSCommonFileSystemHandler getFileSystemHandler() {
+        return fsHandler;
     }
 }

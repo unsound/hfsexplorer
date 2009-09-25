@@ -296,7 +296,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
     }
     */
     
-    private CommonHFSCatalogFileRecord lookupFileInode(int inodeNumber) {
+    CommonHFSCatalogFileRecord lookupFileInode(int inodeNumber) {
         long trueInodeNumber = Util.unsign(inodeNumber);
         CommonHFSCatalogLeafRecord res = getRecord(view.getRoot(), FILE_HARD_LINK_DIR,
                 FILE_HARD_LINK_PREFIX + trueInodeNumber);
@@ -309,7 +309,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
                     res.getClass() + " in file hard link dir for iNode" + trueInodeNumber);
     }
 
-    private CommonHFSCatalogFolderRecord lookupDirectoryInode(int inodeNumber) {
+    CommonHFSCatalogFolderRecord lookupDirectoryInode(int inodeNumber) {
         long trueInodeNumber = Util.unsign(inodeNumber);
         CommonHFSCatalogLeafRecord res = getRecord(view.getRoot(), DIRECTORY_HARD_LINK_DIR,
                 DIRECTORY_HARD_LINK_PREFIX + trueInodeNumber);

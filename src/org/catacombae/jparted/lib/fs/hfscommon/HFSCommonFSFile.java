@@ -32,7 +32,7 @@ import org.catacombae.jparted.lib.fs.FSForkType;
  *
  * @author Erik Larsson
  */
-public class HFSCommonFSFile extends FSFile {
+public class HFSCommonFSFile extends FSFile implements HFSCommonFSEntry {
     private final HFSCommonFileSystemHandler parent;
     private final CommonHFSCatalogLeafRecord keyRecord;
     private final CommonHFSCatalogFileRecord fileRecord;
@@ -118,7 +118,7 @@ public class HFSCommonFSFile extends FSFile {
         return parent.getReadableResourceForkStream(fileRecord);
     }
     
-    HFSCommonFileSystemHandler getFileSystemHandler() {
+    public HFSCommonFileSystemHandler getFileSystemHandler() {
         return parent;
     }
     

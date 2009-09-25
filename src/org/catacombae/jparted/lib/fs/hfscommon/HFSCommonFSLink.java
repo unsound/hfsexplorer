@@ -30,7 +30,7 @@ import org.catacombae.jparted.lib.fs.FSLink;
  *
  * @author erik
  */
-public class HFSCommonFSLink extends FSLink {
+public class HFSCommonFSLink extends FSLink implements HFSCommonFSEntry {
     private final CommonHFSCatalogFileRecord linkRecord;
     private final HFSCommonFileSystemHandler fsHandler;
     
@@ -145,5 +145,9 @@ public class HFSCommonFSLink extends FSLink {
     @Override
     public String getLinkTargetString() {
         return getLinkTargetPosixPath();
+    }
+
+    public HFSCommonFileSystemHandler getFileSystemHandler() {
+        return fsHandler;
     }
 }
