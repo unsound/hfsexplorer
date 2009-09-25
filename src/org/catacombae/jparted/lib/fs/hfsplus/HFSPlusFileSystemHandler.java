@@ -27,8 +27,8 @@ import org.catacombae.jparted.lib.DataLocator;
  */
 public class HFSPlusFileSystemHandler extends HFSCommonFileSystemHandler {
     public HFSPlusFileSystemHandler(DataLocator fsLocator, boolean useCaching,
-            boolean iDoUnicodeFileNameComposition) {
+            boolean doUnicodeFileNameComposition, boolean hideProtected) {
         super(new ImplHFSPlusFileSystemView(fsLocator.createReadOnlyFile(), 0,
-                    useCaching), iDoUnicodeFileNameComposition);
+                    useCaching), doUnicodeFileNameComposition, hideProtected);
     }
 }

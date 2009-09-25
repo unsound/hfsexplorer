@@ -48,6 +48,11 @@ public class HFSPlusFileSystemHandlerFactory extends FileSystemHandlerFactory {
                     "Decides whether Unicode filenames should be composed or " +
                     "left in their original decomposed form.", true);
     
+    private static final CustomAttribute hideProtectedAttribute =
+            createCustomAttribute(AttributeType.BOOLEAN, "HIDE_PROTECTED_FILES",
+                    "Decides whether protected files like the inode " +
+                    "directories and the journal files should show up in a " +
+                    "directory listing.", true);
     
     @Override
     public FileSystemHandler createHandler(DataLocator data) {
@@ -55,6 +60,8 @@ public class HFSPlusFileSystemHandlerFactory extends FileSystemHandlerFactory {
                 createAttributes.getBooleanAttribute(StandardAttribute.CACHING_ENABLED);
         boolean composeFilename =
                 createAttributes.getBooleanAttribute(compositionEnabledAttribute);
+        boolean hideProtected =
+                createAttributes.getBooleanAttribute(hideProtectedAttribute);
         
         ReadableRandomAccessStream recognizerStream = data.createReadOnlyFile();
 
@@ -66,12 +73,14 @@ public class HFSPlusFileSystemHandlerFactory extends FileSystemHandlerFactory {
 
         recognizerStream.close();
 
-        return createHandlerInternal(dataToLoad, useCaching, composeFilename);
+        return createHandlerInternal(dataToLoad, useCaching, composeFilename,
+                hideProtected);
     }
 
     protected FileSystemHandler createHandlerInternal(DataLocator data,
-            boolean useCaching, boolean composeFilename) {
-        return new HFSPlusFileSystemHandler(data, useCaching, composeFilename);
+            boolean useCaching, boolean composeFilename, boolean hideProtected) {
+        return new HFSPlusFileSystemHandler(data, useCaching, composeFilename,
+                hideProtected);
     }
     
     @Override
@@ -90,7 +99,8 @@ public class HFSPlusFileSystemHandlerFactory extends FileSystemHandlerFactory {
     @Override
     public CustomAttribute[] getSupportedCustomAttributes() {
         return new CustomAttribute[] {
-            compositionEnabledAttribute
+            compositionEnabledAttribute,
+            hideProtectedAttribute,
         };
     }
 
