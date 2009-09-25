@@ -19,6 +19,8 @@ package org.catacombae.hfsexplorer.partitioning;
 
 import org.catacombae.hfsexplorer.Util;
 import java.io.PrintStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import org.catacombae.jparted.lib.ps.PartitionType;
 
 public class APMPartition implements Partition {
@@ -124,6 +126,7 @@ public class APMPartition implements Partition {
     public String getPmPartNameAsString() { return Util.readNullTerminatedASCIIString(pmPartName); }
     public String getPmParTypeAsString() { return Util.readNullTerminatedASCIIString(pmParType); }
     public String getPmProcessorAsString() { return Util.readNullTerminatedASCIIString(pmProcessor); }
+    public byte[] getPmPadRaw()      { return Util.createCopy(pmPad); }
     
     public boolean isValid() {
         // Signature check
@@ -158,7 +161,18 @@ public class APMPartition implements Partition {
         ps.println(prefix + "pmBootEntry2: " + getPmBootEntry2());
         ps.println(prefix + "pmBootCksum: " + getPmBootCksum());
         ps.println(prefix + "pmProcessor: \"" + getPmProcessorAsString() + "\"");
-        ps.println(prefix + "pmPad: " + getPmPad());
+        ps.println(prefix + "pmPad:");
+        ps.print(  prefix + " byte[" + pmPad.length +  "] {");
+        for(byte b : pmPad) {
+            ps.print(" " + Util.toHexStringBE(b));
+        }
+        ps.println(" }");
+        try {
+            byte[] md5sum = MessageDigest.getInstance("MD5").digest(pmPad);
+            ps.println(prefix + " MD5: " + Util.byteArrayToHexString(md5sum));
+        } catch(NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
     }
 
     public byte[] getData() {
