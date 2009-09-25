@@ -132,7 +132,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
                 "\"" : path == null ? "null" : "" ) + " });");
         try {
         */
-            if(rootRecord == null)
+        if(rootRecord == null)
             throw new IllegalArgumentException("rootRecord == null");
         if(path == null)
             throw new IllegalArgumentException("path == null");
@@ -160,7 +160,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
                     String[] basePath = Util.arrayCopy(path, 0, new String[i - 1], 0, i - 1);
                     absPath = getTruePathFromPosixPath(posixPath, basePath);
                     if(absPath == null) {
-                        // Sorry pal, no luck in findin' yarr link target
+                        // Sorry pal, no luck in finding your link target
                         //log(prefix + " getRecord: no link target found for posix path \"" + posixPath + "\" with base path \"" + Util.concatenateStrings(basePath, "/") + "\"");
                         return null;
                     }
@@ -192,7 +192,8 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
                 }
 
                 if(absPath == null)
-                    throw new RuntimeException("CHECK YOUR CODE FFS.");
+                    throw new RuntimeException("'assertion' failed. absPath " +
+                            "shouldn't be null");
                 else if(Util.contains(curVisitedList, absPath)) {
                     System.err.println("WARNING: Detected cyclic link structure when resolving link target.");
                     System.err.println("         Resolve stack:");
