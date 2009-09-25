@@ -4,6 +4,17 @@ HFSExplorer Changelog
 
 current
 -------
+- Change: HFSExplorer now hides specially protected files and directories by
+  default. The affected files and directories are the file and directory inode
+  directories ("\u0000\u0000\u0000\u0000HFS+ Private Data" /
+  ".HFS+ Private Directory Data\u000d") and the journal files
+  (".journal_info_block" / ".journal").
+
+- Bugfix: Modify date now set when extracting files.
+
+- Bugfix: HFSCommonFileSystemRecognizer failed when operating on devices
+  requiring aligned I/O.
+
 - Bugfix: int overflow bug in caching layer led to OutOfMemoryError in
   certain situations when reading large disks.
 
