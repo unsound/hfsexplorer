@@ -52,18 +52,17 @@ public class HFSCommonFileSystemRecognizer {
      */
     public static FileSystemType detectFileSystem(ReadableRandomAccessStream bitstream, long offset) {
         try {
-            bitstream.seek(offset + 1024);
-            byte[] signatureData = new byte[2];
+            bitstream.seek(offset);
+            byte[] signatureData = new byte[1024 + 512];
             bitstream.readFully(signatureData);
-            short signature = Util.readShortBE(signatureData);
+            short signature = Util.readShortBE(signatureData, 1024);
             switch(signature) {
                 case SIGNATURE_MFS:
                     return FileSystemType.MFS;
                 case SIGNATURE_HFS:
                     try {
-                        bitstream.seek(offset + 1024 + 124);
-                        bitstream.readFully(signatureData);
-                        short embeddedSignature = Util.readShortBE(signatureData);
+                        short embeddedSignature =
+                                Util.readShortBE(signatureData, 1024 + 124);
                         if(embeddedSignature == SIGNATURE_HFS_PLUS)
                             return FileSystemType.HFS_WRAPPED_HFS_PLUS;
                         else
