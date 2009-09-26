@@ -95,6 +95,8 @@ import org.catacombae.hfsexplorer.gui.ErrorSummaryPanel;
 import org.catacombae.hfsexplorer.gui.MemoryStatisticsPanel;
 import org.catacombae.jparted.lib.DataLocator;
 import org.catacombae.jparted.lib.fs.FSLink;
+import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemRecognizer;
+import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemRecognizer.FileSystemType;
 import org.catacombae.jparted.lib.ps.PartitionType;
 import org.catacombae.udif.UDIFRandomAccessStream;
 
@@ -833,9 +835,8 @@ public class FileSystemBrowserWindow extends JFrame {
         }
 
         // Detect HFS file system
-        FileSystemRecognizer fsr = new FileSystemRecognizer(fsFile, fsOffset);
-        FileSystemRecognizer.FileSystemType fsType = fsr.detectFileSystem();
-        if(fsType == FileSystemRecognizer.FileSystemType.HFS_WRAPPED_HFS_PLUS) {
+        FileSystemType fsType = HFSCommonFileSystemRecognizer.detectFileSystem(fsFile, fsOffset);
+        if(fsType == FileSystemType.HFS_WRAPPED_HFS_PLUS) {
             //System.out.println("Found a wrapped HFS+ volume.");
             byte[] mdbData = new byte[HFSPlusWrapperMDB.STRUCTSIZE];
             fsFile.seek(fsOffset + 1024);
@@ -847,12 +848,11 @@ public class FileSystemBrowserWindow extends JFrame {
             fsOffset += mdb.getDrAlBlSt() * 512 + xd.getXdrStABN() * hfsBlockSize; // Lovely method names...
             //System.out.println("new fsOffset: " + fsOffset);
             // redetect with adjusted fsOffset
-            fsr = new FileSystemRecognizer(fsFile, fsOffset);
-            fsType = fsr.detectFileSystem();
+            fsType = HFSCommonFileSystemRecognizer.detectFileSystem(fsFile, fsOffset);
         }
-        if(fsType == FileSystemRecognizer.FileSystemType.HFS_PLUS ||
-                fsType == FileSystemRecognizer.FileSystemType.HFSX ||
-                fsType == FileSystemRecognizer.FileSystemType.HFS) {
+        if(fsType == FileSystemType.HFS_PLUS ||
+                fsType == FileSystemType.HFSX ||
+                fsType == FileSystemType.HFS) {
             
             fsb.setRoot(null);
             if(fsHandler != null) {
@@ -905,10 +905,10 @@ public class FileSystemBrowserWindow extends JFrame {
         }
         else {
             JOptionPane.showMessageDialog(this, "Invalid HFS type.\nProgram supports:\n" +
-                    "    " + FileSystemRecognizer.FileSystemType.HFS_PLUS + "\n" +
-                    "    " + FileSystemRecognizer.FileSystemType.HFSX + "\n" +
-                    "    " + FileSystemRecognizer.FileSystemType.HFS_WRAPPED_HFS_PLUS + "\n" +
-                    "    " + FileSystemRecognizer.FileSystemType.HFS + "\n" +
+                    "    " + FileSystemType.HFS_PLUS + "\n" +
+                    "    " + FileSystemType.HFSX + "\n" +
+                    "    " + FileSystemType.HFS_WRAPPED_HFS_PLUS + "\n" +
+                    "    " + FileSystemType.HFS + "\n" +
                     "\nDetected type is (" + fsType + ").",
                     "Unsupported file system type", JOptionPane.ERROR_MESSAGE);
         }
