@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2008 Erik Larsson
+ * Copyright (C) 2008-2009 Erik Larsson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@ import org.catacombae.jparted.lib.fs.FSAttributes;
 import org.catacombae.jparted.lib.fs.FSFile;
 import org.catacombae.jparted.lib.fs.FSFork;
 import org.catacombae.jparted.lib.fs.FSForkType;
-
 
 /**
  *

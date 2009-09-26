@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2008 Erik Larsson
+ * Copyright (C) 2008-2009 Erik Larsson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,11 +22,8 @@ import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogAttributes;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFileRecord;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolderRecord;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusBSDInfo;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogAttributes;
 import org.catacombae.jparted.lib.fs.FSAttributes;
-import org.catacombae.jparted.lib.fs.FSEntry;
 import org.catacombae.jparted.lib.fs.WindowsFileAttributes;
 
 /**
