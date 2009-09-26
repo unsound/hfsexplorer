@@ -25,17 +25,13 @@ package org.catacombae.jparted.lib.fs;
  * 
  * @author <a href="mailto:erik82@kth.se">Erik Larsson</a>
  */
-public abstract class FSFolder extends FSEntry {
-    protected FSFolder(FileSystemHandler iParentFileSystem) {
-        super(iParentFileSystem);
-    }
-    
+public interface FSFolder extends FSEntry {
     /**
      * Lists the contents of this folder as an array of the names of its subentries.
      * 
      * @return the contents of this folder as an array of the names of its subentries.
      */
-    public abstract String[] list();
+    public String[] list();
     
     /**
      * Returns the contents of this folder as an array of FSEntries. This method is more expensive
@@ -44,9 +40,17 @@ public abstract class FSFolder extends FSEntry {
      * 
      * @return the contents of this folder as an array of FSEntries.
      */
-    public abstract FSEntry[] listEntries();
-    
-    public abstract FSEntry getChild(String childName);
+    public FSEntry[] listEntries();
+
+    /**
+     * Returns a named child entry in this directory, or <code>null</code> if no
+     * entry by the name <code>childName</code> was found.
+     *
+     * @param childName the name of the child entry to fetch.
+     * @return the requested child entry if existent, or <code>null</code>
+     * otherwise.
+     */
+    public FSEntry getChild(String childName);
     
     /**
      * Returns the valence of this folder, i.e. how many subentries this folder
@@ -54,5 +58,5 @@ public abstract class FSFolder extends FSEntry {
      * 
      * @return the valence of this folder.
      */
-    public abstract long getValence();
+    public long getValence();
 }

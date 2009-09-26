@@ -33,13 +33,13 @@ import org.catacombae.jparted.lib.fs.FSForkType;
  *
  * @author Erik Larsson
  */
-public class HFSCommonFSFork extends FSFork {
+public class HFSCommonFSFork implements FSFork {
+    private static final String RESOURCE_XATTR_NAME = "com.apple.ResourceFork";
     private final HFSCommonFSFile parent;
     private final FSForkType type;
     private final CommonHFSForkData forkData;
     
     HFSCommonFSFork(HFSCommonFSFile iParent, FSForkType iType, CommonHFSForkData iForkData) {
-        super(iParent);
         
         // Input check
         if(iParent == null)
@@ -122,6 +122,22 @@ public class HFSCommonFSFork extends FSFork {
     @Override
     public TruncatableRandomAccessStream getForkStream() throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public boolean hasXattrName() {
+        if(type == FSForkType.MACOS_RESOURCE)
+            return true;
+        else
+            return false;
+    }
+
+    @Override
+    public String getXattrName() {
+        if(type == FSForkType.MACOS_RESOURCE)
+            return RESOURCE_XATTR_NAME;
+        else
+            return null;
     }
 
 }

@@ -231,6 +231,10 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
         public boolean hasBackupDate() {
             return true;
         }
+
+        public CommonHFSFinderInfo getFinderInfo() {
+            return CommonHFSFinderInfo.create(data);
+        }
     }
     
     public static class HFSImplementation extends CommonHFSCatalogFile {
@@ -388,6 +392,10 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
         @Override
         public boolean hasBackupDate() {
             return true;
+        }
+
+        public CommonHFSFinderInfo getFinderInfo() {
+            return CommonHFSFinderInfo.create(data);
         }
     }
 }
