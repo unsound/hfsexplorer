@@ -23,7 +23,6 @@ import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFileRecord;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.jparted.lib.fs.FSAttributes;
 import org.catacombae.jparted.lib.fs.FSEntry;
-//import org.catacombae.jparted.lib.fs.FSFolder;
 import org.catacombae.jparted.lib.fs.FSLink;
 
 /**
@@ -145,6 +144,7 @@ public class HFSCommonFSLink extends HFSCommonFSEntry implements FSLink {
         return getLinkTargetPosixPath();
     }
 
+    @Override
     public HFSCommonFileSystemHandler getFileSystemHandler() {
         return fsHandler;
     }
