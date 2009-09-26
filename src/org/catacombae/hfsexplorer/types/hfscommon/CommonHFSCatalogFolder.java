@@ -196,6 +196,10 @@ public abstract class CommonHFSCatalogFolder implements CommonHFSCatalogAttribut
         public boolean hasBackupDate() {
             return true;
         }
+
+        public CommonHFSFinderInfo getFinderInfo() {
+            return CommonHFSFinderInfo.create(data);
+        }
     }
     
     public static class HFSImplementation extends CommonHFSCatalogFolder {
@@ -329,6 +333,10 @@ public abstract class CommonHFSCatalogFolder implements CommonHFSCatalogAttribut
         @Override
         public boolean hasAttributeModDate() {
             return false;
+        }
+
+        public CommonHFSFinderInfo getFinderInfo() {
+            return CommonHFSFinderInfo.create(data);
         }
     }
 }

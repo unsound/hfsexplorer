@@ -29,11 +29,23 @@ import org.catacombae.jparted.lib.fs.FSFolder;
  *
  * @author Erik Larsson
  */
-public class HFSCommonFSFolder extends FSFolder implements HFSCommonFSEntry {
-    private final HFSCommonFileSystemHandler fsHandler;
+public class HFSCommonFSFolder extends HFSCommonFSEntry implements FSFolder {
+    /**
+     * The record from which this file was referenced. In the case of a
+     * non-hardlinked directory, this variable is equal to
+     * <code>folderRecord</code>.
+     * The key record supplies the name/location of the folder, but all other
+     * data is taken from <code>folderRecord</code>.
+     */
     private final CommonHFSCatalogLeafRecord keyRecord;
+
+    /**
+     * The folder record, from which folder data and attributes are retrieved.
+     * Could be called the 'inode' although it's not really proper in regard to
+     * the structure of HFS.
+     */
     private final CommonHFSCatalogFolderRecord folderRecord;
-    private final CommonHFSCatalogFolder catalogFolder;
+
     private final HFSCommonFSAttributes attributes;
     
     public HFSCommonFSFolder(HFSCommonFileSystemHandler iParent, CommonHFSCatalogFolderRecord iFolderRecord) {
@@ -41,7 +53,7 @@ public class HFSCommonFSFolder extends FSFolder implements HFSCommonFSEntry {
     }
 
     HFSCommonFSFolder(HFSCommonFileSystemHandler iParent, CommonHFSCatalogFileRecord iHardLinkFileRecord, CommonHFSCatalogFolderRecord iFolderRecord) {
-        super(iParent);
+        super(iParent, iFolderRecord.getData());
 
         // Input check
         if(iParent == null)
@@ -49,15 +61,14 @@ public class HFSCommonFSFolder extends FSFolder implements HFSCommonFSEntry {
         if(iFolderRecord == null)
             throw new IllegalArgumentException("iFolderRecord must not be null!");
 
-        this.fsHandler = iParent;
         if(iHardLinkFileRecord != null)
             this.keyRecord = iHardLinkFileRecord;
         else
             this.keyRecord = iFolderRecord;
         this.folderRecord = iFolderRecord;
-        //CommonHFSCatalogLeafRecordData data = folderRecord.getData();
-        this.catalogFolder = folderRecord.getData();
-        this.attributes = new HFSCommonFSAttributes(this, catalogFolder);
+        
+        this.attributes =
+                new HFSCommonFSAttributes(this, folderRecord.getData());
     }
     
     @Override
@@ -77,7 +88,7 @@ public class HFSCommonFSFolder extends FSFolder implements HFSCommonFSEntry {
 
     @Override
     public long getValence() {
-        return catalogFolder.getValence();
+        return folderRecord.getData().getValence();
     }
 
     @Override
@@ -98,13 +109,9 @@ public class HFSCommonFSFolder extends FSFolder implements HFSCommonFSEntry {
      * */
     
     public CommonHFSCatalogFolder getInternalCatalogFolder() {
-        return catalogFolder;
+        return folderRecord.getData();
     }
     CommonHFSCatalogFolderRecord getInternalCatalogFolderRecord() {
         return folderRecord;
-    }
-
-    public HFSCommonFileSystemHandler getFileSystemHandler() {
-        return fsHandler;
     }
 }

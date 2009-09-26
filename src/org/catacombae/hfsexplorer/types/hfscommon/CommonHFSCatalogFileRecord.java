@@ -29,8 +29,8 @@ import org.catacombae.hfsexplorer.types.hfs.CdrFilRec;
  * @author erik
  */
 public abstract class CommonHFSCatalogFileRecord extends CommonHFSCatalogLeafRecord {
-    protected CommonHFSCatalogKey key;
-    protected CommonHFSCatalogFile data;
+    protected final CommonHFSCatalogKey key;
+    protected final CommonHFSCatalogFile data;
     
     private CommonHFSCatalogFileRecord(CommonHFSCatalogKey key,
             CommonHFSCatalogFile data) {

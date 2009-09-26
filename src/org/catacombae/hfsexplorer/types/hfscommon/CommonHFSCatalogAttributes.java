@@ -44,6 +44,7 @@ public interface CommonHFSCatalogAttributes {
     public int getAccessDate();
     public int getBackupDate();
 
+
     /**
      * Returns whether or not this attribute set has a defined value for the "entry created"
      * timestamp.
@@ -96,6 +97,8 @@ public interface CommonHFSCatalogAttributes {
     public boolean hasPermissions();
     public HFSPlusBSDInfo getPermissions();
     //public int getTextEncoding();
+
+    public CommonHFSFinderInfo getFinderInfo();
     
     public Date getCreateDateAsDate();
     public Date getContentModDateAsDate();

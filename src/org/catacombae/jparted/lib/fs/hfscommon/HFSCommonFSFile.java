@@ -23,7 +23,6 @@ import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.jparted.lib.fs.FSAttributes;
 import org.catacombae.jparted.lib.fs.FSFile;
-import org.catacombae.jparted.lib.fs.FSFolder;
 import org.catacombae.jparted.lib.fs.FSFork;
 import org.catacombae.jparted.lib.fs.FSForkType;
 
@@ -32,11 +31,22 @@ import org.catacombae.jparted.lib.fs.FSForkType;
  *
  * @author Erik Larsson
  */
-public class HFSCommonFSFile extends FSFile implements HFSCommonFSEntry {
-    private final HFSCommonFileSystemHandler parent;
+public class HFSCommonFSFile extends HFSCommonFSEntry implements FSFile {
+    /**
+     * The record from which this file was referenced. In the case of a
+     * non-hardlinked file, this variable is equal to <code>fileRecord</code>.
+     * The key record supplies the name/location of the file, but all other data
+     * is taken from <code>fileRecord</code>.
+     */
     private final CommonHFSCatalogLeafRecord keyRecord;
+
+    /**
+     * The file record, from which file data and attributes are retrieved. Could
+     * be called the 'inode' although it's not really proper in regard to the
+     * structure of HFS.
+     */
     private final CommonHFSCatalogFileRecord fileRecord;
-    private final CommonHFSCatalogFile catalogFile;
+    
     private final HFSCommonFSAttributes attributes;
     private final FSFork dataFork;
     private final FSFork resourceFork;
@@ -46,7 +56,7 @@ public class HFSCommonFSFile extends FSFile implements HFSCommonFSEntry {
     }
     
     HFSCommonFSFile(HFSCommonFileSystemHandler iParent, CommonHFSCatalogLeafRecord iHardLinkRecord, CommonHFSCatalogFileRecord iFileRecord) {
-        super(iParent);
+        super(iParent, iFileRecord.getData());
         
         // Input check
         if(iParent == null)
@@ -54,13 +64,12 @@ public class HFSCommonFSFile extends FSFile implements HFSCommonFSEntry {
         if(iFileRecord == null)
             throw new IllegalArgumentException("iFileRecord must not be null!");
         
-        this.parent = iParent;
         this.fileRecord = iFileRecord;
         if(iHardLinkRecord != null)
             this.keyRecord = iHardLinkRecord;
         else
             this.keyRecord = iFileRecord;
-        this.catalogFile = fileRecord.getData();
+        CommonHFSCatalogFile catalogFile = fileRecord.getData();
         this.attributes = new HFSCommonFSAttributes(this, catalogFile);
         this.dataFork = new HFSCommonFSFork(this, FSForkType.DATA, catalogFile.getDataFork());
         this.resourceFork = new HFSCommonFSFork(this, FSForkType.MACOS_RESOURCE, catalogFile.getResourceFork());
@@ -73,7 +82,7 @@ public class HFSCommonFSFile extends FSFile implements HFSCommonFSEntry {
 
     @Override
     public String getName() {
-        return parent.getProperNodeName(keyRecord);
+        return fsHandler.getProperNodeName(keyRecord);
     }
 
     /*
@@ -90,39 +99,54 @@ public class HFSCommonFSFile extends FSFile implements HFSCommonFSEntry {
 
     @Override
     public FSFork[] getAllForks() {
-        return new FSFork[] { dataFork, resourceFork };
+        FSFork[] superForks = super.getAllForks();
+
+        boolean hasResourceFork = resourceFork.getLength() > 0;
+        int numForks = superForks.length + 1;
+        if(hasResourceFork)
+            ++numForks;
+
+        FSFork[] res = new FSFork[numForks];
+        System.arraycopy(superForks, 0, res, 0, superForks.length);
+        res[superForks.length] = dataFork;
+        if(hasResourceFork)
+            res[superForks.length+1] = resourceFork;
+
+        /*
+         * TODO: Remove duplicates, in case we are overriding a fork.
+         * (...which we are not, so this is unneccessary at this point.)
+         */
+
+        return res;
     }
 
     @Override
     public FSFork getForkByType(FSForkType type) {
-        switch(type) {
+        switch (type) {
             case DATA:
                 return dataFork;
             case MACOS_RESOURCE:
                 return resourceFork;
             default:
-                return null;
+                return super.getForkByType(type);
         }
     }
 
     @Override
     public long getCombinedLength() {
-        return dataFork.getLength() + resourceFork.getLength();
+        return super.getCombinedLength() + dataFork.getLength() +
+                resourceFork.getLength();
     }
 
     ReadableRandomAccessStream getReadableDataForkStream() {
-        return parent.getReadableDataForkStream(fileRecord);
+        return fsHandler.getReadableDataForkStream(fileRecord);
     }
     
     ReadableRandomAccessStream getReadableResourceForkStream() {
-        return parent.getReadableResourceForkStream(fileRecord);
-    }
-    
-    public HFSCommonFileSystemHandler getFileSystemHandler() {
-        return parent;
+        return fsHandler.getReadableResourceForkStream(fileRecord);
     }
     
     public CommonHFSCatalogFile getInternalCatalogFile() {
-        return catalogFile;
+        return fileRecord.getData();
     }
 }

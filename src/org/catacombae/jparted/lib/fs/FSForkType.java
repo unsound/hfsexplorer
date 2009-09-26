@@ -34,5 +34,10 @@ public enum FSForkType {
      * meaning for MacOS operating systems, as content type, thumbnails and
      * other metadata are stored there.
      */
-    MACOS_RESOURCE;
+    MACOS_RESOURCE,
+    /**
+     * The 32-byte metadata fork FinderInfo, used by the Mac OS Finder.
+     */
+    MACOS_FINDERINFO,
+    ;
 }

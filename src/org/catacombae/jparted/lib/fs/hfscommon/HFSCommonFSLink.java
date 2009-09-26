@@ -30,15 +30,13 @@ import org.catacombae.jparted.lib.fs.FSLink;
  *
  * @author erik
  */
-public class HFSCommonFSLink extends FSLink implements HFSCommonFSEntry {
+public class HFSCommonFSLink extends HFSCommonFSEntry implements FSLink {
     private final CommonHFSCatalogFileRecord linkRecord;
-    private final HFSCommonFileSystemHandler fsHandler;
     
     public HFSCommonFSLink(HFSCommonFileSystemHandler fsHandler,
             CommonHFSCatalogFileRecord linkRecord) {
-        super(fsHandler);
+        super(fsHandler, linkRecord.getData());
 
-        this.fsHandler = fsHandler;
         this.linkRecord = linkRecord;
         
         if(!linkRecord.getData().isSymbolicLink())

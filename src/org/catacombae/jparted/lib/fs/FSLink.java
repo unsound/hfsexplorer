@@ -26,11 +26,7 @@ package org.catacombae.jparted.lib.fs;
  *
  * @author Erik Larsson
  */
-public abstract class FSLink extends FSEntry {
-
-    protected FSLink(FileSystemHandler parentFileSystem) {
-        super(parentFileSystem);
-    }
+public interface FSLink extends FSEntry {
     
     /**
      * Tries to resolve the target of the link in the context of its file system. If the link is
@@ -40,7 +36,7 @@ public abstract class FSLink extends FSEntry {
      * relative pathnames).
      * @return the target of this link, if possible, or <code>null</code> if the link was invalid.
      */
-    public abstract FSEntry getLinkTarget(String[] parentDir);
+    public FSEntry getLinkTarget(String[] parentDir);
     
     /**
      * Returns a context specific string which shows the intended target for this link in the syntax
@@ -49,5 +45,5 @@ public abstract class FSLink extends FSEntry {
      *
      * @return a context specific string which shows the intended target for this link.
      */
-    public abstract String getLinkTargetString();
+    public String getLinkTargetString();
 }

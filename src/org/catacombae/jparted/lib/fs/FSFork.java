@@ -28,12 +28,7 @@ import org.catacombae.io.WritableRandomAccessStream;
  *
  * @author <a href="mailto:erik82@kth.se">Erik Larsson</a>
  */
-public abstract class FSFork {
-    private final FSFile parent;
-    
-    protected FSFork(FSFile iParent) {
-        this.parent = iParent;
-    }
+public interface FSFork {
     
     /**
      * Returns the length (in bytes) of this fork.
@@ -87,6 +82,24 @@ public abstract class FSFork {
      * available forks.
      */
     public abstract String getForkIdentifier();
+
+    /**
+     * Returns whether or not this fork can be mapped to a UNIX extended
+     * attribute, i.e. if there is a defined name for that extended attribute.
+     *
+     * @return whether or not this fork can be mapped to a UNIX extended
+     * attribute.
+     */
+    public abstract boolean hasXattrName();
+
+    /**
+     * Returns the UNIX 'xattr'-style name of this fork, if applicable, or
+     * <code>null</code> if no such mapping can be made.
+     *
+     * @return the UNIX 'xattr'-style name of this fork if possible, or
+     * <code>null</code> otherwise.
+     */
+    public abstract String getXattrName();
     
     /**
      * Creates an input stream from which the file's contents can be read.

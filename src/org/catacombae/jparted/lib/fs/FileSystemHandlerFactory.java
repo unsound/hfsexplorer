@@ -84,7 +84,24 @@ public abstract class FileSystemHandlerFactory {
      * @return the custom create attributes supported by this implementation.
      */
     public abstract CustomAttribute[] getSupportedCustomAttributes();
-    
+
+    /**
+     * Returns the custom attribute by the name <code>name</code>, if supported
+     * by the implementation. Returns <code>null</code> if not supported.
+     *
+     * @param name the name of the requested custom attribute.
+     * @return the custom attribute by the name <code>name</code> if supported,
+     * and <code>null</code> otherwise.
+     */
+    public CustomAttribute getCustomAttribute(String name) {
+        for(CustomAttribute attr : getSupportedCustomAttributes()) {
+            if(attr.getName().equals(name))
+                return attr;
+        }
+
+        return null;
+    }
+
     /**
      * Returns whether or not this standard attribute is supported by the
      * implementation.

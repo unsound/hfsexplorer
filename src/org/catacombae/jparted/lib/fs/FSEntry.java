@@ -24,34 +24,10 @@ package org.catacombae.jparted.lib.fs;
  * 
  * @author <a href="mailto:erik82@kth.se">Erik Larsson</a>
  */
-public abstract class FSEntry {
+public interface FSEntry {
     public static enum Type {
         FILE, FOLDER, SYMLINK, CHARACTER_DEVICE, BLOCK_DEVICE, FIFO, SOCKET;
     }
-    
-    /**
-     * Implementations of this abstract class must always retain a reference to
-     * the parent file system of the entry.
-     */
-    protected final FileSystemHandler parentFileSystem;
-    
-    /**
-     * Implementations of this abstract class must always retain a reference to
-     * the parent file system of the entry.
-     */
-    protected FSEntry(FileSystemHandler iParentFileSystem) {
-        this.parentFileSystem = iParentFileSystem;
-    }
-    
-    /**
-     * Gets the internal ID of this file in the context of the associated
-     * file system. This may be an internal node ID that has no relevance
-     * except for uniquely identifying an entry in a file system.
-     * @return the internal ID of this file.
-     */
-    /*public byte[] getFileSystemID() {
-        return Util.createCopy(fsId);
-    }*/
     
     /**
      * Returns the attributes of this file system entry. Which attributes are
@@ -59,102 +35,37 @@ public abstract class FSEntry {
      * 
      * @return the attributes of this file system entry.
      */
-    public abstract FSAttributes getAttributes();
-    
-    public abstract String getName();
+    public FSAttributes getAttributes();
+
+    public String getName();
     
     //public abstract FSFolder getParent();
-    
-    protected FileSystemHandler getParentFileSystem() {
-        return parentFileSystem;
-    }
-    
-    /*
-     * The methods below are for convenience purposes. Code involving a lot of
-     * instanceof statements tend to get a bit ugly...
-     */
-    
-    /**
-     * Returns whether or not this FSEntry denotes a file. If this method
-     * returns true, you can safely call the <code>asFile()</code> method in
-     * order to get the full file object.
-     * 
-     * @return whether or not this FSEntry denotes a file.
-     */
-    public boolean isFile() {
-        return this instanceof FSFile;
-    }
-    
-    /**
-     * Returns whether or not this FSEntry denotes a folder (directory). If this
-     * method returns true, you can safely call the <code>asFolder()</code>
-     * method in order to get the full folder object.
-     * 
-     * @return whether or not this FSEntry denotes a folder (directory).
-     */
-    public boolean isFolder() {
-        return this instanceof FSFolder;
-    }
-    
-    /**
-     * Returns this object as an FSFile object, if it can be casted, and throws
-     * a <code>RuntimeException</code> otherwise. You should call the isFile()
-     * method first to make sure the cast is valid.
-     * 
-     * @return this object as an FSFile object, if possible.
-     */
-    public FSFile asFile() {
-        if(this instanceof FSFile)
-            return (FSFile) this;
-        else
-            throw new RuntimeException("Not a file!");
-    }
 
     /**
-     * Returns this object as an FSFolder object, if it can be casted, and
-     * throws a <code>RuntimeException</code> otherwise. You should call the
-     * isFolder() method first to make sure the cast is valid.
-     * 
-     * @return this object as an FSFolder object, if possible.
+     * Returns all available forks for this file.
+     *
+     * @return all available forks for this file.
      */
-    public FSFolder asFolder() {
-        if(this instanceof FSFolder)
-            return (FSFolder) this;
-        else
-            throw new RuntimeException("Not a folder!");
-    }
+    public FSFork[] getAllForks();
 
     /**
-     * Returns the absolute path to this entry in the context of its file system.
-     * @return the absolute path to this entry in the context of its file system.
+     * Returns the fork corresponding to a predefined fork type, if supported,
+     * or <code>null</code> if no fork corresponding to the fork type can be
+     * found or the file system does not support the specified fork type.<br>
+     * To check which fork types the file system handler generally supports,
+     * use FileSystemHandler.getSupportedForkTypes().
+     *
+     * @param type the FSForkType corresponding to the requested fork.
+     * @return the requested fork, if existent, or <code>null</code> otherwise.
      */
-    /*
-    public String[] getAbsolutePath() {
-        LinkedList<String> pathBuilder = new LinkedList<String>();
-        getCanonicalPathInternal(pathBuilder);
-        return pathBuilder.toArray(new String[pathBuilder.size()]);
-    }
+    public FSFork getForkByType(FSForkType type);
 
-    void getCanonicalPathInternal(LinkedList<String> components) {
-        FSFolder parentFolder = getParent();
-        if(parentFolder != null)
-            parentFolder.getCanonicalPathInternal(components);
-        
-        components.addLast(getName());
-    }
-     * */
-
-    /*
-    public String getAbsolutePosixPath() {
-        String[] fsPath = getAbsolutePath();
-        StringBuilder sb = new StringBuilder();
-
-        for(String s : fsPath) {
-            sb.append("/");
-            sb.append(parentFileSystem.generatePosixPathnameComponent(s));
-        }
-
-        return sb.toString();
-    }
-     * */
+    /**
+     * Returns the length of the data of all of the file's forks put together.
+     * For instance if a file has a data fork of 12 bytes and a resource fork of
+     * 8 bytes, this method will return the value 20.
+     *
+     * @return the length of the data of all of the file's forks put together.
+     */
+    public long getCombinedLength();
 }
