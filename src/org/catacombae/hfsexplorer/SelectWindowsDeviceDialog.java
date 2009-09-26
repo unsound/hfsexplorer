@@ -44,6 +44,8 @@ import org.catacombae.hfsexplorer.partitioning.MBRPartition;
 import org.catacombae.hfsexplorer.partitioning.MBRPartitionTable;
 import org.catacombae.hfsexplorer.partitioning.Partition;
 import org.catacombae.hfsexplorer.partitioning.PartitionSystem;
+import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemRecognizer;
+import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemRecognizer.FileSystemType;
 import org.catacombae.jparted.lib.ps.PartitionType;
 import org.catacombae.jparted.lib.ps.ebr.EBRPartition;
 
@@ -251,8 +253,9 @@ public class SelectWindowsDeviceDialog extends JDialog {
                         Partition part = parts[j];
                         PartitionType pt = part.getType();
                         if(pt == PartitionType.APPLE_HFS_CONTAINER || pt == PartitionType.APPLE_HFSX) {
-                            FileSystemRecognizer fsr = new FileSystemRecognizer(llf, part.getStartOffset());
-                            if(fsr.isTypeSupported(fsr.detectFileSystem())) {
+                            FileSystemType fsType =
+                                    HFSCommonFileSystemRecognizer.detectFileSystem(llf, part.getStartOffset());
+                            if(FileSystemRecognizer.isTypeSupported(fsType)) {
                                 fileSystemFound = true;
                                 embeddedFileSystems.add(new EmbeddedPartitionEntry(deviceName, j, part));
                             }
@@ -261,8 +264,9 @@ public class SelectWindowsDeviceDialog extends JDialog {
                 }
                 
                 if(!fileSystemFound && deviceName.endsWith("Partition0")) {
-		    FileSystemRecognizer fsr = new FileSystemRecognizer(llf, 0);
-		    if(fsr.isTypeSupported(fsr.detectFileSystem()))
+                    FileSystemType fsType =
+                            HFSCommonFileSystemRecognizer.detectFileSystem(llf, 0);
+		    if(FileSystemRecognizer.isTypeSupported(fsType))
 			plainFileSystems.add(deviceName);
 		}
                 /* If we found file systems in embedded partition systems,
@@ -275,8 +279,9 @@ public class SelectWindowsDeviceDialog extends JDialog {
 		System.out.println("INFO: Non-critical exception while detecting partition system at \"" +
 				   DEVICE_PREFIX + deviceName + "\": " + e.toString());
 		if(llf != null) {
-		    FileSystemRecognizer fsr = new FileSystemRecognizer(llf, 0);
-		    if(fsr.isTypeSupported(fsr.detectFileSystem()))
+                    FileSystemType fsType =
+                            HFSCommonFileSystemRecognizer.detectFileSystem(llf, 0);
+		    if(FileSystemRecognizer.isTypeSupported(fsType))
 			plainFileSystems.add(deviceName);
 		    llf.close();
 		}
