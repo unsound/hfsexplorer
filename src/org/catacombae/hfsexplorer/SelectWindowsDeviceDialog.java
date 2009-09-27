@@ -255,7 +255,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
                         if(pt == PartitionType.APPLE_HFS_CONTAINER || pt == PartitionType.APPLE_HFSX) {
                             FileSystemType fsType =
                                     HFSCommonFileSystemRecognizer.detectFileSystem(llf, part.getStartOffset());
-                            if(FileSystemRecognizer.isTypeSupported(fsType)) {
+                            if(HFSCommonFileSystemRecognizer.isTypeSupported(fsType)) {
                                 fileSystemFound = true;
                                 embeddedFileSystems.add(new EmbeddedPartitionEntry(deviceName, j, part));
                             }
@@ -266,7 +266,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
                 if(!fileSystemFound && deviceName.endsWith("Partition0")) {
                     FileSystemType fsType =
                             HFSCommonFileSystemRecognizer.detectFileSystem(llf, 0);
-		    if(FileSystemRecognizer.isTypeSupported(fsType))
+		    if(HFSCommonFileSystemRecognizer.isTypeSupported(fsType))
 			plainFileSystems.add(deviceName);
 		}
                 /* If we found file systems in embedded partition systems,
@@ -281,7 +281,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
 		if(llf != null) {
                     FileSystemType fsType =
                             HFSCommonFileSystemRecognizer.detectFileSystem(llf, 0);
-		    if(FileSystemRecognizer.isTypeSupported(fsType))
+		    if(HFSCommonFileSystemRecognizer.isTypeSupported(fsType))
 			plainFileSystems.add(deviceName);
 		    llf.close();
 		}

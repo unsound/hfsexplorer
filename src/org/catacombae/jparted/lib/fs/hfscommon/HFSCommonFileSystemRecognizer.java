@@ -83,4 +83,22 @@ public class HFSCommonFileSystemRecognizer {
             return FileSystemType.UNKNOWN;
         }
     }
+
+    /**
+     * Change this array to tell the recognizer which types the
+     * FileSystemHandler supports.
+     */
+    public static final FileSystemType[] supportedTypes = {
+        FileSystemType.HFS,
+        FileSystemType.HFS_PLUS,
+        FileSystemType.HFS_WRAPPED_HFS_PLUS,
+        FileSystemType.HFSX,
+    };
+
+    public static boolean isTypeSupported(FileSystemType fst) {
+        for(FileSystemType cur : supportedTypes)
+            if(cur == fst)
+                return true;
+        return false;
+    }
 }
