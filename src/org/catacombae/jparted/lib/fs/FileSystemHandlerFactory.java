@@ -50,6 +50,17 @@ public abstract class FileSystemHandlerFactory {
     
     public abstract FileSystemHandler createHandler(DataLocator data);
     public abstract FileSystemHandlerInfo getHandlerInfo();
+
+    public abstract FileSystemCapability[] getCapabilities();
+
+    public boolean hasCapability(FileSystemCapability c) {
+        for(FileSystemCapability cur : getCapabilities()) {
+            if(cur == c)
+                return true;
+        }
+        
+        return false;
+    }
     
     /**
      * Creates a new instance of this particular factory subclass.
