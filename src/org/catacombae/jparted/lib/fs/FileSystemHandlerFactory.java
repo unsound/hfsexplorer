@@ -47,8 +47,16 @@ public abstract class FileSystemHandlerFactory {
      * @return the file system recognizer for the current file system type.
      */
     public abstract FileSystemRecognizer getRecognizer();
-    
+
+    /**
+     * Creates a new file system handler from the data pointed to by the
+     * supplied DataLocator.
+     *
+     * @param data locator of the file system data.
+     * @return a newly created file system handler.
+     */
     public abstract FileSystemHandler createHandler(DataLocator data);
+    
     public abstract FileSystemHandlerInfo getHandlerInfo();
 
     public abstract FileSystemCapability[] getCapabilities();
