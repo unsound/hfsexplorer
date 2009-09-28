@@ -60,5 +60,12 @@ public interface FileSystemHandlerInfo {
      * @return the revision number of this release of the handler.
      */
     public long getRevision();
+
+    /**
+     * Returns the company / group / individual(s) that produced this file
+     * system handler. The string is free-form.
+     *
+     * @return the author of this file system handler.
+     */
     public String getAuthor();
 }
