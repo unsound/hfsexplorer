@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2008 Erik Larsson
+ * Copyright (C) 2008-2009 Erik Larsson
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ import org.catacombae.jparted.lib.fs.FileSystemHandler;
 import org.catacombae.jparted.lib.fs.FileSystemHandlerFactory;
 import org.catacombae.jparted.lib.fs.FileSystemHandlerInfo;
 import org.catacombae.jparted.lib.fs.FileSystemRecognizer;
+import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemHandlerFactory;
 import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemRecognizer;
 import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemRecognizer.FileSystemType;
 import org.catacombae.util.Util;
@@ -35,7 +36,7 @@ import org.catacombae.util.Util;
  *
  * @author erik
  */
-public class HFSPlusFileSystemHandlerFactory extends FileSystemHandlerFactory {
+public class HFSPlusFileSystemHandlerFactory extends HFSCommonFileSystemHandlerFactory {
     private static final FileSystemRecognizer recognizer = new HFSPlusFileSystemRecognizer();
 
     private static final FileSystemHandlerInfo handlerInfo =
