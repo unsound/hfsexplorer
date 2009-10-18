@@ -486,25 +486,6 @@ public abstract class HFSVolume {
 
     // Utility methods
 
-
-
-
-
-    /*
-    private static HFSPlusCatalogLeafRecord findRecordID(HFSPlusCatalogLeafNode leafNode, HFSCatalogNodeID nodeID) {
-	HFSPlusCatalogLeafRecord[] records = leafNode.getLeafRecords();
-	for(int i = 0; i < records.length; ++i) {
-	    HFSPlusCatalogLeafRecord curRec = records[i];
-	    HFSPlusCatalogLeafRecordData curRecData = curRec.getData();
-	    if(curRecData instanceof HFSPlusCatalogFile &&
-	       ((HFSPlusCatalogFile)curRecData).getFileID().toInt() == nodeID.toInt()) {
-		return (HFSPlusCatalogFile)curRecData;
-	    }
-	}
-	return null;
-    }
-    */
-
     protected long calculateDataForkSizeRecursive(CommonHFSCatalogLeafRecord[] recs) {
 	return calculateForkSizeRecursive(recs, false);
     }
@@ -517,14 +498,20 @@ public abstract class HFSVolume {
     protected long calculateResourceForkSizeRecursive(CommonHFSCatalogLeafRecord rec) {
 	return calculateForkSizeRecursive(rec, true);
     }
-    /** Calculates the complete size of the trees represented by <code>recs</code>. */
+
+    /**
+     * Calculates the complete size of the trees rooted in <code>recs</code>.
+     */
     protected long calculateForkSizeRecursive(CommonHFSCatalogLeafRecord[] recs, boolean resourceFork) {
 	long totalSize = 0;
 	for(CommonHFSCatalogLeafRecord rec : recs)
 	    totalSize += calculateForkSizeRecursive(rec, resourceFork);
 	return totalSize;
     }
-    /** Calculates the complete size of the tree represented by <code>rec</code>. */
+
+    /**
+     * Calculates the complete size of the tree represented by <code>rec</code>.
+     */
     protected long calculateForkSizeRecursive(CommonHFSCatalogLeafRecord rec, boolean resourceFork) {
 	if(rec instanceof CommonHFSCatalogFileRecord) {
 	    if(!resourceFork)

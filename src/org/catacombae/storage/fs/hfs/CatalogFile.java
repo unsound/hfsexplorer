@@ -441,4 +441,18 @@ public class CatalogFile extends BTreeFile {
 	return children.toArray(new CommonHFSCatalogLeafRecord[children.size()]);
     }
 
+    /*
+    private static HFSPlusCatalogLeafRecord findRecordID(HFSPlusCatalogLeafNode leafNode, HFSCatalogNodeID nodeID) {
+	HFSPlusCatalogLeafRecord[] records = leafNode.getLeafRecords();
+	for(int i = 0; i < records.length; ++i) {
+	    HFSPlusCatalogLeafRecord curRec = records[i];
+	    HFSPlusCatalogLeafRecordData curRecData = curRec.getData();
+	    if(curRecData instanceof HFSPlusCatalogFile &&
+	       ((HFSPlusCatalogFile)curRecData).getFileID().toInt() == nodeID.toInt()) {
+		return (HFSPlusCatalogFile)curRecData;
+	    }
+	}
+	return null;
+    }
+    */
 }
