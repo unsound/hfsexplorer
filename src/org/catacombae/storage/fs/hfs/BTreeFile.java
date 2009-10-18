@@ -71,7 +71,9 @@ public abstract class BTreeFile {
             //System.err.print("...");
 
 	    if(recordKey.compareTo(searchKey) <= 0 &&
-	       (largestMatchingRecord == null || recordKey.compareTo(largestMatchingRecord.getKey()) > 0)) {
+                    (largestMatchingRecord == null ||
+                    recordKey.compareTo(largestMatchingRecord.getKey()) > 0)) {
+
 		largestMatchingRecord = record;
                 //System.err.print("match!");
 	    }
