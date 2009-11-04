@@ -1259,7 +1259,7 @@ public class FileSystemBrowserWindow extends JFrame {
 
                                 int res = JOptionPane.showConfirmDialog(progress,
                                         "Do you want to follow symbolic links while extracting?\n" +
-                                        "Following symbolic links means that the extracted tree will" +
+                                        "Following symbolic links means that the extracted tree will " +
                                         "more closely match the percieved file system tree, but it\n" +
                                         "increases the size of the extracted data, the time that it " +
                                         "takes to extract it, and puts a lot of identical files at\n" +
