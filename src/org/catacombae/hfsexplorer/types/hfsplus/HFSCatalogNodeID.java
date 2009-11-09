@@ -44,99 +44,111 @@ public class HFSCatalogNodeID implements StructElements {
     public static final HFSCatalogNodeID kHFSBogusExtentFileID       = new HFSCatalogNodeID(15);
     public static final HFSCatalogNodeID kHFSFirstUserCatalogNodeID  = new HFSCatalogNodeID(16);
     
-    private final byte[] hfsCatalogNodeID = new byte[4];
+    private int hfsCatalogNodeID;
 	
     public HFSCatalogNodeID(byte[] data, int offset) {
-	System.arraycopy(data, offset, hfsCatalogNodeID, 0, 4);
+        this.hfsCatalogNodeID = Util.readIntBE(data, offset);
     }
-    public HFSCatalogNodeID(int nodeID) {
-	System.arraycopy(Util.toByteArrayBE(nodeID), 0, hfsCatalogNodeID, 0, 4);
-    }
-    
-    public static int length() { return 4; }
 
-    public int toInt() { return Util.readIntBE(hfsCatalogNodeID); }
-    public long toLong() { return Util.unsign(toInt()); }
-    public String getDescription() {
-	/*
-	 * kHFSRootParentID            = 1,
-	 * kHFSRootFolderID            = 2,
-	 * kHFSExtentsFileID           = 3,
-	 * kHFSCatalogFileID           = 4,
-	 * kHFSBadBlockFileID          = 5,
-	 * kHFSAllocationFileID        = 6,
-	 * kHFSStartupFileID           = 7,
-	 * kHFSAttributesFileID        = 8,
-	 * kHFSRepairCatalogFileID     = 14,
-	 * kHFSBogusExtentFileID       = 15,
-	 * kHFSFirstUserCatalogNodeID  = 16
-	 */
-	String result;
-	switch(toInt()) {
-	case 1:
-	    result = "kHFSRootParentID";
-	    break;
-	case 2:
-	    result = "kHFSRootFolderID";
-	    break;
-	case 3:
-	    result = "kHFSExtentsFileID";
-	    break;
-	case 4:
-	    result = "kHFSCatalogFileID";
-	    break;
-	case 5:
-	    result = "kHFSBadBlockFileID";
-	    break;
-	case 6:
-	    result = "kHFSAllocationFileID";
-	    break;
-	case 7:
-	    result = "kHFSStartupFileID";
-	    break;
-	case 8:
-	    result = "kHFSAttributesFileID";
-	    break;
-	case 14:
-	    result = "kHFSRepairCatalogFileID";
-	    break;
-	case 15:
-	    result = "kHFSBogusExtentFileID";
-	    break;
-	case 16:
-	    result = "kHFSFirstUserCatalogNodeID";
-	    break;
-	default:
-	    result = "User Defined ID";
-	    break;
-	}
-	return result;
+    public HFSCatalogNodeID(int nodeID) {
+        this.hfsCatalogNodeID = nodeID;
     }
-    
+
+    public static int length() {
+        return 4;
+    }
+
+    public int toInt() {
+        return hfsCatalogNodeID;
+    }
+
+    public long toLong() {
+        return Util.unsign(toInt());
+    }
+
+    public String getDescription() {
+        /*
+         * kHFSRootParentID            = 1,
+         * kHFSRootFolderID            = 2,
+         * kHFSExtentsFileID           = 3,
+         * kHFSCatalogFileID           = 4,
+         * kHFSBadBlockFileID          = 5,
+         * kHFSAllocationFileID        = 6,
+         * kHFSStartupFileID           = 7,
+         * kHFSAttributesFileID        = 8,
+         * kHFSRepairCatalogFileID     = 14,
+         * kHFSBogusExtentFileID       = 15,
+         * kHFSFirstUserCatalogNodeID  = 16
+         */
+        String result;
+        switch(toInt()) {
+            case 1:
+                result = "kHFSRootParentID";
+                break;
+            case 2:
+                result = "kHFSRootFolderID";
+                break;
+            case 3:
+                result = "kHFSExtentsFileID";
+                break;
+            case 4:
+                result = "kHFSCatalogFileID";
+                break;
+            case 5:
+                result = "kHFSBadBlockFileID";
+                break;
+            case 6:
+                result = "kHFSAllocationFileID";
+                break;
+            case 7:
+                result = "kHFSStartupFileID";
+                break;
+            case 8:
+                result = "kHFSAttributesFileID";
+                break;
+            case 14:
+                result = "kHFSRepairCatalogFileID";
+                break;
+            case 15:
+                result = "kHFSBogusExtentFileID";
+                break;
+            case 16:
+                result = "kHFSFirstUserCatalogNodeID";
+                break;
+            default:
+                result = "User Defined ID";
+                break;
+        }
+        return result;
+    }
+
     @Override
     public String toString() {
-	return "" + Util.unsign(toInt());// + " (" + getDescription() + ")";
+        return "" + Util.unsign(toInt());// + " (" + getDescription() + ")";
     }
-    
+
     public void printFields(PrintStream ps, String prefix) {
-	ps.println(prefix + " hfsCatalogNodeID: " + toString() + " (" + getDescription() + ")");
+        ps.println(prefix + " hfsCatalogNodeID: " + toString() + " (" + getDescription() + ")");
     }
-    
+
     public void print(PrintStream ps, String prefix) {
-	ps.println(prefix + "HFSCatalogNodeID:");
-	printFields(ps, prefix);
+        ps.println(prefix + "HFSCatalogNodeID:");
+        printFields(ps, prefix);
     }
 
     public byte[] getBytes() {
-        return Util.createCopy(hfsCatalogNodeID);
+        return Util.toByteArrayBE(hfsCatalogNodeID);
     }
 
     public Dictionary getStructElements() {
-        DictionaryBuilder db = new DictionaryBuilder(HFSCatalogNodeID.class.getSimpleName());
+        try {
+            DictionaryBuilder db = new DictionaryBuilder(HFSCatalogNodeID.class.getSimpleName());
+            db.addInt("hfsCatalogNodeID", getClass().getField("hfsCatalogNodeID"), this, UNSIGNED, BIG_ENDIAN, null, null, DECIMAL);
 
-        db.addUIntBE("hfsCatalogNodeID", hfsCatalogNodeID);
-
-        return db.getResult();
+            return db.getResult();
+        } catch(NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
     
