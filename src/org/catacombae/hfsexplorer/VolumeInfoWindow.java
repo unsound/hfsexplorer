@@ -22,6 +22,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import org.catacombae.hfsexplorer.gui.AttributesInfoPanel;
 import org.catacombae.hfsexplorer.gui.CatalogInfoPanel;
 import org.catacombae.hfsexplorer.gui.ExtentsInfoPanel;
 import org.catacombae.hfsexplorer.gui.JournalInfoPanel;
@@ -94,8 +95,23 @@ public class VolumeInfoWindow extends JFrame {
         } catch(Exception e) {
             e.printStackTrace();
         }
-        
-        
+
+
+        // The "Attributes file info" tab
+
+        try {
+            AttributesInfoPanel attributesInfoPanel =
+                    new AttributesInfoPanel((HFSPlusVolume)fsView);
+            JScrollPane scroller = new JScrollPane(attributesInfoPanel,
+                    JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                    JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            tabs.addTab("Attributes file", scroller);
+            scroller.getVerticalScrollBar().setUnitIncrement(10);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+
         // The "Journal info" tab (optional)
         
         try {
