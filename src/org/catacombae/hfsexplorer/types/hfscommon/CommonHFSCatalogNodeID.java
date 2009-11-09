@@ -76,7 +76,7 @@ public abstract class CommonHFSCatalogNodeID {
      * @return a CommonHFSCatalogNodeID representing the specified reserved ID.
      */
     public static CommonHFSCatalogNodeID getHFSPlusReservedID(ReservedID id) {
-        return HFSImplementation.getReservedIDStatic(id);
+        return HFSPlusImplementation.getReservedIDStatic(id);
     }
     
     /**
