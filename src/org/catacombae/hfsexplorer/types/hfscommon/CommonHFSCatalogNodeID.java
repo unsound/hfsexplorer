@@ -55,8 +55,7 @@ public abstract class CommonHFSCatalogNodeID {
      * Returns a CommonHFSCatalogNodeID for a specified reserved ID, if the
      * reserved ID is supported for the implementation (otherwise null is
      * returned). HFS only supports ROOT_PARENT, ROOT_FOLDER, EXTENTS_FILE,
-     * CATALOG_FILE, BAD_BLOCKS_FILE and FIRST_USER_CATALOG_NODE_ID while
-     * HFS+ supports all ReservedID values.
+     * CATALOG_FILE, BAD_BLOCKS_FILE and FIRST_USER_CATALOG_NODE_ID.
      * 
      * @param id the reserved ID to look up.
      * @return a CommonHFSCatalogNodeID representing the specified reserved ID.
@@ -68,9 +67,7 @@ public abstract class CommonHFSCatalogNodeID {
     /**
      * Returns a CommonHFSCatalogNodeID for a specified reserved ID, if the
      * reserved ID is supported for the implementation (otherwise null is
-     * returned). HFS only supports ROOT_PARENT, ROOT_FOLDER, EXTENTS_FILE,
-     * CATALOG_FILE, BAD_BLOCKS_FILE and FIRST_USER_CATALOG_NODE_ID while
-     * HFS+ supports all ReservedID values.
+     * returned). HFS+ supports all ReservedID values.
      * 
      * @param id
      * @return a CommonHFSCatalogNodeID representing the specified reserved ID.
