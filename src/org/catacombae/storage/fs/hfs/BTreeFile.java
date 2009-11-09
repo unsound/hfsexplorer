@@ -5,12 +5,14 @@
 
 package org.catacombae.storage.fs.hfs;
 
+import org.catacombae.hfsexplorer.types.hfscommon.CommonBTHeaderNode;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTHeaderRecord;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTIndexNode;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTIndexRecord;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTKey;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTNodeDescriptor;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSVolumeHeader;
+import org.catacombae.io.Readable;
 import org.catacombae.io.ReadableRandomAccessStream;
 
 /**
@@ -20,8 +22,11 @@ import org.catacombae.io.ReadableRandomAccessStream;
 public abstract class BTreeFile {
     final HFSVolume vol;
 
-    BTreeFile(HFSVolume vol) {
+    private final BTreeOperations ops;
+
+    BTreeFile(HFSVolume vol, BTreeOperations ops) {
         this.vol = vol;
+        this.ops = ops;
     }
 
     abstract class BTreeFileSession {
@@ -31,7 +36,7 @@ public abstract class BTreeFile {
         final ReadableRandomAccessStream btreeStream;
 
         public BTreeFileSession() {
-            this.header = vol.ops.getVolumeHeader();
+            this.header = vol.getVolumeHeader();
             //header.print(System.err, "    ");
             this.btreeStream = getBTreeStream(header);
 
@@ -39,8 +44,8 @@ public abstract class BTreeFile {
             //byte[] nodeDescriptorData = new byte[14];
             //if(forkFilterFile.read(nodeDescriptorData) != nodeDescriptorData.length)
             //	System.out.println("ERROR: Did not read nodeDescriptor completely.");
-            this.btnd = vol.ops.readNodeDescriptor(this.btreeStream);
-            this.bthr = vol.ops.readHeaderRecord(this.btreeStream);
+            this.btnd = readNodeDescriptor(this.btreeStream);
+            this.bthr = readHeaderRecord(this.btreeStream);
             //byte[] headerRec = new byte[BTHeaderRec.length()];
             //forkFilterFile.readFully(headerRec);
             //this.bthr = new BTHeaderRec(headerRec, 0);
@@ -84,5 +89,23 @@ public abstract class BTreeFile {
 
         //System.err.println("findLEKey(): Returning...");
 	return largestMatchingRecord;
+    }
+
+    protected CommonBTHeaderNode createCommonBTHeaderNode(byte[] currentNodeData,
+            int offset, int nodeSize) {
+        return ops.createCommonBTHeaderNode(currentNodeData, offset, nodeSize);
+    }
+    
+    protected CommonBTNodeDescriptor readNodeDescriptor(Readable rd) {
+        return ops.readNodeDescriptor(rd);
+    }
+
+    protected CommonBTHeaderRecord readHeaderRecord(Readable rd) {
+        return ops.readHeaderRecord(rd);
+    }
+
+    protected CommonBTNodeDescriptor createCommonBTNodeDescriptor(
+            byte[] currentNodeData, int offset) {
+        return ops.createCommonBTNodeDescriptor(currentNodeData, offset);
     }
 }

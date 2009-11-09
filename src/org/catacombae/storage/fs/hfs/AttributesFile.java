@@ -5,10 +5,142 @@
 
 package org.catacombae.storage.fs.hfs;
 
+import org.catacombae.hfsexplorer.io.ForkFilter;
+import org.catacombae.hfsexplorer.io.ReadableRandomAccessSubstream;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonBTHeaderRecord;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonBTNode;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonBTNodeDescriptor;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonBTNodeDescriptor.NodeType;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogNodeID.ReservedID;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentDescriptor;
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSVolumeHeader;
+import org.catacombae.io.ReadableRandomAccessStream;
+import org.catacombae.storage.fs.hfs.plus.HFSPlusVolume;
+
 /**
  *
  * @author erik
  */
-public class AttributesFile {
+public class AttributesFile extends BTreeFile {
+    private final HFSPlusVolume view;
 
+    private class Session {
+        public ReadableRandomAccessStream btreeStream;
+        public CommonBTHeaderRecord bthr;
+
+        private Session(ReadableRandomAccessStream btreeStream) {
+            this.btreeStream = btreeStream;
+            this.bthr = readHeaderRecord(btreeStream);
+        }
+
+        public void close() {
+            btreeStream.close();
+        }
+    }
+
+    AttributesFile(HFSPlusVolume view, BTreeOperations ops) {
+        super(view, ops);
+        this.view = view;
+    }
+
+    protected ReadableRandomAccessStream getAttributesFileStream(
+            CommonHFSVolumeHeader header) {
+
+        CommonHFSExtentDescriptor[] allExtents =
+                view.getExtentsOverflowFile().getAllDataExtentDescriptors(
+                view.getCommonHFSCatalogNodeID(ReservedID.ATTRIBUTES_FILE),
+                header.getCatalogFile());
+
+        return new ForkFilter(
+                header.getCatalogFile(),
+                allExtents,
+                new ReadableRandomAccessSubstream(view.hfsFile),
+                view.fsOffset,
+                header.getAllocationBlockSize(),
+                header.getAllocationBlockStart() * view.physicalBlockSize);
+    }
+
+    private Session openSession() {
+        return new Session(getAttributesFileStream(view.getVolumeHeader()));
+    }
+
+    /**
+     * Returns the B-tree root node of the attributes file. If it does not exist
+     * <code>null</code> is returned. The attributes file will have no
+     * meaningful content if there is no root node.
+     *
+     * @return the B-tree root node of the attributes file.
+     */
+    public CommonBTNode getRootNode() {
+        Session ses = openSession();
+
+        try {
+            long rootNode = ses.bthr.getRootNodeNumber();
+
+            if(rootNode == 0) {
+                // There is no index node, or other content. So the node we
+                // seek does not exist. Return null.
+                return null;
+            }
+            else if(rootNode < 0 || rootNode > Integer.MAX_VALUE * 2L) {
+                throw new RuntimeException("Internal error - rootNode out of " +
+                        "range: " + rootNode);
+            }
+            else
+                return getNodeInternal(rootNode, ses);
+
+        } finally {
+            ses.close();
+        }
+    }
+
+    public CommonBTNode getNode(long nodeNumber) {
+
+        if(nodeNumber < 0) {
+            throw new IllegalArgumentException("Invalid node number: " +
+                    nodeNumber);
+        }
+
+        final Session ses = openSession();
+        try {
+            return getNodeInternal(nodeNumber, ses);
+        } finally {
+            ses.close();
+        }
+    }
+
+    private CommonBTNode getNodeInternal(long nodeNumber, Session ses) {
+        final String METHOD = "getNodeInternal";
+        final int nodeSize = ses.bthr.getNodeSize();
+
+        byte[] nodeData = new byte[nodeSize];
+        try {
+            ses.btreeStream.seek(nodeNumber * nodeSize);
+            ses.btreeStream.readFully(nodeData);
+        } catch(RuntimeException e) {
+            System.err.println("RuntimeException in " + METHOD + ". " +
+                    "Printing additional information:");
+            System.err.println("  nodeNumber=" + nodeNumber);
+            System.err.println("  nodeSize=" + nodeSize);
+            System.err.println("  init.extentsFile.length()=" +
+                    ses.btreeStream.length());
+            System.err.println("  (currentNodeNumber * nodeSize)=" +
+                    (nodeNumber * nodeSize));
+            throw e;
+        }
+
+        CommonBTNodeDescriptor nodeDescriptor =
+                createCommonBTNodeDescriptor(nodeData, 0);
+
+        if(nodeDescriptor.getNodeType() == NodeType.HEADER)
+            return createCommonBTHeaderNode(nodeData, 0, nodeSize);
+        else if(nodeDescriptor.getNodeType() == NodeType.INDEX)
+            return view.extentsOverflowFile.createCommonHFSExtentIndexNode(nodeData, 0,
+                    nodeSize);
+        else if(nodeDescriptor.getNodeType() == NodeType.LEAF)
+            return view.extentsOverflowFile.createCommonHFSExtentLeafNode(nodeData, 0,
+                    nodeSize);
+        else
+            return null;
+    }
 }

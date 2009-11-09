@@ -5,10 +5,13 @@
 
 package org.catacombae.storage.fs.hfs;
 
+import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSVolumeHeader;
+
 /**
  *
  * @author erik
  */
-public class VolumeHeader {
+public abstract class VolumeHeader {
+    public abstract CommonHFSVolumeHeader getHeaderStruct();
 
 }
