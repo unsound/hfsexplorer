@@ -63,7 +63,19 @@ public class JournalInfoBlock {
     public long getOffset() { return Util.readLongBE(offset); }
     public long getSize() { return Util.readLongBE(size); }
     public int[] getReserved() { return Util.readIntArrayBE(reserved); }
-    
+
+    public boolean getFlagJournalInFS() {
+        return (getFlags() & kJIJournalInFSMask) != 0;
+    }
+
+    public boolean getFlagJournalOnOtherDevice() {
+        return (getFlags() & kJIJournalOnOtherDeviceMask) != 0;
+    }
+
+    public boolean getFlagJournalNeedInit() {
+        return (getFlags() & kJIJournalNeedInitMask) != 0;
+    }
+
     public static int getStructSize() { return 180; }
     
     public void printFields(PrintStream ps, String prefix) {
