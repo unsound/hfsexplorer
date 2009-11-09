@@ -22,8 +22,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import org.catacombae.hfsexplorer.fs.BaseHFSFileSystemView;
-import org.catacombae.hfsexplorer.gui.AllocationFileInfoPanel;
 import org.catacombae.hfsexplorer.gui.CatalogInfoPanel;
 import org.catacombae.hfsexplorer.gui.ExtentsInfoPanel;
 import org.catacombae.hfsexplorer.gui.JournalInfoPanel;
@@ -31,6 +29,8 @@ import org.catacombae.hfsexplorer.gui.StructViewPanel;
 import org.catacombae.hfsexplorer.gui.HFSPlusVolumeInfoPanel;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.hfsexplorer.types.hfsplus.JournalInfoBlock;
+import org.catacombae.storage.fs.hfs.HFSVolume;
+import org.catacombae.storage.fs.hfs.plus.HFSPlusVolume;
 
 /**
  * A window that queries a HFSish file system about its volume properties and displays them
@@ -40,7 +40,7 @@ import org.catacombae.hfsexplorer.types.hfsplus.JournalInfoBlock;
  */
 public class VolumeInfoWindow extends JFrame {
 
-    public VolumeInfoWindow(BaseHFSFileSystemView fsView) {
+    public VolumeInfoWindow(HFSVolume fsView) {
         super("File system info");
 
         final JTabbedPane tabs = new JTabbedPane();
@@ -99,7 +99,7 @@ public class VolumeInfoWindow extends JFrame {
         // The "Journal info" tab (optional)
         
         try {
-            JournalInfoBlock jib = fsView.getJournalInfoBlock();
+            JournalInfoBlock jib = fsView.getJournal().getJournalInfoBlock();
             if(jib != null) {
                 JournalInfoPanel journalInfoPanel = new JournalInfoPanel(jib);
                 JScrollPane journalInfoPanelScroller = new JScrollPane(journalInfoPanel,

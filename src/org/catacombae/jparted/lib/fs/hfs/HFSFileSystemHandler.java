@@ -17,9 +17,9 @@
 
 package org.catacombae.jparted.lib.fs.hfs;
 
-import org.catacombae.hfsexplorer.fs.ImplHFSFileSystemView;
 import org.catacombae.jparted.lib.DataLocator;
 import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemHandler;
+import org.catacombae.storage.fs.hfs.original.HFSOriginalVolume;
 
 /**
  *
@@ -28,7 +28,7 @@ import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemHandler;
 public class HFSFileSystemHandler extends HFSCommonFileSystemHandler {
 
     public HFSFileSystemHandler(DataLocator fsLocator, boolean useCaching, String encodingName) {
-        super(new ImplHFSFileSystemView(fsLocator.createReadOnlyFile(), 0, useCaching, encodingName),
+        super(new HFSOriginalVolume(fsLocator.createReadOnlyFile(), 0, useCaching, encodingName),
                 false, false);
     }
 }
