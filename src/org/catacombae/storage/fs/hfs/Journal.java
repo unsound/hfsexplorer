@@ -5,6 +5,8 @@
 
 package org.catacombae.storage.fs.hfs;
 
+import org.catacombae.hfsexplorer.types.hfsplus.JournalInfoBlock;
+
 /**
  *
  * @author erik
@@ -12,4 +14,10 @@ package org.catacombae.storage.fs.hfs;
 public abstract class Journal {
     public abstract byte[] getInfoBlockData();
     public abstract byte[] getJournalData();
+
+    /**
+     * Returns the journal info block if a journal is present, null otherwise.
+     * @return the journal info block if a journal is present, null otherwise.
+     */
+    public abstract JournalInfoBlock getJournalInfoBlock();
 }

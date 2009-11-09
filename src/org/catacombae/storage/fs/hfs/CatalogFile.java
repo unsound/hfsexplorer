@@ -37,9 +37,12 @@ import org.catacombae.io.ReadableRandomAccessStream;
  * @author erik
  */
 public class CatalogFile extends BTreeFile {
+    private final CatalogOperations ops;
 
-    CatalogFile(HFSVolume vol) {
-        super(vol);
+    CatalogFile(HFSVolume vol, BTreeOperations superOps,
+            CatalogOperations ops) {
+        super(vol, superOps);
+        this.ops = ops;
     }
 
     class CatalogFileSession extends BTreeFileSession {
@@ -57,8 +60,8 @@ public class CatalogFile extends BTreeFile {
             //if(catalogCache != null)
             //    return catalogCache;
             CommonHFSExtentDescriptor[] allCatalogFileDescriptors =
-                    vol.getAllDataExtentDescriptors(
-                    vol.ops.getCommonHFSCatalogNodeID(ReservedID.CATALOG_FILE),
+                    vol.extentsOverflowFile.getAllDataExtentDescriptors(
+                    vol.getCommonHFSCatalogNodeID(ReservedID.CATALOG_FILE),
                     header.getCatalogFile());
             return new ForkFilter(header.getCatalogFile(),
                     allCatalogFileDescriptors,
@@ -99,7 +102,7 @@ public class CatalogFile extends BTreeFile {
 
         // Search down through the layers of indices to the record with parentID 1.
         CommonHFSCatalogNodeID parentID =
-                vol.ops.getCommonHFSCatalogNodeID(ReservedID.ROOT_PARENT);
+                vol.getCommonHFSCatalogNodeID(ReservedID.ROOT_PARENT);
         final int nodeSize = ses.bthr.getNodeSize();
         long currentNodeOffset = ses.bthr.getRootNodeNumber() * ses.bthr.getNodeSize();
 
@@ -109,10 +112,10 @@ public class CatalogFile extends BTreeFile {
         byte[] currentNodeData = new byte[nodeSize];
         ses.catalogFile.seek(currentNodeOffset);
         ses.catalogFile.readFully(currentNodeData);
-        CommonBTNodeDescriptor nodeDescriptor = vol.ops.createCommonBTNodeDescriptor(currentNodeData, 0);
+        CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
         while(nodeDescriptor.getNodeType() == NodeType.INDEX) {
             CommonHFSCatalogIndexNode currentNode =
-                    vol.ops.newCatalogIndexNode(currentNodeData, 0, ses.bthr.getNodeSize(), ses.bthr);
+                    newCatalogIndexNode(currentNodeData, 0, ses.bthr.getNodeSize(), ses.bthr);
             //System.err.println("currentNode:");
             //currentNode.print(System.err, "  ");
             CommonBTIndexRecord matchingRecord = findKey(currentNode, parentID);
@@ -121,13 +124,13 @@ public class CatalogFile extends BTreeFile {
             currentNodeOffset = matchingRecord.getIndex()*nodeSize;
             ses.catalogFile.seek(currentNodeOffset);
             ses.catalogFile.readFully(currentNodeData);
-            nodeDescriptor = vol.ops.createCommonBTNodeDescriptor(currentNodeData, 0);
+            nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
         }
 
         // Leaf node reached. Find record with parent id 1. (or whatever value is in the parentID variable :) )
         if(nodeDescriptor.getNodeType() == NodeType.LEAF) {
             CommonHFSCatalogLeafNode leaf =
-                    vol.ops.newCatalogLeafNode(currentNodeData, 0, nodeSize, ses.bthr);
+                    newCatalogLeafNode(currentNodeData, 0, nodeSize, ses.bthr);
             CommonHFSCatalogLeafRecord[] recs = leaf.getLeafRecords();
             for(CommonHFSCatalogLeafRecord rec : recs) {
                 if(rec.getKey().getParentID().toLong() == parentID.toLong()) {
@@ -195,14 +198,14 @@ public class CatalogFile extends BTreeFile {
             //System.err.println("  =" + );
             throw e;
         }
-        CommonBTNodeDescriptor nodeDescriptor = vol.ops.createCommonBTNodeDescriptor(currentNodeData, 0);
+        CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
 
         if(nodeDescriptor.getNodeType() == NodeType.HEADER)
-            return vol.ops.createCommonBTHeaderNode(currentNodeData, 0, ses.bthr.getNodeSize());
+            return createCommonBTHeaderNode(currentNodeData, 0, ses.bthr.getNodeSize());
         if(nodeDescriptor.getNodeType() == NodeType.INDEX)
-            return vol.ops.newCatalogIndexNode(currentNodeData, 0, ses.bthr.getNodeSize(), ses.bthr);
+            return newCatalogIndexNode(currentNodeData, 0, ses.bthr.getNodeSize(), ses.bthr);
         else if(nodeDescriptor.getNodeType() == NodeType.LEAF)
-            return vol.ops.newCatalogLeafNode(currentNodeData, 0, ses.bthr.getNodeSize(), ses.bthr);
+            return newCatalogLeafNode(currentNodeData, 0, ses.bthr.getNodeSize(), ses.bthr);
         else
             return null;
     }
@@ -238,7 +241,7 @@ public class CatalogFile extends BTreeFile {
      * <code>leaf</code> as tail.
      */
     public LinkedList<CommonHFSCatalogLeafRecord> getPathTo(CommonHFSCatalogNodeID leafID) {
-	CommonHFSCatalogLeafRecord leafRec = getRecord(leafID, vol.ops.getEmptyString());
+	CommonHFSCatalogLeafRecord leafRec = getRecord(leafID, vol.getEmptyString());
 	if(leafRec != null)
 	    return getPathTo(leafRec);
 	else
@@ -264,7 +267,7 @@ public class CatalogFile extends BTreeFile {
 	pathList.addLast(leaf);
 	CommonHFSCatalogNodeID parentID = leaf.getKey().getParentID();
 	while(!parentID.equals(parentID.getReservedID(ReservedID.ROOT_PARENT))) {
-	    CommonHFSCatalogLeafRecord parent = getRecord(parentID, vol.ops.getEmptyString()); // Look for the thread record associated with the parent dir
+	    CommonHFSCatalogLeafRecord parent = getRecord(parentID, vol.getEmptyString()); // Look for the thread record associated with the parent dir
 	    if(parent == null)
 		throw new RuntimeException("No folder thread found!");
 	    //CommonHFSCatalogLeafRecord data = parent.getData();
@@ -307,28 +310,28 @@ public class CatalogFile extends BTreeFile {
 	byte[] currentNodeData = new byte[ses.bthr.getNodeSize()];
 	ses.catalogFile.seek(currentNodeOffset);
 	ses.catalogFile.readFully(currentNodeData);
-	CommonBTNodeDescriptor nodeDescriptor = vol.ops.createCommonBTNodeDescriptor(currentNodeData, 0);
+	CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
 
 	while(nodeDescriptor.getNodeType() == NodeType.INDEX) {
 	    CommonHFSCatalogIndexNode currentNode =
-                    vol.ops.newCatalogIndexNode(currentNodeData, 0, nodeSize, ses.bthr);
+                    newCatalogIndexNode(currentNodeData, 0, nodeSize, ses.bthr);
 	    CommonBTIndexRecord matchingRecord =
-                    findLEKey(currentNode, vol.ops.newCatalogKey(parentID, nodeName, ses.bthr));
+                    findLEKey(currentNode, newCatalogKey(parentID, nodeName, ses.bthr));
 
             if(matchingRecord == null)
                 return null;
 	    currentNodeOffset = matchingRecord.getIndex()*nodeSize;
 	    ses.catalogFile.seek(currentNodeOffset);
 	    ses.catalogFile.readFully(currentNodeData);
-	    nodeDescriptor = vol.ops.createCommonBTNodeDescriptor(currentNodeData, 0);
+	    nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
 	}
 
 	// Leaf node reached. Find record.
 	if(nodeDescriptor.getNodeType() == NodeType.LEAF) {
-	    CommonHFSCatalogLeafNode leaf = vol.ops.newCatalogLeafNode(currentNodeData, 0, ses.bthr.getNodeSize(), ses.bthr);
+	    CommonHFSCatalogLeafNode leaf = newCatalogLeafNode(currentNodeData, 0, ses.bthr.getNodeSize(), ses.bthr);
 	    CommonHFSCatalogLeafRecord[] recs = leaf.getLeafRecords();
 	    for(CommonHFSCatalogLeafRecord rec : recs)
-		if(rec.getKey().compareTo(vol.ops.newCatalogKey(parentID, nodeName, ses.bthr)) == 0)
+		if(rec.getKey().compareTo(newCatalogKey(parentID, nodeName, ses.bthr)) == 0)
 		    return rec;
 	    return null;
 	}
@@ -374,10 +377,10 @@ public class CatalogFile extends BTreeFile {
 	catalogFile.seek(currentNodeIndex*nodeSize);
 	catalogFile.readFully(currentNodeData);
 
-	CommonBTNodeDescriptor nodeDescriptor = vol.ops.createCommonBTNodeDescriptor(currentNodeData, 0);
+	CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
 	if(nodeDescriptor.getNodeType() == NodeType.INDEX) {
 	    CommonBTIndexNode<CommonHFSCatalogKey> currentNode =
-                    vol.ops.newCatalogIndexNode(currentNodeData, 0, nodeSize, bthr);
+                    newCatalogIndexNode(currentNodeData, 0, nodeSize, bthr);
 	    List<CommonBTIndexRecord<CommonHFSCatalogKey>> matchingRecords =
                     findLEChildKeys(currentNode, dirID);
 	    //System.out.println("Matching records: " + matchingRecords.length);
@@ -396,7 +399,7 @@ public class CatalogFile extends BTreeFile {
 	}
 	else if(nodeDescriptor.getNodeType() == NodeType.LEAF) {
 	    CommonHFSCatalogLeafNode currentNode =
-                    vol.ops.newCatalogLeafNode(currentNodeData, 0, nodeSize, bthr);
+                    newCatalogLeafNode(currentNodeData, 0, nodeSize, bthr);
 
 	    return getChildrenTo(currentNode, dirID);
 	}
@@ -455,4 +458,24 @@ public class CatalogFile extends BTreeFile {
 	return null;
     }
     */
+
+    protected CommonHFSCatalogIndexNode newCatalogIndexNode(byte[] data,
+            int offset, int nodeSize, CommonBTHeaderRecord bthr) {
+        return ops.newCatalogIndexNode(data, offset, nodeSize, bthr);
+    }
+
+    protected CommonHFSCatalogKey newCatalogKey(CommonHFSCatalogNodeID nodeID,
+            CommonHFSCatalogString searchString, CommonBTHeaderRecord bthr) {
+        return ops.newCatalogKey(nodeID, searchString, bthr);
+    }
+
+    protected CommonHFSCatalogLeafNode newCatalogLeafNode(byte[] data,
+            int offset, int nodeSize, CommonBTHeaderRecord bthr) {
+        return ops.newCatalogLeafNode(data, offset, nodeSize, bthr);
+    }
+
+    protected CommonHFSCatalogLeafRecord newCatalogLeafRecord(byte[] data,
+            int offset, CommonBTHeaderRecord bthr) {
+        return ops.newCatalogLeafRecord(data, offset, bthr);
+    }
 }
