@@ -17,6 +17,7 @@
 
 package org.catacombae.csjc.structelements;
 
+import java.lang.reflect.Field;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import static org.catacombae.csjc.structelements.IntegerFieldBits.*;
@@ -123,6 +124,10 @@ public class DictionaryBuilder {
         addUIntBE(key, data, null);
     }
 
+    public void addUIntBE(String key, Field field, Object obj) {
+        addUIntBE(key, field, obj, null);
+    }
+
     public void addUIntLE(String key, byte[] data) {
         addUIntLE(key, data, null);
     }
@@ -137,6 +142,10 @@ public class DictionaryBuilder {
 
     public void addUIntBE(String key, byte[] data, String description) {
         addUIntBE(key, data, 0, data.length, description, null, DECIMAL);
+    }
+
+    public void addUIntBE(String key, Field field, Object obj, String description) {
+        addUIntBE(key, field, obj, description, null, DECIMAL);
     }
 
     public void addUIntLE(String key, byte[] data, String description) {
@@ -187,12 +196,17 @@ public class DictionaryBuilder {
         addInt(key, data, offset, length, UNSIGNED, BIG_ENDIAN, description, unit, rep);
     }
 
+    public void addUIntBE(String key, Field field, Object obj, String description, String unit, IntegerFieldRepresentation rep) {
+        addInt(key, field, obj, UNSIGNED, BIG_ENDIAN, description, unit, rep);
+    }
+
     public void addUIntLE(String key, byte[] data, int offset, int length, String description, String unit, IntegerFieldRepresentation rep) {
         addInt(key, data, offset, length, UNSIGNED, LITTLE_ENDIAN, description, unit, rep);
     }
 
-    private void addInt(String key, byte[] data, int offset, int length,
-            Signedness signedness, Endianness endianness, String description, String unit, IntegerFieldRepresentation rep) {
+    public void addInt(String key, byte[] data, int offset, int length,
+            Signedness signedness, Endianness endianness, String description,
+            String unit, IntegerFieldRepresentation rep) {
         switch(length) {
             case 1:
                 add(key, new IntegerField(data, offset, BITS_8, signedness,
@@ -213,6 +227,33 @@ public class DictionaryBuilder {
             default:
                 throw new IllegalArgumentException("You supplied a " + (length * 8) +
                         "-bit value. Only 64, 32, 16 and 8-bit values are supported.");
+        }
+    }
+
+    public void addInt(String key, Field field, Object obj, Signedness signedness, Endianness endianness,
+            String description, String unit, IntegerFieldRepresentation rep) {
+        int length = getSize(field);
+        switch(length) {
+            case 1:
+                add(key, new IntegerField(obj, field, 0, BITS_8, signedness,
+                        endianness, rep, unit), description);
+                break;
+            case 2:
+                add(key, new IntegerField(obj, field, 0, BITS_16, signedness,
+                        endianness, rep, unit), description);
+                break;
+            case 4:
+                add(key, new IntegerField(obj, field, 0, BITS_32, signedness,
+                        endianness, rep, unit), description);
+                break;
+            case 8:
+                add(key, new IntegerField(obj, field, 0, BITS_64, signedness,
+                        endianness, rep, unit), description);
+                break;
+            default:
+                throw new IllegalArgumentException("You supplied a " +
+                        (length * 8) + "-bit value. Only 64, 32, 16 and " +
+                        "8-bit values are supported.");
         }
     }
 
@@ -346,5 +387,24 @@ public class DictionaryBuilder {
             else
                 add(key, d.getElement(key));
         }
+    }
+
+    public int getSize(Field field) {
+        int size;
+        Class<?> fieldType = field.getType();
+
+        if(fieldType.equals(byte.class))
+            size = 1;
+        else if(fieldType.equals(short.class) ||
+                fieldType.equals(char.class))
+            size = 2;
+        else if(fieldType.equals(int.class))
+            size = 4;
+        else if(fieldType.equals(long.class))
+            size = 8;
+        else
+            throw new RuntimeException("Invalid field type: " + fieldType);
+
+        return size;
     }
 }

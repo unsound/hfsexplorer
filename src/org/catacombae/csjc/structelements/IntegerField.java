@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2008 Erik Larsson
+ * Copyright (C) 2008-2009 Erik Larsson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 
 package org.catacombae.csjc.structelements;
 
+import java.lang.reflect.Field;
 import java.math.BigInteger;
 import org.catacombae.hfsexplorer.Util;
 
@@ -25,7 +26,7 @@ import org.catacombae.hfsexplorer.Util;
  */
 public class IntegerField extends StringRepresentableField {
 
-    private final byte[] fieldData;
+    private final DataHandle fieldData;
     private final int offset;
     private final IntegerFieldBits bits;
     private final Signedness signedness;
@@ -48,6 +49,21 @@ public class IntegerField extends StringRepresentableField {
     public IntegerField(byte[] fieldData, int offset, IntegerFieldBits bits,
             Signedness signedness, Endianness endianness,
             IntegerFieldRepresentation representation, String unitComponent) {
+        this(new ByteArrayDataHandle(fieldData), offset, bits, signedness,
+                endianness, representation, unitComponent);
+    }
+
+    public IntegerField(Object obj, Field fieldData, int offset, IntegerFieldBits bits,
+            Signedness signedness, Endianness endianness,
+            IntegerFieldRepresentation representation, String unitComponent) {
+        this(new IntegerFieldDataHandle(obj, fieldData, bits.getBytes()),
+                offset, bits, signedness, endianness, representation,
+                unitComponent);
+    }
+
+    public IntegerField(DataHandle fieldData, int offset, IntegerFieldBits bits,
+            Signedness signedness, Endianness endianness,
+            IntegerFieldRepresentation representation, String unitComponent) {
         super((signedness == Signedness.SIGNED ? "S" : "U") + "Int" + bits.getBits(),
                 FieldType.INTEGER, unitComponent);
         // Input check
@@ -61,7 +77,7 @@ public class IntegerField extends StringRepresentableField {
             throw new IllegalArgumentException("endianness == null");
         if(representation == null)
             throw new IllegalArgumentException("representation == null");
-        if(fieldData.length - offset < bits.getBytes())
+        if(fieldData.getLength() - offset < bits.getBytes())
             throw new IllegalArgumentException("Not enough data left in fieldData!");
         this.fieldData = fieldData;
         this.offset = offset;
@@ -107,9 +123,9 @@ public class IntegerField extends StringRepresentableField {
     public BigInteger getValueAsBigInteger() {
         byte[] data;
         if(endianness == Endianness.LITTLE_ENDIAN)
-            data = Util.createReverseCopy(fieldData, offset, bits.getBytes());
+            data = Util.byteSwap(fieldData.getBytesAsCopy(offset, bits.getBytes())); // Util.createReverseCopy(fieldData, offset, bits.getBytes());
         else if(endianness == Endianness.BIG_ENDIAN)
-            data = Util.createCopy(fieldData, offset, bits.getBytes());
+            data = fieldData.getBytesAsCopy(offset, bits.getBytes()); // Util.createCopy(fieldData, offset, bits.getBytes());
         else
             throw new RuntimeException("Illegal endianness value: " + endianness);
         if(signedness == Signedness.SIGNED)
