@@ -17,9 +17,9 @@
 
 package org.catacombae.jparted.lib.fs.hfsx;
 
-import org.catacombae.hfsexplorer.fs.ImplHFSXFileSystemView;
 import org.catacombae.jparted.lib.DataLocator;
 import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemHandler;
+import org.catacombae.storage.fs.hfs.x.HFSXVolume;
 
 /**
  * HFSX implementation of a FileSystemHandler. This implementation can be used
@@ -33,7 +33,7 @@ public class HFSXFileSystemHandler extends HFSCommonFileSystemHandler {
     
     public HFSXFileSystemHandler(DataLocator fsLocator, boolean useCaching, 
             boolean doUnicodeFileNameComposition, boolean hideProtected) {
-        super(new ImplHFSXFileSystemView(fsLocator.createReadOnlyFile(), 0, useCaching),
+        super(new HFSXVolume(fsLocator.createReadOnlyFile(), 0, useCaching),
                 doUnicodeFileNameComposition, hideProtected);
     }
 }

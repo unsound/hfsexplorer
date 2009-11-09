@@ -29,7 +29,6 @@ import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFileThreadReco
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolderThread;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogNodeID;
-import org.catacombae.hfsexplorer.fs.BaseHFSFileSystemView;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogKey;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.jparted.lib.fs.FSFolder;
@@ -37,6 +36,7 @@ import org.catacombae.jparted.lib.fs.FSForkType;
 import org.catacombae.jparted.lib.fs.FSLink;
 import org.catacombae.jparted.lib.fs.FileSystemHandler;
 import org.catacombae.jparted.lib.fs.FSEntry;
+import org.catacombae.storage.fs.hfs.HFSVolume;
 
 /**
  * HFS+ implementation of a FileSystemHandler. This implementation can be used
@@ -52,11 +52,11 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
     private static final String JOURNAL_INFO_BLOCK_FILE = ".journal_info_block";
     private static final String JOURNAL_FILE = ".journal";
     
-    private BaseHFSFileSystemView view;
+    private HFSVolume view;
     private boolean doUnicodeFileNameComposition;
     private boolean hideProtected;
     
-    protected HFSCommonFileSystemHandler(BaseHFSFileSystemView iView,
+    protected HFSCommonFileSystemHandler(HFSVolume iView,
                     boolean iDoUnicodeFileNameComposition,
                     boolean hideProtected) {
         this.view = iView;
@@ -66,7 +66,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
     
     @Override
     public FSEntry[] list(String... path) {
-        CommonHFSCatalogFolderRecord curFolder = view.getRoot();
+        CommonHFSCatalogFolderRecord curFolder = view.getCatalogFile().getRootFolder();
         for(String nextFolderName : path) {
             CommonHFSCatalogLeafRecord subRecord = getRecord(curFolder, nextFolderName);
             
@@ -81,7 +81,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
 
     @Override
     public FSEntry getEntry(String... path) {
-        return getEntry(view.getRoot(), path);
+        return getEntry(view.getCatalogFile().getRootFolder(), path);
     }
     
     FSEntry getEntry(CommonHFSCatalogFolderRecord rootRecord, String... path) {
@@ -206,7 +206,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
                     curVisitedList.addLast(absPath);
                     //log(prefix + "  getRecord: Trying to get record for absolute link target...");
                     CommonHFSCatalogLeafRecord linkTarget =
-                            getRecord(view.getRoot(), absPath);
+                            getRecord(view.getCatalogFile().getRootFolder(), absPath);
                     //log(prefix + "  getRecord: target record = " + linkTarget);
                     if(linkTarget != null) {
                         currentRoot = linkTarget;
@@ -224,7 +224,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
 
             //log(prefix + "  getting record (" + currentRootFolder.getData().getFolderID().toLong() + ":\"" + curPathComponent + "\")");
             CommonHFSCatalogLeafRecord newRoot =
-                    view.getRecord(currentRootFolder.getData().getFolderID(), view.encodeString(curPathComponent));
+                    view.getCatalogFile().getRecord(currentRootFolder.getData().getFolderID(), view.encodeString(curPathComponent));
 
             if(newRoot != null)
                 currentRoot = newRoot;
@@ -298,7 +298,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
     
     CommonHFSCatalogFileRecord lookupFileInode(int inodeNumber) {
         long trueInodeNumber = Util.unsign(inodeNumber);
-        CommonHFSCatalogLeafRecord res = getRecord(view.getRoot(), FILE_HARD_LINK_DIR,
+        CommonHFSCatalogLeafRecord res = getRecord(view.getCatalogFile().getRootFolder(), FILE_HARD_LINK_DIR,
                 FILE_HARD_LINK_PREFIX + trueInodeNumber);
         if(res == null)
             return null; // Could not find any inode
@@ -311,7 +311,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
 
     CommonHFSCatalogFolderRecord lookupDirectoryInode(int inodeNumber) {
         long trueInodeNumber = Util.unsign(inodeNumber);
-        CommonHFSCatalogLeafRecord res = getRecord(view.getRoot(), DIRECTORY_HARD_LINK_DIR,
+        CommonHFSCatalogLeafRecord res = getRecord(view.getCatalogFile().getRootFolder(), DIRECTORY_HARD_LINK_DIR,
                 DIRECTORY_HARD_LINK_PREFIX + trueInodeNumber);
         if(res == null)
             return null; // Could not find any inode
@@ -416,7 +416,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
     }
     
     String[] listNames(CommonHFSCatalogFolderRecord folderRecord) {
-        CommonHFSCatalogLeafRecord[] subRecords = view.listRecords(folderRecord);
+        CommonHFSCatalogLeafRecord[] subRecords = view.getCatalogFile().listRecords(folderRecord);
         LinkedList<String> result = new LinkedList<String>();
         for(int i = 0; i < subRecords.length; ++i) {
             CommonHFSCatalogLeafRecord curRecord = subRecords[i];
@@ -428,7 +428,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
     }
 
     FSEntry[] listFSEntries(CommonHFSCatalogFolderRecord folderRecord) {
-        CommonHFSCatalogLeafRecord[] subRecords = view.listRecords(folderRecord);
+        CommonHFSCatalogLeafRecord[] subRecords = view.getCatalogFile().listRecords(folderRecord);
         LinkedList<FSEntry> result = new LinkedList<FSEntry>();
         for(int i = 0; i < subRecords.length; ++i) {
             CommonHFSCatalogLeafRecord curRecord = subRecords[i];
@@ -461,7 +461,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
 
         // Look for the thread record associated with the parent dir
         CommonHFSCatalogLeafRecord parent =
-                view.getRecord(parentID, view.getEmptyString());
+                view.getCatalogFile().getRecord(parentID, view.getEmptyString());
         if(parent == null) {
             if(parentID.toLong() == 1)
                 return null; // There is no parent to root.
@@ -474,7 +474,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
             CommonHFSCatalogFolderThread data =
                     ((CommonHFSCatalogFolderThreadRecord)parent).getData();
             CommonHFSCatalogLeafRecord rec =
-                    view.getRecord(data.getParentID(), data.getNodeName());
+                    view.getCatalogFile().getRecord(data.getParentID(), data.getNodeName());
             if(rec == null)
                 return null;
             else if(rec instanceof CommonHFSCatalogFolderRecord)
@@ -503,7 +503,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
      * 
      * @return the underlying BaseHFSFileSystemView.
      */
-    public BaseHFSFileSystemView getFSView() {
+    public HFSVolume getFSView() {
         return view;
     }
 
@@ -514,7 +514,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
 
     @Override
     public FSFolder getRoot() {
-        return new HFSCommonFSFolder(this, view.getRoot());
+        return new HFSCommonFSFolder(this, view.getCatalogFile().getRootFolder());
     }
 
     @Override

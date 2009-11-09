@@ -58,8 +58,8 @@ import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogIndexNode;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogKey;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafNode;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafRecord;
-import org.catacombae.hfsexplorer.fs.BaseHFSFileSystemView;
 import org.catacombae.hfsexplorer.io.JTextAreaOutputStream;
+import org.catacombae.storage.fs.hfs.HFSVolume;
 
 /**
  *
@@ -70,7 +70,7 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
     private static final int UNIT_INCREMENT = 10;
     
     /** Creates new form CatalogInfoPanel */
-    public CatalogInfoPanel(final BaseHFSFileSystemView fsView) {
+    public CatalogInfoPanel(final HFSVolume fsView) {
         
         initComponents();
 
@@ -80,7 +80,7 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
          * What we need is a method that gets us the children of the "current" node.
          * A B-tree starts with a header node,
          */
-        CommonBTNode iNode = fsView.getCatalogNode(-1); // Get root index node.
+        CommonBTNode iNode = fsView.getCatalogFile().getCatalogNode(-1); // Get root index node.
         
         if(iNode == null) {
             DefaultTreeModel model = new DefaultTreeModel(new NoLeafMutableTreeNode("<empty>"));
@@ -263,12 +263,12 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
         });
     }
 
-    public void expandNode(DefaultMutableTreeNode dmtn, CommonBTNode node, BaseHFSFileSystemView fsView) {
+    public void expandNode(DefaultMutableTreeNode dmtn, CommonBTNode node, HFSVolume fsView) {
         if(node instanceof CommonHFSCatalogIndexNode) {
             List<CommonBTIndexRecord<CommonHFSCatalogKey>> recs = ((CommonHFSCatalogIndexNode) node).getBTRecords();
             for(CommonBTIndexRecord<CommonHFSCatalogKey> rec : recs) {
                 
-                CommonBTNode curNode = fsView.getCatalogNode(rec.getIndex());
+                CommonBTNode curNode = fsView.getCatalogFile().getCatalogNode(rec.getIndex());
                 CommonHFSCatalogKey key = rec.getKey();
                 dmtn.add(new NoLeafMutableTreeNode(new BTNodeStorage(curNode,
                         key.getParentID().toLong() + ":" + fsView.decodeString(key.getNodeName()))));

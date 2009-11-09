@@ -38,16 +38,15 @@ import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfsexplorer.FileSystemBrowser.NoLeafMutableTreeNode;
-import org.catacombae.hfsexplorer.fs.BaseHFSFileSystemView;
 import org.catacombae.hfsexplorer.io.JTextAreaOutputStream;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentIndexNode;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentKey;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentLeafNode;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentLeafRecord;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTIndexRecord;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonBTKey;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTNode;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTNodeDescriptor;
+import org.catacombae.storage.fs.hfs.HFSVolume;
 
 /**
  *
@@ -58,7 +57,7 @@ public class ExtentsInfoPanel extends javax.swing.JPanel {
     private static final int UNIT_INCREMENT = 10;
     
     /** Creates new form CatalogInfoPanel */
-    public ExtentsInfoPanel(final BaseHFSFileSystemView fsView) {
+    public ExtentsInfoPanel(final HFSVolume fsView) {
         
         initComponents();
 
@@ -68,7 +67,7 @@ public class ExtentsInfoPanel extends javax.swing.JPanel {
          * What we need is a method that gets us the children of the "current" node.
          * A B-tree starts with a header node,
          */
-        CommonBTNode iNode = fsView.getExtentsOverflowNode(-1); // Get root index node.
+        CommonBTNode iNode = fsView.getExtentsOverflowFile().getExtentsOverflowNode(-1); // Get root index node.
         
         if(iNode == null) {
             DefaultTreeModel model = new DefaultTreeModel(new NoLeafMutableTreeNode("<empty>"));
@@ -224,12 +223,12 @@ public class ExtentsInfoPanel extends javax.swing.JPanel {
         });
     }
 
-    public void expandNode(DefaultMutableTreeNode dmtn, CommonBTNode node, BaseHFSFileSystemView fsView) {
+    public void expandNode(DefaultMutableTreeNode dmtn, CommonBTNode node, HFSVolume fsView) {
         if(node instanceof CommonHFSExtentIndexNode) {
             List<CommonBTIndexRecord<CommonHFSExtentKey>> recs = ((CommonHFSExtentIndexNode) node).getBTRecords();
             for(CommonBTIndexRecord<CommonHFSExtentKey> rec : recs) {
                 
-                CommonBTNode curNode = fsView.getExtentsOverflowNode(rec.getIndex());
+                CommonBTNode curNode = fsView.getExtentsOverflowFile().getExtentsOverflowNode(rec.getIndex());
                 CommonHFSExtentKey key = rec.getKey();
                 dmtn.add(new NoLeafMutableTreeNode(new BTNodeStorage(curNode, key.getForkType() +
                         ":" + key.getFileID().toLong() + ":" + key.getStartBlock())));

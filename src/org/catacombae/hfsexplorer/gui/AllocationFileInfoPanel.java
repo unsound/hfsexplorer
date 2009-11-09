@@ -21,27 +21,26 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.catacombae.csjc.structelements.ArrayBuilder;
 import org.catacombae.hfsexplorer.GUIUtil;
 import org.catacombae.hfsexplorer.ObjectContainer;
-import org.catacombae.hfsexplorer.fs.BaseHFSAllocationFileView;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentDescriptor;
+import org.catacombae.storage.fs.hfs.AllocationFile;
 
 /**
  *
  * @author erik
  */
 public class AllocationFileInfoPanel extends javax.swing.JPanel {
-    private final BaseHFSAllocationFileView afView;
+    private final AllocationFile afView;
     private final ObjectContainer<Boolean> stopCountBlocksProcess =
             new ObjectContainer<Boolean>(false);
 
     /** Creates new form AllocationFileInfoPanel */
-    public AllocationFileInfoPanel(JFrame window, final BaseHFSAllocationFileView afView) {
+    public AllocationFileInfoPanel(JFrame window, final AllocationFile afView) {
         this.afView = afView;
 
         initComponents();

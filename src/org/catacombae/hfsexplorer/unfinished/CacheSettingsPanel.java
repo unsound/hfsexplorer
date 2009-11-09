@@ -19,7 +19,7 @@ package org.catacombae.hfsexplorer.unfinished;
 
 import java.awt.event.*;
 import javax.swing.*;
-import org.catacombae.hfsexplorer.fs.BaseHFSFileSystemView;
+import org.catacombae.storage.fs.hfs.HFSVolume;
 
 /**
  *
@@ -28,7 +28,7 @@ import org.catacombae.hfsexplorer.fs.BaseHFSFileSystemView;
 public class CacheSettingsPanel extends javax.swing.JPanel {
     
     /** Creates new form CacheSettingsPanel */
-    public CacheSettingsPanel(final BaseHFSFileSystemView fsView) {
+    public CacheSettingsPanel(final HFSVolume fsView) {
         initComponents();
         cachingEnabledBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
