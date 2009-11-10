@@ -19,7 +19,7 @@ package org.catacombae.hfsexplorer;
 
 import org.catacombae.hfsexplorer.FileSystemBrowser.Record;
 import org.catacombae.hfsexplorer.FileSystemBrowser.RecordType;
-import org.catacombae.hfsexplorer.fs.ProgressMonitor;
+import org.catacombae.storage.fs.hfs.ProgressMonitor;
 import org.catacombae.hfsexplorer.gui.FileOperationsPanel;
 import org.catacombae.hfsexplorer.helpbrowser.HelpBrowserPanel;
 import org.catacombae.hfsexplorer.partitioning.Partition;

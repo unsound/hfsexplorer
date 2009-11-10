@@ -19,7 +19,7 @@ package org.catacombae.hfsexplorer;
 
 import java.io.File;
 import java.util.LinkedList;
-import org.catacombae.hfsexplorer.fs.ProgressMonitor;
+import org.catacombae.storage.fs.hfs.ProgressMonitor;
 
 /**
  *
