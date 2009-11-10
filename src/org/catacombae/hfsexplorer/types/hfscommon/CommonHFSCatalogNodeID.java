@@ -123,7 +123,7 @@ public abstract class CommonHFSCatalogNodeID {
         private static final HFSPlusImplementation BOGUS_EXTENT_FILE_ID = new HFSPlusImplementation(HFSCatalogNodeID.kHFSBogusExtentFileID);
         private static final HFSPlusImplementation FIRST_USER_CATALOG_NODE_ID = new HFSPlusImplementation(HFSCatalogNodeID.kHFSFirstUserCatalogNodeID);
         
-        private HFSCatalogNodeID fileID;
+        private final HFSCatalogNodeID fileID;
         
         public HFSPlusImplementation(HFSCatalogNodeID fileID) {
             this.fileID = fileID;
@@ -185,7 +185,7 @@ public abstract class CommonHFSCatalogNodeID {
         private static final HFSImplementation BAD_BLOCKS_FILE_ID = new HFSImplementation(5);
         private static final HFSImplementation FIRST_USER_CATALOG_NODE_ID = new HFSImplementation(16);
 
-        private int filFlNum;
+        private final int filFlNum;
         
         public HFSImplementation(int filFlNum) {
             this.filFlNum = filFlNum;

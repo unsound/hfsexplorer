@@ -135,6 +135,18 @@ public abstract class CommonHFSVolumeHeader implements StructElements {
             return CommonHFSForkData.create(hdr.getExtentsFile());
         }
 
+        public CommonHFSForkData getAllocationFile() {
+            return CommonHFSForkData.create(hdr.getAllocationFile());
+        }
+
+        public CommonHFSForkData getAttributesFile() {
+            return CommonHFSForkData.create(hdr.getAttributesFile());
+        }
+
+        public CommonHFSForkData getStartupFile() {
+            return CommonHFSForkData.create(hdr.getStartupFile());
+        }
+
         @Override
         public void print(PrintStream err, String prefix) {
             hdr.print(err, prefix);
