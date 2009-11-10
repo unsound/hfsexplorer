@@ -54,10 +54,9 @@ import org.catacombae.storage.fs.hfs.HFSVolume;
 
 @SuppressWarnings("deprecation") // TODO: Fix HFSExplorer so it doesn't use deprecated methods...
 public class HFSExplorer {
-    public static final String VERSION = "0.21";
-    public static final String COPYRIGHT = "Copyright \u00A9 Erik Larsson 2006-2008";
-    public static final String[] NOTICES =
-    {
+    public static final String VERSION = "0.22pre";
+    public static final String COPYRIGHT = "Copyright \u00A9 Erik Larsson 2006-2009";
+    public static final String[] NOTICES = {
         "This program is distributed under the GNU General Public License version 3.",
         "See <http://www.gnu.org/copyleft/gpl.html> for the details.",
         "",
@@ -71,7 +70,7 @@ public class HFSExplorer {
         "    Apache Ant bzip2 library <http://ant.apache.org/>",
         "        Copyright \u00A9 the Apache Software Foundation (ASF). Licensed",
         "        under the Apache License, Version 2.0.",
-        "        See <http://www.apache.org/licenses/LICENSE-2.0> for the details."
+        "        See <http://www.apache.org/licenses/LICENSE-2.0> for the details.",
     };
     
     public static BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
@@ -997,11 +996,12 @@ public class HFSExplorer {
     public static void printUsageInfo() {
 	// For measurement of the standard terminal width in fixed width environments:
 	// 80:  <-------------------------------------------------------------------------------->
-	println("hfsx - HFSExplorer Command Line Interface v" + VERSION + " Build #" + BuildNumber.BUILD_NUMBER);
-        //println("  v" + VERSION + " Build #" + BuildNumber.BUILD_NUMBER);
+	println("hfsx - HFSExplorer Command Line Interface");
+        println("Version " + VERSION + " Build #" + BuildNumber.BUILD_NUMBER);
 	println(COPYRIGHT);
-	println("  displays information about an HFS/HFS+/HFSX filesystem.");
-	println("  usage: hfsx [common options] <verb> [verb options] <file/device>");
+        println();
+	println("Utility to explore various aspects of an HFS/HFS+/HFSX filesystem.");
+	println("usage: hfsx [common options] <verb> [verb options] <file/device>");
 	println();
 	println("  Common options:");
 	println("    -apm  Specifies that the HFS partition is embedded within an Apple");
@@ -1017,7 +1017,7 @@ public class HFSExplorer {
 //	println("            structures. Only for debugging purposes.");
 	println();
 	println("  Verb options:");
-	println("    <none defined>");
+	println("    <none currently defined>");
     }
     
     public static void println() {
