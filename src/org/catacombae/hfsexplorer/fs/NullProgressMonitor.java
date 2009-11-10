@@ -5,6 +5,8 @@
  */
 package org.catacombae.hfsexplorer.fs;
 
+import org.catacombae.storage.fs.hfs.ProgressMonitor;
+
 /**
  *
  * @author Erik Larsson
