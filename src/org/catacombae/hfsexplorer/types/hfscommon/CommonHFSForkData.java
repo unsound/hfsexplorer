@@ -17,6 +17,7 @@
 
 package org.catacombae.hfsexplorer.types.hfscommon;
 
+import java.io.PrintStream;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentDescriptor;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusForkData;
 import org.catacombae.hfsexplorer.types.hfs.ExtDataRec;
@@ -39,6 +40,8 @@ public abstract class CommonHFSForkData {
         return new HFSPlusImplementation(hper);
     }
     
+    public abstract void print(PrintStream err, String prefix);
+
     public static class HFSImplementation extends CommonHFSForkData {
         private final ExtDataRec edr;
         private final long logicalSize;
@@ -60,6 +63,11 @@ public abstract class CommonHFSForkData {
             }
             return result;
         }
+
+        @Override
+        public void print(PrintStream ps, String prefix) {
+            edr.print(ps, prefix);
+        }
     }
     
     public static class HFSPlusImplementation extends CommonHFSForkData {
@@ -80,6 +88,11 @@ public abstract class CommonHFSForkData {
                 result[i] = CommonHFSExtentDescriptor.create(src[i]);
             }
             return result;
+        }
+
+        @Override
+        public void print(PrintStream ps, String prefix) {
+            hper.print(ps, prefix);
         }
     }
 }
