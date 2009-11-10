@@ -7,7 +7,6 @@ package org.catacombae.storage.fs.hfs;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import org.catacombae.hfsexplorer.fs.ProgressMonitor;
 import org.catacombae.hfsexplorer.io.ForkFilter;
 import org.catacombae.hfsexplorer.io.ReadableBlockCachingStream;
 import org.catacombae.hfsexplorer.io.ReadableRandomAccessSubstream;
@@ -299,69 +298,69 @@ public abstract class HFSVolume {
     */
 
 
-    /*
-    public long extractDataForkToStream(CommonHFSCatalogLeafRecord fileRecord, OutputStream os) throws IOException {
-	return extractDataForkToStream(fileRecord, os, NullProgressMonitor.getInstance());
+    public long extractDataForkToStream(CommonHFSCatalogLeafRecord fileRecord,
+            OutputStream os, ProgressMonitor pm) throws IOException {
+        // = fileRecord.getData();
+        if(fileRecord instanceof CommonHFSCatalogFileRecord) {
+            CommonHFSCatalogFile catFile =
+                    ((CommonHFSCatalogFileRecord) fileRecord).getData();
+            CommonHFSForkData dataFork = catFile.getDataFork();
+            return extractForkToStream(dataFork,
+                    extentsOverflowFile.getAllDataExtentDescriptors(fileRecord),
+                    os, pm);
+        }
+        else
+            throw new IllegalArgumentException("fileRecord.getData() it not " +
+                    "of type RECORD_TYPE_FILE");
     }
-    */
-    public long extractDataForkToStream(CommonHFSCatalogLeafRecord fileRecord, OutputStream os,
-					ProgressMonitor pm) throws IOException {
-	// = fileRecord.getData();
-	if(fileRecord instanceof CommonHFSCatalogFileRecord) {
-	    CommonHFSCatalogFile catFile = ((CommonHFSCatalogFileRecord)fileRecord).getData();
-	    CommonHFSForkData dataFork = catFile.getDataFork();
-	    return extractForkToStream(dataFork,
-                    extentsOverflowFile.getAllDataExtentDescriptors(fileRecord), os, pm);
-	}
-	else
-	    throw new IllegalArgumentException("fileRecord.getData() it not of type RECORD_TYPE_FILE");
+
+    public long extractResourceForkToStream(
+            CommonHFSCatalogLeafRecord fileRecord, OutputStream os,
+            ProgressMonitor pm) throws IOException {
+        //CommonHFSCatalogLeafRecordData recData = fileRecord.getData();
+        if(fileRecord instanceof CommonHFSCatalogFileRecord) {
+            CommonHFSCatalogFile catFile =
+                    ((CommonHFSCatalogFileRecord) fileRecord).getData();
+            CommonHFSForkData resFork = catFile.getResourceFork();
+            return extractForkToStream(resFork,
+                    extentsOverflowFile.getAllResourceExtentDescriptors(fileRecord),
+                    os, pm);
+        }
+        else
+            throw new IllegalArgumentException("fileRecord.getData() it not " +
+                    "of type RECORD_TYPE_FILE");
     }
-    /*
-    public long exdtractResourceForkToStream(CommonHFSCatalogLeafRecord fileRecord, OutputStream os) throws IOException {
-	return extractResourceForkToStream(fileRecord, os, NullProgressMonitor.getInstance());
-    }*/
-    public long extractResourceForkToStream(CommonHFSCatalogLeafRecord fileRecord, OutputStream os,
-					    ProgressMonitor pm) throws IOException {
-	//CommonHFSCatalogLeafRecordData recData = fileRecord.getData();
-	if(fileRecord instanceof CommonHFSCatalogFileRecord) {
-	    CommonHFSCatalogFile catFile = ((CommonHFSCatalogFileRecord)fileRecord).getData();
-	    CommonHFSForkData resFork = catFile.getResourceFork();
-	    return extractForkToStream(resFork,
-                    extentsOverflowFile.getAllResourceExtentDescriptors(fileRecord), os, pm);
-	}
-	else
-	    throw new IllegalArgumentException("fileRecord.getData() it not of type RECORD_TYPE_FILE");
-    }
-    /*
-    public long extractForkToStream(CommonHFSForkData forkData, CommonHFSExtentDescriptor[] extentDescriptors,
-				    OutputStream os) throws IOException {
-	return extractForkToStream(forkData, extentDescriptors, os, NullProgressMonitor.getInstance());
-    }
-    */
+
     public long extractForkToStream(CommonHFSForkData forkData,
             CommonHFSExtentDescriptor[] extentDescriptors, OutputStream os,
             ProgressMonitor pm) throws IOException {
-    CommonHFSVolumeHeader header = getVolumeHeader();
-	ForkFilter forkFilter = new ForkFilter(forkData, extentDescriptors,
+        CommonHFSVolumeHeader header = getVolumeHeader();
+        ForkFilter forkFilter = new ForkFilter(forkData, extentDescriptors,
                 new ReadableRandomAccessSubstream(hfsFile), fsOffset,
                 header.getAllocationBlockSize(),
-                header.getAllocationBlockStart()*physicalBlockSize);
-	long bytesToRead = forkData.getLogicalSize();
-	byte[] buffer = new byte[4096];
-	while(bytesToRead > 0) {
-	    if(pm.cancelSignaled()) break;
-	    //System.out.print("forkFilter.read([].length=" + buffer.length + ", 0, " + (bytesToRead < buffer.length ? (int)bytesToRead : buffer.length) + "...");
-	    int bytesRead = forkFilter.read(buffer, 0, (bytesToRead < buffer.length ? (int)bytesToRead : buffer.length));
-	    //System.out.println("done. bytesRead = " + bytesRead);
-	    if(bytesRead < 0)
-		break;
-	    else {
-		pm.addDataProgress(bytesRead);
-		os.write(buffer, 0, bytesRead);
-		bytesToRead -= bytesRead;
-	    }
-	}
-	return forkData.getLogicalSize()-bytesToRead;
+                header.getAllocationBlockStart() * physicalBlockSize);
+        long bytesToRead = forkData.getLogicalSize();
+        byte[] buffer = new byte[4096];
+        while(bytesToRead > 0) {
+            if(pm.cancelSignaled())
+                break;
+
+//          System.out.print("forkFilter.read([].length=" + buffer.length +
+//                    ", 0, " +
+//                    (bytesToRead < buffer.length ? (int)bytesToRead : buffer.length) +
+//                    "...");
+            int bytesRead = forkFilter.read(buffer, 0,
+                    (bytesToRead < buffer.length ? (int)bytesToRead : buffer.length));
+//          System.out.println("done. bytesRead = " + bytesRead);
+            if(bytesRead < 0)
+                break;
+            else {
+                pm.addDataProgress(bytesRead);
+                os.write(buffer, 0, bytesRead);
+                bytesToRead -= bytesRead;
+            }
+        }
+        return forkData.getLogicalSize() - bytesToRead;
     }
 
     /**
