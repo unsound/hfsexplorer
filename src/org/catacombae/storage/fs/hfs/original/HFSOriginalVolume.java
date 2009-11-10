@@ -5,8 +5,6 @@
 
 package org.catacombae.storage.fs.hfs.original;
 
-import org.catacombae.hfsexplorer.fs.CharsetStringCodec;
-import org.catacombae.hfsexplorer.fs.MutableStringCodec;
 import org.catacombae.hfsexplorer.io.ReadableRandomAccessSubstream;
 import org.catacombae.hfsexplorer.types.hfs.BTHdrRec;
 import org.catacombae.hfsexplorer.types.hfs.CatKeyRec;
