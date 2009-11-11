@@ -27,42 +27,4 @@ public class Util extends org.catacombae.util.Util {
         }
         return false;
     }
-
-    /**
-     * Reverses the order of the array <code>data</code>.
-     *
-     * @param data the array to reverse.
-     * @return <code>data</code>.
-     */
-    public static byte[] byteSwap(byte[] data) {
-        return byteSwap(data, 0, data.length);
-    }
-
-    /**
-     * Reverses the order of the range defined by <code>offset</code> and
-     * <code>length</code> in the array <code>data</code>.
-     *
-     * @param data the array to reverse.
-     * @param offset the start offset of the region to reverse.
-     * @param length the length of the region to reverse.
-     * @return <code>data</code>.
-     */
-    public static byte[] byteSwap(byte[] data, int offset, int length) {
-        int endOffset = offset + length - 1;
-        int middleOffset = offset + (length / 2);
-        byte tmp;
-
-        for(int head = offset; head < middleOffset; ++head) {
-            int tail = endOffset - head;
-            if(head == tail)
-                break;
-
-            // Swap data[head] and data[tail]
-            tmp = data[head];
-            data[head] = data[tail];
-            data[tail] = tmp;
-        }
-
-        return data;
-    }
 }
