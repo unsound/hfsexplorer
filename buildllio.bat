@@ -21,12 +21,12 @@ echo Building all classes to make sure all is well...
 call "%~dp0\buildall.bat"
 if not "%ERRORLEVEL%"=="0" goto error
 
-echo Creating header file for org.catacombae.hfsexplorer.win32.WindowsLowLevelIO...
-javah -jni -classpath "%CV_JAVA_BUILD_DIR%" -d "%LLIO_SOURCEDIR%" org.catacombae.hfsexplorer.win32.WindowsLowLevelIO
+echo Creating header file for org.catacombae.storage.io.win32.ReadableWin32FileStream...
+javah -jni -classpath "%CV_JAVA_BUILD_DIR%" -d "%LLIO_SOURCEDIR%" org.catacombae.storage.io.win32.ReadableWin32FileStream
 if not "%ERRORLEVEL%"=="0" goto error
 
-echo Creating header file for org.catacombae.hfsexplorer.win32.WritableWin32File...
-javah -jni -classpath "%CV_JAVA_BUILD_DIR%" -d "%LLIO_SOURCEDIR%" org.catacombae.hfsexplorer.win32.WritableWin32File
+echo Creating header file for org.catacombae.storage.io.win32.Win32FileStream...
+javah -jni -classpath "%CV_JAVA_BUILD_DIR%" -d "%LLIO_SOURCEDIR%" org.catacombae.storage.io.win32.Win32FileStream
 if not "%ERRORLEVEL%"=="0" goto error
 
 if "%COMPILER%"=="gcc" goto gcc_compile
