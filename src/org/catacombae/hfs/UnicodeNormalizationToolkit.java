@@ -15,17 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer;
+package org.catacombae.hfs;
 
-//import java.io.FileOutputStream;
-//import java.io.IOException;
-//import java.io.PrintStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Map;
-//import java.util.TreeMap;
+import org.catacombae.util.Util;
 
 /**
  * A class implementing a table for handling the decomposition of characters that's necessary when

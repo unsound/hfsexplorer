@@ -27,7 +27,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.GapContent;
 import javax.swing.text.PlainDocument;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 
 /**
  * An implementation of OutputStream that writes all output to a JTextArea, decoded with the

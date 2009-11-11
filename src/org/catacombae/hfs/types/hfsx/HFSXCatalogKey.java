@@ -17,8 +17,8 @@
 
 package org.catacombae.hfs.types.hfsx;
 
-import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.FastUnicodeCompare;
+import org.catacombae.util.Util;
+import org.catacombae.hfs.FastUnicodeCompare;
 import org.catacombae.hfs.types.hfsplus.BTHeaderRec;
 import org.catacombae.hfs.types.hfsplus.BTKey;
 import org.catacombae.hfs.types.hfsplus.HFSCatalogNodeID;

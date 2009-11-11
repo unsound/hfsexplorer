@@ -18,8 +18,8 @@
 package org.catacombae.hfs.types.hfsplus;
 
 import org.catacombae.csjc.structelements.Dictionary;
-import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.FastUnicodeCompare;
+import org.catacombae.util.Util;
+import org.catacombae.hfs.FastUnicodeCompare;
 import java.io.PrintStream;
 import org.catacombae.csjc.DynamicStruct;
 import org.catacombae.csjc.StructElements;

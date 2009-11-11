@@ -17,7 +17,7 @@
 
 package org.catacombae.csjc.structelements;
 
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 
 /**
  * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>

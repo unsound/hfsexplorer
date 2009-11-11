@@ -17,14 +17,15 @@
 
 package org.catacombae.hfs.types.hfsplus;
 
-import org.catacombae.hfsexplorer.Util;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+import org.catacombae.util.Util;
 import org.catacombae.csjc.MutableStruct;
 import java.util.Date;
-import java.io.*;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.ASCIIStringField;
 import org.catacombae.csjc.structelements.Dictionary;
-import org.catacombae.csjc.structelements.DictionaryBuilder;
 
 public class HFSPlusVolumeHeader extends MutableStruct implements StructElements {
     public static final short SIGNATURE_HFS_PLUS = 0x482B;

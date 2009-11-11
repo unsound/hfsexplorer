@@ -18,7 +18,7 @@
 package org.catacombae.hfs.types.hfsplus;
 
 import org.catacombae.hfs.types.hfsx.HFSXCatalogLeafRecord;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 
 public class HFSPlusCatalogLeafNode extends BTLeafNode {
     protected HFSPlusCatalogLeafRecord[] leafRecords;

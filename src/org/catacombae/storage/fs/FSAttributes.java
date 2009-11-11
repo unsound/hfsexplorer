@@ -18,7 +18,7 @@
 package org.catacombae.storage.fs;
 
 import java.util.Date;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 
 /**
  *

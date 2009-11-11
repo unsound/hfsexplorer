@@ -17,7 +17,7 @@
 
 package org.catacombae.hfsexplorer.fs;
 
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 import org.catacombae.hfsexplorer.io.ReadableRandomAccessSubstream;
 import org.catacombae.hfsexplorer.io.SynchronizedReadableRandomAccess;
 import org.catacombae.hfsexplorer.io.SynchronizedReadableRandomAccessStream;

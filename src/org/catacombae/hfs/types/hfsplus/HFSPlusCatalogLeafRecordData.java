@@ -17,7 +17,7 @@
 
 package org.catacombae.hfs.types.hfsplus;
 
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.csjc.StructElements;
 

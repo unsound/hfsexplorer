@@ -17,7 +17,7 @@
 
 package org.catacombae.hfs.types.hfsplus;
 
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 
 public class BTIndexRecord {
     private final BTKey key;

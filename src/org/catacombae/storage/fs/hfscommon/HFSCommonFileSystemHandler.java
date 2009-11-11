@@ -19,9 +19,9 @@ package org.catacombae.storage.fs.hfscommon;
 
 import java.io.UnsupportedEncodingException;
 import java.util.LinkedList;
-import org.catacombae.hfsexplorer.IOUtil;
-import org.catacombae.hfsexplorer.UnicodeNormalizationToolkit;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.IOUtil;
+import org.catacombae.hfs.UnicodeNormalizationToolkit;
+import org.catacombae.util.Util;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFolderRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFileRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFolderThreadRecord;

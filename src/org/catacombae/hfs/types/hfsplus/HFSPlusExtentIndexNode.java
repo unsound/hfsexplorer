@@ -17,7 +17,7 @@
 
 package org.catacombae.hfs.types.hfsplus;
 
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 
 public class HFSPlusExtentIndexNode extends BTIndexNode {
     public HFSPlusExtentIndexNode(byte[] data, int offset, int nodeSize) {

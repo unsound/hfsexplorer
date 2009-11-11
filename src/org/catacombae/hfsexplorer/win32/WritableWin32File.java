@@ -17,7 +17,7 @@
 
 package org.catacombae.hfsexplorer.win32;
 import org.catacombae.io.RandomAccessStream;
-import org.catacombae.hfsexplorer.*;
+import org.catacombae.util.Util;
 
 /** BUG: Writing at the end of a file will always expand it to fit the sector size! Not very good. Fixit.
     Note: Is this fixed? TODO ?! */

@@ -17,7 +17,7 @@
 
 package org.catacombae.hfsexplorer.io;
 
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 import org.catacombae.hfs.types.hfsplus.HFSPlusExtentDescriptor;
 import org.catacombae.hfs.types.hfsplus.HFSPlusForkData;
 import org.catacombae.io.ReadableRandomAccessStream;

@@ -16,7 +16,8 @@
  */
 
 package org.catacombae.hfsexplorer.partitioning;
-import org.catacombae.hfsexplorer.*;
+
+import org.catacombae.util.Util;
 
 public class MutableMasterBootRecord extends MasterBootRecord {
 //     private MutableMBRPartitionTable() {

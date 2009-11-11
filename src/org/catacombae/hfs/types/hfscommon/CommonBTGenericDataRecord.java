@@ -18,7 +18,7 @@
 package org.catacombae.hfs.types.hfscommon;
 
 import java.io.PrintStream;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 
 /**
  * Record with unspecified data.

@@ -16,13 +16,19 @@
  */
 
 package org.catacombae.hfsexplorer.testcode;
+import java.io.BufferedReader;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import org.catacombae.hfsexplorer.partitioning.GPTHeader;
+import org.catacombae.hfsexplorer.partitioning.GUIDPartitionTable;
+import org.catacombae.hfsexplorer.partitioning.MutableGPTEntry;
+import org.catacombae.hfsexplorer.partitioning.MutableGPTHeader;
+import org.catacombae.hfsexplorer.partitioning.MutableGUIDPartitionTable;
+import org.catacombae.hfsexplorer.win32.WritableWin32File;
 import org.catacombae.io.FileStream;
 import org.catacombae.io.RandomAccessStream;
-import org.catacombae.hfsexplorer.*;
-import org.catacombae.hfsexplorer.partitioning.*;
-import org.catacombae.hfsexplorer.win32.*;
-import java.io.*;
 import org.catacombae.storage.ps.gpt.GPTPartitionType;
+import org.catacombae.util.Util;
 
 /**
  * This time I needed to change partition 3 partition type from Basic Data to HFS+.

@@ -16,7 +16,7 @@
  */
 
 package org.catacombae.hfsexplorer.partitioning;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 import java.io.PrintStream;
 import java.util.Hashtable;
 import org.catacombae.storage.ps.PartitionType;
