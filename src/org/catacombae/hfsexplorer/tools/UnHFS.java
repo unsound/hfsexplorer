@@ -29,7 +29,7 @@ import org.catacombae.hfsexplorer.fs.AppleSingleBuilder;
 import org.catacombae.hfsexplorer.fs.AppleSingleBuilder.AppleSingleVersion;
 import org.catacombae.hfsexplorer.fs.AppleSingleBuilder.FileSystem;
 import org.catacombae.hfsexplorer.fs.AppleSingleBuilder.FileType;
-import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
+import org.catacombae.storage.io.win32.ReadableWin32FileStream;
 import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.RuntimeIOException;
@@ -230,8 +230,8 @@ public class UnHFS {
         }
 
         ReadableRandomAccessStream inputStream;
-        if(WindowsLowLevelIO.isSystemSupported())
-            inputStream = new WindowsLowLevelIO(inputFilename);
+        if(ReadableWin32FileStream.isSystemSupported())
+            inputStream = new ReadableWin32FileStream(inputFilename);
         else
             inputStream = new ReadableFileStream(inputFilename);
 

@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
+import org.catacombae.storage.io.win32.ReadableWin32FileStream;
 import org.catacombae.hfsexplorer.fs.NullProgressMonitor;
 import org.catacombae.storage.ps.apm.types.APMPartition;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFile;
@@ -113,8 +113,8 @@ public class HFSExplorer {
 
 	//RandomAccessFile isoRaf = new RandomAccessFile(args[0], "r");
 	ReadableRandomAccessStream isoRaf;
-	if(WindowsLowLevelIO.isSystemSupported())
-	    isoRaf = new WindowsLowLevelIO(operation.getFilename());
+	if(ReadableWin32FileStream.isSystemSupported())
+	    isoRaf = new ReadableWin32FileStream(operation.getFilename());
 	else
 	    isoRaf = new ReadableFileStream(operation.getFilename());
 

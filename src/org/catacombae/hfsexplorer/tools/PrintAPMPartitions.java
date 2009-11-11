@@ -19,7 +19,7 @@ package org.catacombae.hfsexplorer.tools;
 import java.io.FileOutputStream;
 import org.catacombae.storage.ps.apm.types.ApplePartitionMap;
 import org.catacombae.storage.ps.apm.types.DriverDescriptorRecord;
-import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
+import org.catacombae.storage.io.win32.ReadableWin32FileStream;
 import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 
@@ -27,8 +27,8 @@ public class PrintAPMPartitions {
 
     public static void main(String[] args) throws Exception {
         ReadableRandomAccessStream llf;
-        if(WindowsLowLevelIO.isSystemSupported())
-            llf = new WindowsLowLevelIO(args[0]);
+        if(ReadableWin32FileStream.isSystemSupported())
+            llf = new ReadableWin32FileStream(args[0]);
         else
             llf = new ReadableFileStream(args[0]);
 

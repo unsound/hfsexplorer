@@ -30,7 +30,7 @@ import org.catacombae.storage.ps.gpt.types.GUIDPartitionTable;
 import org.catacombae.storage.ps.mbr.types.MBRPartitionTable;
 import org.catacombae.storage.ps.legacy.Partition;
 import org.catacombae.storage.ps.legacy.PartitionSystem;
-import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
+import org.catacombae.storage.io.win32.ReadableWin32FileStream;
 import org.catacombae.storage.ps.PartitionType;
 
 public class DumpFSInfo {
@@ -60,9 +60,9 @@ public class DumpFSInfo {
     public static void dumpInfo(String[] args) throws Exception {
         long runTimestamp = System.currentTimeMillis();
         ReadableRandomAccessStream fsFile;
-        if(WindowsLowLevelIO.isSystemSupported()) {
+        if(ReadableWin32FileStream.isSystemSupported()) {
             if(args.length == 1) {
-                fsFile = new WindowsLowLevelIO(args[0]);
+                fsFile = new ReadableWin32FileStream(args[0]);
             }
             else if(args.length == 0) {
                 SelectWindowsDeviceDialog swdd =

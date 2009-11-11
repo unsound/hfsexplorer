@@ -22,7 +22,7 @@ import java.util.LinkedList;
 import org.catacombae.storage.ps.mbr.types.MBRPartitionTable;
 import org.catacombae.storage.ps.legacy.Partition;
 import org.catacombae.storage.ps.legacy.PartitionSystem;
-import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
+import org.catacombae.storage.io.win32.ReadableWin32FileStream;
 import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.storage.ps.PartitionType;
@@ -130,8 +130,8 @@ public class EBRPartitionSystem implements PartitionSystem {
 
         String inputFilename = args[0];
         ReadableRandomAccessStream inputStream;
-        if(WindowsLowLevelIO.isSystemSupported())
-            inputStream = new WindowsLowLevelIO(inputFilename);
+        if(ReadableWin32FileStream.isSystemSupported())
+            inputStream = new ReadableWin32FileStream(inputFilename);
         else
             inputStream = new ReadableFileStream(inputFilename);
 
