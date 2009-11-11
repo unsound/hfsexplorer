@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib;
+package org.catacombae.storage;
 
 import java.io.File;
 import org.catacombae.io.ReadableConcatenatedStream;
