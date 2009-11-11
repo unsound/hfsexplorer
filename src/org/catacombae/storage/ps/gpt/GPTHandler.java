@@ -20,7 +20,7 @@ package org.catacombae.storage.ps.gpt;
 import org.catacombae.storage.ps.gpt.types.GUIDPartitionTable;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.storage.ps.legacy.PartitionSystem;
-import org.catacombae.storage.DataLocator;
+import org.catacombae.storage.io.DataLocator;
 import org.catacombae.storage.ps.Partition;
 import org.catacombae.storage.ps.PartitionSystemHandler;
 import org.catacombae.storage.ps.StandardPartition;

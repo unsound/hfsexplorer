@@ -18,7 +18,7 @@
 package org.catacombae.storage.ps.container.hfs;
 
 import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.storage.DataLocator;
+import org.catacombae.storage.io.DataLocator;
 import org.catacombae.storage.fs.FileSystemMajorType;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer;
 import org.catacombae.storage.ps.PartitionSystemType;

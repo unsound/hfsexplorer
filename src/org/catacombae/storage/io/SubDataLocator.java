@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.catacombae.storage;
+package org.catacombae.storage.io;
 
 import org.catacombae.io.ConcatenatedStream;
 import org.catacombae.io.RandomAccessStream;
