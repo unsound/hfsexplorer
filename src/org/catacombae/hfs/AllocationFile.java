@@ -18,7 +18,7 @@
 package org.catacombae.hfs;
 
 import java.util.LinkedList;
-import org.catacombae.hfsexplorer.ObjectContainer;
+import org.catacombae.util.ObjectContainer;
 import org.catacombae.hfs.types.hfscommon.CommonHFSExtentDescriptor;
 import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.io.ReadableRandomAccessStream;

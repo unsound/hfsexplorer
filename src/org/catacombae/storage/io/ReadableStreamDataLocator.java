@@ -17,8 +17,8 @@
 
 package org.catacombae.storage.io;
 
-import org.catacombae.hfsexplorer.io.ReadableRandomAccessSubstream;
-import org.catacombae.hfsexplorer.io.SynchronizedReadableRandomAccessStream;
+import org.catacombae.io.ReadableRandomAccessSubstream;
+import org.catacombae.io.SynchronizedReadableRandomAccessStream;
 import org.catacombae.io.RandomAccessStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 

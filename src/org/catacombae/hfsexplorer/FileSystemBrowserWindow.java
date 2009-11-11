@@ -17,6 +17,7 @@
 
 package org.catacombae.hfsexplorer;
 
+import org.catacombae.util.ObjectContainer;
 import org.catacombae.hfsexplorer.FileSystemBrowser.Record;
 import org.catacombae.hfsexplorer.FileSystemBrowser.RecordType;
 import org.catacombae.hfs.ProgressMonitor;

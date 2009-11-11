@@ -23,7 +23,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.DecimalFormat;
 import javax.swing.SwingUtilities;
-import org.catacombae.hfsexplorer.ObjectContainer;
+import org.catacombae.util.ObjectContainer;
 import org.catacombae.hfsexplorer.SpeedUnitUtils;
 import org.catacombae.util.Util;
 import org.catacombae.storage.fs.FSAttributes;

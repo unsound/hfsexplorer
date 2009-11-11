@@ -19,7 +19,7 @@ package org.catacombae.hfs;
 
 import java.util.LinkedList;
 import org.catacombae.hfs.io.ForkFilter;
-import org.catacombae.hfsexplorer.io.ReadableRandomAccessSubstream;
+import org.catacombae.io.ReadableRandomAccessSubstream;
 import org.catacombae.hfs.types.hfscommon.CommonBTIndexNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTIndexRecord;
 import org.catacombae.hfs.types.hfscommon.CommonBTNode;
