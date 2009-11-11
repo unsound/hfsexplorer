@@ -22,6 +22,9 @@
  
   <property name="target.jparted.jarmanifest" value="${manifest.source.dir}/jparted/MANIFEST.MF"/>
   <property name="target.jparted.outjar" value="targets/jparted/lib/jparted.jar"/>
+
+  <!--<property name="target.libhfs.jarmanifest" value="${manifest.source.dir}/jparted/MANIFEST.MF"/>-->
+  <property name="target.libhfs.outjar" value="targets/libhfs.jar"/>
   
   <path id="java.build.classpath">
     <fileset dir="${java.runtime.library.dir}">
@@ -115,6 +118,25 @@
   
   <target name="jar-jparted" depends="compile-jparted">
     <jar destfile="${target.jparted.outjar}" basedir="${builddir}" manifest="${target.jparted.jarmanifest}"/>
+  </target>
+
+  <target name="build-libhfs" depends="clean,jar-libhfs"/>
+
+  <target name="compile-libhfs" depends="init">
+    <javac srcdir="${java.source.dir}"
+	   destdir="${builddir}"
+	   includes="org/catacombae/storage/**"
+	   debug="true"
+	   debuglevel="${debuglevel}"
+	   encoding="iso-8859-1"
+	   source="${java.source.level}"
+	   target="${java.target.level}">
+      <classpath refid="java.build.classpath"/>
+    </javac>
+  </target>
+
+  <target name="jar-libhfs" depends="compile-libhfs">
+    <jar destfile="${target.libhfs.outjar}" basedir="${builddir}"/>
   </target>
   
   <target name="javadoc">
