@@ -17,7 +17,7 @@
 
 package org.catacombae.hfs;
 
-import org.catacombae.hfsexplorer.io.ForkFilter;
+import org.catacombae.hfs.io.ForkFilter;
 import org.catacombae.hfsexplorer.io.ReadableRandomAccessSubstream;
 import org.catacombae.hfs.types.hfscommon.CommonBTHeaderRecord;
 import org.catacombae.hfs.types.hfscommon.CommonBTNode;
