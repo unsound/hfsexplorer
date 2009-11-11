@@ -15,8 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.partitioning;
+package org.catacombae.storage.ps.mbr.types;
 
+import org.catacombae.storage.ps.legacy.Partition;
 import java.io.PrintStream;
 import java.util.LinkedList;
 import org.catacombae.util.Util;

@@ -25,11 +25,11 @@ import javax.swing.JOptionPane;
 import org.catacombae.hfsexplorer.GUIUtil;
 import org.catacombae.hfsexplorer.PartitionSystemRecognizer;
 import org.catacombae.hfsexplorer.SelectWindowsDeviceDialog;
-import org.catacombae.hfsexplorer.partitioning.ApplePartitionMap;
-import org.catacombae.hfsexplorer.partitioning.GUIDPartitionTable;
-import org.catacombae.hfsexplorer.partitioning.MBRPartitionTable;
-import org.catacombae.hfsexplorer.partitioning.Partition;
-import org.catacombae.hfsexplorer.partitioning.PartitionSystem;
+import org.catacombae.storage.ps.apm.types.ApplePartitionMap;
+import org.catacombae.storage.ps.gpt.types.GUIDPartitionTable;
+import org.catacombae.storage.ps.mbr.types.MBRPartitionTable;
+import org.catacombae.storage.ps.legacy.Partition;
+import org.catacombae.storage.ps.legacy.PartitionSystem;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
 import org.catacombae.storage.ps.PartitionType;
 

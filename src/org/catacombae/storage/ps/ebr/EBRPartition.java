@@ -17,7 +17,7 @@
 
 package org.catacombae.storage.ps.ebr;
 
-import org.catacombae.hfsexplorer.partitioning.MBRPartition;
+import org.catacombae.storage.ps.mbr.types.MBRPartition;
 
 public class EBRPartition extends MBRPartition {
     

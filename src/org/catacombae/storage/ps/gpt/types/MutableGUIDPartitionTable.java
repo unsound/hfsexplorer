@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.partitioning;
+package org.catacombae.storage.ps.gpt.types;
 
 public class MutableGUIDPartitionTable extends GUIDPartitionTable {
     protected MutableGPTHeader mutableHeader;

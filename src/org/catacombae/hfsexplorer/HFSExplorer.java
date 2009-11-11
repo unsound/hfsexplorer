@@ -28,7 +28,7 @@ import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
 import org.catacombae.hfsexplorer.fs.NullProgressMonitor;
-import org.catacombae.hfsexplorer.partitioning.APMPartition;
+import org.catacombae.storage.ps.apm.types.APMPartition;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFile;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFileRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFileThread;

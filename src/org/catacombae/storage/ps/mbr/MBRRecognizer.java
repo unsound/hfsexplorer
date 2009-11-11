@@ -20,7 +20,7 @@ package org.catacombae.storage.ps.mbr;
 import org.catacombae.storage.DataLocator;
 import org.catacombae.storage.ps.PartitionSystemRecognizer;
 import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.hfsexplorer.partitioning.MBRPartitionTable;
+import org.catacombae.storage.ps.mbr.types.MBRPartitionTable;
 
 /**
  *

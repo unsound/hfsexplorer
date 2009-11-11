@@ -16,6 +16,14 @@
  */
 
 package org.catacombae.hfsexplorer.testcode;
+import org.catacombae.storage.ps.gpt.types.GPTEntry;
+import org.catacombae.storage.ps.gpt.types.GPTHeader;
+import org.catacombae.storage.ps.gpt.types.MutableGUIDPartitionTable;
+import org.catacombae.storage.ps.gpt.types.GUIDPartitionTable;
+import org.catacombae.storage.ps.gpt.types.MutableGPTHeader;
+import org.catacombae.storage.ps.gpt.types.MutableGPTEntry;
+import org.catacombae.storage.ps.mbr.types.MBRPartition;
+import org.catacombae.storage.ps.mbr.types.MBRPartitionTable;
 import org.catacombae.io.FileStream;
 import org.catacombae.io.RandomAccessStream;
 import org.catacombae.hfsexplorer.partitioning.*;

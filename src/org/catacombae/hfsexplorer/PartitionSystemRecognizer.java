@@ -16,12 +16,12 @@
  */
 package org.catacombae.hfsexplorer;
 
-import org.catacombae.hfsexplorer.partitioning.ApplePartitionMap;
-import org.catacombae.hfsexplorer.partitioning.DriverDescriptorRecord;
-import org.catacombae.hfsexplorer.partitioning.GPTHeader;
-import org.catacombae.hfsexplorer.partitioning.GUIDPartitionTable;
-import org.catacombae.hfsexplorer.partitioning.MBRPartitionTable;
-import org.catacombae.hfsexplorer.partitioning.PartitionSystem;
+import org.catacombae.storage.ps.apm.types.ApplePartitionMap;
+import org.catacombae.storage.ps.apm.types.DriverDescriptorRecord;
+import org.catacombae.storage.ps.gpt.types.GPTHeader;
+import org.catacombae.storage.ps.gpt.types.GUIDPartitionTable;
+import org.catacombae.storage.ps.mbr.types.MBRPartitionTable;
+import org.catacombae.storage.ps.legacy.PartitionSystem;
 //import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 

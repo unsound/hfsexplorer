@@ -15,12 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.partitioning;
+package org.catacombae.storage.ps.apm.types;
 
 import org.catacombae.util.Util;
 import java.io.PrintStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import org.catacombae.storage.ps.legacy.Partition;
 import org.catacombae.storage.ps.PartitionType;
 
 public class APMPartition implements Partition {
