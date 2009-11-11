@@ -17,8 +17,10 @@
 
 package org.catacombae.hfsexplorer.testcode;
 
-import java.util.*;
-import java.text.*;
+import java.text.DateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * Reference to how the field HFSPlusDate.DIFF_TO_JAVA_DATE_IN_MILLIS is calculated.

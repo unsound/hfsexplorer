@@ -16,6 +16,9 @@
  */
 
 package org.catacombae.hfsexplorer.testcode;
+import java.io.BufferedReader;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
 import org.catacombae.storage.io.win32.Win32FileStream;
 import org.catacombae.storage.ps.gpt.types.GPTEntry;
 import org.catacombae.storage.ps.gpt.types.GPTHeader;
@@ -27,9 +30,6 @@ import org.catacombae.storage.ps.mbr.types.MBRPartition;
 import org.catacombae.storage.ps.mbr.types.MBRPartitionTable;
 import org.catacombae.io.FileStream;
 import org.catacombae.io.RandomAccessStream;
-import org.catacombae.hfsexplorer.partitioning.*;
-import org.catacombae.hfsexplorer.win32.*;
-import java.io.*;
 
 /**
  * <pre>

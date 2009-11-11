@@ -17,9 +17,9 @@
 
 package org.catacombae.hfsexplorer.testcode;
 
+import java.io.File;
+import java.io.RandomAccessFile;
 import org.catacombae.storage.ps.gpt.types.GPTEntry;
-import org.catacombae.hfsexplorer.partitioning.*;
-import java.io.*;
 
 public class PrintGPTEntry {
     public static void main(String[] args) throws Exception {
