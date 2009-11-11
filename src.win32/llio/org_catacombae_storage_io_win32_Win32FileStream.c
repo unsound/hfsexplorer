@@ -21,27 +21,27 @@
 #include <windows.h>
 #include <winioctl.h>
 #include <tchar.h>
-#include "org_catacombae_hfsexplorer_win32_WritableWin32File.h"
+#include "org_catacombae_storage_io_win32_Win32FileStream.h"
 #include "llio_common.h"
 #define DEBUG FALSE
 
 /*
- * Class:     org_catacombae_hfsexplorer_win32_WritableWin32File
+ * Class:     org_catacombae_catacombae_storage_io_win32_Win32FileStream
  * Method:    openNative
  * Signature: (Ljava/lang/String;)[B
  */
-JNIEXPORT jbyteArray JNICALL Java_org_catacombae_hfsexplorer_win32_WritableWin32File_openNative(JNIEnv *env, jclass cls, jstring str) {
-  if(DEBUG) printf("Java_org_catacombae_hfsexplorer_win32_WritableWin32File_openNative called\n");
+JNIEXPORT jbyteArray JNICALL Java_org_catacombae_catacombae_storage_io_win32_Win32FileStream_openNative(JNIEnv *env, jclass cls, jstring str) {
+  if(DEBUG) printf("Java_org_catacombae_catacombae_storage_io_win32_Win32FileStream_openNative called\n");
   return openWin32File(env, str, (GENERIC_READ | GENERIC_WRITE), FILE_SHARE_READ,
 		       NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 }
 
 /*
- * Class:     org_catacombae_hfsexplorer_win32_WritableWin32File
+ * Class:     org_catacombae_catacombae_storage_io_win32_Win32FileStream
  * Method:    write
  * Signature: ([BII[B)V
  */
-JNIEXPORT void JNICALL Java_org_catacombae_hfsexplorer_win32_WritableWin32File_write(JNIEnv *env, jclass cls, jbyteArray data, jint offset, jint length, jbyteArray handleData) {
+JNIEXPORT void JNICALL Java_org_catacombae_catacombae_storage_io_win32_Win32FileStream_write(JNIEnv *env, jclass cls, jbyteArray data, jint offset, jint length, jbyteArray handleData) {
   // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
   BYTE *buffer;
