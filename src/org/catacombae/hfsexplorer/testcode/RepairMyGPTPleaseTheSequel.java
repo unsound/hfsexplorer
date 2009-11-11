@@ -16,6 +16,7 @@
  */
 
 package org.catacombae.hfsexplorer.testcode;
+import org.catacombae.storage.io.win32.Win32FileStream;
 import org.catacombae.storage.ps.gpt.types.GPTEntry;
 import org.catacombae.storage.ps.gpt.types.GPTHeader;
 import org.catacombae.storage.ps.gpt.types.MutableGUIDPartitionTable;
@@ -42,8 +43,8 @@ public class RepairMyGPTPleaseTheSequel {
     public static void main(String[] args) throws Exception {
 	long runTimeStamp = System.currentTimeMillis();
 	RandomAccessStream llf;
-	if(WritableWin32File.isSystemSupported())
-	    llf = new WritableWin32File(args[0]);
+	if(Win32FileStream.isSystemSupported())
+	    llf = new Win32FileStream(args[0]);
 	else
 	    llf = new FileStream(args[0]);
 	

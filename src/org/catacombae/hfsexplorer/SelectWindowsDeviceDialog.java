@@ -33,7 +33,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.ReadableConcatenatedStream;
-import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
+import org.catacombae.storage.io.win32.ReadableWin32FileStream;
 import org.catacombae.hfsexplorer.gui.SelectWindowsDevicePanel;
 import org.catacombae.storage.ps.apm.types.APMPartition;
 import org.catacombae.storage.ps.apm.types.ApplePartitionMap;
@@ -130,7 +130,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
                 @Override
 		public void actionPerformed(ActionEvent ae) {
 		    resultCreatePath = specifyDeviceNameField.getText();
-		    result = new WindowsLowLevelIO(resultCreatePath);
+		    result = new ReadableWin32FileStream(resultCreatePath);
 		    setVisible(false);
 		}
 	    });
@@ -185,7 +185,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
 		    /* Should I add Partition0 to the list? It really means
 		     * "the whole drive". Partition1 is the first partition... */
 		    String currentDevice = "Harddisk"+i+"\\Partition"+j;
-		    WindowsLowLevelIO curFile = new WindowsLowLevelIO(DEVICE_PREFIX + currentDevice);
+		    ReadableWin32FileStream curFile = new ReadableWin32FileStream(DEVICE_PREFIX + currentDevice);
 		    curFile.close();
 		    activeDeviceNames.addLast(currentDevice);
                     anyFound = true;
@@ -202,7 +202,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
 	for(int i = 0; true; ++i) {
 	    try {
 		String currentDevice = "CdRom"+i;
-		WindowsLowLevelIO curFile = new WindowsLowLevelIO(DEVICE_PREFIX + currentDevice);
+		ReadableWin32FileStream curFile = new ReadableWin32FileStream(DEVICE_PREFIX + currentDevice);
 		curFile.close();
 		activeDeviceNames.addLast(currentDevice);
             }
@@ -240,7 +240,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
             
 	    ReadableRandomAccessStream llf = null;
 	    try {
-		llf = new WindowsLowLevelIO(DEVICE_PREFIX + deviceName);
+		llf = new ReadableWin32FileStream(DEVICE_PREFIX + deviceName);
 		PartitionSystemRecognizer psr = new PartitionSystemRecognizer(llf);
 		PartitionSystemRecognizer.PartitionSystemType pst = psr.detectPartitionSystem();
                 
@@ -328,7 +328,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
 			    throw new RuntimeException("Internal error again.");
 			
 			if(embeddedInfo.partition instanceof APMPartition) {
-			    ReadableRandomAccessStream llf = new WindowsLowLevelIO(DEVICE_PREFIX + embeddedInfo.deviceName);
+			    ReadableRandomAccessStream llf = new ReadableWin32FileStream(DEVICE_PREFIX + embeddedInfo.deviceName);
 			    DriverDescriptorRecord ddr = new DriverDescriptorRecord(llf, 0);
 			    ApplePartitionMap apm = new ApplePartitionMap(llf, ddr.getSbBlkSize()*1, ddr.getSbBlkSize());
 			    Partition p = apm.getPartitionEntry((int)embeddedInfo.partitionNumber);
@@ -337,7 +337,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
 			    setVisible(false);
 			}
 			else if(embeddedInfo.partition instanceof GPTEntry) {
-                            ReadableRandomAccessStream llf = new WindowsLowLevelIO(DEVICE_PREFIX + embeddedInfo.deviceName);
+                            ReadableRandomAccessStream llf = new ReadableWin32FileStream(DEVICE_PREFIX + embeddedInfo.deviceName);
 			    GUIDPartitionTable gpt = new GUIDPartitionTable(llf, 0);
 			    Partition p = gpt.getPartitionEntry((int)embeddedInfo.partitionNumber);
 			    resultCreatePath = DEVICE_PREFIX + selectedValue.toString();
@@ -345,7 +345,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
 			    setVisible(false);
                         }
 			else if(embeddedInfo.partition instanceof MBRPartition) {
-                            ReadableRandomAccessStream llf = new WindowsLowLevelIO(DEVICE_PREFIX + embeddedInfo.deviceName);
+                            ReadableRandomAccessStream llf = new ReadableWin32FileStream(DEVICE_PREFIX + embeddedInfo.deviceName);
 			    MBRPartitionTable mbt = new MBRPartitionTable(llf, 0);
                             Partition p = mbt.getPartitionEntry((int)embeddedInfo.partitionNumber);
 			    resultCreatePath = DEVICE_PREFIX + selectedValue.toString();
@@ -358,7 +358,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
 		    }
 		    else {
 			resultCreatePath = DEVICE_PREFIX + selectedValue.toString();
-			result = new WindowsLowLevelIO(resultCreatePath);
+			result = new ReadableWin32FileStream(resultCreatePath);
 			setVisible(false);
 		    }
 		}

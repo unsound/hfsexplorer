@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.win32;
+package org.catacombae.storage.io.win32;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import org.catacombae.util.Util;
 import org.catacombae.io.ReadableRandomAccessStream;
 
-public class WindowsLowLevelIO implements ReadableRandomAccessStream {
+public class ReadableWin32FileStream implements ReadableRandomAccessStream {
     protected byte[] fileHandle;
     protected final int sectorSize; //Detect this later..
     protected long filePointer = 0;
@@ -112,7 +112,7 @@ public class WindowsLowLevelIO implements ReadableRandomAccessStream {
         }
     }
     
-    public WindowsLowLevelIO(String filename) {
+    public ReadableWin32FileStream(String filename) {
         synchronized(loadLibSync) {
             if(!libraryLoaded) {
                 loadLibrary();
@@ -306,7 +306,7 @@ public class WindowsLowLevelIO implements ReadableRandomAccessStream {
 
     public static void main(String[] args) {
         BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-        WindowsLowLevelIO wllio1 = new WindowsLowLevelIO(args[0]);
+        ReadableWin32FileStream wllio1 = new ReadableWin32FileStream(args[0]);
 
 
         try {

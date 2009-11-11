@@ -28,7 +28,7 @@ import org.catacombae.hfs.types.hfs.ExtDescriptor;
 import org.catacombae.hfs.types.hfs.HFSPlusWrapperMDB;
 import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.hfs.types.hfsplus.HFSPlusVolumeHeader;
-import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
+import org.catacombae.storage.io.win32.ReadableWin32FileStream;
 import org.catacombae.io.ReadableConcatenatedStream;
 import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
@@ -186,7 +186,7 @@ public class FileSystemBrowserWindow extends JFrame {
     private void setUpMenus() {
         // Menus
         JMenuItem loadFSFromDeviceItem = null;
-        if(WindowsLowLevelIO.isSystemSupported()) {
+        if(ReadableWin32FileStream.isSystemSupported()) {
             // Only for Windows systems...
             loadFSFromDeviceItem = new JMenuItem("Load file system from device...");
             loadFSFromDeviceItem.addActionListener(new ActionListener() {
@@ -657,8 +657,8 @@ public class FileSystemBrowserWindow extends JFrame {
     public void loadFSWithUDIFAutodetect(String filename, long pos) {
         ReadableRandomAccessStream fsFile;
         try {
-            if(WindowsLowLevelIO.isSystemSupported()) {
-                fsFile = new WindowsLowLevelIO(filename);
+            if(ReadableWin32FileStream.isSystemSupported()) {
+                fsFile = new ReadableWin32FileStream(filename);
             }
             else {
                 fsFile = new ReadableFileStream(filename);
@@ -749,8 +749,8 @@ public class FileSystemBrowserWindow extends JFrame {
 
     public void loadFS(String filename) {
         ReadableRandomAccessStream fsFile;
-        if(WindowsLowLevelIO.isSystemSupported()) {
-            fsFile = new WindowsLowLevelIO(filename);
+        if(ReadableWin32FileStream.isSystemSupported()) {
+            fsFile = new ReadableWin32FileStream(filename);
         }
         else {
             fsFile = new ReadableFileStream(filename);

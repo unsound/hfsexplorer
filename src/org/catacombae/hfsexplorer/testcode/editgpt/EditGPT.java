@@ -23,8 +23,8 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import org.catacombae.storage.ps.gpt.types.GUIDPartitionTable;
 import org.catacombae.storage.ps.gpt.types.MutableGUIDPartitionTable;
-import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
-import org.catacombae.hfsexplorer.win32.WritableWin32File;
+import org.catacombae.storage.io.win32.ReadableWin32FileStream;
+import org.catacombae.storage.io.win32.Win32FileStream;
 import org.catacombae.io.FileStream;
 import org.catacombae.io.RandomAccessStream;
 import org.catacombae.io.ReadableFileStream;
@@ -50,8 +50,8 @@ public class EditGPT extends javax.swing.JPanel {
     
     public void loadFile(File f) {
         ReadableRandomAccessStream llf;
-	if(WritableWin32File.isSystemSupported())
-	    llf = new WindowsLowLevelIO(f.getAbsolutePath());
+	if(Win32FileStream.isSystemSupported())
+	    llf = new ReadableWin32FileStream(f.getAbsolutePath());
 	else
 	    llf = new ReadableFileStream(f.getAbsolutePath());
         

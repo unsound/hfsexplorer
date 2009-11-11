@@ -25,7 +25,7 @@ import org.catacombae.storage.ps.gpt.types.GUIDPartitionTable;
 import org.catacombae.storage.ps.gpt.types.MutableGPTEntry;
 import org.catacombae.storage.ps.gpt.types.MutableGPTHeader;
 import org.catacombae.storage.ps.gpt.types.MutableGUIDPartitionTable;
-import org.catacombae.hfsexplorer.win32.WritableWin32File;
+import org.catacombae.storage.io.win32.Win32FileStream;
 import org.catacombae.io.FileStream;
 import org.catacombae.io.RandomAccessStream;
 import org.catacombae.util.Util;
@@ -41,7 +41,7 @@ public class RepairMyGPTPlease5 {
 	long runTimeStamp = System.currentTimeMillis();
 	RandomAccessStream llf;
 	if(System.getProperty("os.name").toLowerCase().startsWith("windows"))
-	    llf = new WritableWin32File(args[0]);
+	    llf = new Win32FileStream(args[0]);
 	else
 	    llf = new FileStream(args[0]);
 	

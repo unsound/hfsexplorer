@@ -15,16 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.win32;
+package org.catacombae.storage.io.win32;
+import org.catacombae.storage.io.win32.ReadableWin32FileStream;
 import org.catacombae.io.RandomAccessStream;
 import org.catacombae.util.Util;
 
 /** BUG: Writing at the end of a file will always expand it to fit the sector size! Not very good. Fixit.
     Note: Is this fixed? TODO ?! */
 
-public class WritableWin32File extends WindowsLowLevelIO implements RandomAccessStream {
+public class Win32FileStream extends ReadableWin32FileStream implements RandomAccessStream {
     private byte[] sectorBuffer;
-    public WritableWin32File(String filename) {
+    public Win32FileStream(String filename) {
         super(filename);
         sectorBuffer = new byte[sectorSize];
     }
@@ -115,7 +116,7 @@ public class WritableWin32File extends WindowsLowLevelIO implements RandomAccess
     
     /*--------------------- TEST CODE FOLLOWS ---------------------*/
     private static java.io.BufferedReader stdin = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
-    private static WritableWin32File wwf;
+    private static Win32FileStream wwf;
     private static java.io.RandomAccessFile ref;
     private static long currentSeekPos;
     private static int currentBufferSize;
@@ -127,7 +128,7 @@ public class WritableWin32File extends WindowsLowLevelIO implements RandomAccess
 	try {
 	    /* Bashing test. Run this on a test file for some time. If the test file doesn't get corrupted,
 	       we probably have a winner. */
-	    wwf = new WritableWin32File(args[0]);
+	    wwf = new Win32FileStream(args[0]);
 	    ref = new java.io.RandomAccessFile(args[1], "rw");
 	    java.util.Random rnd = new java.util.Random();
 	    if(wwf.length() != ref.length()) {

@@ -21,8 +21,8 @@ import org.catacombae.io.ReadableConcatenatedStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.ConcatenatedStream;
 import org.catacombae.io.RandomAccessStream;
-import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
-import org.catacombae.hfsexplorer.win32.WritableWin32File;
+import org.catacombae.storage.io.win32.ReadableWin32FileStream;
+import org.catacombae.storage.io.win32.Win32FileStream;
 
 /**
  *
@@ -46,7 +46,7 @@ public class WindowsDeviceDataLocator extends DataLocator {
     
     @Override
     public ReadableRandomAccessStream createReadOnlyFile() {
-        ReadableRandomAccessStream llf = new WindowsLowLevelIO(devicePath);
+        ReadableRandomAccessStream llf = new ReadableWin32FileStream(devicePath);
         if(pos != null && len != null)
             return new ReadableConcatenatedStream(llf, pos, len);
         else
@@ -55,7 +55,7 @@ public class WindowsDeviceDataLocator extends DataLocator {
 
     @Override
     public RandomAccessStream createReadWriteFile() {
-        RandomAccessStream wllf = new WritableWin32File(devicePath);
+        RandomAccessStream wllf = new Win32FileStream(devicePath);
         if(pos != null && len != null)
             return new ConcatenatedStream(wllf, pos, len);
         else
