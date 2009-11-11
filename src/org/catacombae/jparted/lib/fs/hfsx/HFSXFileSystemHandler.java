@@ -19,7 +19,7 @@ package org.catacombae.jparted.lib.fs.hfsx;
 
 import org.catacombae.jparted.lib.DataLocator;
 import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemHandler;
-import org.catacombae.storage.fs.hfs.x.HFSXVolume;
+import org.catacombae.hfs.x.HFSXVolume;
 
 /**
  * HFSX implementation of a FileSystemHandler. This implementation can be used

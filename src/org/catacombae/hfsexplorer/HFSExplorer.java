@@ -50,7 +50,7 @@ import org.catacombae.jparted.lib.fs.FileSystemHandler;
 import org.catacombae.jparted.lib.fs.FileSystemHandlerFactory;
 import org.catacombae.jparted.lib.fs.FileSystemMajorType;
 import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemHandler;
-import org.catacombae.storage.fs.hfs.HFSVolume;
+import org.catacombae.hfs.HFSVolume;
 
 @SuppressWarnings("deprecation") // TODO: Fix HFSExplorer so it doesn't use deprecated methods...
 public class HFSExplorer {

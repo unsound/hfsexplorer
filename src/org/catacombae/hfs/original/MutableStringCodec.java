@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.storage.fs.hfs.original;
+package org.catacombae.hfs.original;
 
 /**
  * An implementation of StringCodec that wraps another StringCodec. Which codec is being wrapped can

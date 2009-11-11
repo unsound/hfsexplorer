@@ -59,7 +59,7 @@ import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogKey;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafNode;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.hfsexplorer.io.JTextAreaOutputStream;
-import org.catacombae.storage.fs.hfs.HFSVolume;
+import org.catacombae.hfs.HFSVolume;
 
 /**
  *

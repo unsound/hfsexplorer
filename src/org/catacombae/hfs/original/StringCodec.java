@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.storage.fs.hfs.original;
+package org.catacombae.hfs.original;
 
 /**
  * Transforms data between Java strings and their respective encoded byte[] forms.

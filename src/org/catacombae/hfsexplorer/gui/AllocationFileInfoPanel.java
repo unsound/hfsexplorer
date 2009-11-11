@@ -28,7 +28,7 @@ import org.catacombae.csjc.structelements.ArrayBuilder;
 import org.catacombae.hfsexplorer.GUIUtil;
 import org.catacombae.hfsexplorer.ObjectContainer;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentDescriptor;
-import org.catacombae.storage.fs.hfs.AllocationFile;
+import org.catacombae.hfs.AllocationFile;
 
 /**
  *

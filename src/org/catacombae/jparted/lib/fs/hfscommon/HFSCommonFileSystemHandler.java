@@ -36,7 +36,7 @@ import org.catacombae.jparted.lib.fs.FSForkType;
 import org.catacombae.jparted.lib.fs.FSLink;
 import org.catacombae.jparted.lib.fs.FileSystemHandler;
 import org.catacombae.jparted.lib.fs.FSEntry;
-import org.catacombae.storage.fs.hfs.HFSVolume;
+import org.catacombae.hfs.HFSVolume;
 
 /**
  * HFS+ implementation of a FileSystemHandler. This implementation can be used

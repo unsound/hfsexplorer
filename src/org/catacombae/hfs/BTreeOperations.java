@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.catacombae.storage.fs.hfs;
+package org.catacombae.hfs;
 
 import org.catacombae.io.Readable;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTHeaderNode;

@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.catacombae.storage.fs.hfs.plus;
+package org.catacombae.hfs.plus;
 
 import org.catacombae.hfsexplorer.io.ForkFilter;
 import org.catacombae.hfsexplorer.io.ReadableRandomAccessSubstream;
@@ -34,14 +34,14 @@ import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusVolumeHeader;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSUniStr255;
 import org.catacombae.io.Readable;
 import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.storage.fs.hfs.AllocationFile;
-import org.catacombae.storage.fs.hfs.AttributesFile;
-import org.catacombae.storage.fs.hfs.BTreeOperations;
-import org.catacombae.storage.fs.hfs.CatalogOperations;
-import org.catacombae.storage.fs.hfs.ExtentsOverflowOperations;
-import org.catacombae.storage.fs.hfs.HFSVolume;
-import org.catacombae.storage.fs.hfs.HotFilesFile;
-import org.catacombae.storage.fs.hfs.Journal;
+import org.catacombae.hfs.AllocationFile;
+import org.catacombae.hfs.AttributesFile;
+import org.catacombae.hfs.BTreeOperations;
+import org.catacombae.hfs.CatalogOperations;
+import org.catacombae.hfs.ExtentsOverflowOperations;
+import org.catacombae.hfs.HFSVolume;
+import org.catacombae.hfs.HotFilesFile;
+import org.catacombae.hfs.Journal;
 import org.catacombae.util.Util;
 
 /**
