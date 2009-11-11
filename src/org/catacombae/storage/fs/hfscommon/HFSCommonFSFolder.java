@@ -17,10 +17,10 @@
 
 package org.catacombae.storage.fs.hfscommon;
 
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFileRecord;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolder;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolderRecord;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafRecord;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFileRecord;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFolder;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFolderRecord;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.storage.fs.FSAttributes;
 import org.catacombae.storage.fs.FSEntry;
 import org.catacombae.storage.fs.FSFolder;

@@ -39,13 +39,13 @@ import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfsexplorer.FileSystemBrowser.NoLeafMutableTreeNode;
 import org.catacombae.hfsexplorer.io.JTextAreaOutputStream;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentIndexNode;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentKey;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentLeafNode;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentLeafRecord;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonBTIndexRecord;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonBTNode;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonBTNodeDescriptor;
+import org.catacombae.hfs.types.hfscommon.CommonHFSExtentIndexNode;
+import org.catacombae.hfs.types.hfscommon.CommonHFSExtentKey;
+import org.catacombae.hfs.types.hfscommon.CommonHFSExtentLeafNode;
+import org.catacombae.hfs.types.hfscommon.CommonHFSExtentLeafRecord;
+import org.catacombae.hfs.types.hfscommon.CommonBTIndexRecord;
+import org.catacombae.hfs.types.hfscommon.CommonBTNode;
+import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor;
 import org.catacombae.hfs.HFSVolume;
 
 /**

@@ -17,8 +17,8 @@
 
 package org.catacombae.hfs.original;
 
-import org.catacombae.hfsexplorer.types.hfs.ExtDescriptor;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentDescriptor;
+import org.catacombae.hfs.types.hfs.ExtDescriptor;
+import org.catacombae.hfs.types.hfscommon.CommonHFSExtentDescriptor;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfs.AllocationFile;
 

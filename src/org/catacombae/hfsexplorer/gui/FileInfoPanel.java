@@ -22,11 +22,11 @@
  */
 
 package org.catacombae.hfsexplorer.gui;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFile;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusForkData;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusBSDInfo;
-import org.catacombae.hfsexplorer.types.finder.ExtendedFileInfo;
-import org.catacombae.hfsexplorer.types.finder.FileInfo;
+import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogFile;
+import org.catacombae.hfs.types.hfsplus.HFSPlusForkData;
+import org.catacombae.hfs.types.hfsplus.HFSPlusBSDInfo;
+import org.catacombae.hfs.types.finder.ExtendedFileInfo;
+import org.catacombae.hfs.types.finder.FileInfo;
 import org.catacombae.hfsexplorer.types.*;
 import org.catacombae.hfsexplorer.Util;
 import java.awt.Color;

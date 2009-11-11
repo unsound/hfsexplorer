@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.types.hfsplus;
+package org.catacombae.hfs.types.hfsplus;
 
-import org.catacombae.hfsexplorer.types.hfsx.HFSXCatalogLeafRecord;
+import org.catacombae.hfs.types.hfsx.HFSXCatalogLeafRecord;
 import org.catacombae.hfsexplorer.Util;
 
 public class HFSPlusCatalogLeafNode extends BTLeafNode {

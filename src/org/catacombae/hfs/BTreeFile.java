@@ -17,13 +17,13 @@
 
 package org.catacombae.hfs;
 
-import org.catacombae.hfsexplorer.types.hfscommon.CommonBTHeaderNode;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonBTHeaderRecord;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonBTIndexNode;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonBTIndexRecord;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonBTKey;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonBTNodeDescriptor;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSVolumeHeader;
+import org.catacombae.hfs.types.hfscommon.CommonBTHeaderNode;
+import org.catacombae.hfs.types.hfscommon.CommonBTHeaderRecord;
+import org.catacombae.hfs.types.hfscommon.CommonBTIndexNode;
+import org.catacombae.hfs.types.hfscommon.CommonBTIndexRecord;
+import org.catacombae.hfs.types.hfscommon.CommonBTKey;
+import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor;
+import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.io.Readable;
 import org.catacombae.io.ReadableRandomAccessStream;
 

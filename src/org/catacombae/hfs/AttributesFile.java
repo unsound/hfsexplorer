@@ -19,13 +19,13 @@ package org.catacombae.hfs;
 
 import org.catacombae.hfsexplorer.io.ForkFilter;
 import org.catacombae.hfsexplorer.io.ReadableRandomAccessSubstream;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonBTHeaderRecord;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonBTNode;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonBTNodeDescriptor;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonBTNodeDescriptor.NodeType;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogNodeID.ReservedID;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentDescriptor;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSVolumeHeader;
+import org.catacombae.hfs.types.hfscommon.CommonBTHeaderRecord;
+import org.catacombae.hfs.types.hfscommon.CommonBTNode;
+import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor;
+import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor.NodeType;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogNodeID.ReservedID;
+import org.catacombae.hfs.types.hfscommon.CommonHFSExtentDescriptor;
+import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfs.plus.HFSPlusVolume;
 

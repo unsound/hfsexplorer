@@ -28,8 +28,8 @@ import org.catacombae.hfsexplorer.gui.ExtentsInfoPanel;
 import org.catacombae.hfsexplorer.gui.JournalInfoPanel;
 import org.catacombae.hfsexplorer.gui.StructViewPanel;
 import org.catacombae.hfsexplorer.gui.HFSPlusVolumeInfoPanel;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSVolumeHeader;
-import org.catacombae.hfsexplorer.types.hfsplus.JournalInfoBlock;
+import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
+import org.catacombae.hfs.types.hfsplus.JournalInfoBlock;
 import org.catacombae.hfs.HFSVolume;
 import org.catacombae.hfs.plus.HFSPlusVolume;
 

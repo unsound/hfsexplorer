@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.types.hfsx;
+package org.catacombae.hfs.types.hfsx;
 
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.hfsexplorer.FastUnicodeCompare;
-import org.catacombae.hfsexplorer.types.hfsplus.BTHeaderRec;
-import org.catacombae.hfsexplorer.types.hfsplus.BTKey;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSCatalogNodeID;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogKey;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSUniStr255;
+import org.catacombae.hfs.types.hfsplus.BTHeaderRec;
+import org.catacombae.hfs.types.hfsplus.BTKey;
+import org.catacombae.hfs.types.hfsplus.HFSCatalogNodeID;
+import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogKey;
+import org.catacombae.hfs.types.hfsplus.HFSUniStr255;
 
 public class HFSXCatalogKey extends HFSPlusCatalogKey {
     private final byte keyCompareType;

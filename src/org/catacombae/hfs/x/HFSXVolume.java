@@ -17,17 +17,17 @@
 
 package org.catacombae.hfs.x;
 
-import org.catacombae.hfsexplorer.types.hfscommon.CommonBTHeaderRecord;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogIndexNode;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogKey;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafNode;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafRecord;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogNodeID;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogString;
-import org.catacombae.hfsexplorer.types.hfsplus.BTHeaderRec;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSCatalogNodeID;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSUniStr255;
-import org.catacombae.hfsexplorer.types.hfsx.HFSXCatalogKey;
+import org.catacombae.hfs.types.hfscommon.CommonBTHeaderRecord;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogIndexNode;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogKey;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogLeafNode;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogLeafRecord;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogNodeID;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogString;
+import org.catacombae.hfs.types.hfsplus.BTHeaderRec;
+import org.catacombae.hfs.types.hfsplus.HFSCatalogNodeID;
+import org.catacombae.hfs.types.hfsplus.HFSUniStr255;
+import org.catacombae.hfs.types.hfsx.HFSXCatalogKey;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfs.CatalogOperations;
 import org.catacombae.hfs.plus.HFSPlusVolume;

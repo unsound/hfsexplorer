@@ -18,9 +18,9 @@
 package org.catacombae.hfs;
 
 import org.catacombae.io.Readable;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonBTHeaderNode;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonBTHeaderRecord;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonBTNodeDescriptor;
+import org.catacombae.hfs.types.hfscommon.CommonBTHeaderNode;
+import org.catacombae.hfs.types.hfscommon.CommonBTHeaderRecord;
+import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor;
 
 /**
  *

@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.types.hfscommon;
+package org.catacombae.hfs.types.hfscommon;
 
 import java.io.PrintStream;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentDescriptor;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusForkData;
-import org.catacombae.hfsexplorer.types.hfs.ExtDataRec;
-import org.catacombae.hfsexplorer.types.hfs.ExtDescriptor;
+import org.catacombae.hfs.types.hfsplus.HFSPlusExtentDescriptor;
+import org.catacombae.hfs.types.hfsplus.HFSPlusForkData;
+import org.catacombae.hfs.types.hfs.ExtDataRec;
+import org.catacombae.hfs.types.hfs.ExtDescriptor;
 
 /**
  *

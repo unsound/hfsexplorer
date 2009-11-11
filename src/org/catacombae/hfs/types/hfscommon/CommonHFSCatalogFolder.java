@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.types.hfscommon;
+package org.catacombae.hfs.types.hfscommon;
 
 import java.io.PrintStream;
 import java.util.Date;
@@ -23,11 +23,11 @@ import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusBSDInfo;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFolder;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusDate;
-import org.catacombae.hfsexplorer.types.hfs.CdrDirRec;
-import org.catacombae.hfsexplorer.types.hfs.HFSDate;
+import org.catacombae.hfs.types.hfsplus.HFSPlusBSDInfo;
+import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogFolder;
+import org.catacombae.hfs.types.hfsplus.HFSPlusDate;
+import org.catacombae.hfs.types.hfs.CdrDirRec;
+import org.catacombae.hfs.types.hfs.HFSDate;
 
 /**
  *

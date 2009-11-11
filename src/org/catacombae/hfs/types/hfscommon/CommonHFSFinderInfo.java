@@ -3,12 +3,12 @@
  * and open the template in the editor.
  */
 
-package org.catacombae.hfsexplorer.types.hfscommon;
+package org.catacombae.hfs.types.hfscommon;
 
-import org.catacombae.hfsexplorer.types.hfs.CdrDirRec;
-import org.catacombae.hfsexplorer.types.hfs.CdrFilRec;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFile;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFolder;
+import org.catacombae.hfs.types.hfs.CdrDirRec;
+import org.catacombae.hfs.types.hfs.CdrFilRec;
+import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogFile;
+import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogFolder;
 
 /**
  *

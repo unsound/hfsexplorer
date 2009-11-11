@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.types.hfscommon;
+package org.catacombae.hfs.types.hfscommon;
 
 import org.catacombae.csjc.PrintableStruct;
 

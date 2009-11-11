@@ -17,7 +17,7 @@
 
 package org.catacombae.hfs;
 
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSVolumeHeader;
+import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
 
 /**
  *

@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.types.hfscommon;
+package org.catacombae.hfs.types.hfscommon;
 
 import java.io.PrintStream;
 import org.catacombae.csjc.structelements.Dictionary;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogKey;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFile;
-import org.catacombae.hfsexplorer.types.hfs.CatKeyRec;
-import org.catacombae.hfsexplorer.types.hfs.CdrFilRec;
+import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogKey;
+import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogFile;
+import org.catacombae.hfs.types.hfs.CatKeyRec;
+import org.catacombae.hfs.types.hfs.CdrFilRec;
 
 /**
  *

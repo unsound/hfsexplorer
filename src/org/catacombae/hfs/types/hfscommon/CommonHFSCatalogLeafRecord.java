@@ -15,23 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.types.hfscommon;
+package org.catacombae.hfs.types.hfscommon;
 
 import org.catacombae.csjc.StructElements;
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.types.hfsplus.BTHeaderRec;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFile;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogFolder;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogKey;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogLeafRecordData;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogThread;
-import org.catacombae.hfsexplorer.types.hfsx.HFSXCatalogKey;
-import org.catacombae.hfsexplorer.types.hfs.CatDataRec;
-import org.catacombae.hfsexplorer.types.hfs.CatKeyRec;
-import org.catacombae.hfsexplorer.types.hfs.CdrDirRec;
-import org.catacombae.hfsexplorer.types.hfs.CdrFThdRec;
-import org.catacombae.hfsexplorer.types.hfs.CdrFilRec;
-import org.catacombae.hfsexplorer.types.hfs.CdrThdRec;
+import org.catacombae.hfs.types.hfsplus.BTHeaderRec;
+import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogFile;
+import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogFolder;
+import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogKey;
+import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogLeafRecordData;
+import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogThread;
+import org.catacombae.hfs.types.hfsx.HFSXCatalogKey;
+import org.catacombae.hfs.types.hfs.CatDataRec;
+import org.catacombae.hfs.types.hfs.CatKeyRec;
+import org.catacombae.hfs.types.hfs.CdrDirRec;
+import org.catacombae.hfs.types.hfs.CdrFThdRec;
+import org.catacombae.hfs.types.hfs.CdrFilRec;
+import org.catacombae.hfs.types.hfs.CdrThdRec;
 
 /**
  *

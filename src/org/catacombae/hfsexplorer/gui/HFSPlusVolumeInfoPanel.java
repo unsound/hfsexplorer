@@ -24,8 +24,8 @@
 package org.catacombae.hfsexplorer.gui;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusVolumeHeader;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusForkData;
+import org.catacombae.hfs.types.hfsplus.HFSPlusVolumeHeader;
+import org.catacombae.hfs.types.hfsplus.HFSPlusForkData;
 import java.text.DateFormat;
 
 /**

@@ -27,7 +27,7 @@ import javax.swing.SwingUtilities;
 import org.catacombae.csjc.structelements.ArrayBuilder;
 import org.catacombae.hfsexplorer.GUIUtil;
 import org.catacombae.hfsexplorer.ObjectContainer;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentDescriptor;
+import org.catacombae.hfs.types.hfscommon.CommonHFSExtentDescriptor;
 import org.catacombae.hfs.AllocationFile;
 
 /**

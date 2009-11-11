@@ -17,11 +17,11 @@
 
 package org.catacombae.hfs;
 
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogNodeID;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentIndexNode;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentKey;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentLeafNode;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSForkType;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogNodeID;
+import org.catacombae.hfs.types.hfscommon.CommonHFSExtentIndexNode;
+import org.catacombae.hfs.types.hfscommon.CommonHFSExtentKey;
+import org.catacombae.hfs.types.hfscommon.CommonHFSExtentLeafNode;
+import org.catacombae.hfs.types.hfscommon.CommonHFSForkType;
 
 /**
  *

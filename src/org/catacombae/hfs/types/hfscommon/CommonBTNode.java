@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.types.hfscommon;
+package org.catacombae.hfs.types.hfscommon;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -23,8 +23,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.types.hfsplus.BTNodeDescriptor;
-import org.catacombae.hfsexplorer.types.hfs.NodeDescriptor;
+import org.catacombae.hfs.types.hfsplus.BTNodeDescriptor;
+import org.catacombae.hfs.types.hfs.NodeDescriptor;
 
 /**
  * Generalization of a B-tree node which suits both HFS and HFS+/HFSX

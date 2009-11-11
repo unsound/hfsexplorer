@@ -17,7 +17,7 @@
 
 package org.catacombae.hfsexplorer.testcode;
 import java.io.RandomAccessFile;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentLeafNode;
+import org.catacombae.hfs.types.hfsplus.HFSPlusExtentLeafNode;
 
 public class ParseExtentLeafNode {
     
