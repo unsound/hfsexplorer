@@ -22,7 +22,7 @@ import org.catacombae.hfsexplorer.*;
 import org.catacombae.hfsexplorer.partitioning.*;
 import org.catacombae.hfsexplorer.win32.*;
 import java.io.*;
-import org.catacombae.jparted.lib.ps.gpt.GPTPartitionType;
+import org.catacombae.storage.ps.gpt.GPTPartitionType;
 
 /**
  * 17 August 2008: Changing partition type of partition 2 to microsoft reserved.

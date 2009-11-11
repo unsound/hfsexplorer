@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.ps.container;
+package org.catacombae.storage.ps.container;
 
 import org.catacombae.jparted.lib.DataLocator;
 

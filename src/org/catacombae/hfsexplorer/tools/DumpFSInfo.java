@@ -31,7 +31,7 @@ import org.catacombae.hfsexplorer.partitioning.MBRPartitionTable;
 import org.catacombae.hfsexplorer.partitioning.Partition;
 import org.catacombae.hfsexplorer.partitioning.PartitionSystem;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
-import org.catacombae.jparted.lib.ps.PartitionType;
+import org.catacombae.storage.ps.PartitionType;
 
 public class DumpFSInfo {
 

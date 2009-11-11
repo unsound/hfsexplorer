@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.ps.gpt;
+package org.catacombae.storage.ps.gpt;
 
 import org.catacombae.jparted.lib.DataLocator;
-import org.catacombae.jparted.lib.ps.PartitionSystemRecognizer;
+import org.catacombae.storage.ps.PartitionSystemRecognizer;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.partitioning.GPTHeader;
 

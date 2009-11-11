@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.ps.gpt;
+package org.catacombae.storage.ps.gpt;
 
 import java.nio.LongBuffer;
 import java.util.Hashtable;
-import org.catacombae.jparted.lib.ps.PartitionType;
+import org.catacombae.storage.ps.PartitionType;
 
 /**
  *

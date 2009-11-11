@@ -21,7 +21,7 @@ import org.catacombae.hfsexplorer.Util;
 import java.io.PrintStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import org.catacombae.jparted.lib.ps.PartitionType;
+import org.catacombae.storage.ps.PartitionType;
 
 public class APMPartition implements Partition {
     /*

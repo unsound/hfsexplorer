@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.ps.ebr;
+package org.catacombae.storage.ps.ebr;
 
 import org.catacombae.hfsexplorer.partitioning.MBRPartition;
 

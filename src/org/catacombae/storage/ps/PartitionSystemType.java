@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.ps;
+package org.catacombae.storage.ps;
 
-import org.catacombae.jparted.lib.ps.mbr.MBRHandlerFactory;
-import org.catacombae.jparted.lib.ps.gpt.GPTHandlerFactory;
-import org.catacombae.jparted.lib.ps.apm.APMHandlerFactory;
+import org.catacombae.storage.ps.mbr.MBRHandlerFactory;
+import org.catacombae.storage.ps.gpt.GPTHandlerFactory;
+import org.catacombae.storage.ps.apm.APMHandlerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import org.catacombae.jparted.lib.ps.ebr.EBRHandlerFactory;
+import org.catacombae.storage.ps.ebr.EBRHandlerFactory;
 
 /**
  * Defines the partition system types that the library knows of, and provides a

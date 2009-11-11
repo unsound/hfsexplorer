@@ -19,8 +19,8 @@ package org.catacombae.hfsexplorer.partitioning;
 import org.catacombae.hfsexplorer.Util;
 import java.io.PrintStream;
 import java.util.Hashtable;
-import org.catacombae.jparted.lib.ps.PartitionType;
-import org.catacombae.jparted.lib.ps.mbr.MBRPartitionType;
+import org.catacombae.storage.ps.PartitionType;
+import org.catacombae.storage.ps.mbr.MBRPartitionType;
 
 public class MBRPartition implements Partition {
     protected static final byte PARTITION_NOT_BOOTABLE = (byte)0x00;

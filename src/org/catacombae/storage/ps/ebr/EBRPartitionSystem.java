@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.ps.ebr;
+package org.catacombae.storage.ps.ebr;
 
 import java.io.PrintStream;
 import java.util.LinkedList;
@@ -25,7 +25,7 @@ import org.catacombae.hfsexplorer.partitioning.PartitionSystem;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
 import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.jparted.lib.ps.PartitionType;
+import org.catacombae.storage.ps.PartitionType;
 
 /**
  *
