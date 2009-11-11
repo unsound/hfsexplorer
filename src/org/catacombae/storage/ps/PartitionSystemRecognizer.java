@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.ps;
+package org.catacombae.storage.ps;
 
 import org.catacombae.io.ReadableRandomAccessStream;
 

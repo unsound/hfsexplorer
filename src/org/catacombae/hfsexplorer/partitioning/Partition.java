@@ -17,7 +17,7 @@
 
 package org.catacombae.hfsexplorer.partitioning;
 import java.io.PrintStream;
-import org.catacombae.jparted.lib.ps.PartitionType;
+import org.catacombae.storage.ps.PartitionType;
 
 /** <pre> 
  * A partition is a string of bytes. It is a substring of some larger string of bytes (usually

@@ -46,8 +46,8 @@ import org.catacombae.hfsexplorer.partitioning.Partition;
 import org.catacombae.hfsexplorer.partitioning.PartitionSystem;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer.FileSystemType;
-import org.catacombae.jparted.lib.ps.PartitionType;
-import org.catacombae.jparted.lib.ps.ebr.EBRPartition;
+import org.catacombae.storage.ps.PartitionType;
+import org.catacombae.storage.ps.ebr.EBRPartition;
 
 public class SelectWindowsDeviceDialog extends JDialog {
     private static final String DEVICE_PREFIX = "\\\\?\\GLOBALROOT\\Device\\";

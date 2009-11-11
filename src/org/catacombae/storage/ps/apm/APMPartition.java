@@ -3,10 +3,10 @@
  * and open the template in the editor.
  */
 
-package org.catacombae.jparted.lib.ps.apm;
+package org.catacombae.storage.ps.apm;
 
-import org.catacombae.jparted.lib.ps.PartitionType;
-import org.catacombae.jparted.lib.ps.StandardPartition;
+import org.catacombae.storage.ps.PartitionType;
+import org.catacombae.storage.ps.StandardPartition;
 
 /**
  *

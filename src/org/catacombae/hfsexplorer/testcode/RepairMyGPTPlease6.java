@@ -22,7 +22,7 @@ import org.catacombae.hfsexplorer.*;
 import org.catacombae.hfsexplorer.partitioning.*;
 import org.catacombae.hfsexplorer.win32.*;
 import java.io.*;
-import org.catacombae.jparted.lib.ps.gpt.GPTPartitionType;
+import org.catacombae.storage.ps.gpt.GPTPartitionType;
 
 /**
  * This time I needed to change partition 3 partition type from Basic Data to HFS+.

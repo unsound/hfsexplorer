@@ -17,7 +17,7 @@
 
 package org.catacombae.hfsexplorer.partitioning;
 
-import org.catacombae.jparted.lib.ps.ebr.ExtendedBootRecord;
+import org.catacombae.storage.ps.ebr.ExtendedBootRecord;
 import java.io.PrintStream;
 import java.util.LinkedList;
 import org.catacombae.io.ReadableRandomAccessStream;

@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.ps.container.hfs;
+package org.catacombae.storage.ps.container.hfs;
 
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.jparted.lib.DataLocator;
 import org.catacombae.storage.fs.FileSystemMajorType;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer;
-import org.catacombae.jparted.lib.ps.PartitionSystemType;
-import org.catacombae.jparted.lib.ps.container.ContainerHandler;
-import org.catacombae.jparted.lib.ps.container.ContainerType;
+import org.catacombae.storage.ps.PartitionSystemType;
+import org.catacombae.storage.ps.container.ContainerHandler;
+import org.catacombae.storage.ps.container.ContainerType;
 
 /**
  *

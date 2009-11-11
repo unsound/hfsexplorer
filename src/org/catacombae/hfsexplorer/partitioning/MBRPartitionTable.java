@@ -20,7 +20,7 @@ import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.ReadableByteArrayStream;
 import java.io.PrintStream;
 import java.util.LinkedList;
-import org.catacombae.jparted.lib.ps.mbr.MBRPartitionType;
+import org.catacombae.storage.ps.mbr.MBRPartitionType;
 
 /**
  * This class includes support for the MBR partition scheme, including the

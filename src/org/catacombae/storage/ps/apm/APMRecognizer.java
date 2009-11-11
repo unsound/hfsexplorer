@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.ps.apm;
+package org.catacombae.storage.ps.apm;
 
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.partitioning.ApplePartitionMap;
 import org.catacombae.hfsexplorer.partitioning.DriverDescriptorRecord;
-import org.catacombae.jparted.lib.ps.PartitionSystemRecognizer;
+import org.catacombae.storage.ps.PartitionSystemRecognizer;
 
 /**
  *

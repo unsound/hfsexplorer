@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.ps.apm;
+package org.catacombae.storage.ps.apm;
 
 import org.catacombae.hfsexplorer.Util;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.partitioning.ApplePartitionMap;
 import org.catacombae.hfsexplorer.partitioning.DriverDescriptorRecord;
 import org.catacombae.jparted.lib.DataLocator;
-import org.catacombae.jparted.lib.ps.Partition;
-import org.catacombae.jparted.lib.ps.PartitionSystemHandler;
-import org.catacombae.jparted.lib.ps.StandardPartition;
+import org.catacombae.storage.ps.Partition;
+import org.catacombae.storage.ps.PartitionSystemHandler;
+import org.catacombae.storage.ps.StandardPartition;
 
 /**
  *

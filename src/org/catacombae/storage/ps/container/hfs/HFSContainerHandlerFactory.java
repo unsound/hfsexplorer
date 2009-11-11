@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.ps.container.hfs;
+package org.catacombae.storage.ps.container.hfs;
 
 import org.catacombae.jparted.lib.DataLocator;
-import org.catacombae.jparted.lib.ps.container.ContainerHandler;
-import org.catacombae.jparted.lib.ps.container.ContainerHandlerFactory;
+import org.catacombae.storage.ps.container.ContainerHandler;
+import org.catacombae.storage.ps.container.ContainerHandlerFactory;
 
 /**
  *

@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.ps.apm;
+package org.catacombae.storage.ps.apm;
 
 import org.catacombae.jparted.lib.DataLocator;
-import org.catacombae.jparted.lib.ps.PartitionSystemRecognizer;
-import org.catacombae.jparted.lib.ps.PartitionSystemHandler;
-import org.catacombae.jparted.lib.ps.PartitionSystemHandlerFactory;
-import org.catacombae.jparted.lib.ps.PartitionSystemImplementationInfo;
+import org.catacombae.storage.ps.PartitionSystemRecognizer;
+import org.catacombae.storage.ps.PartitionSystemHandler;
+import org.catacombae.storage.ps.PartitionSystemHandlerFactory;
+import org.catacombae.storage.ps.PartitionSystemImplementationInfo;
 
 /**
  *

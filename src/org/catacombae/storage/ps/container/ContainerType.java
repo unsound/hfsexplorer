@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.ps.container;
+package org.catacombae.storage.ps.container;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import org.catacombae.jparted.lib.ps.container.hfs.HFSContainerHandlerFactory;
+import org.catacombae.storage.ps.container.hfs.HFSContainerHandlerFactory;
 
 /**
  *

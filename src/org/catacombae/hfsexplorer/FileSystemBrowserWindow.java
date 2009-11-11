@@ -97,7 +97,7 @@ import org.catacombae.jparted.lib.DataLocator;
 import org.catacombae.storage.fs.FSLink;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer.FileSystemType;
-import org.catacombae.jparted.lib.ps.PartitionType;
+import org.catacombae.storage.ps.PartitionType;
 import org.catacombae.udif.UDIFRandomAccessStream;
 
 /**
