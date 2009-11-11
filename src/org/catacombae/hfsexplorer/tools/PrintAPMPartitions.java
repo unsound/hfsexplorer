@@ -17,8 +17,8 @@
 
 package org.catacombae.hfsexplorer.tools;
 import java.io.FileOutputStream;
-import org.catacombae.hfsexplorer.partitioning.ApplePartitionMap;
-import org.catacombae.hfsexplorer.partitioning.DriverDescriptorRecord;
+import org.catacombae.storage.ps.apm.types.ApplePartitionMap;
+import org.catacombae.storage.ps.apm.types.DriverDescriptorRecord;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
 import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;

@@ -18,7 +18,7 @@
 package org.catacombae.storage.ps.ebr;
 
 import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.hfsexplorer.partitioning.PartitionSystem;
+import org.catacombae.storage.ps.legacy.PartitionSystem;
 import org.catacombae.storage.DataLocator;
 import org.catacombae.storage.ps.Partition;
 import org.catacombae.storage.ps.PartitionSystemHandler;
@@ -46,7 +46,7 @@ public class EBRHandler extends PartitionSystemHandler {
     public Partition[] getPartitions() {
         EBRPartitionSystem partitionTable = readPartitionTable();
         Partition[] result = new Partition[partitionTable.getUsedPartitionCount()];
-        org.catacombae.hfsexplorer.partitioning.Partition[] parts =
+        org.catacombae.storage.ps.legacy.Partition[] parts =
                 partitionTable.getUsedPartitionEntries();
         for(int i = 0; i < result.length; ++i) {
             result[i] = new StandardPartition(parts[i].getStartOffset(),

@@ -19,8 +19,8 @@ package org.catacombae.storage.ps.apm;
 
 import org.catacombae.util.Util;
 import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.hfsexplorer.partitioning.ApplePartitionMap;
-import org.catacombae.hfsexplorer.partitioning.DriverDescriptorRecord;
+import org.catacombae.storage.ps.apm.types.ApplePartitionMap;
+import org.catacombae.storage.ps.apm.types.DriverDescriptorRecord;
 import org.catacombae.storage.DataLocator;
 import org.catacombae.storage.ps.Partition;
 import org.catacombae.storage.ps.PartitionSystemHandler;
@@ -47,13 +47,13 @@ public class APMHandler extends PartitionSystemHandler {
     public Partition[] getPartitions() {
         ApplePartitionMap apm = readPartitionMap();
         Partition[] result = new Partition[apm.getUsedPartitionCount()];
-        org.catacombae.hfsexplorer.partitioning.Partition[] apmParts =
+        org.catacombae.storage.ps.legacy.Partition[] apmParts =
                 apm.getUsedPartitionEntries();
         for(int i = 0; i < result.length; ++i) {
-            org.catacombae.hfsexplorer.partitioning.Partition p = apmParts[i];
-            if(p instanceof org.catacombae.hfsexplorer.partitioning.APMPartition) {
-                org.catacombae.hfsexplorer.partitioning.APMPartition ap =
-                        (org.catacombae.hfsexplorer.partitioning.APMPartition)p;
+            org.catacombae.storage.ps.legacy.Partition p = apmParts[i];
+            if(p instanceof org.catacombae.storage.ps.apm.types.APMPartition) {
+                org.catacombae.storage.ps.apm.types.APMPartition ap =
+                        (org.catacombae.storage.ps.apm.types.APMPartition)p;
                 
                 result[i] = new APMPartition(p.getStartOffset(),
                         p.getLength(), p.getType(), ap.getPmPartNameAsString());

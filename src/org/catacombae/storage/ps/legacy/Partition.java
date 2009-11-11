@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.partitioning;
+package org.catacombae.storage.ps.legacy;
 import java.io.PrintStream;
 import org.catacombae.storage.ps.PartitionType;
 

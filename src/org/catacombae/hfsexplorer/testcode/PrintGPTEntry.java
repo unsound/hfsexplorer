@@ -17,6 +17,7 @@
 
 package org.catacombae.hfsexplorer.testcode;
 
+import org.catacombae.storage.ps.gpt.types.GPTEntry;
 import org.catacombae.hfsexplorer.partitioning.*;
 import java.io.*;
 

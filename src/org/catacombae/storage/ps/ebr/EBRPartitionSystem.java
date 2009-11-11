@@ -19,9 +19,9 @@ package org.catacombae.storage.ps.ebr;
 
 import java.io.PrintStream;
 import java.util.LinkedList;
-import org.catacombae.hfsexplorer.partitioning.MBRPartitionTable;
-import org.catacombae.hfsexplorer.partitioning.Partition;
-import org.catacombae.hfsexplorer.partitioning.PartitionSystem;
+import org.catacombae.storage.ps.mbr.types.MBRPartitionTable;
+import org.catacombae.storage.ps.legacy.Partition;
+import org.catacombae.storage.ps.legacy.PartitionSystem;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
 import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;

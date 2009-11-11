@@ -18,7 +18,7 @@
 package org.catacombae.storage.ps.mbr;
 
 import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.hfsexplorer.partitioning.MBRPartitionTable;
+import org.catacombae.storage.ps.mbr.types.MBRPartitionTable;
 import org.catacombae.storage.DataLocator;
 import org.catacombae.storage.ps.Partition;
 import org.catacombae.storage.ps.PartitionSystemHandler;
@@ -46,7 +46,7 @@ public class MBRHandler extends PartitionSystemHandler {
     public Partition[] getPartitions() {
         MBRPartitionTable partitionTable = readPartitionTable();
         Partition[] result = new Partition[partitionTable.getUsedPartitionCount()];
-        org.catacombae.hfsexplorer.partitioning.Partition[] parts =
+        org.catacombae.storage.ps.legacy.Partition[] parts =
                 partitionTable.getUsedPartitionEntries();
         for(int i = 0; i < result.length; ++i) {
             result[i] = new StandardPartition(parts[i].getStartOffset(),

@@ -19,8 +19,8 @@ package org.catacombae.storage.ps.apm;
 
 import org.catacombae.util.Util;
 import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.hfsexplorer.partitioning.ApplePartitionMap;
-import org.catacombae.hfsexplorer.partitioning.DriverDescriptorRecord;
+import org.catacombae.storage.ps.apm.types.ApplePartitionMap;
+import org.catacombae.storage.ps.apm.types.DriverDescriptorRecord;
 import org.catacombae.storage.ps.PartitionSystemRecognizer;
 
 /**
