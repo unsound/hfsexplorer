@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.fs.hfsx;
+package org.catacombae.storage.fs.hfsx;
 
 import org.catacombae.jparted.lib.DataLocator;
-import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemHandler;
+import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemHandler;
 import org.catacombae.hfs.x.HFSXVolume;
 
 /**

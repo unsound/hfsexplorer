@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.fs;
+package org.catacombae.storage.fs;
 
 /**
  * This class represents a link in a file system, i.e. a point of redirection to another part of

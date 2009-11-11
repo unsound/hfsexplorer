@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.fs;
+package org.catacombae.storage.fs;
 
-import org.catacombae.jparted.lib.fs.hfsx.HFSXFileSystemHandlerFactory;
-import org.catacombae.jparted.lib.fs.hfsplus.HFSPlusFileSystemHandlerFactory;
+import org.catacombae.storage.fs.hfsx.HFSXFileSystemHandlerFactory;
+import org.catacombae.storage.fs.hfsplus.HFSPlusFileSystemHandlerFactory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import org.catacombae.jparted.lib.fs.hfs.HFSFileSystemHandlerFactory;
+import org.catacombae.storage.fs.hfs.HFSFileSystemHandlerFactory;
 
 /**
  * Contains the possible "major file system types" that the library will work

@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.fs.hfscommon;
+package org.catacombae.storage.fs.hfscommon;
 
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFile;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFileRecord;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.jparted.lib.fs.FSAttributes;
-import org.catacombae.jparted.lib.fs.FSFile;
-import org.catacombae.jparted.lib.fs.FSFork;
-import org.catacombae.jparted.lib.fs.FSForkType;
+import org.catacombae.storage.fs.FSAttributes;
+import org.catacombae.storage.fs.FSFile;
+import org.catacombae.storage.fs.FSFork;
+import org.catacombae.storage.fs.FSForkType;
 
 /**
  *

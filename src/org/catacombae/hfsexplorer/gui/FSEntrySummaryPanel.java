@@ -31,11 +31,11 @@ import javax.swing.border.EmptyBorder;
 import org.catacombae.hfsexplorer.ObjectContainer;
 import org.catacombae.hfsexplorer.SpeedUnitUtils;
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.jparted.lib.fs.FSAttributes;
-import org.catacombae.jparted.lib.fs.FSEntry;
-import org.catacombae.jparted.lib.fs.FSFile;
-import org.catacombae.jparted.lib.fs.FSFolder;
-import org.catacombae.jparted.lib.fs.FSLink;
+import org.catacombae.storage.fs.FSAttributes;
+import org.catacombae.storage.fs.FSEntry;
+import org.catacombae.storage.fs.FSFile;
+import org.catacombae.storage.fs.FSFolder;
+import org.catacombae.storage.fs.FSLink;
 
 /**
  *

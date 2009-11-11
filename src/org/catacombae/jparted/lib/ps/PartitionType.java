@@ -17,7 +17,7 @@
 
 package org.catacombae.jparted.lib.ps;
 
-import org.catacombae.jparted.lib.fs.FileSystemMajorType;
+import org.catacombae.storage.fs.FileSystemMajorType;
 import org.catacombae.jparted.lib.ps.container.ContainerType;
 
 /**

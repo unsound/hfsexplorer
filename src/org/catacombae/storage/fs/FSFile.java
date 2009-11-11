@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.fs;
+package org.catacombae.storage.fs;
 
 /**
  * This interface represents an entry corresponding to a file in the file system

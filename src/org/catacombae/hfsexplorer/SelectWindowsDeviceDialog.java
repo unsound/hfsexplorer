@@ -44,8 +44,8 @@ import org.catacombae.hfsexplorer.partitioning.MBRPartition;
 import org.catacombae.hfsexplorer.partitioning.MBRPartitionTable;
 import org.catacombae.hfsexplorer.partitioning.Partition;
 import org.catacombae.hfsexplorer.partitioning.PartitionSystem;
-import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemRecognizer;
-import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemRecognizer.FileSystemType;
+import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer;
+import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer.FileSystemType;
 import org.catacombae.jparted.lib.ps.PartitionType;
 import org.catacombae.jparted.lib.ps.ebr.EBRPartition;
 

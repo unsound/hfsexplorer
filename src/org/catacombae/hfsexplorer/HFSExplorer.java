@@ -45,11 +45,11 @@ import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.io.ReadableConcatenatedStream;
 import org.catacombae.jparted.lib.DataLocator;
 import org.catacombae.jparted.lib.ReadableStreamDataLocator;
-import org.catacombae.jparted.lib.fs.FileSystemDetector;
-import org.catacombae.jparted.lib.fs.FileSystemHandler;
-import org.catacombae.jparted.lib.fs.FileSystemHandlerFactory;
-import org.catacombae.jparted.lib.fs.FileSystemMajorType;
-import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemHandler;
+import org.catacombae.storage.fs.FileSystemDetector;
+import org.catacombae.storage.fs.FileSystemHandler;
+import org.catacombae.storage.fs.FileSystemHandlerFactory;
+import org.catacombae.storage.fs.FileSystemMajorType;
+import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemHandler;
 import org.catacombae.hfs.HFSVolume;
 
 @SuppressWarnings("deprecation") // TODO: Fix HFSExplorer so it doesn't use deprecated methods...

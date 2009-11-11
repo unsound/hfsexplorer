@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.fs.hfsx;
+package org.catacombae.storage.fs.hfsx;
 
 import org.catacombae.jparted.lib.DataLocator;
-import org.catacombae.jparted.lib.fs.DefaultFileSystemHandlerInfo;
-import org.catacombae.jparted.lib.fs.FileSystemHandler;
-import org.catacombae.jparted.lib.fs.FileSystemHandlerFactory;
-import org.catacombae.jparted.lib.fs.FileSystemHandlerInfo;
-import org.catacombae.jparted.lib.fs.FileSystemRecognizer;
-import org.catacombae.jparted.lib.fs.hfsplus.HFSPlusFileSystemHandlerFactory;
+import org.catacombae.storage.fs.DefaultFileSystemHandlerInfo;
+import org.catacombae.storage.fs.FileSystemHandler;
+import org.catacombae.storage.fs.FileSystemHandlerFactory;
+import org.catacombae.storage.fs.FileSystemHandlerInfo;
+import org.catacombae.storage.fs.FileSystemRecognizer;
+import org.catacombae.storage.fs.hfsplus.HFSPlusFileSystemHandlerFactory;
 
 /**
  *
