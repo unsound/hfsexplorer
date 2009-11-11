@@ -26,8 +26,7 @@ import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogFolder;
 import org.catacombae.hfs.types.hfsplus.HFSPlusBSDInfo;
 import org.catacombae.hfs.types.finder.ExtendedFolderInfo;
 import org.catacombae.hfs.types.finder.FolderInfo;
-import org.catacombae.hfsexplorer.types.*;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 import java.awt.Color;
 import java.text.DateFormat;
 

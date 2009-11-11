@@ -17,8 +17,7 @@
 
 package org.catacombae.hfs.types.hfscommon;
 
-//import org.catacombae.hfsexplorer.fs.StringDecoder;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 import org.catacombae.hfs.types.hfsplus.HFSUniStr255;
 
 /**

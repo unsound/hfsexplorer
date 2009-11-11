@@ -20,7 +20,7 @@ package org.catacombae.hfs.types.hfsplus;
 import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfs.types.finder.ExtendedFileInfo;
 import org.catacombae.hfs.types.finder.FileInfo;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 import java.io.PrintStream;
 import java.util.Date;
 import org.catacombae.csjc.StaticStruct;

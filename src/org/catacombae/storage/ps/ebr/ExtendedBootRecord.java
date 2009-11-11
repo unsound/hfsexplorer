@@ -18,8 +18,7 @@
 package org.catacombae.storage.ps.ebr;
 
 import java.io.PrintStream;
-//import java.util.LinkedList;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 
 /**
  *

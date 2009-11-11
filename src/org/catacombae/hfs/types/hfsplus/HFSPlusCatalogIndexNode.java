@@ -18,7 +18,7 @@
 package org.catacombae.hfs.types.hfsplus;
 
 import org.catacombae.hfs.types.hfsx.HFSXCatalogKey;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 
 public class HFSPlusCatalogIndexNode extends BTIndexNode {
     public HFSPlusCatalogIndexNode(byte[] data, int offset, int nodeSize) {

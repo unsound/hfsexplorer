@@ -16,7 +16,8 @@
  */
 
 package org.catacombae.hfsexplorer.partitioning;
-import org.catacombae.hfsexplorer.Util;
+
+import org.catacombae.util.Util;
 import java.io.PrintStream;
 
 public class MutableGPTHeader extends GPTHeader {

@@ -20,7 +20,7 @@ package org.catacombae.hfs.types.hfsplus;
 import java.text.DateFormat;
 import org.catacombae.csjc.structelements.FieldType;
 import org.catacombae.csjc.structelements.StringRepresentableField;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 
 /**
  *

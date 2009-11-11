@@ -18,7 +18,6 @@
 package org.catacombae.hfs.types.hfscommon;
 
 import org.catacombae.hfs.types.hfsplus.HFSPlusExtentKey;
-import org.catacombae.hfs.types.hfsplus.HFSPlusExtentLeafRecord;
 import org.catacombae.hfs.types.hfsplus.HFSPlusExtentRecord;
 import org.catacombae.hfs.types.hfs.ExtDataRec;
 import org.catacombae.hfs.types.hfs.ExtKeyRec;

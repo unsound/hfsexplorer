@@ -21,7 +21,7 @@ import java.io.PrintStream;
 import java.util.Date;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.Dictionary;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 import org.catacombae.hfs.types.hfsplus.HFSPlusVolumeHeader;
 import org.catacombae.hfs.types.hfs.MasterDirectoryBlock;
 

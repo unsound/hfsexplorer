@@ -18,7 +18,7 @@
 package org.catacombae.hfs.types.hfscommon;
 
 import java.io.PrintStream;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 import org.catacombae.hfs.types.hfsplus.BTNodeDescriptor;
 import org.catacombae.hfs.types.hfs.NodeDescriptor;
 

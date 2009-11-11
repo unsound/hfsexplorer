@@ -21,7 +21,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import org.catacombae.csjc.PrintableStruct;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 import org.catacombae.hfsexplorer.io.SynchronizedReadableRandomAccess;
 import org.catacombae.util.Util.Pair;
 

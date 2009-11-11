@@ -17,7 +17,6 @@
 
 package org.catacombae.storage.ps.container.hfs;
 
-import org.catacombae.hfsexplorer.Util;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.storage.DataLocator;
 import org.catacombae.storage.fs.FileSystemMajorType;

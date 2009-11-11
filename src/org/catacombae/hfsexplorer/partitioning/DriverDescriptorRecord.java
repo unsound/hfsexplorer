@@ -18,7 +18,7 @@
 package org.catacombae.hfsexplorer.partitioning;
 
 import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 import java.io.PrintStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

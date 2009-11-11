@@ -17,7 +17,7 @@
 
 package org.catacombae.hfsexplorer.tools;
 import java.io.FileOutputStream;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 import org.catacombae.hfsexplorer.partitioning.GUIDPartitionTable;
 import org.catacombae.hfsexplorer.win32.WindowsLowLevelIO;
 import org.catacombae.io.ReadableFileStream;

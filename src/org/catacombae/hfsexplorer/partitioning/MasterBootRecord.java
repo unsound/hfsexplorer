@@ -19,7 +19,7 @@ package org.catacombae.hfsexplorer.partitioning;
 
 import java.io.PrintStream;
 import java.util.LinkedList;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 
 /**
  *

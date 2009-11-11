@@ -19,7 +19,7 @@ package org.catacombae.hfs.types.hfscommon;
 
 import java.io.PrintStream;
 import org.catacombae.csjc.PrintableStruct;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 import org.catacombae.hfs.types.hfsplus.BTHeaderRec;
 import org.catacombae.hfs.types.hfs.BTHdrRec;
 

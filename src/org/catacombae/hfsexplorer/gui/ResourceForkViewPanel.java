@@ -39,7 +39,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.catacombae.hfsexplorer.GUIUtil;
 import org.catacombae.hfsexplorer.IOUtil;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 import org.catacombae.hfsexplorer.fs.ResourceForkReader;
 import org.catacombae.hfsexplorer.types.resff.ReferenceListEntry;
 import org.catacombae.hfsexplorer.types.resff.ResourceMap;

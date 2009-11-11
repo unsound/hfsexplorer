@@ -7,7 +7,7 @@
  *  Erik Larsson, 2006
  */
 
-package org.catacombae.hfsexplorer;
+package org.catacombae.hfs;
 
 /**
  * This class implements the FastUnicodeCompare algorithm described in Apple's

@@ -27,7 +27,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
-import org.catacombae.hfsexplorer.UnicodeNormalizationToolkit;
+import org.catacombae.hfs.UnicodeNormalizationToolkit;
 import org.catacombae.util.Util;
 
 public class VisualizeUnicodeNormalization extends JFrame {

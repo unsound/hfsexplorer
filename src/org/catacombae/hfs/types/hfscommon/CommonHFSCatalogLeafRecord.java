@@ -18,7 +18,7 @@
 package org.catacombae.hfs.types.hfscommon;
 
 import org.catacombae.csjc.StructElements;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 import org.catacombae.hfs.types.hfsplus.BTHeaderRec;
 import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogFile;
 import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogFolder;

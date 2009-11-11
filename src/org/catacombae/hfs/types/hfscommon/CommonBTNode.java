@@ -20,9 +20,8 @@ package org.catacombae.hfs.types.hfscommon;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 import org.catacombae.hfs.types.hfsplus.BTNodeDescriptor;
 import org.catacombae.hfs.types.hfs.NodeDescriptor;
 

@@ -18,7 +18,7 @@
 package org.catacombae.hfs.types.finder;
 
 import org.catacombae.hfs.types.carbon.Point;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 import java.io.PrintStream;
 import org.catacombae.csjc.structelements.Dictionary;
 

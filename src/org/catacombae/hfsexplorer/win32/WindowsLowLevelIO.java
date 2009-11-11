@@ -19,7 +19,7 @@ package org.catacombae.hfsexplorer.win32;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 import org.catacombae.io.ReadableRandomAccessStream;
 
 public class WindowsLowLevelIO implements ReadableRandomAccessStream {

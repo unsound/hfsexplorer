@@ -21,7 +21,7 @@ import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.ReadableByteArrayStream;
 import java.util.ArrayList;
 import java.io.PrintStream;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 
 public class ApplePartitionMap implements PartitionSystem {
     private final APMPartition[] partitions;

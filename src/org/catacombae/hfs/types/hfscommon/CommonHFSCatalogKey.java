@@ -20,10 +20,8 @@ package org.catacombae.hfs.types.hfscommon;
 import java.io.PrintStream;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.Dictionary;
-import org.catacombae.hfsexplorer.FastUnicodeCompare;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogKey;
-import org.catacombae.hfs.types.hfsx.HFSXKeyCompareType;
 import org.catacombae.hfs.types.hfs.CatKeyRec;
 
 /**

@@ -20,7 +20,7 @@ package org.catacombae.hfs.types.hfs;
 import java.io.PrintStream;
 import org.catacombae.csjc.structelements.ASCIIStringField;
 import org.catacombae.csjc.structelements.Dictionary;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.Util;
 
 /**
  * A directory thread record in the HFS file system model.

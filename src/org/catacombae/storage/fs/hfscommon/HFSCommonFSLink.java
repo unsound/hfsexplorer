@@ -17,8 +17,8 @@
 
 package org.catacombae.storage.fs.hfscommon;
 
-import org.catacombae.hfsexplorer.IOUtil;
-import org.catacombae.hfsexplorer.Util;
+import org.catacombae.util.IOUtil;
+import org.catacombae.util.Util;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFileRecord;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.storage.fs.FSAttributes;

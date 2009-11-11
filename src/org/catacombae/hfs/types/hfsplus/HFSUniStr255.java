@@ -18,8 +18,8 @@
 package org.catacombae.hfs.types.hfsplus;
 
 import org.catacombae.csjc.structelements.Dictionary;
-import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.UnicodeNormalizationToolkit;
+import org.catacombae.util.Util;
+import org.catacombae.hfs.UnicodeNormalizationToolkit;
 import java.io.PrintStream;
 import org.catacombae.csjc.StructElements;
 
