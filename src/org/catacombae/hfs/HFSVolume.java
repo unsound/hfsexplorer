@@ -20,7 +20,7 @@ package org.catacombae.hfs;
 import java.io.IOException;
 import java.io.OutputStream;
 import org.catacombae.hfs.io.ForkFilter;
-import org.catacombae.hfsexplorer.io.ReadableBlockCachingStream;
+import org.catacombae.hfs.io.ReadableBlockCachingStream;
 import org.catacombae.hfsexplorer.io.ReadableRandomAccessSubstream;
 import org.catacombae.hfsexplorer.io.SynchronizedReadableRandomAccess;
 import org.catacombae.hfsexplorer.io.SynchronizedReadableRandomAccessStream;

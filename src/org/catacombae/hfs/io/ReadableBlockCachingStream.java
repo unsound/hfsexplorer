@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.io;
+package org.catacombae.hfs.io;
 
 import java.util.HashMap;
 import org.catacombae.io.ReadableFilterStream;
