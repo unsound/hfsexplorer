@@ -17,9 +17,9 @@
 
 package org.catacombae.hfsexplorer.testcode;
 
+import java.io.File;
+import java.io.RandomAccessFile;
 import org.catacombae.storage.ps.gpt.types.GPTHeader;
-import org.catacombae.hfsexplorer.partitioning.*;
-import java.io.*;
 
 public class PrintGPTHeader {
     public static void main(String[] args) throws Exception {

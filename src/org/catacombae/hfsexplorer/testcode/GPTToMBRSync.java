@@ -18,10 +18,6 @@
 // THIS CODE IS UNFINISHED!
 
 package org.catacombae.hfsexplorer.testcode;
-import org.catacombae.hfsexplorer.*;
-import org.catacombae.hfsexplorer.partitioning.*;
-import org.catacombae.hfsexplorer.win32.*;
-import java.io.*;
 
 /**
  * <pre>
