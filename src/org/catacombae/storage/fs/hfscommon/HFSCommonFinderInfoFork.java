@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.fs.hfscommon;
+package org.catacombae.storage.fs.hfscommon;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -27,7 +27,7 @@ import org.catacombae.io.ReadableByteArrayStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.TruncatableRandomAccessStream;
 import org.catacombae.io.WritableRandomAccessStream;
-import org.catacombae.jparted.lib.fs.FSFork;
+import org.catacombae.storage.fs.FSFork;
 
 /**
  *

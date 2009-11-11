@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.fs.hfsplus;
+package org.catacombae.storage.fs.hfsplus;
 
 import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.jparted.lib.fs.FileSystemRecognizer;
-import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemRecognizer;
+import org.catacombae.storage.fs.FileSystemRecognizer;
+import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer;
 
 /**
  *

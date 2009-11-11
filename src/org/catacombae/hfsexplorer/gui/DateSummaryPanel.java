@@ -19,7 +19,7 @@ package org.catacombae.hfsexplorer.gui;
 
 import java.awt.Component;
 import java.text.DateFormat;
-import org.catacombae.jparted.lib.fs.FSAttributes;
+import org.catacombae.storage.fs.FSAttributes;
 
 /**
  *

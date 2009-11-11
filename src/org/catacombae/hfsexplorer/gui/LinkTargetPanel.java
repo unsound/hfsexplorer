@@ -18,7 +18,7 @@
 package org.catacombae.hfsexplorer.gui;
 
 import java.awt.Component;
-import org.catacombae.jparted.lib.fs.FSLink;
+import org.catacombae.storage.fs.FSLink;
 
 /**
  *

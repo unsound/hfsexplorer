@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.fs.hfscommon;
+package org.catacombae.storage.fs.hfscommon;
 
-import org.catacombae.jparted.lib.fs.FileSystemCapability;
-import org.catacombae.jparted.lib.fs.FileSystemHandlerFactory;
+import org.catacombae.storage.fs.FileSystemCapability;
+import org.catacombae.storage.fs.FileSystemHandlerFactory;
 
 /**
  *

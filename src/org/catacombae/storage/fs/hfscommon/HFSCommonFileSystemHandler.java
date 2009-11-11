@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.fs.hfscommon;
+package org.catacombae.storage.fs.hfscommon;
 
 import java.io.UnsupportedEncodingException;
 import java.util.LinkedList;
@@ -31,11 +31,11 @@ import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogNodeID;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogKey;
 import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.jparted.lib.fs.FSFolder;
-import org.catacombae.jparted.lib.fs.FSForkType;
-import org.catacombae.jparted.lib.fs.FSLink;
-import org.catacombae.jparted.lib.fs.FileSystemHandler;
-import org.catacombae.jparted.lib.fs.FSEntry;
+import org.catacombae.storage.fs.FSFolder;
+import org.catacombae.storage.fs.FSForkType;
+import org.catacombae.storage.fs.FSLink;
+import org.catacombae.storage.fs.FileSystemHandler;
+import org.catacombae.storage.fs.FSEntry;
 import org.catacombae.hfs.HFSVolume;
 
 /**

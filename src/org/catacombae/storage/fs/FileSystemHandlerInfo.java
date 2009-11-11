@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.fs;
+package org.catacombae.storage.fs;
 
 /**
  * Contains information about a specific implementation of a file system

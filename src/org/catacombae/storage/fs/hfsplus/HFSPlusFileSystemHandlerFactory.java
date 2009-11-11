@@ -15,21 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.jparted.lib.fs.hfsplus;
+package org.catacombae.storage.fs.hfsplus;
 
 import org.catacombae.hfsexplorer.types.hfs.ExtDescriptor;
 import org.catacombae.hfsexplorer.types.hfs.HFSPlusWrapperMDB;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.jparted.lib.DataLocator;
 import org.catacombae.jparted.lib.SubDataLocator;
-import org.catacombae.jparted.lib.fs.DefaultFileSystemHandlerInfo;
-import org.catacombae.jparted.lib.fs.FileSystemHandler;
-import org.catacombae.jparted.lib.fs.FileSystemHandlerFactory;
-import org.catacombae.jparted.lib.fs.FileSystemHandlerInfo;
-import org.catacombae.jparted.lib.fs.FileSystemRecognizer;
-import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemHandlerFactory;
-import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemRecognizer;
-import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemRecognizer.FileSystemType;
+import org.catacombae.storage.fs.DefaultFileSystemHandlerInfo;
+import org.catacombae.storage.fs.FileSystemHandler;
+import org.catacombae.storage.fs.FileSystemHandlerFactory;
+import org.catacombae.storage.fs.FileSystemHandlerInfo;
+import org.catacombae.storage.fs.FileSystemRecognizer;
+import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemHandlerFactory;
+import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer;
+import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer.FileSystemType;
 import org.catacombae.util.Util;
 
 /**

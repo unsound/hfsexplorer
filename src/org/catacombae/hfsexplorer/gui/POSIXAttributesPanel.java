@@ -20,7 +20,7 @@ package org.catacombae.hfsexplorer.gui;
 //import javax.swing.JFrame;
 //import javax.swing.JScrollPane;
 import java.awt.Component;
-import org.catacombae.jparted.lib.fs.FSAttributes.POSIXFileAttributes;
+import org.catacombae.storage.fs.FSAttributes.POSIXFileAttributes;
 
 /**
  *

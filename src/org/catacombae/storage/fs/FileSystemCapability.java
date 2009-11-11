@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.catacombae.jparted.lib.fs;
+package org.catacombae.storage.fs;
 
 /**
  *

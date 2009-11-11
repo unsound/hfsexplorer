@@ -30,13 +30,13 @@ import org.catacombae.hfsexplorer.gui.ResourceForkViewPanel;
 import org.catacombae.hfsexplorer.gui.StructViewPanel;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFile;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolder;
-import org.catacombae.jparted.lib.fs.FSEntry;
-import org.catacombae.jparted.lib.fs.FSFile;
-import org.catacombae.jparted.lib.fs.FSFork;
-import org.catacombae.jparted.lib.fs.FSForkType;
-import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFSFile;
-import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFSFolder;
-import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFSLink;
+import org.catacombae.storage.fs.FSEntry;
+import org.catacombae.storage.fs.FSFile;
+import org.catacombae.storage.fs.FSFork;
+import org.catacombae.storage.fs.FSForkType;
+import org.catacombae.storage.fs.hfscommon.HFSCommonFSFile;
+import org.catacombae.storage.fs.hfscommon.HFSCommonFSFolder;
+import org.catacombae.storage.fs.hfscommon.HFSCommonFSLink;
 
 public class FileInfoWindow extends JFrame {
     
