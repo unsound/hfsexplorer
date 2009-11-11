@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.types.hfsx;
+package org.catacombae.hfs.types.hfsx;
 
-import org.catacombae.hfsexplorer.types.hfsplus.BTHeaderRec;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogIndexNode;
+import org.catacombae.hfs.types.hfsplus.BTHeaderRec;
+import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogIndexNode;
 
 public class HFSXCatalogIndexNode extends HFSPlusCatalogIndexNode {
     public HFSXCatalogIndexNode(byte[] data, int offset, int nodeSize, BTHeaderRec catalogHeaderRec) {

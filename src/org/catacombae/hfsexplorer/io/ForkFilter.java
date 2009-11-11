@@ -18,11 +18,11 @@
 package org.catacombae.hfsexplorer.io;
 
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentDescriptor;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusForkData;
+import org.catacombae.hfs.types.hfsplus.HFSPlusExtentDescriptor;
+import org.catacombae.hfs.types.hfsplus.HFSPlusForkData;
 import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentDescriptor;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSForkData;
+import org.catacombae.hfs.types.hfscommon.CommonHFSExtentDescriptor;
+import org.catacombae.hfs.types.hfscommon.CommonHFSForkData;
 
 /**
  * Facilitates reading the data of a file system fork by abstracting the extents

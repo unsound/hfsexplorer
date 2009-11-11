@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.types.carbon;
+package org.catacombae.hfs.types.carbon;
 
 import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfsexplorer.Util;

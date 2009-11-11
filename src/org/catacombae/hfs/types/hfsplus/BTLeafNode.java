@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.types.hfsplus;
+package org.catacombae.hfs.types.hfsplus;
 
 public abstract class BTLeafNode extends BTNode {
     // This one is open for future generalization

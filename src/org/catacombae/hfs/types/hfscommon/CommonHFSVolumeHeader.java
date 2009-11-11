@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.types.hfscommon;
+package org.catacombae.hfs.types.hfscommon;
 
 import java.io.PrintStream;
 import java.util.Date;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusVolumeHeader;
-import org.catacombae.hfsexplorer.types.hfs.MasterDirectoryBlock;
+import org.catacombae.hfs.types.hfsplus.HFSPlusVolumeHeader;
+import org.catacombae.hfs.types.hfs.MasterDirectoryBlock;
 
 /**
  * This class acts as a generalization of the common data properties of the

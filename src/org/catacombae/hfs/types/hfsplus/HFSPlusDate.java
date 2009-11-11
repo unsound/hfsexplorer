@@ -15,10 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.types.hfsplus;
+package org.catacombae.hfs.types.hfsplus;
 
-import org.catacombae.hfsexplorer.types.hfs.HFSDate;
-import org.catacombae.hfsexplorer.types.*;
+import org.catacombae.hfs.types.hfs.HFSDate;
 import java.util.Date;
 import java.util.TimeZone;
 

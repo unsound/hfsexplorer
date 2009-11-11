@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.types.hfs;
+package org.catacombae.hfs.types.hfs;
 
-import org.catacombae.hfsexplorer.types.finder.FInfo;
-import org.catacombae.hfsexplorer.types.finder.FXInfo;
+import org.catacombae.hfs.types.finder.FInfo;
+import org.catacombae.hfs.types.finder.FXInfo;
 import java.io.PrintStream;
 import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfsexplorer.Util;

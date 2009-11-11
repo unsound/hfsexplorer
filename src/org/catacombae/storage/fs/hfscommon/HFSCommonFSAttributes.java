@@ -19,10 +19,10 @@ package org.catacombae.storage.fs.hfscommon;
 
 import java.util.Date;
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogAttributes;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFileRecord;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogFolderRecord;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusBSDInfo;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogAttributes;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFileRecord;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFolderRecord;
+import org.catacombae.hfs.types.hfsplus.HFSPlusBSDInfo;
 import org.catacombae.storage.fs.FSAttributes;
 import org.catacombae.storage.fs.WindowsFileAttributes;
 

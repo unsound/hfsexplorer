@@ -21,7 +21,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import org.catacombae.hfsexplorer.io.ReadableRandomAccessInputStream;
 import org.catacombae.hfsexplorer.io.SynchronizedReadableRandomAccessStream;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSFinderInfo;
+import org.catacombae.hfs.types.hfscommon.CommonHFSFinderInfo;
 import org.catacombae.io.RandomAccessStream;
 import org.catacombae.io.ReadableByteArrayStream;
 import org.catacombae.io.ReadableRandomAccessStream;

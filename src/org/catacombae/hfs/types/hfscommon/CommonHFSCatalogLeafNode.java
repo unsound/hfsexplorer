@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.types.hfscommon;
+package org.catacombae.hfs.types.hfscommon;
 
-import org.catacombae.hfsexplorer.types.hfsplus.BTHeaderRec;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogKey;
+import org.catacombae.hfs.types.hfsplus.BTHeaderRec;
+import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogKey;
 
 /**
  *

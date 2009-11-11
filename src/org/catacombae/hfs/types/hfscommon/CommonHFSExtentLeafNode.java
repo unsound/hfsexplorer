@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.types.hfscommon;
+package org.catacombae.hfs.types.hfscommon;
 
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentKey;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentLeafRecord;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentRecord;
-import org.catacombae.hfsexplorer.types.hfs.ExtDataRec;
-import org.catacombae.hfsexplorer.types.hfs.ExtKeyRec;
+import org.catacombae.hfs.types.hfsplus.HFSPlusExtentKey;
+import org.catacombae.hfs.types.hfsplus.HFSPlusExtentLeafRecord;
+import org.catacombae.hfs.types.hfsplus.HFSPlusExtentRecord;
+import org.catacombae.hfs.types.hfs.ExtDataRec;
+import org.catacombae.hfs.types.hfs.ExtKeyRec;
 
 /**
  *

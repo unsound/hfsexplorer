@@ -17,7 +17,7 @@
 
 package org.catacombae.hfs;
 
-import org.catacombae.hfsexplorer.types.hfsplus.JournalInfoBlock;
+import org.catacombae.hfs.types.hfsplus.JournalInfoBlock;
 
 /**
  *

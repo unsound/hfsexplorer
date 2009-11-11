@@ -17,8 +17,8 @@
 
 package org.catacombae.hfs.plus;
 
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusVolumeHeader;
-import org.catacombae.hfsexplorer.types.hfsplus.JournalInfoBlock;
+import org.catacombae.hfs.types.hfsplus.HFSPlusVolumeHeader;
+import org.catacombae.hfs.types.hfsplus.JournalInfoBlock;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfs.Journal;
 import org.catacombae.util.Util;

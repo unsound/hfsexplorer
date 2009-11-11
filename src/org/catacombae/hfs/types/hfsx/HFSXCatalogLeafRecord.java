@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.types.hfsx;
+package org.catacombae.hfs.types.hfsx;
 
-import org.catacombae.hfsexplorer.types.hfsplus.BTHeaderRec;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusCatalogLeafRecord;
+import org.catacombae.hfs.types.hfsplus.BTHeaderRec;
+import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogLeafRecord;
 
 public class HFSXCatalogLeafRecord extends HFSPlusCatalogLeafRecord {
     public HFSXCatalogLeafRecord(byte[] data, int offset, BTHeaderRec catalogHeaderRec) {

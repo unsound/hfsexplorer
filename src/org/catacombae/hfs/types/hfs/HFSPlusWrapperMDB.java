@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.types.hfs;
+package org.catacombae.hfs.types.hfs;
 
 import org.catacombae.hfsexplorer.Util;
 import java.io.PrintStream;

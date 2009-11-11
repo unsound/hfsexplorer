@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.types.hfscommon;
+package org.catacombae.hfs.types.hfscommon;
 
 import java.util.Date;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusBSDInfo;
+import org.catacombae.hfs.types.hfsplus.HFSPlusBSDInfo;
 
 /**
  * Generalization of the common attributes of CommonHFSCatalogFolder and CommonHFSCatalogFile.

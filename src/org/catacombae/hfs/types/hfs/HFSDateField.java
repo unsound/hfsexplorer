@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.types.hfs;
+package org.catacombae.hfs.types.hfs;
 
-import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusDateField;
+import org.catacombae.hfs.types.hfsplus.HFSPlusDateField;
 
 /**
  *

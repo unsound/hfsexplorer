@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.types.hfscommon;
+package org.catacombae.hfs.types.hfscommon;
 
 import java.io.PrintStream;
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.types.hfsplus.BTNodeDescriptor;
-import org.catacombae.hfsexplorer.types.hfs.NodeDescriptor;
+import org.catacombae.hfs.types.hfsplus.BTNodeDescriptor;
+import org.catacombae.hfs.types.hfs.NodeDescriptor;
 
 /**
  *

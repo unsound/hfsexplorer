@@ -18,8 +18,8 @@
 package org.catacombae.storage.fs.hfscommon;
 
 import org.catacombae.util.Util;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogAttributes;
-import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSFinderInfo;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogAttributes;
+import org.catacombae.hfs.types.hfscommon.CommonHFSFinderInfo;
 import org.catacombae.storage.fs.BasicFSEntry;
 import org.catacombae.storage.fs.FSFork;
 import org.catacombae.storage.fs.FSForkType;

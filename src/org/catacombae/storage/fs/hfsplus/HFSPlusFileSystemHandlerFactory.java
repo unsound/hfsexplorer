@@ -17,8 +17,8 @@
 
 package org.catacombae.storage.fs.hfsplus;
 
-import org.catacombae.hfsexplorer.types.hfs.ExtDescriptor;
-import org.catacombae.hfsexplorer.types.hfs.HFSPlusWrapperMDB;
+import org.catacombae.hfs.types.hfs.ExtDescriptor;
+import org.catacombae.hfs.types.hfs.HFSPlusWrapperMDB;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.storage.DataLocator;
 import org.catacombae.storage.SubDataLocator;

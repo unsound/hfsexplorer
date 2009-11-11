@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.catacombae.hfsexplorer.types.hfscommon;
+package org.catacombae.hfs.types.hfscommon;
 
 //import org.catacombae.hfsexplorer.fs.StringDecoder;
 import org.catacombae.hfsexplorer.Util;
-import org.catacombae.hfsexplorer.types.hfsplus.HFSUniStr255;
+import org.catacombae.hfs.types.hfsplus.HFSUniStr255;
 
 /**
  *
