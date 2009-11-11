@@ -17,7 +17,7 @@
 
 package org.catacombae.storage.ps.container.hfs;
 
-import org.catacombae.jparted.lib.DataLocator;
+import org.catacombae.storage.DataLocator;
 import org.catacombae.storage.ps.container.ContainerHandler;
 import org.catacombae.storage.ps.container.ContainerHandlerFactory;
 

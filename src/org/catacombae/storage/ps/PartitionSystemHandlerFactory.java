@@ -17,7 +17,7 @@
 
 package org.catacombae.storage.ps;
 
-import org.catacombae.jparted.lib.DataLocator;
+import org.catacombae.storage.DataLocator;
 
 /**
  * A subclass of PartitionSystemHandlerFactory must always have a empty

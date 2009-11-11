@@ -19,7 +19,7 @@ package org.catacombae.storage.ps.ebr;
 
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.partitioning.PartitionSystem;
-import org.catacombae.jparted.lib.DataLocator;
+import org.catacombae.storage.DataLocator;
 import org.catacombae.storage.ps.Partition;
 import org.catacombae.storage.ps.PartitionSystemHandler;
 import org.catacombae.storage.ps.StandardPartition;

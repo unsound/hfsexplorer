@@ -21,7 +21,7 @@ import org.catacombae.hfsexplorer.Util;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.partitioning.ApplePartitionMap;
 import org.catacombae.hfsexplorer.partitioning.DriverDescriptorRecord;
-import org.catacombae.jparted.lib.DataLocator;
+import org.catacombae.storage.DataLocator;
 import org.catacombae.storage.ps.Partition;
 import org.catacombae.storage.ps.PartitionSystemHandler;
 import org.catacombae.storage.ps.StandardPartition;

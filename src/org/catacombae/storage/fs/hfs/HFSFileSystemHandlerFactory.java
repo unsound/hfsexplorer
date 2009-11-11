@@ -17,7 +17,7 @@
 
 package org.catacombae.storage.fs.hfs;
 
-import org.catacombae.jparted.lib.DataLocator;
+import org.catacombae.storage.DataLocator;
 import org.catacombae.storage.fs.DefaultFileSystemHandlerInfo;
 import org.catacombae.storage.fs.FileSystemHandler;
 import org.catacombae.storage.fs.FileSystemHandlerFactory;

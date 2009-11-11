@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.catacombae.jparted.lib;
+package org.catacombae.storage;
 
 import org.catacombae.io.ConcatenatedStream;
 import org.catacombae.io.RandomAccessStream;

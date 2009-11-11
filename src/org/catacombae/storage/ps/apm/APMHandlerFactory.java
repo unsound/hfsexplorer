@@ -17,7 +17,7 @@
 
 package org.catacombae.storage.ps.apm;
 
-import org.catacombae.jparted.lib.DataLocator;
+import org.catacombae.storage.DataLocator;
 import org.catacombae.storage.ps.PartitionSystemRecognizer;
 import org.catacombae.storage.ps.PartitionSystemHandler;
 import org.catacombae.storage.ps.PartitionSystemHandlerFactory;
