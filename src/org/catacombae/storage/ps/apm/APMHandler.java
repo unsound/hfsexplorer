@@ -21,7 +21,7 @@ import org.catacombae.util.Util;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.storage.ps.apm.types.ApplePartitionMap;
 import org.catacombae.storage.ps.apm.types.DriverDescriptorRecord;
-import org.catacombae.storage.DataLocator;
+import org.catacombae.storage.io.DataLocator;
 import org.catacombae.storage.ps.Partition;
 import org.catacombae.storage.ps.PartitionSystemHandler;
 

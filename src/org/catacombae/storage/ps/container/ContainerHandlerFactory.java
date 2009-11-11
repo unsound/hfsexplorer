@@ -17,7 +17,7 @@
 
 package org.catacombae.storage.ps.container;
 
-import org.catacombae.storage.DataLocator;
+import org.catacombae.storage.io.DataLocator;
 
 /**
  *

@@ -37,7 +37,7 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSForkData;
 import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.io.ReadableConcatenatedStream;
 import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.storage.DataLocator;
+import org.catacombae.storage.io.DataLocator;
 import org.catacombae.hfs.original.HFSOriginalVolume;
 import org.catacombae.hfs.plus.HFSPlusVolume;
 import org.catacombae.hfs.x.HFSXVolume;

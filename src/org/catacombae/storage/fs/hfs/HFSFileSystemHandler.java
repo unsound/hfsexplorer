@@ -17,7 +17,7 @@
 
 package org.catacombae.storage.fs.hfs;
 
-import org.catacombae.storage.DataLocator;
+import org.catacombae.storage.io.DataLocator;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemHandler;
 import org.catacombae.hfs.original.HFSOriginalVolume;
 

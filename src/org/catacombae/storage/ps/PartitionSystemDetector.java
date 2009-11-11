@@ -20,7 +20,7 @@ package org.catacombae.storage.ps;
 import java.util.LinkedList;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.RuntimeIOException;
-import org.catacombae.storage.DataLocator;
+import org.catacombae.storage.io.DataLocator;
 
 /**
  *

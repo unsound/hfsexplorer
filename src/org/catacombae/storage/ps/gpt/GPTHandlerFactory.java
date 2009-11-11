@@ -17,7 +17,7 @@
 
 package org.catacombae.storage.ps.gpt;
 
-import org.catacombae.storage.DataLocator;
+import org.catacombae.storage.io.DataLocator;
 import org.catacombae.storage.ps.PartitionSystemRecognizer;
 import org.catacombae.storage.ps.PartitionSystemHandler;
 import org.catacombae.storage.ps.PartitionSystemHandlerFactory;

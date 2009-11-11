@@ -19,7 +19,7 @@ package org.catacombae.storage.fs;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.catacombae.storage.DataLocator;
+import org.catacombae.storage.io.DataLocator;
 
 /**
  * A factory for creating FileSystemHandlers. By setting attributes in the
