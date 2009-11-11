@@ -1,4 +1,4 @@
 #!/bin/sh
 
 cd dist
-./runfsb.sh "$@"
+./hfsexplorer.sh "$@"
