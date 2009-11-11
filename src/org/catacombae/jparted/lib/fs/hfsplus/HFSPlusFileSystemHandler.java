@@ -19,7 +19,7 @@ package org.catacombae.jparted.lib.fs.hfsplus;
 
 import org.catacombae.jparted.lib.fs.hfscommon.HFSCommonFileSystemHandler;
 import org.catacombae.jparted.lib.DataLocator;
-import org.catacombae.storage.fs.hfs.plus.HFSPlusVolume;
+import org.catacombae.hfs.plus.HFSPlusVolume;
 
 /**
  *

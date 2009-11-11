@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.catacombae.storage.fs.hfs;
+package org.catacombae.hfs;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,9 +26,9 @@ import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.io.ReadableConcatenatedStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.jparted.lib.DataLocator;
-import org.catacombae.storage.fs.hfs.original.HFSOriginalVolume;
-import org.catacombae.storage.fs.hfs.plus.HFSPlusVolume;
-import org.catacombae.storage.fs.hfs.x.HFSXVolume;
+import org.catacombae.hfs.original.HFSOriginalVolume;
+import org.catacombae.hfs.plus.HFSPlusVolume;
+import org.catacombae.hfs.x.HFSXVolume;
 
 /**
  *

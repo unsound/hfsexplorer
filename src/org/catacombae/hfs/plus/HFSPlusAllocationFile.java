@@ -3,12 +3,12 @@
  * and open the template in the editor.
  */
 
-package org.catacombae.storage.fs.hfs.plus;
+package org.catacombae.hfs.plus;
 
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentDescriptor;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSPlusExtentDescriptor;
 import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.storage.fs.hfs.AllocationFile;
+import org.catacombae.hfs.AllocationFile;
 
 /**
  *

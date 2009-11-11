@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.catacombae.storage.fs.hfs.x;
+package org.catacombae.hfs.x;
 
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTHeaderRecord;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSCatalogIndexNode;
@@ -17,8 +17,8 @@ import org.catacombae.hfsexplorer.types.hfsplus.HFSCatalogNodeID;
 import org.catacombae.hfsexplorer.types.hfsplus.HFSUniStr255;
 import org.catacombae.hfsexplorer.types.hfsx.HFSXCatalogKey;
 import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.storage.fs.hfs.CatalogOperations;
-import org.catacombae.storage.fs.hfs.plus.HFSPlusVolume;
+import org.catacombae.hfs.CatalogOperations;
+import org.catacombae.hfs.plus.HFSPlusVolume;
 
 /**
  *

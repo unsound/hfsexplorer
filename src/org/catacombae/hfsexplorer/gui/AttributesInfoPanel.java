@@ -46,7 +46,7 @@ import org.catacombae.hfsexplorer.types.hfscommon.CommonHFSExtentLeafRecord;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTIndexRecord;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTNode;
 import org.catacombae.hfsexplorer.types.hfscommon.CommonBTNodeDescriptor;
-import org.catacombae.storage.fs.hfs.HFSVolume;
+import org.catacombae.hfs.HFSVolume;
 
 /**
  *

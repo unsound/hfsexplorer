@@ -5,7 +5,7 @@
  */
 package org.catacombae.hfsexplorer.fs;
 
-import org.catacombae.storage.fs.hfs.ProgressMonitor;
+import org.catacombae.hfs.ProgressMonitor;
 
 /**
  *

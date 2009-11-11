@@ -19,7 +19,7 @@ package org.catacombae.hfsexplorer.unfinished;
 
 import java.awt.event.*;
 import javax.swing.*;
-import org.catacombae.storage.fs.hfs.HFSVolume;
+import org.catacombae.hfs.HFSVolume;
 
 /**
  *
