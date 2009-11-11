@@ -18,9 +18,9 @@
 package org.catacombae.hfsexplorer.fs;
 
 import org.catacombae.util.Util;
-import org.catacombae.hfsexplorer.io.ReadableRandomAccessSubstream;
-import org.catacombae.hfsexplorer.io.SynchronizedReadableRandomAccess;
-import org.catacombae.hfsexplorer.io.SynchronizedReadableRandomAccessStream;
+import org.catacombae.io.ReadableRandomAccessSubstream;
+import org.catacombae.io.SynchronizedReadableRandomAccess;
+import org.catacombae.io.SynchronizedReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.types.resff.ReferenceListEntry;
 import org.catacombae.hfsexplorer.types.resff.ResourceHeader;
 import org.catacombae.hfsexplorer.types.resff.ResourceMap;

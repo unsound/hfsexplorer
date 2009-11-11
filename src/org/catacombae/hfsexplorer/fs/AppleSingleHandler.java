@@ -19,8 +19,8 @@ package org.catacombae.hfsexplorer.fs;
 
 import org.catacombae.hfsexplorer.fs.AppleSingleBuilder.FileType;
 import org.catacombae.hfsexplorer.fs.AppleSingleBuilder.EntryType;
-import org.catacombae.hfsexplorer.io.ReadableRandomAccessSubstream;
-import org.catacombae.hfsexplorer.io.SynchronizedReadableRandomAccessStream;
+import org.catacombae.io.ReadableRandomAccessSubstream;
+import org.catacombae.io.SynchronizedReadableRandomAccessStream;
 import org.catacombae.hfsexplorer.types.applesingle.AppleSingleHeader;
 import org.catacombae.hfsexplorer.types.applesingle.EntryDescriptor;
 import org.catacombae.io.ReadableConcatenatedStream;

@@ -17,7 +17,7 @@
 
 package org.catacombae.hfs.original;
 
-import org.catacombae.hfsexplorer.io.ReadableRandomAccessSubstream;
+import org.catacombae.io.ReadableRandomAccessSubstream;
 import org.catacombae.hfs.types.hfs.BTHdrRec;
 import org.catacombae.hfs.types.hfs.CatKeyRec;
 import org.catacombae.hfs.types.hfs.ExtKeyRec;
