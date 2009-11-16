@@ -137,10 +137,13 @@ public class ForkFilter implements ReadableRandomAccessStream {
     @Override
     public int read(byte[] data, int pos, int len) {
         //System.err.println("ForkFilter.read(" + data + ", " + pos + ", " + len);
-        long offset = fsOffset;
+        long offset = Long.MAX_VALUE; // MAX_VALUE as a sentinel for seek
         long bytesToSkip = logicalPosition;
         int extIndex;
         long currentExtentLength;
+
+        if(extentDescriptors.length < 1)
+            return -1; // EOF
 
         // Skip all extents whose range is located before the requested position (logicalPosition)
         //System.out.println("ForkFilter.read: skipping extents (bytesToSkip=" +
