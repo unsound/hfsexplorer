@@ -102,27 +102,6 @@ public class ForkFilter implements ReadableRandomAccessStream {
         this.lastPhysicalPos = 0; // Set differently from logicalPosition to trigger a seek at first read
     }
 
-    @Deprecated
-    public ForkFilter(HFSPlusForkData forkData, HFSPlusExtentDescriptor[] extentDescriptors,
-            ReadableRandomAccessStream sourceFile, long fsOffset, long allocationBlockSize,
-            long firstBlockByteOffset) {
-        //System.err.println("ForkFilter.<init>(" + forkData + ", " + extentDescriptors + ", " +
-        //        sourceFile + ", " + fsOffset + ", " + blockSize + ");");
-        //System.err.println("  fork has " + extentDescriptors.length + " extents.");
-        this.forkLength = forkData.getLogicalSize();
-        this.extentDescriptors = new CommonHFSExtentDescriptor[extentDescriptors.length];
-        for(int i = 0; i < this.extentDescriptors.length; ++i)
-            this.extentDescriptors[i] = CommonHFSExtentDescriptor.create(extentDescriptors[i]);
-
-        this.sourceFile = sourceFile;
-        this.fsOffset = fsOffset;
-        this.allocationBlockSize = allocationBlockSize;
-        this.firstBlockByteOffset = firstBlockByteOffset;
-        this.logicalPosition = 0;
-        this.lastLogicalPos = -1; // Set differently from logicalPosition to trigger a seek at first read
-        this.lastPhysicalPos = 0; // Set differently from logicalPosition to trigger a seek at first read
-    }
-
     /**
      * {@inheritDoc}
      */
