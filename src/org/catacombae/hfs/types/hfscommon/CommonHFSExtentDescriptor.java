@@ -18,6 +18,7 @@
 package org.catacombae.hfs.types.hfscommon;
 
 import java.io.PrintStream;
+import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.util.Util;
@@ -28,12 +29,11 @@ import org.catacombae.hfs.types.hfs.ExtDescriptor;
  *
  * @author erik
  */
-public abstract class CommonHFSExtentDescriptor implements StructElements {
+public abstract class CommonHFSExtentDescriptor implements StructElements,
+        PrintableStruct {
     public abstract long getStartBlock();
     public abstract long getBlockCount();
 
-    public abstract void print(PrintStream ps, String prefix);
-    
     public static CommonHFSExtentDescriptor create(HFSPlusExtentDescriptor hped) {
         return new HFSPlusImplementation(hped);
     }
@@ -57,6 +57,11 @@ public abstract class CommonHFSExtentDescriptor implements StructElements {
         @Override
         public long getBlockCount() {
             return Util.unsign(hped.getBlockCount());
+        }
+
+        @Override
+        public void printFields(PrintStream ps, String prefix) {
+            hped.printFields(ps, prefix);
         }
 
         @Override
@@ -84,6 +89,11 @@ public abstract class CommonHFSExtentDescriptor implements StructElements {
         @Override
         public long getBlockCount() {
             return Util.unsign(hped.getXdrNumABlks());
+        }
+
+        @Override
+        public void printFields(PrintStream ps, String prefix) {
+            hped.printFields(ps, prefix);
         }
 
         @Override

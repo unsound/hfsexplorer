@@ -19,10 +19,12 @@ package org.catacombae.hfs.types.hfsplus;
 
 import org.catacombae.util.Util;
 import java.io.PrintStream;
+import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.Dictionary;
 
-public class HFSPlusExtentDescriptor implements StructElements {
+public class HFSPlusExtentDescriptor implements StructElements,
+        PrintableStruct {
     /*
      * struct HFSPlusExtentDescriptor
      * size: 8 bytes
@@ -61,8 +63,13 @@ public class HFSPlusExtentDescriptor implements StructElements {
     }
 
     public void print(PrintStream ps, String prefix) {
-        ps.println(prefix + "startBlock: " + getStartBlock());
-        ps.println(prefix + "blockCount: " + getBlockCount());
+        ps.println(prefix + getClass().getSimpleName());
+        printFields(ps, prefix);
+    }
+
+    public void printFields(PrintStream ps, String prefix) {
+        ps.println(prefix + " startBlock: " + getStartBlock());
+        ps.println(prefix + " blockCount: " + getBlockCount());
     }
 
     byte[] getBytes() {

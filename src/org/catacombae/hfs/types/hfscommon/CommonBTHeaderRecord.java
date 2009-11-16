@@ -45,11 +45,13 @@ public abstract class CommonBTHeaderRecord extends CommonBTRecord implements Pri
     public abstract CompareType getKeyCompareType();
     
     public abstract byte[] getBytes();
-    
+
+    /*
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + getClass().getSimpleName() + ":");
         printFields(ps, prefix + " ");
     }
+    */
 
     public static CommonBTHeaderRecord create(BTHeaderRec bthr) {
         return new HFSPlusImplementation(bthr);
@@ -127,14 +129,18 @@ public abstract class CommonBTHeaderRecord extends CommonBTRecord implements Pri
         }
 
         @Override
+        public void print(PrintStream ps, String prefix) {
+            bthr.print(ps, prefix);
+        }
+
+        @Override
         public void printFields(PrintStream ps, String prefix) {
-            ps.println(prefix + "bthr:");
-            bthr.print(ps, prefix + " ");
+            bthr.printFields(ps, prefix);
         }
 
         @Override
         public int getSize() {
-            return bthr.length();
+            return BTHeaderRec.length();
         }
         
         public BTHeaderRec getInternal() {
@@ -196,7 +202,7 @@ public abstract class CommonBTHeaderRecord extends CommonBTRecord implements Pri
 
         @Override
         public CompareType getKeyCompareType() {
-            // Is this correct? Can not find any info on this...
+            // Couldn't find any info, but it seems this is correct.
             return CompareType.BINARY_COMPARE;
         }
         
@@ -205,14 +211,19 @@ public abstract class CommonBTHeaderRecord extends CommonBTRecord implements Pri
             return bthr.getBytes();
         }
         
+        @Override
+        public void print(PrintStream ps, String prefix) {
+            bthr.print(ps, prefix);
+        }
+
+        @Override
         public void printFields(PrintStream ps, String prefix) {
-            ps.println(prefix + "bthr:");
-            bthr.print(ps, prefix + " ");
+            bthr.printFields(ps, prefix);
         }
 
         @Override
         public int getSize() {
-            return bthr.length();
+            return BTHdrRec.length();
         }
     }
 }
