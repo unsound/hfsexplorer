@@ -18,8 +18,6 @@
 package org.catacombae.hfs.io;
 
 import org.catacombae.util.Util;
-import org.catacombae.hfs.types.hfsplus.HFSPlusExtentDescriptor;
-import org.catacombae.hfs.types.hfsplus.HFSPlusForkData;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfs.types.hfscommon.CommonHFSExtentDescriptor;
 import org.catacombae.hfs.types.hfscommon.CommonHFSForkData;
