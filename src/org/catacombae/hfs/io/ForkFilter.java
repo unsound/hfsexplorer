@@ -86,9 +86,13 @@ public class ForkFilter implements ReadableRandomAccessStream {
     public ForkFilter(long forkLength, CommonHFSExtentDescriptor[] extentDescriptors,
             ReadableRandomAccessStream sourceFile, long fsOffset, long allocationBlockSize,
             long firstBlockByteOffset) {
-        //System.err.println("ForkFilter.<init>(" + forkLength + ", " + extentDescriptors + ", " +
-        //        sourceFile + ", " + fsOffset + ", " + allocationBlockSize + ", " + firstBlockByteOffset + ");");
-        //System.err.println("  fork has " + extentDescriptors.length + " extents.");
+        //System.err.println("ForkFilter.<init>(" + forkLength + ", " +
+        //        extentDescriptors + ", " + sourceFile + ", " + fsOffset +
+        //        ", " + allocationBlockSize + ", " + firstBlockByteOffset +
+        //        ");");
+        //System.err.println("  fork has " + extentDescriptors.length +
+        //        " extents.");
+
         this.forkLength = forkLength;
         this.extentDescriptors = Util.arrayCopy(extentDescriptors,
                 new CommonHFSExtentDescriptor[extentDescriptors.length]);
@@ -175,12 +179,12 @@ public class ForkFilter implements ReadableRandomAccessStream {
         if(logicalPosition != lastLogicalPos) {
             //System.out.print("ForkFilter.read: (1)seeking to " + offset + "...");
             sourceFile.seek(offset); // Seek to the correct position
-        //System.out.println("done.");
+            //System.out.println("done.");
         }
         else if(sourceFile.getFilePointer() != lastPhysicalPos) {
             //System.out.print("ForkFilter.read: (2)seeking to " + offset + "...");
             sourceFile.seek(lastPhysicalPos);
-        //System.out.println("done.");
+            //System.out.println("done.");
         }
 
         long bytesLeftInStream = forkLength - logicalPosition;

@@ -27,8 +27,10 @@ import org.catacombae.hfs.original.HFSOriginalVolume;
  */
 public class HFSFileSystemHandler extends HFSCommonFileSystemHandler {
 
-    public HFSFileSystemHandler(DataLocator fsLocator, boolean useCaching, String encodingName) {
-        super(new HFSOriginalVolume(fsLocator.createReadOnlyFile(), 0, useCaching, encodingName),
-                false, false);
+    public HFSFileSystemHandler(DataLocator fsLocator, boolean useCaching,
+            String encodingName) {
+
+        super(new HFSOriginalVolume(fsLocator.createReadOnlyFile(), 0,
+                useCaching, encodingName), false, false);
     }
 }
