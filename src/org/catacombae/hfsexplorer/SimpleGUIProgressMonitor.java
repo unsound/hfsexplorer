@@ -47,19 +47,21 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
     */
     
     /**
-     * A simple default GUI implementation of a confirm dialog for overwriting a directory.
+     * A simple default GUI implementation of a confirm dialog for overwriting a
+     * directory.
      * 
      * @param parentComponent
      * @param dir
      * @return whether or not the user accepts to overwrite <code>dir</code>.
      */
     /*
-    public static boolean confirmOverwriteDirectory(Component parentComponent, File dir) {
+    public static boolean confirmOverwriteDirectory(Component parentComponent,
+            File dir) {
         String[] options = new String[]{"Continue", "Cancel"};
-        int reply = JOptionPane.showOptionDialog(parentComponent, "Warning! Directory:\n    \"" +
-                dir.getAbsolutePath() + "\"\n" +
-                "already exists. Do you want to continue extracting to this directory?",
-                "Warning", JOptionPane.YES_NO_CANCEL_OPTION,
+        int reply = JOptionPane.showOptionDialog(parentComponent,
+                "Warning! Directory:\n    \"" + dir.getAbsolutePath() + "\"\n" +
+                "already exists. Do you want to continue extracting to this " +
+                "directory?", "Warning", JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.WARNING_MESSAGE, null, options, options[0]);
         return reply == 0;
     }
@@ -73,32 +75,37 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
     */
 
     /*
-    public static boolean confirmSkipDirectory(Component parentComponent, String... messageLines) {
+    public static boolean confirmSkipDirectory(Component parentComponent,
+            String... messageLines) {
         StringBuilder sb = new StringBuilder();
         for(String messageLine : messageLines)
             sb.append(messageLine).append("\n");
         
-        int reply = JOptionPane.showConfirmDialog(parentComponent, sb.toString() +
-                        "Do you want to continue? (All files under this directory will be " +
-                        "skipped)", "Error", JOptionPane.YES_NO_OPTION,
-                        JOptionPane.ERROR_MESSAGE);
+        int reply = JOptionPane.showConfirmDialog(parentComponent,
+                sb.toString() + "Do you want to continue? (All files under " +
+                "this directory will be skipped)", "Error",
+                JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
         return reply != JOptionPane.NO_OPTION;
     }
     */
 
     /**
-     * @see #createDirectoryFailed(java.awt.Component, java.io.File)
+     * @see #createDirectoryFailed(java.awt.Component, java.lang.String,
+     * java.io.File)
      */
     @Override
-    public CreateDirectoryFailedAction createDirectoryFailed(String dirname, File parentDirectory) {
+    public CreateDirectoryFailedAction createDirectoryFailed(String dirname,
+            File parentDirectory) {
         return createDirectoryFailed(parentComponent, dirname, parentDirectory);
     }
 
     /**
-     * @see #createFileFailed(java.awt.Component, java.io.File)
+     * @see #createFileFailed(java.awt.Component, java.lang.String,
+     * java.io.File)
      */
     @Override
-    public CreateFileFailedAction createFileFailed(String filename, File parentDirectory) {
+    public CreateFileFailedAction createFileFailed(String filename,
+            File parentDirectory) {
         return createFileFailed(parentComponent, filename, parentDirectory);
     }
 
@@ -119,7 +126,8 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
     }
 
     /**
-     * @see #displayRenamePrompt(java.awt.Component, java.lang.String, java.io.File) 
+     * @see #displayRenamePrompt(java.awt.Component, java.lang.String,
+     * java.io.File)
      */
     @Override
     public String displayRenamePrompt(String currentName, File outDir) {
@@ -127,21 +135,29 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
     }
 
     /**
-     * Default Swing implementation of a "Failed to create directory" user prompt.<br>
-     * This method will never return null.
+     * Default Swing implementation of a "Failed to create directory" user
+     * prompt.<br/>
+     * This method will never return <code>null</code>.
      * 
-     * @param parentComponent the parent component of the user prompt dialog box.
-     * @param file the file for which this prompt was triggered.
+     * @param parentComponent the parent component of the user prompt dialog
+     * box.
+     * @param dirname the name of the directory for which this prompt was
+     * triggered.
+     * @param parentDirectory the parent directory of the directory for which
+     * this prompt was triggered.
      * @return one of RENAME, SKIP_DIRECTORY, AUTO_RENAME or CANCEL.
      */
-    public static CreateDirectoryFailedAction createDirectoryFailed(Component parentComponent,
-            String dirname, File parentDirectory) {
-        String[] options = new String[] { "Rename", "Skip directory", "Auto-rename", "Cancel" };
+    public static CreateDirectoryFailedAction createDirectoryFailed(
+            Component parentComponent, String dirname, File parentDirectory) {
+        String[] options = new String[] {
+            "Rename", "Skip directory", "Auto-rename", "Cancel"
+        };
         
-        int reply = JOptionPane.showOptionDialog(parentComponent, "Could not create directory \"" + 
-                dirname + "\" in:\n    \"" + parentDirectory.getAbsolutePath() + "\"",
-                "Error", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE, null, options,
-                options[0]);
+        int reply = JOptionPane.showOptionDialog(parentComponent,
+                "Could not create directory \"" + dirname + "\" in:\n    \"" +
+                parentDirectory.getAbsolutePath() + "\"", "Error",
+                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE,
+                null, options, options[0]);
         
         switch(reply) {
             case 0:
@@ -156,21 +172,27 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
     }
     
     /**
-     * Default Swing implementation of a "Failed to create file" user prompt.<br>
-     * This method will never return null.
+     * Default Swing implementation of a "Failed to create file" user prompt.
+     * <br/>This method will never return <code>null</code>.
      * 
-     * @param parentComponent the parent component of the user prompt dialog box.
-     * @param file the file for which this prompt was triggered.
+     * @param parentComponent the parent component of the user prompt dialog
+     * box.
+     * @param filename the name of the file for which this prompt was triggered.
+     * @param parentDirectory the parent directory of the file for which this
+     * prompt was triggered.
      * @return one of RENAME, SKIP_FILE, SKIP_DIRECTORY, AUTO_RENAME or CANCEL.
      */
-    public static CreateFileFailedAction createFileFailed(Component parentComponent, String filename,
-            File parentDirectory) {
-        String[] options = new String[] { "Rename", "Skip file", "Skip directory", "Auto-rename", "Cancel" };
+    public static CreateFileFailedAction createFileFailed(
+            Component parentComponent, String filename, File parentDirectory) {
+        String[] options = new String[] {
+            "Rename", "Skip file", "Skip directory", "Auto-rename", "Cancel"
+        };
         
-        int reply = JOptionPane.showOptionDialog(parentComponent, "Could not create file \"" +
-                filename + "\" in:\n    \"" + parentDirectory.getAbsolutePath() + "\"",
-                "Error", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE, null,
-                options, options[0]);
+        int reply = JOptionPane.showOptionDialog(parentComponent,
+                "Could not create file \"" + filename + "\" in:\n    \"" +
+                parentDirectory.getAbsolutePath() + "\"", "Error",
+                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE,
+                null, options, options[0]);
         
         switch(reply) {
             case 0:
@@ -190,18 +212,22 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
      * Default Swing implementation of a "Directory exists" user prompt.<br>
      * This method will never return null.
      * 
-     * @param parentComponent the parent component of the user prompt dialog box.
+     * @param parentComponent the parent component of the user prompt dialog
+     * box.
      * @param directory the directory for which this prompt was triggered.
      * @return one of CONTINUE, SKIP_DIRECTORY, RENAME, AUTO_RENAME or CANCEL.
      */
-    public static DirectoryExistsAction directoryExists(Component parentComponent, File directory) {
-        String[] options = new String[] { "Continue", "Rename", "Skip directory", "Auto-rename", "Cancel" };
+    public static DirectoryExistsAction directoryExists(
+            Component parentComponent, File directory) {
+        String[] options = new String[] {
+            "Continue", "Rename", "Skip directory", "Auto-rename", "Cancel"
+        };
         
-        int reply = JOptionPane.showOptionDialog(parentComponent, "Warning! Directory:\n    \"" +
-                directory.getAbsolutePath() + "\"\n" +
-                "already exists.",
-                "Warning", JOptionPane.YES_NO_CANCEL_OPTION,
-                JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+        int reply = JOptionPane.showOptionDialog(parentComponent,
+                "Warning! Directory:\n    \"" + directory.getAbsolutePath() +
+                "\"\n" + "already exists.", "Warning",
+                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,
+                null, options, options[0]);
         
         switch(reply) {
             case 0:
@@ -221,16 +247,27 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
      * Default Swing implementation of a "File exists" user prompt.<br>
      * This method will never return null.
      * 
-     * @param parentComponent the parent component of the user prompt dialog box.
+     * @param parentComponent the parent component of the user prompt dialog
+     * box.
      * @param file the file for which this prompt was triggered.
-     * @return one of OVERWRITE, OVERWRITE_ALL, RENAME, SKIP_FILE, SKIP_DIRECTORY, AUTO_RENAME or CANCEL.
+     * @return one of OVERWRITE, OVERWRITE_ALL, RENAME, SKIP_FILE,
+     * SKIP_DIRECTORY, AUTO_RENAME or CANCEL.
      */
-    public static FileExistsAction fileExists(Component parentComponent, File file) {
-        String[] options = new String[] { "Overwrite", "Overwrite all", "Rename", "Skip file", "Skip directory", "Auto-rename", "Cancel" };
+    public static FileExistsAction fileExists(Component parentComponent,
+            File file) {
+        String[] options = new String[] {
+            "Overwrite",
+            "Overwrite all",
+            "Rename",
+            "Skip file",
+            "Skip directory",
+            "Auto-rename",
+            "Cancel",
+        };
         
-        int reply = JOptionPane.showOptionDialog(parentComponent, "Warning! File:\n    \"" +
-                file.getAbsolutePath() + "\"\n" + "already exists.",
-                "Warning", JOptionPane.YES_NO_CANCEL_OPTION,
+        int reply = JOptionPane.showOptionDialog(parentComponent,
+                "Warning! File:\n    \"" + file.getAbsolutePath() + "\"\n" +
+                "already exists.", "Warning", JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.WARNING_MESSAGE, null, options, options[0]);
         
         switch(reply) {
@@ -252,18 +289,23 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
     }
     
     /**
-     * Default Swing implementation of a rename file prompt.<br>
-     * If the user aborted the prompt, this method will return <code>null</code>. Otherwise, it will
-     * return the string that the user typed.
+     * Default Swing implementation of a rename file prompt.<br/>
+     * If the user aborted the prompt, this method will return
+     * <code>null</code>. Otherwise, it will return the string that the user
+     * typed.
      * 
-     * @param parentComponent the parent component of the user prompt dialog box.
+     * @param parentComponent the parent component of the user prompt dialog
+     * box.
      * @param currentName the current name of the file.
      * @param outDir the directory where the file is to be located.
-     * @return a new file name, or <code>null</code> if the user canceled the dialog.
+     * @return a new file name, or <code>null</code> if the user canceled the
+     * dialog.
      */
-    public static String displayRenamePrompt(Component parentComponent, String currentName, File outDir) {
-        Object selection = JOptionPane.showInputDialog(parentComponent, "Enter new name:",
-                "Rename", JOptionPane.PLAIN_MESSAGE, null, null, currentName);
+    public static String displayRenamePrompt(Component parentComponent,
+            String currentName, File outDir) {
+        Object selection = JOptionPane.showInputDialog(parentComponent,
+                "Enter new name:", "Rename", JOptionPane.PLAIN_MESSAGE, null,
+                null, currentName);
         
         if(selection != null)
             return selection.toString();
