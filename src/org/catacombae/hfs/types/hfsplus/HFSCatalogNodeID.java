@@ -19,6 +19,7 @@ package org.catacombae.hfs.types.hfsplus;
 
 import org.catacombae.util.Util;
 import java.io.PrintStream;
+import java.lang.reflect.Field;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.Dictionary;
 
@@ -140,10 +141,16 @@ public class HFSCatalogNodeID implements StructElements {
         return Util.toByteArrayBE(hfsCatalogNodeID);
     }
 
+    private Field getPrivateField(String name) throws NoSuchFieldException {
+        Field f = getClass().getDeclaredField("hfsCatalogNodeID");
+        f.setAccessible(true);
+        return f;
+    }
+
     public Dictionary getStructElements() {
         try {
             DictionaryBuilder db = new DictionaryBuilder(HFSCatalogNodeID.class.getSimpleName());
-            db.addInt("hfsCatalogNodeID", getClass().getField("hfsCatalogNodeID"), this, UNSIGNED, BIG_ENDIAN, null, null, DECIMAL);
+            db.addInt("hfsCatalogNodeID", getPrivateField("hfsCatalogNodeID"), this, UNSIGNED, BIG_ENDIAN, null, null, DECIMAL);
 
             return db.getResult();
         } catch(NoSuchFieldException e) {
@@ -151,4 +158,3 @@ public class HFSCatalogNodeID implements StructElements {
         }
     }
 }
-    
