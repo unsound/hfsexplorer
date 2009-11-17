@@ -28,14 +28,16 @@ public class FileNameTools {
     private static HashSet<String> reservedWindowsFilenames = null;
 
     /**
-     * This method should only return a non-null value when it's ABSOLUTELY SURE that the file
-     * can be created.
+     * This method should only return a non-null value when it's ABSOLUTELY SURE
+     * that the file can be created.
      * 
-     * @param curDirName
-     * @param outDir
-     * @return
+     * @param filename the filename to be validated and possibly renamed.
+     * @param outDir the directory where the new file with name
+     * <code>filename</code> is to be created.
+     * @return the resulting 'safe' filename.
      */
-    public static String autoRenameIllegalFilename(String filename, File outDir, boolean isDirectory) {
+    public static String autoRenameIllegalFilename(String filename, File outDir,
+            boolean isDirectory) {
         final char substituteChar = '_';
 
         if(FileNameTools.isReservedWindowsFilename(filename)) {

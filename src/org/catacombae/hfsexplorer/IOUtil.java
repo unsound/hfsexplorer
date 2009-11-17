@@ -69,12 +69,14 @@ public class IOUtil extends org.catacombae.util.IOUtil {
     }
 
     /**
-     * Copies the entire readable stream <code>is</code> to the writable stream <code>os</code>.
+     * Transfers the entire contents of the readable stream <code>is</code> to
+     * the writable stream <code>os</code>.
      *
-     * @param is
-     * @param os
-     * @param blockSize
-     * @throws java.io.IOException
+     * @param is the source stream.
+     * @param os the sink stream.
+     * @param bufferSize the buffer size that should be used in the copy.
+     * @throws RuntimeIOException if an I/O error occurred during the stream
+     * copy.
      */
     public static long streamCopy(Readable is, Writable os, int bufferSize) throws RuntimeIOException {
         byte[] buffer = new byte[bufferSize];
