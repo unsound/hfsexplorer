@@ -26,8 +26,10 @@ import org.catacombae.hfs.plus.HFSPlusVolume;
  * @author erik
  */
 public class HFSPlusFileSystemHandler extends HFSCommonFileSystemHandler {
+
     public HFSPlusFileSystemHandler(DataLocator fsLocator, boolean useCaching,
             boolean doUnicodeFileNameComposition, boolean hideProtected) {
+
         super(new HFSPlusVolume(fsLocator.createReadOnlyFile(), 0,
                     useCaching), doUnicodeFileNameComposition, hideProtected);
     }
