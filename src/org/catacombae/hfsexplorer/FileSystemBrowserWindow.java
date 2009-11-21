@@ -2217,7 +2217,10 @@ public class FileSystemBrowserWindow extends JFrame {
                         continue;
                 }
 
-                if(thisDir.mkdir() || thisDir.exists()) {
+                /* If the directory already exists, then fine. If not, we create
+                 * it and double check that it exists afterwards (to avoid
+                 * unexpected side effects, like in Windows). */
+                if(thisDir.exists() || (thisDir.mkdir() && thisDir.exists())) {
                     if(curDirName != (Object)originalDirName && !curDirName.equals(originalDirName))
                         errorMessages.addLast("Directory \"" + originalDirName +
                                 "\" was renamed to \"" + curDirName + "\" in parent folder \"" +
