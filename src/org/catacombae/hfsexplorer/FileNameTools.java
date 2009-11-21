@@ -186,9 +186,12 @@ public class FileNameTools {
             reservedWindowsFilenames = buildReservedWindowsFilenames();
         if(reservedWindowsFilenames.contains(filename))
             return true;
-        if(filename.charAt(4) == '.' && reservedWindowsFilenames.contains(filename.substring(0, 4)))
+        if(filename.length() > 4 && filename.charAt(4) == '.' &&
+                reservedWindowsFilenames.contains(filename.substring(0, 4)))
             return true;
-        if(filename.charAt(3) == '.' && reservedWindowsFilenames.contains(filename.substring(0, 3)))
+        // WTF am I doing here?? Lesson learned: Comment your g'dam code.
+        if(filename.length() > 3 && filename.charAt(3) == '.' &&
+                reservedWindowsFilenames.contains(filename.substring(0, 3)))
             return true;
 
         return false;
