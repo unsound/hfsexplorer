@@ -102,7 +102,7 @@
                 <StringItem index="0" value="Macintosh HD (\\?\GLOBALROOT\Device\Harddisk0\Partition2)"/>
                 <StringItem index="1" value="Leopard HD (\\?\GLOBALROOT\Device\Harddisk0\Partition3)"/>
                 <StringItem index="2" value="Snow Leopard HD (GPT:5@\\?\GLOBALROOT\Device\Harddisk0\Partition0)"/>
-                <StringItem index="3" value="Time Machine-s&#xe4;kerhetskopior (\\?\GLOBALROOT\Device\Harddisk1\Partition2)"/>
+                <StringItem index="3" value="Time Machine-s&#xe4;kerhetskopior (EBR:2@MBR:4@\\?\GLOBALROOT\Device\Harddisk1\Partition0)"/>
                 <StringItem index="4" value="Mac OS X Install DVD (\\?\GLOBALROOT\Device\CdRom0\Partition0)"/>
                 <StringItem index="5" value=" "/>
                 <StringItem index="6" value="eller:"/>
