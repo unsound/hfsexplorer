@@ -1,5 +1,7 @@
 #!/bin/bash
 
+ZIPFILE=hfsexplorer-current-src.zip
+
 match () {
     local SUBFILE="$1"
     local DIRNAME="$2"
@@ -85,8 +87,8 @@ chmod a+x $TEMPDIR/dist/*.sh
 
 echo "Building zip file..."
 cd $TEMPDIR
-rm ../releases/current-src.zip
-zip -9 -r ../releases/current-src.zip *
+rm ../releases/${ZIPFILE}
+zip -9 -r ../releases/${ZIPFILE} *
 cd ..
 
-echo "Done! Zip file generated in releases/current-src.zip"
+echo "Done! Zip file generated in releases/${ZIPFILE}"

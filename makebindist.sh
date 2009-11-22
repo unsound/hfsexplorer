@@ -1,5 +1,7 @@
 #!/bin/sh
 
+ZIPFILE=hfsexplorer-current-bin.zip
+
 match () {
     local SUBFILE="$1"
     local DIRNAME="$2"
@@ -68,8 +70,8 @@ recursiveRmdir "^CVS$" "$TEMPDIR"
 
 echo "Building zip file..."
 cd $TEMPDIR
-rm ../releases/current-bin.zip
-zip -9 -r ../releases/current-bin.zip *
+rm "../releases/${ZIPFILE}"
+zip -9 -r "../releases/${ZIPFILE}" *
 cd ..
 
-echo "Done! Zip file generated in releases/current-bin.zip"
+echo "Done! Zip file generated at releases/${ZIPFILE}"
