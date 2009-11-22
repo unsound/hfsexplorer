@@ -324,4 +324,12 @@ public class HFSPlusVolumeHeader extends MutableStruct implements StructElements
 
         return db.getResult();
     }
+
+    public boolean isValid() {
+        short sig = getSignature();
+        if(sig != SIGNATURE_HFS_PLUS && sig != SIGNATURE_HFSX)
+            return false;
+
+        return true;
+    }
 }
