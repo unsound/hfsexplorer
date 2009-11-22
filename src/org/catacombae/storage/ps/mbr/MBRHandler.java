@@ -22,7 +22,6 @@ import org.catacombae.storage.ps.mbr.types.MBRPartitionTable;
 import org.catacombae.storage.io.DataLocator;
 import org.catacombae.storage.ps.Partition;
 import org.catacombae.storage.ps.PartitionSystemHandler;
-import org.catacombae.storage.ps.StandardPartition;
 
 /**
  *
@@ -45,14 +44,7 @@ public class MBRHandler extends PartitionSystemHandler {
     @Override
     public Partition[] getPartitions() {
         MBRPartitionTable partitionTable = readPartitionTable();
-        Partition[] result = new Partition[partitionTable.getUsedPartitionCount()];
-        org.catacombae.storage.ps.legacy.Partition[] parts =
-                partitionTable.getUsedPartitionEntries();
-        for(int i = 0; i < result.length; ++i) {
-            result[i] = new StandardPartition(parts[i].getStartOffset(),
-                    parts[i].getLength(), parts[i].getType());
-        }
-        return result;
+        return partitionTable.getUsedPartitionEntries();
     }
 
     @Override

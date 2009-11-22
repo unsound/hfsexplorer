@@ -17,6 +17,7 @@
 
 package org.catacombae.storage.ps.legacy;
 import java.io.PrintStream;
+import org.catacombae.storage.ps.Partition;
 
 /** Generalization of the features that a simple partitioning system should provide. */
 public interface PartitionSystem {

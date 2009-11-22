@@ -20,7 +20,7 @@ package org.catacombae.storage.ps.ebr;
 import java.io.PrintStream;
 import java.util.LinkedList;
 import org.catacombae.storage.ps.mbr.types.MBRPartitionTable;
-import org.catacombae.storage.ps.legacy.Partition;
+import org.catacombae.storage.ps.Partition;
 import org.catacombae.storage.ps.legacy.PartitionSystem;
 import org.catacombae.storage.io.win32.ReadableWin32FileStream;
 import org.catacombae.io.ReadableFileStream;

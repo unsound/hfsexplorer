@@ -21,7 +21,7 @@ import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.ReadableByteArrayStream;
 import java.util.ArrayList;
 import java.io.PrintStream;
-import org.catacombae.storage.ps.legacy.Partition;
+import org.catacombae.storage.ps.Partition;
 import org.catacombae.storage.ps.legacy.PartitionSystem;
 import org.catacombae.util.Util;
 

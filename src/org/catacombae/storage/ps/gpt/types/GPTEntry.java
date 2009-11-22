@@ -17,7 +17,7 @@
 
 package org.catacombae.storage.ps.gpt.types;
 
-import org.catacombae.storage.ps.legacy.Partition;
+import org.catacombae.storage.ps.Partition;
 import org.catacombae.util.Util;
 import java.io.PrintStream;
 import org.catacombae.csjc.StructElements;

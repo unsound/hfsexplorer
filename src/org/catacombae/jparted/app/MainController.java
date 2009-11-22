@@ -33,7 +33,7 @@ import org.catacombae.storage.ps.Partition;
 import org.catacombae.storage.ps.PartitionSystemRecognizer;
 import org.catacombae.storage.ps.PartitionSystemHandler;
 import org.catacombae.storage.ps.PartitionSystemHandlerFactory;
-import org.catacombae.storage.ps.apm.APMPartition;
+import org.catacombae.storage.ps.apm.types.APMPartition;
 
 /**
  *
@@ -124,7 +124,7 @@ public class MainController {
             for (Partition p : partitions) {
                 String name = "";
                 if(p instanceof APMPartition)
-                    name = ((APMPartition)p).getName();
+                    name = ((APMPartition)p).getPmPartNameAsString();
                 
                 mainPanel.addPartition("" + ((i++) + 1), p.getType().toString(),
                         name, "" + p.getStartOffset(),
