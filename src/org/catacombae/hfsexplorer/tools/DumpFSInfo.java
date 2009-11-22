@@ -23,15 +23,22 @@ import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 import javax.swing.JOptionPane;
 import org.catacombae.hfsexplorer.GUIUtil;
-import org.catacombae.hfsexplorer.PartitionSystemRecognizer;
 import org.catacombae.hfsexplorer.SelectWindowsDeviceDialog;
+import org.catacombae.storage.io.ReadableStreamDataLocator;
 import org.catacombae.storage.ps.apm.types.ApplePartitionMap;
 import org.catacombae.storage.ps.gpt.types.GUIDPartitionTable;
 import org.catacombae.storage.ps.mbr.types.MBRPartitionTable;
-import org.catacombae.storage.ps.legacy.Partition;
-import org.catacombae.storage.ps.legacy.PartitionSystem;
 import org.catacombae.storage.io.win32.ReadableWin32FileStream;
+import org.catacombae.storage.ps.Partition;
+import org.catacombae.storage.ps.PartitionSystemDetector;
+import org.catacombae.storage.ps.PartitionSystemHandler;
+import org.catacombae.storage.ps.PartitionSystemHandlerFactory;
+import org.catacombae.storage.ps.PartitionSystemType;
 import org.catacombae.storage.ps.PartitionType;
+import org.catacombae.storage.ps.apm.APMHandler;
+import org.catacombae.storage.ps.apm.types.DriverDescriptorRecord;
+import org.catacombae.storage.ps.gpt.GPTHandler;
+import org.catacombae.storage.ps.mbr.MBRHandler;
 
 public class DumpFSInfo {
 
@@ -94,11 +101,30 @@ public class DumpFSInfo {
         long fsOffset, fsLength;
         int partNum = -1;
 
-        PartitionSystemRecognizer psr = new PartitionSystemRecognizer(fsFile);
-        PartitionSystem partSys = psr.getPartitionSystem();
+        PartitionSystemType[] detectedTypes =
+                PartitionSystemDetector.detectPartitionSystem(fsFile);
+
+        PartitionSystemType detectedType;
+        PartitionSystemHandler partSys;
+        if(detectedTypes.length == 1) {
+            detectedType = detectedTypes[0];
+            PartitionSystemHandlerFactory fact =
+                    detectedType.createDefaultHandlerFactory();
+            partSys = fact.createHandler(new ReadableStreamDataLocator(fsFile));
+        }
+        else if(detectedTypes.length == 0) {
+            detectedType = null;
+            partSys = null;
+        }
+        else {
+            String msg = "Multiple partition system types detected:";
+            for(PartitionSystemType t : detectedTypes)
+                msg += " " + t;
+            throw new RuntimeException(msg);
+        }
 
         if(partSys != null) {
-            Partition[] partitions = partSys.getUsedPartitionEntries();
+            Partition[] partitions = partSys.getPartitions();
             if(partitions.length == 0) {
                 // Proceed to detect file system
                 fsOffset = 0;
@@ -111,16 +137,19 @@ public class DumpFSInfo {
             }
             else {
                 // Dump partition system to file(s)
-                if(partSys instanceof ApplePartitionMap) {
-                    ApplePartitionMap apm = (ApplePartitionMap) partSys;
+                if(partSys instanceof APMHandler) {
+                    APMHandler apmHandler = (APMHandler) partSys;
                     File ddrFile = new File("fsdump-" + runTimestamp + "_ddr.dat");
-                    byte[] ddrData = new byte[512];
                     FileOutputStream fos = new FileOutputStream(ddrFile);
-                    fsFile.seek(0);
-                    fsFile.readFully(ddrData);
-                    fos.write(ddrData);
+                    DriverDescriptorRecord ddr =
+                            apmHandler.readDriverDescriptorRecord();
+                    fos.write(ddr.getData());
                     fos.close();
                     generatedFiles.add(ddrFile);
+
+                    ApplePartitionMap apm = apmHandler.readPartitionMap();
+                    if(apm == null)
+                        throw new RuntimeException("Failed to read APM data.");
 
                     File apmFile = new File("fsdump-" + runTimestamp + "_apm.dat");
                     fos = new FileOutputStream(apmFile);
@@ -128,8 +157,8 @@ public class DumpFSInfo {
                     fos.close();
                     generatedFiles.add(apmFile);
                 }
-                else if(partSys instanceof GUIDPartitionTable) {
-                    GUIDPartitionTable gpt = (GUIDPartitionTable) partSys;
+                else if(partSys instanceof GPTHandler) {
+                    GPTHandler gptHandler = (GPTHandler) partSys;
                     File mbrFile = new File("fsdump-" + runTimestamp + "_protectivembr.dat");
                     byte[] mbrData = new byte[512];
                     FileOutputStream fos = new FileOutputStream(mbrFile);
@@ -138,6 +167,10 @@ public class DumpFSInfo {
                     fos.write(mbrData);
                     fos.close();
                     generatedFiles.add(mbrFile);
+
+                    GUIDPartitionTable gpt = gptHandler.readPartitionTable();
+                    if(gpt == null)
+                        throw new RuntimeException("Failed to read GPT data.");
 
                     File gptBeginFile = new File("fsdump-" + runTimestamp + "_gptprimary.dat");
                     fos = new FileOutputStream(gptBeginFile);
@@ -151,8 +184,10 @@ public class DumpFSInfo {
                     fos.close();
                     generatedFiles.add(gptEndFile);
                 }
-                else if(partSys instanceof MBRPartitionTable) {
-                    MBRPartitionTable mbr = (MBRPartitionTable) partSys;
+                else if(partSys instanceof MBRHandler) {
+                    MBRHandler mbrHandler = (MBRHandler) partSys;
+                    MBRPartitionTable mbr = mbrHandler.readPartitionTable();
+
                     File mbrFile = new File("fsdump-" + runTimestamp + "_mbr.dat");
                     FileOutputStream fos = new FileOutputStream(mbrFile);
                     fos.write(mbr.getMasterBootRecord().getBytes());
@@ -172,8 +207,9 @@ public class DumpFSInfo {
                         break;
                     }
                 }
-                selectedValue = JOptionPane.showInputDialog(null, "Select which partition to read",
-                        "Choose " + partSys.getLongName() + " partition",
+                selectedValue = JOptionPane.showInputDialog(null,
+                        "Select which partition to read",
+                        "Choose " + detectedType.getLongName() + " partition",
                         JOptionPane.QUESTION_MESSAGE,
                         null, partitions, partitions[firstPreferredPartition]);
                 for(int i = 0; i < partitions.length; ++i) {

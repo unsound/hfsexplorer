@@ -35,19 +35,15 @@ import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.ReadableConcatenatedStream;
 import org.catacombae.storage.io.win32.ReadableWin32FileStream;
 import org.catacombae.hfsexplorer.gui.SelectWindowsDevicePanel;
-import org.catacombae.storage.ps.apm.types.APMPartition;
-import org.catacombae.storage.ps.apm.types.ApplePartitionMap;
-import org.catacombae.storage.ps.apm.types.DriverDescriptorRecord;
-import org.catacombae.storage.ps.gpt.types.GPTEntry;
-import org.catacombae.storage.ps.gpt.types.GUIDPartitionTable;
-import org.catacombae.storage.ps.mbr.types.MBRPartition;
-import org.catacombae.storage.ps.mbr.types.MBRPartitionTable;
-import org.catacombae.storage.ps.legacy.Partition;
-import org.catacombae.storage.ps.legacy.PartitionSystem;
+import org.catacombae.storage.ps.Partition;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer.FileSystemType;
+import org.catacombae.storage.io.ReadableStreamDataLocator;
+import org.catacombae.storage.ps.PartitionSystemDetector;
+import org.catacombae.storage.ps.PartitionSystemHandler;
+import org.catacombae.storage.ps.PartitionSystemHandlerFactory;
+import org.catacombae.storage.ps.PartitionSystemType;
 import org.catacombae.storage.ps.PartitionType;
-import org.catacombae.storage.ps.ebr.EBRPartition;
 
 public class SelectWindowsDeviceDialog extends JDialog {
     private static final String DEVICE_PREFIX = "\\\\?\\GLOBALROOT\\Device\\";
@@ -241,31 +237,59 @@ public class SelectWindowsDeviceDialog extends JDialog {
 	    ReadableRandomAccessStream llf = null;
 	    try {
 		llf = new ReadableWin32FileStream(DEVICE_PREFIX + deviceName);
-		PartitionSystemRecognizer psr = new PartitionSystemRecognizer(llf);
-		PartitionSystemRecognizer.PartitionSystemType pst = psr.detectPartitionSystem();
-                
+
+                PartitionSystemType[] detectedTypes =
+                        PartitionSystemDetector.detectPartitionSystem(llf);
+
+                PartitionSystemType pst;
+                if(detectedTypes.length == 1)
+                    pst = detectedTypes[0];
+                else if(detectedTypes.length == 0)
+                    pst = null;
+                else {
+                    String msg = detectedTypes.length + " partition " +
+                            "types detected: { ";
+                    for(PartitionSystemType t : detectedTypes)
+                        msg += t + " ";
+                    msg += "} Cannot continue.";
+                    throw new RuntimeException(msg);
+                }
+
                 boolean fileSystemFound = false;
-                
-                if(pst != PartitionSystemRecognizer.PartitionSystemType.NONE_FOUND) {
-                    PartitionSystem partSys = psr.getPartitionSystem();
-                    Partition[] parts = partSys.getUsedPartitionEntries();
+
+                if(pst != null) {
+                    PartitionSystemHandlerFactory fact =
+                            pst.createDefaultHandlerFactory();
+
+                    PartitionSystemHandler partSys = fact.createHandler(
+                            new ReadableStreamDataLocator(llf));
+
+                    Partition[] parts = partSys.getPartitions();
                     for(int j = 0; j < parts.length; ++j) {
                         Partition part = parts[j];
                         PartitionType pt = part.getType();
-                        if(pt == PartitionType.APPLE_HFS_CONTAINER || pt == PartitionType.APPLE_HFSX) {
+                        if(pt == PartitionType.APPLE_HFS_CONTAINER ||
+                                pt == PartitionType.APPLE_HFSX) {
                             FileSystemType fsType =
-                                    HFSCommonFileSystemRecognizer.detectFileSystem(llf, part.getStartOffset());
-                            if(HFSCommonFileSystemRecognizer.isTypeSupported(fsType)) {
+                                    HFSCommonFileSystemRecognizer.
+                                        detectFileSystem(llf,
+                                            part.getStartOffset());
+
+                            if(HFSCommonFileSystemRecognizer.isTypeSupported(
+                                    fsType)) {
                                 fileSystemFound = true;
-                                embeddedFileSystems.add(new EmbeddedPartitionEntry(deviceName, j, part));
+                                embeddedFileSystems.add(
+                                        new EmbeddedPartitionEntry(deviceName,
+                                        j, pst, part));
                             }
                         }
                     }
                 }
                 
                 if(!fileSystemFound && deviceName.endsWith("Partition0")) {
-                    FileSystemType fsType =
-                            HFSCommonFileSystemRecognizer.detectFileSystem(llf, 0);
+                    FileSystemType fsType = HFSCommonFileSystemRecognizer.
+                            detectFileSystem(llf, 0);
+
 		    if(HFSCommonFileSystemRecognizer.isTypeSupported(fsType))
 			plainFileSystems.add(deviceName);
 		}
@@ -276,11 +300,14 @@ public class SelectWindowsDeviceDialog extends JDialog {
                 //    skipPrefix = deviceName.substring(0, deviceName.length()-1);
 		llf.close();
 	    } catch(Exception e) {
-		System.out.println("INFO: Non-critical exception while detecting partition system at \"" +
-				   DEVICE_PREFIX + deviceName + "\": " + e.toString());
+		System.out.println("INFO: Non-critical exception while " +
+                        "detecting partition system at \"" + DEVICE_PREFIX +
+                        deviceName + "\": " + e.toString());
+
 		if(llf != null) {
-                    FileSystemType fsType =
-                            HFSCommonFileSystemRecognizer.detectFileSystem(llf, 0);
+                    FileSystemType fsType = HFSCommonFileSystemRecognizer.
+                            detectFileSystem(llf, 0);
+
 		    if(HFSCommonFileSystemRecognizer.isTypeSupported(fsType))
 			plainFileSystems.add(deviceName);
 		    llf.close();
@@ -289,26 +316,29 @@ public class SelectWindowsDeviceDialog extends JDialog {
 	}
 	
 	if(plainFileSystems.size() >= 1 || embeddedFileSystems.size() >= 1) {
-	    String[] plainStrings = plainFileSystems.toArray(new String[plainFileSystems.size()]);
+	    String[] plainStrings = plainFileSystems.toArray(
+                    new String[plainFileSystems.size()]);
+
 	    String[] embeddedStrings = new String[embeddedFileSystems.size()];
 	    int i = 0;
 	    for(EmbeddedPartitionEntry cur : embeddedFileSystems) {
 		embeddedStrings[i++] = cur.toString();
             }
-	    
-	    String[] allOptions = new String[plainStrings.length+embeddedStrings.length];
+
+	    String[] allOptions =
+                    new String[plainStrings.length+embeddedStrings.length];
 	    for(i = 0; i < plainStrings.length; ++i)
 		allOptions[i] = plainStrings[i];
 	    for(i = 0; i < embeddedStrings.length; ++i)
 		allOptions[plainStrings.length+i] = embeddedStrings[i];
-	    
-	    Object selectedValue = JOptionPane.showInputDialog(this, "Autodetection complete! Found " +
-							       allOptions.length + " HFS+ file systems.\n" +
-							       "Please choose which one to load:", 
-							       "Load HFS+ file system", 
-							       JOptionPane.QUESTION_MESSAGE,
-							       null, allOptions, allOptions[0]);
-	    if(selectedValue != null) {
+
+	    Object selectedValue = JOptionPane.showInputDialog(this,
+                    "Autodetection complete! Found " + allOptions.length +
+                    " HFS+ file systems.\nPlease choose which one to load:",
+                    "Load HFS+ file system", JOptionPane.QUESTION_MESSAGE,
+                    null, allOptions, allOptions[0]);
+
+            if(selectedValue != null) {
 		int selectedIndex = -1;
 		for(i = 0; i < allOptions.length; ++i) {
 		    if(selectedValue.equals(allOptions[i])) {
@@ -316,48 +346,45 @@ public class SelectWindowsDeviceDialog extends JDialog {
 			break;
 		    }
 		}
+
 		if(selectedIndex == -1) {
-		    throw new RuntimeException("Internal error!");
+		    throw new RuntimeException("selectedIndex == -1");
 		}
 		else {
 		    if(selectedIndex >= plainStrings.length) {
 			// We have an embedded FS
 			selectedIndex -= plainStrings.length;
-			EmbeddedPartitionEntry embeddedInfo = embeddedFileSystems.get(selectedIndex);
+			EmbeddedPartitionEntry embeddedInfo =
+                                embeddedFileSystems.get(selectedIndex);
 			if(embeddedInfo == null)
-			    throw new RuntimeException("Internal error again.");
-			
-			if(embeddedInfo.partition instanceof APMPartition) {
-			    ReadableRandomAccessStream llf = new ReadableWin32FileStream(DEVICE_PREFIX + embeddedInfo.deviceName);
-			    DriverDescriptorRecord ddr = new DriverDescriptorRecord(llf, 0);
-			    ApplePartitionMap apm = new ApplePartitionMap(llf, ddr.getSbBlkSize()*1, ddr.getSbBlkSize());
-			    Partition p = apm.getPartitionEntry((int)embeddedInfo.partitionNumber);
-			    resultCreatePath = DEVICE_PREFIX + selectedValue.toString();
-			    result = new ReadableConcatenatedStream(llf, p.getStartOffset(), p.getLength());
-			    setVisible(false);
-			}
-			else if(embeddedInfo.partition instanceof GPTEntry) {
-                            ReadableRandomAccessStream llf = new ReadableWin32FileStream(DEVICE_PREFIX + embeddedInfo.deviceName);
-			    GUIDPartitionTable gpt = new GUIDPartitionTable(llf, 0);
-			    Partition p = gpt.getPartitionEntry((int)embeddedInfo.partitionNumber);
-			    resultCreatePath = DEVICE_PREFIX + selectedValue.toString();
-			    result = new ReadableConcatenatedStream(llf, p.getStartOffset(), p.getLength());
-			    setVisible(false);
+			    throw new RuntimeException("embeddedInfo == null");
+
+
+                        switch(embeddedInfo.psType) {
+                            case APM:
+                            case GPT:
+                            case MBR:
+                                ReadableRandomAccessStream llf =
+                                        new ReadableWin32FileStream(
+                                        DEVICE_PREFIX + embeddedInfo.deviceName
+                                        );
+
+                                Partition p = embeddedInfo.partition;
+                                resultCreatePath = DEVICE_PREFIX +
+                                        selectedValue.toString();
+                                result = new ReadableConcatenatedStream(llf,
+                                        p.getStartOffset(), p.getLength());
+                                setVisible(false);
+                                break;
+                            default:
+                                throw new RuntimeException("Unexpected " +
+                                        "partition system: " +
+                                        embeddedInfo.psType);
                         }
-			else if(embeddedInfo.partition instanceof MBRPartition) {
-                            ReadableRandomAccessStream llf = new ReadableWin32FileStream(DEVICE_PREFIX + embeddedInfo.deviceName);
-			    MBRPartitionTable mbt = new MBRPartitionTable(llf, 0);
-                            Partition p = mbt.getPartitionEntry((int)embeddedInfo.partitionNumber);
-			    resultCreatePath = DEVICE_PREFIX + selectedValue.toString();
-			    result = new ReadableConcatenatedStream(llf, p.getStartOffset(), p.getLength());
-			    setVisible(false);
-                        }
-                        else
-                            throw new RuntimeException("Unexpected partition system: " +
-                                    embeddedInfo.partition.getClass());
 		    }
 		    else {
-			resultCreatePath = DEVICE_PREFIX + selectedValue.toString();
+			resultCreatePath = DEVICE_PREFIX +
+                                selectedValue.toString();
 			result = new ReadableWin32FileStream(resultCreatePath);
 			setVisible(false);
 		    }
@@ -379,32 +406,37 @@ public class SelectWindowsDeviceDialog extends JDialog {
 // 	}
 	else
 	    JOptionPane.showMessageDialog(this, "No HFS+ file systems found...",
-					  "Result", JOptionPane.INFORMATION_MESSAGE);
+					  "Result",
+                                          JOptionPane.INFORMATION_MESSAGE);
     }
     
     private static final class EmbeddedPartitionEntry {
         public final String deviceName;
         public final long partitionNumber;
+        public final PartitionSystemType psType;
         public final Partition partition;
         
         public EmbeddedPartitionEntry(String deviceName, long partitionNumber,
-                Partition partition) {
+                PartitionSystemType psType, Partition partition) {
             this.deviceName = deviceName;
             this.partitionNumber = partitionNumber;
+            this.psType = psType;
             this.partition = partition;
         }
         
         private String getPartitionSystemString() {
-            if(partition instanceof APMPartition)
-                return "APM";
-            else if(partition instanceof GPTEntry)
-                return "GPT";
-            else if(partition instanceof EBRPartition)
-                return "EBR";
-            else if(partition instanceof MBRPartition)
+            switch(psType) {
+                case MBR:
                 return "MBR";
-            else
+                case GPT:
+                return "GPT";
+                case APM:
+                return "APM";
+                case DOS_EXTENDED:
+                return "EBR";
+                default:
                 return "Unknown partition system";
+            }
         }
         
         @Override
