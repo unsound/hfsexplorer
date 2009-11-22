@@ -23,9 +23,6 @@ import org.catacombae.hfsexplorer.FileSystemBrowser.RecordType;
 import org.catacombae.hfs.ProgressMonitor;
 import org.catacombae.hfsexplorer.gui.FileOperationsPanel;
 import org.catacombae.hfsexplorer.helpbrowser.HelpBrowserPanel;
-import org.catacombae.storage.ps.legacy.PartitionSystem;
-import org.catacombae.hfs.types.hfs.ExtDescriptor;
-import org.catacombae.hfs.types.hfs.HFSPlusWrapperMDB;
 import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.hfs.types.hfsplus.HFSPlusVolumeHeader;
 import org.catacombae.storage.io.win32.ReadableWin32FileStream;
@@ -80,7 +77,9 @@ import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
-import org.catacombae.dmgextractor.encodings.encrypted.ReadableCEncryptedEncodingStream;
+import org.catacombae.dmg.encrypted.ReadableCEncryptedEncodingStream;
+import org.catacombae.dmg.udif.UDIFDetector;
+import org.catacombae.dmg.udif.UDIFRandomAccessStream;
 import org.catacombae.dmgextractor.ui.PasswordDialog;
 import org.catacombae.hfsexplorer.ExtractProgressMonitor.CreateDirectoryFailedAction;
 import org.catacombae.hfsexplorer.ExtractProgressMonitor.CreateFileFailedAction;
@@ -103,7 +102,6 @@ import org.catacombae.storage.ps.PartitionSystemDetector;
 import org.catacombae.storage.ps.PartitionSystemHandler;
 import org.catacombae.storage.ps.PartitionSystemHandlerFactory;
 import org.catacombae.storage.ps.PartitionType;
-import org.catacombae.udif.UDIFRandomAccessStream;
 
 /**
  * The main window for the graphical part of HFSExplorer. This class contains a lot of
@@ -701,7 +699,7 @@ public class FileSystemBrowserWindow extends JFrame {
             
             try {
                 System.err.println("Trying to detect UDIF structure...");
-                if(UDIFRecognizer.isUDIF(fsFile)) {
+                if(UDIFDetector.isUDIFEncoded(fsFile)) {
                     System.err.println("UDIF structure found! Creating filter stream...");
                     UDIFRandomAccessStream stream = null;
                     try {
