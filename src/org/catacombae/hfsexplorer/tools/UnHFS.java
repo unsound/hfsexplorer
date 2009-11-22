@@ -22,9 +22,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import org.catacombae.dmgextractor.encodings.encrypted.ReadableCEncryptedEncodingStream;
+import org.catacombae.dmg.encrypted.ReadableCEncryptedEncodingStream;
+import org.catacombae.dmg.udif.UDIFDetector;
+import org.catacombae.dmg.udif.UDIFRandomAccessStream;
 import org.catacombae.hfsexplorer.IOUtil;
-import org.catacombae.hfsexplorer.UDIFRecognizer;
 import org.catacombae.hfsexplorer.fs.AppleSingleBuilder;
 import org.catacombae.hfsexplorer.fs.AppleSingleBuilder.AppleSingleVersion;
 import org.catacombae.hfsexplorer.fs.AppleSingleBuilder.FileSystem;
@@ -52,9 +53,6 @@ import org.catacombae.storage.ps.PartitionSystemHandler;
 import org.catacombae.storage.ps.PartitionSystemHandlerFactory;
 import org.catacombae.storage.ps.PartitionSystemType;
 import org.catacombae.storage.ps.PartitionType;
-import org.catacombae.udif.UDIFRandomAccessStream;
-//import org.catacombae.jparted.lib.ps.container.ContainerHandler;
-//import org.catacombae.jparted.lib.ps.container.ContainerHandlerFactory;
 
 /**
  * Command line program which extracts all or part of the contents of a
@@ -290,7 +288,7 @@ public class UnHFS {
         }
 
         logDebug("Trying to detect UDIF structure...");
-        if(UDIFRecognizer.isUDIF(inFileStream)) {
+        if(UDIFDetector.isUDIFEncoded(inFileStream)) {
             UDIFRandomAccessStream stream = null;
             try {
                 stream = new UDIFRandomAccessStream(inFileStream);
