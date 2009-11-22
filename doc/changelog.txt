@@ -18,6 +18,16 @@ current
 - Bugfix: int overflow bug in caching layer led to OutOfMemoryError in
   certain situations when reading large disks.
 
+- Bugfix: Didn't check for String length in
+  FileNameTools.isReservedWindowsFilename. Led to an exception being thrown by
+  HFSExplorer right in the face of the user.
+
+- Bugfix: When extracting directories with names containing spaces, the files
+  in these directores could not be extracted. The fix is to check that the
+  created directory name is really equal to the name that we intended to create
+  (method deepEquals) and to fail if it isn't, requiring the user to rename the
+  directory to something sane.
+
 
 0.21
 ----
