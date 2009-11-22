@@ -23,7 +23,6 @@ import org.catacombae.hfsexplorer.FileSystemBrowser.RecordType;
 import org.catacombae.hfs.ProgressMonitor;
 import org.catacombae.hfsexplorer.gui.FileOperationsPanel;
 import org.catacombae.hfsexplorer.helpbrowser.HelpBrowserPanel;
-import org.catacombae.storage.ps.legacy.Partition;
 import org.catacombae.storage.ps.legacy.PartitionSystem;
 import org.catacombae.hfs.types.hfs.ExtDescriptor;
 import org.catacombae.hfs.types.hfs.HFSPlusWrapperMDB;
@@ -88,6 +87,7 @@ import org.catacombae.hfsexplorer.ExtractProgressMonitor.CreateFileFailedAction;
 import org.catacombae.hfsexplorer.ExtractProgressMonitor.DirectoryExistsAction;
 import org.catacombae.hfsexplorer.ExtractProgressMonitor.ExtractProperties;
 import org.catacombae.hfsexplorer.ExtractProgressMonitor.FileExistsAction;
+import org.catacombae.storage.ps.PartitionSystemType;
 import org.catacombae.hfsexplorer.fs.AppleSingleBuilder;
 import org.catacombae.hfsexplorer.fs.AppleSingleBuilder.AppleSingleVersion;
 import org.catacombae.hfsexplorer.fs.AppleSingleBuilder.FileSystem;
@@ -98,6 +98,10 @@ import org.catacombae.storage.io.DataLocator;
 import org.catacombae.storage.fs.FSLink;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer.FileSystemType;
+import org.catacombae.storage.ps.Partition;
+import org.catacombae.storage.ps.PartitionSystemDetector;
+import org.catacombae.storage.ps.PartitionSystemHandler;
+import org.catacombae.storage.ps.PartitionSystemHandlerFactory;
 import org.catacombae.storage.ps.PartitionType;
 import org.catacombae.udif.UDIFRandomAccessStream;
 
@@ -761,16 +765,39 @@ public class FileSystemBrowserWindow extends JFrame {
 
     public void loadFS(ReadableRandomAccessStream fsFile, String displayName) {
 
-        int blockSize = 0x200; // == 512
-        int ddrBlockSize;
         long fsOffset;
         long fsLength;
 
         // Detect partition system
-        PartitionSystemRecognizer psRec = new PartitionSystemRecognizer(fsFile);
-        PartitionSystem partSys = psRec.getPartitionSystem();
-        if(partSys != null) {
-            Partition[] partitions = partSys.getUsedPartitionEntries();
+        PartitionSystemType[] matchingTypes =
+                PartitionSystemDetector.detectPartitionSystem(fsFile);
+
+        if(matchingTypes.length > 1) {
+            String message = "Multiple partition system types detected:";
+            for(PartitionSystemType type : matchingTypes)
+                message += "\n" + type;
+            JOptionPane.showMessageDialog(this, message,
+                    "Partition system detection error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        else if(matchingTypes.length == 1) {
+            PartitionSystemType psType = matchingTypes[0];
+            PartitionSystemHandlerFactory psFact =
+                    psType.createDefaultHandlerFactory();
+
+            if(psFact == null) {
+                JOptionPane.showMessageDialog(this, "Can't find handler for " +
+                        "partition system type " + psType,
+                        "Unsupported partition system",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            PartitionSystemHandler psHandler =
+                    psFact.createHandler(new ReadableStreamDataLocator(fsFile));
+
+            Partition[] partitions = psHandler.getPartitions();
             if(partitions.length == 0) {
                 // Proceed to detect file system
                 fsOffset = 0;
@@ -782,47 +809,58 @@ public class FileSystemBrowserWindow extends JFrame {
                 }
             }
             else {
-                Object selectedValue;
-                int firstPreferredPartition = 0;
+                /* Search for suitable partitions, and make the first one that
+                 * was found the default value for the dialog box. */
+                int defaultSelection = 0;
                 for(int i = 0; i < partitions.length; ++i) {
                     Partition p = partitions[i];
                     PartitionType pt = p.getType();
-                    if(pt == PartitionType.APPLE_HFS_CONTAINER || pt == PartitionType.APPLE_HFSX) {
-                        firstPreferredPartition = i;
+                    if(pt == PartitionType.APPLE_HFS_CONTAINER ||
+                            pt == PartitionType.APPLE_HFSX) {
+                        defaultSelection = i;
                         break;
                     }
                 }
+
+                /* Prompt user to choose a partition to load. */
+                Partition selectedPartition = null;
                 while(true) {
-                    selectedValue = JOptionPane.showInputDialog(this, "Select which partition to read",
-                            "Choose " + partSys.getLongName() + " partition",
+                    Object selectedValue = JOptionPane.showInputDialog(this,
+                            "Select which partition to load",
+                            "Choose " + psType.getLongName() + " partition",
                             JOptionPane.QUESTION_MESSAGE,
-                            null, partitions, partitions[firstPreferredPartition]);
-                    if(selectedValue != null &&
-                            selectedValue instanceof Partition) {
-                        Partition selectedPartition = (Partition) selectedValue;
+                            null, partitions, partitions[defaultSelection]);
+
+                    if(selectedValue == null)
+                        return; // Abort the load process.
+                    else if(selectedValue instanceof Partition) {
+                        selectedPartition = (Partition) selectedValue;
                         PartitionType pt = selectedPartition.getType();
-                        if(pt == PartitionType.APPLE_HFS_CONTAINER || pt == PartitionType.APPLE_HFSX) {
+
+                        if(pt == PartitionType.APPLE_HFS_CONTAINER ||
+                                pt == PartitionType.APPLE_HFSX) {
                             break;
                         }
                         else {
-                            JOptionPane.showMessageDialog(this, "Can't find handler for partition type \"" + selectedPartition.getType() +
-                                    "\"", "Unknown partition type", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(this,
+                                    "Can't find handler for partition type \"" +
+                                    selectedPartition.getType() + "\"",
+                                    "Unknown partition type",
+                                    JOptionPane.ERROR_MESSAGE);
                         }
                     }
-                    else {
-                        return;
-                    }
+                    else
+                        throw new RuntimeException("selectedValue not " +
+                                "instanceof Partition! selectedValue: " +
+                                selectedValue.getClass());
                 }
-                if(selectedValue instanceof Partition) {
-                    Partition selectedPartition = (Partition) selectedValue;
-                    fsOffset = selectedPartition.getStartOffset();//getPmPyPartStart()+selectedPartition.getPmLgDataStart())*blockSize;
-                    fsLength = selectedPartition.getLength();//getPmDataCnt()*blockSize;
-		    //System.err.println("DEBUG Selected partition:");
-		    //selectedPartition.print(System.err, "  ");
-                }
-                else {
-                    throw new RuntimeException("Impossible error!");
-                }
+
+                /* A selection was made. */
+                fsOffset = selectedPartition.getStartOffset();
+                fsLength = selectedPartition.getLength();
+
+                //System.err.println("DEBUG Selected partition:");
+                //selectedPartition.print(System.err, "  ");
             }
         }
         else {
@@ -836,82 +874,84 @@ public class FileSystemBrowserWindow extends JFrame {
         }
 
         // Detect HFS file system
-        FileSystemType fsType = HFSCommonFileSystemRecognizer.detectFileSystem(fsFile, fsOffset);
-        if(fsType == FileSystemType.HFS_WRAPPED_HFS_PLUS) {
-            //System.out.println("Found a wrapped HFS+ volume.");
-            byte[] mdbData = new byte[HFSPlusWrapperMDB.STRUCTSIZE];
-            fsFile.seek(fsOffset + 1024);
-            fsFile.read(mdbData);
-            HFSPlusWrapperMDB mdb = new HFSPlusWrapperMDB(mdbData, 0);
-            ExtDescriptor xd = mdb.getDrEmbedExtent();
-            int hfsBlockSize = mdb.getDrAlBlkSiz();
-            //System.out.println("old fsOffset: " + fsOffset);
-            fsOffset += mdb.getDrAlBlSt() * 512 + xd.getXdrStABN() * hfsBlockSize; // Lovely method names...
-            //System.out.println("new fsOffset: " + fsOffset);
-            // redetect with adjusted fsOffset
-            fsType = HFSCommonFileSystemRecognizer.detectFileSystem(fsFile, fsOffset);
-        }
-        if(fsType == FileSystemType.HFS_PLUS ||
-                fsType == FileSystemType.HFSX ||
-                fsType == FileSystemType.HFS) {
-            
-            fsb.setRoot(null);
-            if(fsHandler != null) {
-                fsHandler.close();
-                fsHandler = null;
-            }
+        FileSystemType fsType = HFSCommonFileSystemRecognizer.detectFileSystem(
+                fsFile, fsOffset);
 
-            final FileSystemMajorType fsMajorType;
-            switch(fsType) {
-                case HFS:
-                    fsMajorType = FileSystemMajorType.APPLE_HFS;
-                    break;
-                case HFS_PLUS:
-                    fsMajorType = FileSystemMajorType.APPLE_HFS_PLUS;
-                    break;
-                case HFSX:
-                    fsMajorType = FileSystemMajorType.APPLE_HFSX;
-                    break;
-                default:
-                    fsMajorType = null;
-                    break;
-            }
+        switch(fsType) {
+            case HFS:
+            case HFS_WRAPPED_HFS_PLUS:
+            case HFS_PLUS:
+            case HFSX:
 
-            FileSystemHandlerFactory factory = fsMajorType.createDefaultHandlerFactory();
-            if(factory.isSupported(StandardAttribute.CACHING_ENABLED)) {
-                factory.getCreateAttributes().
-                        setBooleanAttribute(StandardAttribute.CACHING_ENABLED,
-                        toggleCachingItem.getState());
-            }
+                // Reset browser
+                fsb.setRoot(null);
+                if(fsHandler != null) {
+                    fsHandler.close();
+                    fsHandler = null;
+                }
 
-            //System.err.println("loadFS(): fsFile=" + fsFile);
-            //System.err.println("loadFS(): Creating ReadableConcatenatedStream...");
+                final FileSystemMajorType fsMajorType;
+                switch(fsType) {
+                    case HFS:
+                        fsMajorType = FileSystemMajorType.APPLE_HFS;
+                        break;
+                    case HFS_PLUS:
+                    case HFS_WRAPPED_HFS_PLUS:
+                        fsMajorType = FileSystemMajorType.APPLE_HFS_PLUS;
+                        break;
+                    case HFSX:
+                        fsMajorType = FileSystemMajorType.APPLE_HFSX;
+                        break;
+                    default:
+                        throw new RuntimeException("Unhandled type: " + fsType);
+                }
 
-            ReadableRandomAccessStream stage1;
-            if(fsLength > 0)
-                stage1 = new ReadableConcatenatedStream(fsFile, fsOffset,
-                    fsLength);
-            else
-                stage1 = fsFile;
-            //System.err.println("loadFS(): Creating ReadableStreamDataLocator...");
-            this.fsDataLocator = new ReadableStreamDataLocator(stage1);
-            //System.err.println("loadFS(): Creating fsHandler...");
+                FileSystemHandlerFactory factory =
+                        fsMajorType.createDefaultHandlerFactory();
+                if(factory.isSupported(StandardAttribute.CACHING_ENABLED)) {
+                    factory.getCreateAttributes().setBooleanAttribute(
+                            StandardAttribute.CACHING_ENABLED,
+                            toggleCachingItem.getState());
+                }
 
-            fsHandler = (HFSCommonFileSystemHandler) factory.createHandler(fsDataLocator);
-            FSFolder rootRecord = fsHandler.getRoot();
-            //FSEntry[] rootContents = rootRecord.list();
-            populateFilesystemGUI(rootRecord);
-            setTitle(TITLE_STRING + " - [" + displayName + "]");
-        //adjustTableWidth();
-        }
-        else {
-            JOptionPane.showMessageDialog(this, "Invalid HFS type.\nProgram supports:\n" +
-                    "    " + FileSystemType.HFS_PLUS + "\n" +
-                    "    " + FileSystemType.HFSX + "\n" +
-                    "    " + FileSystemType.HFS_WRAPPED_HFS_PLUS + "\n" +
-                    "    " + FileSystemType.HFS + "\n" +
-                    "\nDetected type is (" + fsType + ").",
-                    "Unsupported file system type", JOptionPane.ERROR_MESSAGE);
+                //System.err.println("loadFS(): fsFile=" + fsFile);
+                //System.err.println("loadFS(): Creating ReadableConcatenatedStream...");
+
+                ReadableRandomAccessStream stage1;
+                if(fsLength > 0)
+                    stage1 = new ReadableConcatenatedStream(fsFile, fsOffset,
+                            fsLength);
+                else if(fsOffset == 0)
+                    stage1 = fsFile;
+                else
+                    throw new RuntimeException("length undefined and offset " +
+                            "!= 0 (fsLength=" + fsLength + " fsOffset=" +
+                            fsOffset + ")");
+
+                //System.err.println("loadFS(): Creating ReadableStreamDataLocator...");
+                this.fsDataLocator = new ReadableStreamDataLocator(stage1);
+                //System.err.println("loadFS(): Creating fsHandler...");
+
+                fsHandler = (HFSCommonFileSystemHandler)
+                        factory.createHandler(fsDataLocator);
+                FSFolder rootRecord = fsHandler.getRoot();
+                //FSEntry[] rootContents = rootRecord.list();
+                populateFilesystemGUI(rootRecord);
+                setTitle(TITLE_STRING + " - [" + displayName + "]");
+                //adjustTableWidth();
+                break;
+
+            default:
+                JOptionPane.showMessageDialog(this, "Invalid HFS type.\n" +
+                        "HFSExplorer supports:\n" +
+                        "    " + FileSystemType.HFS_PLUS + "\n" +
+                        "    " + FileSystemType.HFSX + "\n" +
+                        "    " + FileSystemType.HFS_WRAPPED_HFS_PLUS + "\n" +
+                        "    " + FileSystemType.HFS + "\n" +
+                        "\nDetected type is (" + fsType + ").",
+                        "Unsupported file system type",
+                        JOptionPane.ERROR_MESSAGE);
+                break;
         }
     }
 
