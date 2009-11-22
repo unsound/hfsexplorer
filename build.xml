@@ -48,6 +48,7 @@
     <echo message="  build-jparted - Compiles the org.catacombae.jparted package, "/>
     <echo message="                  subpackages and dependencies and puts the result"/>
     <echo message="                  in targets/jparted/lib/jparted.jar."/>
+    <echo message="  build-libhfs  - Builds libhfs, which is used by hfs-jfuse."/>
     <echo message="  javadoc       - Creates the javadoc documentation for the project."/>
   </target>
   
