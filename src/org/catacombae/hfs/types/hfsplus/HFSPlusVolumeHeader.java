@@ -243,6 +243,7 @@ public class HFSPlusVolumeHeader extends MutableStruct implements StructElements
         String pregapString = "";
         for(int i = 0; i < pregap; ++i)
             pregapString += " ";
+        printAttributes(ps, pregapString);
     }
 
     public void printAttributes(PrintStream ps, String prefix) {
