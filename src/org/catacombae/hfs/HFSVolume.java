@@ -102,6 +102,13 @@ public abstract class HFSVolume {
 
         this.extentsOverflowFile = new ExtentsOverflowFile(this,
                 btreeOperations, extentsOverflowOperations);
+
+        try {
+            runSanityChecks();
+            //System.err.println("Sanity checks completed successfully.");
+        } catch(Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     //public static HFSVolume open(DataLocator loc, boolean writable) {
