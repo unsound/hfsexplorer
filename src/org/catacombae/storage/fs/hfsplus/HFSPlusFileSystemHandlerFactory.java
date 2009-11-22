@@ -121,9 +121,9 @@ public class HFSPlusFileSystemHandlerFactory extends HFSCommonFileSystemHandlerF
     }
 
     /**
-     * "unwraps" a. HFS+ volume wrapped in a HFS container.
+     * Unwraps an HFS+ volume wrapped in a HFS container.
      *
-     * @param data a locator defining the entire wrapping HFS volume.
+     * @param data a locator defining the entire HFS wrapper volume.
      * @return a locator defining only the HFS+ part of the volume.
      */
     private static DataLocator hfsUnwrap(DataLocator data) {
@@ -137,7 +137,8 @@ public class HFSPlusFileSystemHandlerFactory extends HFSCommonFileSystemHandlerF
         ExtDescriptor xd = mdb.getDrEmbedExtent();
         int hfsBlockSize = mdb.getDrAlBlkSiz();
         //System.out.println("old fsOffset: " + fsOffset);
-        long fsOffset = Util.unsign(mdb.getDrAlBlSt()) * 512 + Util.unsign(xd.getXdrStABN()) * hfsBlockSize; // Lovely method names...
+        long fsOffset = Util.unsign(mdb.getDrAlBlSt()) * 512 +
+                Util.unsign(xd.getXdrStABN()) * hfsBlockSize; // Lovely method names...
         long fsLength = Util.unsign(xd.getXdrNumABlks() * hfsBlockSize);
         //System.out.println("new fsOffset: " + fsOffset);
         // redetect with adjusted fsOffset
