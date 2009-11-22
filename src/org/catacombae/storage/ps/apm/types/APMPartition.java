@@ -103,29 +103,67 @@ public class APMPartition implements Partition {
     public long getLength() { return Util.unsign(getPmDataCnt())*blockSize; }
     public PartitionType getType() { return convertPartitionType(getPmParType()); }
     
+    /** partition signature */
     public short getPmSig()        { return Util.readShortBE(pmSig); }
+    /** reserved */
     public short getPmSigPad()     { return Util.readShortBE(pmSigPad); }
+    /** number of blocks in partition map */
     public int getPmMapBlkCnt()    { return Util.readIntBE(pmMapBlkCnt); }
+    /** first physical block of partition */
     public int getPmPyPartStart()  { return Util.readIntBE(pmPyPartStart); }
+    /** number of blocks in partition */
     public int getPmPartBlkCnt()   { return Util.readIntBE(pmPartBlkCnt); }
+    /** partition name */
     public byte[] getPmPartName()  { return Util.createCopy(pmPartName); }
+    /** partition type */
     public byte[] getPmParType()   { return Util.createCopy(pmParType); }
+    /** first logical block of data area */
     public int getPmLgDataStart()  { return Util.readIntBE(pmLgDataStart); }
+    /** number of blocks in data area */
     public int getPmDataCnt()      { return Util.readIntBE(pmDataCnt); }
+    /** partition status information */
     public int getPmPartStatus()   { return Util.readIntBE(pmPartStatus); }
+    /** first logical block of boot code */
     public int getPmLgBootStart()  { return Util.readIntBE(pmLgBootStart); }
+    /** size of boot code, in bytes */
     public int getPmBootSize()     { return Util.readIntBE(pmBootSize); }
+    /** boot code load address */
     public int getPmBootAddr()     { return Util.readIntBE(pmBootAddr); }
+    /** reserved */
     public int getPmBootAddr2()    { return Util.readIntBE(pmBootAddr2); }
+    /** boot code entry point */
     public int getPmBootEntry()    { return Util.readIntBE(pmBootEntry); }
+    /** reserved */
     public int getPmBootEntry2()   { return Util.readIntBE(pmBootEntry2); }
+    /** boot code checksum */
     public int getPmBootCksum()    { return Util.readIntBE(pmBootCksum); }
+    /** processor type */
     public byte[] getPmProcessor() { return Util.createCopy(pmProcessor); }
+    /** reserved */
     public short[] getPmPad()      { return Util.readShortArrayBE(pmPad); }
     
+    /**
+     * Returns the partition signature as a String. (Should always be "PM".)
+     * @return the partition signature as a String.
+     */
     public String getPmSigAsString() { return Util.toASCIIString(pmSig); }
+
+    /**
+     * Returns the partition name as a String.
+     * @return the partition name as a String.
+     */
     public String getPmPartNameAsString() { return Util.readNullTerminatedASCIIString(pmPartName); }
+
+    /**
+     * Returns the partition type as a String.
+     * @return the partition type as a String.
+     */
     public String getPmParTypeAsString() { return Util.readNullTerminatedASCIIString(pmParType); }
+
+    /**
+     * Returns the processor type as a String.
+     * @return the processor type as a String.
+     */
     public String getPmProcessorAsString() { return Util.readNullTerminatedASCIIString(pmProcessor); }
     public byte[] getPmPadRaw()      { return Util.createCopy(pmPad); }
     
