@@ -72,6 +72,13 @@ public abstract class CommonHFSVolumeHeader implements StructElements {
     public static CommonHFSVolumeHeader create(MasterDirectoryBlock hdr) {
         return new HFSImplementation(hdr);
     }
+
+    /**
+     * Validates the data of this volume header.
+     * 
+     * @return whether or not this volume header has valid data.
+     */
+    public abstract boolean isValid();
     
     public static class HFSPlusImplementation extends CommonHFSVolumeHeader {
         private final HFSPlusVolumeHeader hdr;
@@ -172,6 +179,11 @@ public abstract class CommonHFSVolumeHeader implements StructElements {
             // In HFS+, the entire volume is mapped by allocation blocks.
             return getTotalBlocks()*getAllocationBlockSize();
         }
+
+        @Override
+        public boolean isValid() {
+            return hdr.isValid();
+        }
     }
     
     public static class HFSImplementation extends CommonHFSVolumeHeader {
@@ -252,6 +264,11 @@ public abstract class CommonHFSVolumeHeader implements StructElements {
         public long getFileSystemEnd() {
             // In HFS, only the "data" part of the volume is mapped by allocation blocks.
             return getAllocationBlockStart()*512 + getTotalBlocks()*getAllocationBlockSize() + 2*512;
+        }
+
+        @Override
+        public boolean isValid() {
+            return hdr.isValid();
         }
     }
 }
