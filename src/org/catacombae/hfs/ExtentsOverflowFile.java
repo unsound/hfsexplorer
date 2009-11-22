@@ -68,7 +68,7 @@ public class ExtentsOverflowFile extends BTreeFile {
             return new ForkFilter(header.getExtentsOverflowFile(),
                     header.getExtentsOverflowFile().getBasicExtents(),
                     new ReadableRandomAccessSubstream(vol.hfsFile),
-                    vol.fsOffset,
+                    0,
                     header.getAllocationBlockSize(),
                     header.getAllocationBlockStart()*vol.physicalBlockSize);
         }

@@ -62,10 +62,10 @@ public class HFSOriginalVolume extends HFSVolume {
     private final HFSOriginalAllocationFile allocationFile;
     private final MutableStringCodec<CharsetStringCodec> stringCodec;
 
-    public HFSOriginalVolume(ReadableRandomAccessStream hfsFile, long fsOffset,
+    public HFSOriginalVolume(ReadableRandomAccessStream hfsFile,
             boolean cachingEnabled, String encodingName) {
         
-        super(hfsFile, fsOffset, cachingEnabled, new HFSBTreeOperations(),
+        super(hfsFile, cachingEnabled, new HFSBTreeOperations(),
                 new HFSCatalogOperations(), new HFSExtentsOverflowOperations());
 
         this.stringCodec = new MutableStringCodec<CharsetStringCodec>(
@@ -76,7 +76,7 @@ public class HFSOriginalVolume extends HFSVolume {
     
     public MasterDirectoryBlock getHFSMasterDirectoryBlock() {
         byte[] currentBlock = new byte[512];
-        hfsFile.readFrom(fsOffset + 1024, currentBlock);
+        hfsFile.readFrom(1024, currentBlock);
         return new MasterDirectoryBlock(currentBlock, 0);
     }
 
@@ -93,7 +93,7 @@ public class HFSOriginalVolume extends HFSVolume {
 
         ReadableConcatenatedStream volumeBitmapStream =
                 new ReadableConcatenatedStream(new ReadableRandomAccessSubstream(hfsFile),
-                fsOffset + 512*Util.unsign(mdb.getDrVBMSt()),
+                512*Util.unsign(mdb.getDrVBMSt()),
                 volumeBitmapSize);
 
         return new HFSOriginalAllocationFile(this, volumeBitmapStream);

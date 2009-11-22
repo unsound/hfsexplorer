@@ -30,7 +30,7 @@ public class HFSPlusFileSystemHandler extends HFSCommonFileSystemHandler {
     public HFSPlusFileSystemHandler(DataLocator fsLocator, boolean useCaching,
             boolean doUnicodeFileNameComposition, boolean hideProtected) {
 
-        super(new HFSPlusVolume(fsLocator.createReadOnlyFile(), 0,
+        super(new HFSPlusVolume(fsLocator.createReadOnlyFile(),
                     useCaching), doUnicodeFileNameComposition, hideProtected);
     }
 }

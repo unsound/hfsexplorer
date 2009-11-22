@@ -67,16 +67,16 @@ public class HFSPlusVolume extends HFSVolume {
     private final HFSPlusAllocationFile allocationFile;
     private final HFSPlusJournal journal;
 
-    public HFSPlusVolume(ReadableRandomAccessStream hfsFile, long fsOffset,
+    public HFSPlusVolume(ReadableRandomAccessStream hfsFile,
             boolean cachingEnabled) {
 
-        this(hfsFile, fsOffset, cachingEnabled, new HFSPlusCatalogOperations());
+        this(hfsFile, cachingEnabled, new HFSPlusCatalogOperations());
     }
 
-    protected HFSPlusVolume(ReadableRandomAccessStream hfsFile, long fsOffset,
+    protected HFSPlusVolume(ReadableRandomAccessStream hfsFile,
             boolean cachingEnabled, CatalogOperations catalogOperations) {
 
-        super(hfsFile, fsOffset, cachingEnabled, new HFSPlusBTreeOperations(),
+        super(hfsFile, cachingEnabled, new HFSPlusBTreeOperations(),
                 catalogOperations,
                 new HFSPlusExtentsOverflowOperations());
 
@@ -94,7 +94,7 @@ public class HFSPlusVolume extends HFSVolume {
         //System.err.println("  hfsFile.seek(" + (fsOffset + 1024) + ")");
         //System.err.println("  hfsFile.read(byte[" + currentBlock.length +
         //        "])");
-	hfsFile.readFrom(fsOffset + 1024, currentBlock);
+	hfsFile.readFrom(1024, currentBlock);
         return new HFSPlusVolumeHeader(currentBlock);
     }
 
@@ -118,7 +118,7 @@ public class HFSPlusVolume extends HFSVolume {
 
         ForkFilter allocationFileStream = new ForkFilter(allocationFileFork,
                 extDescriptors, new ReadableRandomAccessSubstream(hfsFile),
-                fsOffset, Util.unsign(vh.getBlockSize()), 0);
+                0, Util.unsign(vh.getBlockSize()), 0);
 
         return new HFSPlusAllocationFile(this, allocationFileStream);
     }

@@ -33,7 +33,7 @@ public class HFSXFileSystemHandler extends HFSCommonFileSystemHandler {
     
     public HFSXFileSystemHandler(DataLocator fsLocator, boolean useCaching, 
             boolean doUnicodeFileNameComposition, boolean hideProtected) {
-        super(new HFSXVolume(fsLocator.createReadOnlyFile(), 0, useCaching),
+        super(new HFSXVolume(fsLocator.createReadOnlyFile(), useCaching),
                 doUnicodeFileNameComposition, hideProtected);
     }
 }
