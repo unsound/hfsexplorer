@@ -181,6 +181,14 @@ public abstract class HFSVolume {
         }
 
         fsStream.close();
+
+        // Check the volume header for validity.
+        CommonHFSVolumeHeader vh = getVolumeHeader();
+        if(!vh.isValid()) {
+            System.err.println("Detected invalid volume header:");
+            vh.print(System.err, "  ");
+            throw new Exception("Invalid volume header!");
+        }
     }
 
     /**
