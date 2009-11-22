@@ -17,12 +17,13 @@
 
 package org.catacombae.storage.ps.mbr.types;
 import org.catacombae.storage.ps.legacy.PartitionSystem;
-import org.catacombae.storage.ps.legacy.Partition;
+import org.catacombae.storage.ps.Partition;
 import org.catacombae.storage.ps.ebr.types.DOSExtendedPartitionSystem;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.ReadableByteArrayStream;
 import java.io.PrintStream;
 import java.util.LinkedList;
+import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.storage.ps.mbr.MBRPartitionType;
 
 /**
@@ -32,7 +33,7 @@ import org.catacombae.storage.ps.mbr.MBRPartitionType;
  * 
  * @author Erik
  */
-public class MBRPartitionTable implements PartitionSystem {
+public class MBRPartitionTable implements PartitionSystem, PrintableStruct {
     /* Until I figure out a way to detect sector size, it will be 512... */
     public static final int DEFAULT_SECTOR_SIZE = 512;
     

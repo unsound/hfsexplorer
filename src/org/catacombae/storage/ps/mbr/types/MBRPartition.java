@@ -16,7 +16,7 @@
  */
 
 package org.catacombae.storage.ps.mbr.types;
-import org.catacombae.storage.ps.legacy.Partition;
+import org.catacombae.storage.ps.Partition;
 import org.catacombae.util.Util;
 import java.io.PrintStream;
 import java.util.Hashtable;

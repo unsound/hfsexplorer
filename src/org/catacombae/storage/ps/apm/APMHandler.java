@@ -46,55 +46,13 @@ public class APMHandler extends PartitionSystemHandler {
     @Override
     public Partition[] getPartitions() {
         ApplePartitionMap apm = readPartitionMap();
-        Partition[] result = new Partition[apm.getUsedPartitionCount()];
-        org.catacombae.storage.ps.legacy.Partition[] apmParts =
-                apm.getUsedPartitionEntries();
-        for(int i = 0; i < result.length; ++i) {
-            org.catacombae.storage.ps.legacy.Partition p = apmParts[i];
-            if(p instanceof org.catacombae.storage.ps.apm.types.APMPartition) {
-                org.catacombae.storage.ps.apm.types.APMPartition ap =
-                        (org.catacombae.storage.ps.apm.types.APMPartition)p;
-                
-                result[i] = new APMPartition(p.getStartOffset(),
-                        p.getLength(), p.getType(), ap.getPmPartNameAsString());
-            }
-        }
-        return result;
+        return apm.getUsedPartitionEntries();
     }
 
     @Override
     public void close() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-
-    /*
-    private APMPartitionType convertType(org.catacombae.hfsexplorer.partitioning.Partition.PartitionType type) {
-        switch(type) {
-            case APPLE_APM:
-                return APMPartitionType.APPLE_PARTITION_MAP;
-            case APPLE_DRIVER:
-                return APMPartitionType.APPLE_DRIVER;
-            case APPLE_DRIVER43:
-                return APMPartitionType.APPLE_DRIVER43;
-            case APPLE_MFS:
-                return APMPartitionType.APPLE_MFS;
-            case APPLE_HFS:
-                return APMPartitionType.APPLE_HFS;
-            case APPLE_HFSX:
-                return APMPartitionType.APPLE_HFSX;
-            case APPLE_UNIX_SVR2:
-                return APMPartitionType.APPLE_UNIX_SVR2;
-            case APPLE_PRODOS:
-                return APMPartitionType.APPLE_PRODOS;
-            case APPLE_SCRATCH:
-                return APMPartitionType.APPLE_SCRATCH;
-            case APPLE_FREE:
-                return APMPartitionType.APPLE_FREE;
-            default:
-                return null;
-        }
-    }
-    */
 
     public DriverDescriptorRecord readDriverDescriptorRecord() {
         ReadableRandomAccessStream llf = null;

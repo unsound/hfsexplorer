@@ -17,8 +17,7 @@
 
 package org.catacombae.storage.ps.gpt.types;
 
-import org.catacombae.storage.ps.legacy.PartitionSystem;
-import org.catacombae.storage.ps.legacy.Partition;
+import org.catacombae.storage.ps.Partition;
 import org.catacombae.io.ReadableRandomAccessStream;
 import java.io.PrintStream;
 import java.util.LinkedList;
@@ -26,6 +25,7 @@ import java.util.zip.CRC32;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.ArrayBuilder;
 import org.catacombae.csjc.structelements.Dictionary;
+import org.catacombae.storage.ps.legacy.PartitionSystem;
 import org.catacombae.util.Util;
 
 /**

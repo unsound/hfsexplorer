@@ -17,7 +17,7 @@
 
 package org.catacombae.storage.ps.ebr.types;
 
-import org.catacombae.storage.ps.legacy.Partition;
+import org.catacombae.storage.ps.Partition;
 import org.catacombae.storage.ps.legacy.PartitionSystem;
 import org.catacombae.storage.ps.ebr.ExtendedBootRecord;
 import java.io.PrintStream;

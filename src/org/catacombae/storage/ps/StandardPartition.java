@@ -20,10 +20,12 @@ package org.catacombae.storage.ps;
 import java.io.PrintStream;
 
 /**
+ * A basic implementation of the Partition interface, which just takes the
+ * variables as parameters.
  *
- * @author erik
+ * @author Erik Larsson
  */
-public class StandardPartition extends Partition {
+public class StandardPartition implements Partition {
     private final long startOffset;
     private final long length;
     private final PartitionType type;
@@ -32,7 +34,6 @@ public class StandardPartition extends Partition {
         this.startOffset = startOffset;
         this.length = length;
         this.type = type;
-               
     }
     
     @Override
@@ -52,12 +53,15 @@ public class StandardPartition extends Partition {
 
     @Override
     public void printFields(PrintStream ps, String prefix) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        ps.println(prefix + "startOffset: " + startOffset);
+        ps.println(prefix + "length: " + length);
+        ps.println(prefix + "type: " + type);
     }
 
     @Override
     public void print(PrintStream ps, String prefix) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        ps.println(prefix + getClass().getSimpleName());
+        printFields(ps, prefix + " ");
     }
 
 }
