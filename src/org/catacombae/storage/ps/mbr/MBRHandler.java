@@ -60,7 +60,7 @@ public class MBRHandler extends PartitionSystemHandler {
         
     }
 
-    private MBRPartitionTable readPartitionTable() {
+    public MBRPartitionTable readPartitionTable() {
         ReadableRandomAccessStream llf = null;
         try {
             llf = partitionData.createReadOnlyFile();

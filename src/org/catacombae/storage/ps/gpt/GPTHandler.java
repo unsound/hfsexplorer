@@ -61,7 +61,7 @@ public class GPTHandler extends PartitionSystemHandler {
         
     }
 
-    private GUIDPartitionTable readPartitionTable() {
+    public GUIDPartitionTable readPartitionTable() {
         ReadableRandomAccessStream llf = null;
         try {
             llf = partitionData.createReadOnlyFile();

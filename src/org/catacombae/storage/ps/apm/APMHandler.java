@@ -96,21 +96,35 @@ public class APMHandler extends PartitionSystemHandler {
     }
     */
 
-    private ApplePartitionMap readPartitionMap() {
+    public DriverDescriptorRecord readDriverDescriptorRecord() {
         ReadableRandomAccessStream llf = null;
         try {
             llf = partitionData.createReadOnlyFile();
             byte[] firstBlock = new byte[512];
-            
+
             llf.readFully(firstBlock);
+
+            DriverDescriptorRecord ddr = new DriverDescriptorRecord(firstBlock, 0);
+            return ddr;
+        } finally {
+            if(llf != null)
+                llf.close();
+        }
+    }
+
+    public ApplePartitionMap readPartitionMap() {
+        ReadableRandomAccessStream llf = null;
+        try {
+            llf = partitionData.createReadOnlyFile();
             
             // Look for APM
-            DriverDescriptorRecord ddr = new DriverDescriptorRecord(firstBlock, 0);
+            DriverDescriptorRecord ddr = readDriverDescriptorRecord();
             if(ddr.isValid()) {
                 int blockSize = Util.unsign(ddr.getSbBlkSize());
                 //long numberOfBlocksOnDevice = Util.unsign(ddr.getSbBlkCount());
                 //bitStream.seek(blockSize*1); // second block, first partition in list
-                ApplePartitionMap apm = new ApplePartitionMap(llf, blockSize * 1, blockSize);
+                ApplePartitionMap apm = new ApplePartitionMap(llf,
+                        blockSize * 1, blockSize);
                 if(apm.getPartitionCount() > 0)
                     return apm;
                 else
