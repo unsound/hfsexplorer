@@ -35,7 +35,6 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSExtentDescriptor;
 import org.catacombae.hfs.types.hfscommon.CommonHFSExtentKey;
 import org.catacombae.hfs.types.hfscommon.CommonHFSForkData;
 import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
-import org.catacombae.io.ReadableConcatenatedStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 
 /**
@@ -71,7 +70,6 @@ public abstract class HFSVolume {
     private volatile SynchronizedReadableRandomAccessStream hfsStream;
     //private final SynchronizedReadableRandomAccessStream backingFile;
     private final ReadableRandomAccessStream sourceStream;
-    protected final long fsOffset;
     protected final int physicalBlockSize;
 
     // Variables for reading cached files.
@@ -81,7 +79,7 @@ public abstract class HFSVolume {
     protected final ExtentsOverflowFile extentsOverflowFile;
 
     protected HFSVolume(ReadableRandomAccessStream hfsFile,
-            long fsOffset, boolean cachingEnabled,
+            boolean cachingEnabled,
             BTreeOperations btreeOperations,
             CatalogOperations catalogOperations,
             ExtentsOverflowOperations extentsOverflowOperations) {
@@ -90,7 +88,6 @@ public abstract class HFSVolume {
         this.hfsStream =
                 new SynchronizedReadableRandomAccessStream(sourceStream);
         this.hfsFile = hfsStream;
-        this.fsOffset = fsOffset;
 
         /* This seems to be a built in assumption of HFSish file systems, even
          * when using media with other physical block sizes (for instance CDs,
@@ -198,8 +195,9 @@ public abstract class HFSVolume {
         ReadableRandomAccessSubstream subs =
                 new ReadableRandomAccessSubstream(hfsFile);
 
-        long fsLength = getVolumeHeader().getFileSystemEnd();
-        return new ReadableConcatenatedStream(subs, fsOffset, fsLength);
+        return subs;
+        //long fsLength = getVolumeHeader().getFileSystemEnd();
+        //return new ReadableConcatenatedStream(subs, fsOffset, fsLength);
     }
 
     public abstract CommonHFSVolumeHeader getVolumeHeader();
@@ -344,7 +342,7 @@ public abstract class HFSVolume {
             ProgressMonitor pm) throws IOException {
         CommonHFSVolumeHeader header = getVolumeHeader();
         ForkFilter forkFilter = new ForkFilter(forkData, extentDescriptors,
-                new ReadableRandomAccessSubstream(hfsFile), fsOffset,
+                new ReadableRandomAccessSubstream(hfsFile), 0,
                 header.getAllocationBlockSize(),
                 header.getAllocationBlockStart() * physicalBlockSize);
         long bytesToRead = forkData.getLogicalSize();
@@ -413,7 +411,7 @@ public abstract class HFSVolume {
             CommonHFSExtentDescriptor[] extentDescriptors) {
         CommonHFSVolumeHeader header = getVolumeHeader();
         return new ForkFilter(forkData, extentDescriptors, new ReadableRandomAccessSubstream(hfsFile),
-                fsOffset + fileReadOffset,
+                fileReadOffset,
                 header.getAllocationBlockSize(),
                 header.getAllocationBlockStart() * physicalBlockSize);
     }

@@ -67,7 +67,7 @@ public class AttributesFile extends BTreeFile {
                 header.getCatalogFile(),
                 allExtents,
                 new ReadableRandomAccessSubstream(view.hfsFile),
-                view.fsOffset,
+                0,
                 header.getAllocationBlockSize(),
                 header.getAllocationBlockStart() * view.physicalBlockSize);
     }

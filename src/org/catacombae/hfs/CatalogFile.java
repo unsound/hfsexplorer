@@ -78,7 +78,7 @@ public class CatalogFile extends BTreeFile {
             return new ForkFilter(header.getCatalogFile(),
                     allCatalogFileDescriptors,
                     new ReadableRandomAccessSubstream(vol.hfsFile),
-                    vol.fsOffset,
+                    0,
                     header.getAllocationBlockSize(),
                     header.getAllocationBlockStart()*vol.physicalBlockSize);
         }
@@ -375,7 +375,7 @@ public class CatalogFile extends BTreeFile {
 	CatalogFileSession init = openSession();
 	final ReadableRandomAccessStream catalogFile = init.catalogFile;
 	return collectFilesInDir(folderID, init.bthr.getRootNodeNumber(),
-            new ReadableRandomAccessSubstream(vol.hfsFile), vol.fsOffset,
+            new ReadableRandomAccessSubstream(vol.hfsFile), 0,
             init.header, init.bthr, catalogFile);
     }
 

@@ -37,10 +37,10 @@ import org.catacombae.hfs.plus.HFSPlusVolume;
  * @author erik
  */
 public class HFSXVolume extends HFSPlusVolume {
-    public HFSXVolume(ReadableRandomAccessStream hfsFile, long fsOffset,
+    public HFSXVolume(ReadableRandomAccessStream hfsFile,
             boolean cachingEnabled) {
 
-        super(hfsFile, fsOffset, cachingEnabled, new HFSXCatalogOperations());
+        super(hfsFile, cachingEnabled, new HFSXCatalogOperations());
     }
 
     private static class HFSXCatalogOperations implements CatalogOperations {

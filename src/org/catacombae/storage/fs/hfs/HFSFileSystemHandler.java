@@ -30,7 +30,7 @@ public class HFSFileSystemHandler extends HFSCommonFileSystemHandler {
     public HFSFileSystemHandler(DataLocator fsLocator, boolean useCaching,
             String encodingName) {
 
-        super(new HFSOriginalVolume(fsLocator.createReadOnlyFile(), 0,
+        super(new HFSOriginalVolume(fsLocator.createReadOnlyFile(),
                 useCaching, encodingName), false, false);
     }
 }
