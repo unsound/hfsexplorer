@@ -1652,64 +1652,72 @@ public class FileSystemBrowserWindow extends JFrame {
         extract(parentPath, recs, outDir, progressDialog, errorMessages, followSymbolicLinks,
                 forkTypes.toArray(new FSForkType[forkTypes.size()]));
     }
-    
-    protected void extract(String[] parentPath, List<FSEntry> recs, File outDir,
-            ExtractProgressMonitor progressDialog, LinkedList<String> errorMessages,
-            boolean followSymbolicLinks, FSForkType... forkTypes) {
+
+    /**
+     * Utility method that checks for the existence of a file. This method tries
+     * to overcome some limitations of Java. For instance, the File.exists()
+     * method trims spaces in filenames automatically in Windows, which is
+     * undesirable.
+     */
+    private static boolean deepExists(File f) {
+        if(!f.exists())
+            return false; // We trust that Java never returns false negatives.
         
-        if(!outDir.exists()) {
+        File parentDir = f.getParentFile();
+        for(File child : parentDir.listFiles()) {
+            if(child.getName().equals(f.getName()))
+                return true;
+        }
+
+        return false;
+    }
+
+    protected void extract(String[] parentPath, List<FSEntry> recs, File outDir,
+            ExtractProgressMonitor progressDialog,
+            LinkedList<String> errorMessages, boolean followSymbolicLinks,
+            FSForkType... forkTypes) {
+
+        if(!deepExists(outDir)) {
             String[] options = new String[]{"Create directory", "Cancel"};
-            int reply = JOptionPane.showOptionDialog(this, "Warning! Target directory:\n" +
-                    "    \"" + outDir.getAbsolutePath() + "\"\n" +
+            int reply = JOptionPane.showOptionDialog(this, "Warning! Target " +
+                    "directory:\n    \"" + outDir.getAbsolutePath() + "\"\n" +
                     "does not exist. Do you want to create this directory?",
                     "Warning", JOptionPane.YES_NO_CANCEL_OPTION,
                     JOptionPane.WARNING_MESSAGE, null, options, options[0]);
             if(reply != 0) {
                 //++errorCount;
-                errorMessages.addLast("Skipping all files in " + outDir.getAbsolutePath() +
-                        " as user chose not to create directory.");
+                errorMessages.addLast("Skipping all files in " +
+                        outDir.getAbsolutePath() + " as user chose not to " +
+                        "create directory.");
                 progressDialog.signalCancel();
                 return;
             }
             else {
-                if(!outDir.mkdirs()) {
-                    JOptionPane.showMessageDialog(this, "Could not create directory:\n    \"" +
-                            outDir.getAbsolutePath() + "\"\n",
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                    errorMessages.addLast("Could not create directory \"" + outDir.getAbsolutePath() +
-                            "\".");
+                if(!outDir.mkdirs() || !deepExists(outDir)) {
+                    JOptionPane.showMessageDialog(this, "Could not create " +
+                            "directory:\n    \"" + outDir.getAbsolutePath() +
+                            "\"\n", "Error", JOptionPane.ERROR_MESSAGE);
+                    errorMessages.addLast("Could not create directory \"" +
+                            outDir.getAbsolutePath() + "\".");
                     progressDialog.signalCancel();
                     return;
                 }
             }
         }
-        
-        /*
-        LinkedList<FSForkType> forkTypes = new LinkedList<FSForkType>();
-        if(dataFork)
-            forkTypes.addLast(FSForkType.DATA);
-        if(resourceFork)
-            forkTypes.addLast(FSForkType.MACOS_RESOURCE);
-         * */
-        
-        ExtractVisitor ev = new ExtractVisitor(progressDialog, errorMessages, outDir, forkTypes);
-        traverseTree(parentPath, recs, ev, followSymbolicLinks);
-        
-        /*
-        LinkedList<String> pathStack = new LinkedList<String>();
-        if(parentPath != null) {
-            for(String pathComponent : parentPath)
-                pathStack.addLast(pathComponent);
+        else if(!outDir.isDirectory()) {
+            JOptionPane.showMessageDialog(this, "Target directory is a file:" +
+                    "\n    \"" + outDir.getAbsolutePath() + "\"",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            errorMessages.addLast("Could not create directory \"" +
+                    outDir.getAbsolutePath() + "\", since a file was in the " +
+                    "way.");
+            progressDialog.signalCancel();
+            return;
         }
 
-        if(errorMessages == null) // The user can opt out of recieving error messages, but they must still be recorded.
-            errorMessages = new LinkedList<String>();
-        LinkedList<String[]> absPathStack = new LinkedList<String[]>();
-        for(FSEntry rec : recs) {
-            extractRecursive(rec, pathStack, absPathStack, outDir, progressDialog,
-                    errorMessages, new ObjectContainer<Boolean>(false), dataFork, resourceFork);
-        }
-        */
+        ExtractVisitor ev = new ExtractVisitor(progressDialog, errorMessages,
+                outDir, forkTypes);
+        traverseTree(parentPath, recs, ev, followSymbolicLinks);
     }
 
     /*
@@ -1874,6 +1882,8 @@ public class FileSystemBrowserWindow extends JFrame {
             final File outFile = new File(outDir, curFileName);
             //progressDialog.updateTotalProgress(fractionLowLimit);
 
+            /* Note: We may want to use deepExists here like in the directory
+             * case, but it's less urgent here so I'll pass for now. */
             if(defaultFileExistsAction != FileExistsAction.OVERWRITE && outFile.exists()) {
                 FileExistsAction a;
                 if(defaultFileExistsAction == FileExistsAction.PROMPT_USER)
@@ -2220,7 +2230,7 @@ public class FileSystemBrowserWindow extends JFrame {
                 pm.updateCurrentDir(curDirName);
                 File thisDir = new File(outDir, curDirName);
                 
-                if(defaultDirectoryExistsAction != DirectoryExistsAction.CONTINUE && thisDir.exists()) {
+                if(defaultDirectoryExistsAction != DirectoryExistsAction.CONTINUE && deepExists(thisDir)) {
                     DirectoryExistsAction a;
                     if(defaultDirectoryExistsAction == DirectoryExistsAction.PROMPT_USER)
                         a = pm.directoryExists(thisDir);
@@ -2260,7 +2270,7 @@ public class FileSystemBrowserWindow extends JFrame {
                 /* If the directory already exists, then fine. If not, we create
                  * it and double check that it exists afterwards (to avoid
                  * unexpected side effects, like in Windows). */
-                if(thisDir.exists() || (thisDir.mkdir() && thisDir.exists())) {
+                if(deepExists(thisDir) || (thisDir.mkdir() && deepExists(thisDir))) {
                     if(curDirName != (Object)originalDirName && !curDirName.equals(originalDirName))
                         errorMessages.addLast("Directory \"" + originalDirName +
                                 "\" was renamed to \"" + curDirName + "\" in parent folder \"" +
