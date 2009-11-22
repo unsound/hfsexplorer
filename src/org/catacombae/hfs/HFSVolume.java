@@ -84,6 +84,9 @@ public abstract class HFSVolume {
             CatalogOperations catalogOperations,
             ExtentsOverflowOperations extentsOverflowOperations) {
 
+        //System.err.println("HFSVolume(" + hfsFile + ", " +
+        //        cachingEnabled + ", " + btreeOperations + ", " +
+        //        catalogOperations + ", " + extentsOverflowOperations + ");");
         this.sourceStream = hfsFile;
         this.hfsStream =
                 new SynchronizedReadableRandomAccessStream(sourceStream);

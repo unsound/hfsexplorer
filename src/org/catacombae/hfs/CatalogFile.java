@@ -17,8 +17,10 @@
 
 package org.catacombae.hfs;
 
+import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
+import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.hfs.io.ForkFilter;
 import org.catacombae.io.ReadableRandomAccessSubstream;
 import org.catacombae.hfs.types.hfscommon.CommonBTHeaderNode;
@@ -75,6 +77,8 @@ public class CatalogFile extends BTreeFile {
                     vol.extentsOverflowFile.getAllDataExtentDescriptors(
                     vol.getCommonHFSCatalogNodeID(ReservedID.CATALOG_FILE),
                     header.getCatalogFile());
+            //printStructArray(System.err, "    ", "allCatalogFileDescriptors",
+            //        allCatalogFileDescriptors);
             return new ForkFilter(header.getCatalogFile(),
                     allCatalogFileDescriptors,
                     new ReadableRandomAccessSubstream(vol.hfsFile),
@@ -489,5 +493,13 @@ public class CatalogFile extends BTreeFile {
     protected CommonHFSCatalogLeafRecord newCatalogLeafRecord(byte[] data,
             int offset, CommonBTHeaderRecord bthr) {
         return ops.newCatalogLeafRecord(data, offset, bthr);
+    }
+
+    private static void printStructArray(PrintStream ps, String prefix,
+            String variableName, PrintableStruct[] structs) {
+        for(int i = 0; i < structs.length; ++i) {
+            ps.println(prefix + variableName + "[" + i + "]:");
+            structs[i].print(ps, prefix + " ");
+        }
     }
 }

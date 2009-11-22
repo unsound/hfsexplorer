@@ -53,14 +53,11 @@ public abstract class BTreeFile {
             this.btreeStream = getBTreeStream(header);
 
             this.btreeStream.seek(0);
-            //byte[] nodeDescriptorData = new byte[14];
-            //if(forkFilterFile.read(nodeDescriptorData) != nodeDescriptorData.length)
-            //	System.out.println("ERROR: Did not read nodeDescriptor completely.");
+
             this.btnd = readNodeDescriptor(this.btreeStream);
+            //this.btnd.print(System.err, "    ");
             this.bthr = readHeaderRecord(this.btreeStream);
-            //byte[] headerRec = new byte[BTHeaderRec.length()];
-            //forkFilterFile.readFully(headerRec);
-            //this.bthr = new BTHeaderRec(headerRec, 0);
+            //this.bthr.print(System.err, "    ");
         }
 
         protected abstract ReadableRandomAccessStream getBTreeStream(
