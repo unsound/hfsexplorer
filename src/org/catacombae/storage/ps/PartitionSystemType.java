@@ -35,32 +35,35 @@ import org.catacombae.storage.ps.ebr.EBRHandlerFactory;
  */
 public enum PartitionSystemType {
     /** The PC legacy Master Boot Record partition system. */
-    MBR(true, MBRHandlerFactory.class),
+    MBR(true, MBRHandlerFactory.class, "Master Boot Record"),
 
     /** The GUID Partition Table partition system. */
-    GPT(true, GPTHandlerFactory.class),
+    GPT(true, GPTHandlerFactory.class, "GUID Partition Table"),
 
     /** The Apple Partition Map partition system. */
-    APM(true, APMHandlerFactory.class),
+    APM(true, APMHandlerFactory.class, "Apple Partition Map"),
 
     /**
      * The DOS Extended partition system, designed to work around the
      * 4 partition limit of the PC Master Boot Record partition scheme.
      */
-    DOS_EXTENDED(false, EBRHandlerFactory.class);
+    DOS_EXTENDED(false, EBRHandlerFactory.class, "DOS Extended");
     
     private final boolean isTopLevelCapable;
+    private final String longName;
     
     private LinkedList<Class<? extends PartitionSystemHandlerFactory>> factoryClasses =
             new LinkedList<Class<? extends PartitionSystemHandlerFactory>>();
     
-    private PartitionSystemType(boolean pIsTopLevelCapable) {
+    private PartitionSystemType(boolean pIsTopLevelCapable, String longName) {
         this.isTopLevelCapable = pIsTopLevelCapable;
+        this.longName = longName;
     }
     
     private PartitionSystemType(boolean pIsTopLevelCapable, 
-            Class<? extends PartitionSystemHandlerFactory> pDefaultFactoryClass) {
-        this(pIsTopLevelCapable);
+            Class<? extends PartitionSystemHandlerFactory> pDefaultFactoryClass,
+            String longName) {
+        this(pIsTopLevelCapable, longName);
         
         
         this.factoryClasses.addLast(pDefaultFactoryClass);
@@ -78,6 +81,16 @@ public enum PartitionSystemType {
      */
     public boolean isTopLevelCapable() {
         return isTopLevelCapable;
+    }
+
+    /**
+     * Returns the name of this partition system type, in long form. For
+     * instance "Apple Partition Map", "GUID Partition Table", etc.
+     * 
+     * @return the name of this partition system type, in long form.
+     */
+    public String getLongName() {
+        return longName;
     }
 
     /**
