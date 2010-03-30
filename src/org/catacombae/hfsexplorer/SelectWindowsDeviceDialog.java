@@ -163,51 +163,68 @@ public class SelectWindowsDeviceDialog extends JDialog {
      * @return a list of the names of the detected devices
      */
     protected String[] detectDevices() {
-	//int numDevices = 0;
-	LinkedList<String> activeDeviceNames = new LinkedList<String>();
-	/*
-	 * Since I've been too lazy to figure out how to implement
-	 * a native method for reading the contents of the device
-	 * tree, I'll just make up names for 20 harddrives, with
-	 * 20 partitions in each and check for existence.
-	 * You have more than 20 harddrives? You're out of luck. ;)
-	 */
-	// 20 hard drives minimum...
-	for(int i = 0; true; ++i) {
+        LinkedList<String> activeDeviceNames = new LinkedList<String>();
+
+        /*
+         * Since I've been too lazy to figure out how to implement
+         * a native method for reading the contents of the device
+         * tree, I'll just make up names for at least 20 harddrives,
+         * with at least 20 partitions in each and check for
+         * existence.
+         */
+
+        // 20 hard drives minimum...
+        for(int i = 0; true; ++i) {
             boolean anyFound = false;
-	    // 20 partitions each minimum...
-	    for(int j = 0; true; ++j) {
-		try {
-		    /* Should I add Partition0 to the list? It really means
-		     * "the whole drive". Partition1 is the first partition... */
-		    String currentDevice = "Harddisk"+i+"\\Partition"+j;
-		    ReadableWin32FileStream curFile = new ReadableWin32FileStream(DEVICE_PREFIX + currentDevice);
-		    curFile.close();
-		    activeDeviceNames.addLast(currentDevice);
+            // 20 partitions each minimum...
+            for(int j = 0; true; ++j) {
+                try {
+                    /* Should I add Partition0 to the list? It really means
+                     * "the whole drive". Partition1 is the first partition... */
+                    String currentDevice = "Harddisk" + i + "\\Partition" + j;
+                    ReadableWin32FileStream curFile = new ReadableWin32FileStream(DEVICE_PREFIX + currentDevice);
+                    curFile.close();
+                    activeDeviceNames.addLast(currentDevice);
                     anyFound = true;
-		} catch(Exception e) {
+                } catch(Exception e) {
                     if(j >= 20)
                         break;
                 }
-	    }
+            }
             if(!anyFound && i >= 20)
                break;
-	}
+        }
 
-	// ...and 20 CD-ROMs minimum
-	for(int i = 0; true; ++i) {
-	    try {
-		String currentDevice = "CdRom"+i;
-		ReadableWin32FileStream curFile = new ReadableWin32FileStream(DEVICE_PREFIX + currentDevice);
-		curFile.close();
-		activeDeviceNames.addLast(currentDevice);
+        // ...and 20 CD-ROMs minimum
+        for(int i = 0; true; ++i) {
+            try {
+                String currentDevice = "CdRom" + i;
+                ReadableWin32FileStream curFile = new ReadableWin32FileStream(DEVICE_PREFIX + currentDevice);
+                curFile.close();
+                activeDeviceNames.addLast(currentDevice);
             }
             catch(Exception e) {
                 if(i >= 20) {
                     break;
                 }
             }
-	}
+        }
+
+        // Check for >=10 TrueCrypt volumes, using their special naming scheme.
+        for(int i = 0; true; ++i) {
+            try {
+                String currentDevice = "TrueCryptVolume" + i;
+                ReadableWin32FileStream curFile = new ReadableWin32FileStream(DEVICE_PREFIX + currentDevice);
+                curFile.close();
+                activeDeviceNames.addLast(currentDevice);
+            }
+            catch (Exception e) {
+                if(i >= 10) {
+                    break;
+                }
+            }
+        }
+
 	return activeDeviceNames.toArray(new String[activeDeviceNames.size()]);
     }
     protected void autodetectFilesystems() {
