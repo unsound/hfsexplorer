@@ -210,19 +210,15 @@ public class SelectWindowsDeviceDialog extends JDialog {
             }
         }
 
-        // Check for >=10 TrueCrypt volumes, using their special naming scheme.
-        for(int i = 0; true; ++i) {
+        // Check for TrueCrypt volumes 'A'-'Z', using their special naming scheme.
+        for(char c = 'A'; c <= 'Z'; ++c) {
             try {
-                String currentDevice = "TrueCryptVolume" + i;
+                String currentDevice = "TrueCryptVolume" + c;
                 ReadableWin32FileStream curFile = new ReadableWin32FileStream(DEVICE_PREFIX + currentDevice);
                 curFile.close();
                 activeDeviceNames.addLast(currentDevice);
             }
-            catch (Exception e) {
-                if(i >= 10) {
-                    break;
-                }
-            }
+            catch (Exception e) {}
         }
 
 	return activeDeviceNames.toArray(new String[activeDeviceNames.size()]);
@@ -303,7 +299,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
                     }
                 }
                 
-                if(!fileSystemFound && deviceName.endsWith("Partition0")) {
+                if(!fileSystemFound && (deviceName.endsWith("Partition0") || !deviceName.matches("Harddisk[0-9]+\\\\Partition[0-9]+"))) {
                     FileSystemType fsType = HFSCommonFileSystemRecognizer.
                             detectFileSystem(llf, 0);
 
