@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006-2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -49,7 +49,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
     private static final String DEVICE_PREFIX = "\\\\?\\GLOBALROOT\\Device\\";
 
     private SelectWindowsDevicePanel guiPanel;
-    
+
     // Shortcuts to variables in guiPanel
     private JButton autodetectButton;
     private JRadioButton selectDeviceButton;
@@ -61,98 +61,98 @@ public class SelectWindowsDeviceDialog extends JDialog {
 
     // Additional gui stuff
     private ButtonGroup selectSpecifyGroup;
-    
+
     private ReadableRandomAccessStream result = null;
     private String resultCreatePath = null;
     private String[] detectedDeviceNames;
-    
+
     public SelectWindowsDeviceDialog(Frame owner, boolean modal, String title) {
-	super(owner, modal);
-	setTitle(title);
-	
-	this.guiPanel = new SelectWindowsDevicePanel();
-	this.autodetectButton = guiPanel.autodetectButton;
-	this.selectDeviceButton = guiPanel.selectDeviceButton;
-	this.specifyDeviceNameButton = guiPanel.specifyDeviceNameButton;
-	this.loadButton = guiPanel.loadButton;
-	this.cancelButton = guiPanel.cancelButton;
-	this.specifyDeviceNameField = guiPanel.specifyDeviceNameField;
-	this.detectedDevicesCombo = guiPanel.detectedDevicesCombo;
-	
-	this.selectSpecifyGroup = new ButtonGroup();
-	selectSpecifyGroup.add(selectDeviceButton);
-	selectSpecifyGroup.add(specifyDeviceNameButton);
-	
-	detectedDevicesCombo.removeAllItems();
-	
-	detectedDeviceNames = detectDevices();
-	for(String name : detectedDeviceNames)
-	    detectedDevicesCombo.addItem(name);
-	
-	if(detectedDeviceNames.length > 0) {
-	    detectedDevicesCombo.setSelectedIndex(0);
-	    specifyDeviceNameField.setText(DEVICE_PREFIX + detectedDevicesCombo.getSelectedItem().toString());
-	}
-	
-	autodetectButton.addActionListener(new ActionListener() {
+        super(owner, modal);
+        setTitle(title);
+
+        this.guiPanel = new SelectWindowsDevicePanel();
+        this.autodetectButton = guiPanel.autodetectButton;
+        this.selectDeviceButton = guiPanel.selectDeviceButton;
+        this.specifyDeviceNameButton = guiPanel.specifyDeviceNameButton;
+        this.loadButton = guiPanel.loadButton;
+        this.cancelButton = guiPanel.cancelButton;
+        this.specifyDeviceNameField = guiPanel.specifyDeviceNameField;
+        this.detectedDevicesCombo = guiPanel.detectedDevicesCombo;
+
+        this.selectSpecifyGroup = new ButtonGroup();
+        selectSpecifyGroup.add(selectDeviceButton);
+        selectSpecifyGroup.add(specifyDeviceNameButton);
+
+        detectedDevicesCombo.removeAllItems();
+
+        detectedDeviceNames = detectDevices();
+        for(String name : detectedDeviceNames)
+            detectedDevicesCombo.addItem(name);
+
+        if(detectedDeviceNames.length > 0) {
+            detectedDevicesCombo.setSelectedIndex(0);
+            specifyDeviceNameField.setText(DEVICE_PREFIX + detectedDevicesCombo.getSelectedItem().toString());
+        }
+
+        autodetectButton.addActionListener(new ActionListener() {
                 @Override
-		public void actionPerformed(ActionEvent ae) {
-		    autodetectFilesystems();
-		}
-	    });
-	detectedDevicesCombo.addItemListener(new ItemListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    autodetectFilesystems();
+                }
+            });
+        detectedDevicesCombo.addItemListener(new ItemListener() {
                 @Override
-		public void itemStateChanged(ItemEvent ie) {
-		    if(ie.getStateChange() == ItemEvent.SELECTED)
-			specifyDeviceNameField.setText(DEVICE_PREFIX + ie.getItem().toString());
-		}
-	    });
-	selectDeviceButton.addActionListener(new ActionListener() {
+                public void itemStateChanged(ItemEvent ie) {
+                    if(ie.getStateChange() == ItemEvent.SELECTED)
+                        specifyDeviceNameField.setText(DEVICE_PREFIX + ie.getItem().toString());
+                }
+            });
+        selectDeviceButton.addActionListener(new ActionListener() {
                 @Override
-		public void actionPerformed(ActionEvent ae) {
-		    detectedDevicesCombo.setEnabled(true);
-		    specifyDeviceNameField.setEnabled(false);
-		    specifyDeviceNameField.setText(DEVICE_PREFIX + detectedDevicesCombo.getSelectedItem().toString());
-		}
-	    });
-	specifyDeviceNameButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    detectedDevicesCombo.setEnabled(true);
+                    specifyDeviceNameField.setEnabled(false);
+                    specifyDeviceNameField.setText(DEVICE_PREFIX + detectedDevicesCombo.getSelectedItem().toString());
+                }
+            });
+        specifyDeviceNameButton.addActionListener(new ActionListener() {
                 @Override
-		public void actionPerformed(ActionEvent ae) {
-		    detectedDevicesCombo.setEnabled(false);
-		    specifyDeviceNameField.setEnabled(true);
-		}
-	    });
-	loadButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    detectedDevicesCombo.setEnabled(false);
+                    specifyDeviceNameField.setEnabled(true);
+                }
+            });
+        loadButton.addActionListener(new ActionListener() {
                 @Override
-		public void actionPerformed(ActionEvent ae) {
-		    resultCreatePath = specifyDeviceNameField.getText();
-		    result = new ReadableWin32FileStream(resultCreatePath);
-		    setVisible(false);
-		}
-	    });
-	cancelButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    resultCreatePath = specifyDeviceNameField.getText();
+                    result = new ReadableWin32FileStream(resultCreatePath);
+                    setVisible(false);
+                }
+            });
+        cancelButton.addActionListener(new ActionListener() {
                 @Override
-		public void actionPerformed(ActionEvent ae) {
-		    setVisible(false);
-		}
-	    });
-	
+                public void actionPerformed(ActionEvent ae) {
+                    setVisible(false);
+                }
+            });
+
 // 	JPanel container = new JPanel();
 // 	container.setLayout(new BorderLayout());
 // 	container.setBorder(new EmptyBorder(5, 5, 5, 5));
 // 	container.add(guiPanel, BorderLayout.CENTER);
-	
-	add(guiPanel, BorderLayout.CENTER);
-	pack();
-	setLocationRelativeTo(null);
-	setResizable(false);
+
+        add(guiPanel, BorderLayout.CENTER);
+        pack();
+        setLocationRelativeTo(null);
+        setResizable(false);
     }
 
     public ReadableRandomAccessStream getPartitionStream() { return result; }
-    
+
     /** Could include an identifier of a partitioning scheme. This should only be used to display a descriptive locator. */
     public String getPathName() { return resultCreatePath; }
-    
+
     /**
      * This method is only tested with Windows XP (SP2, x86).
      * Also, it won't work with devices that are not mounted
@@ -221,35 +221,35 @@ public class SelectWindowsDeviceDialog extends JDialog {
             catch (Exception e) {}
         }
 
-	return activeDeviceNames.toArray(new String[activeDeviceNames.size()]);
+        return activeDeviceNames.toArray(new String[activeDeviceNames.size()]);
     }
     protected void autodetectFilesystems() {
-	LinkedList<String> plainFileSystems = new LinkedList<String>();
-	LinkedList<EmbeddedPartitionEntry> embeddedFileSystems = new LinkedList<EmbeddedPartitionEntry>();
-	//String skipPrefix = null;
-        
-	// Look for file systems that sit inside partition systems unsupported by Windows.
-	for(int i = 0; i < detectedDeviceNames.length; ++i) {
-	    String deviceName = detectedDeviceNames[i];
+        LinkedList<String> plainFileSystems = new LinkedList<String>();
+        LinkedList<EmbeddedPartitionEntry> embeddedFileSystems = new LinkedList<EmbeddedPartitionEntry>();
+        //String skipPrefix = null;
+
+        // Look for file systems that sit inside partition systems unsupported by Windows.
+        for(int i = 0; i < detectedDeviceNames.length; ++i) {
+            String deviceName = detectedDeviceNames[i];
 // 	    System.out.println("Checking if \"" + name + "\" might be an unsupported partition system...");
 // 	    System.out.println("  name.startsWith(\"CdRom\") == " + name.startsWith(DEVICE_PREFIX + "CdRom"));
 // 	    System.out.println("  name.endsWith(\"Partition0\") == " + name.endsWith("Partition0"));
-	    
-	    /*
-	    if(name.startsWith("CdRom") ||
-	       (name.endsWith("Partition0") &&
-		!(i+1 < detectedDeviceNames.length && detectedDeviceNames[i+1].endsWith("Partition1"))) ) {
-	    */
-		// We have an unidentifed partition system at "name"
+
+            /*
+            if(name.startsWith("CdRom") ||
+               (name.endsWith("Partition0") &&
+                !(i+1 < detectedDeviceNames.length && detectedDeviceNames[i+1].endsWith("Partition1"))) ) {
+            */
+                // We have an unidentifed partition system at "name"
 // 		System.out.println("TRUE!");
             //if(skipPrefix != null && deviceName.startsWith(skipPrefix))
             //    continue;
             //else
             //    skipPrefix = null;
-            
-	    ReadableRandomAccessStream llf = null;
-	    try {
-		llf = new ReadableWin32FileStream(DEVICE_PREFIX + deviceName);
+
+            ReadableRandomAccessStream llf = null;
+            try {
+                llf = new ReadableWin32FileStream(DEVICE_PREFIX + deviceName);
 
                 PartitionSystemType[] detectedTypes =
                         PartitionSystemDetector.detectPartitionSystem(llf);
@@ -298,79 +298,79 @@ public class SelectWindowsDeviceDialog extends JDialog {
                         }
                     }
                 }
-                
+
                 if(!fileSystemFound && (deviceName.endsWith("Partition0") || !deviceName.matches("Harddisk[0-9]+\\\\Partition[0-9]+"))) {
                     FileSystemType fsType = HFSCommonFileSystemRecognizer.
                             detectFileSystem(llf, 0);
 
-		    if(HFSCommonFileSystemRecognizer.isTypeSupported(fsType))
-			plainFileSystems.add(deviceName);
-		}
+                    if(HFSCommonFileSystemRecognizer.isTypeSupported(fsType))
+                        plainFileSystems.add(deviceName);
+                }
                 /* If we found file systems in embedded partition systems,
                  * ignore windows-detected partitions if the embedded partition
                  * system is at Partition0. */
                 //else if(deviceName.endsWith("Partition0"))
                 //    skipPrefix = deviceName.substring(0, deviceName.length()-1);
-		llf.close();
-	    } catch(Exception e) {
-		System.out.println("INFO: Non-critical exception while " +
+                llf.close();
+            } catch(Exception e) {
+                System.out.println("INFO: Non-critical exception while " +
                         "detecting partition system at \"" + DEVICE_PREFIX +
                         deviceName + "\": " + e.toString());
 
-		if(llf != null) {
+                if(llf != null) {
                     FileSystemType fsType = HFSCommonFileSystemRecognizer.
                             detectFileSystem(llf, 0);
 
-		    if(HFSCommonFileSystemRecognizer.isTypeSupported(fsType))
-			plainFileSystems.add(deviceName);
-		    llf.close();
-		}
-	    }
-	}
-	
-	if(plainFileSystems.size() >= 1 || embeddedFileSystems.size() >= 1) {
-	    String[] plainStrings = plainFileSystems.toArray(
+                    if(HFSCommonFileSystemRecognizer.isTypeSupported(fsType))
+                        plainFileSystems.add(deviceName);
+                    llf.close();
+                }
+            }
+        }
+
+        if(plainFileSystems.size() >= 1 || embeddedFileSystems.size() >= 1) {
+            String[] plainStrings = plainFileSystems.toArray(
                     new String[plainFileSystems.size()]);
 
-	    String[] embeddedStrings = new String[embeddedFileSystems.size()];
-	    int i = 0;
-	    for(EmbeddedPartitionEntry cur : embeddedFileSystems) {
-		embeddedStrings[i++] = cur.toString();
+            String[] embeddedStrings = new String[embeddedFileSystems.size()];
+            int i = 0;
+            for(EmbeddedPartitionEntry cur : embeddedFileSystems) {
+                embeddedStrings[i++] = cur.toString();
             }
 
-	    String[] allOptions =
+            String[] allOptions =
                     new String[plainStrings.length+embeddedStrings.length];
-	    for(i = 0; i < plainStrings.length; ++i)
-		allOptions[i] = plainStrings[i];
-	    for(i = 0; i < embeddedStrings.length; ++i)
-		allOptions[plainStrings.length+i] = embeddedStrings[i];
+            for(i = 0; i < plainStrings.length; ++i)
+                allOptions[i] = plainStrings[i];
+            for(i = 0; i < embeddedStrings.length; ++i)
+                allOptions[plainStrings.length+i] = embeddedStrings[i];
 
-	    Object selectedValue = JOptionPane.showInputDialog(this,
+            Object selectedValue = JOptionPane.showInputDialog(this,
                     "Autodetection complete! Found " + allOptions.length +
                     " HFS+ file systems.\nPlease choose which one to load:",
                     "Load HFS+ file system", JOptionPane.QUESTION_MESSAGE,
                     null, allOptions, allOptions[0]);
 
             if(selectedValue != null) {
-		int selectedIndex = -1;
-		for(i = 0; i < allOptions.length; ++i) {
-		    if(selectedValue.equals(allOptions[i])) {
-			selectedIndex = i;
-			break;
-		    }
-		}
+                int selectedIndex = -1;
+                for(i = 0; i < allOptions.length; ++i) {
+                    if(selectedValue.equals(allOptions[i])) {
+                        selectedIndex = i;
+                        break;
+                    }
+                }
 
-		if(selectedIndex == -1) {
-		    throw new RuntimeException("selectedIndex == -1");
-		}
-		else {
-		    if(selectedIndex >= plainStrings.length) {
-			// We have an embedded FS
-			selectedIndex -= plainStrings.length;
-			EmbeddedPartitionEntry embeddedInfo =
+                if(selectedIndex == -1) {
+                    throw new RuntimeException("selectedIndex == -1");
+                }
+                else {
+                    if(selectedIndex >= plainStrings.length) {
+                        // We have an embedded FS
+                        selectedIndex -= plainStrings.length;
+                        EmbeddedPartitionEntry embeddedInfo =
                                 embeddedFileSystems.get(selectedIndex);
-			if(embeddedInfo == null)
-			    throw new RuntimeException("embeddedInfo == null");
+                        if(embeddedInfo == null)
+                            throw new RuntimeException("embeddedInfo == null");
 
 
                         switch(embeddedInfo.psType) {
@@ -394,16 +394,16 @@ public class SelectWindowsDeviceDialog extends JDialog {
                                         "partition system: " +
                                         embeddedInfo.psType);
                         }
-		    }
-		    else {
-			resultCreatePath = DEVICE_PREFIX +
+                    }
+                    else {
+                        resultCreatePath = DEVICE_PREFIX +
                                 selectedValue.toString();
-			result = new ReadableWin32FileStream(resultCreatePath);
-			setVisible(false);
-		    }
-		}
-	    }
-	}
+                        result = new ReadableWin32FileStream(resultCreatePath);
+                        setVisible(false);
+                    }
+                }
+            }
+        }
 // 	else if(plainFileSystems.size() > 0) {
 // 	    int res = JOptionPane.showConfirmDialog(this, "Autodetection complete! Found an " +
 // 						    "HFS+ file system at \"" + 
@@ -417,18 +417,18 @@ public class SelectWindowsDeviceDialog extends JDialog {
 // 		setVisible(false);
 // 	    }
 // 	}
-	else
-	    JOptionPane.showMessageDialog(this, "No HFS+ file systems found...",
-					  "Result",
+        else
+            JOptionPane.showMessageDialog(this, "No HFS+ file systems found...",
+                                          "Result",
                                           JOptionPane.INFORMATION_MESSAGE);
     }
-    
+
     private static final class EmbeddedPartitionEntry {
         public final String deviceName;
         public final long partitionNumber;
         public final PartitionSystemType psType;
         public final Partition partition;
-        
+
         public EmbeddedPartitionEntry(String deviceName, long partitionNumber,
                 PartitionSystemType psType, Partition partition) {
             this.deviceName = deviceName;
@@ -436,7 +436,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
             this.psType = psType;
             this.partition = partition;
         }
-        
+
         private String getPartitionSystemString() {
             switch(psType) {
                 case MBR:
@@ -451,7 +451,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
                 return "Unknown partition system";
             }
         }
-        
+
         @Override
         public String toString() {
             return deviceName + "[" + getPartitionSystemString() + ":Partition" +
