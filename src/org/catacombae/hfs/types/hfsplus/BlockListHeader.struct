@@ -1,0 +1,8 @@
+struct BlockListHeader {
+    UInt16    maxBlocks;
+    UInt16    numBlocks;
+    UInt32    bytesUsed;
+    UInt32    checksum;
+    UInt32    pad;
+    BlockInfo  binfo[1];
+};

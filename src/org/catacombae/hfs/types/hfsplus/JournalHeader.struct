@@ -1,0 +1,10 @@
+struct JournalHeader {
+    UInt32    magic;
+    UInt32    endian;
+    UInt64    start;
+    UInt64    end;
+    UInt64    size;
+    UInt32    blhdrSize;
+    UInt32    checksum;
+    UInt32    jhdrSize;
+};
