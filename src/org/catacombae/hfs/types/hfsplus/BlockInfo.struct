@@ -1,0 +1,5 @@
+struct BlockInfo {
+    UInt64    bnum;
+    UInt32    bsize;
+    UInt32    next;
+};
