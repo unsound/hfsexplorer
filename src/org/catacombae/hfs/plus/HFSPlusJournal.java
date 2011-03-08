@@ -61,18 +61,18 @@ class HFSPlusJournal extends Journal {
          * don't know the size of the journal? */
         JournalInfoBlock infoBlock = getJournalInfoBlock();
 
-        if(infoBlock.getOffset() < 0)
+        if(infoBlock.getRawOffset() < 0)
             throw new Error("SInt64 overflow for JournalInfoBlock.offset!");
-        if(infoBlock.getSize() < 0)
+        if(infoBlock.getRawSize() < 0)
             throw new Error("SInt64 overflow for JournalInfoBlock.size!");
-        else if(infoBlock.getSize() > Integer.MAX_VALUE)
+        else if(infoBlock.getRawSize() > Integer.MAX_VALUE)
             throw new RuntimeException("Java int overflow!");
 
-        byte[] dataBuffer = new byte[(int)infoBlock.getSize()];
+        byte[] dataBuffer = new byte[(int)infoBlock.getRawSize()];
 
         ReadableRandomAccessStream fsStream = vol.createFSStream();
         try {
-            fsStream.seek(infoBlock.getOffset());
+            fsStream.seek(infoBlock.getRawOffset());
             fsStream.readFully(dataBuffer);
         } finally {
             fsStream.close();
