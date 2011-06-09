@@ -161,9 +161,10 @@ public abstract class HFSVolume {
         // Checks if the length of the stream is block-aligned.
         {
             long res = fsStream.length() % 512;
-            if(res != 0)
-                throw new Exception("Length of file system is not " +
-                        "block-aligned. Found " + res + " extra bytes.");
+            if(res != 0 && res != -1)
+                throw new Exception("Length of file system (" +
+                        fsStream.length() + ") is not block-aligned. Found " +
+                        res + " extra bytes.");
         }
         
         // Reads the first block of the file system.
@@ -179,7 +180,7 @@ public abstract class HFSVolume {
         }
 
         // Reads the last block of the file system.
-        {
+        if(fsStream.length() > 0) {
             fsStream.seek(fsStream.length()-512);
 
             int bytesRead = fsStream.read(block);
