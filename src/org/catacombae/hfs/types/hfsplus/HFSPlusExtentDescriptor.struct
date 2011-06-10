@@ -1,0 +1,4 @@
+struct HFSPlusExtentDescriptor {
+    UInt32                  startBlock;
+    UInt32                  blockCount;
+};
