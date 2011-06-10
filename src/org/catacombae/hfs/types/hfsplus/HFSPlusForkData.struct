@@ -1,0 +1,6 @@
+struct HFSPlusForkData {
+    UInt64                  logicalSize;
+    UInt32                  clumpSize;
+    UInt32                  totalBlocks;
+    HFSPlusExtentRecord     extents;
+};
