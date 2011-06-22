@@ -1,0 +1,2 @@
+Main-Class: org.catacombae.hfsexplorer.tools.MkAPM
+Class-Path: csframework.jar
