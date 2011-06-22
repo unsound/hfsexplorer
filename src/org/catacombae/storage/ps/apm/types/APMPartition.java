@@ -21,6 +21,7 @@ import org.catacombae.util.Util;
 import java.io.PrintStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import org.catacombae.storage.ps.Partition;
 import org.catacombae.storage.ps.PartitionType;
 
@@ -99,6 +100,107 @@ public class APMPartition implements Partition {
 
         this.blockSize = blockSize;
     }
+
+    /**
+     * Creates a new APMPartition with the specified parameters.
+     *
+     * @param partitionMapBlockCount
+     *      The number of blocks in the partition map that contains this
+     *      partition.
+     * @param partitionStartBlock
+     *      The first block of the partition's data.
+     * @param partitionBlockCount
+     *      The number of blocks in the partition.
+     * @param partitionName
+     *      The name of the partition.
+     * @param partitionType
+     *      The type of the partition (Apple_HFS, Apple_partition_map, ...).
+     * @param partitionStatus
+     *      The status bits of the partition (see source code for more info).
+     * @param blockSize
+     *      The block size of the device, as specified in the Driver Descriptor
+     *      Record.
+     */
+    public APMPartition(long partitionMapBlockCount, long partitionStartBlock,
+            long partitionBlockCount, String partitionName,
+            String partitionType, int partitionStatus, int blockSize) {
+
+        /* Input check: Number ranges. */
+
+        if(partitionMapBlockCount < 0 || partitionMapBlockCount >= 0xFFFFFFFFL)
+            throw new IllegalArgumentException("'partitionMapBlockCount' out " +
+                    "of range: " + partitionMapBlockCount);
+
+        if(partitionStartBlock < 0 || partitionStartBlock >= 0xFFFFFFFFL)
+            throw new IllegalArgumentException("'partitionStartBlock' out of " +
+                    "range: " + partitionStartBlock);
+
+        if(partitionBlockCount < 0 || partitionBlockCount >= 0xFFFFFFFFL)
+            throw new IllegalArgumentException("'partitionBlockCount' out of " +
+                    "range: " + partitionBlockCount);
+
+        int partitionNameEncodedLength =
+                partitionName.codePointCount(0, partitionName.length());
+        if(partitionNameEncodedLength < 0 ||
+                partitionNameEncodedLength > pmPartName.length)
+            throw new IllegalArgumentException("'partitionName' string too " +
+                    "long: " + partitionName.length());
+
+        /* Input check: String lengths. */
+
+        int partitionTypeEncodedLength =
+                partitionType.codePointCount(0, partitionType.length());
+        if(partitionTypeEncodedLength < 0 ||
+                partitionTypeEncodedLength > pmParType.length)
+            throw new IllegalArgumentException("'partitionType' string too " +
+                    "long: " + partitionType.length());
+
+        /* Filling in the APMPartition fields. */
+
+        Util.arrayPutBE(pmSig, 0, APM_PARTITION_SIGNATURE);
+        Arrays.fill(pmSigPad, (byte) 0);
+        Util.arrayPutBE(pmMapBlkCnt, 0, (int) partitionMapBlockCount);
+        Util.arrayPutBE(pmPyPartStart, 0, (int) partitionStartBlock);
+        Util.arrayPutBE(pmPartBlkCnt, 0, (int) partitionBlockCount);
+
+        try {
+            Util.encodeASCIIString(partitionName, 0, pmPartName, 0,
+                    partitionNameEncodedLength);
+            if(partitionNameEncodedLength < pmPartName.length)
+                Arrays.fill(pmPartName, partitionNameEncodedLength,
+                        pmPartName.length, (byte) 0);
+        } catch(IllegalArgumentException e) {
+            throw new IllegalArgumentException("'partitionName' has illegal " +
+                    "(non-ASCII) characters.");
+        }
+
+        try {
+            Util.encodeASCIIString(partitionType, 0, pmParType, 0,
+                    partitionTypeEncodedLength);
+            if(partitionTypeEncodedLength < pmParType.length)
+                Arrays.fill(pmParType, partitionTypeEncodedLength,
+                        pmParType.length, (byte) 0);
+        } catch(IllegalArgumentException e) {
+            throw new IllegalArgumentException("'partitionType' has illegal " +
+                    "(non-ASCII) characters.");
+        }
+
+        Util.arrayPutBE(pmLgDataStart, 0, (int) 0);
+        Util.arrayPutBE(pmDataCnt, 0, (int) partitionBlockCount);
+        Util.arrayPutBE(pmPartStatus, 0, partitionStatus);
+        Util.arrayPutBE(pmLgBootStart, 0, (int) 0);
+        Util.arrayPutBE(pmBootSize, 0, (int) 0);
+        Util.arrayPutBE(pmBootAddr, 0, (int) 0);
+        Util.arrayPutBE(pmBootAddr2, 0, (int) 0);
+        Util.arrayPutBE(pmBootEntry, 0, (int) 0);
+        Util.arrayPutBE(pmBootEntry2, 0, (int) 0);
+        Util.arrayPutBE(pmBootCksum, 0, (int) 0);
+        Arrays.fill(pmProcessor, (byte) 0);
+        Arrays.fill(pmPad, (byte) 0);
+
+        this.blockSize = blockSize;
+    }
+
     public static int structSize() { return 512; }
     // Defined in Partition
     public long getStartOffset() { return ( Util.unsign(getPmPyPartStart())+
