@@ -141,6 +141,27 @@ public class APMPartition implements Partition {
     public byte[] getPmProcessor() { return Util.createCopy(pmProcessor); }
     /** reserved */
     public short[] getPmPad()      { return Util.readShortArrayBE(pmPad); }
+
+    private static boolean getBit(byte[] array, int bit) {
+        final long bitLength = ((long) array.length) << 3;
+        if(bit < 0 || bit >= bitLength)
+            throw new IllegalArgumentException("'bit' out of range: " + bit);
+
+        final int arrayIndex = (int)((bitLength - 1 - bit) >>> 3);
+        final int bitIndex = (bit & 0x7);
+
+        return (array[arrayIndex] & (0x1 << bitIndex)) != 0;
+    }
+
+    public boolean getPmPartStatusValid() { return getBit(pmPartStatus, 0); }
+    public boolean getPmPartStatusAllocated() { return getBit(pmPartStatus, 1); }
+    public boolean getPmPartStatusInUse() { return getBit(pmPartStatus, 2); }
+    public boolean getPmPartStatusBootable() { return getBit(pmPartStatus, 3); }
+    public boolean getPmPartStatusReadable() { return getBit(pmPartStatus, 4); }
+    public boolean getPmPartStatusWritable() { return getBit(pmPartStatus, 5); }
+    public boolean getPmPartStatusOSPicCode() { return getBit(pmPartStatus, 6); }
+    public boolean getPmPartStatusOSSpecific1() { return getBit(pmPartStatus, 7); }
+    public boolean getPmPartStatusOSSpecific2() { return getBit(pmPartStatus, 8); }
     
     /**
      * Returns the partition signature as a String. (Should always be "PM".)
@@ -191,7 +212,16 @@ public class APMPartition implements Partition {
         ps.println(prefix + "pmParType: \"" + getPmParTypeAsString() + "\"");
         ps.println(prefix + "pmLgDataStart: " + getPmLgDataStart());
         ps.println(prefix + "pmDataCnt: " + getPmDataCnt());
-        ps.println(prefix + "pmPartStatus: " + getPmPartStatus());
+        ps.println(prefix + "pmPartStatus: 0x" + Util.toHexStringBE(getPmPartStatus()));
+        ps.println(prefix + "  valid: " + getPmPartStatusValid());
+        ps.println(prefix + "  allocated: " + getPmPartStatusAllocated());
+        ps.println(prefix + "  in use: " + getPmPartStatusInUse());
+        ps.println(prefix + "  bootable: " + getPmPartStatusBootable());
+        ps.println(prefix + "  readable: " + getPmPartStatusReadable());
+        ps.println(prefix + "  writable: " + getPmPartStatusWritable());
+        ps.println(prefix + "  OS pic code: " + getPmPartStatusOSPicCode());
+        ps.println(prefix + "  OS specific 1: " + getPmPartStatusOSSpecific1());
+        ps.println(prefix + "  OS specific 2: " + getPmPartStatusOSSpecific2());
         ps.println(prefix + "pmLgBootStart: " + getPmLgBootStart());
         ps.println(prefix + "pmBootSize: " + getPmBootSize());
         ps.println(prefix + "pmBootAddr: " + getPmBootAddr());
