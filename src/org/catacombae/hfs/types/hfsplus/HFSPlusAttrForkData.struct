@@ -1,0 +1,5 @@
+struct HFSPlusAttrForkData {
+    UInt32          recordType;
+    UInt32          reserved;
+    HFSPlusForkData theFork;
+};
