@@ -1,0 +1,5 @@
+struct HFSPlusAttrExtents {
+    UInt32                  recordType;
+    UInt32                  reserved;
+    HFSPlusExtentRecord     extents;
+};
