@@ -25,6 +25,9 @@ import org.catacombae.storage.ps.Partition;
 import org.catacombae.storage.ps.PartitionType;
 
 public class APMPartition implements Partition {
+    public static final short APM_PARTITION_SIGNATURE = 0x504D;
+    public static final short APM_PARTITION_OLD_SIGNATURE = 0x5453;
+
     /*
      * struct Partition
      * size: 512 bytes
@@ -191,8 +194,8 @@ public class APMPartition implements Partition {
     public boolean isValid() {
         // Signature check
         int pmSigInt = getPmSig() & 0xFFFF;
-        if(pmSigInt != 0x504D && // Signature "PM", in ASCII
-           pmSigInt != 0x5453) // Older signature, but still supported.
+        if(pmSigInt != APM_PARTITION_SIGNATURE && // Signature "PM", in ASCII
+           pmSigInt != APM_PARTITION_OLD_SIGNATURE) // Older signature, but still supported.
             return false;
         
         return true;
