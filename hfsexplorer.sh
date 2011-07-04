@@ -1,4 +1,3 @@
 #!/bin/sh
 
-cd dist
-./hfsexplorer.sh "$@"
+dist/hfsexplorer.sh "$@"
