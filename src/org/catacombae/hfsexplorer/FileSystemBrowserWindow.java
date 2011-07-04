@@ -78,6 +78,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import org.catacombae.dmg.encrypted.ReadableCEncryptedEncodingStream;
+import org.catacombae.dmg.sparsebundle.ReadableSparseBundleStream;
 import org.catacombae.dmg.udif.UDIFDetector;
 import org.catacombae.dmg.udif.UDIFRandomAccessStream;
 import org.catacombae.dmgextractor.ui.PasswordDialog;
@@ -254,7 +255,8 @@ public class FileSystemBrowserWindow extends JFrame {
             public void actionPerformed(ActionEvent ae) {
                 //JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setMultiSelectionEnabled(false);
-                fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                fileChooser.setFileSelectionMode(
+                        JFileChooser.FILES_AND_DIRECTORIES);
                 
                 SimpleFileFilter dmgFilter = new SimpleFileFilter();
                 dmgFilter.addExtension("dmg");
@@ -266,6 +268,26 @@ public class FileSystemBrowserWindow extends JFrame {
                 cdrFilter.addExtension("cdr");
                 cdrFilter.setDescription("CD/DVD image (*.iso,*.cdr)");
                 fileChooser.addChoosableFileFilter(cdrFilter);
+
+                FileFilter sparseBundleFilter = new FileFilter() {
+
+                    @Override
+                    public boolean accept(File file) {
+                        if(file.isDirectory() &&
+                                file.getName().endsWith(".sparsebundle")) {
+                            return true;
+                        }
+                        else
+                            return false;
+                    }
+
+                    @Override
+                    public String getDescription() {
+                        return "Mac OS X sparse bundles (*.sparsebundle)";
+                    }
+
+                };
+                fileChooser.addChoosableFileFilter(sparseBundleFilter);
                 
                 SimpleFileFilter imgFilter = new SimpleFileFilter();
                 imgFilter.addExtension("img");
@@ -660,7 +682,11 @@ public class FileSystemBrowserWindow extends JFrame {
     public void loadFSWithUDIFAutodetect(String filename, long pos) {
         ReadableRandomAccessStream fsFile;
         try {
-            if(ReadableWin32FileStream.isSystemSupported()) {
+            File f = new File(filename);
+            if(f.isDirectory()) {
+                fsFile = new ReadableSparseBundleStream(f);
+            }
+            else if(ReadableWin32FileStream.isSystemSupported()) {
                 fsFile = new ReadableWin32FileStream(filename);
             }
             else {
