@@ -91,7 +91,7 @@ public class CdrDirRec extends CatDataRec {
     /** reserved (ARRAY[1..4] OF LongInt) */
     public int[] getDirResrv() { return Util.readIntArrayBE(dirResrv); }
 
-    @Override
+    /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(CdrDirRec.class.getSimpleName());
         

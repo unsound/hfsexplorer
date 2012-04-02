@@ -158,7 +158,7 @@ public class HFSPlusCatalogFolder extends HFSPlusCatalogLeafRecordData implement
         return result;
     }
     
-    @Override
+    /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(HFSPlusCatalogFolder.class.getSimpleName());
         

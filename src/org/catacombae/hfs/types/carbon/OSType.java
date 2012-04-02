@@ -61,7 +61,7 @@ public class OSType implements StructElements {
         return osType.getBytes();
     }
 
-    @Override
+    /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(OSType.class.getSimpleName());
         

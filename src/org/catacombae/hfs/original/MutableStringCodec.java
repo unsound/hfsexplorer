@@ -37,7 +37,7 @@ public class MutableStringCodec <A extends StringCodec> implements StringCodec {
     /**
      * {@inheritDoc}
      */
-    @Override
+    /* @Override */
     public String decode(byte[] data) {
         return underlying.decode(data);
     }
@@ -45,7 +45,7 @@ public class MutableStringCodec <A extends StringCodec> implements StringCodec {
     /**
      * {@inheritDoc}
      */
-    @Override
+    /* @Override */
     public String decode(byte[] data, int off, int len) {
         return underlying.decode(data, off, len);
     }
@@ -53,7 +53,7 @@ public class MutableStringCodec <A extends StringCodec> implements StringCodec {
     /**
      * {@inheritDoc}
      */
-    @Override
+    /* @Override */
     public byte[] encode(String str) {
         return underlying.encode(str);
     }
@@ -61,7 +61,7 @@ public class MutableStringCodec <A extends StringCodec> implements StringCodec {
     /**
      * {@inheritDoc}
      */
-    @Override
+    /* @Override */
     public byte[] encode(String str, int off, int len) {
         return underlying.encode(str, off, len);
     }

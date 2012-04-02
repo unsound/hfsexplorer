@@ -134,7 +134,7 @@ public class ReadableWin32FileStream implements ReadableRandomAccessStream {
         }
     }
     
-    @Override
+    /* @Override */
     public void seek(long pos) {
         //System.err.println("WindowsLowLevelIO.seek(" + pos + ");");
 
@@ -147,7 +147,7 @@ public class ReadableWin32FileStream implements ReadableRandomAccessStream {
             throw new RuntimeException("File closed!");
     }
     
-    @Override
+    /* @Override */
     public int read() {
         //System.err.println("WindowsLowLevelIO.read();");
         byte[] oneByte = new byte[1];
@@ -157,13 +157,13 @@ public class ReadableWin32FileStream implements ReadableRandomAccessStream {
             return -1;
     }
     
-    @Override
+    /* @Override */
     public int read(byte[] data) {
         //System.err.println("WindowsLowLevelIO.read(byte[" + data.length + "]);");
         return read(data, 0, data.length);
     }
 
-    @Override
+    /* @Override */
     public int read(byte[] data, int pos, int len) {
         //System.err.println("WindowsLowLevelIO.read(byte[" + data.length + "], " + pos + ", " + len + ");");
         if(fileHandle != null) {
@@ -218,12 +218,12 @@ public class ReadableWin32FileStream implements ReadableRandomAccessStream {
             throw new RuntimeException("File closed!");
     }
 
-    @Override
+    /* @Override */
     public void readFully(byte[] data) {
         readFully(data, 0, data.length);
     }
 
-    @Override
+    /* @Override */
     public void readFully(byte[] data, int offset, int length) {
         if(fileHandle != null) {
             int bytesRead = 0;
@@ -239,7 +239,7 @@ public class ReadableWin32FileStream implements ReadableRandomAccessStream {
             throw new RuntimeException("File closed!");
     }
 
-    @Override
+    /* @Override */
     public long length() {
         //System.err.println("WindowsLowLevelIO.length();");
         if(fileHandle != null) {
@@ -251,7 +251,7 @@ public class ReadableWin32FileStream implements ReadableRandomAccessStream {
             throw new RuntimeException("File closed!");
     }
 	
-    @Override
+    /* @Override */
     public long getFilePointer() {
         //System.err.println("WindowsLowLevelIO.getFilePointer();");
         if(fileHandle != null) {
@@ -262,7 +262,7 @@ public class ReadableWin32FileStream implements ReadableRandomAccessStream {
             throw new RuntimeException("File closed!");
     }
     
-    @Override
+    /* @Override */
     public void close() {
         if(fileHandle != null) {
             close(fileHandle);

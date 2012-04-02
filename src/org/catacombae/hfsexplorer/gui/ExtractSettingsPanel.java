@@ -46,7 +46,7 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
         this();
         
         p.addListener(new ExtractPropertiesListener() {
-            @Override
+            /* @Override */
             public void propertyChanged(Object changedProperty) {
                 //System.err.println("Received a propertyChanged for " + changedProperty);
                 final AbstractButton theButton;
@@ -140,7 +140,7 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
                 
                 if(theButton != null) {
                     SwingUtilities.invokeLater(new Runnable() {
-                        @Override
+                        /* @Override */
                         public void run() {
                             theButton.setSelected(true);
                         }
@@ -228,7 +228,7 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
         
         quietModeBox.addActionListener(new ActionListener() {
 
-            @Override
+            /* @Override */
             public void actionPerformed(ActionEvent e) {
                 boolean selected = quietModeBox.isSelected();
                 
@@ -549,7 +549,7 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
             this.p = p;
             this.action = action;
         }
-        @Override
+        /* @Override */
         public void actionPerformed(ActionEvent e) {
             if(button.isSelected()) {
                 //System.err.println("Setting action " + action.getClass().getSimpleName() + "." +

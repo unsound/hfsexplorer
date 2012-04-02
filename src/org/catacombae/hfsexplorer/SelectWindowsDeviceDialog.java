@@ -95,20 +95,20 @@ public class SelectWindowsDeviceDialog extends JDialog {
         }
 
         autodetectButton.addActionListener(new ActionListener() {
-                @Override
+                /* @Override */
                 public void actionPerformed(ActionEvent ae) {
                     autodetectFilesystems();
                 }
             });
         detectedDevicesCombo.addItemListener(new ItemListener() {
-                @Override
+                /* @Override */
                 public void itemStateChanged(ItemEvent ie) {
                     if(ie.getStateChange() == ItemEvent.SELECTED)
                         specifyDeviceNameField.setText(DEVICE_PREFIX + ie.getItem().toString());
                 }
             });
         selectDeviceButton.addActionListener(new ActionListener() {
-                @Override
+                /* @Override */
                 public void actionPerformed(ActionEvent ae) {
                     detectedDevicesCombo.setEnabled(true);
                     specifyDeviceNameField.setEnabled(false);
@@ -116,14 +116,14 @@ public class SelectWindowsDeviceDialog extends JDialog {
                 }
             });
         specifyDeviceNameButton.addActionListener(new ActionListener() {
-                @Override
+                /* @Override */
                 public void actionPerformed(ActionEvent ae) {
                     detectedDevicesCombo.setEnabled(false);
                     specifyDeviceNameField.setEnabled(true);
                 }
             });
         loadButton.addActionListener(new ActionListener() {
-                @Override
+                /* @Override */
                 public void actionPerformed(ActionEvent ae) {
                     resultCreatePath = specifyDeviceNameField.getText();
                     result = new ReadableWin32FileStream(resultCreatePath);
@@ -131,7 +131,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
                 }
             });
         cancelButton.addActionListener(new ActionListener() {
-                @Override
+                /* @Override */
                 public void actionPerformed(ActionEvent ae) {
                     setVisible(false);
                 }

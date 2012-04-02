@@ -58,7 +58,7 @@ public class ExtractProgressDialog extends JDialog implements ExtractProgressMon
         cancelButton = progressPanel.cancelButton;
         cancelButton.addActionListener(new ActionListener() {
 
-            @Override
+            /* @Override */
             public void actionPerformed(ActionEvent ae) {
                 signalCancel();
             }
@@ -66,7 +66,7 @@ public class ExtractProgressDialog extends JDialog implements ExtractProgressMon
         
         progressPanel.addShowSettingsButtonListener(new ActionListener() {
 
-            @Override
+            /* @Override */
             public void actionPerformed(ActionEvent e) {
                 boolean selected = progressPanel.getShowSettingsButtonSelected();
                 if(selected)
@@ -96,38 +96,38 @@ public class ExtractProgressDialog extends JDialog implements ExtractProgressMon
         setResizable(false);
     }
 
-    @Override
+    /* @Override */
     public void updateCalculateDir(String dirname) {
         progressPanel.updateCalculateDir(dirname);
     }
 
-    @Override
+    /* @Override */
     public void updateTotalProgress(double fraction, String message) {
         progressPanel.updateTotalProgress(fraction, message);
     }
 
-    @Override
+    /* @Override */
     public void updateCurrentDir(String dirname) {
         progressPanel.updateCurrentDir(dirname);
     }
 
-    @Override
+    /* @Override */
     public void updateCurrentFile(String filename, long fileSize) {
         progressPanel.updateCurrentFile(filename, fileSize);
     }
 
-    @Override
+    /* @Override */
     public synchronized void signalCancel() {
         cancelButton.setEnabled(false);
         cancelSignaled = true;
     }
 
-    @Override
+    /* @Override */
     public boolean cancelSignaled() {
         return cancelSignaled;
     }
 
-    @Override
+    /* @Override */
     public void confirmCancel() {
         if(isVisible())
             dispose();
@@ -139,13 +139,13 @@ public class ExtractProgressDialog extends JDialog implements ExtractProgressMon
         dispose();
     }
 
-    @Override
+    /* @Override */
     public void setDataSize(long totalSize) {
         this.totalSize = totalSize;
         addDataProgress(0);
     }
 
-    @Override
+    /* @Override */
     public void addDataProgress(long dataSize) {
         completedSize += dataSize;
         String message = SpeedUnitUtils.bytesToBinaryUnit(completedSize, sizeFormatter) + "/" +
@@ -165,32 +165,32 @@ public class ExtractProgressDialog extends JDialog implements ExtractProgressMon
     }
     */
 
-    @Override
+    /* @Override */
     public CreateDirectoryFailedAction createDirectoryFailed(String dirname, File parentDirectory) {
         return SimpleGUIProgressMonitor.createDirectoryFailed(this, dirname, parentDirectory);
     }
 
-    @Override
+    /* @Override */
     public CreateFileFailedAction createFileFailed(String filename, File parentDirectory) {
         return SimpleGUIProgressMonitor.createFileFailed(this, filename, parentDirectory);
     }
 
-    @Override
+    /* @Override */
     public DirectoryExistsAction directoryExists(File directory) {
         return SimpleGUIProgressMonitor.directoryExists(this, directory);
     }
 
-    @Override
+    /* @Override */
     public FileExistsAction fileExists(File file) {
         return SimpleGUIProgressMonitor.fileExists(this, file);
     }
 
-    @Override
+    /* @Override */
     public String displayRenamePrompt(String currentName, File outDir) {
         return SimpleGUIProgressMonitor.displayRenamePrompt(this, currentName, outDir);
     }
 
-    @Override
+    /* @Override */
     public ExtractProperties getExtractProperties() {
         return extractProperties;
     }

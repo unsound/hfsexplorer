@@ -99,7 +99,7 @@ public class HFSUniStr255 implements StructElements {
 	return getUnicodeAsComposedString();
     }
 
-    @Override
+    /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(HFSUniStr255.class.getSimpleName());
         

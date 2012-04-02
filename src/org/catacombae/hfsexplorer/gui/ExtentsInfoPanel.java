@@ -83,7 +83,7 @@ public class ExtentsInfoPanel extends javax.swing.JPanel {
 
         dirTree.addTreeWillExpandListener(new TreeWillExpandListener() {
 
-            @Override
+            /* @Override */
             public void treeWillExpand(TreeExpansionEvent e)
                     throws ExpandVetoException {
 
@@ -103,7 +103,7 @@ public class ExtentsInfoPanel extends javax.swing.JPanel {
                     throw new RuntimeException("Wrong node type in tree!");
             }
 
-            @Override
+            /* @Override */
             public void treeWillCollapse(TreeExpansionEvent e) {
             }
         });
@@ -161,7 +161,7 @@ public class ExtentsInfoPanel extends javax.swing.JPanel {
 
         catalogTree.addTreeSelectionListener(new TreeSelectionListener() {
             
-            @Override
+            /* @Override */
             public void valueChanged(TreeSelectionEvent te) {
                 //System.err.println("Tree selection");
                 Object o = te.getPath().getLastPathComponent();

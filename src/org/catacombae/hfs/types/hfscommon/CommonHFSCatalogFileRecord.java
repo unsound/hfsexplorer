@@ -47,7 +47,7 @@ public abstract class CommonHFSCatalogFileRecord extends CommonHFSCatalogLeafRec
         return data;
     }
 
-    @Override
+    /* @Override */
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + CommonHFSCatalogFileRecord.class.getSimpleName() + ":");
         printFields(ps, prefix + " ");
@@ -60,7 +60,7 @@ public abstract class CommonHFSCatalogFileRecord extends CommonHFSCatalogLeafRec
         data.print(ps, prefix + " ");
     }
 
-    @Override
+    /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db =
                 new DictionaryBuilder(CommonHFSCatalogFileRecord.class.getSimpleName(),

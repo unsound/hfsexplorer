@@ -243,7 +243,7 @@ public class HFSPlusBSDInfo implements StructElements {
         return result;
     }
 
-    @Override
+    /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(HFSPlusBSDInfo.class.getSimpleName());
         

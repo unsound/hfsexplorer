@@ -91,7 +91,7 @@ public class DInfo implements StructElements {
 	return result;
     }
 
-    @Override
+    /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(DInfo.class.getSimpleName());
         db.add("frRect", frRect.getStructElements());

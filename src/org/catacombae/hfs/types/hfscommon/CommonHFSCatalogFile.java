@@ -94,7 +94,7 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
             return CommonHFSForkData.create(data.getResourceFork());
         }
 
-        @Override
+        /* @Override */
         public int size() {
             return data.size();
         }
@@ -104,62 +104,62 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
             return data.getBytes();
         }
 
-        @Override
+        /* @Override */
         public short getRecordType() {
             return data.getRecordType();
         }
 
-        @Override
+        /* @Override */
         public short getFlags() {
             return data.getFlags();
         }
 
-        @Override
+        /* @Override */
         public int getCreateDate() {
             return data.getCreateDate();
         }
 
-        @Override
+        /* @Override */
         public int getContentModDate() {
             return data.getContentModDate();
         }
 
-        @Override
+        /* @Override */
         public int getAttributeModDate() {
             return data.getAttributeModDate();
         }
 
-        @Override
+        /* @Override */
         public int getAccessDate() {
             return data.getAccessDate();
         }
 
-        @Override
+        /* @Override */
         public int getBackupDate() {
             return data.getBackupDate();
         }
 
-        @Override
+        /* @Override */
         public Date getCreateDateAsDate() {
             return data.getCreateDateAsDate();
         }
 
-        @Override
+        /* @Override */
         public Date getContentModDateAsDate() {
             return data.getContentModDateAsDate();
         }
 
-        @Override
+        /* @Override */
         public Date getAttributeModDateAsDate() {
             return data.getAttributeModDateAsDate();
         }
 
-        @Override
+        /* @Override */
         public Date getAccessDateAsDate() {
             return data.getAccessDateAsDate();
         }
 
-        @Override
+        /* @Override */
         public Date getBackupDateAsDate() {
             return data.getBackupDateAsDate();
         }
@@ -175,7 +175,7 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
             return data.getPermissions().getFileModeFileType() == HFSPlusBSDInfo.FILETYPE_SYMBOLIC_LINK;
         }
 
-        @Override
+        /* @Override */
         public Dictionary getStructElements() {
             return data.getStructElements();
         }
@@ -207,27 +207,27 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
             return data.getPermissions().getSpecial();
         }
 
-        @Override
+        /* @Override */
         public boolean hasCreateDate() {
             return true;
         }
 
-        @Override
+        /* @Override */
         public boolean hasContentModDate() {
             return true;
         }
 
-        @Override
+        /* @Override */
         public boolean hasAttributeModDate() {
             return true;
         }
 
-        @Override
+        /* @Override */
         public boolean hasAccessDate() {
             return true;
         }
 
-        @Override
+        /* @Override */
         public boolean hasBackupDate() {
             return true;
         }
@@ -259,7 +259,7 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
             return CommonHFSForkData.create(data.getFilRExtRec(), data.getFilRLgLen());
         }
 
-        @Override
+        /* @Override */
         public int size() {
             return data.size();
         }
@@ -269,62 +269,62 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
             return data.getBytes();
         }
 
-        @Override
+        /* @Override */
         public short getRecordType() {
             return data.getCdrType();
         }
 
-        @Override
+        /* @Override */
         public short getFlags() {
             return data.getFilFlags();
         }
 
-        @Override
+        /* @Override */
         public int getCreateDate() {
             return data.getFilCrDat();
         }
 
-        @Override
+        /* @Override */
         public int getContentModDate() {
             return data.getFilMdDat();
         }
 
-        @Override
+        /* @Override */
         public int getAttributeModDate() {
             return data.getFilMdDat();
         }
 
-        @Override
+        /* @Override */
         public int getAccessDate() {
             return data.getFilMdDat();
         }
 
-        @Override
+        /* @Override */
         public int getBackupDate() {
             return data.getFilBkDat();
         }
 
-        @Override
+        /* @Override */
         public Date getCreateDateAsDate() {
             return HFSPlusDate.localTimestampToDate(getCreateDate());
         }
 
-        @Override
+        /* @Override */
         public Date getContentModDateAsDate() {
             return HFSPlusDate.localTimestampToDate(getContentModDate());
         }
 
-        @Override
+        /* @Override */
         public Date getAttributeModDateAsDate() {
             return HFSPlusDate.localTimestampToDate(getAttributeModDate());
         }
 
-        @Override
+        /* @Override */
         public Date getAccessDateAsDate() {
             return HFSPlusDate.localTimestampToDate(getAccessDate());
         }
 
-        @Override
+        /* @Override */
         public Date getBackupDateAsDate() {
             return HFSPlusDate.localTimestampToDate(getBackupDate());
         }
@@ -341,7 +341,7 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
             return false;
         }
 
-        @Override
+        /* @Override */
         public Dictionary getStructElements() {
             return data.getStructElements();
         }
@@ -369,27 +369,27 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
             throw new UnsupportedOperationException("Not supported for HFS.");
         }
 
-        @Override
+        /* @Override */
         public boolean hasCreateDate() {
             return true;
         }
 
-        @Override
+        /* @Override */
         public boolean hasContentModDate() {
             return true;
         }
 
-        @Override
+        /* @Override */
         public boolean hasAttributeModDate() {
             return false;
         }
 
-        @Override
+        /* @Override */
         public boolean hasAccessDate() {
             return false;
         }
 
-        @Override
+        /* @Override */
         public boolean hasBackupDate() {
             return true;
         }

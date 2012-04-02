@@ -45,7 +45,7 @@ public abstract class CommonHFSExtentLeafRecord extends CommonBTRecord implement
     
     public abstract CommonHFSExtentDescriptor[] getRecordData();
     
-    @Override
+    /* @Override */
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + getClass().getSimpleName() + ":");
         printFields(ps, prefix + " ");
@@ -103,7 +103,7 @@ public abstract class CommonHFSExtentLeafRecord extends CommonBTRecord implement
             return res;
         }
 
-        @Override
+        /* @Override */
         public void printFields(PrintStream ps, String prefix) {
             ps.println(prefix + "key:");
             key.print(ps, prefix + " ");
@@ -111,7 +111,7 @@ public abstract class CommonHFSExtentLeafRecord extends CommonBTRecord implement
             recordData.print(ps, prefix + " ");
         }
 
-        @Override
+        /* @Override */
         public Dictionary getStructElements() {
             DictionaryBuilder db = new DictionaryBuilder("CommonHFSExtentLeafRecord.HFSImplementation",
                     "HFS extents overflow file leaf record");
@@ -171,7 +171,7 @@ public abstract class CommonHFSExtentLeafRecord extends CommonBTRecord implement
             return res;
         }
 
-        @Override
+        /* @Override */
         public void printFields(PrintStream ps, String prefix) {
             ps.println(prefix + "key:");
             key.print(ps, prefix + " ");
@@ -179,7 +179,7 @@ public abstract class CommonHFSExtentLeafRecord extends CommonBTRecord implement
             recordData.print(ps, prefix + " ");
         }
 
-        @Override
+        /* @Override */
         public Dictionary getStructElements() {
             DictionaryBuilder db = new DictionaryBuilder("CommonHFSExtentLeafRecord.HFSPlusImplementation",
                     "HFS+ extents overflow file leaf record");

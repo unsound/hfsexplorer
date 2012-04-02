@@ -220,14 +220,14 @@ public class HFSOriginalVolume extends HFSVolume {
 
     private static class HFSCatalogOperations implements CatalogOperations {
 
-        @Override
+        /* @Override */
         public CommonHFSCatalogIndexNode newCatalogIndexNode(byte[] data,
                 int offset, int nodeSize, CommonBTHeaderRecord bthr) {
 
             return CommonHFSCatalogIndexNode.createHFS(data, offset, nodeSize);
         }
 
-        @Override
+        /* @Override */
         public CommonHFSCatalogKey newCatalogKey(CommonHFSCatalogNodeID nodeID,
                 CommonHFSCatalogString searchString,
                 CommonBTHeaderRecord bthr) {
@@ -236,14 +236,14 @@ public class HFSOriginalVolume extends HFSVolume {
                     (int)nodeID.toLong(), searchString.getStringBytes()));
         }
 
-        @Override
+        /* @Override */
         public CommonHFSCatalogLeafNode newCatalogLeafNode(byte[] data,
                 int offset, int nodeSize, CommonBTHeaderRecord bthr) {
 
             return CommonHFSCatalogLeafNode.createHFS(data, offset, nodeSize);
         }
 
-        @Override
+        /* @Override */
         public CommonHFSCatalogLeafRecord newCatalogLeafRecord(
                 byte[] data, int offset, CommonBTHeaderRecord bthr) {
 

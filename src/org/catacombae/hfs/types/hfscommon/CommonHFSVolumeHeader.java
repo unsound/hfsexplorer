@@ -169,7 +169,7 @@ public abstract class CommonHFSVolumeHeader implements StructElements {
             return 0;
         }
         
-        @Override
+        /* @Override */
         public Dictionary getStructElements() {
             return hdr.getStructElements();
         }
@@ -255,7 +255,7 @@ public abstract class CommonHFSVolumeHeader implements StructElements {
             return Util.unsign(hdr.getDrAlBlSt());
         }
 
-        @Override
+        /* @Override */
         public Dictionary getStructElements() {
             return hdr.getStructElements();
         }

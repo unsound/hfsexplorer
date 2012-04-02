@@ -71,7 +71,7 @@ public class DateSummaryPanel extends javax.swing.JPanel implements ChainedPanel
         //    createField.setText(attributes.getDate().toString());
     }
     
-    @Override
+    /* @Override */
     public void setChainedContents(Component c) {
         chainedContentsPanel.removeAll();
         chainedContentsPanel.add(c);

@@ -158,7 +158,7 @@ public class CatKeyRec implements DynamicStruct, StructElements {
         return 1+Util.unsign(getCkrKeyLen());
     }
 
-    @Override
+    /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(CatKeyRec.class.getSimpleName());
         

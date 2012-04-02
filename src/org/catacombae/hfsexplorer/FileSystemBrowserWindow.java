@@ -159,13 +159,13 @@ public class FileSystemBrowserWindow extends JFrame {
 
         if(System.getProperty("os.name").toLowerCase().startsWith("mac os x")) {
             MacSpecific.registerMacApplicationHandler(new MacSpecific.MacApplicationHandler() {
-                @Override
+                /* @Override */
                 public boolean acceptQuit() {
                     exitApplication();
                     return false;
                 }
                 
-                @Override
+                /* @Override */
                 public void showAboutDialog() {
                     actionShowAboutDialog();
                 }
@@ -194,7 +194,7 @@ public class FileSystemBrowserWindow extends JFrame {
             // Only for Windows systems...
             loadFSFromDeviceItem = new JMenuItem("Load file system from device...");
             loadFSFromDeviceItem.addActionListener(new ActionListener() {
-                @Override
+                /* @Override */
                 public void actionPerformed(ActionEvent ae) {
                     SelectWindowsDeviceDialog deviceDialog =
                             new SelectWindowsDeviceDialog(FileSystemBrowserWindow.this,
@@ -251,7 +251,7 @@ public class FileSystemBrowserWindow extends JFrame {
 
         JMenuItem openUDIFItem = new JMenuItem("Load file system from file...");
         openUDIFItem.addActionListener(new ActionListener() {
-            @Override
+            /* @Override */
             public void actionPerformed(ActionEvent ae) {
                 //JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setMultiSelectionEnabled(false);
@@ -320,7 +320,7 @@ public class FileSystemBrowserWindow extends JFrame {
 
         JMenuItem loadFromPathItem = new JMenuItem("Load file system from path...");
         loadFromPathItem.addActionListener(new ActionListener() {
-            @Override
+            /* @Override */
             public void actionPerformed(ActionEvent ae) {
                 String path = JOptionPane.showInputDialog(FileSystemBrowserWindow.this,
                         "Pathname to load:", "Load file system from path", JOptionPane.QUESTION_MESSAGE);
@@ -382,7 +382,7 @@ public class FileSystemBrowserWindow extends JFrame {
         if(dcw != null) {
             debugConsoleItem = new JMenuItem("Debug console");
             debugConsoleItem.addActionListener(new ActionListener() {
-                @Override
+                /* @Override */
                 public void actionPerformed(ActionEvent ae) {
                     dcw.setVisible(true);
                 }
@@ -394,7 +394,7 @@ public class FileSystemBrowserWindow extends JFrame {
         if(!System.getProperty("os.name").toLowerCase().startsWith("mac os x")) {
             exitProgramItem = new JMenuItem("Exit");
             exitProgramItem.addActionListener(new ActionListener() {
-                @Override
+                /* @Override */
                 public void actionPerformed(ActionEvent ae) {
                     exitApplication();
                 }
@@ -405,7 +405,7 @@ public class FileSystemBrowserWindow extends JFrame {
 
         JMenuItem fsInfoItem = new JMenuItem("File system info");
         fsInfoItem.addActionListener(new ActionListener() {
-            @Override
+            /* @Override */
             public void actionPerformed(ActionEvent ae) {
                 if(ensureFileSystemLoaded()) {
                     VolumeInfoWindow infoWindow = new VolumeInfoWindow(fsHandler.getFSView());
@@ -438,7 +438,7 @@ public class FileSystemBrowserWindow extends JFrame {
         toggleCachingItem = new JCheckBoxMenuItem("Use file system caching");
         toggleCachingItem.setState(true);
         toggleCachingItem.addActionListener(new ActionListener() {
-            @Override
+            /* @Override */
             public void actionPerformed(ActionEvent ae) {
                 if(fsHandler != null) {
                     if(toggleCachingItem.getState()) {
@@ -471,7 +471,7 @@ public class FileSystemBrowserWindow extends JFrame {
         
         JMenuItem memoryStatisticsItem = new JMenuItem("Memory statistics");
         memoryStatisticsItem.addActionListener(new ActionListener() {
-            @Override
+            /* @Override */
             public void actionPerformed(ActionEvent ae) {
                 MemoryStatisticsPanel.createMemoryStatisticsWindow().setVisible(true);
             }
@@ -479,7 +479,7 @@ public class FileSystemBrowserWindow extends JFrame {
 
         JMenuItem createDiskImageItem = new JMenuItem("Create disk image...");
         createDiskImageItem.addActionListener(new ActionListener() {
-            @Override
+            /* @Override */
             public void actionPerformed(ActionEvent ae) {
                 if(ensureFileSystemLoaded()) {
                     actionExtractToDiskImage();
@@ -492,7 +492,7 @@ public class FileSystemBrowserWindow extends JFrame {
 
         JMenuItem startHelpBrowserItem = new JMenuItem("Help browser");
         startHelpBrowserItem.addActionListener(new ActionListener() {
-            @Override
+            /* @Override */
             public void actionPerformed(ActionEvent ae) {
                 File f = new File("doc/html/index.html");
                 if(f.exists()) {
@@ -508,7 +508,7 @@ public class FileSystemBrowserWindow extends JFrame {
 
         JMenuItem checkUpdatesItem = new JMenuItem("Check for updates...");
         checkUpdatesItem.addActionListener(new ActionListener() {
-            @Override
+            /* @Override */
             public void actionPerformed(ActionEvent ae) {
                 InputStream infoDictStream = null;
                 for(String s : VERSION_INFO_DICTIONARY) {
@@ -573,7 +573,7 @@ public class FileSystemBrowserWindow extends JFrame {
         if(!System.getProperty("os.name").toLowerCase().startsWith("mac os x")) {
             aboutItem = new JMenuItem("About...");
             aboutItem.addActionListener(new ActionListener() {
-                @Override
+                /* @Override */
                 public void actionPerformed(ActionEvent ae) {
                     actionShowAboutDialog();
                 }
@@ -1054,7 +1054,7 @@ public class FileSystemBrowserWindow extends JFrame {
             //System.err.println("Windows detected");
             final String finalCommand = "cmd.exe /c start \"HFSExplorer invoker\" \"" + rec.getName() + "\"";
             alOpen = new ActionListener() {
-                @Override
+                /* @Override */
                 public void actionPerformed(ActionEvent ae) {
                     File tempDir = new File(System.getProperty("java.io.tmpdir"));
                     LinkedList<String> errorMessages = new LinkedList<String>();
@@ -1089,7 +1089,7 @@ public class FileSystemBrowserWindow extends JFrame {
         else if(Java6Util.isJava6OrHigher() && Java6Specific.canOpen()) {
             //System.err.println("Java 1.6 detected.");
             alOpen = new ActionListener() {
-                @Override
+                /* @Override */
                 public void actionPerformed(ActionEvent ae) {
                     File tempDir = new File(System.getProperty("java.io.tmpdir"));
                     LinkedList<String> errorMessages = new LinkedList<String>();
@@ -1125,7 +1125,7 @@ public class FileSystemBrowserWindow extends JFrame {
             //System.err.println("OS X detected");
             final String[] finalCommand = new String[]{"open", rec.getName()};
             alOpen = new ActionListener() {
-                @Override
+                /* @Override */
                 public void actionPerformed(ActionEvent ae) {
                     File tempDir = new File(System.getProperty("java.io.tmpdir"));
                     LinkedList<String> errorMessages = new LinkedList<String>();
@@ -1159,7 +1159,7 @@ public class FileSystemBrowserWindow extends JFrame {
         }
 
         ActionListener alSave = new ActionListener() {
-            @Override
+            /* @Override */
             public void actionPerformed(ActionEvent ae) {
                 actionExtractToDir(parentPath, rec);
                 fopFrame.dispose();
@@ -1212,7 +1212,7 @@ public class FileSystemBrowserWindow extends JFrame {
             pm.setProgress(0);
 
             Runnable r = new Runnable() {
-                @Override
+                /* @Override */
                 public void run() {
                     ReadableRandomAccessStream fsStream = fsDataLocator.createReadOnlyFile();
                     FileOutputStream fileOut = null;
@@ -1301,7 +1301,7 @@ public class FileSystemBrowserWindow extends JFrame {
                     final File outDir = fileChooser.getSelectedFile();
                     final ExtractProgressDialog progress = new ExtractProgressDialog(this);
                     Runnable r = new Runnable() {
-                        @Override
+                        /* @Override */
                         public void run() {
                             // Caching is now turned on or off manually, either for the entire device/file, or not at all.
                             //fsView.retainCatalogFile(); // Cache the catalog file to speed up operations
@@ -2117,22 +2117,22 @@ public class FileSystemBrowserWindow extends JFrame {
     
     public class NullTreeVisitor implements TreeVisitor {
 
-        @Override
+        /* @Override */
         public boolean startDirectory(String[] parentPath, FSFolder folder) { return true; }
         
-        @Override
+        /* @Override */
         public void endDirectory(String[] parentPath, FSFolder folder) {}
         
-        @Override
+        /* @Override */
         public void file(FSFile fsf) {}
 
-        @Override
+        /* @Override */
         public void link(FSLink fsl) {}
 
-        @Override
+        /* @Override */
         public void traversalError(String message) {}
 
-        @Override
+        /* @Override */
         public boolean cancelTraversal() { return false; }
     }
     
@@ -2386,7 +2386,7 @@ public class FileSystemBrowserWindow extends JFrame {
     }
     
     private class FileSystemProvider implements FileSystemBrowser.FileSystemProvider<FSEntry> {
-        @Override
+        /* @Override */
         public void actionDoubleClickFile(List<Record<FSEntry>> recordPath) {
             if(recordPath.size() < 1)
                 throw new IllegalArgumentException("Empty path to file!");
@@ -2422,7 +2422,7 @@ public class FileSystemBrowserWindow extends JFrame {
             }
         }
 
-        @Override
+        /* @Override */
         public void actionExtractToDir(List<Record<FSEntry>> parentPathList, List<Record<FSEntry>> recordList) {
             String[] parentPath = getFSPath(parentPathList);
             
@@ -2434,7 +2434,7 @@ public class FileSystemBrowserWindow extends JFrame {
             FileSystemBrowserWindow.this.actionExtractToDir(parentPath, fsEntryList, true, false);
         }
 
-        @Override
+        /* @Override */
         public void actionGetInfo(final List<Record<FSEntry>> parentPathList,
                 final List<Record<FSEntry>> recordList) {
             List<FSEntry> entryList = new ArrayList<FSEntry>(recordList.size());
@@ -2443,7 +2443,7 @@ public class FileSystemBrowserWindow extends JFrame {
             FileSystemBrowserWindow.this.actionGetInfo(getFSPath(parentPathList), entryList);
         }
 
-        @Override
+        /* @Override */
         public JPopupMenu getRightClickRecordPopupMenu(final List<Record<FSEntry>> parentPathList,
                 final List<Record<FSEntry>> recordList) {
             final String[] parentPath = getFSPath(parentPathList);
@@ -2456,7 +2456,7 @@ public class FileSystemBrowserWindow extends JFrame {
 
             JMenuItem infoItem = new JMenuItem("Information");
             infoItem.addActionListener(new ActionListener() {
-                @Override
+                /* @Override */
                 public void actionPerformed(ActionEvent e) {
                     FileSystemBrowserWindow.this.actionGetInfo(parentPath, userObjectList);
                 }
@@ -2465,7 +2465,7 @@ public class FileSystemBrowserWindow extends JFrame {
 
             JMenuItem dataExtractItem = new JMenuItem("Extract data");
             dataExtractItem.addActionListener(new ActionListener() {
-                @Override
+                /* @Override */
                 public void actionPerformed(ActionEvent e) {
                     FileSystemBrowserWindow.this.actionExtractToDir(parentPath, userObjectList, true, false);
                 }
@@ -2474,7 +2474,7 @@ public class FileSystemBrowserWindow extends JFrame {
 
             JMenuItem resExtractItem = new JMenuItem("Extract resource fork(s)");
             resExtractItem.addActionListener(new ActionListener() {
-                @Override
+                /* @Override */
                 public void actionPerformed(ActionEvent e) {
                     FileSystemBrowserWindow.this.actionExtractToDir(parentPath, userObjectList, false, true);
                 }
@@ -2483,7 +2483,7 @@ public class FileSystemBrowserWindow extends JFrame {
 
             JMenuItem bothExtractItem = new JMenuItem("Extract data and resource fork(s)");
             bothExtractItem.addActionListener(new ActionListener() {
-                @Override
+                /* @Override */
                 public void actionPerformed(ActionEvent e) {
                     FileSystemBrowserWindow.this.actionExtractToDir(parentPath, userObjectList, true, true);
                 }
@@ -2493,12 +2493,12 @@ public class FileSystemBrowserWindow extends JFrame {
             return jpm;
         }
 
-        @Override
+        /* @Override */
         public boolean isFileSystemLoaded() {
             return fsHandler != null;
         }
 
-        @Override
+        /* @Override */
         public List<Record<FSEntry>> getFolderContents(List<Record<FSEntry>> folderRecordPath) {
             FSEntry lastEntry = folderRecordPath.get(folderRecordPath.size() - 1).getUserObject();
             
@@ -2537,7 +2537,7 @@ public class FileSystemBrowserWindow extends JFrame {
             }
         }
 
-        @Override
+        /* @Override */
         public String getAddressPath(List<String> pathComponents) {
             StringBuilder sb = new StringBuilder("/");
 
@@ -2548,7 +2548,7 @@ public class FileSystemBrowserWindow extends JFrame {
             return sb.toString();
         }
 
-        @Override
+        /* @Override */
         public String[] parseAddressPath(String targetAddress) {
             if(!targetAddress.startsWith("/")) {
                 return null;
@@ -2712,7 +2712,7 @@ public class FileSystemBrowserWindow extends JFrame {
 
                 final String pathName = pathNameTmp;
                 SwingUtilities.invokeLater(new Runnable() {
-                    @Override
+                    /* @Override */
                     public void run() {
                         fsbWindow.loadFSWithUDIFAutodetect(pathName);
                     }

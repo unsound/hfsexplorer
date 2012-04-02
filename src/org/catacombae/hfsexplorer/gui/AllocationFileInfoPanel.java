@@ -54,14 +54,14 @@ public class AllocationFileInfoPanel extends javax.swing.JPanel {
         });
         
         Thread t = new Thread(new Runnable() {
-            @Override
+            /* @Override */
             public void run() {
                 final ObjectContainer<Long> freeBlocks = new ObjectContainer<Long>((long)-1);
                 final ObjectContainer<Long> usedBlocks = new ObjectContainer<Long>((long)-1);
                 afView.countBlocks(freeBlocks, usedBlocks, stopCountBlocksProcess);
                 if(!stopCountBlocksProcess.o) {
                     SwingUtilities.invokeLater(new Runnable() {
-                        @Override
+                        /* @Override */
                         public void run() {
                             allocatedBlocksField.setText(usedBlocks.o.toString());
                             freeBlocksField.setText(freeBlocks.o.toString());
@@ -76,11 +76,11 @@ public class AllocationFileInfoPanel extends javax.swing.JPanel {
 
         allocateButton.addActionListener(new ActionListener() {
 
-            @Override
+            /* @Override */
             public void actionPerformed(ActionEvent e) {
                 allocateButton.setEnabled(false);
                 Thread t = new Thread(new Runnable() {
-                    @Override
+                    /* @Override */
                     public void run() {
                         try {
                             long l = Long.parseLong(allocateSizeField.getText());
@@ -94,7 +94,7 @@ public class AllocationFileInfoPanel extends javax.swing.JPanel {
                                     ab.add(desc.getStructElements());
                                 }
                                 SwingUtilities.invokeLater(new Runnable() {
-                                    @Override
+                                    /* @Override */
                                     public void run() {
                                         resultScroller.setViewportView(new StructViewPanel("Possible allocations",
                                                 ab.getResult()));
@@ -116,7 +116,7 @@ public class AllocationFileInfoPanel extends javax.swing.JPanel {
                                     "Exception", JOptionPane.ERROR_MESSAGE);
                         } finally {
                             SwingUtilities.invokeLater(new Runnable() {
-                                @Override
+                                /* @Override */
                                 public void run() {
                                     allocateButton.setEnabled(true);
                                 }

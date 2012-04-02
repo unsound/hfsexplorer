@@ -131,7 +131,7 @@ public class HFSPlusExtentKey extends BTKey implements StructElements {
 	return result;
     }
 
-    @Override
+    /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder("HFSPlusExtentKey", "HFS+ extent key");
         

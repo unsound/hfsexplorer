@@ -55,7 +55,7 @@ public class CharsetStringCodec implements StringCodec {
     /**
      * {@inheritDoc}
      */
-    @Override
+    /* @Override */
     public String decode(byte[] data) {
         return decode(data, 0, data.length);
     }
@@ -63,7 +63,7 @@ public class CharsetStringCodec implements StringCodec {
     /**
      * {@inheritDoc}
      */
-    @Override
+    /* @Override */
     public String decode(byte[] data, int off, int len) {
         try {
             return decoder.decode(ByteBuffer.wrap(data, off, len)).toString();
@@ -75,7 +75,7 @@ public class CharsetStringCodec implements StringCodec {
     /**
      * {@inheritDoc}
      */
-    @Override
+    /* @Override */
     public byte[] encode(String str) {
         return encode(str, 0, str.length());
     }
@@ -83,7 +83,7 @@ public class CharsetStringCodec implements StringCodec {
     /**
      * {@inheritDoc}
      */
-    @Override
+    /* @Override */
     public byte[] encode(String str, int off, int len) {
         try {
             return encoder.encode(CharBuffer.wrap(str.toCharArray(), off, len)).array();

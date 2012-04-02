@@ -117,7 +117,7 @@ public class HFSPlusCatalogFile extends HFSPlusCatalogLeafRecordData implements 
     public Date getBackupDateAsDate() { return HFSPlusDate.gmtTimestampToDate(getBackupDate()); }
 
 
-    @Override
+    /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(HFSPlusCatalogFile.class.getSimpleName());
         
@@ -202,7 +202,7 @@ public class HFSPlusCatalogFile extends HFSPlusCatalogLeafRecordData implements 
         return result;        
     }
 
-    @Override
+    /* @Override */
     public int size() {
         return length();
     }

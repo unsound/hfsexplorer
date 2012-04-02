@@ -33,7 +33,7 @@ public class FlagViewPanel extends javax.swing.JPanel {
         
         if(false) {
             flagBox.addActionListener(new ActionListener() {
-                @Override
+                /* @Override */
                 public void actionPerformed(ActionEvent e) {
                     flagBox.setSelected(data.getValueAsBoolean());
                 }

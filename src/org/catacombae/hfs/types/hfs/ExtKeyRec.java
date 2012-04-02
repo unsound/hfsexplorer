@@ -94,7 +94,7 @@ public class ExtKeyRec implements StructElements {
 	return result;
     }
 
-    @Override
+    /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder("ExtKeyRec", "HFS extent key");
         

@@ -107,7 +107,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
     /**
      * {@inheritDoc}
      */
-    @Override
+    /* @Override */
     public void seek(long pos) {
         //System.err.println("ForkFilter.seek(" + pos + ");");
         logicalPosition = pos;
@@ -116,7 +116,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
     /**
      * {@inheritDoc}
      */
-    @Override
+    /* @Override */
     public int read() {
         byte[] oneByte = new byte[1];
         if(read(oneByte) == 1)
@@ -128,7 +128,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
     /**
      * {@inheritDoc}
      */
-    @Override
+    /* @Override */
     public int read(byte[] data) {
         return read(data, 0, data.length);
     }
@@ -136,7 +136,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
     /**
      * {@inheritDoc}
      */
-    @Override
+    /* @Override */
     public int read(byte[] data, int pos, int len) {
         //System.err.println("ForkFilter.read(" + data + ", " + pos + ", " + len);
         long offset = Long.MAX_VALUE; // MAX_VALUE as a sentinel for seek
@@ -238,7 +238,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
     /**
      * {@inheritDoc}
      */
-    @Override
+    /* @Override */
     public void readFully(byte[] data) {
         readFully(data, 0, data.length);
     }
@@ -246,7 +246,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
     /**
      * {@inheritDoc}
      */
-    @Override
+    /* @Override */
     public void readFully(byte[] data, int offset, int length) {
         int bytesRead = 0;
         while(bytesRead < length) {
@@ -261,7 +261,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
     /**
      * {@inheritDoc}
      */
-    @Override
+    /* @Override */
     public long length() {
         return forkLength;
     }
@@ -269,7 +269,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
     /**
      * {@inheritDoc}
      */
-    @Override
+    /* @Override */
     public long getFilePointer() {
         return logicalPosition;
     }
@@ -285,7 +285,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
     /**
      * Does nothing.
      */
-    @Override
+    /* @Override */
     public void close() {
         //sourceFile.close(); // <- bad idea.
     }

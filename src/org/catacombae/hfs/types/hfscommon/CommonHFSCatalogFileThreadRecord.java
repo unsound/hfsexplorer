@@ -48,13 +48,13 @@ public class CommonHFSCatalogFileThreadRecord extends CommonHFSCatalogLeafRecord
         return data;
     }
     
-    @Override
+    /* @Override */
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + CommonHFSCatalogFileThreadRecord.class.getSimpleName() + ":");
         printFields(ps, prefix + " ");
     }
 
-    @Override
+    /* @Override */
     public void printFields(PrintStream ps, String prefix) {
         ps.println(prefix + "key:");
         key.print(ps, prefix + " ");
@@ -62,7 +62,7 @@ public class CommonHFSCatalogFileThreadRecord extends CommonHFSCatalogLeafRecord
         data.print(ps, prefix + " ");
     }
 
-    @Override
+    /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db =
                 new DictionaryBuilder(CommonHFSCatalogFileThreadRecord.class.getSimpleName(),

@@ -46,7 +46,7 @@ public class ExtractProgressPanel extends javax.swing.JPanel {
     public void updateCalculateDir(final String dirname) {
         SwingUtilities.invokeLater(new Runnable() {
 
-            @Override
+            /* @Override */
             public void run() {
                 currentFilenameLabel.setText("Processing: " + dirname);
                 currentFilenameLabel.setToolTipText(dirname);
@@ -59,7 +59,7 @@ public class ExtractProgressPanel extends javax.swing.JPanel {
         // just to be sure no deadlocks arise...
         SwingUtilities.invokeLater(new Runnable() {
 
-            @Override
+            /* @Override */
             public void run() {
                 progressBar.setValue((int) (fraction * Integer.MAX_VALUE));
                 progressBar.setString((progressFormatter.format(100 * fraction) + "% (" + message + ")"));
@@ -70,7 +70,7 @@ public class ExtractProgressPanel extends javax.swing.JPanel {
     public void updateCurrentDir(final String dirname) {
         SwingUtilities.invokeLater(new Runnable() {
 
-            @Override
+            /* @Override */
             public void run() {
                 currentFilenameLabel.setText("Extracting: " + dirname);
                 currentFilenameLabel.setToolTipText(dirname);
@@ -81,7 +81,7 @@ public class ExtractProgressPanel extends javax.swing.JPanel {
     public void updateCurrentFile(final String filename, final long fileSize) {
         SwingUtilities.invokeLater(new Runnable() {
 
-            @Override
+            /* @Override */
             public void run() {
                 currentFilenameLabel.setText("Extracting: " + filename + " (" + SpeedUnitUtils.bytesToBinaryUnit(fileSize, fileSizeFormatter) + ")");
                 currentFilenameLabel.setToolTipText(filename);

@@ -178,7 +178,7 @@ public class JTextAreaOutputStream extends OutputStream {
                 if(textAreaScroller != null && !updateRequested) {
                     updateRequested = true;
                     SwingUtilities.invokeLater(new Runnable() {
-                        @Override
+                        /* @Override */
                         public void run() {
                             synchronized(syncObject) {
                                 //textArea.append(curBuilder.toString());

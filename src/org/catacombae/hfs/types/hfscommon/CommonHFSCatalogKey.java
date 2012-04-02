@@ -32,7 +32,7 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey<CommonHFSCatalogKe
     public abstract CommonHFSCatalogNodeID getParentID();
     public abstract CommonHFSCatalogString getNodeName();
     
-    @Override
+    /* @Override */
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + CommonHFSCatalogKey.class.getSimpleName() + ":");
         printFields(ps, prefix + " ");
@@ -83,7 +83,7 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey<CommonHFSCatalogKe
             return key.getBytes();
         }
         
-        @Override
+        /* @Override */
         public int compareTo(CommonHFSCatalogKey o) {
             if(o instanceof HFSPlusImplementation) {
                 HFSPlusImplementation k = (HFSPlusImplementation) o;
@@ -115,23 +115,23 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey<CommonHFSCatalogKe
             }
         }
 
-        @Override
+        /* @Override */
         public int maxSize() {
             return key.maxSize();
         }
 
-        @Override
+        /* @Override */
         public int occupiedSize() {
             return key.occupiedSize();
         }
 
-        @Override
+        /* @Override */
         public void printFields(PrintStream ps, String prefix) {
             ps.println(prefix + "key:");
             key.print(ps, prefix + " ");
         }
 
-        @Override
+        /* @Override */
         public Dictionary getStructElements() {
             return key.getStructElements();
         }
@@ -163,12 +163,12 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey<CommonHFSCatalogKe
             return CommonHFSCatalogString.createHFS(key.getCkrCName());
         }
 
-        @Override
+        /* @Override */
         public int maxSize() {
             return key.maxSize();
         }
 
-        @Override
+        /* @Override */
         public int occupiedSize() {
             return key.occupiedSize();
         }
@@ -178,7 +178,7 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey<CommonHFSCatalogKe
             return key.getBytes();
         }
         
-        @Override
+        /* @Override */
         public int compareTo(CommonHFSCatalogKey o) {
             if(o instanceof HFSImplementation) {
                 HFSImplementation k = (HFSImplementation) o;
@@ -203,13 +203,13 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey<CommonHFSCatalogKe
             }
         }
 
-        @Override
+        /* @Override */
         public void printFields(PrintStream ps, String prefix) {
             ps.println(prefix + "key:");
             key.print(ps, prefix + " ");
         }
         
-        @Override
+        /* @Override */
         public Dictionary getStructElements() {
             return key.getStructElements();
         }

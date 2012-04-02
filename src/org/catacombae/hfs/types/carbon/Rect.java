@@ -88,7 +88,7 @@ public class Rect implements StructElements {
 	return result;
     }
 
-    @Override
+    /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(Rect.class.getSimpleName());
         

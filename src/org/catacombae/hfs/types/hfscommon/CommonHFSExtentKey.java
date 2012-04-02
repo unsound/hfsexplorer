@@ -30,7 +30,7 @@ import org.catacombae.hfs.types.hfs.ExtKeyRec;
  */
 public abstract class CommonHFSExtentKey extends CommonBTKey<CommonHFSExtentKey> implements StructElements {
 
-    @Override
+    /* @Override */
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + getClass().getSimpleName() + ":");
         printFields(ps, prefix + " ");
@@ -104,28 +104,28 @@ public abstract class CommonHFSExtentKey extends CommonBTKey<CommonHFSExtentKey>
             return key.getBytes();
         }
 
-        @Override
+        /* @Override */
         public int maxSize() {
             return key.length();
         }
 
-        @Override
+        /* @Override */
         public int occupiedSize() {
             return key.length();
         }
 
-        @Override
+        /* @Override */
         public void printFields(PrintStream ps, String prefix) {
             ps.println(prefix + "key:");
             key.print(ps, prefix + " ");
         }
 
-        @Override
+        /* @Override */
         public Dictionary getStructElements() {
             return key.getStructElements();
         }
 
-        @Override
+        /* @Override */
         public int compareTo(CommonHFSExtentKey o) {
             if(o instanceof HFSPlusImplementation) {
                 return commonCompare(this, o);
@@ -167,28 +167,28 @@ public abstract class CommonHFSExtentKey extends CommonBTKey<CommonHFSExtentKey>
             return key.getBytes();
         }
 
-        @Override
+        /* @Override */
         public int maxSize() {
             return key.length();
         }
 
-        @Override
+        /* @Override */
         public int occupiedSize() {
             return key.length();
         }
 
-        @Override
+        /* @Override */
         public void printFields(PrintStream ps, String prefix) {
             ps.println(prefix + "key:");
             key.print(ps, prefix + " ");
         }
 
-        @Override
+        /* @Override */
         public Dictionary getStructElements() {
             return key.getStructElements();
         }
 
-        @Override
+        /* @Override */
         public int compareTo(CommonHFSExtentKey o) {
             if(o instanceof HFSImplementation) {
                 return commonCompare(this, o);

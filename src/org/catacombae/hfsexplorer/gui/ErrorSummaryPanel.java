@@ -34,7 +34,7 @@ public class ErrorSummaryPanel extends javax.swing.JPanel {
         this(errorMessages);
         
         closeButton.addActionListener(new ActionListener() {
-            @Override
+            /* @Override */
             public void actionPerformed(ActionEvent e) {
                 dialog.dispose();
             }

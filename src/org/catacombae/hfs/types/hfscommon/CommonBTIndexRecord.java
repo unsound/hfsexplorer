@@ -67,13 +67,13 @@ public abstract class CommonBTIndexRecord <K extends CommonBTKey<K>> extends Com
         return res;
     }
 
-    @Override
+    /* @Override */
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + "CommonBTIndexRecord:");
         printFields(ps, prefix);
     }
     
-    @Override
+    /* @Override */
     public void printFields(PrintStream ps, String prefix) {
         ps.println(prefix + " key:");
         key.print(ps, prefix + "  ");

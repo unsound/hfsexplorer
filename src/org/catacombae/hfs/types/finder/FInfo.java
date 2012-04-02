@@ -121,7 +121,7 @@ public class FInfo implements StructElements {
         return result;
     }
 
-    @Override
+    /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(FInfo.class.getSimpleName());
         
