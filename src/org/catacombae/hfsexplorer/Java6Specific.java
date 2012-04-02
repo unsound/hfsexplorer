@@ -17,12 +17,14 @@
 
 package org.catacombae.hfsexplorer;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.io.File;
 import java.io.IOException;
 import java.awt.Desktop;
 import java.awt.Image;
 import java.awt.Window;
+import java.lang.reflect.Method;
 import java.util.Comparator;
 import java.util.List;
 import javax.swing.ImageIcon;
@@ -78,7 +80,20 @@ public class Java6Specific {
 	LinkedList<Image> iconImages = new LinkedList<Image>();
 	for(ImageIcon ii : icons)
 	    iconImages.addLast(ii.getImage());
-	window.setIconImages(iconImages);
+
+        try {
+            Class c = window.getClass();
+            Method m = c.getMethod("setIconImages", LinkedList.class);
+            m.invoke(window, iconImages);
+        } catch(NoSuchMethodException ex) {
+            throw new RuntimeException(ex);
+        } catch (IllegalAccessException ex) {
+            throw new RuntimeException(ex);
+        } catch (IllegalArgumentException ex) {
+            throw new RuntimeException(ex);
+        } catch (InvocationTargetException ex) {
+            throw new RuntimeException(ex);
+        }
     }
     
     /**
@@ -103,6 +118,19 @@ public class Java6Specific {
             ++i;
         }
         sorter.toggleSortOrder(defaultSortColumn);
-        table.setRowSorter(sorter);
+
+        try {
+            Class c = table.getClass();
+            Method m = c.getMethod("setIconImages", TableRowSorter.class);
+            m.invoke(table, sorter);
+        } catch(NoSuchMethodException ex) {
+            throw new RuntimeException(ex);
+        } catch (IllegalAccessException ex) {
+            throw new RuntimeException(ex);
+        } catch (IllegalArgumentException ex) {
+            throw new RuntimeException(ex);
+        } catch (InvocationTargetException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }
