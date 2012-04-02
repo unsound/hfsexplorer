@@ -74,12 +74,12 @@ public class HFSCommonFSFile extends HFSCommonFSEntry implements FSFile {
         this.resourceFork = new HFSCommonFSFork(this, FSForkType.MACOS_RESOURCE, catalogFile.getResourceFork());
     }
     
-    @Override
+    /* @Override */
     public FSAttributes getAttributes() {
         return attributes;
     }
 
-    @Override
+    /* @Override */
     public String getName() {
         return fsHandler.getProperNodeName(keyRecord);
     }
@@ -91,7 +91,7 @@ public class HFSCommonFSFile extends HFSCommonFSEntry implements FSFile {
     }
      * */
 
-    @Override
+    /* @Override */
     public FSFork getMainFork() {
         return getForkByType(FSForkType.DATA);
     }

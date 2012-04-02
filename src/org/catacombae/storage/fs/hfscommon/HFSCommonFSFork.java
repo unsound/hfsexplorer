@@ -56,22 +56,22 @@ public class HFSCommonFSFork implements FSFork {
         this.forkData = iForkData;
     }
     
-    @Override
+    /* @Override */
     public long getLength() {
         return forkData.getLogicalSize();
     }
 
-    @Override
+    /* @Override */
     public boolean isWritable() {
         return false; // Will be implemented in the future
     }
 
-    @Override
+    /* @Override */
     public boolean isTruncatable() {
         return false; // Will be implemented in the future
     }
 
-    @Override
+    /* @Override */
     public String getForkIdentifier() {
         switch(type) {
             case DATA:
@@ -84,14 +84,14 @@ public class HFSCommonFSFork implements FSFork {
         }
     }
 
-    @Override
+    /* @Override */
     public InputStream getInputStream() {
         return new ReadableRandomAccessInputStream(
                 new SynchronizedReadableRandomAccessStream(
                         getReadableRandomAccessStream()));
     }
 
-    @Override
+    /* @Override */
     public ReadableRandomAccessStream getReadableRandomAccessStream() {
         switch(type) {
             case DATA:
@@ -104,27 +104,27 @@ public class HFSCommonFSFork implements FSFork {
         }
     }
 
-    @Override
+    /* @Override */
     public WritableRandomAccessStream getWritableRandomAccessStream() throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
+    /* @Override */
     public RandomAccessStream getRandomAccessStream() throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
+    /* @Override */
     public OutputStream getOutputStream() throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
+    /* @Override */
     public TruncatableRandomAccessStream getForkStream() throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
+    /* @Override */
     public boolean hasXattrName() {
         if(type == FSForkType.MACOS_RESOURCE)
             return true;
@@ -132,7 +132,7 @@ public class HFSCommonFSFork implements FSFork {
             return false;
     }
 
-    @Override
+    /* @Override */
     public String getXattrName() {
         if(type == FSForkType.MACOS_RESOURCE)
             return RESOURCE_XATTR_NAME;

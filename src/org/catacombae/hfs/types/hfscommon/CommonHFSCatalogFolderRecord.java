@@ -45,7 +45,7 @@ public abstract class CommonHFSCatalogFolderRecord extends CommonHFSCatalogLeafR
         return data;
     }
     
-    @Override
+    /* @Override */
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + CommonHFSCatalogFolderRecord.class.getSimpleName() + ":");
         printFields(ps, prefix + " ");

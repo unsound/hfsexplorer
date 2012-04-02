@@ -39,7 +39,7 @@ public class MemoryStatisticsPanel extends javax.swing.JPanel {
         
         runGcButton.addActionListener(new ActionListener() {
 
-            @Override
+            /* @Override */
             public void actionPerformed(ActionEvent e) {
                 Runtime.getRuntime().gc();
             }
@@ -50,7 +50,7 @@ public class MemoryStatisticsPanel extends javax.swing.JPanel {
     public void startThread() {
         Runnable r = new Runnable() {
             
-            @Override
+            /* @Override */
             public void run() {
                 Runtime rt = Runtime.getRuntime();
                 synchronized(syncObj) {
@@ -61,7 +61,7 @@ public class MemoryStatisticsPanel extends javax.swing.JPanel {
                         final long allocatedMem = curMaxMem - freeMem;
                         
                         SwingUtilities.invokeLater(new Runnable() {
-                            @Override
+                            /* @Override */
                             public void run() {
                                 allocatedMemoryField.setText(Util.addUnitSpaces("" + allocatedMem, 3) + " bytes");
                                 freeMemoryField.setText(Util.addUnitSpaces("" + freeMem, 3) + " bytes");

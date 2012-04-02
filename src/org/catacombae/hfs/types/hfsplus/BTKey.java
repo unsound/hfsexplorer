@@ -22,7 +22,7 @@ public abstract class BTKey implements Comparable<BTKey> {
     public abstract int length();    
     public abstract byte[] getBytes();
 
-    @Override
+    /* @Override */
     public int compareTo(BTKey btk) {
 	byte[] thisData = getBytes();
 	byte[] thatData = btk.getBytes();

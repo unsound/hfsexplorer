@@ -67,7 +67,7 @@ public class HFSCommonFSLink extends HFSCommonFSEntry implements FSLink {
     /**
      * {@inheritDoc}
      */
-    @Override
+    /* @Override */
     public FSEntry getLinkTarget(String[] parentDir) {
         /*
         String prefix = parentFileSystem.globalPrefix;
@@ -118,12 +118,12 @@ public class HFSCommonFSLink extends HFSCommonFSEntry implements FSLink {
         //} finally { parentFileSystem.log(prefix + "Returning from getLinkTarget."); parentFileSystem.globalPrefix = prefix; }
     }
 
-    @Override
+    /* @Override */
     public FSAttributes getAttributes() {
         return new HFSCommonFSAttributes(this, linkRecord.getData());
     }
 
-    @Override
+    /* @Override */
     public String getName() {
         return fsHandler.getProperNodeName(linkRecord);
     }
@@ -139,7 +139,7 @@ public class HFSCommonFSLink extends HFSCommonFSEntry implements FSLink {
         return linkRecord;
     }
 
-    @Override
+    /* @Override */
     public String getLinkTargetString() {
         return getLinkTargetPosixPath();
     }

@@ -98,7 +98,7 @@ public class FXInfo implements StructElements {
 	return result;
     }
 
-    @Override
+    /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(FXInfo.class.getSimpleName());
         

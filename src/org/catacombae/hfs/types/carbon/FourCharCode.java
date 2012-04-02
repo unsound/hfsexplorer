@@ -60,7 +60,7 @@ public class FourCharCode implements StructElements {
         return Util.createCopy(fourCharCode);
     }
 
-    @Override
+    /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(FourCharCode.class.getSimpleName());
         

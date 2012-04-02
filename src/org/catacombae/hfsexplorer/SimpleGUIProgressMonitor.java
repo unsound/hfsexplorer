@@ -34,7 +34,7 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
         this.parentComponent = parentComponent;
     }
         
-    @Override
+    /* @Override */
     public ExtractProperties getExtractProperties() {
         return extractProperties;
     }
@@ -93,7 +93,7 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
      * @see #createDirectoryFailed(java.awt.Component, java.lang.String,
      * java.io.File)
      */
-    @Override
+    /* @Override */
     public CreateDirectoryFailedAction createDirectoryFailed(String dirname,
             File parentDirectory) {
         return createDirectoryFailed(parentComponent, dirname, parentDirectory);
@@ -103,7 +103,7 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
      * @see #createFileFailed(java.awt.Component, java.lang.String,
      * java.io.File)
      */
-    @Override
+    /* @Override */
     public CreateFileFailedAction createFileFailed(String filename,
             File parentDirectory) {
         return createFileFailed(parentComponent, filename, parentDirectory);
@@ -112,7 +112,7 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
     /**
      * @see #directoryExists(java.awt.Component, java.io.File) 
      */
-    @Override
+    /* @Override */
     public DirectoryExistsAction directoryExists(File directory) {
         return directoryExists(parentComponent, directory);
     }
@@ -120,7 +120,7 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
     /**
      * @see #fileExists(java.awt.Component, java.io.File)
      */
-    @Override
+    /* @Override */
     public FileExistsAction fileExists(File file) {
         return fileExists(parentComponent, file);
     }
@@ -129,7 +129,7 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
      * @see #displayRenamePrompt(java.awt.Component, java.lang.String,
      * java.io.File)
      */
-    @Override
+    /* @Override */
     public String displayRenamePrompt(String currentName, File outDir) {
         return displayRenamePrompt(parentComponent, currentName, outDir);
     }

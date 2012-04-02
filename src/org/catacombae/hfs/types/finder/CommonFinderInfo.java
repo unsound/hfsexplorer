@@ -105,7 +105,7 @@ public abstract class CommonFinderInfo implements StructElements, PrintableStruc
         return result;
     }
     
-    @Override
+    /* @Override */
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " finderFlags: " + getFinderFlags());
 	ps.println(prefix + " location: ");
@@ -113,7 +113,7 @@ public abstract class CommonFinderInfo implements StructElements, PrintableStruc
 	ps.println(prefix + " reservedField: " + getReservedField());
     }    
     
-    @Override
+    /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(CommonFinderInfo.class.getSimpleName());
         

@@ -34,7 +34,7 @@ public abstract class CommonHFSCatalogFolderThread implements PrintableStruct, S
     public abstract int length();
     public abstract byte[] getBytes();
     
-    @Override
+    /* @Override */
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + CommonHFSCatalogFolderThread.class.getSimpleName() + ":");
         printFields(ps, prefix + " ");
@@ -75,13 +75,13 @@ public abstract class CommonHFSCatalogFolderThread implements PrintableStruct, S
             return data.getBytes();
         }
         
-        @Override
+        /* @Override */
         public void printFields(PrintStream ps, String prefix) {
             ps.println(prefix + "data:");
             data.print(ps, prefix + " ");
         }
 
-        @Override
+        /* @Override */
         public Dictionary getStructElements() {
             return data.getStructElements();
         }
@@ -114,13 +114,13 @@ public abstract class CommonHFSCatalogFolderThread implements PrintableStruct, S
             return data.getBytes();
         }
 
-        @Override
+        /* @Override */
         public void printFields(PrintStream ps, String prefix) {
             ps.println(prefix + "data:");
             data.print(ps, prefix + " ");
         }
         
-        @Override
+        /* @Override */
         public Dictionary getStructElements() {
             return data.getStructElements();
         }

@@ -130,34 +130,34 @@ public class FileSystemBrowser<A> {
 
         upButton.addActionListener(new ActionListener() {
 
-            @Override
+            /* @Override */
             public void actionPerformed(ActionEvent e) {
                 actionGotoParentDir();
             }
         });
         extractButton.addActionListener(new ActionListener() {
-            @Override
+            /* @Override */
             public void actionPerformed(ActionEvent e) {
                 actionExtractToDir();
             }
         });
 
         infoButton.addActionListener(new ActionListener() {
-            @Override
+            /* @Override */
             public void actionPerformed(ActionEvent e) {
                 actionGetInfo();
             }
         });
         
         goButton.addActionListener(new ActionListener() {
-            @Override
+            /* @Override */
             public void actionPerformed(ActionEvent e) {
                 actionGotoDir();
             }
         });
         
         addressField.addActionListener(new ActionListener() {
-            @Override
+            /* @Override */
             public void actionPerformed(ActionEvent e) {
                 actionGotoDir();
             }
@@ -226,10 +226,10 @@ public class FileSystemBrowser<A> {
             private int[] w1 = null;
             //public int[] lastWidths = null;
 
-            @Override
+            /* @Override */
             public void columnAdded(TableColumnModelEvent e) { /*System.out.println("columnAdded");*/ }
 
-            @Override
+            /* @Override */
             public void columnMarginChanged(ChangeEvent e) {
                 if (disableColumnListener[0]) {
                     return;
@@ -318,13 +318,13 @@ public class FileSystemBrowser<A> {
                     locked = false; /*System.err.println();*/ }
             }
 
-            @Override
+            /* @Override */
             public void columnMoved(TableColumnModelEvent e) { /*System.out.println("columnMoved");*/ }
 
-            @Override
+            /* @Override */
             public void columnRemoved(TableColumnModelEvent e) { /*System.out.println("columnRemoved");*/ }
 
-            @Override
+            /* @Override */
             public void columnSelectionChanged(ListSelectionEvent e) { /*System.out.println("columnSelectionChanged");*/ }
         };
         fileTable.getColumnModel().addColumnModelListener(columnListener);
@@ -338,7 +338,7 @@ public class FileSystemBrowser<A> {
             private ImageIcon folderIcon = new ImageIcon(ClassLoader.getSystemResource("res/folder.png"));
             private ImageIcon emptyIcon = new ImageIcon(ClassLoader.getSystemResource("res/nothing.png"));
 		
-            @Override
+            /* @Override */
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, final int row, final int column) {
                 if(value instanceof RecordContainer) {
                     final Component objectComponent = objectRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -392,7 +392,7 @@ public class FileSystemBrowser<A> {
 
         fileTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
-            @Override
+            /* @Override */
             public void valueChanged(ListSelectionEvent e) {
                 /* When the selection in the file table changes, update the
                  * selection status field with the new selection count and
@@ -514,46 +514,46 @@ public class FileSystemBrowser<A> {
        	dirTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         
 	dirTree.addTreeSelectionListener(new TreeSelectionListener() {
-                @Override
+                /* @Override */
 		public void valueChanged(TreeSelectionEvent e) {
 		    TreePath tp = e.getPath();
                     actionTreeNodeSelected(tp);
                 }
 	    });
 	dirTree.addTreeWillExpandListener(new TreeWillExpandListener() {
-                @Override
+                /* @Override */
 		public void treeWillExpand(TreeExpansionEvent e) 
                     throws ExpandVetoException {
 		    //System.out.println("Tree will expand!");
                     actionExpandDirTreeNode(e.getPath());
 		}
 		
-                @Override
+                /* @Override */
 		public void treeWillCollapse(TreeExpansionEvent e) {}
 
 	    });
 	
 	// Focus monitoring
 	fileTable.addFocusListener(new FocusListener() {
-                @Override
+                /* @Override */
 		public void focusGained(FocusEvent e) {
 		    //System.err.println("fileTable gained focus!");
 		    fileTableLastFocus = System.nanoTime();
 		    //dirTree.clearSelection();
 		}
 
-                @Override
+                /* @Override */
 		public void focusLost(FocusEvent e) {}
 	    });
 	dirTree.addFocusListener(new FocusListener() {
-                @Override
+                /* @Override */
 		public void focusGained(FocusEvent e) {
 		    //System.err.println("dirTree gained focus!");
 		    dirTreeLastFocus = System.nanoTime();
 		    //fileTable.clearSelection(); // I'm unsure whether this behaviour is desired
 		}
 
-                @Override
+                /* @Override */
 		public void focusLost(FocusEvent e) {}
 	    });
 	
@@ -1396,7 +1396,7 @@ public class FileSystemBrowser<A> {
         
         @Override public String toString() { return rec.getName(); }
 
-        @Override
+        /* @Override */
         public int compareTo(Object o) {
             if(o instanceof RecordContainer) {
                 RecordContainer rc = (RecordContainer)o;
@@ -1421,7 +1421,7 @@ public class FileSystemBrowser<A> {
         
         public long getSize() { return trueSize; }
         
-        @Override
+        /* @Override */
         public int compareTo(Object o) {
             if(o instanceof SizeEntry) {
                 SizeEntry se = (SizeEntry) o;
@@ -1497,7 +1497,7 @@ public class FileSystemBrowser<A> {
             }
         }
 
-        @Override
+        /* @Override */
         public int compareTo(Object o) {
             if(o instanceof RecordTypeEntry) {
                 RecordTypeEntry rte = (RecordTypeEntry)o;
@@ -1524,7 +1524,7 @@ public class FileSystemBrowser<A> {
             return displayString;
         }
 
-        @Override
+        /* @Override */
         public int compareTo(Object o) {
             if(o instanceof DateEntry) {
                 DateEntry de = (DateEntry)o;
@@ -1542,7 +1542,7 @@ public class FileSystemBrowser<A> {
             this.index = index;
         }
         
-        @Override
+        /* @Override */
         public int compareTo(IndexEntry o) {
             return index-o.index;
         }
@@ -1553,7 +1553,7 @@ public class FileSystemBrowser<A> {
     
     private static class ComparableComparator implements Comparator<Comparable<Comparable>> {
 
-        @Override
+        /* @Override */
         public int compare(Comparable<Comparable> o1, Comparable<Comparable> o2) {
             //System.err.println("ComparableComparator comparing a " + o1.getClass() + " and a " + o2.getClass());
             //if(o1 instanceof Comparable && o2 instanceof Comparable) {

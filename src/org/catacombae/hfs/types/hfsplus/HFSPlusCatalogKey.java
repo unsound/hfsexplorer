@@ -107,13 +107,13 @@ public class HFSPlusCatalogKey extends BTKey implements DynamicStruct, StructEle
     @Override
     public int length() { return occupiedSize(); }
     
-    @Override
+    /* @Override */
     public int occupiedSize() { return 2+Util.unsign(getKeyLength()); }
     
-    @Override
+    /* @Override */
     public int maxSize() { return MAX_STRUCTSIZE; }
 
-    @Override
+    /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(HFSPlusCatalogKey.class.getSimpleName());
         

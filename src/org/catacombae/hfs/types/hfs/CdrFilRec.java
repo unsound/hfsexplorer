@@ -99,7 +99,7 @@ public class CdrFilRec extends CatDataRec {
     
     public static int length() { return STRUCTSIZE; }
     
-    @Override
+    /* @Override */
     public int size() { return length(); }
     
     /** file flags (SignedByte) */
@@ -205,7 +205,7 @@ public class CdrFilRec extends CatDataRec {
         return result;
     }
     
-    @Override
+    /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(CdrThdRec.class.getSimpleName());
         

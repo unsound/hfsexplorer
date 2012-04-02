@@ -71,32 +71,32 @@ public class HFSCommonFSFolder extends HFSCommonFSEntry implements FSFolder {
                 new HFSCommonFSAttributes(this, folderRecord.getData());
     }
     
-    @Override
+    /* @Override */
     public String[] list() {
         return fsHandler.listNames(folderRecord);
     }
     
-    @Override
+    /* @Override */
     public FSEntry[] listEntries() {
         return fsHandler.listFSEntries(folderRecord);
     }
     
-    @Override
+    /* @Override */
     public FSEntry getChild(String name) {
         return fsHandler.getEntry(folderRecord, name);
     }
 
-    @Override
+    /* @Override */
     public long getValence() {
         return folderRecord.getData().getValence();
     }
 
-    @Override
+    /* @Override */
     public FSAttributes getAttributes() {
         return attributes;
     }
 
-    @Override
+    /* @Override */
     public String getName() {
         return fsHandler.getProperNodeName(keyRecord);
     }

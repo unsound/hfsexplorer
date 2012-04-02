@@ -52,7 +52,7 @@ public class HelpBrowserPanel extends javax.swing.JPanel {
         initComponents();
         htmlView.setEditable(false);
         htmlView.addHyperlinkListener(new HyperlinkListener() {
-            @Override
+            /* @Override */
             public void hyperlinkUpdate(HyperlinkEvent e) {
                 if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     URL url = e.getURL();
@@ -63,13 +63,13 @@ public class HelpBrowserPanel extends javax.swing.JPanel {
         });
 
         backButton.addActionListener(new ActionListener() {
-            @Override
+            /* @Override */
             public void actionPerformed(ActionEvent e) {
                 goBack();
             }
         });
         homeButton.addActionListener(new ActionListener() {
-            @Override
+            /* @Override */
             public void actionPerformed(ActionEvent e) {
                 goHome();
             }

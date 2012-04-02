@@ -191,7 +191,7 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
         }
     }
 
-    @Override
+    /* @Override */
     public void setChainedContents(Component c) {
         extendedInfoStackPanel.removeAll();
         extendedInfoStackPanel.add(c);
@@ -312,7 +312,7 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
     private void startFolderSizeCalculation(final FSFolder folder) {
         Runnable r = new Runnable () {
             
-            @Override
+            /* @Override */
             public void run() {
                 String resultString;
                 try {
@@ -333,7 +333,7 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
 
                 SwingUtilities.invokeLater(new Runnable() {
 
-                    @Override
+                    /* @Override */
                     public void run() {
                         sizeField.setText(finalResultString);
                     }

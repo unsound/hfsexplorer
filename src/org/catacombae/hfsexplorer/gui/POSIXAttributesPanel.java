@@ -57,7 +57,7 @@ public class POSIXAttributesPanel extends javax.swing.JPanel implements ChainedP
         initComponents();
     }
     
-    @Override
+    /* @Override */
     public void setChainedContents(Component c) {
         chainedContentsPanel.removeAll();
         chainedContentsPanel.add(c);

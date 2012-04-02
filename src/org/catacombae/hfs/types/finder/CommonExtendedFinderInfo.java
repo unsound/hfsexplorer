@@ -58,14 +58,14 @@ public abstract class CommonExtendedFinderInfo implements StructElements, Printa
 	return (getExtendedFinderFlags() & kExtendedFlagHasRoutingInfo) != 0;
     }
 
-    @Override
+    /* @Override */
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " extendedFinderFlags: " + getExtendedFinderFlags());
 	ps.println(prefix + " reserved2: " + getReserved2());
 	ps.println(prefix + " putAwayFolderID: " + getPutAwayFolderID());
     }
     
-    @Override
+    /* @Override */
     public Dictionary getStructElements() {
          DictionaryBuilder db = new DictionaryBuilder(CommonExtendedFinderInfo.class.getName());
          

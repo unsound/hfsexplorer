@@ -47,7 +47,7 @@ public abstract class HFSCommonFSEntry extends BasicFSEntry {
         return fsHandler;
     }
 
-    @Override
+    /* @Override */
     public FSFork[] getAllForks() {
         FSFork fork = getFinderInfoFork();
         if(fork != null)
@@ -56,7 +56,7 @@ public abstract class HFSCommonFSEntry extends BasicFSEntry {
             return new FSFork[0];
     }
 
-    @Override
+    /* @Override */
     public FSFork getForkByType(FSForkType type) {
 
         if(type == FSForkType.MACOS_FINDERINFO)
@@ -65,7 +65,7 @@ public abstract class HFSCommonFSEntry extends BasicFSEntry {
             return null;
     }
 
-    @Override
+    /* @Override */
     public long getCombinedLength() {
         
         FSFork fork = getFinderInfoFork();

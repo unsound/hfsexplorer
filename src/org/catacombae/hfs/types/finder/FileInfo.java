@@ -78,7 +78,7 @@ public class FileInfo extends CommonFinderInfo implements StructElements {
 	super.printFields(ps, prefix);
     }
     
-    @Override
+    /* @Override */
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "FileInfo:");
 	printFields(ps, prefix);

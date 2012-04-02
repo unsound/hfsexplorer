@@ -70,7 +70,7 @@ public class FolderInfo extends CommonFinderInfo implements StructElements {
 	super.printFields(ps, prefix);
     }
     
-    @Override
+    /* @Override */
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "FolderInfo:");
 	printFields(ps, prefix);

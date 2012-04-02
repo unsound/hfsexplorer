@@ -36,29 +36,29 @@ public class StandardPartition implements Partition {
         this.type = type;
     }
     
-    @Override
+    /* @Override */
     public long getStartOffset() {
         return startOffset;
     }
 
-    @Override
+    /* @Override */
     public long getLength() {
         return length;
     }
 
-    @Override
+    /* @Override */
     public PartitionType getType() {
         return type;
     }
 
-    @Override
+    /* @Override */
     public void printFields(PrintStream ps, String prefix) {
         ps.println(prefix + "startOffset: " + startOffset);
         ps.println(prefix + "length: " + length);
         ps.println(prefix + "type: " + type);
     }
 
-    @Override
+    /* @Override */
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + getClass().getSimpleName());
         printFields(ps, prefix + " ");

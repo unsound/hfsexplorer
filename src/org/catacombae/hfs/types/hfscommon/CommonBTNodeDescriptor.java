@@ -97,12 +97,12 @@ public abstract class CommonBTNodeDescriptor implements PrintableStruct {
             return Util.unsign(btnd.getNumRecords());
         }
 
-        @Override
+        /* @Override */
         public void print(PrintStream ps, String prefix) {
             btnd.print(ps, prefix);
         }
 
-        @Override
+        /* @Override */
         public void printFields(PrintStream ps, String prefix) {
             btnd.printFields(ps, prefix);
         }
@@ -152,12 +152,12 @@ public abstract class CommonBTNodeDescriptor implements PrintableStruct {
             return Util.unsign(nd.getNdNRecs());
         }
 
-        @Override
+        /* @Override */
         public void print(PrintStream ps, String prefix) {
             nd.print(ps, prefix);
         }
 
-        @Override
+        /* @Override */
         public void printFields(PrintStream ps, String prefix) {
             nd.printFields(ps, prefix);
         }

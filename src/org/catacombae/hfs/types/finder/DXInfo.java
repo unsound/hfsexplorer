@@ -102,7 +102,7 @@ public class DXInfo implements StructElements {
 	return result;
     }
 
-    @Override
+    /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(DXInfo.class.getSimpleName());
         
