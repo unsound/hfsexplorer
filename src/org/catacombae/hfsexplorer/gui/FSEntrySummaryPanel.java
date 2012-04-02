@@ -358,7 +358,7 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
             }
 
             if(entry instanceof FSFile) {
-                result.o += ((FSFile) entry).getMainFork().getLength();
+                result.o = result.o + ((FSFile) entry).getMainFork().getLength();
             }
             else if(entry instanceof FSFolder) {
                 calculateFolderSize((FSFolder) entry, result);
