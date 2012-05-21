@@ -34,8 +34,19 @@ public class HFSPlusExtentRecord implements StructElements {
     private final HFSPlusExtentDescriptor[] array = new HFSPlusExtentDescriptor[8];
 
     public HFSPlusExtentRecord(byte[] data, int offset) {
-	for(int i = 0; i < array.length; ++i)
-	    array[i] = new HFSPlusExtentDescriptor(data, offset+i*HFSPlusExtentDescriptor.getSize());
+        this(false, data, offset);
+    }
+
+    private HFSPlusExtentRecord(final boolean mutable, byte[] data, int offset)
+    {
+        for(int i = 0; i < array.length; ++i) {
+            if(mutable)
+                array[i] = new HFSPlusExtentDescriptor.Mutable(data,
+                        offset+i*HFSPlusExtentDescriptor.getSize());
+            else
+                array[i] = new HFSPlusExtentDescriptor(data,
+                        offset+i*HFSPlusExtentDescriptor.getSize());
+        }
     }
 
     public HFSPlusExtentDescriptor getExtentDescriptor(int index) {
@@ -111,5 +122,58 @@ public class HFSPlusExtentRecord implements StructElements {
         }
 
         return db.getResult();
+    }
+
+    private final void _set(HFSPlusExtentRecord rec) {
+        for(int i = 0; i < this.array.length; ++i) {
+            ((HFSPlusExtentDescriptor.Mutable) this.array[i]).set(
+                    rec.array[i]);
+        }
+    }
+
+    private final void _setExtentDescriptor(int index,
+            HFSPlusExtentDescriptor extentDescriptor)
+    {
+        if(index < 0 || index > this.array.length) {
+            throw new RuntimeException("index out of range: " + index);
+        }
+
+        ((HFSPlusExtentDescriptor.Mutable) this.array[index]).set(
+                extentDescriptor);
+    }
+
+    private final void _setExtentDescriptors(
+            HFSPlusExtentDescriptor[] extentDescriptors)
+    {
+        if(extentDescriptors.length != this.array.length) {
+            throw new RuntimeException("Invalid length of array " +
+                    "'extentDescriptors': " + extentDescriptors.length);
+        }
+
+        for(int i = 0; i < this.array.length; ++i) {
+            this._setExtentDescriptor(i, extentDescriptors[i]);
+        }
+    }
+
+    public static class Mutable extends HFSPlusExtentRecord {
+        public Mutable(byte[] data, int offset) {
+            super(true, data, offset);
+        }
+
+        public void set(HFSPlusExtentRecord rec) {
+            super._set(rec);
+        }
+
+        public void setExtentDescriptor(int index,
+                HFSPlusExtentDescriptor extentDescriptor)
+        {
+            super._setExtentDescriptor(index, extentDescriptor);
+        }
+
+        public void setExtentDescriptors(
+                HFSPlusExtentDescriptor[] extentDescriptors)
+        {
+            super._setExtentDescriptors(extentDescriptors);
+        }
     }
 }

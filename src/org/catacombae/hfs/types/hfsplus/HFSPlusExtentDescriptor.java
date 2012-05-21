@@ -90,6 +90,37 @@ public class HFSPlusExtentDescriptor implements StructElements,
 
         return sb.getResult();
     }
+
+    private final void _setStartBlock(int startBlock) {
+        Util.arrayPutBE(this.startBlock, 0, (int) startBlock);
+    }
+
+    private final void _setBlockCount(int blockCount) {
+        Util.arrayPutBE(this.blockCount, 0, (int) blockCount);
+    }
+
+    public static class Mutable extends HFSPlusExtentDescriptor {
+        public Mutable(byte[] data, int offset) {
+            super(data, offset);
+        }
+
+        public Mutable(int startBlock, int blockCount) {
+            super(startBlock, blockCount);
+        }
+
+        public void set(HFSPlusExtentDescriptor desc) {
+            this.setStartBlock(desc.getStartBlock());
+            this.setBlockCount(desc.getBlockCount());
+        }
+
+        public void setStartBlock(int startBlock) {
+            super._setStartBlock(startBlock);
+        }
+
+        public void setBlockCount(int blockCount) {
+            super._setBlockCount(blockCount);
+        }
+    }
 }
 
 /* Maximal filstorlek i HFS+ måste vara blockSize*2^32*8. Dvs. vid blockSize = 4096:
