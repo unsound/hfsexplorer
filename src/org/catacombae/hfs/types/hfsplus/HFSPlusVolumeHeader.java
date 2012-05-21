@@ -96,6 +96,10 @@ public class HFSPlusVolumeHeader extends MutableStruct implements StructElements
     }
 	
     public HFSPlusVolumeHeader(byte[] data, int offset) {
+        this(false, data, offset);
+    }
+
+    private HFSPlusVolumeHeader(boolean mutable, byte[] data, int offset) {
 	//this(new ByteArrayInputStream(data, offset, _getSize()));
 	System.arraycopy(data, offset+0, signature, 0, 2);
 	System.arraycopy(data, offset+2, version, 0, 2);
@@ -115,20 +119,32 @@ public class HFSPlusVolumeHeader extends MutableStruct implements StructElements
 	System.arraycopy(data, offset+56, rsrcClumpSize, 0, 4);
 	System.arraycopy(data, offset+60, dataClumpSize, 0, 4);
 	//System.arraycopy(data, 64, nextCatalogID, 0, 4);// (HFSCatalogNodeID)
-	nextCatalogID = new HFSCatalogNodeID(data, offset+64);
+        nextCatalogID = (mutable ?
+            new HFSCatalogNodeID.Mutable(data, offset+64) :
+            new HFSCatalogNodeID(data, offset+64));
 	System.arraycopy(data, offset+68, writeCount, 0, 4);
 	System.arraycopy(data, offset+72, encodingsBitmap, 0, 4);
 	System.arraycopy(data, offset+80, finderInfo, 0, 4*8);
 	//System.arraycopy(data, 112, allocationFile, 0, 80);
-	allocationFile = new HFSPlusForkData(data, offset+112);
+	allocationFile = (mutable ?
+            new HFSPlusForkData.Mutable(data, offset+112) :
+            new HFSPlusForkData(data, offset+112));
 	//System.arraycopy(data, 192, extentsFile, 0, 80);
-	extentsFile = new HFSPlusForkData(data, offset+192);
+	extentsFile = (mutable ?
+            new HFSPlusForkData.Mutable(data, offset+192) :
+            new HFSPlusForkData(data, offset+192));
 	//System.arraycopy(data, 272, catalogFile, 0, 80);
-	catalogFile = new HFSPlusForkData(data, offset+272);
+	catalogFile = (mutable ?
+            new HFSPlusForkData.Mutable(data, offset+272) :
+            new HFSPlusForkData(data, offset+272));
 	//System.arraycopy(data, 352, attributesFile, 0, 80);
-	attributesFile = new HFSPlusForkData(data, offset+352);
+	attributesFile = (mutable ?
+            new HFSPlusForkData.Mutable(data, offset+352) :
+            new HFSPlusForkData(data, offset+352));
 	//System.arraycopy(data, 432, startupFile, 0, 80);
-	startupFile = new HFSPlusForkData(data, offset+432);
+	startupFile = (mutable ?
+            new HFSPlusForkData.Mutable(data, offset+432) :
+            new HFSPlusForkData(data, offset+432));
     }
 	
     public HFSPlusVolumeHeader(InputStream is) throws IOException {
@@ -332,5 +348,314 @@ public class HFSPlusVolumeHeader extends MutableStruct implements StructElements
             return false;
 
         return true;
+    }
+
+    private void _setSignature(short signature) {
+        Util.arrayPutBE(this.signature, 0, (short) signature);
+    }
+
+    private void _setVersion(short version) {
+        Util.arrayPutBE(this.version, 0, (short) version);
+    }
+
+    private void _setAttributes(int attributes) {
+        Util.arrayPutBE(this.attributes, 0, (int) attributes);
+    }
+
+    private void _setLastMountedVersion(int lastMountedVersion) {
+        Util.arrayPutBE(this.lastMountedVersion, 0, (int) lastMountedVersion);
+    }
+
+    private void _setJournalInfoBlock(int journalInfoBlock) {
+        Util.arrayPutBE(this.journalInfoBlock, 0, (int) journalInfoBlock);
+    }
+
+    private void _setCreateDate(int createDate) {
+        Util.arrayPutBE(this.createDate, 0, (int) createDate);
+    }
+
+    private void _setModifyDate(int modifyDate) {
+        Util.arrayPutBE(this.modifyDate, 0, (int) modifyDate);
+    }
+
+    private void _setBackupDate(int backupDate) {
+        Util.arrayPutBE(this.backupDate, 0, (int) backupDate);
+    }
+
+    private void _setCheckedDate(int checkedDate) {
+        Util.arrayPutBE(this.checkedDate, 0, (int) checkedDate);
+    }
+
+    private void _setFileCount(int fileCount) {
+        Util.arrayPutBE(this.fileCount, 0, (int) fileCount);
+    }
+
+    private void _setFolderCount(int folderCount) {
+        Util.arrayPutBE(this.folderCount, 0, (int) folderCount);
+    }
+
+    private void _setBlockSize(int blockSize) {
+        Util.arrayPutBE(this.blockSize, 0, (int) blockSize);
+    }
+
+    private void _setTotalBlocks(int totalBlocks) {
+        Util.arrayPutBE(this.totalBlocks, 0, (int) totalBlocks);
+    }
+
+    private void _setFreeBlocks(int freeBlocks) {
+        Util.arrayPutBE(this.freeBlocks, 0, (int) freeBlocks);
+    }
+
+    private void _setNextAllocation(int nextAllocation) {
+        Util.arrayPutBE(this.nextAllocation, 0, (int) nextAllocation);
+    }
+
+    private void _setRsrcClumpSize(int rsrcClumpSize) {
+        Util.arrayPutBE(this.rsrcClumpSize, 0, (int) rsrcClumpSize);
+    }
+
+    private void _setDataClumpSize(int dataClumpSize) {
+        Util.arrayPutBE(this.dataClumpSize, 0, (int) dataClumpSize);
+    }
+
+    private HFSCatalogNodeID.Mutable _getMutableNextCatalogID() {
+        return (HFSCatalogNodeID.Mutable) this.nextCatalogID;
+    }
+
+    private void _setNextCatalogID(HFSCatalogNodeID nextCatalogID) {
+        this._getMutableNextCatalogID().setValue(nextCatalogID.toInt());
+    }
+
+    private void _setWriteCount(int writeCount) {
+        Util.arrayPutBE(this.writeCount, 0, (int) writeCount);
+    }
+
+    private void _setEncodingsBitmap(long encodingsBitmap) {
+        Util.arrayPutBE(this.encodingsBitmap, 0, (long) encodingsBitmap);
+    }
+
+    private void _setFinderInfo(int[] finderInfo) {
+        if(finderInfo.length != 8)
+            throw new RuntimeException("Invalid length of finderInfo array.");
+
+        for(int i = 0; i < 8; ++i) {
+            Util.arrayPutBE(this.finderInfo, i*4, (int) finderInfo[i]);
+        }
+    }
+
+    private HFSPlusForkData.Mutable _getMutableAllocationFile() {
+        return (HFSPlusForkData.Mutable) this.allocationFile;
+    }
+
+    private void _setAllocationFile(HFSPlusForkData allocationFile) {
+        this._getMutableAllocationFile().set(allocationFile);
+    }
+
+    private HFSPlusForkData.Mutable _getMutableExtentsFile() {
+        return (HFSPlusForkData.Mutable) this.extentsFile;
+    }
+
+    private void _setExtentsFile(HFSPlusForkData extentsFile) {
+        this._getMutableExtentsFile().set(extentsFile);
+    }
+
+    private HFSPlusForkData.Mutable _getMutableCatalogFile() {
+        return (HFSPlusForkData.Mutable) this.catalogFile;
+    }
+
+    private void _setCatalogFile(HFSPlusForkData catalogFile) {
+        this._getMutableCatalogFile().set(catalogFile);
+    }
+
+    private HFSPlusForkData.Mutable _getMutableAttributesFile() {
+        return (HFSPlusForkData.Mutable) this.attributesFile;
+    }
+
+    private void _setAttributesFile(HFSPlusForkData attributesFile) {
+        this._getMutableAttributesFile().set(attributesFile);
+    }
+
+    private HFSPlusForkData.Mutable _getMutableStartupFile() {
+        return (HFSPlusForkData.Mutable) this.startupFile;
+    }
+
+    private void _setStartupFile(HFSPlusForkData startupFile) {
+        this._getMutableStartupFile().set(startupFile);
+    }
+
+    private void _set(HFSPlusVolumeHeader header) {
+        Util.arrayCopy(header.signature, this.signature);
+        Util.arrayCopy(header.version, this.version);
+        Util.arrayCopy(header.attributes, this.attributes);
+        Util.arrayCopy(header.lastMountedVersion, this.lastMountedVersion);
+        Util.arrayCopy(header.journalInfoBlock, this.journalInfoBlock);
+        Util.arrayCopy(header.createDate, this.createDate);
+        Util.arrayCopy(header.modifyDate, this.modifyDate);
+        Util.arrayCopy(header.backupDate, this.backupDate);
+        Util.arrayCopy(header.checkedDate, this.checkedDate);
+        Util.arrayCopy(header.fileCount, this.fileCount);
+        Util.arrayCopy(header.folderCount, this.folderCount);
+        Util.arrayCopy(header.blockSize, this.blockSize);
+        Util.arrayCopy(header.totalBlocks, this.totalBlocks);
+        Util.arrayCopy(header.freeBlocks, this.freeBlocks);
+        Util.arrayCopy(header.nextAllocation, this.nextAllocation);
+        Util.arrayCopy(header.rsrcClumpSize, this.rsrcClumpSize);
+        Util.arrayCopy(header.dataClumpSize, this.dataClumpSize);
+        this._setNextCatalogID(header.nextCatalogID);
+        Util.arrayCopy(header.writeCount, this.writeCount);
+        Util.arrayCopy(header.encodingsBitmap, this.encodingsBitmap);
+        Util.arrayCopy(header.finderInfo, this.finderInfo);
+        this._setAllocationFile(header.allocationFile);
+        this._setExtentsFile(header.extentsFile);
+        this._setCatalogFile(header.catalogFile);
+        this._setAttributesFile(header.attributesFile);
+        this._setStartupFile(header.startupFile);
+    }
+
+    public static class Mutable extends HFSPlusVolumeHeader {
+
+        public Mutable(byte[] data) {
+            super(data);
+        }
+
+        public Mutable(byte[] data, int offset) {
+            super(data, offset);
+        }
+
+        public Mutable(InputStream is) throws IOException {
+            super(is);
+        }
+
+        public void set(HFSPlusVolumeHeader header) {
+            super._set(header);
+        }
+
+        public void setSignature(short signature) {
+            super._setSignature(signature);
+        }
+
+        public void setVersion(short version) {
+            super._setVersion(version);
+        }
+
+        public void setAttributes(int attributes) {
+            super._setAttributes(attributes);
+        }
+
+        public void setLastMountedVersion(int lastMountedVersion) {
+            super._setLastMountedVersion(lastMountedVersion);
+        }
+
+        public void setJournalInfoBlock(int journalInfoBlock) {
+            super._setJournalInfoBlock(journalInfoBlock);
+        }
+
+        public void setCreateDate(int createDate) {
+            super._setCreateDate(createDate);
+        }
+
+        public void setModifyDate(int modifyDate) {
+            super._setModifyDate(modifyDate);
+        }
+
+        public void setBackupDate(int backupDate) {
+            super._setBackupDate(backupDate);
+        }
+
+        public void setCheckedDate(int checkedDate) {
+            super._setCheckedDate(checkedDate);
+        }
+
+        public void setFileCount(int fileCount) {
+            super._setFileCount(fileCount);
+        }
+
+        public void setFolderCount(int folderCount) {
+            super._setFolderCount(folderCount);
+        }
+
+        public void setBlockSize(int blockSize) {
+            super._setBlockSize(blockSize);
+        }
+
+        public void setTotalBlocks(int totalBlocks) {
+            super._setTotalBlocks(totalBlocks);
+        }
+
+        public void setFreeBlocks(int freeBlocks) {
+            super._setFreeBlocks(freeBlocks);
+        }
+
+        public void setNextAllocation(int nextAllocation) {
+            super._setNextAllocation(nextAllocation);
+        }
+
+        public void setRsrcClumpSize(int rsrcClumpSize) {
+            super._setRsrcClumpSize(rsrcClumpSize);
+        }
+
+        public void setDataClumpSize(int dataClumpSize) {
+            super._setDataClumpSize(dataClumpSize);
+        }
+
+        public HFSCatalogNodeID.Mutable getMutableNextCatalogID() {
+            return super._getMutableNextCatalogID();
+        }
+
+        public void setNextCatalogID(HFSCatalogNodeID nextCatalogID) {
+            super._setNextCatalogID(nextCatalogID);
+        }
+
+        public void setWriteCount(int writeCount) {
+            super._setWriteCount(writeCount);
+        }
+
+        public void setEncodingsBitmap(long encodingsBitmap) {
+            super._setEncodingsBitmap(encodingsBitmap);
+        }
+
+        public void setFinderInfo(int[] finderInfo) {
+            super._setFinderInfo(finderInfo);
+        }
+
+        public HFSPlusForkData.Mutable getMutableAllocationFile() {
+            return super._getMutableAllocationFile();
+        }
+
+        public void setAllocationFile(HFSPlusForkData allocationFile) {
+            super._setAllocationFile(allocationFile);
+        }
+
+        public HFSPlusForkData.Mutable getMutableExtentsFile() {
+            return super._getMutableExtentsFile();
+        }
+
+        public void setExtentsFile(HFSPlusForkData extentsFile) {
+            super._setExtentsFile(extentsFile);
+        }
+
+        public HFSPlusForkData.Mutable getMutableCatalogFile() {
+            return super._getMutableCatalogFile();
+        }
+
+        public void setCatalogFile(HFSPlusForkData catalogFile) {
+            super._setCatalogFile(catalogFile);
+        }
+
+        public HFSPlusForkData.Mutable getMutableAttributesFile() {
+            return super._getMutableAttributesFile();
+        }
+
+        public void setAttributesFile(HFSPlusForkData attributesFile) {
+            super._setAttributesFile(attributesFile);
+        }
+
+        public HFSPlusForkData.Mutable getMutableStartupFile() {
+            return super._getMutableStartupFile();
+        }
+
+        public void setStartupFile(HFSPlusForkData startupFile) {
+            super._setStartupFile(startupFile);
+        }
     }
 }

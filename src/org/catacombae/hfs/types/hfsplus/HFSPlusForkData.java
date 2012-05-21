@@ -41,10 +41,17 @@ public class HFSPlusForkData implements StructElements {
     private final HFSPlusExtentRecord extents;
 
     public HFSPlusForkData(byte[] data, int offset) {
+        this(false, data, offset);
+    }
+
+    private HFSPlusForkData(boolean mutable, byte[] data, int offset) {
 	System.arraycopy(data, offset+0, logicalSize, 0, 8);
 	System.arraycopy(data, offset+8, clumpSize, 0, 4);
 	System.arraycopy(data, offset+12, totalBlocks, 0, 4);
-	extents = new HFSPlusExtentRecord(data, offset+16);
+        if(mutable)
+            extents = new HFSPlusExtentRecord.Mutable(data, offset+16);
+        else
+            extents = new HFSPlusExtentRecord(data, offset+16);
     }
 
     public static int length() { return 80; }
@@ -98,5 +105,55 @@ public class HFSPlusForkData implements StructElements {
         db.add("extents", extents.getStructElements());
 
         return db.getResult();
+    }
+
+    private final void _setLogicalSize(long logicalSize) {
+        Util.arrayPutBE(this.logicalSize, 0, (long) logicalSize);
+    }
+
+    private final void _setClumpSize(long clumpSize) {
+        Util.arrayPutBE(this.clumpSize, 0, (long) clumpSize);
+    }
+
+    private final void _setTotalBlocks(long totalBlocks) {
+        Util.arrayPutBE(this.totalBlocks, 0, (long) totalBlocks);
+    }
+
+    private final void _setExtents(HFSPlusExtentRecord extents) {
+        ((HFSPlusExtentRecord.Mutable) this.extents).set(extents);
+    }
+
+    private final void _set(HFSPlusForkData forkData) {
+        Util.arrayCopy(forkData.logicalSize, this.logicalSize);
+        Util.arrayCopy(forkData.clumpSize, this.clumpSize);
+        Util.arrayCopy(forkData.totalBlocks, this.totalBlocks);
+        this._setExtents(forkData.extents);
+    }
+
+    public static class Mutable extends HFSPlusForkData {
+        public Mutable(byte[] data, int offset) {
+            super(data, offset);
+        }
+
+        public void set(HFSPlusForkData forkData) {
+            super._set(forkData);
+        }
+
+        public void setLogicalSize(long logicalSize) {
+            super._setLogicalSize(logicalSize);
+        }
+
+        public void setClumpSize(long clumpSize) {
+            super._setClumpSize(clumpSize);
+        }
+
+        public void setTotalBlocks(long totalBlocks) {
+            super._setTotalBlocks(totalBlocks);
+        }
+
+        public void setExtents(HFSPlusExtentRecord extents) {
+            super._setExtents(extents);
+        }
+
     }
 }

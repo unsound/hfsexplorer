@@ -234,4 +234,38 @@ public class HFSCatalogNodeID implements StructElements, PrintableStruct {
             throw new RuntimeException(e);
         }
     }
+
+    private void _setValue(int nodeID) {
+        this.hfsCatalogNodeID = nodeID;
+    }
+
+    public static class Mutable extends HFSCatalogNodeID {
+        /**
+         * Creates a new HFSCatalogNodeID.Mutable from raw data located at
+         * offset <code>offset</code> in the array <code>data</code>.
+         *
+         * @param data an array containing the catalog node ID data.
+         * @param offset offset in the array where the catalog node ID data
+         * begins.
+         */
+        public Mutable(byte[] data, int offset) {
+            super(data, offset);
+        }
+
+        /**
+         * Creates a new HFSCatalogNodeID.Mutable from the int value
+         * <code>nodeID</code>. <code>nodeID</code>, being a Java integer and
+         * thus signed, is nevertheless regarded as an unsigned value.
+         *
+         * @param nodeID the catalog node ID value. This is interpreted as being
+         * unsigned.
+         */
+        public Mutable(int nodeID) {
+            super(nodeID);
+        }
+
+        public void setValue(int nodeID) {
+            super._setValue(nodeID);
+        }
+    }
 }
