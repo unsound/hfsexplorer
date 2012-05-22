@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -31,45 +31,45 @@ public class MasterDirectoryBlock implements StructElements {
     /*
      * struct MasterDirectoryBlock
      * size: 162 bytes
-     * description: 
-     * 
-     * BP   Size  Type        Identifier  Description                            
+     * description:
+     *
+     * BP   Size  Type        Identifier  Description
      * --------------------------------------------------------------------------
-     * 0    2     UInt16      drSigWord   volume signature                       
-     * 2    4     UInt32      drCrDate    date and time of volume creation       
-     * 6    4     UInt32      drLsMod     date and time of last modification     
-     * 10   2     UInt16      drAtrb      volume attributes                      
-     * 12   2     UInt16      drNmFls     number of files in root directory      
-     * 14   2     UInt16      drVBMSt     first block of volume bitmap           
-     * 16   2     UInt16      drAllocPtr  start of next allocation search        
-     * 18   2     UInt16      drNmAlBlks  number of allocation blocks in volume  
-     * 20   4     UInt32      drAlBlkSiz  size (in bytes) of allocation blocks   
-     * 24   4     UInt32      drClpSiz    default clump size                     
-     * 28   2     UInt16      drAlBlSt    first allocation block in volume       
-     * 30   4     UInt32      drNxtCNID   next unused catalog node ID            
-     * 34   2     UInt16      drFreeBks   number of unused allocation blocks     
-     * 36   1     UInt8       drVNLength  length of volume name                  
+     * 0    2     UInt16      drSigWord   volume signature
+     * 2    4     UInt32      drCrDate    date and time of volume creation
+     * 6    4     UInt32      drLsMod     date and time of last modification
+     * 10   2     UInt16      drAtrb      volume attributes
+     * 12   2     UInt16      drNmFls     number of files in root directory
+     * 14   2     UInt16      drVBMSt     first block of volume bitmap
+     * 16   2     UInt16      drAllocPtr  start of next allocation search
+     * 18   2     UInt16      drNmAlBlks  number of allocation blocks in volume
+     * 20   4     UInt32      drAlBlkSiz  size (in bytes) of allocation blocks
+     * 24   4     UInt32      drClpSiz    default clump size
+     * 28   2     UInt16      drAlBlSt    first allocation block in volume
+     * 30   4     UInt32      drNxtCNID   next unused catalog node ID
+     * 34   2     UInt16      drFreeBks   number of unused allocation blocks
+     * 36   1     UInt8       drVNLength  length of volume name
      * 37   1*27  Char[28]    drVN        volume name
-     * 64   4     UInt32      drVolBkUp   date and time of last backup           
-     * 68   2     UInt16      drVSeqNum   volume backup sequence number          
-     * 70   4     UInt32      drWrCnt     volume write count                     
-     * 74   4     UInt32      drXTClpSiz  clump size for extents overflow file   
-     * 78   4     UInt32      drCTClpSiz  clump size for catalog file            
+     * 64   4     UInt32      drVolBkUp   date and time of last backup
+     * 68   2     UInt16      drVSeqNum   volume backup sequence number
+     * 70   4     UInt32      drWrCnt     volume write count
+     * 74   4     UInt32      drXTClpSiz  clump size for extents overflow file
+     * 78   4     UInt32      drCTClpSiz  clump size for catalog file
      * 82   2     UInt16      drNmRtDirs  number of directories in root directory
-     * 84   4     UInt32      drFilCnt    number of files in volume              
-     * 88   4     UInt32      drDirCnt    number of directories in volume        
-     * 92   4*8   UInt32[8]   drFndrInfo  information used by the Finder         
-     * 124  2     UInt16      drVCSize    size (in blocks) of volume cache       
+     * 84   4     UInt32      drFilCnt    number of files in volume
+     * 88   4     UInt32      drDirCnt    number of directories in volume
+     * 92   4*8   UInt32[8]   drFndrInfo  information used by the Finder
+     * 124  2     UInt16      drVCSize    size (in blocks) of volume cache
      * 126  2     UInt16      drVBMCSize  size (in blocks) of volume bitmap cache
      * 128  2     UInt16      drCtlCSize  size (in blocks) of common volume cache
-     * 130  4     UInt32      drXTFlSize  size of extents overflow file          
+     * 130  4     UInt32      drXTFlSize  size of extents overflow file
      * 134  12    ExtDataRec  drXTExtRec  extent record for extents overflow file
      * 146  4     UInt32      drCTFlSize  size of catalog file
      * 150  12    ExtDataRec  drCTExtRec  extent record for catalog file
      */
-    
+
     public static final int STRUCTSIZE = 162;
-    
+
     private final byte[] drSigWord = new byte[2];
     private final byte[] drCrDate = new byte[4];
     private final byte[] drLsMod = new byte[4];
@@ -101,7 +101,7 @@ public class MasterDirectoryBlock implements StructElements {
     private final ExtDataRec drXTExtRec;
     private final byte[] drCTFlSize = new byte[4];
     private final ExtDataRec drCTExtRec;
-    
+
     public MasterDirectoryBlock(byte[] data, int offset) {
         System.arraycopy(data, offset + 0, drSigWord, 0, 2);
         System.arraycopy(data, offset + 2, drCrDate, 0, 4);
@@ -137,7 +137,7 @@ public class MasterDirectoryBlock implements StructElements {
     }
 
     public static int length() { return STRUCTSIZE; }
-    
+
     /** volume signature */
     public short getDrSigWord() { return Util.readShortBE(drSigWord); }
     /** date and time of volume creation */
@@ -200,11 +200,11 @@ public class MasterDirectoryBlock implements StructElements {
     public int getDrCTFlSize() { return Util.readIntBE(drCTFlSize); }
     /** extent record for catalog file */
     public ExtDataRec getDrCTExtRec() { return drCTExtRec; }
-    
+
     public Date getDrCrDateAsDate() { return HFSDate.localTimestampToDate(getDrCrDate()); }
     public Date getDrLsModAsDate() { return HFSDate.localTimestampToDate(getDrLsMod()); }
     public Date getDrVolBkUpAsDate() { return HFSDate.localTimestampToDate(getDrVolBkUp()); }
-    
+
     public void printFields(PrintStream ps, String prefix) {
         ps.println(prefix + " drSigWord: " + Util.unsign(getDrSigWord()) + " (\"" + Util.toASCIIString(getDrSigWord()) + "\")");
         ps.println(prefix + " drCrDate: " + Util.unsign(getDrCrDate()) + " (" + getDrCrDateAsDate() + ")");
@@ -245,7 +245,7 @@ public class MasterDirectoryBlock implements StructElements {
         ps.println(prefix + "MasterDirectoryBlock:");
         printFields(ps, prefix);
     }
-    
+
     public byte[] getBytes() {
         byte[] result = new byte[length()];
         byte[] tempData;
@@ -296,7 +296,7 @@ public class MasterDirectoryBlock implements StructElements {
 
         return db.getResult();
     }
-    
+
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(MasterDirectoryBlock.class.getSimpleName());
 

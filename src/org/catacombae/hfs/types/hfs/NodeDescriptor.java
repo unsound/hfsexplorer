@@ -25,16 +25,16 @@ public class NodeDescriptor {
     /*
      * struct NodeDescriptor
      * size: 14 bytes
-     * description: 
-     * 
-     * BP  Size  Type    Identifier  Description                        
+     * description:
+     *
+     * BP  Size  Type    Identifier  Description
      * -----------------------------------------------------------------
-     * 0   4     SInt32  ndFLink     forward link (LongInt)             
-     * 4   4     SInt32  ndBLink     backward link (LongInt)            
-     * 8   1     SInt8   ndType      node type (SignedByte)             
-     * 9   1     SInt8   ndNHeight   node level (SignedByte)            
+     * 0   4     SInt32  ndFLink     forward link (LongInt)
+     * 4   4     SInt32  ndBLink     backward link (LongInt)
+     * 8   1     SInt8   ndType      node type (SignedByte)
+     * 9   1     SInt8   ndNHeight   node level (SignedByte)
      * 10  2     SInt16  ndNRecs     number of records in node (Integer)
-     * 12  2     SInt16  ndResv2     reserved (Integer)                 
+     * 12  2     SInt16  ndResv2     reserved (Integer)
      */
 
     public static final int STRUCTSIZE = 14;

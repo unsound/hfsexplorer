@@ -299,7 +299,7 @@ public class UnHFS {
                 System.exit(1);
             }
         }
-        
+
         DataLocator inputDataLocator = new ReadableStreamDataLocator(inFileStream);
 
         PartitionSystemType[] psTypes =
@@ -365,7 +365,7 @@ public class UnHFS {
 
 
         FileSystemMajorType[] fsTypes = FileSystemDetector.detectFileSystem(inputDataLocator);
-        
+
         FileSystemHandlerFactory fact = null;
         outer:
         for(FileSystemMajorType type : fsTypes) {
@@ -488,16 +488,16 @@ public class UnHFS {
 
         try {
             os = new FileOutputStream(targetFile);
-            
+
             in = fork.getReadableRandomAccessStream();
-            
+
             long extractedBytes = IOUtil.streamCopy(in, os, 128*1024);
             if(extractedBytes != fork.getLength()) {
                 System.err.println("WARNING: Did not extract intended number of bytes to \"" +
                         targetFile.getPath() + "\"! Intended: " + fork.getLength() +
                         " Extracted: " + extractedBytes);
             }
-            
+
             return true;
         } catch(FileNotFoundException fnfe) {
             return false;

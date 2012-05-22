@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,11 +22,11 @@ public class MutableGUIDPartitionTable extends GUIDPartitionTable {
     protected MutableGPTEntry[] mutableEntries;
     protected MutableGPTHeader mutableBackupHeader;
     protected MutableGPTEntry[] mutableBackupEntries;
-    
+
     public MutableGUIDPartitionTable(GUIDPartitionTable source) {
 	super(new MutableGPTHeader(source.header), new MutableGPTHeader(source.backupHeader),
 	      source.entries.length, source.backupEntries.length);
-	
+
 	this.mutableHeader = (MutableGPTHeader)header;
 	this.mutableEntries = new MutableGPTEntry[source.entries.length];
 	for(int i = 0; i < this.entries.length; ++i) {
@@ -41,29 +41,29 @@ public class MutableGUIDPartitionTable extends GUIDPartitionTable {
 	    this.backupEntries[i] = this.mutableBackupEntries[i];
 	}
     }
-    
+
     public MutableGPTHeader getMutablePrimaryHeader() { return mutableHeader; }
     public MutableGPTHeader getMutableBackupHeader() { return mutableBackupHeader; }
     public MutableGPTEntry getMutablePrimaryEntry(int index) { return mutableEntries[index]; }
     public MutableGPTEntry getMutableBackupEntry(int index) { return mutableBackupEntries[index]; }
     public MutableGPTEntry[] getMutablePrimaryEntries() { return mutableEntries; }
     public MutableGPTEntry[] getMutableBackupEntries() { return mutableBackupEntries; }
-    
+
     public void setMutablePrimaryHeader(MutableGPTHeader mutableHeader) {
 	this.mutableHeader = mutableHeader;
 	this.header = mutableHeader;
     }
-    
+
     public void setMutableBackupHeader(MutableGPTHeader mutableBackupHeader) {
 	this.mutableBackupHeader = mutableBackupHeader;
 	this.backupHeader = mutableBackupHeader;
     }
-    
+
     public void setMutablePrimaryEntries(MutableGPTEntry[] mutableEntries) {
 	this.mutableEntries = mutableEntries;
 	this.entries = mutableEntries;
     }
-    
+
     public void setMutableBackupEntries(MutableGPTEntry[] mutableBackupEntries) {
 	this.mutableBackupEntries = mutableBackupEntries;
 	this.backupEntries = mutableBackupEntries;

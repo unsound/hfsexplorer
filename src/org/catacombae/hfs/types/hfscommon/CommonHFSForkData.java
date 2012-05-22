@@ -29,32 +29,32 @@ import org.catacombae.hfs.types.hfs.ExtDescriptor;
  */
 public abstract class CommonHFSForkData {
     public abstract long getLogicalSize();
-    
+
     public abstract CommonHFSExtentDescriptor[] getBasicExtents();
-    
+
     public static CommonHFSForkData create(ExtDataRec edr, long logicalSize) {
         return new HFSImplementation(edr, logicalSize);
     }
-    
+
     public static CommonHFSForkData create(HFSPlusForkData hper) {
         return new HFSPlusImplementation(hper);
     }
-    
+
     public abstract void print(PrintStream err, String prefix);
 
     public static class HFSImplementation extends CommonHFSForkData {
         private final ExtDataRec edr;
         private final long logicalSize;
-        
+
         public HFSImplementation(ExtDataRec edr, long logicalSize) {
             this.edr = edr;
             this.logicalSize = logicalSize;
         }
-        
+
         public long getLogicalSize() {
             return logicalSize;
         }
-        
+
         public CommonHFSExtentDescriptor[] getBasicExtents() {
             ExtDescriptor[] src = edr.getExtDataRecs();
             CommonHFSExtentDescriptor[] result = new CommonHFSExtentDescriptor[src.length];
@@ -69,18 +69,18 @@ public abstract class CommonHFSForkData {
             edr.print(ps, prefix);
         }
     }
-    
+
     public static class HFSPlusImplementation extends CommonHFSForkData {
         private final HFSPlusForkData hper;
-        
+
         public HFSPlusImplementation(HFSPlusForkData hper) {
             this.hper = hper;
         }
-        
+
         public long getLogicalSize() {
             return hper.getLogicalSize();
         }
-        
+
         public CommonHFSExtentDescriptor[] getBasicExtents() {
             HFSPlusExtentDescriptor[] src = hper.getExtents().getExtentDescriptors();
             CommonHFSExtentDescriptor[] result = new CommonHFSExtentDescriptor[src.length];

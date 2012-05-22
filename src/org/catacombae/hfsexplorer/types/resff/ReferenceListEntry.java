@@ -27,25 +27,25 @@ public class ReferenceListEntry implements StaticStruct, PrintableStruct {
     /*
      * struct ReferenceListEntry
      * size: 12 bytes
-     * description: 
-     * 
-     * BP  Size  Type      Identifier          Description                                                         
+     * description:
+     *
+     * BP  Size  Type      Identifier          Description
      * ------------------------------------------------------------------------------------------------------------
-     * 0   2     UInt16    resourceID          // Resource ID                                                      
-     * 2   2     UInt16    resourceNameOffset  // Offset from beginning of resource name list to resource name     
-     * 4   1     UInt8     resourceAttributes  // Resource attributes                                              
+     * 0   2     UInt16    resourceID          // Resource ID
+     * 2   2     UInt16    resourceNameOffset  // Offset from beginning of resource name list to resource name
+     * 4   1     UInt8     resourceAttributes  // Resource attributes
      * 5   1*3   UInt8[3]  resourceDataOffset  // Offset from beginning of resource data to data for this resource.
-     * 8   4     UInt32    reserved1           // Reserved for handle to resource.                                 
+     * 8   4     UInt32    reserved1           // Reserved for handle to resource.
      */
-    
+
     public static final int STRUCTSIZE = 12;
-    
+
     private final byte[] resourceID = new byte[2];
     private final byte[] resourceNameOffset = new byte[2];
     private final byte[] resourceAttributes = new byte[1];
     private final byte[] resourceDataOffset = new byte[1*3];
     private final byte[] reserved1 = new byte[4];
-    
+
     public ReferenceListEntry(byte[] data, int offset) {
 	System.arraycopy(data, offset+0, resourceID, 0, 2);
 	System.arraycopy(data, offset+2, resourceNameOffset, 0, 2);
@@ -53,9 +53,9 @@ public class ReferenceListEntry implements StaticStruct, PrintableStruct {
 	System.arraycopy(data, offset+5, resourceDataOffset, 0, 1*3);
 	System.arraycopy(data, offset+8, reserved1, 0, 4);
     }
-    
+
     public static int length() { return STRUCTSIZE; }
-    
+
     /** // Resource ID */
     public short getResourceID() { return Util.readShortBE(resourceID); }
     /** // Offset from beginning of resource name list to resource name */
@@ -73,7 +73,7 @@ public class ReferenceListEntry implements StaticStruct, PrintableStruct {
 
     /** // Reserved for handle to resource. */
     public int getReserved1() { return Util.readIntBE(reserved1); }
-    
+
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " resourceID: " + getResourceID());
 	ps.println(prefix + " resourceNameOffset: " + getResourceNameOffset());
@@ -81,12 +81,12 @@ public class ReferenceListEntry implements StaticStruct, PrintableStruct {
 	ps.println(prefix + " resourceDataOffset: " + getResourceDataOffset());
 	ps.println(prefix + " reserved1: " + getReserved1());
     }
-    
+
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "ReferenceListEntry:");
 	printFields(ps, prefix);
     }
-    
+
     public byte[] getBytes() {
 	byte[] result = new byte[length()];
 	int offset = 0;

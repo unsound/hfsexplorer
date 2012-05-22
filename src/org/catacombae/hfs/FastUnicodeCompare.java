@@ -32,7 +32,7 @@ package org.catacombae.hfs;
  * In pseudocode:
  *
  *     Let c = source Unicode character
- *     Let table[] = lower case table 
+ *     Let table[] = lower case table
  *
  *     lower = table[highbyte(c)]
  *     if (lower == 0)
@@ -77,10 +77,10 @@ package org.catacombae.hfs;
 public class FastUnicodeCompare {
     /** Can not be instantiated. */
     private FastUnicodeCompare() {}
-    
+
     /**
      * Compares two UTF-16 strings using the FastUnicodeCompare algorithm.
-     * 
+     *
      * @param str1 the first string to compare.
      * @param str2 the second string to compare.
      * @return 0 if the strings are identical, -1 if <code>str1</code> is considered "less than"

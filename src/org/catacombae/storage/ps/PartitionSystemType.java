@@ -48,27 +48,27 @@ public enum PartitionSystemType {
      * 4 partition limit of the PC Master Boot Record partition scheme.
      */
     DOS_EXTENDED(false, EBRHandlerFactory.class, "DOS Extended");
-    
+
     private final boolean isTopLevelCapable;
     private final String longName;
-    
+
     private LinkedList<Class<? extends PartitionSystemHandlerFactory>> factoryClasses =
             new LinkedList<Class<? extends PartitionSystemHandlerFactory>>();
-    
+
     private PartitionSystemType(boolean pIsTopLevelCapable, String longName) {
         this.isTopLevelCapable = pIsTopLevelCapable;
         this.longName = longName;
     }
-    
-    private PartitionSystemType(boolean pIsTopLevelCapable, 
+
+    private PartitionSystemType(boolean pIsTopLevelCapable,
             Class<? extends PartitionSystemHandlerFactory> pDefaultFactoryClass,
             String longName) {
         this(pIsTopLevelCapable, longName);
-        
-        
+
+
         this.factoryClasses.addLast(pDefaultFactoryClass);
     }
-    
+
     /**
      * Tells whether this is a partition system that can be used as a top level
      * partition system. A top level partition system can be put directly onto a
@@ -76,7 +76,7 @@ public enum PartitionSystemType {
      * A partition system that is not capable of being a top level partition
      * system can arguably be called an embedded partition system. An example of
      * a non top capable partition system is the DOS Extended partition system.
-     * 
+     *
      * @return whether or not this partition system is top level capable.
      */
     public boolean isTopLevelCapable() {
@@ -86,7 +86,7 @@ public enum PartitionSystemType {
     /**
      * Returns the name of this partition system type, in long form. For
      * instance "Apple Partition Map", "GUID Partition Table", etc.
-     * 
+     *
      * @return the name of this partition system type, in long form.
      */
     public String getLongName() {
@@ -98,13 +98,13 @@ public enum PartitionSystemType {
      * PartitionSystemType, it calls this method. If there are no current
      * factory classes tied to this PartitionSystemType, the added class will
      * become the default factory for the type.
-     * 
+     *
      * @param pFactoryClass the factory class to register with this type.
      */
     public void addFactoryClass(Class<? extends PartitionSystemHandlerFactory> pFactoryClass) {
         this.factoryClasses.addLast(pFactoryClass);
     }
-    
+
     /**
      * Returns all registered factory classes for this type. The first entry in
      * the list will be the default factory class.

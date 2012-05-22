@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -26,7 +26,7 @@ public class HFSPlusCatalogIndexNode extends BTIndexNode {
     }
     protected HFSPlusCatalogIndexNode(byte[] data, int offset, int nodeSize, BTHeaderRec catalogHeaderRec) {
 	super(data, offset, nodeSize);
-	
+
 	// Populate record list
 	// we loop offsets.length-1 times, since last offset is offset to free space
 	for(int i = 0; i < records.length; ++i) {
@@ -39,5 +39,5 @@ public class HFSPlusCatalogIndexNode extends BTIndexNode {
 	    records[i] = new BTIndexRecord(currentKey, data, offset+currentOffset);
 	}
     }
-    //public static 
+    //public static
 }

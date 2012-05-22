@@ -11,13 +11,13 @@ public class BlockInfo implements StaticStruct, PrintableStruct {
     /*
      * struct BlockInfo
      * size: 16 bytes
-     * description: 
-     * 
+     * description:
+     *
      * BP  Size  Type    Identifier  Description
      * -----------------------------------------
-     * 0   8     UInt64  bnum        
-     * 8   4     UInt32  bsize       
-     * 12  4     UInt32  next        
+     * 0   8     UInt64  bnum
+     * 8   4     UInt32  bsize
+     * 12  4     UInt32  next
      */
 
     public static final int STRUCTSIZE = 16;

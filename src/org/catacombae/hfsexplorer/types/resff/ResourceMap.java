@@ -30,22 +30,22 @@ public class ResourceMap implements PrintableStruct {
     /*
      * struct ResourceMap
      * size: minimum 30 or 38 bytes
-     * description: 
-     * 
-     * BP  Size  Type                       Identifier              Description                                           
+     * description:
+     *
+     * BP  Size  Type                       Identifier              Description
      * -------------------------------------------------------------------------------------------------------------------
-     * 0   1*16  UInt8[16]                  reserved1               // Reserved for copy of resource header.              
-     * 16  4     UInt32                     reserved2               // Reserved for handle to next resource map.          
-     * 20  2     UInt16                     reserved3               // Reserved for file reference number.                
-     * 22  2     UInt16                     resourceForkAttributes  // Resource fork attributes                           
+     * 0   1*16  UInt8[16]                  reserved1               // Reserved for copy of resource header.
+     * 16  4     UInt32                     reserved2               // Reserved for handle to next resource map.
+     * 20  2     UInt16                     reserved3               // Reserved for file reference number.
+     * 22  2     UInt16                     resourceForkAttributes  // Resource fork attributes
      * 24  2     UInt16                     typeListOffset          // Offset from beginning of map to resource type list.
      * 26  2     UInt16                     nameListOffset          // Offset from beginning of map to resource name list.
-     * 28  2     UInt16                     typeCount               // Number of types in the map minus 1.                
-     * 30  8*?   ResourceType[typeCount+1]  resourceTypeList        // Resource type list.                                
+     * 28  2     UInt16                     typeCount               // Number of types in the map minus 1.
+     * 30  8*?   ResourceType[typeCount+1]  resourceTypeList        // Resource type list.
      */
-    
+
     public static final int STRUCTSIZE = 46;
-    
+
     private final byte[] reserved1 = new byte[1*16];
     private final byte[] reserved2 = new byte[4];
     private final byte[] reserved3 = new byte[2];
@@ -56,7 +56,7 @@ public class ResourceMap implements PrintableStruct {
     private final ResourceType[] resourceTypeList;
     private final List<Pair<ResourceType, ReferenceListEntry[]>> referenceList;
     private final List<Pair<ReferenceListEntry, ResourceName>> resourceNameList;
-    
+
     public ResourceMap(SynchronizedReadableRandomAccess stream, final long offset) {
         byte[] data = new byte[30];
         stream.readFullyFrom(offset, data);
@@ -134,7 +134,7 @@ public class ResourceMap implements PrintableStruct {
             }
         }
     }
-    
+
     public static int length() { return STRUCTSIZE; }
 
     public int maxSize() {
@@ -147,7 +147,7 @@ public class ResourceMap implements PrintableStruct {
     public int occupiedSize() {
         return 30 + resourceTypeList.length*ResourceType.length();
     }
-    
+
     /** // Reserved for copy of resource header. */
     public byte[] getReserved1() { return Util.readByteArrayBE(reserved1); }
     /** // Reserved for handle to next resource map. */
@@ -167,7 +167,7 @@ public class ResourceMap implements PrintableStruct {
     public ResourceType[] getResourceTypeList() {
         return Util.arrayCopy(resourceTypeList, new ResourceType[resourceTypeList.length]);
     }
-    
+
     public List<Pair<ResourceType, ReferenceListEntry[]>> getReferenceList() {
         return new ArrayList<Pair<ResourceType, ReferenceListEntry[]>>(referenceList);
     }
@@ -239,7 +239,7 @@ public class ResourceMap implements PrintableStruct {
             }
         }
     }
-    
+
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + "ResourceMap:");
         printFields(ps, prefix);

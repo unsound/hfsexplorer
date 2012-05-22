@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006-2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -25,31 +25,31 @@ public class DriverDescriptorEntry {
     /*
      * struct DriverDescriptorEntry
      * size: 8 bytes
-     * description: 
-     * 
-     * BP  Size  Type    Identifier  Description                             
+     * description:
+     *
+     * BP  Size  Type    Identifier  Description
      * ----------------------------------------------------------------------
-     * 0   4     UInt32  ddBlock     {first driver's starting block}         
+     * 0   4     UInt32  ddBlock     {first driver's starting block}
      * 4   2     UInt16  ddSize      {size of the driver, in 512-byte blocks}
-     * 6   2     UInt16  ddType      {operating system type (MacOS = 1)}     
+     * 6   2     UInt16  ddType      {operating system type (MacOS = 1)}
      */
-    
+
     private final byte[] ddBlock = new byte[4];
     private final byte[] ddSize = new byte[2];
     private final byte[] ddType = new byte[2];
-    
+
     public DriverDescriptorEntry(byte[] data, int offset) {
 	System.arraycopy(data, offset+0, ddBlock, 0, 4);
 	System.arraycopy(data, offset+4, ddSize, 0, 2);
 	System.arraycopy(data, offset+6, ddType, 0, 2);
     }
-    
+
     public static int length() { return 8; }
-    
+
     public int getDdBlock() { return Util.readIntBE(ddBlock); }
     public short getDdSize() { return Util.readShortBE(ddSize); }
     public short getDdType() { return Util.readShortBE(ddType); }
-    
+
     public byte[] getData() {
 	byte[] result = new byte[length()];
 	int offset = 0;
@@ -66,7 +66,7 @@ public class DriverDescriptorEntry {
 	ps.println(prefix + " ddSize: " + getDdSize());
 	ps.println(prefix + " ddType: " + getDdType());
     }
-    
+
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "DriverDescriptorEntry:");
 	printFields(ps, prefix);

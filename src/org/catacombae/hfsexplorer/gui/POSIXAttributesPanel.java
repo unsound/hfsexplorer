@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -27,7 +27,7 @@ import org.catacombae.storage.fs.FSAttributes.POSIXFileAttributes;
  * @author erik
  */
 public class POSIXAttributesPanel extends javax.swing.JPanel implements ChainedPanel {
-    
+
     public POSIXAttributesPanel(POSIXFileAttributes attrs) {
         this();
 
@@ -42,7 +42,7 @@ public class POSIXAttributesPanel extends javax.swing.JPanel implements ChainedP
         otherReadBox.setSelected(attrs.canOthersRead());
         otherWriteBox.setSelected(attrs.canOthersWrite());
         otherExecuteBox.setSelected(attrs.canOthersExecute());
-        
+
         setUidBox.setSelected(attrs.isSetUID());
         setGidBox.setSelected(attrs.isSetGID());
         stickyBitBox.setSelected(attrs.isStickyBit());
@@ -56,7 +56,7 @@ public class POSIXAttributesPanel extends javax.swing.JPanel implements ChainedP
     private POSIXAttributesPanel() {
         initComponents();
     }
-    
+
     /* @Override */
     public void setChainedContents(Component c) {
         chainedContentsPanel.removeAll();

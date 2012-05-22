@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -26,10 +26,10 @@ public class HFSPlusCatalogLeafRecord {
     public static final int HFS_PLUS_FILE_RECORD = 0x0002;
     public static final int HFS_PLUS_FOLDER_THREAD_RECORD = 0x0003;
     public static final int HFS_PLUS_FILE_THREAD_RECORD = 0x0004;
-    
+
     protected final HFSPlusCatalogKey key;
     protected final HFSPlusCatalogLeafRecordData recordData;
-    
+
     public HFSPlusCatalogLeafRecord(byte[] data, int offset) {
 	this(data, offset, null);
     }
@@ -38,7 +38,7 @@ public class HFSPlusCatalogLeafRecord {
 	    key = new HFSPlusCatalogKey(data, offset);
 	else
 	    key = new HFSXCatalogKey(data, offset, catalogHeaderRec);
-	
+
 	short recordType = Util.readShortBE(data, offset+key.length());
 	if(recordType == HFS_PLUS_FOLDER_RECORD)
 	    recordData = new HFSPlusCatalogFolder(data, offset+key.length());
@@ -51,10 +51,10 @@ public class HFSPlusCatalogLeafRecord {
 	else
 	    throw new RuntimeException("Invalid record type!");
     }
-    
+
     public HFSPlusCatalogKey getKey() { return key; }
     public HFSPlusCatalogLeafRecordData getData() { return recordData; }
-    
+
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " key:");
 	key.printFields(ps, prefix + "  ");

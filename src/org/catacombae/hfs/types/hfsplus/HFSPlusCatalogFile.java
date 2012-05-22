@@ -30,28 +30,28 @@ public class HFSPlusCatalogFile extends HFSPlusCatalogLeafRecordData implements 
     /*
      * struct HFSPlusCatalogFile
      * size: 248 bytes
-     * description: 
-     * 
+     * description:
+     *
      * BP   Size  Type              Identifier        Description
      * ----------------------------------------------------------
-     * 0    2     SInt16            recordType                   
-     * 2    2     UInt16            flags                        
-     * 4    4     UInt32            reserved1                    
-     * 8    4     HFSCatalogNodeID  fileID                       
-     * 12   4     UInt32            createDate                   
-     * 16   4     UInt32            contentModDate               
-     * 20   4     UInt32            attributeModDate             
-     * 24   4     UInt32            accessDate                   
-     * 28   4     UInt32            backupDate                   
-     * 32   16    HFSPlusBSDInfo    permissions                  
-     * 48   16    FileInfo          userInfo                     
-     * 64   16    ExtendedFileInfo  finderInfo                   
-     * 80   4     UInt32            textEncoding                 
-     * 84   4     UInt32            reserved2                    
-     * 88   80    HFSPlusForkData   dataFork                     
-     * 168  80    HFSPlusForkData   resourceFork                 
+     * 0    2     SInt16            recordType
+     * 2    2     UInt16            flags
+     * 4    4     UInt32            reserved1
+     * 8    4     HFSCatalogNodeID  fileID
+     * 12   4     UInt32            createDate
+     * 16   4     UInt32            contentModDate
+     * 20   4     UInt32            attributeModDate
+     * 24   4     UInt32            accessDate
+     * 28   4     UInt32            backupDate
+     * 32   16    HFSPlusBSDInfo    permissions
+     * 48   16    FileInfo          userInfo
+     * 64   16    ExtendedFileInfo  finderInfo
+     * 80   4     UInt32            textEncoding
+     * 84   4     UInt32            reserved2
+     * 88   80    HFSPlusForkData   dataFork
+     * 168  80    HFSPlusForkData   resourceFork
      */
-    
+
     private final byte[] recordType = new byte[2];
     private final byte[] flags = new byte[2];
     private final byte[] reserved1 = new byte[4];
@@ -68,7 +68,7 @@ public class HFSPlusCatalogFile extends HFSPlusCatalogLeafRecordData implements 
     private final byte[] reserved2 = new byte[4];
     private final HFSPlusForkData dataFork;
     private final HFSPlusForkData resourceFork;
-    
+
     public HFSPlusCatalogFile(byte[] data, int offset) {
 	System.arraycopy(data, offset+0, recordType, 0, 2);
 	System.arraycopy(data, offset+2, flags, 0, 2);
@@ -87,9 +87,9 @@ public class HFSPlusCatalogFile extends HFSPlusCatalogLeafRecordData implements 
 	dataFork = new HFSPlusForkData(data, offset+88);
 	resourceFork = new HFSPlusForkData(data, offset+168);
     }
-    
+
     public static int length() { return 248; }
-    
+
     public short getRecordType() { return Util.readShortBE(recordType); }
     public short getFlags() { return Util.readShortBE(flags); }
     public int getReserved1() { return Util.readIntBE(reserved1); }
@@ -106,10 +106,10 @@ public class HFSPlusCatalogFile extends HFSPlusCatalogLeafRecordData implements 
     public int getReserved2() { return Util.readIntBE(reserved2); }
     public HFSPlusForkData getDataFork() { return dataFork; }
     public HFSPlusForkData getResourceFork() { return resourceFork; }
-    
+
     public boolean getFileLockedFlag() { return (getFlags() & 0x1) != 0; }
     public boolean getThreadExistsFlag() { return (getFlags() & 0x2) != 0; }
-    
+
     public Date getCreateDateAsDate() { return HFSPlusDate.gmtTimestampToDate(getCreateDate()); }
     public Date getContentModDateAsDate() { return HFSPlusDate.gmtTimestampToDate(getContentModDate()); }
     public Date getAttributeModDateAsDate() { return HFSPlusDate.gmtTimestampToDate(getAttributeModDate()); }
@@ -120,7 +120,7 @@ public class HFSPlusCatalogFile extends HFSPlusCatalogLeafRecordData implements 
     /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(HFSPlusCatalogFile.class.getSimpleName());
-        
+
         db.addFlag("fileLocked", flags, 0);
         db.addFlag("threadExists", flags, 1);
         db.addUIntBE("reserved1", reserved1);
@@ -137,10 +137,10 @@ public class HFSPlusCatalogFile extends HFSPlusCatalogLeafRecordData implements 
         db.addUIntBE("reserved2", reserved2);
         db.add("dataFork", dataFork.getStructElements());
         db.add("resourceFork", resourceFork.getStructElements());
-        
+
         return db.getResult();
     }
-    
+
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " recordType: " + getRecordType());
 	ps.println(prefix + " flags: " + getFlags());
@@ -165,17 +165,17 @@ public class HFSPlusCatalogFile extends HFSPlusCatalogLeafRecordData implements 
 	ps.println(prefix + " resourceFork: ");
 	getResourceFork().print(ps, prefix+"  ");
     }
-    
+
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "HFSPlusCatalogFile:");
 	printFields(ps, prefix);
     }
-    
+
     public byte[] getBytes() {
         byte[] result = new byte[length()];
         byte[] tempData;
         int offset = 0;
-        
+
         System.arraycopy(recordType, 0, result, offset, recordType.length); offset += recordType.length;
         System.arraycopy(flags, 0, result, offset, flags.length); offset += flags.length;
         System.arraycopy(reserved1, 0, result, offset, reserved1.length); offset += reserved1.length;
@@ -198,8 +198,8 @@ public class HFSPlusCatalogFile extends HFSPlusCatalogLeafRecordData implements 
         System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
         tempData = resourceFork.getBytes();
         System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
-        
-        return result;        
+
+        return result;
     }
 
     /* @Override */

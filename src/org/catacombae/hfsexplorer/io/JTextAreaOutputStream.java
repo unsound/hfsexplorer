@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -32,7 +32,7 @@ import org.catacombae.util.Util;
 /**
  * An implementation of OutputStream that writes all output to a JTextArea, decoded with the
  * standard platform encoding, or a user supplied one.
- * 
+ *
  * @author Erik Larsson
  */
 public class JTextAreaOutputStream extends OutputStream {
@@ -41,7 +41,7 @@ public class JTextAreaOutputStream extends OutputStream {
      * 160000 bytes (not considering possible UTF-16 surrogate pairs).
      */
     private static final int MAX_LENGTH = /*10;//*/80*1000;
-    
+
     private final PrintStream stdErr;
     private final JTextArea textArea;
     private final JScrollPane textAreaScroller;
@@ -50,32 +50,32 @@ public class JTextAreaOutputStream extends OutputStream {
     private final GapContent content;
     private boolean updateRequested = false;
     private PlainDocument document;
-    
+
     /**
      * Creates a new JTextAreaOutputStream which writes to <code>textArea</code> and synchronizes
      * all writes using <code>synchronized(textArea) { ... }</code> statements.
-     * 
+     *
      * @param textArea the text area to write to (non-null).
      */
     public JTextAreaOutputStream(PrintStream stdErr, JTextArea textArea) {
         this(stdErr, textArea, textArea);
     }
-    
+
     /**
      * Creates a new JTextAreaOutputStream which writes to <code>textArea</code> and synchronizes
      * all writes using <code>synchronized(syncObject) { ... }</code> statements.
-     * 
+     *
      * @param textArea the text area to write to (non-null).
      * @param syncObject the object to synchronize on (non-null).
      */
     public JTextAreaOutputStream(PrintStream stdErr, JTextArea textArea, Object syncObject) {
         this(stdErr, textArea, syncObject, null);
     }
-    
+
     /**
      * Creates a new JTextAreaOutputStream which writes to <code>textArea</code> and synchronizes
      * all writes using <code>synchronized(syncObject) { ... }</code> statements.
-     * 
+     *
      * @param textArea the text area to write to (non-null).
      * @param syncObject the object to synchronize on (non-null).
      * @param encoding the encoding to use when decoding the stream data into Unicode characters.
@@ -105,18 +105,18 @@ public class JTextAreaOutputStream extends OutputStream {
             throw new IllegalArgumentException("textArea == null");
         if(syncObject == null)
             throw new IllegalArgumentException("syncObject == null");
-        
+
         this.stdErr = stdErr;
         this.textArea = textArea;
         this.textAreaScroller = textAreaScroller;
         this.syncObject = syncObject;
         this.encoding = encoding;
-        
+
         this.content = new GapContent();
         this.document = new PlainDocument(content);
         textArea.setDocument(document);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -148,7 +148,7 @@ public class JTextAreaOutputStream extends OutputStream {
                 else
                     s = new String(b, off, len, encoding);
                 try {
-                
+
                     //textArea.append(s);
                     //curBuilder.append(s);
                     if(s.length() > MAX_LENGTH) {
@@ -156,7 +156,7 @@ public class JTextAreaOutputStream extends OutputStream {
 
                         s = s.substring(s.length()-MAX_LENGTH);
                         //stdErr.println(" to " + s.length());
-                        
+
                     }
                     int overrun = (document.getLength()-2+s.length()) - MAX_LENGTH;
                     //stdErr.println("overrun=" + overrun);

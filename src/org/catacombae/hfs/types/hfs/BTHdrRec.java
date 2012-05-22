@@ -25,24 +25,24 @@ public class BTHdrRec {
     /*
      * struct BTHdrRec
      * size: 106 bytes
-     * description: 
-     * 
-     * BP  Size  Type       Identifier   Description                             
+     * description:
+     *
+     * BP  Size  Type       Identifier   Description
      * --------------------------------------------------------------------------
-     * 0   2     SInt16     bthDepth     current depth of tree (Integer)         
-     * 2   4     SInt32     bthRoot      number of root node (LongInt)           
+     * 0   2     SInt16     bthDepth     current depth of tree (Integer)
+     * 2   4     SInt32     bthRoot      number of root node (LongInt)
      * 6   4     SInt32     bthNRecs     number of leaf records in tree (LongInt)
-     * 10  4     SInt32     bthFNode     number of first leaf node (LongInt)     
-     * 14  4     SInt32     bthLNode     number of last leaf node (LongInt)      
-     * 18  2     SInt16     bthNodeSize  size of a node (Integer)                
-     * 20  2     SInt16     bthKeyLen    maximum length of a key (Integer)       
-     * 22  4     SInt32     bthNNodes    total number of nodes in tree (LongInt) 
-     * 26  4     SInt32     bthFree      number of free nodes (LongInt)          
-     * 30  1*76  SInt8[76]  bthResv      reserved (ARRAY[1..76] OF SignedByte)   
+     * 10  4     SInt32     bthFNode     number of first leaf node (LongInt)
+     * 14  4     SInt32     bthLNode     number of last leaf node (LongInt)
+     * 18  2     SInt16     bthNodeSize  size of a node (Integer)
+     * 20  2     SInt16     bthKeyLen    maximum length of a key (Integer)
+     * 22  4     SInt32     bthNNodes    total number of nodes in tree (LongInt)
+     * 26  4     SInt32     bthFree      number of free nodes (LongInt)
+     * 30  1*76  SInt8[76]  bthResv      reserved (ARRAY[1..76] OF SignedByte)
      */
-    
+
     public static final int STRUCTSIZE = 106;
-    
+
     private final byte[] bthDepth = new byte[2];
     private final byte[] bthRoot = new byte[4];
     private final byte[] bthNRecs = new byte[4];
@@ -53,7 +53,7 @@ public class BTHdrRec {
     private final byte[] bthNNodes = new byte[4];
     private final byte[] bthFree = new byte[4];
     private final byte[] bthResv = new byte[1*76];
-    
+
     public BTHdrRec(byte[] data, int offset) {
 	System.arraycopy(data, offset+0, bthDepth, 0, 2);
 	System.arraycopy(data, offset+2, bthRoot, 0, 4);
@@ -66,9 +66,9 @@ public class BTHdrRec {
 	System.arraycopy(data, offset+26, bthFree, 0, 4);
 	System.arraycopy(data, offset+30, bthResv, 0, 1*76);
     }
-    
+
     public static int length() { return STRUCTSIZE; }
-    
+
     /** current depth of tree (Integer) */
     public short getBthDepth() { return Util.readShortBE(bthDepth); }
     /** number of root node (LongInt) */
@@ -89,7 +89,7 @@ public class BTHdrRec {
     public int getBthFree() { return Util.readIntBE(bthFree); }
     /** reserved (ARRAY[1..76] OF SignedByte) */
     public byte[] getBthResv() { return Util.readByteArrayBE(bthResv); }
-    
+
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " bthDepth: " + getBthDepth());
 	ps.println(prefix + " bthRoot: " + getBthRoot());
@@ -102,12 +102,12 @@ public class BTHdrRec {
 	ps.println(prefix + " bthFree: " + getBthFree());
 	ps.println(prefix + " bthResv: " + getBthResv());
     }
-    
+
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "BTHdrRec:");
 	printFields(ps, prefix);
     }
-    
+
     public byte[] getBytes() {
 	byte[] result = new byte[STRUCTSIZE];
 	int offset = 0;

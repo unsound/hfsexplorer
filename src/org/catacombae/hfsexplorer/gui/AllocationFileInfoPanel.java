@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -44,7 +44,7 @@ public class AllocationFileInfoPanel extends javax.swing.JPanel {
         this.afView = afView;
 
         initComponents();
-        
+
         window.addWindowListener(new WindowAdapter() {
 
             @Override
@@ -52,7 +52,7 @@ public class AllocationFileInfoPanel extends javax.swing.JPanel {
                 stopCountBlocksProcess.o = true;
             }
         });
-        
+
         Thread t = new Thread(new Runnable() {
             /* @Override */
             public void run() {

@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,7 +20,7 @@ package org.catacombae.csjc;
 /**
  * Represents a dynamic struct, i.e. a struct with a size that varies between
  * instances.
- * 
+ *
  * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
  */
 public interface DynamicStruct extends AbstractStruct {

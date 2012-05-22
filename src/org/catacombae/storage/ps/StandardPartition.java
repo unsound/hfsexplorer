@@ -29,13 +29,13 @@ public class StandardPartition implements Partition {
     private final long startOffset;
     private final long length;
     private final PartitionType type;
-    
+
     public StandardPartition(long startOffset, long length, PartitionType type) {
         this.startOffset = startOffset;
         this.length = length;
         this.type = type;
     }
-    
+
     /* @Override */
     public long getStartOffset() {
         return startOffset;

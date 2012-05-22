@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -26,7 +26,7 @@ import org.catacombae.util.Util;
  */
 public class ExtendedBootRecord {
     public static final short MBR_SIGNATURE = 0x55AA;
-    
+
     /*
      * struct ExtendedBootRecord
      * size: 512 bytes
@@ -34,7 +34,7 @@ public class ExtendedBootRecord {
      * BP   Size  Type              Variable name        Description
      * --------------------------------------------------------------
      * 0    394   byte[394]         reserved1            most likely zeroed
-     * 394  9     byte[9]           optIBMBootmgrEntry   possible IBM Boot Manager menu entry 
+     * 394  9     byte[9]           optIBMBootmgrEntry   possible IBM Boot Manager menu entry
      * 403  37    byte[37]          reserved2            most likely zeroed
      * 440  4     UInt32            optDiskSignature     possibly IBM extended data
      * 444  2     byte[2]           reserved3            most likely zeroed
@@ -53,9 +53,9 @@ public class ExtendedBootRecord {
     protected final EBRPartition secondEntry;
     protected final byte[] reserved4 = new byte[32];
     protected final byte[] mbrSignature = new byte[2];
-    
+
     //private final LinkedList<Partition> tempList = new LinkedList<Partition>(); // getUsedPartitionEntries()
-    
+
     /** <code>data</code> is assumed to be at least (<code>offset</code>+512) bytes in length. */
     public ExtendedBootRecord(byte[] data, int offset, long extendedPartitionOffset, long thisRecordOffset, int sectorSize) {
         //System.err.println("ExtendedBootRecord...");
@@ -72,7 +72,7 @@ public class ExtendedBootRecord {
         if(!Util.arrayRegionsEqual(getBytes(), 0, getStructSize(), data, offset, getStructSize()))
             throw new RuntimeException("Internal error!");
     }
-    
+
     public ExtendedBootRecord(ExtendedBootRecord source) {
         System.arraycopy(source.reserved1, 0, reserved1, 0, reserved1.length);
         System.arraycopy(source.optIBMBootmgrEntry, 0, optIBMBootmgrEntry, 0, optIBMBootmgrEntry.length);
@@ -84,21 +84,21 @@ public class ExtendedBootRecord {
         System.arraycopy(source.reserved4, 0, reserved3, 0, reserved4.length);
         System.arraycopy(source.mbrSignature, 0, mbrSignature, 0, mbrSignature.length);
     }
-    
+
     public static int getStructSize() { return 512; }
-    
+
     /** This is an optional field, and might contain unexpected and invalid data. */
     public byte[] getOptionalIBMBootManagerEntry() { return Util.createCopy(optIBMBootmgrEntry); }
-    
+
     /** This is an optional field, and might contain unexpected and invalid data. */
     public int getOptionalDiskSignature() { return Util.readIntBE(optDiskSignature); }
-    
+
     public EBRPartition getFirstEntry() { return firstEntry; }
-    
+
     public EBRPartition getSecondEntry() { return secondEntry; }
-    
+
     public short getMBRSignature() { return Util.readShortBE(mbrSignature); }
-    
+
     public void printFields(PrintStream ps, String prefix) {
         ps.println(prefix + " diskSignature: 0x" + Util.toHexStringBE(getOptionalDiskSignature()) + " (optional, and possibly incorrect)");
 
@@ -138,7 +138,7 @@ public class ExtendedBootRecord {
         else
             return true;
     }
-    
+
     public byte[] getBytes() {
         byte[] result = new byte[512];
         byte[] curData;

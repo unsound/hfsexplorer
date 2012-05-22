@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -24,7 +24,7 @@ package org.catacombae.storage.fs;
  * or more "forks" of data, where one of the forks always must be considered the
  * "main" fork or the "data" fork. Some file systems do not support forks, in
  * which case the only fork available is the "main" fork.
- * 
+ *
  * @author <a href="mailto:catacombae@gmail.com">Erik Larsson</a>
  */
 public interface FSFile extends FSEntry {
@@ -32,7 +32,7 @@ public interface FSFile extends FSEntry {
      * Returns the main (data) fork of this file, containing the data that users
      * normally will see. All implementors must make sure that this FSFork
      * always exists.
-     * 
+     *
      * @return the main (data) fork of this file.
      */
     public abstract FSFork getMainFork();

@@ -35,11 +35,11 @@ public class HFSContainerHandler extends ContainerHandler {
     private static final short SIGNATURE_HFSX =     (short)0x4858; // ASCII: 'HX'
 
     private DataLocator partitionData;
-    
+
     public HFSContainerHandler(DataLocator partitionData) {
         this.partitionData = partitionData;
     }
-    
+
     @Override
     public boolean containsFileSystem() {
         return true;

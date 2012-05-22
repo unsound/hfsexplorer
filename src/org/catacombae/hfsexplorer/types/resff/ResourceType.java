@@ -27,47 +27,47 @@ public class ResourceType implements StaticStruct, PrintableStruct {
     /*
      * struct ResourceType
      * size: 8 bytes
-     * description: 
-     * 
-     * BP  Size  Type     Identifier           Description                                                                    
+     * description:
+     *
+     * BP  Size  Type     Identifier           Description
      * -----------------------------------------------------------------------------------------------------------------------
-     * 0   1*4   Char[4]  type                 // Resource type.                                                              
-     * 4   2     UInt16   instanceCount        // Number of resources of this type in map minus 1.                            
+     * 0   1*4   Char[4]  type                 // Resource type.
+     * 4   2     UInt16   instanceCount        // Number of resources of this type in map minus 1.
      * 6   2     UInt16   referenceListOffset  // Offset from beginning of resource type list to reference list for this type.
      */
-    
+
     public static final int STRUCTSIZE = 8;
-    
+
     private final byte[] type = new byte[1*4];
     private final byte[] instanceCount = new byte[2];
     private final byte[] referenceListOffset = new byte[2];
-    
+
     public ResourceType(byte[] data, int offset) {
 	System.arraycopy(data, offset+0, type, 0, 1*4);
 	System.arraycopy(data, offset+4, instanceCount, 0, 2);
 	System.arraycopy(data, offset+6, referenceListOffset, 0, 2);
     }
-    
+
     public static int length() { return STRUCTSIZE; }
-    
+
     /** // Resource type. */
     public byte[] getType() { return Util.readByteArrayBE(type); }
     /** // Number of resources of this type in map minus 1. */
     public short getInstanceCount() { return Util.readShortBE(instanceCount); }
     /** // Offset from beginning of resource type list to reference list for this type. */
     public short getReferenceListOffset() { return Util.readShortBE(referenceListOffset); }
-    
+
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " type: " + Util.toASCIIString(getType()));
 	ps.println(prefix + " instanceCount: " + getInstanceCount());
 	ps.println(prefix + " referenceListOffset: " + getReferenceListOffset());
     }
-    
+
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "ResourceType:");
 	printFields(ps, prefix);
     }
-    
+
     public byte[] getBytes() {
 	byte[] result = new byte[length()];
 	int offset = 0;

@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@ import org.catacombae.csjc.structelements.Dictionary;
 public class HFSPlusVolumeHeader extends MutableStruct implements StructElements {
     public static final short SIGNATURE_HFS_PLUS = 0x482B;
     public static final short SIGNATURE_HFSX = 0x4858;
-    /* 
+    /*
      * struct HFSPlusVolumeHeader
      * size: 512 bytes
      *
@@ -63,7 +63,7 @@ public class HFSPlusVolumeHeader extends MutableStruct implements StructElements
      * 352  80    HFSPlusForkData   attributesFile
      * 432  80    HFSPlusForkData   startupFile
      */
-	
+
     private final byte[] signature = new byte[2];
     private final byte[] version = new byte[2];
     private final byte[] attributes = new byte[4];
@@ -90,11 +90,11 @@ public class HFSPlusVolumeHeader extends MutableStruct implements StructElements
     private final HFSPlusForkData catalogFile;
     private final HFSPlusForkData attributesFile;
     private final HFSPlusForkData startupFile;
-	
+
     public HFSPlusVolumeHeader(byte[] data) {
 	this(data, 0);
     }
-	
+
     public HFSPlusVolumeHeader(byte[] data, int offset) {
         this(false, data, offset);
     }
@@ -146,15 +146,15 @@ public class HFSPlusVolumeHeader extends MutableStruct implements StructElements
             new HFSPlusForkData.Mutable(data, offset+432) :
             new HFSPlusForkData(data, offset+432));
     }
-	
+
     public HFSPlusVolumeHeader(InputStream is) throws IOException {
 	this(Util.fillBuffer(is, new byte[_getSize()]), 0);
     }
-	
+
     private static int _getSize() {
 	return 512;
     }
-	
+
     public short getSignature()                { return Util.readShortBE(signature); } // UInt16 0x0
     public short getVersion()                  { return Util.readShortBE(version); } // UInt16 0x2
     public int getAttributes()                 { return Util.readIntBE(attributes); } // UInt32 0x4
@@ -176,7 +176,7 @@ public class HFSPlusVolumeHeader extends MutableStruct implements StructElements
     public int getWriteCount()                 { return Util.readIntBE(writeCount); } // UInt32 0x44
     public long getEncodingsBitmap()           { return Util.readLongBE(encodingsBitmap); } // UInt64 0x48
     public int[] getFinderInfo()               { return Util.readIntArrayBE(finderInfo); } // UInt32[8] 0x50
- 
+
     public HFSPlusForkData getAllocationFile() { return allocationFile; } // 0x70
     public HFSPlusForkData getExtentsFile()    { return extentsFile; } // 0xC0
     public HFSPlusForkData getCatalogFile()    { return catalogFile; } // 0x110
@@ -203,7 +203,7 @@ public class HFSPlusVolumeHeader extends MutableStruct implements StructElements
          * in local time. */
         return HFSPlusDate.localTimestampToDate(getCheckedDate());
     }
-    
+
     public boolean getAttributeVolumeHardwareLock()     { return ((getAttributes() >> 7) & 0x1) != 0; }
     public boolean getAttributeVolumeUnmounted()        { return ((getAttributes() >> 8) & 0x1) != 0; }
     public boolean getAttributeVolumeSparedBlocks()     { return ((getAttributes() >> 9) & 0x1) != 0; }
@@ -254,7 +254,7 @@ public class HFSPlusVolumeHeader extends MutableStruct implements StructElements
         startupFile.print(ps, prefix + "  ");
     // 	    ps.println(prefix + ": " + );
     }
-	
+
     public void printAttributes(PrintStream ps, int pregap) {
         String pregapString = "";
         for(int i = 0; i < pregap; ++i)
@@ -282,18 +282,18 @@ public class HFSPlusVolumeHeader extends MutableStruct implements StructElements
             System.err.println("usage: main <file> <byte position>");
         else {
             Long pos = Long.parseLong(args[1]);
-            
+
             RandomAccessFile raf = new RandomAccessFile(args[0], "r");
             raf.seek(pos);
             byte[] buf = new byte[_getSize()];
             raf.readFully(buf);
             raf.close();
-            
+
             new HFSPlusVolumeHeader(buf).print(System.out, "");
         }
     }
     */
-    
+
     private Dictionary getAttributeElements() {
         DictionaryBuilder db = new DictionaryBuilder("Attributes");
 

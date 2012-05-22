@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -24,7 +24,7 @@ public class HFSPlusExtentLeafNode extends BTLeafNode {
     //protected BTNodeDescriptor nodeDescriptor;
     protected HFSPlusExtentLeafRecord[] leafRecords;
     protected short[] leafRecordOffsets;
-    
+
     public HFSPlusExtentLeafNode(byte[] data, int offset, int nodeSize) {
 	//nodeDescriptor = new BTNodeDescriptor(data, offset);
 	super(data, offset, nodeSize);
@@ -38,10 +38,10 @@ public class HFSPlusExtentLeafNode extends BTLeafNode {
 	    int currentOffset = Util.unsign(leafRecordOffsets[i]);
 	    leafRecords[i] = new HFSPlusExtentLeafRecord(data, offset+currentOffset);
 	}
-	
+
     }
-    
-    public short[] getLeafRecordOffsets() { 
+
+    public short[] getLeafRecordOffsets() {
 	short[] offsets = new short[leafRecordOffsets.length];
 	for(int i = 0; i < offsets.length; ++i) {
 	    offsets[i] = leafRecordOffsets[i];
@@ -65,7 +65,7 @@ public class HFSPlusExtentLeafNode extends BTLeafNode {
 	    leafRecords[i].printFields(ps, prefix + "  ");
 	}
     }
-    
+
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "HFSPlusExtentLeafNode:");
 	printFields(ps, prefix);

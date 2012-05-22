@@ -33,7 +33,7 @@ public abstract class CommonHFSCatalogFolderThread implements PrintableStruct, S
     public abstract CommonHFSCatalogString getNodeName();
     public abstract int length();
     public abstract byte[] getBytes();
-    
+
     /* @Override */
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + CommonHFSCatalogFolderThread.class.getSimpleName() + ":");
@@ -43,14 +43,14 @@ public abstract class CommonHFSCatalogFolderThread implements PrintableStruct, S
     public static CommonHFSCatalogFolderThread create(HFSPlusCatalogThread data) {
         return new HFSPlusImplementation(data);
     }
-    
+
     public static CommonHFSCatalogFolderThread create(CdrThdRec data) {
         return new HFSImplementation(data);
     }
-    
+
     private static class HFSPlusImplementation extends CommonHFSCatalogFolderThread {
         private final HFSPlusCatalogThread data;
-        
+
         public HFSPlusImplementation(HFSPlusCatalogThread data) {
             this.data = data;
         }
@@ -74,7 +74,7 @@ public abstract class CommonHFSCatalogFolderThread implements PrintableStruct, S
         public byte[] getBytes() {
             return data.getBytes();
         }
-        
+
         /* @Override */
         public void printFields(PrintStream ps, String prefix) {
             ps.println(prefix + "data:");
@@ -86,10 +86,10 @@ public abstract class CommonHFSCatalogFolderThread implements PrintableStruct, S
             return data.getStructElements();
         }
     }
-    
+
     private static class HFSImplementation extends CommonHFSCatalogFolderThread {
         private final CdrThdRec data;
-        
+
         public HFSImplementation(CdrThdRec data) {
             this.data = data;
         }
@@ -119,7 +119,7 @@ public abstract class CommonHFSCatalogFolderThread implements PrintableStruct, S
             ps.println(prefix + "data:");
             data.print(ps, prefix + " ");
         }
-        
+
         /* @Override */
         public Dictionary getStructElements() {
             return data.getStructElements();

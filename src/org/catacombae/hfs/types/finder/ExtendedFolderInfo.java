@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -27,26 +27,26 @@ public class ExtendedFolderInfo extends CommonExtendedFinderInfo {
     /*
      * struct ExtendedFolderInfo
      * size: 16 bytes
-     * description: 
-     * 
-     * BP  Size  Type    Identifier           Description                        
+     * description:
+     *
+     * BP  Size  Type    Identifier           Description
      * --------------------------------------------------------------------------
      * 0   4     Point   scrollPosition       // Scroll position (for icon views)
-     * 4   4     SInt32  reserved1                                               
-     * 8   2     UInt16  extendedFinderFlags                                     
-     * 10  2     SInt16  reserved2                                               
-     * 12  4     SInt32  putAwayFolderID                                         
+     * 4   4     SInt32  reserved1
+     * 8   2     UInt16  extendedFinderFlags
+     * 10  2     SInt16  reserved2
+     * 12  4     SInt32  putAwayFolderID
      */
-    
+
     private final Point scrollPosition;
     private final byte[] reserved1 = new byte[4];
-    
+
     public ExtendedFolderInfo(byte[] data, int offset) {
         super(data, offset);
 	scrollPosition = new Point(data, offset+0);
 	System.arraycopy(data, offset+4, reserved1, 0, 4);
     }
-    
+
     public static int length() { return 16; }
 
     @Override
@@ -54,19 +54,19 @@ public class ExtendedFolderInfo extends CommonExtendedFinderInfo {
         byte[] result = new byte[length()];
 	byte[] tempData;
 	int offset = 0;
-        
+
         tempData = scrollPosition.getBytes();
 	System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
 	System.arraycopy(reserved1, 0, result, offset, reserved1.length); offset += reserved1.length;
         tempData = super.getBytes();
 	System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
-        
+
         return result;
     }
-    
+
     public Point getScrollPosition() { return scrollPosition; }
     public int getReserved1() { return Util.readIntBE(reserved1); }
-    
+
     @Override
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " scrollPosition: ");
@@ -74,7 +74,7 @@ public class ExtendedFolderInfo extends CommonExtendedFinderInfo {
 	ps.println(prefix + " reserved1: " + getReserved1());
 	super.printFields(ps, prefix);
     }
-    
+
     /* @Override */
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "ExtendedFolderInfo:");
@@ -84,11 +84,11 @@ public class ExtendedFolderInfo extends CommonExtendedFinderInfo {
     @Override
     public Dictionary getStructElements() {
          DictionaryBuilder db = new DictionaryBuilder(ExtendedFolderInfo.class.getName());
-         
+
          db.add("scrollPosition", scrollPosition.getStructElements());
          db.addUIntBE("reserved1", reserved1);
          db.addAll(super.getStructElements());
-         
+
          return db.getResult();
     }
 }

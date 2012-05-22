@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -38,56 +38,56 @@ public abstract class CommonHFSCatalogNodeID {
         BOGUS_EXTENT_FILE,
         FIRST_USER_CATALOG_NODE_ID
     }
-    
+
     /**
      * Returns an <code>int</code> representation of this catalog node ID.
      * @return an <code>int</code> representation of this catalog node ID.
      */
     //public abstract int toInt();
-    
+
      /**
      * Returns an <code>long</code> representation of this catalog node ID.
      * @return an <code>long</code> representation of this catalog node ID.
      */
    public abstract long toLong();
-    
+
     /**
      * Returns a CommonHFSCatalogNodeID for a specified reserved ID, if the
      * reserved ID is supported for the implementation (otherwise null is
      * returned). HFS only supports ROOT_PARENT, ROOT_FOLDER, EXTENTS_FILE,
      * CATALOG_FILE, BAD_BLOCKS_FILE and FIRST_USER_CATALOG_NODE_ID.
-     * 
+     *
      * @param id the reserved ID to look up.
      * @return a CommonHFSCatalogNodeID representing the specified reserved ID.
      */
     public static CommonHFSCatalogNodeID getHFSReservedID(ReservedID id) {
         return HFSImplementation.getReservedIDStatic(id);
     }
-    
+
     /**
      * Returns a CommonHFSCatalogNodeID for a specified reserved ID, if the
      * reserved ID is supported for the implementation (otherwise null is
      * returned). HFS+ supports all ReservedID values.
-     * 
+     *
      * @param id
      * @return a CommonHFSCatalogNodeID representing the specified reserved ID.
      */
     public static CommonHFSCatalogNodeID getHFSPlusReservedID(ReservedID id) {
         return HFSPlusImplementation.getReservedIDStatic(id);
     }
-    
+
     /**
      * Returns a CommonHFSCatalogNodeID for a specified reserved ID, if the
      * reserved ID is supported for the implementation (otherwise null is
      * returned). HFS only supports ROOT_PARENT, ROOT_FOLDER, EXTENTS_FILE,
      * CATALOG_FILE, BAD_BLOCKS_FILE and FIRST_USER_CATALOG_NODE_ID while
      * HFS+ supports all ReservedID values.
-     * 
+     *
      * @param id
      * @return a CommonHFSCatalogNodeID representing the specified reserved ID.
      */
     public abstract CommonHFSCatalogNodeID getReservedID(ReservedID id);
-     
+
     @Override
     public boolean equals(Object o) {
         if(o instanceof CommonHFSCatalogNodeID)
@@ -95,21 +95,21 @@ public abstract class CommonHFSCatalogNodeID {
         else
             return false;
     }
-    
+
     @Override
     public int hashCode() {
         return (int)toLong();
     }
 
-    
+
     public static CommonHFSCatalogNodeID create(HFSCatalogNodeID fileID) {
         return new HFSPlusImplementation(fileID);
     }
-    
+
     public static CommonHFSCatalogNodeID create(int filFlNum) {
         return new HFSImplementation(filFlNum);
     }
-    
+
     public static class HFSPlusImplementation extends CommonHFSCatalogNodeID {
         private static final HFSPlusImplementation ROOT_PARENT_ID = new HFSPlusImplementation(HFSCatalogNodeID.kHFSRootParentID);
         private static final HFSPlusImplementation ROOT_FOLDER_ID = new HFSPlusImplementation(HFSCatalogNodeID.kHFSRootFolderID);
@@ -122,9 +122,9 @@ public abstract class CommonHFSCatalogNodeID {
         private static final HFSPlusImplementation REPAIR_CATALOG_FILE_ID = new HFSPlusImplementation(HFSCatalogNodeID.kHFSRepairCatalogFileID);
         private static final HFSPlusImplementation BOGUS_EXTENT_FILE_ID = new HFSPlusImplementation(HFSCatalogNodeID.kHFSBogusExtentFileID);
         private static final HFSPlusImplementation FIRST_USER_CATALOG_NODE_ID = new HFSPlusImplementation(HFSCatalogNodeID.kHFSFirstUserCatalogNodeID);
-        
+
         private final HFSCatalogNodeID fileID;
-        
+
         public HFSPlusImplementation(HFSCatalogNodeID fileID) {
             this.fileID = fileID;
         }
@@ -140,12 +140,12 @@ public abstract class CommonHFSCatalogNodeID {
         public long toLong() {
             return fileID.toLong();
         }
-        
+
         @Override
         public CommonHFSCatalogNodeID getReservedID(ReservedID id) {
             return getReservedIDStatic(id);
         }
-        
+
         public static CommonHFSCatalogNodeID getReservedIDStatic(ReservedID id) {
             switch(id) {
                 case ROOT_PARENT:
@@ -176,7 +176,7 @@ public abstract class CommonHFSCatalogNodeID {
             }
         }
     }
-    
+
     public static class HFSImplementation extends CommonHFSCatalogNodeID {
         private static final HFSImplementation ROOT_PARENT_ID = new HFSImplementation(1);
         private static final HFSImplementation ROOT_FOLDER_ID = new HFSImplementation(2);
@@ -186,11 +186,11 @@ public abstract class CommonHFSCatalogNodeID {
         private static final HFSImplementation FIRST_USER_CATALOG_NODE_ID = new HFSImplementation(16);
 
         private final int filFlNum;
-        
+
         public HFSImplementation(int filFlNum) {
             this.filFlNum = filFlNum;
         }
-        
+
         /*
         @Override
         public int toInt() {
@@ -207,7 +207,7 @@ public abstract class CommonHFSCatalogNodeID {
         public CommonHFSCatalogNodeID getReservedID(ReservedID id) {
             return getReservedIDStatic(id);
         }
-        
+
         public static CommonHFSCatalogNodeID getReservedIDStatic(ReservedID id) {
             switch(id) {
                 case ROOT_PARENT:

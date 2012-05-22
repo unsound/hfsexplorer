@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -28,17 +28,17 @@ import java.nio.charset.UnsupportedCharsetException;
 
 /**
  * StringCodec that uses a CharsetDecoder internally.
- * 
+ *
  * @author Erik Larsson
  */
 public class CharsetStringCodec implements StringCodec {
     private final String charsetName;
     private final CharsetDecoder decoder;
     private final CharsetEncoder encoder;
-    
+
     /**
      * Creates a new CharsetStringCodec.
-     * 
+     *
      * @param charsetName the name of the charset, for instance "ISO-8859-1", "UTF-16BE", "KOI8-R"
      * @throws java.nio.charset.IllegalCharsetNameException if the charset name doesn't match any
      * known charset.
@@ -51,7 +51,7 @@ public class CharsetStringCodec implements StringCodec {
         this.decoder = cs.newDecoder();
         this.encoder = cs.newEncoder();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -59,7 +59,7 @@ public class CharsetStringCodec implements StringCodec {
     public String decode(byte[] data) {
         return decode(data, 0, data.length);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -91,7 +91,7 @@ public class CharsetStringCodec implements StringCodec {
             throw new RuntimeException("Could not encode data!", e);
         }
     }
-    
+
     /**
      * Returns the charset name as it was passed to the constructor.
      * @return the charset name as it was passed to the constructor.

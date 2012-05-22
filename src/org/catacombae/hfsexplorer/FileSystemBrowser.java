@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2007-2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -73,7 +73,7 @@ import org.catacombae.hfsexplorer.gui.FilesystemBrowserPanel;
 /**
  * A generalization of the file system browser into a very autonomous component with very few
  * dependencies, so that it can be easily reused in the future.
- * 
+ *
  * @author Erik Larsson
  */
 public class FileSystemBrowser<A> {
@@ -89,31 +89,31 @@ public class FileSystemBrowser<A> {
     private final JTable fileTable;
     private final JScrollPane fileTableScroller;
     private final JTree dirTree;
-    
+
     //private final JPopupMenu treeNodePopupMenu;
     //private final JPopupMenu tableNodePopupMenu;
-    
+
     private final Vector<String> colNames = new Vector<String>();
     private final DefaultTableModel tableModel;
-    
+
     // Focus timestamps (for determining what to extract)
     private long fileTableLastFocus = 0;
     private long dirTreeLastFocus = 0;
 
     /** For determining the standard layout size of the columns in the table. */
     private int totalColumnWidth = 0;
-    
+
     /** Used for formatting byte size strings, like 234,12 MiB. */
     private final DecimalFormat sizeFormat = new DecimalFormat("0.00");
-    
+
     // Communication between adjustColumnsWidths and the column listener
     private final boolean[] disableColumnListener = { false };
     private final ObjectContainer<int[]> lastWidths = new ObjectContainer<int[]>(null);
     private DefaultTreeModel treeModel;
-    
+
     private final GenericPlaceholder<A> genericPlaceholder = new GenericPlaceholder<A>();
     private TreePath lastTreeSelectionPath = null;
-    
+
     public FileSystemBrowser(FileSystemProvider<A> iController) {
         this.controller = iController;
         this.viewComponent = new FilesystemBrowserPanel();
@@ -148,14 +148,14 @@ public class FileSystemBrowser<A> {
                 actionGetInfo();
             }
         });
-        
+
         goButton.addActionListener(new ActionListener() {
             /* @Override */
             public void actionPerformed(ActionEvent e) {
                 actionGotoDir();
             }
         });
-        
+
         addressField.addActionListener(new ActionListener() {
             /* @Override */
             public void actionPerformed(ActionEvent e) {
@@ -173,7 +173,7 @@ public class FileSystemBrowser<A> {
         */
         //this.treeNodePopupMenu = controller.createTreeNodePopupMenu();
         //this.tableNodePopupMenu = controller.createTableNodePopupMenu();
-        
+
         final Class objectClass = new Object().getClass();
         colNames.add("Name");
         colNames.add("Size");
@@ -212,7 +212,7 @@ public class FileSystemBrowser<A> {
         fileTable.getColumnModel().getColumn(4).setResizable(false);
 
         if(Java6Util.isJava6OrHigher()) {
-            
+
             Comparator<?> c = new ComparableComparator();
             ArrayList<Comparator<?>> rowComparators = new ArrayList<Comparator<?>>(5);
             for(int i = 0; i < 5; ++i) // 5 rows currently
@@ -337,14 +337,14 @@ public class FileSystemBrowser<A> {
             private ImageIcon documentIcon = new ImageIcon(ClassLoader.getSystemResource("res/emptydocument.png"));
             private ImageIcon folderIcon = new ImageIcon(ClassLoader.getSystemResource("res/folder.png"));
             private ImageIcon emptyIcon = new ImageIcon(ClassLoader.getSystemResource("res/nothing.png"));
-		
+
             /* @Override */
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, final int row, final int column) {
                 if(value instanceof RecordContainer) {
                     final Component objectComponent = objectRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                     final JLabel jl = theOne;
                     Record rec = ((RecordContainer) value).getRecord(genericPlaceholder);
-                    
+
                     switch(rec.getType()) {
                         case FOLDER:
                         case FOLDER_LINK:
@@ -360,7 +360,7 @@ public class FileSystemBrowser<A> {
                         default:
                             throw new RuntimeException("Unhandled RecordType: " + rec.getType());
                     }
-                    
+
                     jl.setVisible(true);
                     Component c = new Component() {
                         {
@@ -489,7 +489,7 @@ public class FileSystemBrowser<A> {
                 }
             }
         });
-	
+
 	dirTree.addMouseListener(new MouseAdapter() {
             @Override
         public void mousePressed(MouseEvent e) {
@@ -512,7 +512,7 @@ public class FileSystemBrowser<A> {
 
         setRoot(null);
        	dirTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        
+
 	dirTree.addTreeSelectionListener(new TreeSelectionListener() {
                 /* @Override */
 		public void valueChanged(TreeSelectionEvent e) {
@@ -522,17 +522,17 @@ public class FileSystemBrowser<A> {
 	    });
 	dirTree.addTreeWillExpandListener(new TreeWillExpandListener() {
                 /* @Override */
-		public void treeWillExpand(TreeExpansionEvent e) 
+		public void treeWillExpand(TreeExpansionEvent e)
                     throws ExpandVetoException {
 		    //System.out.println("Tree will expand!");
                     actionExpandDirTreeNode(e.getPath());
 		}
-		
+
                 /* @Override */
 		public void treeWillCollapse(TreeExpansionEvent e) {}
 
 	    });
-	
+
 	// Focus monitoring
 	fileTable.addFocusListener(new FocusListener() {
                 /* @Override */
@@ -556,7 +556,7 @@ public class FileSystemBrowser<A> {
                 /* @Override */
 		public void focusLost(FocusEvent e) {}
 	    });
-	
+
  	fileTableScroller.addComponentListener(new ComponentAdapter() {
                 @Override
                 public void componentResized(ComponentEvent e) {
@@ -565,7 +565,7 @@ public class FileSystemBrowser<A> {
 		}
  	    });
     }
-    
+
     /**
      * Action code for the action "go to parent directory" in the file system browser.
      */
@@ -593,15 +593,15 @@ public class FileSystemBrowser<A> {
         FolderTreeNode nodeToPopulate;
         if(objectToPopulate instanceof FolderTreeNode) {
             nodeToPopulate = (FolderTreeNode) objectToPopulate;
-            
+
             List<Record<A>> recordPath = getRecordPath(currentTreeSelection);
-            
+
             // First make sure we have updated contents
             populateTreeNodeFromPath(nodeToPopulate, recordPath);
             dirTree.expandPath(lastTreeSelectionPath);
-            
+
             int childCount = treeModel.getChildCount(nodeToPopulate);
-            
+
             Object finalChild = null;
             for(int i = 0; i < childCount; ++i) {
                 Object curChild = treeModel.getChild(nodeToPopulate, i);
@@ -618,7 +618,7 @@ public class FileSystemBrowser<A> {
             if(finalChild == null)
                 throw new RuntimeException("Selection path to leaf child not found!");
         }
-         /*       
+         /*
         String[] rawPath = new String[recordPath.size()-1+1];
         int i = 0;
         for(Record<A> rec : recordPath) {
@@ -627,11 +627,11 @@ public class FileSystemBrowser<A> {
             ++i;
         }
         rawPath[i] = subDir.getName();
-        
+
         setCurrentDirectory(rawPath);
           * */
     }
-    
+
     /**
      * Action code for the action "get info about selection" in the file system browser.
      */
@@ -655,7 +655,7 @@ public class FileSystemBrowser<A> {
                         JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     private void actionExpandDirTreeNode(TreePath targetNodePath) {
         if(ensureFileSystemLoaded()) {
             try {
@@ -679,7 +679,7 @@ public class FileSystemBrowser<A> {
             }
         }
     }
-    
+
     private void actionTreeNodeSelected(TreePath selectionPath) {
         // System.err.println("actionTreeNodeSelected(" + selectionPath.toString() + ");");
         // System.err.println("  path count: " + selectionPath.getPathCount());
@@ -697,13 +697,13 @@ public class FileSystemBrowser<A> {
             }
         }
     }
-    
+
     private void displayUnhandledException(Throwable e) {
         e.printStackTrace();
         JOptionPane.showMessageDialog(viewComponent, e.getClass() + " while populating " +
                 "tree node:\n  " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     }
-                
+
     private List<Record<A>> getRecordPath(TreePath tp) {
         if(tp == null)
             return null;
@@ -732,7 +732,7 @@ public class FileSystemBrowser<A> {
                 throw new RuntimeException("Unexpected node class in tree: " + obj.getClass());
             }
         }
-        
+
         return recordPath;
     }
 
@@ -742,14 +742,14 @@ public class FileSystemBrowser<A> {
         int[] w1 = new int[columnCount];
         for(int i = 0; i < w1.length; ++i)
 	    w1[i] = fileTable.getColumnModel().getColumn(i).getPreferredWidth();
-		    
+
 // 	System.err.print("  Widths before =");
 // 	for(int width : w1)
 // 	    System.err.print(" " + width);
 // 	System.err.println();
 
 	disableColumnListener[0] = true;
-		    
+
 	fileTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 	fileTableScroller.invalidate();
 	//fileTable.invalidate();
@@ -776,21 +776,21 @@ public class FileSystemBrowser<A> {
 // 	for(int i = 0; i < columnCount; ++i)
 // 	    System.err.print(" " + fileTable.getColumnModel().getColumn(i).getPreferredWidth());
 // 	System.err.println();
-		    
+
 	lastWidths.o = null;
 	disableColumnListener[0] = false;
     }
-    
+
     private void populateTreeNodeFromPath(FolderTreeNode nodeToPopulate, List<Record<A>> recordPath) {
         List<Record<A>> childRecords =
                 controller.getFolderContents(recordPath);
         populateTreeNodeFromContents(nodeToPopulate, childRecords);
     }
-    
+
     private void populateTreeNodeFromContents(FolderTreeNode nodeToPopulate,
             List<Record<A>> childRecords) {
         //System.err.println("populateTreeNodeFromContents called for " + nodeToPopulate.getUserObject().toString());
-        
+
         final Queue<Record<A>> remainingQueue;
 
         { // Initialize remainingQueue
@@ -904,61 +904,61 @@ public class FileSystemBrowser<A> {
             }
         }
     }
-  
+
     private List<String> asNameList(List<Record<A>> recordList) {
         ArrayList<String> res = new ArrayList<String>();
         for(Record<A> rec : recordList)
             res.add(rec.getName());
         return res;
     }
-    
+
     private void populateTableFromPath(List<Record<A>> folderRecordPath) {
         List<Record<A>> childRecords = controller.getFolderContents(folderRecordPath);
         List<String> nameList = asNameList(folderRecordPath.subList(1, folderRecordPath.size()));
         String displayPath =
                 controller.getAddressPath(nameList);
-        
+
         populateTableFromContents(childRecords, displayPath);
     }
-    
+
     private void populateTableFromContents(List<Record<A>> contents, String displayPath) {
         while(tableModel.getRowCount() > 0) {
             tableModel.removeRow(tableModel.getRowCount()-1);
 	}
-	
+
         DateFormat dti = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
         int i = 0;
 	for(Record<A> rec : contents) {
 	    Vector<Object> currentRow = new Vector<Object>(4);
-	    
+
             currentRow.add(new RecordContainer(rec));
             currentRow.add(new SizeEntry(rec.getSize()));
             currentRow.add(new RecordTypeEntry(rec.getType()));
             currentRow.add(new DateEntry(rec.getModifyDate(), dti));
             currentRow.add(new IndexEntry(i++));
-            
+
             tableModel.addRow(currentRow);
 	}
 	adjustTableWidth();
-        
+
         fileTableScroller.getVerticalScrollBar().setValue(0);
         addressField.setText(displayPath);
     }
 
     /**
      * Returns the JComponent that can be used to display the FileSystemBrowser.
-     * 
+     *
      * @return the JComponent that can be used to display the FileSystemBrowser.
      */
     public JComponent getViewComponent() {
         return viewComponent;
     }
-    
+
     /**
      * Returns the current user selection as a list of the user objects
      * contained within the records, rather than a list of the records
      * themselves. This is a convenience method.
-     * 
+     *
      * @return the current user selection as a list of user objects.
      */
     public List<A> getUserObjectSelection() {
@@ -969,14 +969,14 @@ public class FileSystemBrowser<A> {
         }
         return result;
     }
-    
+
     /**
      * Returns the current user selection for the file system browser. The
      * selection may be from the tree, in which case there is only one object,
      * or from the table, in which case there can be several. Which one to
      * choose when there is a selection in both the table and the tree depends
      * on which component last had focus.
-     * 
+     *
      * @return the current user selection for the file system browser.
      */
     public List<Record<A>> getSelection() {
@@ -1001,7 +1001,7 @@ public class FileSystemBrowser<A> {
 
     /**
      * Returns the current user selection for the folder tree.
-     * 
+     *
      * @return the current user selection for the folder tree.
      */
     private Record<A> getTreeSelection() {
@@ -1036,7 +1036,7 @@ public class FileSystemBrowser<A> {
                     "Error", JOptionPane.ERROR_MESSAGE);
             result = null;
         }
-        
+
         return result;
     }
 
@@ -1084,7 +1084,7 @@ public class FileSystemBrowser<A> {
 
     /**
      * Returns the current user selection for the folder contents table.
-     * 
+     *
      * @return the current user selection for the folder contents table.
      */
     private List<Record<A>> getTableSelection() {
@@ -1117,16 +1117,16 @@ public class FileSystemBrowser<A> {
             }
             result = actualResult;
         }
-        
+
         return result;
     }
-    
+
     /**
      * Returns whether or not a file system is loaded by the controller. If a
      * file system is not loaded, an error message dialog is displayed to notify
      * the user that the operation it requested could not be performed, and then
      * <code>false</code> is returned.
-     * 
+     *
      * @return whether or not a file system is loaded by the controller.
      */
     private boolean ensureFileSystemLoaded() {
@@ -1140,7 +1140,7 @@ public class FileSystemBrowser<A> {
             return false;
         }
     }
-    
+
     public void setRoot(Record<A> rootRecord) {
         final TreeNode rootNode;
         final List<Record<A>> rootRecordPath;
@@ -1163,7 +1163,7 @@ public class FileSystemBrowser<A> {
         // System.err.print("Setting tree model...");
         dirTree.setModel(treeModel);
         // System.err.println("done!");
-        
+
         lastTreeSelectionPath = new TreePath(rootNode);
         // System.err.print("Doing select in tree...");
         selectInTree(lastTreeSelectionPath);
@@ -1173,7 +1173,7 @@ public class FileSystemBrowser<A> {
         }
         else
             populateTableFromContents(new ArrayList<Record<A>>(0), "");
-        
+
         // System.err.print("Setting selection status...");
         setSelectionStatus(0, 0);
         // System.err.println("done!");
@@ -1185,15 +1185,15 @@ public class FileSystemBrowser<A> {
         dirTree.setSelectionPath(childPath);
         dirTree.scrollPathToVisible(childPath);
     }
-    
+
     /*
      * Notes on changing the current directory.
-     * 
+     *
      * Directories can be changed by:
      * - Clicking on the requested directory
      * - Typing the address in the address bar and pressing enter or pushing the "Go"-button
      * - Double-clicking a directory entry in the directory contents table
-     * 
+     *
      * Expected reaction:
      * - The directory contents table is populated with the contents of the requested directory
      * - The tree components leading up to the selected directory are expanded.
@@ -1201,21 +1201,21 @@ public class FileSystemBrowser<A> {
      *   place, except if there are no subdirectories to this node, in which case the node should
      *   be expanded to remove the expansion sign.
      * - The address field is updated to reflect the currently selected directory.
-     * 
+     *
      * Action entry points:
      * - actionChangeDir - triggered by a double-click in the contents table
-     * - 
-     * 
+     * -
+     *
      * What we need to do:
-     * 
-     * Because of how events are triggered, 
+     *
+     * Because of how events are triggered,
      * - Look up the required Record<A> entry for the directory
-     *   1. For 
+     *   1. For
      * - Look up the contents of the requested directory
-     * 
+     *
      * When a change directory-event is triggered, the following should take place:
-     * 
-     * - 
+     *
+     * -
      */
     private void setCurrentDirectory(String[] pathnameComponents) {
         System.err.println("setCurrentDirectory(): printing pathnameComponents");
@@ -1228,19 +1228,19 @@ public class FileSystemBrowser<A> {
         }
         else
             throw new RuntimeException("Unexpected root node class: " + rootObj.getClass());
-        
+
         LinkedList<Record<A>> dirStack = new LinkedList<Record<A>>();
         //LinkedList<FolderTreeNode> nodeStack = new LinkedList<FolderTreeNode>();
         //nodeStack.addLast(curNode);
         TreePath treePath = new TreePath(curNode);
-        
+
         for(String currentComponent : pathnameComponents) {
             //FolderTreeNode curNode = (FolderTreeNode) curObj;
-            
+
             dirStack.addLast(curNode.getRecordContainer().getRecord(genericPlaceholder));
             populateTreeNodeFromPath(curNode, dirStack);
             dirTree.expandPath(treePath);
-            
+
             int childCount = treeModel.getChildCount(curNode);
             FolderTreeNode requestedNode = null;
             for(int i = 0; i < childCount; ++i) {
@@ -1257,7 +1257,7 @@ public class FileSystemBrowser<A> {
                     throw new RuntimeException("Unexpected tree node class: " + curChild.getClass());
                 }
             }
-            
+
             if(requestedNode != null) {
                 curNode = requestedNode;
                 //nodeStack.addLast(curNode);
@@ -1270,49 +1270,49 @@ public class FileSystemBrowser<A> {
                 return;
             }
         }
-        
+
         //TreePath tp = new TreePath(nodeStack.toArray(new FolderTreeNode[nodeStack.size()]));
         System.err.println("setCurrentDirectory(): selecting the following path in tree:");
         for(Object o : treePath.getPath())
             System.err.print(" \"" + o.toString() + "\"");
-        
+
         selectInTree(treePath);
     }
-    
+
     /**
      * This method is called each time the user makes/changes a selection in
      * the right pane. The resulting text is supposed to be printed somewhere
      * below the file system browser, but it's up to the controller to decide
      * where to display it.<br>
      * The text will look something like "3 objects selected (11,39 KiB)".
-     * 
+     *
      * @param selectedFilesCount  number of files currently selected.
      * @param totalSize           the total size of the selection.
      */
     private void setSelectionStatus(long selectedFilesCount, long selectionSize) {
         String sizeString;
-        if(selectionSize >= 1024) 
+        if(selectionSize >= 1024)
             sizeString = SpeedUnitUtils.bytesToBinaryUnit(selectionSize,
                     sizeFormat);
         else
             sizeString = selectionSize + " bytes";
-        
+
         statusLabel.setText(selectedFilesCount +
                 ((selectedFilesCount==1)?" object":" objects") +
                 " selected (" + sizeString + ")");
     }
-    
+
     public static enum RecordType {
         FILE, FOLDER, FILE_LINK, FOLDER_LINK, BROKEN_LINK;
     }
-    
+
     public static class Record<A> {
         private RecordType type;
         private String name;
         private long size;
         private Date modifyDate;
         private A userObject;
-        
+
         public Record(RecordType iType, String iName, long iSize,
                 Date iModifyDate, A iUserObject) {
             this.type = iType;
@@ -1321,44 +1321,44 @@ public class FileSystemBrowser<A> {
             this.modifyDate = iModifyDate;
             this.userObject = iUserObject;
         }
-        
+
         public RecordType getType() {
             return type;
         }
-        
+
         public String getName() {
             return name;
         }
-        
+
         public long getSize() {
             return size;
         }
-        
+
         public Date getModifyDate() {
             return modifyDate;
         }
-        
+
         public A getUserObject() {
             return userObject;
         }
     }
-        
+
     public static interface FileSystemProvider<A> {
-        
+
         public void actionDoubleClickFile(List<Record<A>> fileRecordPath);
 
         public void actionExtractToDir(List<Record<A>> parentPath, List<Record<A>> recordList);
-        
+
         public void actionGetInfo(List<Record<A>> parentPath, List<Record<A>> recordList);
 
         public JPopupMenu getRightClickRecordPopupMenu(List<Record<A>> parentPath, List<Record<A>> selectedRecords);
-        
+
         public boolean isFileSystemLoaded();
-        
+
         public List<Record<A>> getFolderContents(List<Record<A>> folderRecordPath);
 
         public String getAddressPath(List<String> pathComponents);
-        
+
         /**
          * Parses the string <code>targetAddress</code> as a path specifier in the context of the
          * current file system. For example, in a unix-like file system environment you would want
@@ -1366,34 +1366,34 @@ public class FileSystemBrowser<A> {
          * system you can choose to parse the path "\Windows\System32" or "C:\Windows\System32" as
          * <code>{ "Windows", "System32" }</code>. The parsing must be consistent with the result of
          * <code>getAddressPath</code>.
-         * 
+         *
          * @param targetAddress
          * @return the components of the address path if the parsing was successful, or
          * <code>null</code> if the target address string was invalid.
          */
         public String[] parseAddressPath(String targetAddress);
-        
-        
+
+
     }
-    
+
     /** Aggregation class for storage in the first column of fileTable. */
     private static class RecordContainer implements Comparable {
 	private Record rec;
-        
+
 	private RecordContainer() {}
 	public RecordContainer(Record rec) {
 	    this.rec = rec;
 	}
-        
+
         /*public Record getRecord() {
             return rec;
         }*/
-        
+
         @SuppressWarnings("unchecked")
 	public <T> Record<T> getRecord(GenericPlaceholder<T> placeholder) {
             return (Record<T>)rec;
         }
-        
+
         @Override public String toString() { return rec.getName(); }
 
         /* @Override */
@@ -1406,7 +1406,7 @@ public class FileSystemBrowser<A> {
                 throw new RuntimeException("Can not compare a RecordContainer with a " + o.getClass());
         }
     }
-    
+
     /**
      * Wrapper for the size field in the table.
      */
@@ -1418,9 +1418,9 @@ public class FileSystemBrowser<A> {
             this.trueSize = trueSize;
             this.presentedSize = SpeedUnitUtils.bytesToBinaryUnit(trueSize);
         }
-        
+
         public long getSize() { return trueSize; }
-        
+
         /* @Override */
         public int compareTo(Object o) {
             if(o instanceof SizeEntry) {
@@ -1436,7 +1436,7 @@ public class FileSystemBrowser<A> {
             else
                 throw new RuntimeException("Can not compare a SizeEntry with a " + o.getClass());
         }
-        
+
         @Override
         public String toString() {
             return presentedSize;
@@ -1446,10 +1446,10 @@ public class FileSystemBrowser<A> {
     public static class RecordTypeEntry implements Comparable {
         private final RecordType recordType;
         private final String displayString;
-        
+
         public RecordTypeEntry(RecordType recordType) {
             this.recordType = recordType;
-            
+
             switch(recordType) {
                 case FILE:
                     displayString = "File";
@@ -1471,14 +1471,14 @@ public class FileSystemBrowser<A> {
                         "unexpected record type (" + recordType + ")");
             }
         }
-        
+
         public RecordType getRecordType() { return recordType; }
-        
+
         @Override
         public String toString() {
             return displayString;
         }
-        
+
         private int getPriority() {
             switch(recordType) {
                 case FOLDER:
@@ -1507,18 +1507,18 @@ public class FileSystemBrowser<A> {
                 throw new RuntimeException("Can not compare a RecordTypeEntry to a " + o.getClass());
         }
     }
-    
+
     private static class DateEntry implements Comparable {
         private final Date date;
         private final String displayString;
-        
+
         public DateEntry(Date date, DateFormat formatter) {
             this.date = date;
             this.displayString = formatter.format(date);
         }
-        
+
         public Date getDate() { return date; }
-        
+
         @Override
         public String toString() {
             return displayString;
@@ -1534,23 +1534,23 @@ public class FileSystemBrowser<A> {
                 throw new RuntimeException("Can not compare a DateEntry to a " + o.getClass());
         }
     }
-    
+
     private static class IndexEntry implements Comparable<IndexEntry> {
         private final int index;
-        
+
         public IndexEntry(int index) {
             this.index = index;
         }
-        
+
         /* @Override */
         public int compareTo(IndexEntry o) {
             return index-o.index;
         }
-        
+
         @Override
         public String toString() { return ""; }
     }
-    
+
     private static class ComparableComparator implements Comparator<Comparable<Comparable>> {
 
         /* @Override */
@@ -1562,34 +1562,34 @@ public class FileSystemBrowser<A> {
             else
                 throw new UnsupportedOperationException("Trying to compare non-Comparables.");*/
         }
-        
+
     }
-    
+
     public static class NoLeafMutableTreeNode extends DefaultMutableTreeNode {
         public NoLeafMutableTreeNode(Object userObject) {
             super(userObject);
         }
-        
+
 	/** Hack to avoid that JTree paints leaf nodes. We have no leafs, only dirs. */
 	@Override public boolean isLeaf() { return false; }
     }
-    
+
     private static class FolderTreeNode extends NoLeafMutableTreeNode {
-        
+
         private final RecordContainer rc;
-        
+
 	public FolderTreeNode(RecordContainer o) {
             super(o);
             rc = o;
         }
-        
+
         public RecordContainer getRecordContainer() { return rc; }
     }
-    
+
     private static class ObjectContainer<A> {
 	public A o;
 	public ObjectContainer(A o) { this.o = o; }
     }
-    
+
     private static class GenericPlaceholder<A> {}
 }

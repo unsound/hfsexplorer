@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -27,11 +27,11 @@ public class ExtDescriptor implements StructElements {
     /*
      * struct ExtDescriptor
      * size: 4 bytes
-     * description: 
-     * 
-     * BP  Size  Type    Identifier   Description                
+     * description:
+     *
+     * BP  Size  Type    Identifier   Description
      * ----------------------------------------------------------
-     * 0   2     UInt16  xdrStABN     first allocation block     
+     * 0   2     UInt16  xdrStABN     first allocation block
      * 2   2     UInt16  xdrNumABlks  number of allocation blocks
      */
 
@@ -52,12 +52,12 @@ public class ExtDescriptor implements StructElements {
     }
 
     public static int length() { return STRUCTSIZE; }
-    
+
     /** first allocation block */
     public short getXdrStABN() { return Util.readShortBE(xdrStABN); }
     /** number of allocation blocks */
     public short getXdrNumABlks() { return Util.readShortBE(xdrNumABlks); }
-    
+
     public void printFields(PrintStream ps, String prefix) {
         ps.println(prefix + " xdrStABN: " + Util.unsign(getXdrStABN()));
         ps.println(prefix + " xdrNumABlks: " + Util.unsign(getXdrNumABlks()));

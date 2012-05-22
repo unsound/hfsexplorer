@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006-2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -40,12 +40,12 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
     private static final ImageIcon BACK_ICON;
     private static final ImageIcon UP_ICON;
     private static final ImageIcon INFO_ICON;
-        
+
 
     static {
         ImageIcon forwardIcon = null, extractIcon = null, backIcon = null, upIcon = null, infoIcon = null;
         try {
-            
+
             forwardIcon = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/forward.png"));
             extractIcon = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/extract.png"));
             backIcon = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/back.png"));
@@ -61,13 +61,13 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
         INFO_ICON = infoIcon;
     }
     */
-    
+
     /** Creates new form FilesystemBrowserPanel */
     public FilesystemBrowserPanel() {
         initComponents();
         fileTableScroller.getViewport().setBackground(fileTable.getBackground()); // To remove the grey area below the actual table
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -194,8 +194,8 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
                 .add(boxPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 429, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-    
-    
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JTextField addressField;
     private javax.swing.JPanel boxPanel;

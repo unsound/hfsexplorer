@@ -138,7 +138,7 @@ public enum GPTPartitionType {
             reverseLookupTable = new Hashtable<LongBuffer, GPTPartitionType>();
         reverseLookupTable.put(lb, t);
     }
-    
+
     public static GPTPartitionType getType(long typeGUIDMsb, long typeGUIDLsb) {
         GPTPartitionType type = reverseLookupTable.get(LongBuffer.wrap(new long[] { typeGUIDMsb, typeGUIDLsb }));
         if(type != null)

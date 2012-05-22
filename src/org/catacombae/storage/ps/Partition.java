@@ -24,7 +24,7 @@ import org.catacombae.csjc.PrintableStruct;
  * A partition is a string of bytes. It is a substring of some possibly larger
  * string of bytes (usually representing a physical device holding the data,
  * such as a hard disk, a memory stick or an optical disc).
- * 
+ *
  * A partition usually has metadata asssociated with it, facilitating the
  * interpretation of the data inside the partition. This simple abstraction
  * produces three fundamental variables:
@@ -34,16 +34,16 @@ import org.catacombae.csjc.PrintableStruct;
  * unit of this general partition will be one byte, so most implementations will
  * need to convert from the native sector number to an actual byte offset/length.
  * </pre>
- * 
+ *
  * @author Erik Larsson
  */
 public interface Partition extends PrintableStruct {
     /** Returns the start offset in bytes. */
     public abstract long getStartOffset();
-    
+
     /** Returns the length of the partition in bytes. */
     public abstract long getLength();
-    
+
     /** Returns the type of the partition. */
     public abstract PartitionType getType();
 }

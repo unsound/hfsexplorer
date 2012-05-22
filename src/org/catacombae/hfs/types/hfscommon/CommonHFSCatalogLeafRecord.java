@@ -71,10 +71,10 @@ public abstract class CommonHFSCatalogLeafRecord extends CommonBTRecord implemen
                 System.err.println("data: " + Util.byteArrayToHexString(data, offset, length));
                 throw new RuntimeException("Invalid HFS record type: " + recordType);
         }
-        
+
         return create(key, recordData);
     }
-    
+
     public static CommonHFSCatalogLeafRecord createHFSPlus(byte[] data, int offset, int length) {
         HFSPlusCatalogKey key = new HFSPlusCatalogKey(data, offset);
         final HFSPlusCatalogLeafRecordData recordData;
@@ -97,11 +97,11 @@ public abstract class CommonHFSCatalogLeafRecord extends CommonBTRecord implemen
         }
         return create(key, recordData);
     }
-    
+
     public static CommonHFSCatalogLeafRecord createHFSX(byte[] data, int offset, int length, BTHeaderRec bthr) {
         if(bthr == null)
             throw new IllegalArgumentException("bthr == null");
-        
+
         HFSXCatalogKey key = new HFSXCatalogKey(data, offset, bthr);
         final HFSPlusCatalogLeafRecordData recordData;
 
@@ -123,22 +123,22 @@ public abstract class CommonHFSCatalogLeafRecord extends CommonBTRecord implemen
         }
         return create(key, recordData);
     }
-    
+
     public abstract CommonHFSCatalogKey getKey();
-    
+
     public static CommonHFSCatalogLeafRecord create(HFSPlusCatalogKey key,
             HFSPlusCatalogLeafRecordData data) {
         if(data instanceof HFSPlusCatalogFolder) {
             return CommonHFSCatalogFolderRecord.create(key, (HFSPlusCatalogFolder)data);
         }
         else if(data instanceof HFSPlusCatalogFile) {
-            return CommonHFSCatalogFileRecord.create(key, (HFSPlusCatalogFile)data);            
+            return CommonHFSCatalogFileRecord.create(key, (HFSPlusCatalogFile)data);
         }
         else if(data instanceof HFSPlusCatalogThread) {
             if(data.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FILE_THREAD) {
                 return CommonHFSCatalogFileThreadRecord.create(key, (HFSPlusCatalogThread)data);
             }
-            
+
             else if(data.getRecordType() == HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD) {
                 return CommonHFSCatalogFolderThreadRecord.create(key, (HFSPlusCatalogThread)data);
             }
@@ -148,14 +148,14 @@ public abstract class CommonHFSCatalogLeafRecord extends CommonBTRecord implemen
         else
             throw new RuntimeException("Unknown type of HFSPlusCatalogLeafRecordData: " + data.getClass());
     }
-    
+
     public static CommonHFSCatalogLeafRecord create(CatKeyRec key,
             CatDataRec data) {
         if(data instanceof CdrDirRec) {
             return CommonHFSCatalogFolderRecord.create(key, (CdrDirRec)data);
         }
         else if(data instanceof CdrFilRec) {
-            return CommonHFSCatalogFileRecord.create(key, (CdrFilRec)data);            
+            return CommonHFSCatalogFileRecord.create(key, (CdrFilRec)data);
         }
         else if(data instanceof CdrFThdRec) {
             return CommonHFSCatalogFileThreadRecord.create(key, (CdrFThdRec)data);

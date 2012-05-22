@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -258,7 +258,7 @@ public class DumpFSInfo {
         if(pos > fsOffset &&
                 extractDataToFile(fsFile, pos, last64File, 65536))
             generatedFiles.add(last64File);
-        
+
         // Display result
         StringBuilder sb = new StringBuilder();
         sb.append("Dumped FS info to directory:\n    ");

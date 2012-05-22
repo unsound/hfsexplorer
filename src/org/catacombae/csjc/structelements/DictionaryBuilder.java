@@ -39,7 +39,7 @@ public class DictionaryBuilder {
     public DictionaryBuilder(String typeName) {
         this(typeName, null);
     }
-    
+
     public DictionaryBuilder(String typeName, String typeDescription) {
         this.typeName = typeName;
         this.typeDescription = typeDescription;
@@ -60,7 +60,7 @@ public class DictionaryBuilder {
             IntegerFieldBits bits, Signedness signedness, Endianness endianness) {
         addIntArray(key, data, offset, length, bits, signedness, endianness, null, DECIMAL);
     }
-    
+
     public void addIntArray(String key, byte[] data, int offset, int length,
             IntegerFieldBits bits, Signedness signedness, Endianness endianness, String description,
             IntegerFieldRepresentation rep) {
@@ -98,7 +98,7 @@ public class DictionaryBuilder {
     public void add(String key, StructElement mapping) {
         add(key, mapping, null);
     }
-    
+
     public void add(String key, StructElement mapping, String description) {
         //System.err.println(this + ": add(" + key + ", " + mapping + ", " + description + ");");
         if(mappings.get(key) != null)
@@ -358,7 +358,7 @@ public class DictionaryBuilder {
     public void addFlag(String key, byte[] data, int bitOffset, String description) {
         addFlag(key, data, 0, data.length, bitOffset, description);
     }
-    
+
     public void addFlag(String key, byte[] data, int bitOffset) {
         addFlag(key, data, 0, data.length, bitOffset);
     }
@@ -366,18 +366,18 @@ public class DictionaryBuilder {
     public void addFlag(String key, byte[] data, int offset, int length, int bitOffset) {
         addFlag(key, data, offset, length, bitOffset, null);
     }
-    
+
     public void addFlag(String key, byte[] data, int offset, int length, int bitOffset, String description) {
         add(key, new FlagField(data, offset, length, bitOffset), description);
     }
-    
+
     public void addEncodedString(String key, byte[] data, String encoding) {
         addEncodedString(key, data, 0, data.length, encoding);
     }
     public void addEncodedString(String key, byte[] data, int offset, int length, String encoding) {
         add(key, new EncodedStringField(data, offset, length, encoding));
     }
-    
+
     /** Adds all the key-value mappings present in <code>d</code> in order. */
     public void addAll(Dictionary d) {
         for(String key : d.getKeys()) {

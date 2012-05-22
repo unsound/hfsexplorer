@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006-2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -48,13 +48,13 @@ public class ExtractProgressDialog extends JDialog implements ExtractProgressMon
 
     private ExtractProgressDialog(Frame owner, boolean modal) {
         super(owner, "Extracting...", modal);
-        
+
         final JPanel backgroundPanel = new JPanel();
-        
+
         extractProperties = new ExtractProperties();
         progressPanel = new ExtractProgressPanel();
         settingsPanel = new ExtractSettingsPanel(extractProperties);
-        
+
         cancelButton = progressPanel.cancelButton;
         cancelButton.addActionListener(new ActionListener() {
 
@@ -63,7 +63,7 @@ public class ExtractProgressDialog extends JDialog implements ExtractProgressMon
                 signalCancel();
             }
         });
-        
+
         progressPanel.addShowSettingsButtonListener(new ActionListener() {
 
             /* @Override */
@@ -75,12 +75,12 @@ public class ExtractProgressDialog extends JDialog implements ExtractProgressMon
                     backgroundPanel.remove(settingsPanel);
                 pack();
             }
-            
+
         });
 
         backgroundPanel.setLayout(new BoxLayout(backgroundPanel, BoxLayout.PAGE_AXIS));
         backgroundPanel.add(progressPanel);
-        
+
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
 
@@ -89,7 +89,7 @@ public class ExtractProgressDialog extends JDialog implements ExtractProgressMon
                 requestCloseWindow();
             }
         });
-        
+
         add(backgroundPanel);
         pack();
         setLocationRelativeTo(null);
@@ -194,7 +194,7 @@ public class ExtractProgressDialog extends JDialog implements ExtractProgressMon
     public ExtractProperties getExtractProperties() {
         return extractProperties;
     }
-    
+
     /*
     public static void main(String[] args) {
         ExtractProgressDialog d = new ExtractProgressDialog(null);

@@ -28,27 +28,27 @@ public class DXInfo implements StructElements {
     /*
      * struct DXInfo
      * size: 11 bytes
-     * description: 
-     * 
-     * BP  Size  Type    Identifier   Description                                                                                                                                                                                                                                                               
+     * description:
+     *
+     * BP  Size  Type    Identifier   Description
      * ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-     * 0   4     Point   frScroll     Scroll position within the Finder window. The Finder does not necessarily save this position immediately upon user action.                                                                                                                                                
-     * -1  4     SInt32  frOpenChain  Chain of directory IDs for open folders. The Finder numbers directory IDs. The Finder does not necessarily save this information immediately upon user action.                                                                                                            
-     * 3   1     SInt8   frScript     Extended flags. If the high-bit is set, the script system for displaying the folder's name.                                                                                                                                                                               
-     * 4   1     SInt8   frXFlags     Extended flags. See ÒExtended Finder Flags .Ó                                                                                                                                                                                                                             
+     * 0   4     Point   frScroll     Scroll position within the Finder window. The Finder does not necessarily save this position immediately upon user action.
+     * -1  4     SInt32  frOpenChain  Chain of directory IDs for open folders. The Finder numbers directory IDs. The Finder does not necessarily save this information immediately upon user action.
+     * 3   1     SInt8   frScript     Extended flags. If the high-bit is set, the script system for displaying the folder's name.
+     * 4   1     SInt8   frXFlags     Extended flags. See ÒExtended Finder Flags .Ó
      * 5   2     SInt16  frComment    Reserved (set to 0). If the high-bit is clear, an ID number for the comment that is displayed in the information window when the user selects a folder and chooses the Get Info command from the File menu. The numbers that identify comments are assigned by the Finder.
-     * 7   4     SInt32  frPutAway    If the user moves the folder onto the desktop, the directory ID of the folder from which the user moves it.                                                                                                                                                               
+     * 7   4     SInt32  frPutAway    If the user moves the folder onto the desktop, the directory ID of the folder from which the user moves it.
      */
-    
+
     public static final int STRUCTSIZE = 11;
-    
+
     private final Point frScroll;
     private final byte[] frOpenChain = new byte[4];
     private final byte[] frScript = new byte[1];
     private final byte[] frXFlags = new byte[1];
     private final byte[] frComment = new byte[2];
     private final byte[] frPutAway = new byte[4];
-    
+
     public DXInfo(byte[] data, int offset) {
 	frScroll = new Point(data, offset+0);
 	System.arraycopy(data, offset+-1, frOpenChain, 0, 4);
@@ -57,9 +57,9 @@ public class DXInfo implements StructElements {
 	System.arraycopy(data, offset+5, frComment, 0, 2);
 	System.arraycopy(data, offset+7, frPutAway, 0, 4);
     }
-    
+
     public static int length() { return STRUCTSIZE; }
-    
+
     /** Scroll position within the Finder window. The Finder does not necessarily save this position immediately upon user action. */
     public Point getFrScroll() { return frScroll; }
     /** Chain of directory IDs for open folders. The Finder numbers directory IDs. The Finder does not necessarily save this information immediately upon user action. */
@@ -72,7 +72,7 @@ public class DXInfo implements StructElements {
     public short getFrComment() { return Util.readShortBE(frComment); }
     /** If the user moves the folder onto the desktop, the directory ID of the folder from which the user moves it. */
     public int getFrPutAway() { return Util.readIntBE(frPutAway); }
-    
+
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " frScroll: ");
 	getFrScroll().print(ps, prefix+"  ");
@@ -82,12 +82,12 @@ public class DXInfo implements StructElements {
 	ps.println(prefix + " frComment: " + getFrComment());
 	ps.println(prefix + " frPutAway: " + getFrPutAway());
     }
-    
+
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "DXInfo:");
 	printFields(ps, prefix);
     }
-    
+
     public byte[] getBytes() {
 	byte[] result = new byte[STRUCTSIZE];
 	byte[] tempData;
@@ -105,14 +105,14 @@ public class DXInfo implements StructElements {
     /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(DXInfo.class.getSimpleName());
-        
+
         db.add("frScroll", frScroll.getStructElements());
         db.addUIntBE("frOpenChain", frOpenChain);
         db.addUIntBE("frScript", frScript);
         db.addUIntBE("frXFlags", frXFlags);
         db.addUIntBE("frComment", frComment);
         db.addUIntBE("frPutAway", frPutAway);
-        
+
         return db.getResult();
     }
 }

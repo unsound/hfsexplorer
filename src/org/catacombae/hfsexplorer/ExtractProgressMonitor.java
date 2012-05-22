@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -44,7 +44,7 @@ public interface ExtractProgressMonitor extends ProgressMonitor {
     public static interface ExtractPropertiesListener {
         public void propertyChanged(Object changedProperty);
     }
-    
+
     public static class ExtractProperties {
         private final LinkedList<ExtractPropertiesListener> listeners =
                 new LinkedList<ExtractPropertiesListener>();
@@ -52,47 +52,47 @@ public interface ExtractProgressMonitor extends ProgressMonitor {
         private volatile CreateFileFailedAction createFileAction = CreateFileFailedAction.PROMPT_USER;
         private volatile DirectoryExistsAction dirExistsAction = DirectoryExistsAction.PROMPT_USER;
         private volatile FileExistsAction fileExistsAction = FileExistsAction.PROMPT_USER;
-        
+
         public CreateDirectoryFailedAction getCreateDirectoryFailedAction() {
             return createDirAction;
         }
-        
+
         public CreateFileFailedAction getCreateFileFailedAction() {
             return createFileAction;
         }
-        
+
         public DirectoryExistsAction getDirectoryExistsAction() {
             return dirExistsAction;
-        } 
-        
+        }
+
         public FileExistsAction getFileExistsAction() {
             return fileExistsAction;
         }
-        
+
         public void setCreateDirectoryFailedAction(CreateDirectoryFailedAction action) {
             createDirAction = action;
             notifyListeners(action);
         }
-        
+
         public void setCreateFileFailedAction(CreateFileFailedAction action) {
             createFileAction = action;
             notifyListeners(action);
         }
-        
+
         public void setDirectoryExistsAction(DirectoryExistsAction action) {
             dirExistsAction = action;
             notifyListeners(action);
         }
-        
+
         public void setFileExistsAction(FileExistsAction action) {
             fileExistsAction = action;
             notifyListeners(action);
         }
-        
+
         public void addListener(ExtractPropertiesListener listener) {
             listeners.addLast(listener);
         }
-        
+
         private void notifyListeners(Object changedProperty) {
             for(ExtractPropertiesListener listener : listeners) {
                 try {
@@ -103,7 +103,7 @@ public interface ExtractProgressMonitor extends ProgressMonitor {
             }
         }
     }
-    
+
     public static enum CreateDirectoryFailedAction { PROMPT_USER, SKIP_DIRECTORY, RENAME, AUTO_RENAME, CANCEL }
     public static enum CreateFileFailedAction { PROMPT_USER, SKIP_FILE, SKIP_DIRECTORY, RENAME, AUTO_RENAME, CANCEL }
     public static enum DirectoryExistsAction { PROMPT_USER, CONTINUE, SKIP_DIRECTORY, RENAME, AUTO_RENAME, CANCEL }

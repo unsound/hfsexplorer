@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -27,13 +27,13 @@ import org.catacombae.hfsexplorer.io.JTextAreaOutputStream;
 public class DebugConsoleWindow extends JFrame {
     private static final int WINDOW_NUMBER_OF_COLUMNS = 80;
     private static final int WINDOW_NUMBER_OF_LINES = 25;
-    
+
     private final JScrollPane debugAreaScroller;
     private final JTextArea debugArea;
-    
+
     private final Object syncObject = new Object();
     private final OutputStream debugStream;
-        
+
     public DebugConsoleWindow(PrintStream stdErr) {
         super("Debug Console");
         setLayout(new BorderLayout());

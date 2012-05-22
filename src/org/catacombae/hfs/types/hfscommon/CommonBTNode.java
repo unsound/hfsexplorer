@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -28,12 +28,12 @@ import org.catacombae.hfs.types.hfs.NodeDescriptor;
 /**
  * Generalization of a B-tree node which suits both HFS and HFS+/HFSX
  * implementations.
- * 
+ *
  * @author Erik Larsson
  */
 public abstract class CommonBTNode <R extends CommonBTRecord> {
     protected final InternalContainer ic;
-    
+
     protected static enum FSType { HFS, HFS_PLUS };
 
     protected CommonBTNode(byte[] data, int offset, int nodeSize, FSType type) {
@@ -48,7 +48,7 @@ public abstract class CommonBTNode <R extends CommonBTRecord> {
                 throw new RuntimeException("unknown HFSType: " + type);
         }
     }
-    
+
     public CommonBTNodeDescriptor getNodeDescriptor() {
         return ic.getNodeDescriptor();
     }
@@ -56,11 +56,11 @@ public abstract class CommonBTNode <R extends CommonBTRecord> {
     public R getBTRecord(int index) {
         return ic.getBTRecord(index);
     }
-    
+
     public List<R> getBTRecords() {
         return ic.getBTRecords();
     }
-    
+
     protected abstract R createBTRecord(int recordNumber,
             byte[] data, int offset, int length);
 
@@ -74,7 +74,7 @@ public abstract class CommonBTNode <R extends CommonBTRecord> {
         protected final CommonBTNodeDescriptor nodeDescriptor;
         protected final List<R> records;
         protected final short[] offsets;
-        
+
         protected InternalContainer(CommonBTNodeDescriptor nodeDescriptor,
                 byte[] data, int offset, int nodeSize) {
             this.nodeDescriptor = nodeDescriptor;
@@ -89,11 +89,11 @@ public abstract class CommonBTNode <R extends CommonBTRecord> {
             }
             this.records = Collections.unmodifiableList(tmpRecords);
         }
-        
+
         public CommonBTNodeDescriptor getNodeDescriptor() {
             return nodeDescriptor;
         }
-                
+
         public R getBTRecord(int index) {
             return records.get(index);
         }
@@ -101,7 +101,7 @@ public abstract class CommonBTNode <R extends CommonBTRecord> {
         public List<R> getBTRecords() {
             return records;
         }
-        
+
         public void printFields(PrintStream ps, String prefix) {
             ps.println(prefix + " nodeDescriptor: ");
             nodeDescriptor.print(ps, prefix + "  ");
@@ -117,7 +117,7 @@ public abstract class CommonBTNode <R extends CommonBTRecord> {
             }
         }
     }
-    
+
     private class HFSImplementation extends InternalContainer {
         public HFSImplementation(byte[] data, int offset, int nodeSize) {
             super(CommonBTNodeDescriptor.create(new NodeDescriptor(data, offset)),

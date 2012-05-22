@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -27,11 +27,11 @@ public class MutableGPTHeader extends GPTHeader {
     public MutableGPTHeader(GPTHeader source) {
 	super(source);
     }
-    
+
     public void setFields(GPTHeader source) {
 	setFieldsInternal(source);
     }
-    
+
     /** DON'T EVER USE THIS METHOD! The signature is set automatically when an object
 	is created so this method should not be called under normal circumstances. */
     public void setSignature(byte[] data, int off) { copyData(data, off, signature); }
@@ -53,7 +53,7 @@ public class MutableGPTHeader extends GPTHeader {
     /** DON'T EVER USE THIS METHOD! At least not with any other argument than 000....
 	(Won't be checked, but EFI 1.10 specification only allows this field to be zeroed) */
     public void setReserved2(byte[] data, int off) { copyData(data, off, reserved2); }
-    
+
     private static void copyData(byte[] data, int off, byte[] dest) {
 	copyData(data, off, dest, dest.length);
     }

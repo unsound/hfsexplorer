@@ -39,16 +39,16 @@ public abstract class CommonHFSExtentLeafNode extends CommonBTNode<CommonHFSExte
     public static CommonHFSExtentLeafNode createHFS(byte[] data, int offset, int nodeSize) {
         return new HFSImplementation(data, offset, nodeSize);
     }
-    
+
     public static CommonHFSExtentLeafNode createHFSPlus(byte[] data, int offset, int nodeSize) {
         return new HFSPlusImplementation(data, offset, nodeSize);
     }
-    
+
     public static class HFSPlusImplementation extends CommonHFSExtentLeafNode {
         public HFSPlusImplementation(byte[] data, int offset, int nodeSize) {
             super(data, offset, nodeSize, FSType.HFS_PLUS);
         }
-        
+
         @Override
         protected CommonHFSExtentLeafRecord createBTRecord(int recordNumber, byte[] data, int offset, int length) {
             final HFSPlusExtentKey key = new HFSPlusExtentKey(data, offset);
@@ -62,7 +62,7 @@ public abstract class CommonHFSExtentLeafNode extends CommonBTNode<CommonHFSExte
         public HFSImplementation(byte[] data, int offset, int nodeSize) {
             super(data, offset, nodeSize, FSType.HFS);
         }
-        
+
         @Override
         protected CommonHFSExtentLeafRecord createBTRecord(int recordNumber, byte[] data, int offset, int length) {
             final ExtKeyRec key = new ExtKeyRec(data, offset);

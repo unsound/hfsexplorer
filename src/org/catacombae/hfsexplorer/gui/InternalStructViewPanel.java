@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -37,7 +37,7 @@ public class InternalStructViewPanel extends javax.swing.JPanel {
 
         String[] keys = dict.getKeys();
         JPanel[] subPanels = new JPanel[keys.length];
-        
+
         for(int i = 0; i < keys.length; ++i) {
             String curKey = keys[i];
             StructElement curElement = dict.getElement(curKey);
@@ -56,20 +56,20 @@ public class InternalStructViewPanel extends javax.swing.JPanel {
         for(JPanel subPanel : subPanels)
             fieldsPanel.add(subPanel);
     }
-    
+
     public InternalStructViewPanel(String label, Array array) {
         this(label);
-            
+
         StructElement[] elems = array.getElements();
         JPanel[] subPanels = new JPanel[elems.length];
-        
+
         for(int i = 0; i < elems.length; ++i) {
             StructElement curElement = elems[i];
-            
+
             subPanels[i] = createPanel("[" + i + "]", curElement);
             subPanels[i].setBorder(new EmptyBorder(0, 0, 5, 0));
         }
-        
+
         fieldsPanel.removeAll();
         for(JPanel subPanel : subPanels)
             fieldsPanel.add(subPanel);

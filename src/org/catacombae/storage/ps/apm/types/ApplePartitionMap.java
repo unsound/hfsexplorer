@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006-2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -27,7 +27,7 @@ import org.catacombae.util.Util;
 
 public class ApplePartitionMap implements PartitionSystem {
     private final APMPartition[] partitions;
-    
+
     public ApplePartitionMap(ReadableRandomAccessStream isoRaf, long pmOffset, int blockSize) {
         isoRaf.seek(pmOffset);
         byte[] currentBlock =
@@ -70,14 +70,14 @@ public class ApplePartitionMap implements PartitionSystem {
 
                 partitionList.add(p);
             }
-            
+
             else {
                 System.err.println("Erroneous partition:");
                 p.printFields(System.err, "  ");
                 throw new RuntimeException("Encountered invalid partition map entry at index: " +
                         partitionList.size() + " pmMapBlkCnt=" + pmMapBlkCnt);
             }
-            
+
 
             //++partitionIndex;
         }
@@ -156,20 +156,20 @@ public class ApplePartitionMap implements PartitionSystem {
 
     public String getLongName() { return "Apple Partition Map"; }
     public String getShortName() { return "APM"; }
-    
+
     /** This main method prints the fields of the DDR and APM in the file specified in args[0], offset 0. */
     /*
     public static void main(String[] args) {
 	ReadableFileStream fin = new ReadableFileStream(args[0]);
 	byte[] curBlock = new byte[DriverDescriptorRecord.length()];
-	
+
 	if(fin.read(curBlock) != curBlock.length) throw new RuntimeException("Could not read all...");
 	DriverDescriptorRecord ddr = new DriverDescriptorRecord(curBlock, 0);
 	ddr.print(System.out, "");
 
 	final int blockSize = 512;
 	curBlock = new byte[blockSize];
-	
+
 	ApplePartitionMap apm = new ApplePartitionMap(fin, blockSize, blockSize);
 	apm.print(System.out, "");
     }

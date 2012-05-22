@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -26,7 +26,7 @@ public class MutableMasterBootRecord extends MasterBootRecord {
     public MutableMasterBootRecord(MasterBootRecord mbr) {
 	super(mbr);
     }
-    
+
     public void setOptionalIBMExtendedData1(byte[] data) { copyData(data, 0, optIBMExtendedData1); }
     public void setOptionalIBMExtendedData2(byte[] data) { copyData(data, 0, optIBMExtendedData2); }
     public void setOptionalIBMExtendedData3(byte[] data) { copyData(data, 0, optIBMExtendedData3); }
@@ -40,7 +40,7 @@ public class MutableMasterBootRecord extends MasterBootRecord {
     public void setMBRSignature(short sig) {
 	Util.arrayCopy(Util.toByteArrayBE(sig), mbrSignature);
     }
-    
+
     private static void copyData(byte[] data, int off, byte[] dest) {
 	copyData(data, off, dest, dest.length);
     }

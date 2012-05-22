@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,7 +20,7 @@ package org.catacombae.storage.fs;
 /**
  * Default implementation of a FileSystemHandlerInfo object which holds static
  * fields.
- * 
+ *
  * @author Erik Larsson
  */
 public class DefaultFileSystemHandlerInfo implements FileSystemHandlerInfo {
@@ -31,7 +31,7 @@ public class DefaultFileSystemHandlerInfo implements FileSystemHandlerInfo {
     private final String author;
 
     /**
-     * 
+     *
      * @param iHandlerIdentifier a unique identifier for this file system handler.
      * @param iHandlerName the handler name.
      * @param iHandlerVersion a free-form user readable version string for this handler.
@@ -46,7 +46,7 @@ public class DefaultFileSystemHandlerInfo implements FileSystemHandlerInfo {
         this.revision = iRevision;
         this.author = iAuthor;
     }
-    
+
     /**
      * {@inheritDoc}
      */

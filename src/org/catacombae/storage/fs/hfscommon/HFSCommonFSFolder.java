@@ -47,7 +47,7 @@ public class HFSCommonFSFolder extends HFSCommonFSEntry implements FSFolder {
     private final CommonHFSCatalogFolderRecord folderRecord;
 
     private final HFSCommonFSAttributes attributes;
-    
+
     public HFSCommonFSFolder(HFSCommonFileSystemHandler iParent, CommonHFSCatalogFolderRecord iFolderRecord) {
         this(iParent, null, iFolderRecord);
     }
@@ -66,21 +66,21 @@ public class HFSCommonFSFolder extends HFSCommonFSEntry implements FSFolder {
         else
             this.keyRecord = iFolderRecord;
         this.folderRecord = iFolderRecord;
-        
+
         this.attributes =
                 new HFSCommonFSAttributes(this, folderRecord.getData());
     }
-    
+
     /* @Override */
     public String[] list() {
         return fsHandler.listNames(folderRecord);
     }
-    
+
     /* @Override */
     public FSEntry[] listEntries() {
         return fsHandler.listFSEntries(folderRecord);
     }
-    
+
     /* @Override */
     public FSEntry getChild(String name) {
         return fsHandler.getEntry(folderRecord, name);
@@ -107,7 +107,7 @@ public class HFSCommonFSFolder extends HFSCommonFSEntry implements FSFolder {
         return fsHandler.lookupParentFolder(keyRecord);
     }
      * */
-    
+
     public CommonHFSCatalogFolder getInternalCatalogFolder() {
         return folderRecord.getData();
     }

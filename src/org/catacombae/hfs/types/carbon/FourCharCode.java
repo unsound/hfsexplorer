@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -27,14 +27,14 @@ public class FourCharCode implements StructElements {
      * struct FourCharCode
      * size: 4 bytes
      * description: a typedef originally
-     * 
+     *
      * BP  Size  Type    Identifier    Description
      * -------------------------------------------
-     * 0   4     UInt32  fourCharCode             
+     * 0   4     UInt32  fourCharCode
      */
-    
+
     private final byte[] fourCharCode = new byte[4];
-    
+
     public FourCharCode(byte[] data, int offset) {
         System.arraycopy(data, offset + 0, fourCharCode, 0, 4);
     }
@@ -63,9 +63,9 @@ public class FourCharCode implements StructElements {
     /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(FourCharCode.class.getSimpleName());
-        
+
         db.addEncodedString("fourCharCode", fourCharCode, "US-ASCII");
-        
+
         return db.getResult();
     }
 }

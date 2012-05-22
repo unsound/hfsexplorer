@@ -28,9 +28,9 @@ import org.catacombae.storage.ps.PartitionSystemHandler;
  * @author erik
  */
 public class GPTHandler extends PartitionSystemHandler {
-    
+
     private DataLocator partitionData;
-    
+
     public GPTHandler(DataLocator partitionData) {
         this.partitionData = partitionData;
     }
@@ -40,7 +40,7 @@ public class GPTHandler extends PartitionSystemHandler {
         GUIDPartitionTable gpt = readPartitionTable();
         return gpt.getUsedPartitionCount();
     }
-    
+
     @Override
     public Partition[] getPartitions() {
         GUIDPartitionTable partitionTable = readPartitionTable();
@@ -49,7 +49,7 @@ public class GPTHandler extends PartitionSystemHandler {
 
     @Override
     public void close() {
-        
+
     }
 
     public GUIDPartitionTable readPartitionTable() {
@@ -57,7 +57,7 @@ public class GPTHandler extends PartitionSystemHandler {
         try {
             llf = partitionData.createReadOnlyFile();
             GUIDPartitionTable gpt = new GUIDPartitionTable(llf, 0);
-            
+
             if(gpt.isValid())
                 return gpt;
             else

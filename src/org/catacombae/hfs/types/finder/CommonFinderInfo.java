@@ -36,7 +36,7 @@ public abstract class CommonFinderInfo implements StructElements, PrintableStruc
     public static final int[] COLOR_5 = { 255, 230, 32 }; // Yellow
     public static final int[] COLOR_6 = { 255, 64, 84 }; // Red
     public static final int[] COLOR_7 = { 255, 184, 31 }; // Orange
-    
+
     public static final int kIsOnDesk       = 0x0001;
     public static final int kColor          = 0x000E;
     public static final int kIsShared       = 0x0040;
@@ -52,19 +52,19 @@ public abstract class CommonFinderInfo implements StructElements, PrintableStruc
     protected final byte[] finderFlags = new byte[2];
     protected final Point location;
     protected final byte[] reservedField = new byte[2];
-    
+
     protected CommonFinderInfo(byte[] data, int offset) {
 	System.arraycopy(data, offset+8, finderFlags, 0, 2);
 	location = new Point(data, offset+10);
-	System.arraycopy(data, offset+14, reservedField, 0, 2);        
+	System.arraycopy(data, offset+14, reservedField, 0, 2);
     }
-    
+
     public static int length() { return 8; }
-    
+
     public short getFinderFlags() { return Util.readShortBE(finderFlags); }
     public Point getLocation() { return location; }
     public short getReservedField() { return Util.readShortBE(reservedField); }
-    
+
     // These should be placed in a common superclass of FolderInfo and FileInfo...
     public boolean getFinderFlagIsOnDesk() { return (getFinderFlags() & kIsOnDesk) != 0; }
     public byte getFinderFlagColor() { return (byte) ((getFinderFlags() & kColor) >> 1); }
@@ -91,32 +91,32 @@ public abstract class CommonFinderInfo implements StructElements, PrintableStruc
     public boolean getFinderFlagHasBundle() { return (getFinderFlags() & kHasBundle) != 0; }
     public boolean getFinderFlagIsInvisible() { return (getFinderFlags() & kIsInvisible) != 0; }
     public boolean getFinderFlagIsAlias() { return (getFinderFlags() & kIsAlias) != 0; }
-    
+
     public byte[] getBytes() {
         byte[] result = new byte[length()];
 	byte[] tempData;
 	int offset = 0;
-        
+
         System.arraycopy(finderFlags, 0, result, offset, finderFlags.length); offset += finderFlags.length;
         tempData = location.getBytes();
 	System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
 	System.arraycopy(reservedField, 0, result, offset, reservedField.length); offset += reservedField.length;
-        
+
         return result;
     }
-    
+
     /* @Override */
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " finderFlags: " + getFinderFlags());
 	ps.println(prefix + " location: ");
 	getLocation().print(ps, prefix+"  ");
 	ps.println(prefix + " reservedField: " + getReservedField());
-    }    
-    
+    }
+
     /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(CommonFinderInfo.class.getSimpleName());
-        
+
         Dictionary finderFlagsDictionary;
         {
             DictionaryBuilder dbFinderFlags = new DictionaryBuilder("UInt16");
@@ -144,7 +144,7 @@ public abstract class CommonFinderInfo implements StructElements, PrintableStruc
             dbFinderFlags.addFlag("kIsShared", finderFlags, 6);
             //dbFinderFlags.add(new IntegerField(finderFlags, 0, 1, 4, SIGNED, BIG_ENDIAN)); //TODO: improve IntegerField to handle arbitrary bitlength
             dbFinderFlags.addFlag("kIsOnDesk", finderFlags, 1);
-            
+
             finderFlagsDictionary = db.getResult();
         }
         db.add("finderFlags", finderFlagsDictionary);

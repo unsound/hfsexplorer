@@ -26,7 +26,7 @@ import org.catacombae.hfs.HFSVolume;
  * @author  Erik
  */
 public class CacheSettingsPanel extends javax.swing.JPanel {
-    
+
     /** Creates new form CacheSettingsPanel */
     public CacheSettingsPanel(final HFSVolume fsView) {
         initComponents();
@@ -35,13 +35,13 @@ public class CacheSettingsPanel extends javax.swing.JPanel {
                 boolean b = cachingEnabledBox.isSelected();
                 blockSizeField.setEnabled(b);
                 blocksInCacheField.setEnabled(b);
-                
+
             }
         });
-        
+
         applyButton.addActionListener(new ActionListener () {
             public void actionPerformed(ActionEvent ae) {
-                
+
             }
         });
     }
@@ -148,8 +148,8 @@ public class CacheSettingsPanel extends javax.swing.JPanel {
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
-    
-    
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton applyButton;
     private javax.swing.JTextField blockSizeField;

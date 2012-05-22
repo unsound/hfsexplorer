@@ -27,32 +27,32 @@ public class ResourceHeader implements StaticStruct, PrintableStruct {
     /*
      * struct ResourceHeader
      * size: 16 bytes
-     * description: 
-     * 
-     * BP  Size  Type    Identifier  Description                                                                             
+     * description:
+     *
+     * BP  Size  Type    Identifier  Description
      * ----------------------------------------------------------------------------------------------------------------------
      * 0   4     UInt32  dataOffset  // Offset from the beginning of the resource fork to the beginning of the resource data.
-     * 4   4     UInt32  mapOffset   // Offset from the beginning of the resource fork to the beginning of the resource map. 
-     * 8   4     UInt32  dataLength  // Length of resource data.                                                             
-     * 12  4     UInt32  mapLength   // Length of resource map.                                                              
+     * 4   4     UInt32  mapOffset   // Offset from the beginning of the resource fork to the beginning of the resource map.
+     * 8   4     UInt32  dataLength  // Length of resource data.
+     * 12  4     UInt32  mapLength   // Length of resource map.
      */
-    
+
     public static final int STRUCTSIZE = 16;
-    
+
     private final byte[] dataOffset = new byte[4];
     private final byte[] mapOffset = new byte[4];
     private final byte[] dataLength = new byte[4];
     private final byte[] mapLength = new byte[4];
-    
+
     public ResourceHeader(byte[] data, int offset) {
 	System.arraycopy(data, offset+0, dataOffset, 0, 4);
 	System.arraycopy(data, offset+4, mapOffset, 0, 4);
 	System.arraycopy(data, offset+8, dataLength, 0, 4);
 	System.arraycopy(data, offset+12, mapLength, 0, 4);
     }
-    
+
     public static int length() { return STRUCTSIZE; }
-    
+
     /** // Offset from the beginning of the resource fork to the beginning of the resource data. */
     public int getDataOffset() { return Util.readIntBE(dataOffset); }
     /** // Offset from the beginning of the resource fork to the beginning of the resource map. */
@@ -61,19 +61,19 @@ public class ResourceHeader implements StaticStruct, PrintableStruct {
     public int getDataLength() { return Util.readIntBE(dataLength); }
     /** // Length of resource map. */
     public int getMapLength() { return Util.readIntBE(mapLength); }
-    
+
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " dataOffset: " + getDataOffset());
 	ps.println(prefix + " mapOffset: " + getMapOffset());
 	ps.println(prefix + " dataLength: " + getDataLength());
 	ps.println(prefix + " mapLength: " + getMapLength());
     }
-    
+
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "ResourceHeader:");
 	printFields(ps, prefix);
     }
-    
+
     public byte[] getBytes() {
 	byte[] result = new byte[length()];
 	int offset = 0;

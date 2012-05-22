@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,7 +23,7 @@ package org.catacombae.hfsexplorer;
  */
 public class JarMain {
     private static final String CONSOLE_ARG = "-dbgconsole";
-    
+
     /**
      * This special main method for starting the application makes sure
      * the argument "-dbgconsole" is present in args, and adds it if
@@ -41,7 +41,7 @@ public class JarMain {
 	}
 	else
 	    fsbArgs = args;
-	
+
 	FileSystemBrowserWindow.main(fsbArgs);
     }
 }

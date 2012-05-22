@@ -34,7 +34,7 @@ public class APMHandlerFactory extends PartitionSystemHandlerFactory {
     public PartitionSystemHandler createHandler(DataLocator partitionData) {
         return new APMHandler(partitionData);
     }
-    
+
     @Override
     public PartitionSystemImplementationInfo getInfo() {
         return new PartitionSystemImplementationInfo("Apple Partition Map",

@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -32,23 +32,23 @@ public class HFSPlusExtentKey extends BTKey implements StructElements {
     /*
      * struct HFSPlusExtentKey
      * size: 12 bytes
-     * description: 
-     * 
+     * description:
+     *
      * BP  Size  Type              Identifier  Description
      * ---------------------------------------------------
-     * 0   2     UInt16            keyLength              
-     * 2   1     UInt8             forkType               
-     * 3   1     UInt8             pad                    
-     * 4   4     HFSCatalogNodeID  fileID                 
-     * 8   4     UInt32            startBlock             
+     * 0   2     UInt16            keyLength
+     * 2   1     UInt8             forkType
+     * 3   1     UInt8             pad
+     * 4   4     HFSCatalogNodeID  fileID
+     * 8   4     UInt32            startBlock
      */
-    
+
     private final byte[] keyLength = new byte[2];
     private final byte[] forkType = new byte[1];
     private final byte[] pad = new byte[1];
     private final HFSCatalogNodeID fileID;
     private final byte[] startBlock = new byte[4];
-    
+
     public HFSPlusExtentKey(byte[] data, int offset) {
 	System.arraycopy(data, offset+0, keyLength, 0, 2);
 	System.arraycopy(data, offset+2, forkType, 0, 1);
@@ -63,10 +63,10 @@ public class HFSPlusExtentKey extends BTKey implements StructElements {
 	this.fileID = fileID;
 	System.arraycopy(Util.toByteArrayBE(startBlock), 0, this.startBlock, 0, 4);
     }
-    
+
     @Override
     public int length() { return 12; }
-    
+
     @Override
     public short getKeyLength() { return Util.readShortBE(keyLength); }
     public byte getForkType() { return Util.readByteBE(forkType); }
@@ -76,7 +76,7 @@ public class HFSPlusExtentKey extends BTKey implements StructElements {
 
     public int getUnsignedForkType() { return Util.unsign(getForkType()); }
     public long getUnsignedStartBlock() { return Util.unsign(getStartBlock()); }
-    
+
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " keyLength: " + getKeyLength());
 	ps.println(prefix + " forkType: " + getForkType());
@@ -85,12 +85,12 @@ public class HFSPlusExtentKey extends BTKey implements StructElements {
 	getFileID().print(ps, prefix+"  ");
 	ps.println(prefix + " startBlock: " + getStartBlock());
     }
-    
+
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "HFSPlusExtentKey:");
 	printFields(ps, prefix);
     }
-    
+
     @Override
     public int compareTo(BTKey btk) {
 	if(btk instanceof HFSPlusExtentKey) {
@@ -117,9 +117,9 @@ public class HFSPlusExtentKey extends BTKey implements StructElements {
 	}
 	else {
 	    return super.compareTo(btk);
-	}	
+	}
     }
-    
+
     @Override
     public byte[] getBytes() {
 	byte[] result = new byte[length()];
@@ -134,13 +134,13 @@ public class HFSPlusExtentKey extends BTKey implements StructElements {
     /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder("HFSPlusExtentKey", "HFS+ extent key");
-        
+
         db.addUIntBE("keyLength", keyLength, "Key length", "bytes");
         db.addUIntBE("forkType", forkType, "Fork type");
         db.addUIntBE("pad", pad, "Padding", IntegerFieldRepresentation.HEXADECIMAL);
         db.add("fileID", fileID.getStructElements(), "File ID");
         db.addUIntBE("startBlock", startBlock, "Start block number");
-        
+
         return db.getResult();
     }
 }

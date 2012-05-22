@@ -28,9 +28,9 @@ import org.catacombae.storage.ps.PartitionSystemHandler;
  * @author erik
  */
 public class EBRHandler extends PartitionSystemHandler {
-    
+
     private DataLocator partitionData;
-    
+
     public EBRHandler(DataLocator partitionData) {
         this.partitionData = partitionData;
     }
@@ -40,7 +40,7 @@ public class EBRHandler extends PartitionSystemHandler {
         PartitionSystem ps = readPartitionTable();
         return ps.getUsedPartitionCount();
     }
-    
+
     @Override
     public Partition[] getPartitions() {
         EBRPartitionSystem partitionTable = readPartitionTable();
@@ -49,20 +49,20 @@ public class EBRHandler extends PartitionSystemHandler {
 
     @Override
     public void close() {
-        
+
     }
 
     private EBRPartitionSystem readPartitionTable() {
         try {
             ReadableRandomAccessStream llf = partitionData.createReadOnlyFile();
             byte[] firstBlock = new byte[512];
-            
+
             llf.readFully(firstBlock);
 
             EBRPartitionSystem ebs = new EBRPartitionSystem(llf, 0, 512);
             if(ebs.isValid())
                 return ebs;
-            
+
         } catch (Exception e) {
         }
         return null;

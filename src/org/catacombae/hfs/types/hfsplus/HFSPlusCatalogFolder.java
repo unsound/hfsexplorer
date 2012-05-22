@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -30,26 +30,26 @@ public class HFSPlusCatalogFolder extends HFSPlusCatalogLeafRecordData implement
     /*
      * struct HFSPlusCatalogFolder
      * size: 88 bytes
-     * description: 
-     * 
+     * description:
+     *
      * BP  Size  Type                Identifier        Description
      * -----------------------------------------------------------
-     * 0   2     SInt16              recordType                   
-     * 2   2     UInt16              flags                        
-     * 4   4     UInt32              valence                      
-     * 8   4     HFSCatalogNodeID    folderID                     
-     * 12  4     UInt32              createDate                   
-     * 16  4     UInt32              contentModDate               
-     * 20  4     UInt32              attributeModDate             
-     * 24  4     UInt32              accessDate                   
-     * 28  4     UInt32              backupDate                   
-     * 32  16    HFSPlusBSDInfo      permissions                  
-     * 48  16    FolderInfo          userInfo                     
-     * 64  16    ExtendedFolderInfo  finderInfo                   
-     * 80  4     UInt32              textEncoding                 
-     * 84  4     UInt32              reserved                     
+     * 0   2     SInt16              recordType
+     * 2   2     UInt16              flags
+     * 4   4     UInt32              valence
+     * 8   4     HFSCatalogNodeID    folderID
+     * 12  4     UInt32              createDate
+     * 16  4     UInt32              contentModDate
+     * 20  4     UInt32              attributeModDate
+     * 24  4     UInt32              accessDate
+     * 28  4     UInt32              backupDate
+     * 32  16    HFSPlusBSDInfo      permissions
+     * 48  16    FolderInfo          userInfo
+     * 64  16    ExtendedFolderInfo  finderInfo
+     * 80  4     UInt32              textEncoding
+     * 84  4     UInt32              reserved
      */
-    
+
     private final byte[] recordType = new byte[2];
     private final byte[] flags = new byte[2];
     private final byte[] valence = new byte[4];
@@ -64,7 +64,7 @@ public class HFSPlusCatalogFolder extends HFSPlusCatalogLeafRecordData implement
     private final ExtendedFolderInfo finderInfo;
     private final byte[] textEncoding = new byte[4];
     private final byte[] reserved = new byte[4];
-    
+
     public HFSPlusCatalogFolder(byte[] data, int offset) {
 	System.arraycopy(data, offset+0, recordType, 0, 2);
 	System.arraycopy(data, offset+2, flags, 0, 2);
@@ -81,9 +81,9 @@ public class HFSPlusCatalogFolder extends HFSPlusCatalogLeafRecordData implement
 	System.arraycopy(data, offset+80, textEncoding, 0, 4);
 	System.arraycopy(data, offset+84, reserved, 0, 4);
     }
-    
+
     public static int length() { return 88; }
-    
+
     public short getRecordType() { return Util.readShortBE(recordType); }
     public short getFlags() { return Util.readShortBE(flags); }
     public int getValence() { return Util.readIntBE(valence); }
@@ -98,13 +98,13 @@ public class HFSPlusCatalogFolder extends HFSPlusCatalogLeafRecordData implement
     public ExtendedFolderInfo getFinderInfo() { return finderInfo; }
     public int getTextEncoding() { return Util.readIntBE(textEncoding); }
     public int getReserved() { return Util.readIntBE(reserved); }
-    
+
     public Date getCreateDateAsDate() { return HFSPlusDate.gmtTimestampToDate(getCreateDate()); }
     public Date getContentModDateAsDate() { return HFSPlusDate.gmtTimestampToDate(getContentModDate()); }
     public Date getAttributeModDateAsDate() { return HFSPlusDate.gmtTimestampToDate(getAttributeModDate()); }
     public Date getAccessDateAsDate() { return HFSPlusDate.gmtTimestampToDate(getAccessDate()); }
     public Date getBackupDateAsDate() { return HFSPlusDate.gmtTimestampToDate(getBackupDate()); }
-    
+
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " recordType: " + getRecordType());
 	ps.println(prefix + " flags: " + getFlags());
@@ -125,7 +125,7 @@ public class HFSPlusCatalogFolder extends HFSPlusCatalogLeafRecordData implement
 	ps.println(prefix + " textEncoding: " + getTextEncoding());
 	ps.println(prefix + " reserved: " + getReserved());
     }
-    
+
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "HFSPlusCatalogFolder:");
 	printFields(ps, prefix);
@@ -135,7 +135,7 @@ public class HFSPlusCatalogFolder extends HFSPlusCatalogLeafRecordData implement
 	byte[] result = new byte[length()];
 	byte[] tempData;
 	int offset = 0;
-        
+
 	System.arraycopy(recordType, 0, result, offset, recordType.length); offset += recordType.length;
 	System.arraycopy(flags, 0, result, offset, flags.length); offset += flags.length;
 	System.arraycopy(valence, 0, result, offset, valence.length); offset += valence.length;
@@ -154,29 +154,29 @@ public class HFSPlusCatalogFolder extends HFSPlusCatalogLeafRecordData implement
         System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
         System.arraycopy(textEncoding, 0, result, offset, textEncoding.length); offset += textEncoding.length;
 	System.arraycopy(reserved, 0, result, offset, reserved.length); offset += reserved.length;
-        
+
         return result;
     }
-    
+
     /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(HFSPlusCatalogFolder.class.getSimpleName());
-        
+
         /*
-         * 0   2     SInt16              recordType                   
-         * 2   2     UInt16              flags                        
-         * 4   4     UInt32              valence                      
-         * 8   4     HFSCatalogNodeID    folderID                     
-         * 12  4     UInt32              createDate                   
-         * 16  4     UInt32              contentModDate               
-         * 20  4     UInt32              attributeModDate             
-         * 24  4     UInt32              accessDate                   
-         * 28  4     UInt32              backupDate                   
-         * 32  16    HFSPlusBSDInfo      permissions                  
-         * 48  16    FolderInfo          userInfo                     
-         * 64  16    ExtendedFolderInfo  finderInfo                   
-         * 80  4     UInt32              textEncoding                 
-         * 84  4     UInt32              reserved                     
+         * 0   2     SInt16              recordType
+         * 2   2     UInt16              flags
+         * 4   4     UInt32              valence
+         * 8   4     HFSCatalogNodeID    folderID
+         * 12  4     UInt32              createDate
+         * 16  4     UInt32              contentModDate
+         * 20  4     UInt32              attributeModDate
+         * 24  4     UInt32              accessDate
+         * 28  4     UInt32              backupDate
+         * 32  16    HFSPlusBSDInfo      permissions
+         * 48  16    FolderInfo          userInfo
+         * 64  16    ExtendedFolderInfo  finderInfo
+         * 80  4     UInt32              textEncoding
+         * 84  4     UInt32              reserved
          */
         db.addUIntBE("recordType", recordType);
         db.addUIntBE("flags", flags);
@@ -192,7 +192,7 @@ public class HFSPlusCatalogFolder extends HFSPlusCatalogLeafRecordData implement
         db.add("finderInfo", finderInfo.getStructElements());
         db.addUIntBE("textEncoding", textEncoding);
         db.addUIntBE("reserved", reserved);
-        
+
         return db.getResult();
     }
 }

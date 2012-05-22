@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -28,16 +28,16 @@ public class HFSPlusBSDInfo implements StructElements {
     /*
      * struct HFSPlusBSDInfo
      * size: 16 bytes
-     * description: 
-     * 
+     * description:
+     *
      * BP  Size  Type    Identifier  Description
      * -----------------------------------------
-     * 0   4     UInt32  ownerID                
-     * 4   4     UInt32  groupID                
-     * 8   1     UInt8   adminFlags             
-     * 9   1     UInt8   ownerFlags             
-     * 10  2     UInt16  fileMode               
-     * 12  4     UInt32  special                
+     * 0   4     UInt32  ownerID
+     * 4   4     UInt32  groupID
+     * 8   1     UInt8   adminFlags
+     * 9   1     UInt8   ownerFlags
+     * 10  2     UInt16  fileMode
+     * 12  4     UInt32  special
      */
     public static final byte MASK_ADMIN_ARCHIVED = 0x1;
     public static final byte MASK_ADMIN_IMMUTABLE = 0x2;
@@ -55,15 +55,15 @@ public class HFSPlusBSDInfo implements StructElements {
     public static final byte FILETYPE_SYMBOLIC_LINK = 012;
     public static final byte FILETYPE_SOCKET = 014;
     public static final byte FILETYPE_WHITEOUT = 016;
-    
-    
+
+
     private final byte[] ownerID = new byte[4];
     private final byte[] groupID = new byte[4];
     private final byte[] adminFlags = new byte[1];
     private final byte[] ownerFlags = new byte[1];
     private final byte[] fileMode = new byte[2];
     private final byte[] special = new byte[4];
-    
+
     public HFSPlusBSDInfo(byte[] data, int offset) {
 	System.arraycopy(data, offset+0, ownerID, 0, 4);
 	System.arraycopy(data, offset+4, groupID, 0, 4);
@@ -72,9 +72,9 @@ public class HFSPlusBSDInfo implements StructElements {
 	System.arraycopy(data, offset+10, fileMode, 0, 2);
 	System.arraycopy(data, offset+12, special, 0, 4);
     }
-    
+
     public static int length() { return 16; }
-    
+
     public int getOwnerID() { return Util.readIntBE(ownerID); }
     public int getGroupID() { return Util.readIntBE(groupID); }
     public byte getAdminFlags() { return Util.readByteBE(adminFlags); }
@@ -85,17 +85,17 @@ public class HFSPlusBSDInfo implements StructElements {
     public boolean getAdminArchivedFlag()  { return (getAdminFlags() & MASK_ADMIN_ARCHIVED)  != 0; }
     public boolean getAdminImmutableFlag() { return (getAdminFlags() & MASK_ADMIN_IMMUTABLE) != 0; }
     public boolean getAdminAppendFlag()    { return (getAdminFlags() & MASK_ADMIN_APPEND)    != 0; }
-    
+
     public boolean getOwnerNodumpFlag()    { return (getOwnerFlags() & MASK_OWNER_NODUMP)    != 0; }
     public boolean getOwnerImmutableFlag() { return (getOwnerFlags() & MASK_OWNER_IMMUTABLE) != 0; }
     public boolean getOwnerAppendFlag()    { return (getOwnerFlags() & MASK_OWNER_APPEND)    != 0; }
     public boolean getOwnerOpaqueFlag()    { return (getOwnerFlags() & MASK_OWNER_OPAQUE)    != 0; }
-    
+
     public byte getFileModeFileType() {
 	int type = (getFileMode() >> 12) & 017;
 	return (byte)type;
     }
-    
+
     public boolean getFileModeSetUserID()    { return ((getFileMode() >> 9) & 0x4) != 0; }
     public boolean getFileModeSetGroupID()   { return ((getFileMode() >> 9) & 0x2) != 0; }
     public boolean getFileModeSticky()       { return ((getFileMode() >> 9) & 0x1) != 0; }
@@ -113,7 +113,7 @@ public class HFSPlusBSDInfo implements StructElements {
     /**
      * Returns the POSIX-type file mode string for this file, as it would appear
      * when listing it with 'ls -l'. Example: <code>drwxr-x---</code>.
-     * 
+     *
      * @return the POSIX-type file mode string for this file.
      */
     public String getFileModeString() {
@@ -232,24 +232,24 @@ public class HFSPlusBSDInfo implements StructElements {
     byte[] getBytes() {
         byte[] result = new byte[length()];
         int offset = 0;
-        
+
         System.arraycopy(ownerID, 0, result, offset, ownerID.length); offset += ownerID.length;
         System.arraycopy(groupID, 0, result, offset, groupID.length); offset += groupID.length;
         System.arraycopy(adminFlags, 0, result, offset, adminFlags.length); offset += adminFlags.length;
         System.arraycopy(ownerFlags, 0, result, offset, ownerFlags.length); offset += ownerFlags.length;
         System.arraycopy(fileMode, 0, result, offset, fileMode.length); offset += fileMode.length;
         System.arraycopy(special, 0, result, offset, special.length); offset += special.length;
-        
+
         return result;
     }
 
     /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(HFSPlusBSDInfo.class.getSimpleName());
-        
+
         db.addUIntBE("ownerID", ownerID);
         db.addUIntBE("groupID", groupID);
-        
+
         final Dictionary adminFlagsDict;
         {
             DictionaryBuilder dbAdminFlags = new DictionaryBuilder("UInt8");
@@ -259,7 +259,7 @@ public class HFSPlusBSDInfo implements StructElements {
             adminFlagsDict = dbAdminFlags.getResult();
         }
         db.add("adminFlags", adminFlagsDict);
-        
+
         final Dictionary ownerFlagsDict;
         {
             DictionaryBuilder dbOwnerFlags = new DictionaryBuilder("UInt8");
@@ -270,11 +270,11 @@ public class HFSPlusBSDInfo implements StructElements {
             ownerFlagsDict = dbOwnerFlags.getResult();
         }
         db.add("ownerFlags", ownerFlagsDict);
-        
+
        final Dictionary fileModeFlagsDict;
         {
             DictionaryBuilder dbFileModeFlags = new DictionaryBuilder("UInt16");
-            
+
             dbFileModeFlags.add("fileType", new FileTypeField());
             dbFileModeFlags.addFlag("setUserID", fileMode, 11, "Set user ID on execution");
             dbFileModeFlags.addFlag("setGroupID", fileMode, 10, "Set group ID on execution");
@@ -288,16 +288,16 @@ public class HFSPlusBSDInfo implements StructElements {
             dbFileModeFlags.addFlag("otherRead", fileMode, 2, "Others can read");
             dbFileModeFlags.addFlag("otherWrite", fileMode, 1, "Others can write");
             dbFileModeFlags.addFlag("otherExecute", fileMode, 0, "Others can execute");
-            
+
             fileModeFlagsDict = dbFileModeFlags.getResult();
         }
         db.add("fileMode", fileModeFlagsDict);
-        
+
         db.addUIntBE("special", special);
-        
+
         return db.getResult();
     }
-    
+
     private class FileTypeField extends StringRepresentableField {
         public FileTypeField() {
             super("FileType", ASCIISTRING);
@@ -329,7 +329,7 @@ public class HFSPlusBSDInfo implements StructElements {
                     return "[Unknown file type: " + fileTypeByte + "]";
             }
         }
-        
+
         @Override
         public void setStringValue(String value) throws IllegalArgumentException {
             throw new UnsupportedOperationException("Not supported yet.");

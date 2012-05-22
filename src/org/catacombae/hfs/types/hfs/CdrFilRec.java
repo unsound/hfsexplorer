@@ -55,7 +55,7 @@ public class CdrFilRec extends CatDataRec {
      */
 
     public static final int STRUCTSIZE = 102;
-    
+
     private final byte[] filFlags = new byte[1];
     private final byte[] filTyp = new byte[1];
     private final FInfo filUsrWds;
@@ -74,7 +74,7 @@ public class CdrFilRec extends CatDataRec {
     private final ExtDataRec filExtRec;
     private final ExtDataRec filRExtRec;
     private final byte[] filResrv = new byte[4];
-    
+
     public CdrFilRec(byte[] data, int offset) {
         super(data, offset);
 	    System.arraycopy(data, offset + 2, filFlags, 0, 1);
@@ -96,12 +96,12 @@ public class CdrFilRec extends CatDataRec {
         filRExtRec = new ExtDataRec(data, offset + 86);
         System.arraycopy(data, offset + 98, filResrv, 0, 4);
     }
-    
+
     public static int length() { return STRUCTSIZE; }
-    
+
     /* @Override */
     public int size() { return length(); }
-    
+
     /** file flags (SignedByte) */
     public byte getFilFlags() { return Util.readByteBE(filFlags); }
     /** file type (SignedByte) */
@@ -138,7 +138,7 @@ public class CdrFilRec extends CatDataRec {
     public ExtDataRec getFilRExtRec() { return filRExtRec; }
     /** reserved (LongInt) */
     public int getFilResrv() { return Util.readIntBE(filResrv); }
-    
+
     @Override
     public void printFields(PrintStream ps, String prefix) {
         super.printFields(ps, prefix);
@@ -165,13 +165,13 @@ public class CdrFilRec extends CatDataRec {
         getFilRExtRec().print(ps, prefix + "  ");
         ps.println(prefix + " filResrv: " + getFilResrv());
     }
-    
+
     @Override
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + "CdrFilRec:");
         printFields(ps, prefix);
     }
-    
+
     @Override
     public byte[] getBytes() {
         byte[] result = new byte[STRUCTSIZE];
@@ -204,11 +204,11 @@ public class CdrFilRec extends CatDataRec {
         System.arraycopy(filResrv, 0, result, offset, filResrv.length); offset += filResrv.length;
         return result;
     }
-    
+
     /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(CdrThdRec.class.getSimpleName());
-        
+
         super.addSuperStructElements(db);
         db.addUIntBE("filFlags", filFlags, "File flags");
         db.addUIntBE("filTyp", filTyp, "File type");
@@ -228,7 +228,7 @@ public class CdrFilRec extends CatDataRec {
         db.add("filExtRec", filExtRec.getStructElements(), "First data fork extent record");
         db.add("filRExtRec", filRExtRec.getStructElements(), "First resource fork extent record");
         db.addUIntBE("filResrv", filResrv, "Reserved", HEXADECIMAL);
-        
+
         return db.getResult();
     }
 }

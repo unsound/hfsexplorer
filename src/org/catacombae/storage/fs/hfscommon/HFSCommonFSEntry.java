@@ -67,7 +67,7 @@ public abstract class HFSCommonFSEntry extends BasicFSEntry {
 
     /* @Override */
     public long getCombinedLength() {
-        
+
         FSFork fork = getFinderInfoFork();
         if(fork != null)
             return finderInfoFork.getLength();

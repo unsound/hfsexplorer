@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -27,21 +27,21 @@ public class HFSPlusCatalogThread extends HFSPlusCatalogLeafRecordData implement
     /*
      * struct HFSPlusCatalogThread
      * size: ~520 bytes
-     * description: 
-     * 
+     * description:
+     *
      * BP  Size  Type              Identifier  Description
      * ---------------------------------------------------
-     * 0   2     SInt16            recordType             
-     * 2   2     SInt16            reserved               
-     * 4   4     HFSCatalogNodeID  parentID               
-     * 8   ~512  HFSUniStr255      nodeName               
+     * 0   2     SInt16            recordType
+     * 2   2     SInt16            reserved
+     * 4   4     HFSCatalogNodeID  parentID
+     * 8   ~512  HFSUniStr255      nodeName
      */
-    
+
     private final byte[] recordType = new byte[2];
     private final byte[] reserved = new byte[2];
     private final HFSCatalogNodeID parentID;
     private final HFSUniStr255 nodeName;
-    
+
     public HFSPlusCatalogThread(byte[] data, int offset) {
 	System.arraycopy(data, offset+0, recordType, 0, 2);
 	System.arraycopy(data, offset+2, reserved, 0, 2);
@@ -63,12 +63,12 @@ public class HFSPlusCatalogThread extends HFSPlusCatalogLeafRecordData implement
 
         return result;
     }
-    
+
     public int length() { return 2+2+parentID.length()+nodeName.length(); }
-    
+
     /* @Override */
     public int occupiedSize() { return length(); }
-    
+
     /* @Override */
     public int maxSize() { return 520; }
 
@@ -77,7 +77,7 @@ public class HFSPlusCatalogThread extends HFSPlusCatalogLeafRecordData implement
     public short getReserved() { return Util.readShortBE(reserved); }
     public HFSCatalogNodeID getParentID() { return parentID; }
     public HFSUniStr255 getNodeName() { return nodeName; }
-    
+
     /* @Override */
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " recordType: " + getRecordType());
@@ -87,7 +87,7 @@ public class HFSPlusCatalogThread extends HFSPlusCatalogLeafRecordData implement
 	ps.println(prefix + " nodeName: ");
 	getNodeName().print(ps, prefix+"  ");
     }
-    
+
     /* @Override */
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "HFSPlusCatalogThread:");
@@ -97,12 +97,12 @@ public class HFSPlusCatalogThread extends HFSPlusCatalogLeafRecordData implement
     /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(HFSPlusCatalogThread.class.getSimpleName());
-        
+
         db.addUIntBE("recordType", recordType);
         db.addUIntBE("reserved", reserved);
         db.add("parentID", parentID.getStructElements());
         db.add("nodeName", nodeName.getStructElements());
-        
+
         return db.getResult();
     }
 }

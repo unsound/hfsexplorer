@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -28,31 +28,31 @@ public abstract class FSAttributes {
 
     public abstract boolean hasPOSIXFileAttributes();
     public abstract POSIXFileAttributes getPOSIXFileAttributes();
-    
+
     public abstract boolean hasWindowsFileAttributes();
     public abstract WindowsFileAttributes getWindowsFileAttributes();
-    
+
     public abstract boolean hasCreateDate();
     public abstract Date getCreateDate();
-    
+
     public abstract boolean hasModifyDate();
     public abstract Date getModifyDate();
-    
+
     public abstract boolean hasAttributeModifyDate();
     public abstract Date getAttributeModifyDate();
-    
+
     public abstract boolean hasAccessDate();
     public abstract Date getAccessDate();
-    
+
     public abstract boolean hasBackupDate();
     public abstract Date getBackupDate();
 
     public abstract boolean hasLinkCount();
     public abstract Long getLinkCount();
-    
+
     //public abstract FSAccessControlList getAccessControlList();
-    
-    
+
+
     public static abstract class POSIXFileAttributes {
 
         /** One of the valid return values for <code>getFileType();</code> */
@@ -236,11 +236,11 @@ public abstract class FSAttributes {
         private final long userID;
         private final long groupID;
         private final Long inodeNumber;
-        
+
         public DefaultPOSIXFileAttributes(long userID, long groupID, short fileMode) {
             this(userID, groupID, fileMode, null);
         }
-        
+
         public DefaultPOSIXFileAttributes(long userID, long groupID, short fileMode, long inodeNumber) {
             this(userID, groupID, fileMode, new Long(inodeNumber));
         }
@@ -255,7 +255,7 @@ public abstract class FSAttributes {
         /** {@inheritDoc} */
         @Override
         public long getUserID() { return userID; }
-        
+
         /** {@inheritDoc} */
         @Override
         public long getGroupID() { return groupID; }

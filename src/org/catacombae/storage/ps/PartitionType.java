@@ -24,7 +24,7 @@ import org.catacombae.storage.ps.container.ContainerType;
  * This enum presents a general representation of the partition types that may
  * be encountered. If FAT32 has several different partition types associated in
  * a MBR table, they all have the same general type.
- * 
+ *
  * @author Erik Larsson
  */
 public enum PartitionType {
@@ -65,7 +65,7 @@ public enum PartitionType {
     EFI_SYSTEM(ContentType.FILE_SYSTEM),
     SPECIAL(ContentType.OTHER),
     UNKNOWN(ContentType.OTHER);
-    
+
     /**
      * We can have three types of processable content in a partition:
      * <ul>
@@ -85,14 +85,14 @@ public enum PartitionType {
     public static enum ContentType {
         FILE_SYSTEM, PARTITION_SYSTEM, CONTAINER, OTHER;
     }
-    
+
     private final ContentType contentType;
-    
+
     // At most one of these three should be set to a value.
     private FileSystemMajorType fsType = null;
     private PartitionSystemType psType = null;
     private ContainerType containerType = null;
-         
+
     private PartitionType(ContentType contentType) {
         this.contentType = contentType;
     }
@@ -110,18 +110,18 @@ public enum PartitionType {
             throw new RuntimeException("Wrong content type for constructor.");
         this.psType = psType;
     }
-    
+
     private PartitionType(ContentType contentType, ContainerType containerType) {
         this(contentType);
         if(contentType != ContentType.CONTAINER)
             throw new RuntimeException("Wrong content type for constructor.");
         this.containerType = containerType;
     }
-    
+
     public ContentType getContentType() {
         return contentType;
     }
-    
+
     public FileSystemMajorType getAssociatedFileSystemType() {
         if(contentType != ContentType.FILE_SYSTEM)
             throw new RuntimeException("Trying to get the file system type " +
@@ -130,7 +130,7 @@ public enum PartitionType {
             return fsType;
         }
     }
-    
+
     public PartitionSystemType getAssociatedPartitionSystemType() {
         if(contentType != ContentType.PARTITION_SYSTEM)
             throw new RuntimeException("Trying to get the partition system type " +
@@ -139,7 +139,7 @@ public enum PartitionType {
             return psType;
         }
     }
-    
+
     public ContainerType getAssociatedContainerType() {
         if(contentType != ContentType.CONTAINER)
             throw new RuntimeException("Trying to get the container type " +

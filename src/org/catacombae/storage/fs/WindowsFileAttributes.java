@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -35,22 +35,22 @@ public class WindowsFileAttributes {
     private static final int FILE_ATTRIBUTE_ENCRYPTED = 0x4000;
     private static final int FILE_ATTRIBUTE_OFFLINE = 0x1000;
     private static final int FILE_ATTRIBUTE_VIRTUAL = 0x10000;
-    
+
     private final int attributeDword;
-    
+
     /**
      * Creates a new WindowsFileAttributes from a 32 bit integer holding the
      * flags as specified in the <code>dwFileAttributes</code> member of
      * <code>struct BY_HANDLE_FILE_INFORMATION</code> (see
      * <a href="http://msdn.microsoft.com/en-us/library/aa363788(VS.85).aspx">
      * MSDN</a>).
-     * 
+     *
      * @param iAttributeDword
      */
     public WindowsFileAttributes(int iAttributeDword) {
         attributeDword = iAttributeDword;
     }
-    
+
     /**
      * The file or directory is read-only. Applications can read the file,
      * but cannot write to it or delete it. If it is a directory,

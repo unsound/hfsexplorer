@@ -28,12 +28,12 @@ import org.catacombae.io.ReadableRandomAccessStream;
  */
 public class ReadableStreamDataLocator extends DataLocator {
     private SynchronizedReadableRandomAccessStream backingStream;
-    
+
     public ReadableStreamDataLocator(ReadableRandomAccessStream sourceStream) {
         this.backingStream =
                 new SynchronizedReadableRandomAccessStream(sourceStream);
     }
-    
+
     @Override
     public ReadableRandomAccessStream createReadOnlyFile() {
         return new ReadableRandomAccessSubstream(backingStream);
@@ -48,7 +48,7 @@ public class ReadableStreamDataLocator extends DataLocator {
     public boolean isWritable() {
         return false;
     }
-    
+
     public SynchronizedReadableRandomAccessStream getBackingStream() {
         return backingStream;
     }

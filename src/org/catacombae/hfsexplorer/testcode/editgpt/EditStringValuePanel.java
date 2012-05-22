@@ -27,7 +27,7 @@ import org.catacombae.csjc.structelements.StringRepresentableField;
 public class EditStringValuePanel extends javax.swing.JPanel {
     private StringRepresentableField userData;
     private String originalValue;
-    
+
     /** Creates new form EditStringValuePanel */
     public EditStringValuePanel() {
         initComponents();
@@ -86,7 +86,7 @@ private void lockedCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GE
     else
         contentsField.setEditable(true);
 }//GEN-LAST:event_lockedCheckboxActionPerformed
-    
+
     public String getDescription() {
         return descriptionLabel.getText();
     }
@@ -94,24 +94,24 @@ private void lockedCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GE
     public void setDecription(String s) {
         descriptionLabel.setText(s);
     }
-    
+
     public void setValue(String value) {
         contentsField.setText(value);
         this.originalValue = value;
     }
-    
+
     public String getValue() {
         return contentsField.getText();
     }
-    
+
     public boolean isModified() {
         return !contentsField.getText().equals(originalValue);
     }
-    
+
     public void setUserData(StringRepresentableField data) {
         this.userData = data;
     }
-    
+
     public StringRepresentableField getUserData() {
         return userData;
     }

@@ -32,31 +32,31 @@ public class ErrorSummaryPanel extends javax.swing.JPanel {
 
     private ErrorSummaryPanel(final JDialog dialog, List<String> errorMessages) {
         this(errorMessages);
-        
+
         closeButton.addActionListener(new ActionListener() {
             /* @Override */
             public void actionPerformed(ActionEvent e) {
                 dialog.dispose();
             }
         });
-        
-        
+
+
     }
     /** Creates new form ErrorSummaryPanel */
     private ErrorSummaryPanel(List<String> errorMessages) {
         initComponents();
-        
+
         for(String msg : errorMessages) {
             contentsAreaScroller.append(msg + "\n");
         }
     }
-    
+
     public static JDialog createErrorSummaryDialog(Dialog owner, List<String> errorMessages) {
         JDialog dialog = new JDialog(owner, "Error summary", true);
         fillErrorSummaryDialog(dialog, errorMessages);
         return dialog;
     }
-    
+
     public static JDialog createErrorSummaryDialog(Frame owner, List<String> errorMessages) {
         JDialog dialog = new JDialog(owner, "Error summary", true);
         fillErrorSummaryDialog(dialog, errorMessages);
@@ -66,7 +66,7 @@ public class ErrorSummaryPanel extends javax.swing.JPanel {
     private static void fillErrorSummaryDialog(JDialog dialog, List<String> errorMessages) {
         ErrorSummaryPanel esp = new ErrorSummaryPanel(dialog, errorMessages);
         dialog.add(esp);
-        
+
         dialog.pack();
         dialog.setLocationRelativeTo(null);
     }

@@ -29,15 +29,15 @@ public class FInfo implements StructElements {
     /*
      * struct FInfo
      * size: 16 bytes
-     * description: 
-     * 
-     * BP  Size  Type    Identifier  Description                                                                                      
+     * description:
+     *
+     * BP  Size  Type    Identifier  Description
      * -------------------------------------------------------------------------------------------------------------------------------
-     * 0   4     OSType  fdType      File type.                                                                                       
-     * 4   4     OSType  fdCreator   The signature of the application that created the file.                                          
-     * 8   2     UInt16  fdFlags     Finder flags. See ÒFinder Flags.Ó                                                                
+     * 0   4     OSType  fdType      File type.
+     * 4   4     OSType  fdCreator   The signature of the application that created the file.
+     * 8   2     UInt16  fdFlags     Finder flags. See ÒFinder Flags.Ó
      * 10  4     Point   fdLocation  The location--specified in coordinates local to the window--of the file's icon within its window.
-     * 14  2     SInt16  fdFldr      The window in which the file's icon appears; this information is meaningful only to the Finder.  
+     * 14  2     SInt16  fdFldr      The window in which the file's icon appears; this information is meaningful only to the Finder.
      */
 
     public static final int STRUCTSIZE = 16;
@@ -55,7 +55,7 @@ public class FInfo implements StructElements {
         fdLocation = new Point(data, offset + 10);
         System.arraycopy(data, offset + 14, fdFldr, 0, 2);
     }
-    
+
     public static int length() {
         return STRUCTSIZE;
     }
@@ -100,7 +100,7 @@ public class FInfo implements StructElements {
         ps.println(prefix + "FInfo:");
         printFields(ps, prefix);
     }
-    
+
     public byte[] getBytes() {
         byte[] result = new byte[length()];
         int offset = 0;
@@ -124,13 +124,13 @@ public class FInfo implements StructElements {
     /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(FInfo.class.getSimpleName());
-        
+
         db.add("fdType", fdType.getStructElements());
         db.add("fdCreator", fdCreator.getStructElements());
         db.addUIntBE("fdFlags", fdFlags);
         db.add("fdLocation", fdLocation.getStructElements());
         db.addSIntBE("fdFldr", fdFldr);
-        
+
         return db.getResult();
     }
 }

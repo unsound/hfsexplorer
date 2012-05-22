@@ -45,7 +45,7 @@ public class IntegerField extends StringRepresentableField {
         this(fieldData, offset, bits, signedness, endianness,
                 IntegerFieldRepresentation.DECIMAL, null);
     }
-    
+
     public IntegerField(byte[] fieldData, int offset, IntegerFieldBits bits,
             Signedness signedness, Endianness endianness,
             IntegerFieldRepresentation representation, String unitComponent) {

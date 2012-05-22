@@ -44,9 +44,9 @@ public class CdrDirRec extends CatDataRec {
      * 38  16    DXInfo     dirFndrInfo  additional Finder information (DXInfo)
      * 54  4*4   SInt32[4]  dirResrv     reserved (ARRAY[1..4] OF LongInt)
      */
-    
+
     public static final int STRUCTSIZE = 70;
-    
+
     private final byte[] dirFlags = new byte[2];
     private final byte[] dirVal = new byte[2];
     private final byte[] dirDirID = new byte[4];
@@ -56,7 +56,7 @@ public class CdrDirRec extends CatDataRec {
     private final DInfo dirUsrInfo;
     private final DXInfo dirFndrInfo;
     private final byte[] dirResrv = new byte[4*4];
-    
+
     public CdrDirRec(byte[] data, int offset) {
         super(data, offset);
         System.arraycopy(data, offset + 2, dirFlags, 0, 2);
@@ -69,9 +69,9 @@ public class CdrDirRec extends CatDataRec {
         dirFndrInfo = new DXInfo(data, offset + 38);
         System.arraycopy(data, offset + 54, dirResrv, 0, 4 * 4);
     }
-    
+
     public static int length() { return STRUCTSIZE; }
-    
+
     /** directory flags (Integer) */
     public short getDirFlags() { return Util.readShortBE(dirFlags); }
     /** directory valence (Integer) */
@@ -94,7 +94,7 @@ public class CdrDirRec extends CatDataRec {
     /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(CdrDirRec.class.getSimpleName());
-        
+
         super.addSuperStructElements(db);
         db.addUIntBE("dirFlags", dirFlags, "Directory flags", BINARY);
         db.addUIntBE("dirVal", dirVal, "Valence");
@@ -105,7 +105,7 @@ public class CdrDirRec extends CatDataRec {
         db.add("dirUsrInfo", dirUsrInfo.getStructElements(), "Finder info");
         db.add("dirFndrInfo", dirFndrInfo.getStructElements(), "Extended Finder info");
         db.addIntArray("dirResrv", dirResrv, BITS_32, UNSIGNED, BIG_ENDIAN, "Reserved", HEXADECIMAL);
-        
+
         return db.getResult();
     }
 
@@ -126,13 +126,13 @@ public class CdrDirRec extends CatDataRec {
         getDirFndrInfo().print(ps, prefix + "  ");
         ps.println(prefix + " dirResrv: " + getDirResrv());
     }
-    
+
     @Override
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "CdrDirRec:");
 	printFields(ps, prefix);
     }
-    
+
     @Override
     public byte[] getBytes() {
         byte[] result = new byte[size()];

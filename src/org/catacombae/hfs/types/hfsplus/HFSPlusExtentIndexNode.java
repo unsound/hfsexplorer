@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,7 +22,7 @@ import org.catacombae.util.Util;
 public class HFSPlusExtentIndexNode extends BTIndexNode {
     public HFSPlusExtentIndexNode(byte[] data, int offset, int nodeSize) {
 	super(data, offset, nodeSize);
-	
+
 	// Populate record list
 	// we loop offsets.length-1 times, since last offset is offset to free space
 	for(int i = 0; i < records.length; ++i) {
@@ -31,5 +31,5 @@ public class HFSPlusExtentIndexNode extends BTIndexNode {
 	    records[i] = new BTIndexRecord(currentKey, data, offset+currentOffset);
 	}
     }
-    //public static 
+    //public static
 }

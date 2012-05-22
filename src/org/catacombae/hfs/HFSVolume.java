@@ -136,7 +136,7 @@ public abstract class HFSVolume {
                 writable ? loc.createReadWriteFile() : loc.createReadOnlyFile(),
                 0, false);
     }
-    
+
     public static HFSVolume openHFSWrappedHFSPlus(DataLocator loc,
             boolean writable) {
         // TODO
@@ -166,7 +166,7 @@ public abstract class HFSVolume {
                         fsStream.length() + ") is not block-aligned. Found " +
                         res + " extra bytes.");
         }
-        
+
         // Reads the first block of the file system.
         {
             fsStream.seek(0);

@@ -26,7 +26,7 @@ public class PartitionSystemImplementationInfo {
     private String implementationName;
     private String implementationVersion;
     private String author;
-    
+
     public PartitionSystemImplementationInfo(String partitionSystemName,
             String implementationName, String implementationVersion,
             String author) {
@@ -35,19 +35,19 @@ public class PartitionSystemImplementationInfo {
         this.implementationVersion = implementationVersion;
         this.author = author;
     }
-    
+
     public String getPartitionSystemName() {
         return partitionSystemName;
     }
-    
+
     public String getImplementationName() {
         return implementationName;
     }
-    
+
     public String getImplementationVersion() {
         return implementationVersion;
     }
-    
+
     public String getAuthor() {
         return author;
     }

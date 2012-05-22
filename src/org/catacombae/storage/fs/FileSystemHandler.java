@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -25,7 +25,7 @@ import org.catacombae.util.Util;
  * @author erik
  */
 public abstract class FileSystemHandler {
-    
+
     /**
      * Lists all entries present under the <code>path</code> supplied. Path must
      * point to a folder, and is composed of a variable arguments list with each
@@ -46,7 +46,7 @@ public abstract class FileSystemHandler {
      * file system: <code>listFiles("Users", "joe");</code>
      * </li>
      * </ul>
-     * 
+     *
      * @param path the path to the requested folder with each path component
      * as a separate string. The first component under the root dir will be
      * leftmost in the argument list.
@@ -54,10 +54,10 @@ public abstract class FileSystemHandler {
      * the requested folder, or <code>null</code> if the folder can't be found.
      */
     public abstract FSEntry[] list(String... path);
-    
+
     /**
      * Returns the root folder of the file system hierarchy.
-     * 
+     *
      * @return the root folder of the file system hierarchy.
      */
     public abstract FSFolder getRoot();
@@ -72,7 +72,7 @@ public abstract class FileSystemHandler {
      * <code>null</code> if no such entry exists.
      */
     public abstract FSEntry getEntry(String... path);
-    
+
     /**
      * Looks up the FSEntry denoted by the supplied POSIX path. Since POSIX
      * paths may be relative, a root folder is needed to resolve the relative
@@ -110,7 +110,7 @@ public abstract class FileSystemHandler {
     /**
      * Returns an absolute, canonical path name in the current file system for the given POSIX path
      * string.
-     * 
+     *
      * @param posixPath
      * @param rootFolderPath
      * @return an absolute, canonical path name for the given POSIX path.
@@ -152,7 +152,7 @@ public abstract class FileSystemHandler {
                 curEntry2 = getEntry(curPath);
                 //log(prefix + "  gtpfpp: curEntry2=" + curEntry2);
             }
-            
+
             FSFolder curFolder;
             if(curEntry2 instanceof FSFolder)
                 curFolder = (FSFolder) curEntry2;
@@ -164,11 +164,11 @@ public abstract class FileSystemHandler {
                     visitedLinks = new LinkedList<String[]>();
                 else
                     visitedLinks.clear();
-                
+
                 if(curPath == null)
                     curPath = pathStack.toArray(new String[pathStack.size()]);
                 FSEntry linkTarget = resolveLinks(curPath, curLink, visitedLinks);
-                
+
                 //log(prefix + "  gtpfpp: Before test.");
                 if(linkTarget == null)
                     return null; // Invalid link target.
@@ -203,7 +203,7 @@ public abstract class FileSystemHandler {
                 //log(prefix + "  gtpfpp: fsPathnameComponent=" + fsPathnameComponent);
 
                 FSEntry nextEntry = curFolder.getChild(fsPathnameComponent);
-                
+
                 /*for(FSEntry entry : curFolder.list()) {
                     //log(prefix + "  gtpfpp:   Checking if " + entry.getName() + " matches...");
 
@@ -234,11 +234,11 @@ public abstract class FileSystemHandler {
         }
         */
     }
-    
+
     public FSEntry resolveLinks(String[] linkPath, FSLink link) {
         return resolveLinks(linkPath, link, new LinkedList<String[]>());
     }
-    
+
     private FSEntry resolveLinks(String[] curPath, FSLink curLink, LinkedList<String[]> visitedLinks) {
         System.err.println("resolveLinks(" + Util.concatenateStrings(curPath, "/") + ", " +
                 curLink.getLinkTargetString() + ", ...);");
@@ -335,7 +335,7 @@ public abstract class FileSystemHandler {
 
     /**
      * Returns the path to the link's target in absolute form.
-     * 
+     *
      * @param link the link to resolve.
      * @return the path to the link's target in absolute form.
      */
@@ -349,18 +349,18 @@ public abstract class FileSystemHandler {
      * file system handler and has no meaning in its context.<br>
      * <b>Note:</b> All implementations must support the FSForkType.DATA type,
      * as the main fork, the data fork, must always be defined for a file.
-     * 
+     *
      * @return the predefined fork types that this file system recognizes and
      * supports.
      */
     public abstract FSForkType[] getSupportedForkTypes();
-    
+
     /**
      * Closes the file system handler and frees allocated resources.
      */
     public abstract void close();
 
-    // Debug stuff... TODO remove 
+    // Debug stuff... TODO remove
     /*
     public String globalPrefix = "";
     public void log(String message) {

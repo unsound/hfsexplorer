@@ -25,33 +25,33 @@ public class BootBlkHdr {
     /*
      * struct BootBlkHdr
      * size: 148 bytes
-     * description: 
-     * 
-     * BP   Size  Type      Identifier      Description                               
+     * description:
+     *
+     * BP   Size  Type      Identifier      Description
      * -------------------------------------------------------------------------------
-     * 0    2     SInt16    bbID            boot blocks signature (Integer)           
-     * 2    4     SInt32    bbEntry         entry point to boot code (LongInt)        
-     * 6    2     SInt16    bbVersion       boot blocks version number (Integer)      
-     * 8    2     SInt16    bbPageFlags     used internally (Integer)                 
-     * 10   1*16  Char[16]  bbSysName       System filename (Str15)                   
-     * 26   1*16  Char[16]  bbShellName     Finder filename (Str15)                   
-     * 42   1*16  Char[16]  bbDbg1Name      debugger filename (Str15)                 
-     * 58   1*16  Char[16]  bbDbg2Name      debugger filename (Str15)                 
-     * 74   1*16  Char[16]  bbScreenName    name of startup screen (Str15)            
-     * 90   1*16  Char[16]  bbHelloName     name of startup program (Str15)           
-     * 106  1*16  Char[16]  bbScrapName     name of system scrap file (Str15)         
-     * 122  2     SInt16    bbCntFCBs       number of FCBs to allocate (Integer)      
-     * 124  2     SInt16    bbCntEvts       number of event queue elements (Integer)  
-     * 126  4     SInt32    bb128KSHeap     system heap size on 128K Mac (LongInt)    
-     * 130  4     SInt32    bb256KSHeap     used internally (LongInt)                 
+     * 0    2     SInt16    bbID            boot blocks signature (Integer)
+     * 2    4     SInt32    bbEntry         entry point to boot code (LongInt)
+     * 6    2     SInt16    bbVersion       boot blocks version number (Integer)
+     * 8    2     SInt16    bbPageFlags     used internally (Integer)
+     * 10   1*16  Char[16]  bbSysName       System filename (Str15)
+     * 26   1*16  Char[16]  bbShellName     Finder filename (Str15)
+     * 42   1*16  Char[16]  bbDbg1Name      debugger filename (Str15)
+     * 58   1*16  Char[16]  bbDbg2Name      debugger filename (Str15)
+     * 74   1*16  Char[16]  bbScreenName    name of startup screen (Str15)
+     * 90   1*16  Char[16]  bbHelloName     name of startup program (Str15)
+     * 106  1*16  Char[16]  bbScrapName     name of system scrap file (Str15)
+     * 122  2     SInt16    bbCntFCBs       number of FCBs to allocate (Integer)
+     * 124  2     SInt16    bbCntEvts       number of event queue elements (Integer)
+     * 126  4     SInt32    bb128KSHeap     system heap size on 128K Mac (LongInt)
+     * 130  4     SInt32    bb256KSHeap     used internally (LongInt)
      * 134  4     SInt32    bbSysHeapSize   system heap size on all machines (LongInt)
-     * 138  2     SInt16    filler          reserved (Integer)                        
-     * 140  4     SInt32    bbSysHeapExtra  additional system heap space (LongInt)    
-     * 144  4     SInt32    bbSysHeapFract  fraction of RAM for system heap (LongInt) 
+     * 138  2     SInt16    filler          reserved (Integer)
+     * 140  4     SInt32    bbSysHeapExtra  additional system heap space (LongInt)
+     * 144  4     SInt32    bbSysHeapFract  fraction of RAM for system heap (LongInt)
      */
-    
+
     public static final int STRUCTSIZE = 148;
-    
+
     private final byte[] bbID = new byte[2];
     private final byte[] bbEntry = new byte[4];
     private final byte[] bbVersion = new byte[2];
@@ -71,7 +71,7 @@ public class BootBlkHdr {
     private final byte[] filler = new byte[2];
     private final byte[] bbSysHeapExtra = new byte[4];
     private final byte[] bbSysHeapFract = new byte[4];
-    
+
     public BootBlkHdr(byte[] data, int offset) {
 	System.arraycopy(data, offset+0, bbID, 0, 2);
 	System.arraycopy(data, offset+2, bbEntry, 0, 4);
@@ -93,9 +93,9 @@ public class BootBlkHdr {
 	System.arraycopy(data, offset+140, bbSysHeapExtra, 0, 4);
 	System.arraycopy(data, offset+144, bbSysHeapFract, 0, 4);
     }
-    
+
     public static int length() { return STRUCTSIZE; }
-    
+
     /** boot blocks signature (Integer) */
     public short getBbID() { return Util.readShortBE(bbID); }
     /** entry point to boot code (LongInt) */
@@ -134,7 +134,7 @@ public class BootBlkHdr {
     public int getBbSysHeapExtra() { return Util.readIntBE(bbSysHeapExtra); }
     /** fraction of RAM for system heap (LongInt) */
     public int getBbSysHeapFract() { return Util.readIntBE(bbSysHeapFract); }
-    
+
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " bbID: " + getBbID());
 	ps.println(prefix + " bbEntry: " + getBbEntry());
@@ -156,12 +156,12 @@ public class BootBlkHdr {
 	ps.println(prefix + " bbSysHeapExtra: " + getBbSysHeapExtra());
 	ps.println(prefix + " bbSysHeapFract: " + getBbSysHeapFract());
     }
-    
+
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "BootBlkHdr:");
 	printFields(ps, prefix);
     }
-    
+
     public byte[] getBytes() {
 	byte[] result = new byte[STRUCTSIZE];
 	int offset = 0;

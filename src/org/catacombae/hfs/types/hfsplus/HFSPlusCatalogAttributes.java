@@ -21,7 +21,7 @@ import java.util.Date;
 
 /**
  * Generalization of the common attributes of HFSPlusCatalogFolder and HFSPlusCatalogFile.
- * 
+ *
  * @author Erik Larsson
  */
 public interface HFSPlusCatalogAttributes {
@@ -34,7 +34,7 @@ public interface HFSPlusCatalogAttributes {
     public int getBackupDate();
     public HFSPlusBSDInfo getPermissions();
     public int getTextEncoding();
-    
+
     public Date getCreateDateAsDate();
     public Date getContentModDateAsDate();
     public Date getAttributeModDateAsDate();

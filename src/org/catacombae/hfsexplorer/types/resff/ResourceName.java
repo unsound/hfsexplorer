@@ -29,17 +29,17 @@ public class ResourceName implements DynamicStruct, PrintableStruct {
     /*
      * struct ResourceName
      * size: minimum 1 bytes
-     * description: 
-     * 
+     * description:
+     *
      * BP  Size  Type              Identifier  Description
      * ---------------------------------------------------
-     * 0   1     UInt8             nameLength             
-     * 1   1*?   Char[nameLength]  name                   
+     * 0   1     UInt8             nameLength
+     * 1   1*?   Char[nameLength]  name
      */
-    
+
     private final byte nameLength;
     private final byte[] name;
-    
+
     public ResourceName(SynchronizedReadableRandomAccess stream, final long offset) {
 
         byte[] nameLengthArray = new byte[1];
@@ -49,12 +49,12 @@ public class ResourceName implements DynamicStruct, PrintableStruct {
         name = new byte[getNameLength()];
         stream.readFullyFrom(offset+1, name);
     }
-    
+
     /**  */
     public short getNameLength() { return Util.unsign(nameLength); }
     /**  */
     public byte[] getName() { return Util.readByteArrayBE(name); }
-    
+
     public void printFields(PrintStream ps, String prefix) {
         ps.println(prefix + " nameLength: " + getNameLength());
         try {
@@ -63,12 +63,12 @@ public class ResourceName implements DynamicStruct, PrintableStruct {
             ps.println(prefix + " name: 0x" + Util.byteArrayToHexString(getName()) + " (non-decodable)");
         }
     }
-    
+
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + "ResourceName:");
         printFields(ps, prefix);
     }
-    
+
     public byte[] getBytes() {
         byte[] result = new byte[occupiedSize()];
         int offset = 0;

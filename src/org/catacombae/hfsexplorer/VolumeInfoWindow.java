@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2007-2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -36,7 +36,7 @@ import org.catacombae.hfs.plus.HFSPlusVolume;
 /**
  * A window that queries a HFSish file system about its volume properties and displays them
  * graphically.
- * 
+ *
  * @author Erik Larsson
  */
 public class VolumeInfoWindow extends JFrame {
@@ -45,10 +45,10 @@ public class VolumeInfoWindow extends JFrame {
         super("File system info");
 
         final JTabbedPane tabs = new JTabbedPane();
-        
-        
+
+
         // The "Volume header" tab
-        
+
         try {
             final JPanel volumeInfoPanel;
             CommonHFSVolumeHeader volHeader = fsView.getVolumeHeader();
@@ -58,7 +58,7 @@ public class VolumeInfoWindow extends JFrame {
             else
                 volumeInfoPanel = new StructViewPanel("Volume header",
                     volHeader.getStructElements());
-            
+
             JScrollPane volumeInfoPanelScroller = new JScrollPane(volumeInfoPanel,
                     JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -70,7 +70,7 @@ public class VolumeInfoWindow extends JFrame {
 
 
         // The "Catalog file info" tab
-        
+
         try {
             CatalogInfoPanel catalogInfoPanel = new CatalogInfoPanel(fsView);
             JScrollPane catalogInfoPanelScroller = new JScrollPane(catalogInfoPanel,
@@ -81,10 +81,10 @@ public class VolumeInfoWindow extends JFrame {
         } catch(Exception e) {
             e.printStackTrace();
         }
-        
-        
+
+
         // The "Extents overflow file info" tab
-        
+
         try {
             ExtentsInfoPanel extentsInfoPanel = new ExtentsInfoPanel(fsView);
             JScrollPane scroller = new JScrollPane(extentsInfoPanel,
@@ -113,7 +113,7 @@ public class VolumeInfoWindow extends JFrame {
 
 
         // The "Journal info" tab (optional)
-        
+
         try {
             JournalInfoBlock jib = fsView.getJournal().getJournalInfoBlock();
             if(jib != null) {
@@ -127,8 +127,8 @@ public class VolumeInfoWindow extends JFrame {
         } catch(Exception e) {
             e.printStackTrace();
         }
-        
-        
+
+
         // The "Allocation file info" tab
         /*
         try {
@@ -143,9 +143,9 @@ public class VolumeInfoWindow extends JFrame {
             e.printStackTrace();
         }
         */
-        
+
         add(tabs, BorderLayout.CENTER);
-        
+
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         pack();
         int width = getSize().width;

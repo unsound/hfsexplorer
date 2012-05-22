@@ -45,7 +45,7 @@ public class DisplayTextFilePanel extends javax.swing.JPanel {
     private byte[] fileData = new byte[] { 0 };
     private final Frame parentFrame;
     private final String baseTitle;
-    
+
     /** Creates new form DisplayTextFilePanel. */
     public DisplayTextFilePanel() {
         this(null);
@@ -61,14 +61,14 @@ public class DisplayTextFilePanel extends javax.swing.JPanel {
             this.baseTitle = parentFrame.getTitle();
         else
             this.baseTitle = "";
-        
+
         initComponents();
-        
+
         textPaneScroller.getVerticalScrollBar().setMinimum(0);
         textPaneScroller.getVerticalScrollBar().setMaximum(Integer.MAX_VALUE);
         textPaneScroller.getHorizontalScrollBar().setMinimum(0);
         textPaneScroller.getHorizontalScrollBar().setMaximum(Integer.MAX_VALUE);
-        
+
         Set<String> keySet = Charset.availableCharsets().keySet();
         ArrayList<String> charsets = new ArrayList<String>(keySet);
         LinkedList<String> listItems = new LinkedList<String>();
@@ -85,19 +85,19 @@ public class DisplayTextFilePanel extends javax.swing.JPanel {
         }
         for(String curCharset : charsets)
             listItems.add(curCharset);
-        
+
         encodingBox.removeAllItems();
         for(String curItem : listItems)
             encodingBox.addItem(curItem);
         if(encodingBox.getItemCount() > 0)
             encodingBox.setSelectedIndex(0);
-        
+
         encodingBox.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
                 refreshView();
             }
-            
+
         });
     }
 
@@ -109,7 +109,7 @@ public class DisplayTextFilePanel extends javax.swing.JPanel {
                 if(files.length == 1) {
                     if(files[0].isFile()) {
                         loadFile(files[0]);
-                        
+
                     }
                     else
                         JOptionPane.showMessageDialog(DisplayTextFilePanel.this, "You can only view files.",
@@ -141,11 +141,11 @@ public class DisplayTextFilePanel extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(this, "File too large for memory address space! (" +
                     file.length() + "bytes)");
     }
-    
+
     public void loadStream(InputStream is) {
         loadStream(new InputStreamReadable(is));
     }
-    
+
     public void loadStream(Readable is) {
         try {
             byte[] tmp = new byte[65536];
@@ -157,7 +157,7 @@ public class DisplayTextFilePanel extends javax.swing.JPanel {
 
             fileData = baos.toByteArray();
             baos = null;
-            
+
             refreshView();
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -195,7 +195,7 @@ public class DisplayTextFilePanel extends javax.swing.JPanel {
     private String getSelectedEncoding() {
         return encodingBox.getSelectedItem().toString();
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is

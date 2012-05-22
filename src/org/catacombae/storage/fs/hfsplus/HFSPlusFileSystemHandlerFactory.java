@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008-2009 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -42,19 +42,19 @@ public class HFSPlusFileSystemHandlerFactory extends HFSCommonFileSystemHandlerF
     private static final FileSystemHandlerInfo handlerInfo =
             new DefaultFileSystemHandlerInfo("org.catacombae.hfs_plus_handler",
             "HFS+ file system handler", "1.0", 0, "Erik Larsson, Catacombae Software");
-            
-            
+
+
     private static final CustomAttribute compositionEnabledAttribute =
             createCustomAttribute(AttributeType.BOOLEAN, "COMPOSE_UNICODE_FILENAMES",
                     "Decides whether Unicode filenames should be composed or " +
                     "left in their original decomposed form.", true);
-    
+
     private static final CustomAttribute hideProtectedAttribute =
             createCustomAttribute(AttributeType.BOOLEAN, "HIDE_PROTECTED_FILES",
                     "Decides whether protected files like the inode " +
                     "directories and the journal files should show up in a " +
                     "directory listing.", true);
-    
+
     @Override
     public FileSystemHandler createHandler(DataLocator data) {
         boolean useCaching =
@@ -63,7 +63,7 @@ public class HFSPlusFileSystemHandlerFactory extends HFSCommonFileSystemHandlerF
                 createAttributes.getBooleanAttribute(compositionEnabledAttribute);
         boolean hideProtected =
                 createAttributes.getBooleanAttribute(hideProtectedAttribute);
-        
+
         ReadableRandomAccessStream recognizerStream = data.createReadOnlyFile();
 
         final DataLocator dataToLoad;
@@ -88,7 +88,7 @@ public class HFSPlusFileSystemHandlerFactory extends HFSCommonFileSystemHandlerF
         return new HFSPlusFileSystemHandler(data, useCaching, composeFilename,
                 hideProtected);
     }
-    
+
     @Override
     public FileSystemHandlerInfo getHandlerInfo() {
         return handlerInfo;
@@ -98,7 +98,7 @@ public class HFSPlusFileSystemHandlerFactory extends HFSCommonFileSystemHandlerF
     public StandardAttribute[] getSupportedStandardAttributes() {
         // Set default values for standard attributes
         setStandardAttributeDefaultValue(StandardAttribute.CACHING_ENABLED, true);
-        
+
         return new StandardAttribute[] { StandardAttribute.CACHING_ENABLED };
     }
 

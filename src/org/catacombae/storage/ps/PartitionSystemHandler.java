@@ -22,15 +22,15 @@ package org.catacombae.storage.ps;
  * @author erik
  */
 public abstract class PartitionSystemHandler {
-    
+
     public abstract long getPartitionCount();
     public abstract Partition[] getPartitions();
     public abstract void close();
-    
+
     /**
      * Returns the partition with number <code>partitionNumber</code>, or
      * <code>null</code> if there is no partition with the specified number.
-     * 
+     *
      * @param partitionNumber the requested partition number.
      * @return the partition with number <code>partitionNumber</code>, or
      * <code>null</code> if there is no partition with the specified number.

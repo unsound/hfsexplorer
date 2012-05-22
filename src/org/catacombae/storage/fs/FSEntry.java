@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -21,24 +21,24 @@ package org.catacombae.storage.fs;
  * A file system entry in our hierarchical file system model. This corresponds
  * to one of the nodes in a file system that denote a file, folder, device,
  * socket, etc.
- * 
+ *
  * @author <a href="mailto:catacombae@gmail.com">Erik Larsson</a>
  */
 public interface FSEntry {
     public static enum Type {
         FILE, FOLDER, SYMLINK, CHARACTER_DEVICE, BLOCK_DEVICE, FIFO, SOCKET;
     }
-    
+
     /**
      * Returns the attributes of this file system entry. Which attributes are
      * available for a specific file system varies enourmously.
-     * 
+     *
      * @return the attributes of this file system entry.
      */
     public FSAttributes getAttributes();
 
     public String getName();
-    
+
     //public abstract FSFolder getParent();
 
     /**

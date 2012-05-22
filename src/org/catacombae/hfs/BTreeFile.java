@@ -104,7 +104,7 @@ public abstract class BTreeFile {
             int offset, int nodeSize) {
         return ops.createCommonBTHeaderNode(currentNodeData, offset, nodeSize);
     }
-    
+
     protected CommonBTNodeDescriptor readNodeDescriptor(Readable rd) {
         return ops.readNodeDescriptor(rd);
     }

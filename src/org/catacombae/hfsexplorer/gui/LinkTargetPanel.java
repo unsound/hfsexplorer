@@ -29,7 +29,7 @@ public class LinkTargetPanel extends javax.swing.JPanel implements ChainedPanel 
     /** Creates new form LinkTargetPanel */
     public LinkTargetPanel(FSLink link) {
         initComponents();
-        
+
         linkTargetField.setText(link.getLinkTargetString());
     }
 

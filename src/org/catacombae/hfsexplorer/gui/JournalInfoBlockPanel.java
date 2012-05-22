@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@ import org.catacombae.util.Util;
  * @author  erik
  */
 public class JournalInfoBlockPanel extends javax.swing.JPanel {
-    
+
     /** Creates new form JournalInfoBlockPanel */
     public JournalInfoBlockPanel() {
         initComponents();
@@ -41,13 +41,13 @@ public class JournalInfoBlockPanel extends javax.swing.JPanel {
 	journalInFSBox.setSelected((flags & jib.kJIJournalInFSMask) != 0);
 	journalOnOtherDeviceBox.setSelected((flags & jib.kJIJournalOnOtherDeviceMask) != 0);
 	journalNeedInitBox.setSelected((flags & jib.kJIJournalNeedInitMask) != 0);
-	
+
 	int[] deviceSignature = jib.getDeviceSignature();
 	deviceSignatureField0.setText(Util.toHexStringBE(deviceSignature[0]) + Util.toHexStringBE(deviceSignature[1]));
 	deviceSignatureField1.setText(Util.toHexStringBE(deviceSignature[2]) + Util.toHexStringBE(deviceSignature[3]));
 	deviceSignatureField2.setText(Util.toHexStringBE(deviceSignature[4]) + Util.toHexStringBE(deviceSignature[5]));
 	deviceSignatureField3.setText(Util.toHexStringBE(deviceSignature[6]) + Util.toHexStringBE(deviceSignature[7]));
-	
+
 	journalOffsetField.setText("0x" + Util.toHexStringBE(jib.getRawOffset()));
 	journalSizeField.setText(jib.getSize() + " bytes");
 	int[] reserved = jib.getReserved();
@@ -68,7 +68,7 @@ public class JournalInfoBlockPanel extends javax.swing.JPanel {
 	reservedField14.setText(Util.toHexStringBE(reserved[28]) + Util.toHexStringBE(reserved[29]));
 	reservedField15.setText(Util.toHexStringBE(reserved[30]) + Util.toHexStringBE(reserved[31]));
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -315,8 +315,8 @@ public class JournalInfoBlockPanel extends javax.swing.JPanel {
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-    
-    
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel deviceSignatureField0;
     private javax.swing.JLabel deviceSignatureField1;
@@ -352,5 +352,5 @@ public class JournalInfoBlockPanel extends javax.swing.JPanel {
     private javax.swing.JLabel reservedField9;
     private javax.swing.JLabel reservedLabel;
     // End of variables declaration//GEN-END:variables
-    
+
 }

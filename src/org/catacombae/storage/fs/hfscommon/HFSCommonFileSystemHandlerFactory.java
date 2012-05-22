@@ -25,7 +25,7 @@ import org.catacombae.storage.fs.FileSystemHandlerFactory;
  * @author erik
  */
 public abstract class HFSCommonFileSystemHandlerFactory  extends FileSystemHandlerFactory {
-    
+
     @Override
     public FileSystemCapability[] getCapabilities() {
         return new FileSystemCapability[] {

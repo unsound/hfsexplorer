@@ -44,18 +44,18 @@ public abstract class CommonBTNodeDescriptor implements PrintableStruct {
     }
     public abstract void printFields(PrintStream ps, String prefix);
     */
-    
+
     public static CommonBTNodeDescriptor create(BTNodeDescriptor btnd) {
         return new HFSPlusImplementation(btnd);
     }
-    
+
     public static CommonBTNodeDescriptor create(NodeDescriptor nd) {
         return new HFSImplementation(nd);
     }
-    
+
     private static class HFSPlusImplementation extends CommonBTNodeDescriptor {
         private final BTNodeDescriptor btnd;
-        
+
         public HFSPlusImplementation(BTNodeDescriptor btnd) {
             this.btnd = btnd;
         }
@@ -86,7 +86,7 @@ public abstract class CommonBTNodeDescriptor implements PrintableStruct {
                     throw new RuntimeException("Unknown node type: " + b);
             }
         }
-        
+
         @Override
         public short getHeight() {
             return Util.unsign(btnd.getHeight());
@@ -107,10 +107,10 @@ public abstract class CommonBTNodeDescriptor implements PrintableStruct {
             btnd.printFields(ps, prefix);
         }
     }
-    
+
     public static class HFSImplementation extends CommonBTNodeDescriptor {
         private final NodeDescriptor nd;
-        
+
         public HFSImplementation(NodeDescriptor nd) {
             this.nd = nd;
         }
@@ -141,7 +141,7 @@ public abstract class CommonBTNodeDescriptor implements PrintableStruct {
                     throw new RuntimeException("Unknown node type: " + b);
             }
         }
-        
+
         @Override
         public short getHeight() {
             return Util.unsign(nd.getNdNHeight());

@@ -22,7 +22,7 @@ import org.catacombae.hfs.types.hfsplus.HFSPlusBSDInfo;
 
 /**
  * Generalization of the common attributes of CommonHFSCatalogFolder and CommonHFSCatalogFile.
- * 
+ *
  * Please note that this class is NOT designed to cope with subtle differences
  * between HFS and HFS+. For instance HFS does not have the concept of separate
  * content modify and attribute modify dates, and does not at all store access
@@ -48,48 +48,48 @@ public interface CommonHFSCatalogAttributes {
     /**
      * Returns whether or not this attribute set has a defined value for the "entry created"
      * timestamp.
-     * 
+     *
      * @return whether or not this attribute set has a defined value for the "entry created"
      * timestamp.
      */
     public boolean hasCreateDate();
-    
+
     /**
      * Returns whether or not this attribute set has a defined value for the "contents modified"
      * timestamp.
-     * 
+     *
      * @return whether or not this attribute set has a defined value for the "contents modified"
      * timestamp.
      */
     public boolean hasContentModDate();
-    
+
     /**
      * Returns whether or not this attribute set has a defined value for the "attributes modified"
      * timestamp.
-     * 
+     *
      * @return whether or not this attribute set has a defined value for the "attribtues modified"
      * timestamp.
      */
     public boolean hasAttributeModDate();
-    
+
     /**
      * Returns whether or not this attribute set has a defined value for the "entry last accessed"
      * timestamp.
-     * 
+     *
      * @return whether or not this attribute set has a defined value for the "entry last accessed"
      * timestamp.
      */
     public boolean hasAccessDate();
-    
+
     /**
      * Returns whether or not this attribute set has a defined value for the "entry last backuped"
      * timestamp.
-     * 
+     *
      * @return whether or not this attribute set has a defined value for the "entry last backuped"
      * timestamp.
      */
     public boolean hasBackupDate();
-    
+
     /**
      * Returns whether or not this object contains HFS+ permissions.
      * @return whether or not this object contains HFS+ permissions.
@@ -99,7 +99,7 @@ public interface CommonHFSCatalogAttributes {
     //public int getTextEncoding();
 
     public CommonHFSFinderInfo getFinderInfo();
-    
+
     public Date getCreateDateAsDate();
     public Date getContentModDateAsDate();
     public Date getAttributeModDateAsDate();

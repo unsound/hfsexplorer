@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -27,62 +27,62 @@ public class FolderInfo extends CommonFinderInfo implements StructElements {
     /*
      * struct FolderInfo
      * size: 16 bytes
-     * description: 
-     * 
+     * description:
+     *
      * BP  Size  Type    Identifier     Description
      * --------------------------------------------
-     * 0   8     Rect    windowBounds              
-     * 8   2     UInt16  finderFlags               
-     * 10  4     Point   location                  
-     * 14  2     UInt16  reservedField             
+     * 0   8     Rect    windowBounds
+     * 8   2     UInt16  finderFlags
+     * 10  4     Point   location
+     * 14  2     UInt16  reservedField
      */
-    
+
     private final Rect windowBounds;
-    
+
     public FolderInfo(byte[] data, int offset) {
         super(data, offset);
 	windowBounds = new Rect(data, offset+0);
     }
-    
+
     public static int length() { return 16; }
 
     public Rect getWindowBounds() { return windowBounds; }
-    
+
     @Override
     public byte[] getBytes() {
         byte[] result = new byte[length()];
 	byte[] tempData;
 	int offset = 0;
-        
+
         tempData = windowBounds.getBytes();
 	System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
-        
+
         tempData = super.getBytes();
         System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
-        
+
         return result;
     }
-    
-    @Override    
+
+    @Override
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " windowBounds: ");
 	getWindowBounds().print(ps, prefix+"  ");
 	super.printFields(ps, prefix);
     }
-    
+
     /* @Override */
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "FolderInfo:");
 	printFields(ps, prefix);
     }
-    
+
     @Override
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(FolderInfo.class.getSimpleName());
-        
+
         db.add("windowBounds", windowBounds.getStructElements());
         db.addAll(super.getStructElements());
-        
+
         return db.getResult();
-    }  
+    }
 }

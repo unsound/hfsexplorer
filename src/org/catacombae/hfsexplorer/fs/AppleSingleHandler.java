@@ -106,11 +106,11 @@ public class AppleSingleHandler {
         }
         return null;
     }
-    
+
     /**
      * Looks up the resource descriptor for the resource fork type, if any. Returns
      * <code>null</code> if none exists.
-     * 
+     *
      * @return the resource descriptor for the resource fork type, if any. Returns <code>null</code>
      * if none exists.
      */

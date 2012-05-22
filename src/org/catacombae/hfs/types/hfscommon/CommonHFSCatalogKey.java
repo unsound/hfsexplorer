@@ -31,7 +31,7 @@ import org.catacombae.hfs.types.hfs.CatKeyRec;
 public abstract class CommonHFSCatalogKey extends CommonBTKey<CommonHFSCatalogKey> implements StructElements {
     public abstract CommonHFSCatalogNodeID getParentID();
     public abstract CommonHFSCatalogString getNodeName();
-    
+
     /* @Override */
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + CommonHFSCatalogKey.class.getSimpleName() + ":");
@@ -41,21 +41,21 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey<CommonHFSCatalogKe
     public static CommonHFSCatalogKey create(HFSPlusCatalogKey key) {
         return new HFSPlusImplementation(key);
     }
-    
+
     /*
     public static CommonHFSCatalogKey create(HFSPlusCatalogKey key, HFSXKeyCompareType compType) {
         return new HFSXImplementation(key, compType);
     }
      * */
-    
+
     public static CommonHFSCatalogKey create(CatKeyRec key) {
         return new HFSImplementation(key);
     }
-    
+
     public static class HFSPlusImplementation extends CommonHFSCatalogKey {
         private final HFSPlusCatalogKey key;
         //private HFSXKeyCompareType compType;
-        
+
         public HFSPlusImplementation(HFSPlusCatalogKey key) {
             //this(key, HFSXKeyCompareType.CASE_FOLDING);
             this.key = key;
@@ -82,7 +82,7 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey<CommonHFSCatalogKe
         public byte[] getBytes() {
             return key.getBytes();
         }
-        
+
         /* @Override */
         public int compareTo(CommonHFSCatalogKey o) {
             if(o instanceof HFSPlusImplementation) {
@@ -136,7 +136,7 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey<CommonHFSCatalogKe
             return key.getStructElements();
         }
     }
-    
+
     /*
     public static class HFSXImplementation extends HFSPlusImplementation {
         public HFSXImplementation(HFSPlusCatalogKey key,
@@ -145,10 +145,10 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey<CommonHFSCatalogKe
         }
     }
     */
-    
+
     public static class HFSImplementation extends CommonHFSCatalogKey {
         private final CatKeyRec key;
-        
+
         public HFSImplementation(CatKeyRec key) {
             this.key = key;
         }
@@ -177,7 +177,7 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey<CommonHFSCatalogKe
         public byte[] getBytes() {
             return key.getBytes();
         }
-        
+
         /* @Override */
         public int compareTo(CommonHFSCatalogKey o) {
             if(o instanceof HFSImplementation) {
@@ -208,7 +208,7 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey<CommonHFSCatalogKe
             ps.println(prefix + "key:");
             key.print(ps, prefix + " ");
         }
-        
+
         /* @Override */
         public Dictionary getStructElements() {
             return key.getStructElements();

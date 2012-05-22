@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -41,10 +41,10 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
     private final ButtonGroup createFileButtonGroup = new ButtonGroup();
     private final ButtonGroup dirExistsButtonGroup = new ButtonGroup();
     private final ButtonGroup fileExistsButtonGroup = new ButtonGroup();
-    
+
     public ExtractSettingsPanel(final ExtractProperties p) {
         this();
-        
+
         p.addListener(new ExtractPropertiesListener() {
             /* @Override */
             public void propertyChanged(Object changedProperty) {
@@ -137,7 +137,7 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
                 else
                     throw new RuntimeException("Unknown property: " +
                             (changedProperty != null?changedProperty.getClass():"null"));
-                
+
                 if(theButton != null) {
                     SwingUtilities.invokeLater(new Runnable() {
                         /* @Override */
@@ -148,7 +148,7 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
                 }
             }
         });
-        
+
         createDirPromptUserButton.doClick();
         createFilePromptUserButton.doClick();
         dirExistsPromptUserButton.doClick();
@@ -162,7 +162,7 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
                 p, CreateDirectoryFailedAction.AUTO_RENAME));
         createDirCancelButton.addActionListener(new CreateDirListener(createDirCancelButton,
                 p, CreateDirectoryFailedAction.CANCEL));
-        
+
         createFilePromptUserButton.addActionListener(new CreateFileListener(createFilePromptUserButton,
                 p, CreateFileFailedAction.PROMPT_USER));
         createFileSkipFileButton.addActionListener(new CreateFileListener(createFileSkipFileButton,
@@ -173,7 +173,7 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
                 p, CreateFileFailedAction.AUTO_RENAME));
         createFileCancelButton.addActionListener(new CreateFileListener(createFileCancelButton,
                 p, CreateFileFailedAction.CANCEL));
-        
+
         dirExistsPromptUserButton.addActionListener(new DirExistsListener(dirExistsPromptUserButton,
                 p, DirectoryExistsAction.PROMPT_USER));
         dirExistsContinueButton.addActionListener(new DirExistsListener(dirExistsContinueButton,
@@ -184,7 +184,7 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
                 p, DirectoryExistsAction.AUTO_RENAME));
         dirExistsCancelButton.addActionListener(new DirExistsListener(dirExistsCancelButton,
                 p, DirectoryExistsAction.CANCEL));
-        
+
         fileExistsPromptUserButton.addActionListener(new FileExistsListener(fileExistsPromptUserButton,
                 p, FileExistsAction.PROMPT_USER));
         fileExistsSkipFileButton.addActionListener(new FileExistsListener(fileExistsSkipFileButton,
@@ -201,18 +201,18 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
     /** Creates new form ExtractSettingsPanel */
     private ExtractSettingsPanel() {
         initComponents();
-        
+
         createDirButtonGroup.add(createDirPromptUserButton);
         createDirButtonGroup.add(createDirSkipDirectoryButton);
         createDirButtonGroup.add(createDirAutoRenameButton);
         createDirButtonGroup.add(createDirCancelButton);
-        
+
         createFileButtonGroup.add(createFilePromptUserButton);
         createFileButtonGroup.add(createFileSkipFileButton);
         createFileButtonGroup.add(createFileSkipDirectoryButton);
         createFileButtonGroup.add(createFileAutoRenameButton);
         createFileButtonGroup.add(createFileCancelButton);
-        
+
         dirExistsButtonGroup.add(dirExistsPromptUserButton);
         dirExistsButtonGroup.add(dirExistsContinueButton);
         dirExistsButtonGroup.add(dirExistsSkipDirectoryButton);
@@ -225,20 +225,20 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
         fileExistsButtonGroup.add(fileExistsOverwriteButton);
         fileExistsButtonGroup.add(fileExistsAutoRenameButton);
         fileExistsButtonGroup.add(fileExistsCancelButton);
-        
+
         quietModeBox.addActionListener(new ActionListener() {
 
             /* @Override */
             public void actionPerformed(ActionEvent e) {
                 boolean selected = quietModeBox.isSelected();
-                
+
                 if(selected) {
                     createDirSkipDirectoryButton.doClick();
                     createFileSkipFileButton.doClick();
                     dirExistsSkipDirectoryButton.doClick();
                     fileExistsSkipFileButton.doClick();
                 }
-                
+
                 List<ButtonGroup> buttonGroups = Arrays.asList(createDirButtonGroup,
                         createFileButtonGroup, dirExistsButtonGroup, fileExistsButtonGroup);
                 for(ButtonGroup bg : buttonGroups) {
@@ -249,7 +249,7 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
                     }
                 }
             }
-            
+
         });
     }
 
@@ -543,7 +543,7 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
         protected final AbstractButton button;
         protected final ExtractProperties p;
         protected final A action;
-        
+
         public AbstractListener(AbstractButton button, ExtractProperties p, A action) {
             this.button = button;
             this.p = p;
@@ -557,10 +557,10 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
                 setAction(action);
             }
         }
-        
+
         protected abstract void setAction(A action);
     }
-    
+
     private class CreateDirListener extends AbstractListener<CreateDirectoryFailedAction> {
         public CreateDirListener(AbstractButton button, ExtractProperties p, CreateDirectoryFailedAction action) {
             super(button, p, action);
@@ -571,7 +571,7 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
             p.setCreateDirectoryFailedAction(action);
         }
     }
-    
+
     private class CreateFileListener extends AbstractListener<CreateFileFailedAction> {
         public CreateFileListener(AbstractButton button, ExtractProperties p, CreateFileFailedAction action) {
             super(button, p, action);
@@ -582,7 +582,7 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
             p.setCreateFileFailedAction(action);
         }
     }
-    
+
     private class DirExistsListener extends AbstractListener<DirectoryExistsAction> {
         public DirExistsListener(AbstractButton button, ExtractProperties p, DirectoryExistsAction action) {
             super(button, p, action);
@@ -593,7 +593,7 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
             p.setDirectoryExistsAction(action);
         }
     }
-    
+
     private class FileExistsListener extends AbstractListener<FileExistsAction> {
         public FileExistsListener(AbstractButton button, ExtractProperties p, FileExistsAction action) {
             super(button, p, action);
@@ -604,7 +604,7 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
             p.setFileExistsAction(action);
         }
     }
-    
+
     /*
     public static void main(String[] args) {
         JFrame jf = new JFrame("Test");

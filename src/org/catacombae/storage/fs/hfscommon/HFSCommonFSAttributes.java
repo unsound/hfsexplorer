@@ -31,11 +31,11 @@ import org.catacombae.storage.fs.WindowsFileAttributes;
  * @author Erik Larsson
  */
 class HFSCommonFSAttributes extends FSAttributes {
-    
+
     private final HFSCommonFSEntry parentEntry;
     private final CommonHFSCatalogAttributes attributes;
     private POSIXFileAttributes posixAttributes = null;
-    
+
     public HFSCommonFSAttributes(HFSCommonFSEntry parentEntry, CommonHFSCatalogAttributes attributes) {
         this.parentEntry = parentEntry;
         this.attributes = attributes;
@@ -155,7 +155,7 @@ class HFSCommonFSAttributes extends FSAttributes {
                 return Util.unsign(rec.getData().getPermissions().getSpecial());
             }
         }
-        
+
         return null;
     }
 

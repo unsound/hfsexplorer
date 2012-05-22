@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -21,25 +21,25 @@ import org.catacombae.util.Util;
 import java.io.PrintStream;
 
 public class MutableGPTEntry extends GPTEntry {
-    
+
     public MutableGPTEntry(int blockSize) {
 	super(blockSize);
     }
     public MutableGPTEntry(GPTEntry source) {
 	super(source);
     }
-    
+
     public void setPartitionTypeGUID(byte[] data, int off) { copyData(data, off, partitionTypeGUID); }
     public void setUniquePartitionGUID(byte[] data, int off) { copyData(data, off, uniquePartitionGUID); }
     public void setStartingLBA(long i) { Util.arrayCopy(Util.toByteArrayLE(i), startingLBA); }
     public void setEndingLBA(long i) { Util.arrayCopy(Util.toByteArrayLE(i), endingLBA); }
     public void setAttributeBits(long i) { Util.arrayCopy(Util.toByteArrayBE(i), attributeBits); }
     public void setPartitionName(byte[] data, int off) { copyData(data, off, partitionName); }
-    
+
     public void setFields(GPTEntry gptEntry) {
 	super.copyFields(gptEntry);
     }
-    
+
     private static void copyData(byte[] data, int off, byte[] dest) {
 	copyData(data, off, dest, dest.length);
     }

@@ -23,7 +23,7 @@ package org.catacombae.csjc.structelements;
 public enum IntegerFieldBits {
 
     BITS_8(8), BITS_16(16), BITS_32(32), BITS_64(64);
-    
+
     private final int bitCount;
 
     private IntegerFieldBits(int bitCount) {

@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006-2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -25,14 +25,14 @@ import org.catacombae.storage.ps.mbr.MBRPartitionType;
 
 public class MBRPartition implements Partition {
     protected static final byte PARTITION_NOT_BOOTABLE = (byte)0x00;
-    protected static final byte PARTITION_BOOTABLE     = (byte)0x80;  
-    
+    protected static final byte PARTITION_BOOTABLE     = (byte)0x80;
+
     /** By some reason I couldn't put this variable inside MBRPartitionType. Initalizer error. */
     private static final Hashtable<Byte,MBRPartitionType> byteMap = new Hashtable<Byte,MBRPartitionType>();
     //public static enum MBRPartitionType {
-	/* Partition type data from microsoft 
+	/* Partition type data from microsoft
          * (http://technet2.microsoft.com/WindowsServer/en/library/bdeda920-1f08-4683-9ffb-7b4b50df0b5a1033.mspx?mfr=true)
-         * 
+         *
 	 * 0x01 FAT12 primary partition or logical drive (fewer than 32,680 sectors in the volume)
 	 * 0x04 FAT16 partition or logical drive (32,680-65,535 sectors or 16 MB-33 MB)
 	 * 0x05 Extended partition
@@ -78,19 +78,19 @@ public class MBRPartition implements Partition {
 	PARTITION_TYPE_LINUX_SWAP           ((byte)0x82),
 	PARTITION_TYPE_LINUX_NATIVE         ((byte)0x83), // Used for reiserfs, ext2, ext3 and many more
 	UNKNOWN_PARTITION_TYPE; // Returned when no known type can be matched
-	
+
 	private byte type;
-	
+
 	private MBRPartitionType(byte type) {
 	    this.type = type;
 	    byteMap.put(type, this);
 	}
 	private MBRPartitionType() {}
-	
+
 	private void register(byte type) {
 	    byteMap.put(type, this);
 	}
-	
+
 	public static MBRPartitionType getType(byte b) {
 	    MBRPartitionType type = byteMap.get(b);
 	    if(type != null)
@@ -105,9 +105,9 @@ public class MBRPartition implements Partition {
     protected final byte[] lastSector = new byte[3];
     protected final byte[] lbaFirstSector = new byte[4];
     protected final byte[] lbaPartitionLength = new byte[4];
-    
+
     private final int sectorSize;
-    
+
     /** <code>data</code> is assumed to be at least (<code>offset</code>+16) bytes in length. */
     public MBRPartition(byte[] data, int offset, int sectorSize) {
 	this(sectorSize);
@@ -131,9 +131,9 @@ public class MBRPartition implements Partition {
 	System.arraycopy(source.partitionType, 0, partitionType, 0, 1);
 	System.arraycopy(source.lastSector, 0, lastSector, 0, 3);
 	System.arraycopy(source.lbaFirstSector, 0, lbaFirstSector, 0, 4);
-	System.arraycopy(source.lbaPartitionLength, 0, lbaPartitionLength, 0, 4);	
+	System.arraycopy(source.lbaPartitionLength, 0, lbaPartitionLength, 0, 4);
     }
-    
+
     // Defined in Partition
     public long getStartOffset() { return Util.unsign(getLBAFirstSector())*sectorSize; }
     public long getLength() { return Util.unsign(getLBAPartitionLength())*sectorSize; }
@@ -141,7 +141,7 @@ public class MBRPartition implements Partition {
         return getPartitionTypeAsEnum().getGeneralType();
     }
 
-	
+
     public byte getStatus() { return Util.readByteLE(status); }
     /** The result is returned in CHS form. This representation is deprecated and cannot handle
 	today's storage sizes. Preferrably use the getLBA-methods.*/
@@ -152,18 +152,18 @@ public class MBRPartition implements Partition {
     public byte[] getLastSector() { return Util.createCopy(lastSector); }
     public int getLBAFirstSector() { return Util.readIntLE(lbaFirstSector); }
     public int getLBAPartitionLength() { return Util.readIntLE(lbaPartitionLength); }
-    
+
     public MBRPartitionType getPartitionTypeAsEnum() {
         return MBRPartitionType.fromMBRType(getPartitionType());
     }
-    
+
     public boolean isBootable() {
 	return getStatus() == PARTITION_BOOTABLE;
     }
     public boolean isValid() {
 	/* Calculate the coefficients numHead and numSec.
 	 * (C*numHead*numSec) + (H*numSec) + (S-1) = LBA.
-	 * 
+	 *
 	 * Say that we have c1, h1, s1 and lba1, as well as c2, h2, s2, lba2.
 	 */
 	int beginLBA = getLBAFirstSector();
@@ -177,11 +177,11 @@ public class MBRPartition implements Partition {
 	int endS = endCHS[1] & 0x3F;
 	int endH = endCHS[0];
 	int endC = ((endCHS[1] & 0xC0) >> 6) * 0xFF + endCHS[2];
-	
-	
-	
-	
-	
+
+
+
+
+
 	byte statusByte = getStatus();
 	return (statusByte == PARTITION_NOT_BOOTABLE || statusByte == PARTITION_BOOTABLE);
     }
@@ -189,14 +189,14 @@ public class MBRPartition implements Partition {
     public boolean isUsed() {
 	return isValid() && getPartitionTypeAsEnum() != MBRPartitionType.UNUSED;
     }
-    
+
     @Override
     public String toString() {
 	MBRPartitionType mpt = getPartitionTypeAsEnum();
-	return (isBootable()?"Bootable ":"") + "MBR Partition (" + mpt + 
+	return (isBootable()?"Bootable ":"") + "MBR Partition (" + mpt +
 	    (mpt == null?" [0x"+Util.toHexStringBE(getPartitionType())+"]":"") + ")";
     }
-    
+
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " status: 0x" + Util.toHexStringBE(getStatus()));
 	ps.println(prefix + " firstSector: 0x" + Util.byteArrayToHexString(getFirstSector()));
@@ -265,7 +265,7 @@ public class MBRPartition implements Partition {
 	    return PartitionType.UNKNOWN;
 	}
     }*/
-    
+
     public byte[] getBytes() {
 	byte[] result = new byte[16];
 	int i = 0;
@@ -275,7 +275,7 @@ public class MBRPartition implements Partition {
 	System.arraycopy(lastSector, 0, result, i, lastSector.length); i += lastSector.length;
 	System.arraycopy(lbaFirstSector, 0, result, i, lbaFirstSector.length); i += lbaFirstSector.length;
 	System.arraycopy(lbaPartitionLength, 0, result, i, lbaPartitionLength.length); i += lbaPartitionLength.length;
-   	
+
 	if(i != result.length)
 	    throw new RuntimeException("Internal error!");
 	return result;

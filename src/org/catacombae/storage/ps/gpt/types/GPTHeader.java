@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006-2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -55,7 +55,7 @@ public class GPTHeader implements StructElements {
      *   Backup LBA. The LBA address of the backup GPT header. This value is always equal to the last LBA on the disk.
      *
      * 0x28  8 bytes
-     *   First Usable LBA. The first usable LBA that can be contained in a GUID partition entry. In other words, 
+     *   First Usable LBA. The first usable LBA that can be contained in a GUID partition entry. In other words,
      *   the first partition begins at this LBA. In the 64-bit versions of Windows Server 2003, this number is always LBA 34.
      *
      * 0x30  8 bytes
@@ -100,10 +100,10 @@ public class GPTHeader implements StructElements {
 
     protected int blockSize;
     private final CRC32 crc = new CRC32();
-    
+
     public GPTHeader(byte[] data, int offset, int blockSize) {
 	this.blockSize = blockSize;
-	
+
 	System.arraycopy(data, offset+0, signature, 0, 8);
 	System.arraycopy(data, offset+8, revision, 0, 4);
 	System.arraycopy(data, offset+12, headerSize, 0, 4);
@@ -129,7 +129,7 @@ public class GPTHeader implements StructElements {
     public GPTHeader(GPTHeader source) {
 	setFieldsInternal(source);
     }
-    
+
     protected void setFieldsInternal(GPTHeader source) {
 	this.blockSize = source.blockSize;
 	System.arraycopy(source.signature, 0, signature, 0, signature.length);
@@ -153,9 +153,9 @@ public class GPTHeader implements StructElements {
 // 		     long partitionEntryLBA, int numberOfPartitionEntries, int sizeOfPartitionEntry,
 // 		     int partitionEntryArrayCRC32, byte[] reserved2) {
 //     }
-    
+
     public static int getSize() { return 512; }
-    
+
     public long getSignature()               { return Util.readLongBE(signature); }
     public int getRevision()                 { return Util.readIntLE(revision); }
     public int getHeaderSize()               { return Util.readIntLE(headerSize); }
@@ -171,12 +171,12 @@ public class GPTHeader implements StructElements {
     public int getSizeOfPartitionEntry()     { return Util.readIntLE(sizeOfPartitionEntry); }
     public int getPartitionEntryArrayCRC32() { return Util.readIntLE(partitionEntryArrayCRC32); }
     public byte[] getReserved2()             { return Util.createCopy(reserved2); }
-    
+
     public boolean isValid() {
 	return getSignature() == GPT_SIGNATURE &&
 	    calculateCRC32() == getCRC32Checksum();
     }
-    
+
     /** Calculates the CRC32 as it should appear in the crc32Checksum field in the header. */
     public int calculateCRC32() {
 	crc.reset();
@@ -196,7 +196,7 @@ public class GPTHeader implements StructElements {
 	crc.update(partitionEntryArrayCRC32);
 	return (int)(crc.getValue() & 0xFFFFFFFF);
     }
-    
+
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " signature: 0x" + Util.toHexStringBE(getSignature()));
 	ps.println(prefix + " revision: 0x" + Util.toHexStringBE(getRevision()));
@@ -214,12 +214,12 @@ public class GPTHeader implements StructElements {
 	ps.println(prefix + " partitionEntryArrayCRC32: 0x" + Util.toHexStringBE(getPartitionEntryArrayCRC32()));
 	ps.println(prefix + " reserved2: [too much data to display...]");
     }
-    
+
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "GPTHeader:");
 	printFields(ps, prefix);
     }
-    
+
     public byte[] getBytes() {
 	byte[] result = new byte[512];
 	int offset = 0;
@@ -238,10 +238,10 @@ public class GPTHeader implements StructElements {
 	System.arraycopy(sizeOfPartitionEntry, 0, result, offset, sizeOfPartitionEntry.length); offset += 4;
 	System.arraycopy(partitionEntryArrayCRC32, 0, result, offset, partitionEntryArrayCRC32.length); offset += 4;
 	System.arraycopy(reserved2, 0, result, offset, reserved2.length); offset += 420;
- 	
+
 	return result;
     }
-    
+
     public boolean equals(Object obj) {
 	if(obj instanceof GPTHeader) {
 	    GPTHeader gpth = (GPTHeader)obj;
@@ -251,7 +251,7 @@ public class GPTHeader implements StructElements {
 	else
 	    return false;
     }
-    
+
     /**
      * Checks that if supplied GPTHeader is a valid backup header to this header (or the reverse,
      * as a primary header is always a valid backup to the backup header).<br>
@@ -266,18 +266,18 @@ public class GPTHeader implements StructElements {
 	if(!Util.arraysEqual(this.signature, backupHeader.signature)) return false;
 	if(!Util.arraysEqual(this.revision, backupHeader.revision)) return false;
 	if(!Util.arraysEqual(this.headerSize, backupHeader.headerSize)) return false;
-	
+
 	// Special treatment: CRC32s should not be equal
 	if(Util.arraysEqual(this.crc32Checksum, backupHeader.crc32Checksum)) return false;
 	// End special treatment
-	
+
 	if(!Util.arraysEqual(this.reserved1, backupHeader.reserved1)) return false;
-	
+
 	// Special treatment: primary and backup LBAs are swapped
 	if(!Util.arraysEqual(this.primaryLBA, backupHeader.backupLBA)) return false;
 	if(!Util.arraysEqual(this.backupLBA, backupHeader.primaryLBA)) return false;
 	// End special treatment
-	
+
 	if(!Util.arraysEqual(this.firstUsableLBA, backupHeader.firstUsableLBA)) return false;
 	if(!Util.arraysEqual(this.lastUsableLBA, backupHeader.lastUsableLBA)) return false;
 	if(!Util.arraysEqual(this.diskGUID, backupHeader.diskGUID)) return false;
@@ -285,26 +285,26 @@ public class GPTHeader implements StructElements {
 	// Special treatment: partition entry LBAs should not be equal
 	if(Util.arraysEqual(this.partitionEntryLBA, backupHeader.partitionEntryLBA)) return false;
 	// End special treatment
-	
+
 	if(!Util.arraysEqual(this.numberOfPartitionEntries, backupHeader.numberOfPartitionEntries)) return false;
 	if(!Util.arraysEqual(this.sizeOfPartitionEntry, backupHeader.sizeOfPartitionEntry)) return false;
 	if(!Util.arraysEqual(this.partitionEntryArrayCRC32, backupHeader.partitionEntryArrayCRC32)) return false;
 	if(!Util.arraysEqual(this.reserved2, backupHeader.reserved2)) return false;
-	
+
 	return true;
     }
 
     public GPTHeader createValidBackupHeader()  {
 	GPTHeader newHeader = new GPTHeader(this);
-	
+
 	// 1. Swap primary and backup LBAs for the new header
 	byte[] primaryLBA = Util.createCopy(newHeader.primaryLBA);
 	byte[] backupLBA = Util.createCopy(newHeader.backupLBA);
 	Util.arrayCopy(primaryLBA, newHeader.backupLBA);
 	Util.arrayCopy(backupLBA, newHeader.primaryLBA);
-	
+
 	// 2. Calculate correct value for partitionEntryLBA
-	/* 
+	/*
 	 * The backup header's partition entry LBA is calculated from substracting
 	 * (numberOfPartitionEntries*sizeOfPartitionEntry)/blockSize from primaryLBA,
 	 * adding one if the byte size of the partition entry area is not aligned with
@@ -319,7 +319,7 @@ public class GPTHeader implements StructElements {
 				       ") == newHeader.partitionEntryLBA.length(" + newHeader.partitionEntryLBA.length +
 				       ") failed.");
 	System.arraycopy(pePosBytes, 0, newHeader.partitionEntryLBA, 0, newHeader.partitionEntryLBA.length);
-	
+
 	// 3. Finalize the header by calculating its CRC32 value and setting it.
 	int crc = newHeader.calculateCRC32();
 	byte[] crcBytes = Util.toByteArrayLE(crc);
@@ -328,13 +328,13 @@ public class GPTHeader implements StructElements {
 				       ") == newHeader.crc32Checksum.length(" + newHeader.crc32Checksum.length +
 				       ") failed.");
 	System.arraycopy(crcBytes, 0, newHeader.crc32Checksum, 0, newHeader.crc32Checksum.length);
-	
+
 	return newHeader;
     }
 
     public Dictionary getStructElements() {
         DictionaryBuilder dbStruct = new DictionaryBuilder(getClass().getSimpleName());
-        
+
         dbStruct.add("signature", new IntegerField(signature, BITS_64, UNSIGNED, BIG_ENDIAN));
         dbStruct.add("revision", new IntegerField(revision, BITS_32, UNSIGNED, LITTLE_ENDIAN));
         dbStruct.add("headerSize", new IntegerField(headerSize, BITS_32, UNSIGNED, LITTLE_ENDIAN));
@@ -350,7 +350,7 @@ public class GPTHeader implements StructElements {
         dbStruct.add("sizeOfPartitionEntry", new IntegerField(sizeOfPartitionEntry, BITS_32, UNSIGNED, LITTLE_ENDIAN));
         dbStruct.add("partitionEntryArrayCRC32", new IntegerField(partitionEntryArrayCRC32, BITS_32, UNSIGNED, LITTLE_ENDIAN));
         dbStruct.add("reserved2", new ByteArrayField(reserved2));
-        
+
         return dbStruct.getResult();
     }
 }

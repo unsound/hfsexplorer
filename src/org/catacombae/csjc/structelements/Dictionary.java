@@ -28,7 +28,7 @@ public class Dictionary extends StructElement {
     private final String[] keys;
     private final Hashtable<String,StructElement> mappings;
     private final Hashtable<String,String> descriptions;
-        
+
     Dictionary(String typeName, String[] keys, Hashtable<String,StructElement> mappings,
             Hashtable<String,String> descriptions) {
         this(typeName, null, keys, mappings, descriptions);
@@ -53,11 +53,11 @@ public class Dictionary extends StructElement {
     public StructElement getElement(String name) {
         return mappings.get(name);
     }
-    
+
     /**
      * Returns the associated description with variable <code>name</code> if there exists any, and
      * <code>null</code> otherwise.
-     * 
+     *
      * @param name the variable name, which must be equal to one of the elements in the array
      * returned by <code>getKeys()</code>.
      * @return the associated description, if any, or null if no description exists.

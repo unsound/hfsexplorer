@@ -199,7 +199,7 @@ public class HFSPlusVolume extends HFSVolume {
 
         public CommonBTHeaderNode createCommonBTHeaderNode(
                 byte[] currentNodeData, int offset, int nodeSize) {
-            
+
             return CommonBTHeaderNode.createHFSPlus(currentNodeData, offset,
                     nodeSize);
         }
@@ -236,7 +236,7 @@ public class HFSPlusVolume extends HFSVolume {
 
         public CommonHFSCatalogIndexNode newCatalogIndexNode(byte[] data,
                 int offset, int nodeSize, CommonBTHeaderRecord bthr) {
-            
+
             return CommonHFSCatalogIndexNode.createHFSPlus(data, offset,
                     nodeSize);
         }
@@ -286,7 +286,7 @@ public class HFSPlusVolume extends HFSVolume {
         public CommonHFSExtentKey createCommonHFSExtentKey(
                 CommonHFSForkType forkType, CommonHFSCatalogNodeID fileID,
                 int startBlock) {
-            
+
             final byte forkTypeByte;
             switch(forkType) {
                 case DATA_FORK:
@@ -298,7 +298,7 @@ public class HFSPlusVolume extends HFSVolume {
                 default:
                     throw new RuntimeException("Invalid fork type");
             }
-            
+
             HFSPlusExtentKey key = new HFSPlusExtentKey(forkTypeByte,
                     new HFSCatalogNodeID((int) fileID.toLong()), startBlock);
             return CommonHFSExtentKey.create(key);

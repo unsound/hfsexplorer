@@ -64,7 +64,7 @@ public class HFSOriginalVolume extends HFSVolume {
 
     public HFSOriginalVolume(ReadableRandomAccessStream hfsFile,
             boolean cachingEnabled, String encodingName) {
-        
+
         super(hfsFile, cachingEnabled, new HFSBTreeOperations(),
                 new HFSCatalogOperations(), new HFSExtentsOverflowOperations());
 
@@ -73,7 +73,7 @@ public class HFSOriginalVolume extends HFSVolume {
 
         this.allocationFile = createAllocationFile();
     }
-    
+
     public MasterDirectoryBlock getHFSMasterDirectoryBlock() {
         byte[] currentBlock = new byte[512];
         hfsFile.readFrom(1024, currentBlock);
@@ -211,7 +211,7 @@ public class HFSOriginalVolume extends HFSVolume {
 
         public CommonBTNodeDescriptor createCommonBTNodeDescriptor(
                 byte[] currentNodeData, int i) {
-            
+
             final NodeDescriptor nd = new NodeDescriptor(currentNodeData, i);
             return CommonBTNodeDescriptor.create(nd);
         }
@@ -271,7 +271,7 @@ public class HFSOriginalVolume extends HFSVolume {
         public CommonHFSExtentKey createCommonHFSExtentKey(
                 CommonHFSForkType forkType, CommonHFSCatalogNodeID fileID,
                 int startBlock) {
-            
+
             if(startBlock < Short.MIN_VALUE || startBlock > Short.MAX_VALUE)
                 throw new IllegalArgumentException("start block out of range " +
                         "for short (signed 16-bit integer)");

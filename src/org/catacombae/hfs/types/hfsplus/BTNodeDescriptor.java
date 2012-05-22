@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -34,21 +34,21 @@ public class BTNodeDescriptor {
      * 10   2     UInt16            numRecords
      * 12   2     UInt16            reserved
      */
-    
+
     public static final int BT_LEAF_NODE = -1;
     public static final int BT_INDEX_NODE = 0;
     public static final int BT_HEADER_NODE = 1;
     public static final int BT_MAP_NODE = 2;
 
     private static final int STRUCTSIZE = 14;
-    
+
     private final byte[] fLink = new byte[4];
     private final byte[] bLink = new byte[4];
     private final byte[] kind = new byte[1];
     private final byte[] height = new byte[1];
     private final byte[] numRecords = new byte[2];
     private final byte[] reserved = new byte[2];
-    
+
     public BTNodeDescriptor(byte[] data, int offset) {
 	System.arraycopy(data, offset+0, fLink, 0, 4);
 	System.arraycopy(data, offset+4, bLink, 0, 4);
@@ -91,7 +91,7 @@ public class BTNodeDescriptor {
 	    result = "UNKNOWN!";
 	return result;
     }
-    
+
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " fLink: " + getFLink() + "");
 	ps.println(prefix + " bLink: " + getBLink() + "");

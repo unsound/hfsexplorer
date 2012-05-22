@@ -49,7 +49,7 @@ public class ResourceViewer extends javax.swing.JFrame {
     /** Creates new form ResourceViewer */
     public ResourceViewer() {
         super("Resource Viewer");
-        
+
         this.resourceForkViewPanel = new ResourceForkViewPanel(null);
 
         initComponents();
@@ -189,7 +189,7 @@ public class ResourceViewer extends javax.swing.JFrame {
         } catch(Exception e) {
             //It's ok. Non-critical.
         }
-        
+
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 ResourceViewer rv = new ResourceViewer();

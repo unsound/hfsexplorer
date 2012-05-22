@@ -33,7 +33,7 @@ public class MainPanel extends javax.swing.JPanel {
         public String name;
         public String start;
         public String end;
-        
+
         public PartitionTableRow(String number, String type,
                 String name, String start, String end) {
             this.number = number;
@@ -49,17 +49,17 @@ public class MainPanel extends javax.swing.JPanel {
             return false;
         }
     }
-    
+
     private final PartitionTableModel partitionTableModel;
-    
+
     /** Creates new form MainPanel */
     public MainPanel() {
         initComponents();
-        
+
         partitionTableModel = new PartitionTableModel();
         partitionTableModel.setColumnIdentifiers(new String[] {"Number", "Type", "Name", "Start", "End"});
         partitionTable.setModel(partitionTableModel);
-        
+
     }
 
     /** This method is called from within the constructor to
@@ -130,44 +130,44 @@ public class MainPanel extends javax.swing.JPanel {
                     .addContainerGap()))
         );
     }// </editor-fold>//GEN-END:initComponents
-    
+
     public void setPartitionSystemsBoxContents(Vector<String> contents) {
         partitionSystemsBox.removeAllItems();
         for(String currentItem : contents)
             partitionSystemsBox.addItem(currentItem);
     }
-    
+
     public void setPartitionSystemsBoxEnabled(boolean enabled) {
         partitionSystemsBox.setEnabled(enabled);
     }
-    
+
     public void setSynchronizeButtonEnabled(boolean enabled) {
         synchronizeButton.setEnabled(enabled);
     }
-    
+
     public void setPartitionSystemsBoxListener(ActionListener listener) {
         for(ActionListener al : partitionSystemsBox.getActionListeners())
             partitionSystemsBox.removeActionListener(al);
         partitionSystemsBox.addActionListener(listener);
     }
-    
+
     public void setSynchronizeButtonListener(ActionListener listener) {
         for(ActionListener al : synchronizeButton.getActionListeners())
             synchronizeButton.removeActionListener(al);
         synchronizeButton.addActionListener(listener);
     }
-    
+
     public void clearPartitionList() {
         int rowCount = partitionTableModel.getRowCount();
         for(int i = rowCount-1; i >= 0; --i)
             partitionTableModel.removeRow(i);
     }
-    
+
     public void addPartition(String number, String type, String name,
             String start, String end) {
         partitionTableModel.addRow(new String[] { number, type, name, start, end });
     }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JComboBox partitionSystemsBox;

@@ -27,7 +27,7 @@ package org.catacombae.storage.fs;
  * @author Erik Larsson
  */
 public interface FSLink extends FSEntry {
-    
+
     /**
      * Tries to resolve the target of the link in the context of its file system. If the link is
      * invalid, this method will return null.
@@ -37,7 +37,7 @@ public interface FSLink extends FSEntry {
      * @return the target of this link, if possible, or <code>null</code> if the link was invalid.
      */
     public FSEntry getLinkTarget(String[] parentDir);
-    
+
     /**
      * Returns a context specific string which shows the intended target for this link in the syntax
      * of its file system. This string is only for display purposes in info boxes or debug messages.

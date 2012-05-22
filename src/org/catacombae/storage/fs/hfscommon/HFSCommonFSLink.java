@@ -31,13 +31,13 @@ import org.catacombae.storage.fs.FSLink;
  */
 public class HFSCommonFSLink extends HFSCommonFSEntry implements FSLink {
     private final CommonHFSCatalogFileRecord linkRecord;
-    
+
     public HFSCommonFSLink(HFSCommonFileSystemHandler fsHandler,
             CommonHFSCatalogFileRecord linkRecord) {
         super(fsHandler, linkRecord.getData());
 
         this.linkRecord = linkRecord;
-        
+
         if(!linkRecord.getData().isSymbolicLink())
             throw new IllegalArgumentException("linkRecord is no symbolic link!");
     }
@@ -96,7 +96,7 @@ public class HFSCommonFSLink extends HFSCommonFSEntry implements FSLink {
             else if(res == null)
                 System.err.println("\ngetLinkTarget(): Could not get entry for true path \"" +
                         Util.concatenateStrings(targetPath, "/") + "\"");
-            
+
             if(res != null && res instanceof FSLink)
                 throw new RuntimeException("res still instanceof FSLink!");
         }
@@ -104,7 +104,7 @@ public class HFSCommonFSLink extends HFSCommonFSEntry implements FSLink {
             System.err.println("\ngetLinkTarget(): Could not get true path!");
             res = null;
         }
-        
+
         if(res == null) {
             System.err.println("getLinkTarget(): FAILED to get entry by posix path for link " +
                     linkRecord.getKey().getParentID().toLong() + ":\"" +
@@ -113,7 +113,7 @@ public class HFSCommonFSLink extends HFSCommonFSEntry implements FSLink {
             System.err.println("getLinkTarget():   parentDir=\"" + Util.concatenateStrings(parentDir, "/") + "\"");
             System.err.println();
         }
-        
+
         return res;
         //} finally { parentFileSystem.log(prefix + "Returning from getLinkTarget."); parentFileSystem.globalPrefix = prefix; }
     }

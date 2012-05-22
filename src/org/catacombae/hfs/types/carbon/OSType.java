@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -26,18 +26,18 @@ public class OSType implements StructElements {
      * struct OSType
      * size: 4 bytes
      * description: a typedef originally
-     * 
+     *
      * BP  Size  Type          Identifier  Description
      * -----------------------------------------------
-     * 0   4     FourCharCode  osType                 
+     * 0   4     FourCharCode  osType
      */
-    
+
     private FourCharCode osType;
-    
+
     public OSType(byte[] data, int offset) {
         osType = new FourCharCode(data, offset);
     }
-    
+
     public FourCharCode getOSType() {
         return osType;
     }
@@ -56,7 +56,7 @@ public class OSType implements StructElements {
         ps.println(prefix + "OSType:");
         printFields(ps, prefix);
     }
-    
+
     public byte[] getBytes() {
         return osType.getBytes();
     }
@@ -64,9 +64,9 @@ public class OSType implements StructElements {
     /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(OSType.class.getSimpleName());
-        
+
         db.add("osType", osType.getStructElements());
-        
+
         return db.getResult();
     }
 }

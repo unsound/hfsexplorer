@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -39,19 +39,19 @@ public class FileInfoPanel extends javax.swing.JPanel {
     private final DateFormat dti = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
     private Boolean originalOpaqueness = null;
     private Color originalColor = null;
-    
+
     /** Creates new form FileInfoPanel */
     public FileInfoPanel() {
         initComponents();
     }
-    
+
     public void setFields(HFSPlusCatalogFile cf) {
 	recordTypeField.setText("0x" + Util.toHexStringBE(cf.getRecordType()));
-	
+
         //flagsDebugField.setText("0x" + Util.toHexStringBE(cf.getFlags()));
 	fileLockedBox.setSelected(cf.getFileLockedFlag());
 	threadExistsBox.setSelected(cf.getThreadExistsFlag());
-	
+
 	reserved1Field.setText("0x" + Util.toHexStringBE(cf.getReserved1()));
 	fileIDField.setText(cf.getFileID().toString());
 	createDateField.setText(dti.format(cf.getCreateDateAsDate()));
@@ -59,7 +59,7 @@ public class FileInfoPanel extends javax.swing.JPanel {
 	attributesModifyDateField.setText(dti.format(cf.getAttributeModDateAsDate()));
         accessDateField.setText(dti.format(cf.getAccessDateAsDate()));
 	backupDateField.setText(dti.format(cf.getBackupDateAsDate()));
-	
+
 	HFSPlusBSDInfo bi = cf.getPermissions();
 	permissionsOwnerIDField.setText("" + bi.getOwnerID());
 	permissionsGroupIDField.setText("" + bi.getGroupID());
@@ -75,7 +75,7 @@ public class FileInfoPanel extends javax.swing.JPanel {
  	permissionsFileModeSGIDBox.setSelected(bi.getFileModeSetGroupID());
  	permissionsFileModeSTXTBox.setSelected(bi.getFileModeSticky());
 	permissionsSpecialField.setText("0x" + Util.toHexStringBE(bi.getSpecial()));
-	
+
 	FileInfo ui = cf.getUserInfo();
 	userInfoFileTypeField.setText("\"" + ui.getFileType().toString() + "\" (0x" + Util.toHexStringBE(ui.getFileType().getOSType().getFourCharCode()) + ")");
 	userInfoFileCreatorField.setText("\"" + ui.getFileCreator().toString() + "\" (0x" + Util.toHexStringBE(ui.getFileCreator().getOSType().getFourCharCode()) + ")");
@@ -105,7 +105,7 @@ public class FileInfoPanel extends javax.swing.JPanel {
 	userInfoFinderFlagsIsAliasBox.setSelected(ui.getFinderFlagIsAlias());
 	userInfoLocationField.setText(ui.getLocation().toString());
 	userInfoReservedField.setText("0x" + Util.toHexStringBE(ui.getReservedField()));
-	
+
 	ExtendedFileInfo ei = cf.getFinderInfo();
 	finderInfoReserved1Field.setText("0x" + Util.toHexStringBE(ei.getReserved1()));
  	finderInfoExtendedFinderFlagsExtendedFlagsAreInvalidBox.setSelected(ei.getExtendedFinderFlagExtendedFlagsAreInvalid());
@@ -116,7 +116,7 @@ public class FileInfoPanel extends javax.swing.JPanel {
 
 	textEncodingField.setText("" + cf.getTextEncoding());
 	reserved2Field.setText("0x" + Util.toHexStringBE(cf.getReserved2()));
-	
+
 	HFSPlusForkData df = cf.getDataFork();
 	dataForkLogicalSizeField.setText("" + df.getLogicalSize() + " bytes");
 	dataForkClumpSizeField.setText("" + df.getClumpSize() + " bytes");
@@ -127,7 +127,7 @@ public class FileInfoPanel extends javax.swing.JPanel {
 	resForkClumpSizeField.setText("" + rf.getClumpSize() + " bytes");
 	resForkTotalBlocksField.setText("" + rf.getTotalBlocks());
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -1124,8 +1124,8 @@ public class FileInfoPanel extends javax.swing.JPanel {
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-    
-    
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField accessDateField;
     private javax.swing.JTextField attributesModifyDateField;
@@ -1244,5 +1244,5 @@ public class FileInfoPanel extends javax.swing.JPanel {
     private javax.swing.JTextField userInfoLocationField;
     private javax.swing.JTextField userInfoReservedField;
     // End of variables declaration//GEN-END:variables
-    
+
 }
