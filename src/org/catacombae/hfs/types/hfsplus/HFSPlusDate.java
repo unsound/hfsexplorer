@@ -23,6 +23,9 @@ import java.util.TimeZone;
 
 /** In the future, this could wrap a 32 bit HFS+ date. */
 public class HFSPlusDate extends HFSDate {
+
+    protected HFSPlusDate() {}
+
     /** 
      * Pre-calculated. This is the amount of milliseconds between 01-01-1904 00:00:00.0000
      * (HFS+ starting date) and 01-01-1970 00:00:00.0000 (the start of the java "epoch").

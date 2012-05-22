@@ -26,6 +26,9 @@ import java.util.TimeZone;
  * @author <a href="mailto:catacombae@gmail.com">Erik Larsson</a>
  */
 public class HFSDate {
+
+    protected HFSDate() {}
+
     /**
      * Converts a HFS local date to a Java date, treated as if it had been
      * stored in the current locale/time zone. (I.e. if the date had been stored
