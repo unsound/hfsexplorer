@@ -22,7 +22,7 @@ package org.catacombae.storage.fs;
  * to one of the nodes in a file system that denote a file, folder, device,
  * socket, etc.
  * 
- * @author <a href="mailto:erik82@kth.se">Erik Larsson</a>
+ * @author <a href="mailto:catacombae@gmail.com">Erik Larsson</a>
  */
 public interface FSEntry {
     public static enum Type {

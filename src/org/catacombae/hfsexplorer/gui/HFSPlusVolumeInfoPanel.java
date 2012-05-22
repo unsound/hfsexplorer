@@ -31,7 +31,7 @@ import java.text.DateFormat;
 /**
  * A panel for displaying the values in a HFSPlusVolumeHeader in a good looking
  * way.
- * @author  Erik Larsson, erik82@kth.se
+ * @author <a href="mailto:catacombae@gmail.com">Erik Larsson</a>
  */
 public class HFSPlusVolumeInfoPanel extends javax.swing.JPanel {
     private final DateFormat dti =
