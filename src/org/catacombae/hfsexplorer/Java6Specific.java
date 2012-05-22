@@ -29,6 +29,7 @@ import java.util.Comparator;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JTable;
+import javax.swing.RowSorter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -83,7 +84,7 @@ public class Java6Specific {
 
         try {
             Class c = window.getClass();
-            Method m = c.getMethod("setIconImages", LinkedList.class);
+            Method m = c.getMethod("setIconImages", List.class);
             m.invoke(window, iconImages);
         } catch(NoSuchMethodException ex) {
             throw new RuntimeException(ex);
@@ -121,7 +122,7 @@ public class Java6Specific {
 
         try {
             Class c = table.getClass();
-            Method m = c.getMethod("setIconImages", TableRowSorter.class);
+            Method m = c.getMethod("setRowSorter", RowSorter.class);
             m.invoke(table, sorter);
         } catch(NoSuchMethodException ex) {
             throw new RuntimeException(ex);
