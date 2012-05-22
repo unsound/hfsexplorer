@@ -10,16 +10,16 @@ public class BlockListHeader implements StaticStruct, PrintableStruct {
     /*
      * struct BlockListHeader
      * size: 32 bytes
-     * description: 
-     * 
+     * description:
+     *
      * BP  Size  Type          Identifier  Description
      * -----------------------------------------------
-     * 0   2     UInt16        maxBlocks   
-     * 2   2     UInt16        numBlocks   
-     * 4   4     UInt32        bytesUsed   
-     * 8   4     UInt32        checksum    
-     * 12  4     UInt32        pad         
-     * 16  16*1  BlockInfo[1]  binfo       
+     * 0   2     UInt16        maxBlocks
+     * 2   2     UInt16        numBlocks
+     * 4   4     UInt32        bytesUsed
+     * 8   4     UInt32        checksum
+     * 12  4     UInt32        pad
+     * 16  16*1  BlockInfo[1]  binfo
      */
 
     public static final int STRUCTSIZE = 32;

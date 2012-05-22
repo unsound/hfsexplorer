@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -47,7 +47,7 @@ public class TestFileSystemView extends javax.swing.JFrame {
         fileIconLabel.setIcon(fsv.getSystemIcon(new File("file.withcompletelyunknownextension")));
         folderIconLabel.setIcon(fsv.getSystemIcon(new File("lib/")));
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -99,7 +99,7 @@ public class TestFileSystemView extends javax.swing.JFrame {
         );
         pack();
     }// </editor-fold>//GEN-END:initComponents
-    
+
     /**
      * @param args the command line arguments
      */
@@ -110,12 +110,12 @@ public class TestFileSystemView extends javax.swing.JFrame {
             }
         });
     }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel fileIconLabel;
     private javax.swing.JLabel folderIconLabel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     // End of variables declaration//GEN-END:variables
-    
+
 }

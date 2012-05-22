@@ -47,10 +47,10 @@ public abstract class CommonHFSCatalogFileThread implements PrintableStruct, Str
     public static CommonHFSCatalogFileThread create(CdrFThdRec data) {
         return new HFSImplementation(data);
     }
-    
+
     private static class HFSPlusImplementation extends CommonHFSCatalogFileThread {
         private final HFSPlusCatalogThread data;
-        
+
         public HFSPlusImplementation(HFSPlusCatalogThread data) {
             this.data = data;
         }
@@ -84,14 +84,14 @@ public abstract class CommonHFSCatalogFileThread implements PrintableStruct, Str
             return data.getStructElements();
         }
     }
-    
+
     private static class HFSImplementation extends CommonHFSCatalogFileThread {
         private final CdrFThdRec data;
-        
+
         public HFSImplementation(CdrFThdRec data) {
             this.data = data;
         }
-        
+
         public int length() {
             return data.length();
         }

@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -40,7 +40,7 @@ import org.catacombae.util.Util;
 
 public class RepairMyBackupGPT {
     private static BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-    
+
     public static void main(String[] args) throws Exception {
 	long runTimeStamp = System.currentTimeMillis();
 	RandomAccessStream llf;
@@ -51,7 +51,7 @@ public class RepairMyBackupGPT {
 	}
 	else
 	    llf = new FileStream(args[0]);
-	
+
 	final GUIDPartitionTable originalGpt = new GUIDPartitionTable(llf, 0);
 	MutableGUIDPartitionTable gpt = new MutableGUIDPartitionTable(originalGpt);
 
@@ -69,13 +69,13 @@ public class RepairMyBackupGPT {
 		System.exit(-1);
 		return;
 	    }
-	    
+
 	    // Backup the GPT backup table at the end of the disk.
 	    String backupFilename2 = null;
 	    {
 		long backupGPTPos = hdr.getBackupLBA()*blockSize - hdr.getNumberOfPartitionEntries()*hdr.getSizeOfPartitionEntry();
 		int backupGPTLen = hdr.getNumberOfPartitionEntries()*hdr.getSizeOfPartitionEntry() + blockSize;
-		
+
 		byte[] backup2 = new byte[backupGPTLen];
 		llf.seek(backupGPTPos);
 		int bytesRead = llf.read(backup2);
@@ -100,54 +100,54 @@ public class RepairMyBackupGPT {
 		    }
 		}
 	    }
-	    	
+
 	    // Now let's modify the table in memory
-	    
+
 	    System.out.println("Modifying GPT data in memory:");
-	    
+
 	    System.out.print("  - Creating a GPT backup header from the primary header...");
 	    GPTHeader newBackupHeader = hdr.createValidBackupHeader();
 	    System.out.println("done.");
-	    
+
 	    System.out.print("  - Setting contents of mutable backup header to newly created backup header...");
 	    MutableGPTHeader backupHeader = gpt.getMutableBackupHeader();
 	    backupHeader.setFields(newBackupHeader);
 	    System.out.println("done.");
-	    
+
 	    System.out.print("  - Setting contents of all backup table entries to match primary entries...");
 	    MutableGPTEntry[] primaryEntries = gpt.getMutablePrimaryEntries();
 	    MutableGPTEntry[] backupEntries = Util.arrayCopy(primaryEntries, new MutableGPTEntry[primaryEntries.length]);
 	    gpt.setMutableBackupEntries(backupEntries);
 	    System.out.println("done.");
-	    
+
 	    // At this point, all data in gpt should have been set to intended values.
 	    // Finalizing and checking the resulting table...
-	    
+
 	    System.out.print("  - Checking if gpt.isValid() == true as it now should be...");
 	    if(!gpt.isValid()) {
 		System.out.println("failed! Halting program.");
 		System.exit(0);
 	    }
 	    System.out.println("yes.");
-	    
+
 	    // If we have got to this point, the table should be valid and ready to be written to disk!
 	    System.out.println("The backup table is now ready to be written down to disk.");
-	    
+
 	    System.out.print("Press enter to view the original table:");
 	    stdin.readLine();
 	    originalGpt.printBackupFields(System.out, "");
-	    
+
 	    System.out.print("Press enter to view the modified table:");
 	    stdin.readLine();
 	    gpt.printBackupFields(System.out, "");
-	    
+
 	    System.out.print("If you want to write this table to disk, type \"yes\" here: ");
 	    String answer = stdin.readLine();
 	    if(answer.equals("yes")) {
 		System.out.print("Getting binary data for backup table...");
 		byte[] newBackupGPT = gpt.getBackupTableBytes();
 		System.out.println("done.");
-		
+
 		// Write the new backup GPT data to a file.
 		String newdataFilename2 = "gpt_backup_table-" + runTimeStamp + ".new";
 		System.out.print("Writing new GPT backup header and table to \"" + newdataFilename2 + "\"...");
@@ -155,9 +155,9 @@ public class RepairMyBackupGPT {
 		newdataFile2.write(newBackupGPT);
 		newdataFile2.close();
 		System.out.println("done!");
-		
+
 		// Write to disk! Dangerous stuff...
-		
+
 		System.out.print("Writing backup table...");
 		long backupTableLocation = gpt.getBackupTableBytesOffset();
 		int backupTableSize = newBackupGPT.length;
@@ -195,14 +195,14 @@ public class RepairMyBackupGPT {
 			return;
 		    }
 		}
-		
+
 		System.out.print("Seeking to " + backupTableLocation + "...");
 		llf.seek(backupTableLocation);
 		System.out.println("done!");
 		System.out.print("Writing backup GPT data...");
 		llf.write(newBackupGPT);
 		System.out.println("done!");
-		
+
 		// Check to see if we have succeeded.
 		System.out.println();
 		System.out.println("Checking the newly written GPT...");
@@ -220,11 +220,11 @@ public class RepairMyBackupGPT {
 	    }
 	    else
 		System.out.println("Exiting program without modifying anything.");
-	    
+
 	}
 	else
 	    System.out.println("The GUID Partition Table on disk seems to be valid. No changes will be made.");
 	llf.close();
     }
-    
+
 }

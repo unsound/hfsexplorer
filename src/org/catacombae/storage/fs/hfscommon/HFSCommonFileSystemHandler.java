@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008-2009 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -41,7 +41,7 @@ import org.catacombae.hfs.HFSVolume;
 /**
  * HFS+ implementation of a FileSystemHandler. This implementation can be used
  * to access HFS+ file systems.
- * 
+ *
  * @author Erik Larsson
  */
 public class HFSCommonFileSystemHandler extends FileSystemHandler {
@@ -51,11 +51,11 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
     private static final String DIRECTORY_HARD_LINK_PREFIX = "dir_";
     private static final String JOURNAL_INFO_BLOCK_FILE = ".journal_info_block";
     private static final String JOURNAL_FILE = ".journal";
-    
+
     private HFSVolume view;
     private boolean doUnicodeFileNameComposition;
     private boolean hideProtected;
-    
+
     protected HFSCommonFileSystemHandler(HFSVolume iView,
                     boolean iDoUnicodeFileNameComposition,
                     boolean hideProtected) {
@@ -63,13 +63,13 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
         this.doUnicodeFileNameComposition = iDoUnicodeFileNameComposition;
         this.hideProtected = hideProtected;
     }
-    
+
     @Override
     public FSEntry[] list(String... path) {
         CommonHFSCatalogFolderRecord curFolder = view.getCatalogFile().getRootFolder();
         for(String nextFolderName : path) {
             CommonHFSCatalogLeafRecord subRecord = getRecord(curFolder, nextFolderName);
-            
+
             if(subRecord != null && subRecord instanceof CommonHFSCatalogFolderRecord)
                 curFolder = (CommonHFSCatalogFolderRecord) subRecord;
             else
@@ -83,10 +83,10 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
     public FSEntry getEntry(String... path) {
         return getEntry(view.getCatalogFile().getRootFolder(), path);
     }
-    
+
     FSEntry getEntry(CommonHFSCatalogFolderRecord rootRecord, String... path) {
         CommonHFSCatalogLeafRecord rec = getRecord(rootRecord, path);
-        
+
         if(rec == null)
             return null;
         else if(rec instanceof CommonHFSCatalogFileRecord)
@@ -96,12 +96,12 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
         else
             throw new RuntimeException("Did not excpect a " + rec.getClass() + " here!");
     }
-    
+
     /**
      * Searches the hierarchy rooted in <code>rootRecord</code> for the record addressed by
      * <code>path</code>. If any symbolic or hard links exist in the path to the requested entry,
      * they will be resolved, but the requested destination will be returned as it is.
-     * 
+     *
      * @param rootRecord (non-null) the root record from which we will begin searching.
      * @param path the path to our requested entry. May be empty, in which case
      * <code>rootRecord</code> is returned.
@@ -110,7 +110,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
     CommonHFSCatalogLeafRecord getRecord(final CommonHFSCatalogFolderRecord rootRecord, final String... path) {
         /*
          * Algorithm (variables are prefixed with $):
-         * 
+         *
          * $currentRoot = $root
          * for each path component $pc except the last one:
          *   while currentRoot is a link:
@@ -147,7 +147,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
             //        path.length + ": \"" + curPathComponent + "\"");
 
             LinkedList<String[]> curVisitedList = null;
-            
+
             // Iterate through all links.
             while(currentRoot instanceof CommonHFSCatalogFileRecord) {
                 CommonHFSCatalogFileRecord fr =
@@ -244,7 +244,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
         }
         */
     }
-    
+
     private FSEntry entryFromRecord(CommonHFSCatalogFileRecord fileRecord) {
 
             if(fileRecord.getData().isSymbolicLink())
@@ -275,12 +275,12 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
             }
             else
                 return new HFSCommonFSFile(this, fileRecord);
-        
+
     }
     private FSEntry entryFromRecord(CommonHFSCatalogFolderRecord folderRecord) {
         return new HFSCommonFSFolder(this, folderRecord);
     }
-    
+
     /*
     private FSEntry entriFromRecord(CommonHFSCatalogLeafRecord rec) {
         if(rec instanceof CommonHFSCatalogFileRecord) {
@@ -295,7 +295,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
             return null;
     }
     */
-    
+
     CommonHFSCatalogFileRecord lookupFileInode(int inodeNumber) {
         long trueInodeNumber = Util.unsign(inodeNumber);
         CommonHFSCatalogLeafRecord res = getRecord(view.getCatalogFile().getRootFolder(), FILE_HARD_LINK_DIR,
@@ -328,7 +328,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
     }
 
     String getProperNodeName(CommonHFSCatalogLeafRecord record) {
-        
+
         //if(doUnicodeFileNameComposition)
         //    return record.getKey().getNodeName().decode(COMPOSED_UTF16_DECODER);
         //else
@@ -352,7 +352,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
 
     /**
      * Converts a HFS+ POSIX UTF-8 pathname into pathname component strings.
-     * 
+     *
      * @param path the bytes that make up the HFS+ POSIX UTF-8 pathname string.
      * @param offset offset to the beginning of string data in <code>path</code>.
      * @param length length of string data in <code>path</code>.
@@ -377,11 +377,11 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
     ReadableRandomAccessStream getReadableDataForkStream(CommonHFSCatalogFileRecord fileRecord) {
         return view.getReadableDataForkStream(fileRecord);
     }
-    
+
     ReadableRandomAccessStream getReadableResourceForkStream(CommonHFSCatalogFileRecord fileRecord) {
         return view.getReadableResourceForkStream(fileRecord);
     }
-    
+
     /*
     boolean isUnicodeCompositionEnabled() {
         return doUnicodeFileNameComposition;
@@ -414,7 +414,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
 
         return false;
     }
-    
+
     String[] listNames(CommonHFSCatalogFolderRecord folderRecord) {
         CommonHFSCatalogLeafRecord[] subRecords = view.getCatalogFile().listRecords(folderRecord);
         LinkedList<String> result = new LinkedList<String>();
@@ -440,13 +440,13 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
                 curEntry = entryFromRecord((CommonHFSCatalogFileRecord)curRecord);
             else if(curRecord instanceof CommonHFSCatalogFolderRecord)
                 curEntry = entryFromRecord((CommonHFSCatalogFolderRecord)curRecord);
-                
+
             if(curEntry != null)
                 result.addLast(curEntry);
         }
         return result.toArray(new FSEntry[result.size()]);
     }
-    
+
     HFSCommonFSFolder lookupParentFolder(CommonHFSCatalogLeafRecord childRecord) {
         CommonHFSCatalogFolderRecord folderRec = lookupParentFolderRecord(childRecord);
         if(folderRec != null)
@@ -494,13 +494,13 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
         }
     }
 
-    
+
     /**
      * Returns the underlying BaseHFSFileSystemView that serves the file system
      * handler with data.<br>
      * <b>Don't use this method if you want your code to be file system
      * independent!</b>
-     * 
+     *
      * @return the underlying BaseHFSFileSystemView.
      */
     public HFSVolume getFSView() {

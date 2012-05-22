@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -28,12 +28,12 @@ package org.catacombae.hfsexplorer.gui;
  * @author  Erik
  */
 public class PartitionSystemInfoPanel extends javax.swing.JPanel {
-    
+
     /** Creates new form PartitionSystemInfoPanel */
     public PartitionSystemInfoPanel() {
         initComponents();
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -143,8 +143,8 @@ public class PartitionSystemInfoPanel extends javax.swing.JPanel {
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
-    
-    
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
@@ -156,5 +156,5 @@ public class PartitionSystemInfoPanel extends javax.swing.JPanel {
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
-    
+
 }

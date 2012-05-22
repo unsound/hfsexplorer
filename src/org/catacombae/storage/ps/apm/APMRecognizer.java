@@ -28,7 +28,7 @@ import org.catacombae.storage.ps.PartitionSystemRecognizer;
  * @author erik
  */
 public class APMRecognizer implements PartitionSystemRecognizer {
-    
+
     public boolean detect(ReadableRandomAccessStream fsStream, long offset, long length) {
         try {
             //ReadableRandomAccessStream llf = data.createReadOnlyFile();

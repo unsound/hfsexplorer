@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -90,7 +90,7 @@ public class PartitionSystemDetector {
 
         LinkedList<PartitionSystemType> result =
                 new LinkedList<PartitionSystemType>();
-        
+
         for(PartitionSystemType type : PartitionSystemType.values()) {
             PartitionSystemHandlerFactory fact =
                     type.createDefaultHandlerFactory();

@@ -33,12 +33,12 @@ public enum ContainerType {
     APPLE_HFS(HFSContainerHandlerFactory.class),
     APPLE_UNIX_SVR2,
     LINUX_NATIVE;
-    
+
     private LinkedList<Class<? extends ContainerHandlerFactory>> factoryClasses =
             new LinkedList<Class<? extends ContainerHandlerFactory>>();
 
     private ContainerType() {}
-    
+
     private ContainerType(Class<? extends ContainerHandlerFactory> defaultFactoryClass) {
         this.factoryClasses.addLast(defaultFactoryClass);
     }
@@ -53,7 +53,7 @@ public enum ContainerType {
     public void addFactoryClass(Class<? extends ContainerHandlerFactory> factoryClass) {
         this.factoryClasses.addLast(factoryClass);
     }
-    
+
     /**
      * Returns all registered factory classes for this type. The first entry in
      * the list will be the default factory class.
@@ -62,7 +62,7 @@ public enum ContainerType {
     public List<Class<? extends ContainerHandlerFactory>> getFactoryClasses() {
         return new ArrayList<Class<? extends ContainerHandlerFactory>>(factoryClasses);
     }
-    
+
     /**
      * Returns a newly created factory from the type's default factory class.
      * If there is no factory classes defined for the type, <code>null</code> is
@@ -79,7 +79,7 @@ public enum ContainerType {
             return createHandlerFactory(factoryClass);
         }
     }
-    
+
     /**
      * Returns a newly created factory from a specified factory class.
      *

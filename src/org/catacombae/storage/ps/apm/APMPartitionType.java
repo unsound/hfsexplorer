@@ -39,7 +39,7 @@ public enum APMPartitionType {
 
     private final String apmName;
     private final PartitionType generalType;
-    
+
     private APMPartitionType(String apmName) {
         this(apmName, null);
     }

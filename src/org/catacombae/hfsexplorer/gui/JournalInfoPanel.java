@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -34,22 +34,22 @@ public class JournalInfoPanel extends JPanel {
 	noJournalPanel = new JPanel();
 	noJournalLabel = new JLabel("No journal present", SwingConstants.CENTER);
 	layout = new CardLayout();
-	
+
 	contentsPanel.setLayout(new BorderLayout());
 	contentsPanel.add(infoBlockPanel, BorderLayout.CENTER);
-	
+
 	noJournalPanel.setLayout(new BorderLayout());
 	noJournalPanel.add(noJournalLabel, BorderLayout.CENTER);
-	
+
 	setLayout(layout);
 	add(noJournalPanel, "A");
 	add(contentsPanel, "B");
 	layout.show(this, "A");
-	
+
 	//pack();
         setFields(jib);
     }
-    
+
     public void setFields(JournalInfoBlock jib) {
 	infoBlockPanel.setFields(jib);
 	layout.show(this, "B");

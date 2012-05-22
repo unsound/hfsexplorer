@@ -33,13 +33,13 @@ public class CommonHFSCatalogFolderThreadRecord extends CommonHFSCatalogLeafReco
 
     private CommonHFSCatalogKey key;
     private CommonHFSCatalogFolderThread data;
-    
+
     private CommonHFSCatalogFolderThreadRecord(CommonHFSCatalogKey key,
             CommonHFSCatalogFolderThread data) {
         this.key = key;
         this.data = data;
     }
-    
+
     @Override
     public CommonHFSCatalogKey getKey() {
         return key;
@@ -48,13 +48,13 @@ public class CommonHFSCatalogFolderThreadRecord extends CommonHFSCatalogLeafReco
     public CommonHFSCatalogFolderThread getData() {
         return data;
     }
-    
+
     /* @Override */
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + CommonHFSCatalogFolderThreadRecord.class.getSimpleName() + ":");
         printFields(ps, prefix + " ");
     }
-    
+
     /* @Override */
     public void printFields(PrintStream ps, String prefix) {
         ps.println(prefix + "key:");
@@ -71,7 +71,7 @@ public class CommonHFSCatalogFolderThreadRecord extends CommonHFSCatalogLeafReco
 
         db.add("key", key.getStructElements(), "Catalog key");
         db.add("data", data.getStructElements(), "Folder thread data");
-            
+
         return db.getResult();
     }
 
@@ -80,13 +80,13 @@ public class CommonHFSCatalogFolderThreadRecord extends CommonHFSCatalogLeafReco
         return new CommonHFSCatalogFolderThreadRecord(CommonHFSCatalogKey.create(key),
                 CommonHFSCatalogFolderThread.create(data));
     }
-    
+
     public static CommonHFSCatalogFolderThreadRecord create(CatKeyRec key, CdrThdRec data) {
         return new CommonHFSCatalogFolderThreadRecord(CommonHFSCatalogKey.create(key),
-                CommonHFSCatalogFolderThread.create(data));        
+                CommonHFSCatalogFolderThread.create(data));
     }
 
-    
+
     @Override
     public int getSize() {
         return key.occupiedSize() + data.length();

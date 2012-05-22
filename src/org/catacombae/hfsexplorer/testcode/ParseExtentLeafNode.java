@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,7 +20,7 @@ import java.io.RandomAccessFile;
 import org.catacombae.hfs.types.hfsplus.HFSPlusExtentLeafNode;
 
 public class ParseExtentLeafNode {
-    
+
     public static void main(String[] args) throws Exception {
         RandomAccessFile raf = new RandomAccessFile(args[0], "r");
         byte[] data = new byte[(int) raf.length()];

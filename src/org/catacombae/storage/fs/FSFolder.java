@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,22 +22,22 @@ package org.catacombae.storage.fs;
  * file system presented by a FileSystemHandler. A folder is an entry which
  * holds subentries, like other files, folders or special files. A folder has no
  * associated data, other than the file system metadata such as attributes.
- * 
+ *
  * @author <a href="mailto:catacombae@gmail.com">Erik Larsson</a>
  */
 public interface FSFolder extends FSEntry {
     /**
      * Lists the contents of this folder as an array of the names of its subentries.
-     * 
+     *
      * @return the contents of this folder as an array of the names of its subentries.
      */
     public String[] list();
-    
+
     /**
      * Returns the contents of this folder as an array of FSEntries. This method is more expensive
      * than <code>list()</code> since all the attributes of each subentry is also retrieved and
      * put into an FSEntry object.
-     * 
+     *
      * @return the contents of this folder as an array of FSEntries.
      */
     public FSEntry[] listEntries();
@@ -51,11 +51,11 @@ public interface FSFolder extends FSEntry {
      * otherwise.
      */
     public FSEntry getChild(String childName);
-    
+
     /**
      * Returns the valence of this folder, i.e. how many subentries this folder
      * holds.
-     * 
+     *
      * @return the valence of this folder.
      */
     public long getValence();

@@ -54,7 +54,7 @@ import org.catacombae.util.Util.Pair;
  */
 public class ResourceForkViewPanel extends javax.swing.JPanel {
     private ResourceForkReader reader = null;
-    
+
     /**
      * An item as it is displayed in the list view over available resources.
      * Its toString method decides how it is displayed to the user.
@@ -273,7 +273,7 @@ public class ResourceForkViewPanel extends javax.swing.JPanel {
             }
             else
                 nameField.setText(nameString);
-            
+
             typeField.setText(typeString);
             idField.setText("" + li.entry.getResourceID());
             sizeField.setText(li.size + " bytes");

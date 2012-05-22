@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006-2009 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -72,7 +72,7 @@ public class HFSExplorer {
         "        under the Apache License, Version 2.0.",
         "        See <http://www.apache.org/licenses/LICENSE-2.0> for the details.",
     };
-    
+
     public static BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
     private static class Options {
 	public boolean readAPM = false;
@@ -83,23 +83,23 @@ public class HFSExplorer {
 	FRAGCHECK,
 	TEST,
 	SYSTEMFILEINFO;
-	
+
 	private final LinkedList<String> argsList = new LinkedList<String>();
 	public void addArg(String argument) {
 	    argsList.add(argument);
 	}
-	
+
 	public String[] getArgs() {
 	    return argsList.toArray(new String[argsList.size()]);
 	}
-	
+
 	public String getFilename() { return argsList.getLast(); }
     }
-    
+
     private static Options options = new Options();
     private static Operation operation;
     private static BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
-    
+
     public static void main(String[] args) throws IOException {
 	if(args.length == 0) {
 	    printUsageInfo();
@@ -377,7 +377,7 @@ public class HFSExplorer {
 //	    System.out.println("Nodes read: " + nodeNumber);
 //
 //    }
-    
+
     private static void operationBrowse(Operation op, ReadableRandomAccessStream hfsFile, long fsOffset, long fsLength) {
 	//HFSPlusFileSystemView fsView = new HFSPlusFileSystemView(hfsFile, fsOffset);
         DataLocator inputDataLocator = new ReadableStreamDataLocator(
@@ -503,7 +503,7 @@ public class HFSExplorer {
 	    //long nextID = -1;
 	    while(true) {
 		print("Command[?]: ");
-		
+
 		String input = null;
 		try {
 		    input = stdIn.readLine().trim();
@@ -564,7 +564,7 @@ public class HFSExplorer {
 				try { dataOut.close(); } catch(IOException ioe2) {}
 				continue; // or rather... don't continue (: mwahaha
 			    }
-			    
+
 			    String resourceForkFilename = dataForkFilename + ".resourcefork";
 			    FileOutputStream resourceOut = new FileOutputStream(resourceForkFilename);
 			    print("Extracting resource fork to file \"" + resourceForkFilename + "\"...");
@@ -580,7 +580,7 @@ public class HFSExplorer {
 			    }
 			    //break; // to reread the directory
 			}
-			
+
 		    } catch(FileNotFoundException fnfe) {
 			fnfe.printStackTrace();
 		    } catch(NumberFormatException nfe) {
@@ -592,10 +592,10 @@ public class HFSExplorer {
 		    input = input.substring("info ".length()).trim();
 		    try {
 			long nextID = Long.parseLong(input);
-			
+
 			CommonHFSCatalogLeafRecord selectedFileRecord = null;
 			for(CommonHFSCatalogLeafRecord rec : recordsInDir) {
-			    
+
 			    if(rec instanceof CommonHFSCatalogFileRecord) {
 				CommonHFSCatalogFileRecord catFileRec =
                                         (CommonHFSCatalogFileRecord) rec;
@@ -665,7 +665,7 @@ public class HFSExplorer {
 // 			HFSPlusCatalogLeafRecord nextDir = null;
 // 			for(HFSPlusCatalogLeafRecord rec : recordsInDir) {
 // 			    HFSPlusCatalogLeafRecordData recData = rec.getData();
-// 			    if((recData.getRecordType() == 
+// 			    if((recData.getRecordType() ==
 // 				HFSPlusCatalogLeafRecordData.RECORD_TYPE_FOLDER_THREAD) &&
 // 			       recData instanceof HFSPlusCatalogThread) {
 // 				HFSPlusCatalogThread catThread = (HFSPlusCatalogThread)recData;
@@ -680,7 +680,7 @@ public class HFSExplorer {
 // 			}
 // 			else {
 			    pathStack.removeLast();
-			    
+
 			    currentDir = pathThread.removeLast();//nextDir;//nextFolder.getFolderID();
 			    break;
 // 			}
@@ -728,7 +728,7 @@ public class HFSExplorer {
 	final int numberOfFilesToDisplay = 10;
 	ArrayList<Pair<CommonHFSCatalogLeafRecord, Integer>> mostFragmentedList =
                 new ArrayList<Pair<CommonHFSCatalogLeafRecord, Integer>>(numberOfFilesToDisplay+1);
-	
+
 	/*
 	 * This is the deal:
 	 *   - Go to catalog file
@@ -738,7 +738,7 @@ public class HFSExplorer {
 	 *       let the file bubble upwards in the list until it is at the right position.
 	 *     - If list.size() > numberOfFilesToDisplay: do removeLast() until they match.
 	 */
-	
+
         DataLocator inputDataLocator = new ReadableStreamDataLocator(
                 new ReadableConcatenatedStream(hfsFile, fsOffset, fsLength));
 
@@ -785,13 +785,13 @@ public class HFSExplorer {
 	CommonHFSCatalogFolderRecord currentDir = rootRecord;
 	recursiveFragmentSearch(fsView, rootRecord, mostFragmentedList, numberOfFilesToDisplay, options.verbose);
 	if(!options.verbose) println();
-	
+
 	println("Most fragmented files: ");
 	for(Pair<CommonHFSCatalogLeafRecord, Integer> phi : mostFragmentedList) {
 	    println(phi.b + " - \"" + phi.a.getKey().getNodeName() + "\"");
 	}
     }
-    
+
     private static void recursiveFragmentSearch(HFSVolume fsView, CommonHFSCatalogLeafRecord currentDir,
 						ArrayList<Pair<CommonHFSCatalogLeafRecord, Integer>> mostFragmentedList,
 						final int listMaxLength, final boolean verbose) {
@@ -805,12 +805,12 @@ public class HFSExplorer {
                         getAllDataExtentDescriptors(rec);
 
 		mostFragmentedList.add(new Pair<CommonHFSCatalogLeafRecord, Integer>(rec, descs.length));
-		
+
 		// Let the new item bubble up to its position in the list
 		for(int i = mostFragmentedList.size()-1; i > 0; --i) {
 		    Pair<CommonHFSCatalogLeafRecord, Integer> lower = mostFragmentedList.get(i);
 		    Pair<CommonHFSCatalogLeafRecord, Integer> higher = mostFragmentedList.get(i-1);
-		    
+
 		    if(lower.b.intValue() > higher.b.intValue()) {
 			// Switch places.
 			mostFragmentedList.set(i-1, lower);
@@ -842,7 +842,7 @@ public class HFSExplorer {
                         rec.getClass());
 	}
     }
-    
+
     private static void operationSystemFileInfo(Operation op,
             ReadableRandomAccessStream hfsFile, long fsOffset, long fsLength) {
 //	ReadableRandomAccessStream oldHfsFile = hfsFile;
@@ -953,7 +953,7 @@ public class HFSExplorer {
 
 	//HFSPlusCatalogLeafRecord rootRecord = fsView.getRoot();
 	//HFSPlusCatalogLeafRecord currentDir = rootRecord;
-	
+
 	for(int i = 0; i < interestingFiles.length; ++i) {
 	    System.out.println(labels[i] + ":");
 	    CommonHFSForkData currentFile = interestingFiles[i];
@@ -969,7 +969,7 @@ public class HFSExplorer {
 		    ++numberOfExtents;
 		}
 	    }
-	    
+
 	    if(currentFile.getLogicalSize() <= basicExtentsBlockCount*header.getAllocationBlockSize()) {
 		// All blocks are in basic extents
 		System.out.println("  Number of extents: " + numberOfExtents +
@@ -992,7 +992,7 @@ public class HFSExplorer {
 	    }
 	}
     }
-    
+
     public static void printUsageInfo() {
 	// For measurement of the standard terminal width in fixed width environments:
 	// 80:  <-------------------------------------------------------------------------------->
@@ -1019,7 +1019,7 @@ public class HFSExplorer {
 	println("  Verb options:");
 	println("    <none currently defined>");
     }
-    
+
     public static void println() {
 	//System.out.print(BACKSPACE79);
 	System.out.println();
@@ -1044,7 +1044,7 @@ public class HFSExplorer {
 	//System.out.print(BACKSPACE79);
 	if(options.verbose) System.out.print(s);
     }
-    
+
     public static boolean parseOptions(String[] arguments, int offset,
             int length) {
 	int i;
@@ -1092,7 +1092,7 @@ public class HFSExplorer {
 	for(int i = 0; i < records.length; ++i) {
 	    HFSPlusCatalogLeafRecord curRec = records[i];
 	    HFSPlusCatalogLeafRecordData curRecData = curRec.getData();
-	    if(curRecData instanceof HFSPlusCatalogFile && 
+	    if(curRecData instanceof HFSPlusCatalogFile &&
 	       ((HFSPlusCatalogFile)curRecData).getFileID().toInt() == nodeID.toInt()) {
 		return (HFSPlusCatalogFile)curRecData;
 	    }
@@ -1104,7 +1104,7 @@ public class HFSExplorer {
 	for(int i = 0; i < records.length; ++i) {
 	    HFSPlusCatalogLeafRecord curRec = records[i];
 	    HFSPlusCatalogLeafRecordData curRecData = curRec.getData();
-	    if(curRecData instanceof HFSPlusCatalogFolder && 
+	    if(curRecData instanceof HFSPlusCatalogFolder &&
 	       ((HFSPlusCatalogFolder)curRecData).getFolderID().toInt() == nodeID.toInt()) {
 		return (HFSPlusCatalogFolder)curRecData;
 	    }

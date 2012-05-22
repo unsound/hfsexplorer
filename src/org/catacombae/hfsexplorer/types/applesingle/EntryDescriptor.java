@@ -25,22 +25,22 @@ public class EntryDescriptor {
     /*
      * struct EntryDescriptor
      * size: 12 bytes
-     * description: 
-     * 
+     * description:
+     *
      * BP  Size  Type    Identifier   Description
      * ------------------------------------------
-     * 0   4     UInt32  entryId                 
-     * 4   4     UInt32  entryOffset             
-     * 8   4     UInt32  entryLength             
+     * 0   4     UInt32  entryId
+     * 4   4     UInt32  entryOffset
+     * 8   4     UInt32  entryLength
      */
-    
+
     public static final int STRUCTSIZE = 12;
     private static final long MAX_UINT = 0xFFFFFFFFL;
-    
+
     private final byte[] entryId = new byte[4];
     private final byte[] entryOffset = new byte[4];
     private final byte[] entryLength = new byte[4];
-    
+
     public EntryDescriptor(byte[] data, int offset) {
 	System.arraycopy(data, offset+0, entryId, 0, 4);
 	System.arraycopy(data, offset+4, entryOffset, 0, 4);
@@ -59,27 +59,27 @@ public class EntryDescriptor {
         System.arraycopy(Util.toByteArrayBE((int)entryOffset), 0, this.entryOffset, 0, 4);
         System.arraycopy(Util.toByteArrayBE((int)entryLength), 0, this.entryLength, 0, 4);
     }
-    
+
     public static int length() { return STRUCTSIZE; }
-    
+
     /**  */
     public int getEntryId() { return Util.readIntBE(entryId); }
     /**  */
     public int getEntryOffset() { return Util.readIntBE(entryOffset); }
     /**  */
     public int getEntryLength() { return Util.readIntBE(entryLength); }
-    
+
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " entryId: " + getEntryId());
 	ps.println(prefix + " entryOffset: " + getEntryOffset());
 	ps.println(prefix + " entryLength: " + getEntryLength());
     }
-    
+
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "EntryDescriptor:");
 	printFields(ps, prefix);
     }
-    
+
     public byte[] getBytes() {
 	byte[] result = new byte[STRUCTSIZE];
 	int offset = 0;

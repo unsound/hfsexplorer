@@ -14,11 +14,11 @@ import org.catacombae.hfs.ProgressMonitor;
 public class NullProgressMonitor implements ProgressMonitor {
 
     private static final NullProgressMonitor INSTANCE = new NullProgressMonitor();
-    
+
     public static NullProgressMonitor getInstance() { return INSTANCE; }
-    
+
     protected NullProgressMonitor() {}
-    
+
     /* @Override */
     public void signalCancel() {}
 

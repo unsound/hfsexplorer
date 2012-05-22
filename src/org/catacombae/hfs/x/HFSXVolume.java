@@ -61,7 +61,7 @@ public class HFSXVolume extends HFSPlusVolume {
 
         public CommonHFSCatalogKey newCatalogKey(CommonHFSCatalogNodeID nodeID,
                 CommonHFSCatalogString searchString, CommonBTHeaderRecord bthr) {
-        
+
             BTHeaderRec trueBthr = getBTHeaderRec(bthr);
             return CommonHFSCatalogKey.create(new HFSXCatalogKey(
                     new HFSCatalogNodeID((int) nodeID.toLong()),

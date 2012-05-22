@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -34,12 +34,12 @@ public class PrintGPTHeader {
 	}
 	if(args.length > 1)
 	    offset = Long.parseLong(args[1]);
-	
+
 	byte[] data = new byte[GPTHeader.getSize()];
 	RandomAccessFile sourceRaf = new RandomAccessFile(sourceFile, "r");
 	sourceRaf.seek(offset);
 	sourceRaf.read(data);
-	
+
 	GPTHeader gph = new GPTHeader(data, 0, 512);
 	gph.print(System.out, "");
     }

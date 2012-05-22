@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@ public class FlagViewPanel extends javax.swing.JPanel {
     /** Creates new form FlagViewPanel */
     public FlagViewPanel(String label, final FlagField data) {
         initComponents();
-        
+
         if(false) {
             flagBox.addActionListener(new ActionListener() {
                 /* @Override */
@@ -41,7 +41,7 @@ public class FlagViewPanel extends javax.swing.JPanel {
         }
         else
             flagBox.setEnabled(false);
-        
+
         flagBox.setSelected(data.getValueAsBoolean());
         flagLabel.setText(label);
     }
@@ -79,7 +79,7 @@ public class FlagViewPanel extends javax.swing.JPanel {
                 .add(flagLabel))
         );
     }// </editor-fold>//GEN-END:initComponents
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox flagBox;
     private javax.swing.JLabel flagLabel;

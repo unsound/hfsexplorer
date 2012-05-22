@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -36,13 +36,13 @@ import java.text.DateFormat;
 public class HFSPlusVolumeInfoPanel extends javax.swing.JPanel {
     private final DateFormat dti =
             DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-    
+
     /** Creates new form HFSPlusVolumeInfoPanel */
     public HFSPlusVolumeInfoPanel(HFSPlusVolumeHeader vh) {
         initComponents();
         setFields(vh);
     }
-    
+
     /**
      * Sets the fields of this HFSPlusVolumeInfoPanel to the values in the structure
      * <code>vh</code>.
@@ -51,7 +51,7 @@ public class HFSPlusVolumeInfoPanel extends javax.swing.JPanel {
     public void setFields(HFSPlusVolumeHeader vh) {
 	signatureField.setText("" + Util.toASCIIString(vh.getSignature()));
 	versionField.setText("" + vh.getVersion());
-        
+
 	hardwareLockBox.setSelected(vh.getAttributeVolumeHardwareLock());
 	volumeUnmountedBox.setSelected(vh.getAttributeVolumeUnmounted());
 	sparedBlocksBox.setSelected(vh.getAttributeVolumeSparedBlocks());
@@ -61,7 +61,7 @@ public class HFSPlusVolumeInfoPanel extends javax.swing.JPanel {
 	idsReusedBox.setSelected(vh.getAttributeCatalogNodeIDsReused());
 	journaledBox.setSelected(vh.getAttributeVolumeJournaled());
 	softwareLockBox.setSelected(vh.getAttributeVolumeSoftwareLock());
-        
+
 	lastMountedVersionField.setText("" +
                 Util.toASCIIString(vh.getLastMountedVersion()));
 	journalInfoBlockField.setText("0x" +
@@ -91,44 +91,44 @@ public class HFSPlusVolumeInfoPanel extends javax.swing.JPanel {
 	finderInfo6Field.setText("" + finderInfo[5]);
 	finderInfo78Field.setText("0x" + Util.toHexStringBE(finderInfo[6]) +
                 Util.toHexStringBE(finderInfo[7]));
-        
+
         // Allocation file fields
         HFSPlusForkData allocationFileData = vh.getAllocationFile();
         allocationFileLogicalSizeField.setText(allocationFileData.getLogicalSize() + " bytes");
         allocationFileClumpSizeField.setText(allocationFileData.getClumpSize() + " bytes");
         allocationFileTotalBlocksField.setText("" + allocationFileData.getTotalBlocks());
         allocationFileBasicExtentCountField.setText("" + allocationFileData.getExtents().getNumExtentsInUse());
-        
+
         // Extents file fields
         HFSPlusForkData extentsFileData = vh.getExtentsFile();
         extentsFileLogicalSizeField.setText(extentsFileData.getLogicalSize() + " bytes");
         extentsFileClumpSizeField.setText(extentsFileData.getClumpSize() + " bytes");
         extentsFileTotalBlocksField.setText("" + extentsFileData.getTotalBlocks());
         extentsFileBasicExtentCountField.setText("" + extentsFileData.getExtents().getNumExtentsInUse());
-        
+
         // Catalog file fields
         HFSPlusForkData catalogFileData = vh.getCatalogFile();
         catalogFileLogicalSizeField.setText(catalogFileData.getLogicalSize() + " bytes");
         catalogFileClumpSizeField.setText(catalogFileData.getClumpSize() + " bytes");
         catalogFileTotalBlocksField.setText("" + catalogFileData.getTotalBlocks());
         catalogFileBasicExtentCountField.setText("" + catalogFileData.getExtents().getNumExtentsInUse());
-        
+
         // Attributes file fields
         HFSPlusForkData attributesFileData = vh.getAttributesFile();
         attributesFileLogicalSizeField.setText(attributesFileData.getLogicalSize() + " bytes");
         attributesFileClumpSizeField.setText(attributesFileData.getClumpSize() + " bytes");
         attributesFileTotalBlocksField.setText("" + attributesFileData.getTotalBlocks());
         attributesFileBasicExtentCountField.setText("" + attributesFileData.getExtents().getNumExtentsInUse());
-        
+
         // Startup file fields
         HFSPlusForkData startupFileData = vh.getStartupFile();
         startupFileLogicalSizeField.setText(startupFileData.getLogicalSize() + " bytes");
         startupFileClumpSizeField.setText(startupFileData.getClumpSize() + " bytes");
         startupFileTotalBlocksField.setText("" + startupFileData.getTotalBlocks());
         startupFileBasicExtentCountField.setText("" + startupFileData.getExtents().getNumExtentsInUse());
-        
+
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -1118,8 +1118,8 @@ public class HFSPlusVolumeInfoPanel extends javax.swing.JPanel {
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-    
-    
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField allocationFileBasicExtentCountField;
     private javax.swing.JLabel allocationFileBasicExtentCountLabel;
@@ -1237,5 +1237,5 @@ public class HFSPlusVolumeInfoPanel extends javax.swing.JPanel {
     private javax.swing.JTextField writeCountField;
     private javax.swing.JLabel writeCountLabel;
     // End of variables declaration//GEN-END:variables
-    
+
 }

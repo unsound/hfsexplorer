@@ -38,9 +38,9 @@ public class HFSCommonFSFork implements FSFork {
     private final HFSCommonFSFile parent;
     private final FSForkType type;
     private final CommonHFSForkData forkData;
-    
+
     HFSCommonFSFork(HFSCommonFSFile iParent, FSForkType iType, CommonHFSForkData iForkData) {
-        
+
         // Input check
         if(iParent == null)
             throw new IllegalArgumentException("iParent must not be null!");
@@ -50,12 +50,12 @@ public class HFSCommonFSFork implements FSFork {
             throw new IllegalArgumentException("iType is unsupported!");
         if(iForkData == null)
             throw new IllegalArgumentException("iForkData must not be null!");
-        
+
         this.parent = iParent;
         this.type = iType;
         this.forkData = iForkData;
     }
-    
+
     /* @Override */
     public long getLength() {
         return forkData.getLogicalSize();

@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006-2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -26,7 +26,7 @@ import com.apple.eawt.ApplicationEvent;
  * This class implements all the calls in the application that are purely Mac-specific. A static
  * initialization of this class on other platforms than Mac OS X would probably lead to a
  * ClassLoader exception.
- * 
+ *
  * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
  */
 public class MacSpecific {
@@ -42,14 +42,14 @@ public class MacSpecific {
         public boolean acceptQuit();
 
         /**
-         * 
+         *
          */
         public void showAboutDialog();
     }
-    
+
     /**
      * Registers a QuitHandler with the Mac OS X API:s.
-     * 
+     *
      * @param qh the QuitHandler to register.
      */
     public static void registerMacApplicationHandler(final MacApplicationHandler qh) {

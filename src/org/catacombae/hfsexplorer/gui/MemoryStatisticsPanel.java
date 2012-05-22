@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -30,26 +30,26 @@ import org.catacombae.util.Util;
  * @author <a href="mailto:catacombae@gmail.com">Erik Larsson</a>
  */
 public class MemoryStatisticsPanel extends javax.swing.JPanel {
-    
+
     private final Object syncObj = new Object();
     private boolean abortThread = false;
-    
+
     public MemoryStatisticsPanel() {
         initComponents();
-        
+
         runGcButton.addActionListener(new ActionListener() {
 
             /* @Override */
             public void actionPerformed(ActionEvent e) {
                 Runtime.getRuntime().gc();
             }
-            
+
         });
     }
-    
+
     public void startThread() {
         Runnable r = new Runnable() {
-            
+
             /* @Override */
             public void run() {
                 Runtime rt = Runtime.getRuntime();
@@ -59,7 +59,7 @@ public class MemoryStatisticsPanel extends javax.swing.JPanel {
                         final long maxMem = rt.maxMemory();
                         final long freeMem = rt.freeMemory();
                         final long allocatedMem = curMaxMem - freeMem;
-                        
+
                         SwingUtilities.invokeLater(new Runnable() {
                             /* @Override */
                             public void run() {
@@ -69,7 +69,7 @@ public class MemoryStatisticsPanel extends javax.swing.JPanel {
                                 maxMemoryField.setText(Util.addUnitSpaces("" + maxMem, 3) + " bytes");
                             }
                         });
-                        
+
                         try {
                             syncObj.wait(500);
                         } catch(InterruptedException ie) {
@@ -78,16 +78,16 @@ public class MemoryStatisticsPanel extends javax.swing.JPanel {
                     }
                     syncObj.notify();
                 }
-                
+
                 System.err.println("MemoryStatisticsPanel thread aborted.");
             }
         };
-        
+
         synchronized(syncObj) {
             new Thread(r).start();
         }
     }
-    
+
     public void stopThread() {
         synchronized(syncObj) {
             abortThread = true;
@@ -99,18 +99,18 @@ public class MemoryStatisticsPanel extends javax.swing.JPanel {
             }
         }
     }
-    
+
     /**
      * Creates a JFrame that encloses a MemoryStatisticsPanel, properly wired to accommodate any
      * window close-events and stop the thread when they happen. This is all that you need in order
      * to create a window showing memory statistics. (Just call setVisible(true) on the returned
      * JFrame to bring it up... it will automatically start collecting memory information.)
-     * 
+     *
      * @return a JFrame enclosing a MemoryStatisticsPanel.
      */
     public static JFrame createMemoryStatisticsWindow() {
         final JFrame memoryStatisticsWindow = new JFrame("Memory statistics");
-        
+
         final MemoryStatisticsPanel msp = new MemoryStatisticsPanel();
         memoryStatisticsWindow.add(msp);
         memoryStatisticsWindow.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -119,7 +119,7 @@ public class MemoryStatisticsPanel extends javax.swing.JPanel {
             public void windowOpened(WindowEvent e) {
                 msp.startThread();
             }
-            
+
             @Override
             public void windowClosing(WindowEvent e) {
                 //System.err.println("Window closing. Signaling any calculate process to stop.");
@@ -127,13 +127,13 @@ public class MemoryStatisticsPanel extends javax.swing.JPanel {
                 memoryStatisticsWindow.dispose();
             }
         });
-        
+
         memoryStatisticsWindow.pack();
         memoryStatisticsWindow.setLocationRelativeTo(null);
         memoryStatisticsWindow.setResizable(false);
         return memoryStatisticsWindow;
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is

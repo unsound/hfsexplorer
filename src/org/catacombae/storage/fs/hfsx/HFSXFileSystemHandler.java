@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -26,12 +26,12 @@ import org.catacombae.hfs.x.HFSXVolume;
  * to access HFSX file systems. (HFSX file systems are very similar to HFS+,
  * but with a few extensions, like the ability to treat file names in a case
  * sensitive manner).
- * 
+ *
  * @author Erik Larsson
  */
 public class HFSXFileSystemHandler extends HFSCommonFileSystemHandler {
-    
-    public HFSXFileSystemHandler(DataLocator fsLocator, boolean useCaching, 
+
+    public HFSXFileSystemHandler(DataLocator fsLocator, boolean useCaching,
             boolean doUnicodeFileNameComposition, boolean hideProtected) {
         super(new HFSXVolume(fsLocator.createReadOnlyFile(), useCaching),
                 doUnicodeFileNameComposition, hideProtected);

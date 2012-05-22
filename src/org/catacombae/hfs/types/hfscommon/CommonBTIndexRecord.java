@@ -27,20 +27,20 @@ import org.catacombae.util.Util;
 public abstract class CommonBTIndexRecord <K extends CommonBTKey<K>> extends CommonBTRecord {
     protected final K key;
     protected final byte[] index = new byte[4];
-    
+
     public static <K extends CommonBTKey<K>> CommonBTIndexRecord<K> createHFS(K key, byte[] data, int offset) {
         return new HFSImplementation<K>(key, data, offset);
     }
-    
+
     public static <K extends CommonBTKey<K>> CommonBTIndexRecord<K> createHFSPlus(K key, byte[] data, int offset) {
         return new HFSPlusImplementation<K>(key, data, offset);
     }
-    
+
     protected CommonBTIndexRecord(K key, byte[] data, int offset) {
         this.key = key;
         System.arraycopy(data, offset+key.occupiedSize(), index, 0, index.length);
     }
-    
+
     public K getKey() {
         return key;
     }
@@ -72,7 +72,7 @@ public abstract class CommonBTIndexRecord <K extends CommonBTKey<K>> extends Com
         ps.println(prefix + "CommonBTIndexRecord:");
         printFields(ps, prefix);
     }
-    
+
     /* @Override */
     public void printFields(PrintStream ps, String prefix) {
         ps.println(prefix + " key:");
@@ -82,11 +82,11 @@ public abstract class CommonBTIndexRecord <K extends CommonBTKey<K>> extends Com
 
 
     private static class HFSImplementation <K extends CommonBTKey<K>> extends CommonBTIndexRecord<K> {
-        
+
         public HFSImplementation(K key, byte[] data, int offset) {
             super(key, data, offset);
         }
-        
+
         @Override
         public int getSize() {
             return key.occupiedSize() + index.length;
@@ -98,17 +98,17 @@ public abstract class CommonBTIndexRecord <K extends CommonBTKey<K>> extends Com
         }
          * */
     }
-    
+
     private static class HFSPlusImplementation <K extends CommonBTKey<K>> extends CommonBTIndexRecord<K> {
         public HFSPlusImplementation(K key, byte[] data, int offset) {
             super(key, data, offset);
         }
-        
+
         @Override
         public int getSize() {
             return key.occupiedSize() + index.length;
         }
-        
+
         /*
         @Override
         public long getIndexAsOffset(int nodeSize) {

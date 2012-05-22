@@ -70,31 +70,31 @@ public interface StructElements {
     public static final IntegerFieldRepresentation OCTAL = IntegerFieldRepresentation.OCTAL;
     /** Shorthand constant. */
     public static final IntegerFieldRepresentation BINARY = IntegerFieldRepresentation.BINARY;
-    
+
     /**
      * Shorthand subclass, so the user doesn't have to import DictionaryBuilder in every
      * implementation of StructElements.
      */
     public class DictionaryBuilder extends org.catacombae.csjc.structelements.DictionaryBuilder {
         /**
-         * @see org.catacombae.csjc.structelements.DictionaryBuilder#DictionaryBuilder(java.lang.String) 
+         * @see org.catacombae.csjc.structelements.DictionaryBuilder#DictionaryBuilder(java.lang.String)
          */
         public DictionaryBuilder(String typeName) {
             super(typeName);
         }
         /**
-         * @see org.catacombae.csjc.structelements.DictionaryBuilder#DictionaryBuilder(java.lang.String, java.lang.String) 
+         * @see org.catacombae.csjc.structelements.DictionaryBuilder#DictionaryBuilder(java.lang.String, java.lang.String)
          */
         public DictionaryBuilder(String typeName, String typeDescription) {
             super(typeName, typeDescription);
         }
     }
-    
+
     /**
      * Returns a dictionary of the elements of this data structure. The keys in
      * the dictionary should be the respective variable names, and the elements
      * should provide access to all the fields of the data structure.
-     * 
+     *
      * @return a dictionary of the elements of this data structure.
      */
     public Dictionary getStructElements();

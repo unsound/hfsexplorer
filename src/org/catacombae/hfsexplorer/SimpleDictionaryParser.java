@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006-2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,7 +23,7 @@ import java.util.Hashtable;
 public class SimpleDictionaryParser {
     private static final String SPD_HEADER = "!SimpleDictionary";
     private Hashtable<String, String> dictionaryTable = new Hashtable<String, String>();
-    
+
     public SimpleDictionaryParser(InputStream is) {
 	try {
 	    BufferedReader buf = new BufferedReader(new InputStreamReader(is, "UTF-8"));
@@ -34,7 +34,7 @@ public class SimpleDictionaryParser {
 	    //System.err.println("spdTag: \"" + spdTag + "\" spdVersion: \"" + spdVersion + "\"");
 	    if(!(spdTag.equals(SPD_HEADER) && spdVersion.equals("1.0")))
 		throw new RuntimeException("Invalid SimpleDictionary data.");
-	    
+
 	    String currentLine = buf.readLine();
 	    while(currentLine != null) {
 		colonIndex = currentLine.indexOf(":");
@@ -46,9 +46,9 @@ public class SimpleDictionaryParser {
 	    }
 	} catch(IOException ioe) { throw new RuntimeException(ioe); }
     }
-    
+
     public String getValue(String key) { return dictionaryTable.get(key); }
-    
+
     /*
     public static void main(String[] args) {
 	new SimpleDictionaryParser(System.in);

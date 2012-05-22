@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2007-2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -21,12 +21,12 @@ import org.catacombae.util.Util;
 import java.lang.reflect.Field;
 
 /**
- * 
+ *
  * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
  */
 public abstract class MutableStruct {
     private final boolean mutable;
-    
+
     public MutableStruct() {
 	this.mutable = false;
     }
@@ -124,7 +124,7 @@ public abstract class MutableStruct {
     protected void accessViolation() {
 	throw new RuntimeException("Access violation: Tried to set fields in an immutable object.");
     }
-    
+
     /** Looks up the byte array with identifer <code>fieldName</code> in
 	the current class and returns it (an actual reference, no copy).
 	If no identifier can be found, or the identifier is not of type

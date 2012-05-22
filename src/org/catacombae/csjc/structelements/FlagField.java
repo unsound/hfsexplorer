@@ -67,7 +67,7 @@ public class FlagField extends BooleanRepresentableField {
 
     /**
      * Testcode.
-     * 
+     *
      * @param args command line arguments.
      */
     /*

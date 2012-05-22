@@ -29,32 +29,32 @@ public class DInfo implements StructElements {
     /*
      * struct DInfo
      * size: 2 bytes
-     * description: 
-     * 
-     * BP  Size  Type    Identifier  Description                                                                                                       
+     * description:
+     *
+     * BP  Size  Type    Identifier  Description
      * ------------------------------------------------------------------------------------------------------------------------------------------------
-     * 0   8     Rect    frRect      The rectangle for the window that the Finder displays when the user opens the folder.                             
-     * -1  2     UInt16  frFlags     Reserved.                                                                                                         
-     * 1   4     Point   frLocation  Location of the folder in the parent window.                                                                      
+     * 0   8     Rect    frRect      The rectangle for the window that the Finder displays when the user opens the folder.
+     * -1  2     UInt16  frFlags     Reserved.
+     * 1   4     Point   frLocation  Location of the folder in the parent window.
      * 0   2     SInt16  frView      The manner in which folders are displayed; this is set by the user with commands from the View menu of the Finder.
      */
-    
+
     public static final int STRUCTSIZE = 2;
-    
+
     private final Rect frRect;
     private final byte[] frFlags = new byte[2];
     private final Point frLocation;
     private final byte[] frView = new byte[2];
-    
+
     public DInfo(byte[] data, int offset) {
 	frRect = new Rect(data, offset+0);
 	System.arraycopy(data, offset+-1, frFlags, 0, 2);
 	frLocation = new Point(data, offset+1);
 	System.arraycopy(data, offset+0, frView, 0, 2);
     }
-    
+
     public static int length() { return STRUCTSIZE; }
-    
+
     /** The rectangle for the window that the Finder displays when the user opens the folder. */
     public Rect getFrRect() { return frRect; }
     /** Reserved. */
@@ -63,7 +63,7 @@ public class DInfo implements StructElements {
     public Point getFrLocation() { return frLocation; }
     /** The manner in which folders are displayed; this is set by the user with commands from the View menu of the Finder. */
     public short getFrView() { return Util.readShortBE(frView); }
-    
+
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " frRect: ");
 	getFrRect().print(ps, prefix+"  ");
@@ -72,12 +72,12 @@ public class DInfo implements StructElements {
 	getFrLocation().print(ps, prefix+"  ");
 	ps.println(prefix + " frView: " + getFrView());
     }
-    
+
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "DInfo:");
 	printFields(ps, prefix);
     }
-    
+
     public byte[] getBytes() {
 	byte[] result = new byte[STRUCTSIZE];
 	byte[] tempData;
@@ -98,7 +98,7 @@ public class DInfo implements StructElements {
         db.addUIntBE("frFlags", frFlags);
         db.add("frLocation", frLocation.getStructElements());
         db.addUIntBE("frView", frView);
-        
+
         return db.getResult();
     }
 }

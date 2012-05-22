@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -25,44 +25,44 @@ public class HFSPlusWrapperMDB {
     /*
      * struct HFSPlusWrapperMDB
      * size: 170 bytes
-     * description: 
-     * 
-     * BP   Size  Type           Identifier      Description                                                 
+     * description:
+     *
+     * BP   Size  Type           Identifier      Description
      * ------------------------------------------------------------------------------------------------------
-     * 0    2     UInt16         drSigWord       volume signature                                            
-     * 2    4     UInt32         drCrDate        date and time of volume creation                            
-     * 6    4     UInt32         drLsMod         date and time of last modification                          
-     * 10   2     UInt16         drAtrb          volume attributes                                           
-     * 12   2     UInt16         drNmFls         number of files in root directory                           
-     * 14   2     UInt16         drVBMSt         first block of volume bitmap                                
-     * 16   2     UInt16         drAllocPtr      start of next allocation search                             
-     * 18   2     UInt16         drNmAlBlks      number of allocation blocks in volume                       
-     * 20   4     UInt32         drAlBlkSiz      size (in bytes) of allocation blocks                        
-     * 24   4     UInt32         drClpSiz        default clump size                                          
-     * 28   2     UInt16         drAlBlSt        first allocation block in volume                            
-     * 30   4     UInt32         drNxtCNID       next unused catalog node ID                                 
-     * 34   2     UInt16         drFreeBks       number of unused allocation blocks                          
-     * 36   1     UInt8          drVNLength      length of volume name                                       
-     * 37   1*27  Char[27]       drVN            volume name                                                 
-     * 64   4     UInt32         drVolBkUp       date and time of last backup                                
-     * 68   2     UInt16         drVSeqNum       volume backup sequence number                               
-     * 70   4     UInt32         drWrCnt         volume write count                                          
-     * 74   4     UInt32         drXTClpSiz      clump size for extents overflow file                        
-     * 78   4     UInt32         drCTClpSiz      clump size for catalog file                                 
-     * 82   2     UInt16         drNmRtDirs      number of directories in root directory                     
-     * 84   4     UInt32         drFilCnt        number of files in volume                                   
-     * 88   4     UInt32         drDirCnt        number of directories in volume                             
-     * 92   4*8   UInt32[8]      drFndrInfo      information used by the Finder                              
-     * 124  2     UInt16         drEmbedSigWord  HFS+ Wrapper specific: Must always be 'H+'                  
+     * 0    2     UInt16         drSigWord       volume signature
+     * 2    4     UInt32         drCrDate        date and time of volume creation
+     * 6    4     UInt32         drLsMod         date and time of last modification
+     * 10   2     UInt16         drAtrb          volume attributes
+     * 12   2     UInt16         drNmFls         number of files in root directory
+     * 14   2     UInt16         drVBMSt         first block of volume bitmap
+     * 16   2     UInt16         drAllocPtr      start of next allocation search
+     * 18   2     UInt16         drNmAlBlks      number of allocation blocks in volume
+     * 20   4     UInt32         drAlBlkSiz      size (in bytes) of allocation blocks
+     * 24   4     UInt32         drClpSiz        default clump size
+     * 28   2     UInt16         drAlBlSt        first allocation block in volume
+     * 30   4     UInt32         drNxtCNID       next unused catalog node ID
+     * 34   2     UInt16         drFreeBks       number of unused allocation blocks
+     * 36   1     UInt8          drVNLength      length of volume name
+     * 37   1*27  Char[27]       drVN            volume name
+     * 64   4     UInt32         drVolBkUp       date and time of last backup
+     * 68   2     UInt16         drVSeqNum       volume backup sequence number
+     * 70   4     UInt32         drWrCnt         volume write count
+     * 74   4     UInt32         drXTClpSiz      clump size for extents overflow file
+     * 78   4     UInt32         drCTClpSiz      clump size for catalog file
+     * 82   2     UInt16         drNmRtDirs      number of directories in root directory
+     * 84   4     UInt32         drFilCnt        number of files in volume
+     * 88   4     UInt32         drDirCnt        number of directories in volume
+     * 92   4*8   UInt32[8]      drFndrInfo      information used by the Finder
+     * 124  2     UInt16         drEmbedSigWord  HFS+ Wrapper specific: Must always be 'H+'
      * 126  4     ExtDescriptor  drEmbedExtent   HFS+ Wrapper specific: The extent containing the HFS+ volume
-     * 130  4     UInt32         drXTFlSize      size of extents overflow file                               
-     * 134  16    ExtDataRec     drXTExtRec      extent record for extents overflow file                     
-     * 150  4     UInt32         drCTFlSize      size of catalog file                                        
-     * 154  16    ExtDataRec     drCTExtRec      extent record for catalog file                              
+     * 130  4     UInt32         drXTFlSize      size of extents overflow file
+     * 134  16    ExtDataRec     drXTExtRec      extent record for extents overflow file
+     * 150  4     UInt32         drCTFlSize      size of catalog file
+     * 154  16    ExtDataRec     drCTExtRec      extent record for catalog file
      */
-    
+
     public static final int STRUCTSIZE = 170;
-    
+
     private final byte[] drSigWord = new byte[2];
     private final byte[] drCrDate = new byte[4];
     private final byte[] drLsMod = new byte[4];
@@ -93,7 +93,7 @@ public class HFSPlusWrapperMDB {
     private final ExtDataRec drXTExtRec;
     private final byte[] drCTFlSize = new byte[4];
     private final ExtDataRec drCTExtRec;
-    
+
     public HFSPlusWrapperMDB(byte[] data, int offset) {
 	System.arraycopy(data, offset+0, drSigWord, 0, 2);
 	System.arraycopy(data, offset+2, drCrDate, 0, 4);
@@ -126,9 +126,9 @@ public class HFSPlusWrapperMDB {
 	System.arraycopy(data, offset+150, drCTFlSize, 0, 4);
 	drCTExtRec = new ExtDataRec(data, offset+154);
     }
-    
+
     public static int length() { return STRUCTSIZE; }
-    
+
     /** volume signature */
     public short getDrSigWord() { return Util.readShortBE(drSigWord); }
     /** date and time of volume creation */
@@ -189,7 +189,7 @@ public class HFSPlusWrapperMDB {
     public int getDrCTFlSize() { return Util.readIntBE(drCTFlSize); }
     /** extent record for catalog file */
     public ExtDataRec getDrCTExtRec() { return drCTExtRec; }
-    
+
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " drSigWord: " + getDrSigWord());
 	ps.println(prefix + " drCrDate: " + getDrCrDate());
@@ -225,12 +225,12 @@ public class HFSPlusWrapperMDB {
 	ps.println(prefix + " drCTExtRec: ");
 	getDrCTExtRec().print(ps, prefix+"  ");
     }
-    
+
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "HFSPlusWrapperMDB:");
 	printFields(ps, prefix);
     }
-    
+
     public byte[] getBytes() {
 	byte[] result = new byte[STRUCTSIZE];
 	byte[] tempData;

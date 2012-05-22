@@ -44,7 +44,7 @@ public abstract class CommonHFSCatalogFolderRecord extends CommonHFSCatalogLeafR
     public CommonHFSCatalogFolder getData() {
         return data;
     }
-    
+
     /* @Override */
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + CommonHFSCatalogFolderRecord.class.getSimpleName() + ":");
@@ -89,28 +89,28 @@ public abstract class CommonHFSCatalogFolderRecord extends CommonHFSCatalogLeafR
             HFSPlusCatalogFolder data) {
         return new HFSPlusImplementation(key, data);
     }
-    
+
     public static CommonHFSCatalogFolderRecord create(CatKeyRec key, CdrDirRec data) {
         return new HFSImplementation(key, data);
     }
 
     public static class HFSPlusImplementation extends CommonHFSCatalogFolderRecord {
-        
+
         public HFSPlusImplementation(HFSPlusCatalogKey key, HFSPlusCatalogFolder data) {
             super(CommonHFSCatalogKey.create(key), CommonHFSCatalogFolder.create(data));
         }
-        
+
         @Override
         public int getSize() {
             return key.occupiedSize() + data.length();
         }
     }
-    
+
     public static class HFSImplementation extends CommonHFSCatalogFolderRecord {
         public HFSImplementation(CatKeyRec key, CdrDirRec data) {
             super(CommonHFSCatalogKey.create(key), CommonHFSCatalogFolder.create(data));
         }
-        
+
         @Override
         public int getSize() {
             return key.occupiedSize() + data.length();

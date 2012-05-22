@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -39,7 +39,7 @@ import org.catacombae.storage.fs.FSLink;
 public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPanel {
     private volatile boolean cancelSignaled = false;
     private DecimalFormat sizeFormatter = new DecimalFormat("0.00");
-    
+
     FSEntrySummaryPanel() {
         initComponents();
     }
@@ -94,7 +94,7 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
                 //System.err.println("Window closing. Signaling any calculate process to stop.");
                 cancelSignaled = true;
             }
-            
+
             /*
             @Override
             public void windowClosed(WindowEvent e) {
@@ -167,22 +167,22 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
         }
         typeField.setText(typeString);
         sizeField.setText(sizeString);
-        
-        
+
+
         FSAttributes attrs = entry.getAttributes();
-        
+
         ChainedPanel currentChain = this;
-        
+
         if(entry instanceof FSLink) {
             LinkTargetPanel ltp = new LinkTargetPanel((FSLink)entry);
             currentChain.setChainedContents(ltp);
             currentChain = ltp;
         }
-        
+
         DateSummaryPanel dsp = new DateSummaryPanel(attrs);
         currentChain.setChainedContents(dsp);
         currentChain = dsp;
-        
+
         if(attrs.hasPOSIXFileAttributes()) {
             POSIXAttributesPanel attributesPanel =
                     new POSIXAttributesPanel(attrs.getPOSIXFileAttributes());
@@ -196,7 +196,7 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
         extendedInfoStackPanel.removeAll();
         extendedInfoStackPanel.add(c);
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -297,7 +297,7 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
         String baseString = Long.toString(result);
         if(result >= 1000) {
             String spacedString = Util.addUnitSpaces(baseString, 3);
-            
+
             if(result >= 1024) {
                 return SpeedUnitUtils.bytesToBinaryUnit(result, sizeFormatter) + " (" +
                         spacedString + " bytes" + ")";
@@ -311,7 +311,7 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
 
     private void startFolderSizeCalculation(final FSFolder folder) {
         Runnable r = new Runnable () {
-            
+
             /* @Override */
             public void run() {
                 String resultString;
@@ -324,7 +324,7 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
                     e.printStackTrace();
                     resultString = "Exception while calculating! See debug console for info...";
                 }
-                
+
                 final String finalResultString;
                 if(!cancelSignaled)
                     finalResultString = resultString;
@@ -339,9 +339,9 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
                     }
                 });
             }
-            
+
         };
-        
+
         new Thread(r).start();
     }
 
@@ -371,7 +371,7 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
                         " unexpected type " + entry.getClass());
         }
     }
-    
+
     /*
     public static void main(String[] args) {
         JFrame jf = new JFrame("Test");

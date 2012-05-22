@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2007-2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -53,22 +53,22 @@ import org.catacombae.hfs.HFSVolume;
  * @author  Erik
  */
 public class ExtentsInfoPanel extends javax.swing.JPanel {
-    
+
     private static final int UNIT_INCREMENT = 10;
-    
+
     /** Creates new form CatalogInfoPanel */
     public ExtentsInfoPanel(final HFSVolume fsView) {
-        
+
         initComponents();
 
         JTree dirTree = catalogTree;
         // Populate the root
-	/* 
+	/*
          * What we need is a method that gets us the children of the "current" node.
          * A B-tree starts with a header node,
          */
         CommonBTNode iNode = fsView.getExtentsOverflowFile().getExtentsOverflowNode(-1); // Get root index node.
-        
+
         if(iNode == null) {
             DefaultTreeModel model = new DefaultTreeModel(new NoLeafMutableTreeNode("<empty>"));
             dirTree.setModel(model);
@@ -107,7 +107,7 @@ public class ExtentsInfoPanel extends javax.swing.JPanel {
             public void treeWillCollapse(TreeExpansionEvent e) {
             }
         });
-        
+
         final String INDEX_NAME = "index";
         final String LEAF_NAME = "leaf";
         final String PRINT_FIELDS_AREA_NAME = "printfieldsarea";
@@ -117,34 +117,34 @@ public class ExtentsInfoPanel extends javax.swing.JPanel {
         final String FILE_THREAD_NAME = "filethread";
         final String FOLDER_THREAD_NAME = "folderthread";
         final String STRUCT_VIEW_PANEL_NAME = "structview";
-        
+
         final CardLayout clRoot = new CardLayout();
         final JPanel leafPanel = new JPanel();
-        
+
         final CardLayout clLeaf = new CardLayout();
         leafPanel.setLayout(clLeaf);
-        
+
         leafPanel.add(new JLabel("INTERNAL ERROR!", SwingConstants.CENTER), OTHER_NAME);
         leafPanel.add(new JLabel("Displaying file thread information is not yet supported.", SwingConstants.CENTER), FILE_THREAD_NAME);
         leafPanel.add(new JLabel("Displaying folder thread information is not yet supported.", SwingConstants.CENTER), FOLDER_THREAD_NAME);
-        
+
         final JScrollPane structViewPanelScroller = new JScrollPane();
         structViewPanelScroller.getVerticalScrollBar().setUnitIncrement(UNIT_INCREMENT);
         structViewPanelScroller.getHorizontalScrollBar().setUnitIncrement(UNIT_INCREMENT);
         leafPanel.add(structViewPanelScroller, STRUCT_VIEW_PANEL_NAME);
-        
+
         final FileInfoPanel fileInfoPanel = new FileInfoPanel();
         JScrollPane fileInfoPanelScroller = new JScrollPane(fileInfoPanel);
         fileInfoPanelScroller.getVerticalScrollBar().setUnitIncrement(UNIT_INCREMENT);
         fileInfoPanelScroller.getHorizontalScrollBar().setUnitIncrement(UNIT_INCREMENT);
         leafPanel.add(fileInfoPanelScroller, FILE_NAME);
-        
+
         final FolderInfoPanel folderInfoPanel = new FolderInfoPanel();
         JScrollPane folderInfoPanelScroller = new JScrollPane(folderInfoPanel);
         folderInfoPanelScroller.getVerticalScrollBar().setUnitIncrement(UNIT_INCREMENT);
         folderInfoPanelScroller.getHorizontalScrollBar().setUnitIncrement(UNIT_INCREMENT);
         leafPanel.add(folderInfoPanelScroller, FOLDER_NAME);
-        
+
         final JTextArea printFieldsTextArea = new JTextArea(0, 0);
         printFieldsTextArea.setEditable(false);
         printFieldsTextArea.setLineWrap(false);
@@ -160,7 +160,7 @@ public class ExtentsInfoPanel extends javax.swing.JPanel {
         //infoScroller.setViewportView(infoPanel);
 
         catalogTree.addTreeSelectionListener(new TreeSelectionListener() {
-            
+
             /* @Override */
             public void valueChanged(TreeSelectionEvent te) {
                 //System.err.println("Tree selection");
@@ -193,7 +193,7 @@ public class ExtentsInfoPanel extends javax.swing.JPanel {
                             String label = dict.getTypeDescription();
                             if(label == null)
                                 label = dict.getTypeName();
-                            
+
                             structViewPanelScroller.setViewportView(
                                     new StructViewPanel(label + ":", dict));
                             clLeaf.show(leafPanel, STRUCT_VIEW_PANEL_NAME);
@@ -205,7 +205,7 @@ public class ExtentsInfoPanel extends javax.swing.JPanel {
                             ps.close();
                             printFieldsTextArea.setCaretPosition(0);
                             clLeaf.show(leafPanel, PRINT_FIELDS_AREA_NAME);
-                            
+
                         }
                         else {
                             System.err.println("CatalogInfoPanel: Could not show record type " + rec.getClass());
@@ -227,7 +227,7 @@ public class ExtentsInfoPanel extends javax.swing.JPanel {
         if(node instanceof CommonHFSExtentIndexNode) {
             List<CommonBTIndexRecord<CommonHFSExtentKey>> recs = ((CommonHFSExtentIndexNode) node).getBTRecords();
             for(CommonBTIndexRecord<CommonHFSExtentKey> rec : recs) {
-                
+
                 CommonBTNode curNode = fsView.getExtentsOverflowFile().getExtentsOverflowNode(rec.getIndex());
                 CommonHFSExtentKey key = rec.getKey();
                 dmtn.add(new NoLeafMutableTreeNode(new BTNodeStorage(curNode, key.getForkType() +
@@ -285,7 +285,7 @@ public class ExtentsInfoPanel extends javax.swing.JPanel {
             return text;
         }
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is

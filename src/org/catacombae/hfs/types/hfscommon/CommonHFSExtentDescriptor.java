@@ -37,23 +37,23 @@ public abstract class CommonHFSExtentDescriptor implements StructElements,
     public static CommonHFSExtentDescriptor create(HFSPlusExtentDescriptor hped) {
         return new HFSPlusImplementation(hped);
     }
-    
+
     public static CommonHFSExtentDescriptor create(ExtDescriptor hped) {
         return new HFSImplementation(hped);
     }
-    
+
     public static class HFSPlusImplementation extends CommonHFSExtentDescriptor {
         private final HFSPlusExtentDescriptor hped;
-        
+
         public HFSPlusImplementation(HFSPlusExtentDescriptor hped) {
             this.hped = hped;
         }
-        
+
         @Override
         public long getStartBlock() {
             return Util.unsign(hped.getStartBlock());
         }
-        
+
         @Override
         public long getBlockCount() {
             return Util.unsign(hped.getBlockCount());
@@ -73,19 +73,19 @@ public abstract class CommonHFSExtentDescriptor implements StructElements,
             return hped.getStructElements();
         }
     }
-    
+
     public static class HFSImplementation extends CommonHFSExtentDescriptor {
         private final ExtDescriptor hped;
-        
+
         public HFSImplementation(ExtDescriptor hped) {
             this.hped = hped;
         }
-        
+
         @Override
         public long getStartBlock() {
             return Util.unsign(hped.getXdrStABN());
         }
-        
+
         @Override
         public long getBlockCount() {
             return Util.unsign(hped.getXdrNumABlks());

@@ -33,7 +33,7 @@ public class RandomAccessFileDataLocator extends DataLocator {
     private final File file;
     private final Long pos, len;
     private final boolean writable;
-    
+
     /**
      * Creates a new DataLocator with a path to the backing file.
      *
@@ -42,7 +42,7 @@ public class RandomAccessFileDataLocator extends DataLocator {
     public RandomAccessFileDataLocator(String pPath) {
         this(new File(pPath));
     }
-    
+
     /**
      * Creates a new DataLocator with a path to the backing file.
      *
@@ -99,7 +99,7 @@ public class RandomAccessFileDataLocator extends DataLocator {
     public RandomAccessFileDataLocator(File pFile, boolean pWritable) {
         this(pFile, null, null, pWritable);
     }
-    
+
     /**
      * Creates a new DataLocator with File object pointing at the backing file.
      *
@@ -124,7 +124,7 @@ public class RandomAccessFileDataLocator extends DataLocator {
             boolean pWritable) {
         this(pFile, new Long(pPos), new Long(pLen), pWritable);
     }
-    
+
     private RandomAccessFileDataLocator(File pFile, Long pPos, Long pLen,
             boolean writable) {
         if(!pFile.canRead())
@@ -138,7 +138,7 @@ public class RandomAccessFileDataLocator extends DataLocator {
         this.len = pLen;
         this.writable = writable;
     }
-    
+
     @Override
     public ReadableRandomAccessStream createReadOnlyFile() {
         ReadableRandomAccessStream llf = new ReadableFileStream(file);
@@ -156,9 +156,9 @@ public class RandomAccessFileDataLocator extends DataLocator {
         else
             return wllf;
     }
-    
+
     @Override
     public boolean isWritable() {
         return writable;
-    }    
+    }
 }

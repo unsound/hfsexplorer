@@ -52,7 +52,7 @@ public class EBRPartitionSystem implements PartitionSystem {
             if(recordList.size() > 10000)
                 throw new RuntimeException("Number of EBR partitions capped at 10000.");
             recordList.add(ebr);
-            
+
             if(ebr.isTerminator())
                 break; // We have reached the end of the EBR linked list.
             else {

@@ -32,13 +32,13 @@ import org.catacombae.hfs.types.hfs.CdrFThdRec;
 public class CommonHFSCatalogFileThreadRecord extends CommonHFSCatalogLeafRecord implements PrintableStruct {
     private CommonHFSCatalogKey key;
     private CommonHFSCatalogFileThread data;
-    
+
     private CommonHFSCatalogFileThreadRecord(CommonHFSCatalogKey key,
             CommonHFSCatalogFileThread data) {
         this.key = key;
         this.data = data;
     }
-    
+
     @Override
     public CommonHFSCatalogKey getKey() {
         return key;
@@ -47,7 +47,7 @@ public class CommonHFSCatalogFileThreadRecord extends CommonHFSCatalogLeafRecord
     public CommonHFSCatalogFileThread getData() {
         return data;
     }
-    
+
     /* @Override */
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + CommonHFSCatalogFileThreadRecord.class.getSimpleName() + ":");
@@ -70,7 +70,7 @@ public class CommonHFSCatalogFileThreadRecord extends CommonHFSCatalogLeafRecord
 
         db.add("key", key.getStructElements(), "Catalog key");
         db.add("data", data.getStructElements(), "File thread data");
-            
+
         return db.getResult();
     }
 
@@ -79,12 +79,12 @@ public class CommonHFSCatalogFileThreadRecord extends CommonHFSCatalogLeafRecord
         return new CommonHFSCatalogFileThreadRecord(CommonHFSCatalogKey.create(key),
                 CommonHFSCatalogFileThread.create(data));
     }
-    
+
     public static CommonHFSCatalogFileThreadRecord create(CatKeyRec key, CdrFThdRec data) {
         return new CommonHFSCatalogFileThreadRecord(CommonHFSCatalogKey.create(key),
-                CommonHFSCatalogFileThread.create(data));        
+                CommonHFSCatalogFileThread.create(data));
     }
-    
+
     @Override
     public int getSize() {
         return key.occupiedSize() + data.length();

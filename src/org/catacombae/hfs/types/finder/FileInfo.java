@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -27,26 +27,26 @@ public class FileInfo extends CommonFinderInfo implements StructElements {
     /*
      * struct FileInfo
      * size: 16 bytes
-     * description: 
-     * 
-     * BP  Size  Type    Identifier     Description                         
+     * description:
+     *
+     * BP  Size  Type    Identifier     Description
      * ---------------------------------------------------------------------
-     * 0   4     OSType  fileType       // The type of the file             
-     * 4   4     OSType  fileCreator    // The file's creator               
-     * 8   2     UInt16  finderFlags                                        
-     * 10  4     Point   location       // File's location in the folder.   
-     * 14  2     UInt16  reservedField                                      
+     * 0   4     OSType  fileType       // The type of the file
+     * 4   4     OSType  fileCreator    // The file's creator
+     * 8   2     UInt16  finderFlags
+     * 10  4     Point   location       // File's location in the folder.
+     * 14  2     UInt16  reservedField
      */
-    
+
     private final OSType fileType;
     private final OSType fileCreator;
-    
+
     public FileInfo(byte[] data, int offset) {
         super(data, offset);
 	fileType = new OSType(data, offset+0);
 	fileCreator = new OSType(data, offset+4);
     }
-    
+
     public static int length() { return 16; }
 
     @Override
@@ -54,21 +54,21 @@ public class FileInfo extends CommonFinderInfo implements StructElements {
         byte[] result = new byte[length()];
 	byte[] tempData;
 	int offset = 0;
-        
+
         tempData = fileType.getBytes();
 	System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
         tempData = fileCreator.getBytes();
 	System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
-        
+
         tempData = super.getBytes();
 	System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
-                
+
         return result;
     }
-    
+
     public OSType getFileType() { return fileType; }
     public OSType getFileCreator() { return fileCreator; }
-    
+
     @Override
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " fileType: ");
@@ -77,7 +77,7 @@ public class FileInfo extends CommonFinderInfo implements StructElements {
 	getFileCreator().print(ps, prefix+"  ");
 	super.printFields(ps, prefix);
     }
-    
+
     /* @Override */
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "FileInfo:");
@@ -87,11 +87,11 @@ public class FileInfo extends CommonFinderInfo implements StructElements {
     @Override
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(FileInfo.class.getSimpleName());
-        
+
         db.add("fileType", fileType.getStructElements());
         db.add("fileCreator", fileCreator.getStructElements());
         db.addAll(super.getStructElements());
-        
+
         return db.getResult();
     }
 }

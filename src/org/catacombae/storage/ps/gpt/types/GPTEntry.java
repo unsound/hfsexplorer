@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006-2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -32,25 +32,25 @@ public class GPTEntry implements Partition, StructElements {
     /*
      * struct GPTEntry
      * size: 128 bytes
-     * description: 
-     * 
+     * description:
+     *
      * BP  Size  Type      Identifier           Description
      * ----------------------------------------------------
-     * 0   16    byte[16]  partitionTypeGUID               
-     * 16  16    byte[16]  uniquePartitionGUID             
-     * 32  8     UInt64    startingLBA                     
-     * 40  8     UInt64    endingLBA                       
-     * 48  8     UInt64    attributeBits                   
-     * 56  72    byte[72]  partitionName                   
+     * 0   16    byte[16]  partitionTypeGUID
+     * 16  16    byte[16]  uniquePartitionGUID
+     * 32  8     UInt64    startingLBA
+     * 40  8     UInt64    endingLBA
+     * 48  8     UInt64    attributeBits
+     * 56  72    byte[72]  partitionName
      */
-    
+
     protected final byte[] partitionTypeGUID = new byte[16];
     protected final byte[] uniquePartitionGUID = new byte[16];
     protected final byte[] startingLBA = new byte[8];
     protected final byte[] endingLBA = new byte[8];
     protected final byte[] attributeBits = new byte[8];
     protected final byte[] partitionName = new byte[72];
-    
+
     private final int blockSize;
 
     public GPTEntry(byte[] data, int offset, int blockSize) {
@@ -68,7 +68,7 @@ public class GPTEntry implements Partition, StructElements {
      * @param blockSize
      */
     protected GPTEntry(int blockSize) { this.blockSize = blockSize; }
-    
+
     public GPTEntry(GPTEntry source) {
         this(source.blockSize);
         copyFields(source);
@@ -82,21 +82,21 @@ public class GPTEntry implements Partition, StructElements {
         System.arraycopy(source.attributeBits, 0, attributeBits, 0, attributeBits.length);
         System.arraycopy(source.partitionName, 0, partitionName, 0, partitionName.length);
     }
-    
+
     // Defined in Partition
     public long getStartOffset() { return getStartingLBA()*blockSize; }
     public long getLength() { return getEndingLBA()*blockSize - getStartOffset(); }
     public PartitionType getType() { return convertPartitionType(getPartitionTypeGUIDAsEnum()); }
-    
+
     public static int getSize() { return 128; }
-    
+
     public byte[] getPartitionTypeGUID() { return Util.createCopy(partitionTypeGUID); }
     public byte[] getUniquePartitionGUID() { return Util.createCopy(uniquePartitionGUID); }
     public long getStartingLBA() { return Util.readLongLE(startingLBA); }
     public long getEndingLBA() { return Util.readLongLE(endingLBA); }
     public long getAttributeBits() { return Util.readLongBE(attributeBits); }
     public byte[] getPartitionName() { return Util.createCopy(partitionName); }
-    
+
     public GPTPartitionType getPartitionTypeGUIDAsEnum() {
         return GPTPartitionType.getType(Util.readLongBE(partitionTypeGUID, 0), Util.readLongBE(partitionTypeGUID, 8));
     }
@@ -115,7 +115,7 @@ public class GPTEntry implements Partition, StructElements {
     public boolean isUsed() {
         return getPartitionTypeGUIDAsEnum() != GPTPartitionType.PARTITION_TYPE_UNUSED_ENTRY;
     }
-    
+
     @Override
     public String toString() {
         return "\"" + getPartitionNameAsString() + "\" (" + getPartitionTypeGUIDAsEnum() + ")";
@@ -147,7 +147,7 @@ public class GPTEntry implements Partition, StructElements {
 
         return result;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
 	if(obj instanceof GPTEntry) {
@@ -158,9 +158,9 @@ public class GPTEntry implements Partition, StructElements {
 	else
 	    return false;
     }
-    
+
     // Utility methods
-    
+
     public static String getGUIDAsString(byte[] guid) {
         String res = "{";
         res += Util.toHexStringLE(Util.readIntBE(guid, 0)) + "-";
@@ -170,7 +170,7 @@ public class GPTEntry implements Partition, StructElements {
         res += Util.byteArrayToHexString(guid, 10, 6) + "}";
         return res.toUpperCase();
     }
-    
+
     public static PartitionType convertPartitionType(GPTPartitionType gpt) {
         switch(gpt) {
             case PARTITION_TYPE_APPLE_HFS:
@@ -190,7 +190,7 @@ public class GPTEntry implements Partition, StructElements {
         db.addUIntLE("startingLBA", startingLBA);
         db.addUIntLE("endingLBA", endingLBA);
         db.add("partitionName", new EncodedStringField(partitionName, "UTF-16LE"));
-        
+
         return db.getResult();
     }
 }

@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,7 +20,7 @@ package org.catacombae.storage.fs;
 /**
  * Enumerates the fork types that are recognized by the API as having a special
  * meaning.
- * 
+ *
  * @author Erik Larsson
  */
 public enum FSForkType {

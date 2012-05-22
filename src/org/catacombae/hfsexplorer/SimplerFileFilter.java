@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,19 +22,19 @@ import java.io.*;
 /**
  * Even simpler file filter as it only allows one extension.<br>
  * Directories are always accepted.
- * 
+ *
  * @author Erik Larsson
  */
 public class SimplerFileFilter extends javax.swing.filechooser.FileFilter {
 
     private String extension;
     private String description;
-    
+
     public SimplerFileFilter(String extension, String description) {
 	this.extension = extension;
 	this.description = description;
     }
-    
+
     /** {@inheritDoc} */
     @Override
     public boolean accept(File f) {
@@ -46,11 +46,11 @@ public class SimplerFileFilter extends javax.swing.filechooser.FileFilter {
         else
             return false;
     }
-    
+
     /** {@inheritDoc} */
     @Override
     public String getDescription() { return description; }
-    
+
     /**
      * Returns the extension that this file filter matches.
      * @return the extension that this file filter matches.

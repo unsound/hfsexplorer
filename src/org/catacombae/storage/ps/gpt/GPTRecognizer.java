@@ -28,11 +28,11 @@ import org.catacombae.storage.ps.gpt.types.GPTHeader;
  */
 public class GPTRecognizer implements PartitionSystemRecognizer {
     /*private DataLocator data;
-    
+
     public GPTRecognizer(DataLocator pData) {
         this.data = pData;
     }
-    
+
     @Override
     public boolean existsPartitionSystem() {
         try {
@@ -40,7 +40,7 @@ public class GPTRecognizer implements PartitionSystemRecognizer {
             byte[] secondBlock = new byte[512];
             llf.seek(512);
             llf.readFully(secondBlock);
-            
+
             // Look for GPT
             // Let's assume that blocks are always 512 bytes in size with MBR and GPT. I don't know
             // how to detect the actual block size (at least when reading from a file, otherwise I
@@ -51,7 +51,7 @@ public class GPTRecognizer implements PartitionSystemRecognizer {
             }
         } catch(Exception e) {
         }
-            
+
         return false;
     }*/
 

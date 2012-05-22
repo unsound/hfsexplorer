@@ -42,21 +42,21 @@ public class EditGPT extends javax.swing.JPanel {
     /** Creates new form EditGPT */
     public EditGPT() {
         containerPanel = new ContainerPanel();
-        
+
         initComponents();
-        
+
         add(containerPanel, BorderLayout.CENTER);
     }
-    
+
     public void loadFile(File f) {
         ReadableRandomAccessStream llf;
 	if(Win32FileStream.isSystemSupported())
 	    llf = new ReadableWin32FileStream(f.getAbsolutePath());
 	else
 	    llf = new ReadableFileStream(f.getAbsolutePath());
-        
+
         final GUIDPartitionTable gpt = new GUIDPartitionTable(llf, 0);
-        
+
         setFields(gpt);
     }
 
@@ -75,14 +75,14 @@ public class EditGPT extends javax.swing.JPanel {
     private void setFields(GUIDPartitionTable gpt) {
         this.originalGPT = gpt;
         //this.modifiedGPT = new MutableGUIDPartitionTable(gpt);
-        
+
         containerPanel.setFields(originalGPT.getStructElements());
     }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
-    
+
     public static void main(String[] args) {
         try {
 	    javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
@@ -94,9 +94,9 @@ public class EditGPT extends javax.swing.JPanel {
 	catch(Throwable e) {
 	    //It's ok. Non-critical.
 	}
-        
+
         File gptFile = new File(args[0]);
-        
+
         JFrame jf = new JFrame("EditGPT");
         EditGPT egpt = new EditGPT();
         jf.add(new JScrollPane(egpt));

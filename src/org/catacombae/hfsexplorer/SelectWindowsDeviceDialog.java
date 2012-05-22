@@ -406,9 +406,9 @@ public class SelectWindowsDeviceDialog extends JDialog {
         }
 // 	else if(plainFileSystems.size() > 0) {
 // 	    int res = JOptionPane.showConfirmDialog(this, "Autodetection complete! Found an " +
-// 						    "HFS+ file system at \"" + 
+// 						    "HFS+ file system at \"" +
 // 						    plainFileSystems.getFirst() +"\".\n" +
-// 						    "Do you want to load it?", 
+// 						    "Do you want to load it?",
 // 						    "Load HFS+ file system",
 // 						    JOptionPane.YES_NO_OPTION,
 // 						    JOptionPane.QUESTION_MESSAGE);

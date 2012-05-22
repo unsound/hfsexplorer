@@ -31,19 +31,19 @@ import org.catacombae.storage.io.win32.Win32FileStream;
 public class WindowsDeviceDataLocator extends DataLocator {
     private final String devicePath;
     private final Long pos, len;
-    
+
     public WindowsDeviceDataLocator(String pDevicePath) {
         this.devicePath = pDevicePath;
         this.pos = null;
         this.len = null;
     }
-    
+
     public WindowsDeviceDataLocator(String pDevicePath, long pPos, long pLen) {
         this.devicePath = pDevicePath;
         this.pos = pPos;
         this.len = pLen;
     }
-    
+
     @Override
     public ReadableRandomAccessStream createReadOnlyFile() {
         ReadableRandomAccessStream llf = new ReadableWin32FileStream(devicePath);

@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006-2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -107,7 +107,7 @@ import org.catacombae.storage.ps.PartitionType;
 /**
  * The main window for the graphical part of HFSExplorer. This class contains a lot of
  * non-presentation code and is very large. Should be restructured in the future.
- * 
+ *
  * @author Erik
  */
 public class FileSystemBrowserWindow extends JFrame {
@@ -164,7 +164,7 @@ public class FileSystemBrowserWindow extends JFrame {
                     exitApplication();
                     return false;
                 }
-                
+
                 /* @Override */
                 public void showAboutDialog() {
                     actionShowAboutDialog();
@@ -257,12 +257,12 @@ public class FileSystemBrowserWindow extends JFrame {
                 fileChooser.setMultiSelectionEnabled(false);
                 fileChooser.setFileSelectionMode(
                         JFileChooser.FILES_AND_DIRECTORIES);
-                
+
                 SimpleFileFilter dmgFilter = new SimpleFileFilter();
                 dmgFilter.addExtension("dmg");
                 dmgFilter.setDescription("Mac OS X disk images (*.dmg)");
                 fileChooser.addChoosableFileFilter(dmgFilter);
-                
+
                 SimpleFileFilter cdrFilter = new SimpleFileFilter();
                 cdrFilter.addExtension("iso");
                 cdrFilter.addExtension("cdr");
@@ -288,12 +288,12 @@ public class FileSystemBrowserWindow extends JFrame {
 
                 };
                 fileChooser.addChoosableFileFilter(sparseBundleFilter);
-                
+
                 SimpleFileFilter imgFilter = new SimpleFileFilter();
                 imgFilter.addExtension("img");
                 imgFilter.setDescription("Raw disk image (*.img)");
                 fileChooser.addChoosableFileFilter(imgFilter);
-                
+
                 fileChooser.setFileFilter(fileChooser.getAcceptAllFileFilter());
                 int res = fileChooser.showOpenDialog(FileSystemBrowserWindow.this);
                 if(res == JFileChooser.APPROVE_OPTION) {
@@ -454,7 +454,7 @@ public class FileSystemBrowserWindow extends JFrame {
                 }
             }
         });
-        
+
         /*
         JMenuItem setFileReadOffsetItem = new JMenuItem("Set file read offset...");
         setFileReadOffsetItem.addActionListener(new ActionListener() {
@@ -467,8 +467,8 @@ public class FileSystemBrowserWindow extends JFrame {
                 }
             }
         });
-        */ 
-        
+        */
+
         JMenuItem memoryStatisticsItem = new JMenuItem("Memory statistics");
         memoryStatisticsItem.addActionListener(new ActionListener() {
             /* @Override */
@@ -722,7 +722,7 @@ public class FileSystemBrowserWindow extends JFrame {
                 System.err.println("[INFO] Non-critical exception while trying to detect CEncryptedEncoding structure:");
                 e.printStackTrace();
             }
-            
+
             try {
                 System.err.println("Trying to detect UDIF structure...");
                 if(UDIFDetector.isUDIFEncoded(fsFile)) {
@@ -1194,7 +1194,7 @@ public class FileSystemBrowserWindow extends JFrame {
             else {
                 saveFile = selectedFile;
             }
-            
+
             if(saveFile.exists()) {
                 int res = JOptionPane.showConfirmDialog(this, "The file:\n  " + saveFile.getPath() +
                         "\nAlready exists. Do you want to overwrite?", "Confirm overwrite",
@@ -1202,7 +1202,7 @@ public class FileSystemBrowserWindow extends JFrame {
                 if(res != JOptionPane.YES_OPTION)
                     return;
             }
-            
+
             final javax.swing.ProgressMonitor pm =
                     new javax.swing.ProgressMonitor(FileSystemBrowserWindow.this,
                     "Extracting file system data to disk image...",
@@ -1285,7 +1285,7 @@ public class FileSystemBrowserWindow extends JFrame {
     private void actionExtractToDir(final String[] parentPath, List<FSEntry> selection) {
         actionExtractToDir(parentPath, selection, true, false);
     }
-    
+
     private void actionExtractToDir(final String[] parentPath, final List<FSEntry> selection,
             final boolean dataFork, final boolean resourceFork) {
         if(!dataFork && !resourceFork) {
@@ -1331,7 +1331,7 @@ public class FileSystemBrowserWindow extends JFrame {
                                         "different locations in your target folder.",
                                         "Follow symbolic links?", JOptionPane.YES_NO_CANCEL_OPTION,
                                         JOptionPane.QUESTION_MESSAGE);
-                                
+
                                 final boolean followSymlinks;
                                 if(res == JOptionPane.YES_OPTION)
                                     followSymlinks = true;
@@ -1339,14 +1339,14 @@ public class FileSystemBrowserWindow extends JFrame {
                                     followSymlinks = false;
                                 else
                                     return;
-                                    
+
                                 /*
                                 System.err.println("TEST traversing with traverseTree");
                                 traverseTree(parentPath, selection, new NullTreeVisitor(), followSymlinks);
                                 if(true)
                                     return;
                                 */
-                                
+
                                 long dataSize = calculateForkSizeRecursive(parentPath, selection,
                                         progress, forkTypes, followSymlinks);
                                 if(false) {
@@ -1356,20 +1356,20 @@ public class FileSystemBrowserWindow extends JFrame {
                                         System.err.println("Size calculation completed. Total size: " + dataSize + " bytes");
                                     return;
                                 }
-                                
+
                                 //JOptionPane.showMessageDialog(progress, "dataSize = " + dataSize);
-                                
+
                                 if(progress.cancelSignaled())
                                     progress.confirmCancel();
                                 else {
                                     progress.setDataSize(dataSize);
-                                    
+
                                     LinkedList<String> errorMessages = new LinkedList<String>();
                                     extract(parentPath, selection, outDir, progress, errorMessages,
                                             followSymlinks, forkTypes);
                                     if(progress.cancelSignaled())
                                         errorMessages.addLast("User aborted extraction.");
-                                    
+
                                     if(!progress.cancelSignaled()) {
                                         if(errorMessages.size() == 0) {
                                             JOptionPane.showMessageDialog(progress,
@@ -1428,12 +1428,12 @@ public class FileSystemBrowserWindow extends JFrame {
     //fileChooser.setSelectedFiles(new File[0]);
     //fileChooser.setCurrentDirectory(fileChooser.getCurrentDirectory());
     }
-    
+
     /**
      * Calculates the combined size of the forks of types <code>forkTypes</code> for the selection,
      * including for all files in subdirectories, recursively. If <code>forkTypes</code> is empty,
      * all forks are included in the calculation.
-     * 
+     *
      * @param parentPath the parent path of the entries in <code>selection</code>.
      * @param selection the source entries for the calculation.
      * @param progress the progress monitor that recieves updates about our current state and
@@ -1450,33 +1450,33 @@ public class FileSystemBrowserWindow extends JFrame {
             for(FSForkType forkType : fsHandler.getSupportedForkTypes())
                 forkTypes.add(forkType);
         }
-        
+
         CalculateTreeSizeVisitor sizeVisitor =
                 new CalculateTreeSizeVisitor(progress, forkTypes);
         traverseTree(parentPath, selection, sizeVisitor, followSymlinks);
         return sizeVisitor.getSize();
     }
-    
+
     private void traverseTree(String[] parentPath, List<FSEntry> entries, TreeVisitor visitor,
             boolean followSymbolicLinks) {
         LinkedList<String[]> absPathsStack = new LinkedList<String[]>();
         LinkedList<String> pathStack = new LinkedList<String>();
-        
+
         if(parentPath != null) {
             absPathsStack.addLast(parentPath);
             for(String pathComponent : parentPath)
                 pathStack.addLast(pathComponent);
         }
-        
+
         FSEntry[] children = entries.toArray(new FSEntry[entries.size()]);
-        
+
         traverseTreeRecursive(children, pathStack, absPathsStack, visitor, followSymbolicLinks);
     }
-    
+
     private void traverseTreeRecursive(final FSEntry[] selection, final LinkedList<String> pathStack,
             final LinkedList<String[]> absPathsStack, final TreeVisitor visitor,
             final boolean followSymbolicLinks) {
-        
+
         if(visitor.cancelTraversal()) {
             return;
         }
@@ -1484,24 +1484,24 @@ public class FileSystemBrowserWindow extends JFrame {
         //System.err.println("calculateForkSizeRecursive")
         String[] pathStackArray = pathStack.toArray(new String[pathStack.size()]);
         String pathStackString = Util.concatenateStrings(pathStack, "/");
-        
+
         //System.err.print("Directory: \"");
         //System.err.print(pathStackString);
         //System.err.println("\"...");
-        
+
         for(FSEntry curEntry : selection) {
             if(visitor.cancelTraversal()) {
                 break;
             }
-            
+
             String curEntryString = (pathStackString.length() > 0 ? pathStackString + "/" : "") +
                                 curEntry.getName();
             //System.err.println("Processing \"" + curEntryString + "\"...");
-            
+
             String[] linkTargetPath = null;
             if(followSymbolicLinks && curEntry instanceof FSLink) {
                 FSLink curLink = (FSLink)curEntry;
-                
+
                 //System.err.print("  Getting link target for \"" + curEntryString + "\"...");
                 String[] targetPath = fsHandler.getTargetPath(curLink, pathStackArray);
                 if(targetPath != null) {
@@ -1514,7 +1514,7 @@ public class FileSystemBrowserWindow extends JFrame {
                         visitor.traversalError(msg);
                         continue;
                     }
-                        
+
                     FSEntry linkTarget = fsHandler.getEntry(targetPath);
                     if(linkTarget != null) {
                         //System.err.println("  Happily resolved link \"" + curLink.getLinkTargetString() + "\" to an FSEntry by the name \"" + linkTarget.getName() + "\"");
@@ -1534,7 +1534,7 @@ public class FileSystemBrowserWindow extends JFrame {
                     visitor.traversalError(msg);
                 }
             }
-            
+
             final String[] absolutePath;
             if(linkTargetPath != null)
                 absolutePath = linkTargetPath;
@@ -1544,7 +1544,7 @@ public class FileSystemBrowserWindow extends JFrame {
                 else
                     absolutePath = new String[0];
             }
-            
+
             if(curEntry instanceof FSFile) {
                 visitor.file((FSFile) curEntry);
             }
@@ -1552,15 +1552,15 @@ public class FileSystemBrowserWindow extends JFrame {
                 FSFolder curFolder = (FSFolder) curEntry;
                 if(absPathsStack.size() > 0)
                     pathStack.addLast(curFolder.getName());
-                        
+
                 absPathsStack.addLast(absolutePath);
-                
+
                 try {
                     if(visitor.startDirectory(pathStackArray, curFolder)) {
-                        
+
                         traverseTreeRecursive(curFolder.listEntries(), pathStack, absPathsStack,
                                 visitor, followSymbolicLinks);
-                    
+
                         visitor.endDirectory(pathStackArray, curFolder);
                     }
                 } finally {
@@ -1577,7 +1577,7 @@ public class FileSystemBrowserWindow extends JFrame {
                     System.err.println(msg);
                     //visitor.traversalError(msg);
                 }
-                
+
                 visitor.link((FSLink) curEntry);
             }
             else {
@@ -1585,7 +1585,7 @@ public class FileSystemBrowserWindow extends JFrame {
             }
         }
     }
-    
+
     private void actionShowAboutDialog() {
         String message = "";
         message += "HFSExplorer " + HFSExplorer.VERSION + " Build #" + BuildNumber.BUILD_NUMBER + "\n";
@@ -1598,11 +1598,11 @@ public class FileSystemBrowserWindow extends JFrame {
         message += "\nJava Runtime Environment: " + System.getProperty("java.version");
         message += "\nVirtual machine: " + System.getProperty("java.vm.vendor") + " " +
                 System.getProperty("java.vm.name") + " " + System.getProperty("java.vm.version");
-        
+
         JOptionPane.showMessageDialog(this, message, "About", JOptionPane.INFORMATION_MESSAGE);
-        
+
     }
-    
+
     private void actionGetInfo(String[] parentPath, List<FSEntry> entries) {
         if(entries.size() != 1) {
             JOptionPane.showMessageDialog(this, "Get info for multiple selections not yet possible.\n" +
@@ -1622,7 +1622,7 @@ public class FileSystemBrowserWindow extends JFrame {
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     /** <code>progressDialog</code> may NOT be null. */
     protected void extract(String[] parentPath, FSEntry rec, File outDir,
             ExtractProgressMonitor progressDialog, LinkedList<String> errorMessages,
@@ -1686,7 +1686,7 @@ public class FileSystemBrowserWindow extends JFrame {
     private static boolean deepExists(File f) {
         if(!f.exists())
             return false; // We trust that Java never returns false negatives.
-        
+
         File parentDir = f.getParentFile();
         for(File child : parentDir.listFiles()) {
             if(child.getName().equals(f.getName()))
@@ -1759,12 +1759,12 @@ public class FileSystemBrowserWindow extends JFrame {
         }
 
         //int errorCount = 0;
-        
+
         String[] absolutePath = null;
         if(rec instanceof FSLink) {
             FSLink curLink = (FSLink) rec;
             String[] pathStackArray = pathStack.toArray(new String[pathStack.size()]);
-            
+
             String[] targetPath = fsHandler.getTargetPath(curLink, pathStackArray);
             if(targetPath != null) {
                 if(Util.contains(absPathsStack, targetPath)) {
@@ -1776,7 +1776,7 @@ public class FileSystemBrowserWindow extends JFrame {
                             "\"... skipping this entry.");
                     return;
                 }
-                
+
                 FSEntry linkTarget = fsHandler.getEntry(targetPath);
                 if(linkTarget != null) {
                     rec = linkTarget;
@@ -1796,7 +1796,7 @@ public class FileSystemBrowserWindow extends JFrame {
             }
             //FSEntry linkTarget = curLink.getLinkTarget(pathStackArray);
         }
-        
+
         if(rec instanceof FSFile) {
             if(dataFork) {
                 extractFile((FSFile) rec, outDir, progressDialog, errorMessages, overwriteAll, FSForkType.DATA);
@@ -1838,7 +1838,7 @@ public class FileSystemBrowserWindow extends JFrame {
                     for(String[] cur : absPathsStack) {
                         System.err.println("                     " + Util.concatenateStrings(cur, "/"));
                     }
-                    
+
                     for(FSEntry outRec : contents) {
                         extractRecursive(outRec, pathStack, absPathsStack, thisDir, progressDialog,
                                 errorMessages, overwriteAll, dataFork, resourceFork);
@@ -1874,33 +1874,33 @@ public class FileSystemBrowserWindow extends JFrame {
             final ObjectContainer<Boolean> skipDirectory, final FSForkType forkType) {
         //int errorCount = 0;
         final String originalFileName;
-        
+
         if(forkType == FSForkType.DATA)
             originalFileName = rec.getName();
         else if(forkType == FSForkType.MACOS_RESOURCE)
             originalFileName = "._" + rec.getName(); // Special syntax for resource forks in foreign file systems
-        else 
+        else
             throw new RuntimeException("Unexpected fork type: " + forkType);
-        
+
         CreateFileFailedAction defaultCreateFileFailedAction =
                 extractProperties.getCreateFileFailedAction();
         FileExistsAction defaultFileExistsAction =
                 extractProperties.getFileExistsAction();
-        
+
         String fileName = originalFileName;
-        
+
         while(fileName != null) {
             String curFileName = fileName;
             fileName = null;
-            
+
             //System.out.println("file: \"" + filename + "\" range: " + fractionLowLimit + "-" + fractionHighLimit);
             final FSFork theFork = rec.getForkByType(forkType);
-            
+
             if(theFork == null)
                 throw new RuntimeException("Could not find a fork of type: " + forkType);
             else if(forkType == FSForkType.MACOS_RESOURCE && theFork.getLength() == 0)
                 return; // Extracting empty resource forks is really pointless.
-            
+
             progressDialog.updateCurrentFile(curFileName, theFork.getLength());
 
             final File outFile = new File(outDir, curFileName);
@@ -1916,7 +1916,7 @@ public class FileSystemBrowserWindow extends JFrame {
                     a = defaultFileExistsAction;
                     defaultFileExistsAction = FileExistsAction.PROMPT_USER;
                 }
-                
+
                 if(a == FileExistsAction.OVERWRITE) {
                 }
                 else if(a == FileExistsAction.OVERWRITE_ALL) {
@@ -1936,14 +1936,14 @@ public class FileSystemBrowserWindow extends JFrame {
                 }
                 else if(a == FileExistsAction.RENAME) {
                     fileName = progressDialog.displayRenamePrompt(curFileName, outDir);
-                    
+
                     if(fileName == null)
                         fileName = curFileName;
                     continue;
                 }
                 else if(a == FileExistsAction.AUTO_RENAME) {
                     fileName = FileNameTools.autoRenameIllegalFilename(curFileName, outDir, false);
-                    
+
                     if(fileName == null)
                         fileName = curFileName;
                     continue;
@@ -1985,10 +1985,10 @@ public class FileSystemBrowserWindow extends JFrame {
                 else
                     extractForkToStream(theFork, fos, progressDialog);
                 fos.close();
-                
+
                 if(rec.getAttributes().hasModifyDate())
                     outFile.setLastModified(rec.getAttributes().getModifyDate().getTime());
-                
+
                 if(curFileName != (Object) originalFileName && !curFileName.equals(originalFileName))
                     errorMessages.addLast("File \"" + originalFileName +
                             "\" was renamed to \"" + curFileName + "\" in parent folder \"" +
@@ -2005,7 +2005,7 @@ public class FileSystemBrowserWindow extends JFrame {
                 }
                 System.out.println();
                 // </Debug messages>
-                
+
                 // <Prompt user for action, if needed>
                 CreateFileFailedAction a;
                 if(defaultCreateFileFailedAction == CreateFileFailedAction.PROMPT_USER)
@@ -2014,7 +2014,7 @@ public class FileSystemBrowserWindow extends JFrame {
                     a = defaultCreateFileFailedAction;
                     defaultCreateFileFailedAction = CreateFileFailedAction.PROMPT_USER;
                 }
-                
+
                 if(a == CreateFileFailedAction.SKIP_FILE) {
                     errorMessages.addLast("Skipped extracting file \"" + outFile.getAbsolutePath() +
                             "\" due to user interaction.");
@@ -2028,7 +2028,7 @@ public class FileSystemBrowserWindow extends JFrame {
                 }
                 else if(a == CreateFileFailedAction.RENAME) {
                     fileName = progressDialog.displayRenamePrompt(curFileName, outDir);
-                    
+
                     if(fileName == null)
                         fileName = curFileName;
                     continue;
@@ -2047,7 +2047,7 @@ public class FileSystemBrowserWindow extends JFrame {
                 else {
                     throw new RuntimeException("Internal error! Did not expect a: " + a);
                 }
-                // </Prompt user for action, if needed>                
+                // </Prompt user for action, if needed>
             } catch(IOException ioe) {
                 System.err.println("Received I/O exception when trying to write to file \"" + outFile + "\":");
                 ioe.printStackTrace();
@@ -2091,7 +2091,7 @@ public class FileSystemBrowserWindow extends JFrame {
      */
     public interface TreeVisitor {
         /**
-         * 
+         *
          * @param parentPath
          * @param folder
          * @return whether tree traversal should enter this directory or not. If the visitor returns
@@ -2101,28 +2101,28 @@ public class FileSystemBrowserWindow extends JFrame {
         public void endDirectory(String[] parentPath, FSFolder folder);
         public void file(FSFile fsf);
         public void link(FSLink fsl);
-        
+
         /**
          * This method is called when the traversal engine encounters a non-critical error.
          * @param message
          */
         public void traversalError(String message);
-        
+
         /**
          * Implement this to return true when the traversal process is to be aborted.
          * @return true if the visitor requests that the tree traversal be aborted.
          */
         public boolean cancelTraversal();
     }
-    
+
     public class NullTreeVisitor implements TreeVisitor {
 
         /* @Override */
         public boolean startDirectory(String[] parentPath, FSFolder folder) { return true; }
-        
+
         /* @Override */
         public void endDirectory(String[] parentPath, FSFolder folder) {}
-        
+
         /* @Override */
         public void file(FSFile fsf) {}
 
@@ -2135,35 +2135,35 @@ public class FileSystemBrowserWindow extends JFrame {
         /* @Override */
         public boolean cancelTraversal() { return false; }
     }
-    
+
     public class CalculateTreeSizeVisitor extends NullTreeVisitor {
         private final ExtractProgressMonitor pm;
         private final StringBuilder sb = new StringBuilder();
         private final FSForkType[] forkTypes;
         private long size = 0;
         //private LinkedList<String> errorMessages = new LinkedList<String>();
-        
+
         public CalculateTreeSizeVisitor(ExtractProgressMonitor pm, List<FSForkType> forkTypes) {
             this(pm, forkTypes.toArray(new FSForkType[forkTypes.size()]));
         }
-        
+
         public CalculateTreeSizeVisitor(ExtractProgressMonitor pm, FSForkType... forkTypes) {
             this.pm = pm;
             this.forkTypes = forkTypes;
-            
+
             if(this.pm == null)
                 throw new IllegalArgumentException("pm == null");
             if(this.forkTypes == null)
                 throw new IllegalArgumentException("forkTypes == null");
-            
+
             if(forkTypes.length == 0)
                 throw new IllegalArgumentException("No fork types to extract.");
         }
-        
+
         public long getSize() {
             return size;
         }
-        
+
         @Override
         public boolean startDirectory(String[] parentPath, FSFolder folder) {
             sb.setLength(0);
@@ -2173,7 +2173,7 @@ public class FileSystemBrowserWindow extends JFrame {
             pm.updateCalculateDir(sb.toString());
             return true;
         }
-        
+
         @Override
         public void file(FSFile file) {
             for(FSForkType forkType : forkTypes) {
@@ -2182,11 +2182,11 @@ public class FileSystemBrowserWindow extends JFrame {
                     size += fork.getLength();
             }
         }
-        
+
         @Override
         public boolean cancelTraversal() { return pm.cancelSignaled(); }
     }
-    
+
     private class ExtractVisitor extends NullTreeVisitor {
         private final ExtractProgressMonitor pm;
         private final LinkedList<String> errorMessages;
@@ -2196,7 +2196,7 @@ public class FileSystemBrowserWindow extends JFrame {
         private final ExtractProperties extractProperties;
         private final FSForkType[] forkTypes;
         private final LinkedList<File> outDirStack = new LinkedList<File>();
-        
+
         public ExtractVisitor(ExtractProgressMonitor pm, LinkedList<String> errorMessages, File outDir,
                 List<FSForkType> forkTypes) {
             this(pm, errorMessages, outDir, forkTypes.toArray(new FSForkType[forkTypes.size()]));
@@ -2208,7 +2208,7 @@ public class FileSystemBrowserWindow extends JFrame {
             this.outRootDir = outDir;
             this.forkTypes = forkTypes;
             this.extractProperties = this.pm.getExtractProperties();
-            
+
             if(this.pm == null)
                 throw new IllegalArgumentException("pm == null");
             if(this.errorMessages == null)
@@ -2217,13 +2217,13 @@ public class FileSystemBrowserWindow extends JFrame {
                 throw new IllegalArgumentException("outDir == null");
             if(this.forkTypes == null)
                 throw new IllegalArgumentException("forkTypes == null");
-            
+
             if(forkTypes.length == 0)
                 throw new IllegalArgumentException("No fork types to extract.");
-            
+
             outDirStack.addLast(outDir);
         }
-        
+
         @Override
         public boolean startDirectory(String[] parentPath, FSFolder folder) {
             //System.err.println("startDirectory(" + Util.concatenateStrings(parentPath, "/") + ", " + folder.getName());
@@ -2231,15 +2231,15 @@ public class FileSystemBrowserWindow extends JFrame {
             //    System.err.println("  skipping...");
             //    return false;
             //}
-                
+
             //System.err.println("outDirStack.getLast()=" + outDirStack.getLast());
             final File outDir = outDirStack.getLast();
-            
+
             final CreateDirectoryFailedAction originalCreateDirectoryFailedAction =
                     extractProperties.getCreateDirectoryFailedAction();
             final DirectoryExistsAction originalDirectoryExistsAction =
                     extractProperties.getDirectoryExistsAction();
-            
+
             CreateDirectoryFailedAction defaultCreateDirectoryFailedAction =
                     originalCreateDirectoryFailedAction;
             DirectoryExistsAction defaultDirectoryExistsAction =
@@ -2250,17 +2250,17 @@ public class FileSystemBrowserWindow extends JFrame {
             while(dirName != null) {
                 String curDirName = dirName;
                 dirName = null;
-                
+
                 pm.updateCurrentDir(curDirName);
                 File thisDir = new File(outDir, curDirName);
-                
+
                 if(defaultDirectoryExistsAction != DirectoryExistsAction.CONTINUE && deepExists(thisDir)) {
                     DirectoryExistsAction a;
                     if(defaultDirectoryExistsAction == DirectoryExistsAction.PROMPT_USER)
                         a = pm.directoryExists(thisDir);
                     else
                         a = defaultDirectoryExistsAction;
-                    
+
                     boolean resetLoop = false;
                     switch(a) {
                         case CONTINUE:
@@ -2272,7 +2272,7 @@ public class FileSystemBrowserWindow extends JFrame {
                             resetLoop = true;
                             break;
                         case AUTO_RENAME:
-                            dirName = FileNameTools.autoRenameIllegalFilename(curDirName, outDir, true);                            
+                            dirName = FileNameTools.autoRenameIllegalFilename(curDirName, outDir, true);
                             if(dirName == null)
                                 dirName = curDirName;
                             resetLoop = true;
@@ -2299,7 +2299,7 @@ public class FileSystemBrowserWindow extends JFrame {
                         errorMessages.addLast("Directory \"" + originalDirName +
                                 "\" was renamed to \"" + curDirName + "\" in parent folder \"" +
                                 outDir.getAbsolutePath() + "\".");
-                    
+
                     outDirStack.addLast(thisDir);
                     return true;
                 }
@@ -2312,7 +2312,7 @@ public class FileSystemBrowserWindow extends JFrame {
                         // Only perform the default action once... or else we would have an endless loop
                         defaultCreateDirectoryFailedAction = CreateDirectoryFailedAction.PROMPT_USER;
                     }
-                    
+
                     switch(a) {
                         case SKIP_DIRECTORY:
                             errorMessages.addLast("Could not create directory \"" + thisDir.getAbsolutePath() +
@@ -2324,7 +2324,7 @@ public class FileSystemBrowserWindow extends JFrame {
                                 dirName = curDirName;
                             break;
                         case AUTO_RENAME:
-                            dirName = FileNameTools.autoRenameIllegalFilename(curDirName, outDir, true);                            
+                            dirName = FileNameTools.autoRenameIllegalFilename(curDirName, outDir, true);
                             if(dirName == null) {
                                 dirName = curDirName;
                                 /*
@@ -2345,23 +2345,23 @@ public class FileSystemBrowserWindow extends JFrame {
                         default:
                             throw new RuntimeException("Internal error! Did not expect a: " + a);
                     }
-                    
+
                 }
             }
             return false;
         }
-        
+
         @Override
         public void endDirectory(String[] parentPath, FSFolder folder) {
             outDirStack.removeLast();
             skipDirectory.o = false;
         }
-        
+
         @Override
         public void file(FSFile fsf) {
             if(skipDirectory.o)
                 return;
-            
+
             File outDir = outDirStack.getLast();
             for(FSForkType forkType : forkTypes)
                 extractFile(fsf, outDir, pm, errorMessages, extractProperties, skipDirectory, forkType);
@@ -2384,7 +2384,7 @@ public class FileSystemBrowserWindow extends JFrame {
             return pm.cancelSignaled();
         }
     }
-    
+
     private class FileSystemProvider implements FileSystemBrowser.FileSystemProvider<FSEntry> {
         /* @Override */
         public void actionDoubleClickFile(List<Record<FSEntry>> recordPath) {
@@ -2425,7 +2425,7 @@ public class FileSystemBrowserWindow extends JFrame {
         /* @Override */
         public void actionExtractToDir(List<Record<FSEntry>> parentPathList, List<Record<FSEntry>> recordList) {
             String[] parentPath = getFSPath(parentPathList);
-            
+
             List<FSEntry> fsEntryList = new ArrayList<FSEntry>(recordList.size());
             for(Record<FSEntry> rec : recordList) {
                 fsEntryList.add(rec.getUserObject());
@@ -2501,7 +2501,7 @@ public class FileSystemBrowserWindow extends JFrame {
         /* @Override */
         public List<Record<FSEntry>> getFolderContents(List<Record<FSEntry>> folderRecordPath) {
             FSEntry lastEntry = folderRecordPath.get(folderRecordPath.size() - 1).getUserObject();
-            
+
             // Resolve any links first
             if(lastEntry instanceof FSLink) {
                 String[] parentPath = getFSPath(folderRecordPath, folderRecordPath.size()-1);
@@ -2518,11 +2518,11 @@ public class FileSystemBrowserWindow extends JFrame {
                     throw new RuntimeException("Tried to get folder contents for link target type " +
                         lastEntry.getClass());
             }
-            
+
             // Then check for folder
             if(lastEntry instanceof FSFolder) {
                 String[] folderPath = getFSPath(folderRecordPath);
-                
+
                 FSEntry[] entryArray = ((FSFolder) lastEntry).listEntries();
                 ArrayList<Record<FSEntry>> entryList = new ArrayList<Record<FSEntry>>(entryArray.length);
                 for(FSEntry entry : entryArray) {
@@ -2598,7 +2598,7 @@ public class FileSystemBrowserWindow extends JFrame {
 
             while(it.hasNext())
                 it.next(); // Finish the iterator
-            
+
             return res;
         }
     }

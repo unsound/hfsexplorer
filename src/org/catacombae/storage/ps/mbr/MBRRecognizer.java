@@ -29,18 +29,18 @@ import org.catacombae.storage.ps.mbr.types.MBRPartitionTable;
 public class MBRRecognizer implements PartitionSystemRecognizer {
     /*
     private DataLocator data;
-    
+
     public MBRRecognizer(DataLocator pData) {
         this.data = pData;
     }
-    
+
     @Override
     public boolean existsPartitionSystem() {
         try {
             ReadableRandomAccessStream llf = data.createReadOnlyFile();
             byte[] firstBlock = new byte[512];
             llf.read(firstBlock);
-            
+
             // Look for MBR
             MBRPartitionTable mpt = new MBRPartitionTable(firstBlock, 0);
             if(mpt.isValid()) {
@@ -48,7 +48,7 @@ public class MBRRecognizer implements PartitionSystemRecognizer {
             }
         } catch(Exception e) {
         }
-            
+
         return false;
     }
     */

@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,7 +20,7 @@ package org.catacombae.storage.ps.ebr;
 import org.catacombae.storage.ps.mbr.types.MBRPartition;
 
 public class EBRPartition extends MBRPartition {
-    
+
     private final long baseOffset;
 
     /**
@@ -35,13 +35,13 @@ public class EBRPartition extends MBRPartition {
         super(data, offset, sectorSize);
         this.baseOffset = baseOffset;
     }
-    
+
     /** Copy constructor. */
     public EBRPartition(EBRPartition source) {
         super(source);
         this.baseOffset = source.baseOffset;
     }
-    
+
     // Defined in Partition
     @Override
     public long getStartOffset() { return super.getStartOffset()+baseOffset; }

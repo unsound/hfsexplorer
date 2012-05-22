@@ -15,18 +15,18 @@ public class JournalHeader implements StaticStruct, PrintableStruct {
     /*
      * struct JournalHeader
      * size: 44 bytes
-     * description: 
-     * 
+     * description:
+     *
      * BP  Size  Type    Identifier  Description
      * -----------------------------------------
-     * 0   4     UInt32  magic       
-     * 4   4     UInt32  endian      
-     * 8   8     UInt64  start       
-     * 16  8     UInt64  end         
-     * 24  8     UInt64  size        
-     * 32  4     UInt32  blhdrSize   
-     * 36  4     UInt32  checksum    
-     * 40  4     UInt32  jhdrSize    
+     * 0   4     UInt32  magic
+     * 4   4     UInt32  endian
+     * 8   8     UInt64  start
+     * 16  8     UInt64  end
+     * 24  8     UInt64  size
+     * 32  4     UInt32  blhdrSize
+     * 36  4     UInt32  checksum
+     * 40  4     UInt32  jhdrSize
      */
 
     public static final int STRUCTSIZE = 44;

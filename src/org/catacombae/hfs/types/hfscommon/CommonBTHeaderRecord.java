@@ -32,7 +32,7 @@ public abstract class CommonBTHeaderRecord extends CommonBTRecord implements Pri
     public enum CompareType {
         CASE_FOLDING, BINARY_COMPARE;
     }
-    
+
     public abstract int getTreeDepth();
     public abstract long getRootNodeNumber();
     public abstract long getNumberOfLeafRecords();
@@ -43,7 +43,7 @@ public abstract class CommonBTHeaderRecord extends CommonBTRecord implements Pri
     public abstract long getTotalNodes();
     public abstract long getFreeNodes();
     public abstract CompareType getKeyCompareType();
-    
+
     public abstract byte[] getBytes();
 
     /*
@@ -56,14 +56,14 @@ public abstract class CommonBTHeaderRecord extends CommonBTRecord implements Pri
     public static CommonBTHeaderRecord create(BTHeaderRec bthr) {
         return new HFSPlusImplementation(bthr);
     }
-    
+
     public static CommonBTHeaderRecord create(BTHdrRec bthr) {
         return new HFSImplementation(bthr);
     }
-    
+
     public static class HFSPlusImplementation extends CommonBTHeaderRecord {
         private BTHeaderRec bthr;
-        
+
         public HFSPlusImplementation(BTHeaderRec bthr) {
             this.bthr = bthr;
         }
@@ -142,15 +142,15 @@ public abstract class CommonBTHeaderRecord extends CommonBTRecord implements Pri
         public int getSize() {
             return BTHeaderRec.length();
         }
-        
+
         public BTHeaderRec getInternal() {
             return bthr;
         }
     }
-    
+
     public static class HFSImplementation extends CommonBTHeaderRecord {
         private BTHdrRec bthr;
-        
+
         public HFSImplementation(BTHdrRec bthr) {
             this.bthr = bthr;
         }
@@ -205,12 +205,12 @@ public abstract class CommonBTHeaderRecord extends CommonBTRecord implements Pri
             // Couldn't find any info, but it seems this is correct.
             return CompareType.BINARY_COMPARE;
         }
-        
+
         @Override
         public byte[] getBytes() {
             return bthr.getBytes();
         }
-        
+
         /* @Override */
         public void print(PrintStream ps, String prefix) {
             bthr.print(ps, prefix);

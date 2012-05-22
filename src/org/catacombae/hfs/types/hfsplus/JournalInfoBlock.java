@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -33,8 +33,8 @@ public class JournalInfoBlock implements StaticStruct, PrintableStruct {
     /*
      * struct JournalInfoBlock
      * size: 180 bytes
-     * description: 
-     * 
+     * description:
+     *
      * BP  Size  Type        Identifier       Description
      * --------------------------------------------------
      * 0   4     UInt32      flags
@@ -93,7 +93,7 @@ public class JournalInfoBlock implements StaticStruct, PrintableStruct {
     }
 
     public static int getStructSize() { return length(); }
-    
+
     public void printFields(PrintStream ps, String prefix) {
         ps.println(prefix + " flags: " + getFlags());
         ps.println(prefix + " deviceSignature: " + getDeviceSignature());

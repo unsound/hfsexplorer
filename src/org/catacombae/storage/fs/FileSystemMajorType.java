@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@ import org.catacombae.storage.fs.hfs.HFSFileSystemHandlerFactory;
  * Contains the possible "major file system types" that the library will work
  * with, and defines all file system handler implementations for these file
  * systems that are available in the build.
- * 
+ *
  * @author <a href="mailto:catacombae@gmail.com">Erik Larsson</a>
  */
 public enum FileSystemMajorType {
@@ -40,42 +40,42 @@ public enum FileSystemMajorType {
     APPLE_HFSX(HFSXFileSystemHandlerFactory.class),
     APPLE_UFS, APPLE_PRODOS, FAT12, FAT16, FAT32, EXFAT, NTFS, HPFS, EXT3,
     REISERFS, REISER4, XFS, JFS, ZFS, UNKNOWN;
-    
+
     /*
     private static final Map<String, List<Class<? extends FileSystemHandlerFactory>>> DEFINED_FACTORIES;
-    
+
     static {
-        DEFINED_FACTORIES = 
+        DEFINED_FACTORIES =
                 new HashMap<String, List<Class<? extends FileSystemHandlerFactory>>>();
-        
+
         LinkedList<Class<? extends FileSystemHandlerFactory>> hfsPlusHandlers =
                 new LinkedList<Class<? extends FileSystemHandlerFactory>>();
         hfsPlusHandlers.addLast(HFSPlusFileSystemHandlerFactory.class);
         DEFINED_FACTORIES.put("HFS+", hfsPlusHandlers);
     }
-    
+
     public static Class[] getFactories(String fsType) {
         List<Class<? extends FileSystemHandlerFactory>> factoryList =
                 DEFINED_FACTORIES.get(fsType);
         return factoryList.toArray(new Class[factoryList.size()]);
     }
      * */
-    
+
     private final LinkedList<Class<? extends FileSystemHandlerFactory>> factoryClasses =
             new LinkedList<Class<? extends FileSystemHandlerFactory>>();
-    
+
     /**
      * Creates a FileSystemMajorType with no file system handler implementations
      * specified.
      */
     private FileSystemMajorType() {
     }
-    
+
     /**
      * Creates a FileSystemMajorType specifing the factory classes of the available
      * file system handler implementations for this file system. The first argument
      * is assumed to be the default implementation.
-     * 
+     *
      * @param pFactoryClasses
      */
     private FileSystemMajorType(Class<? extends FileSystemHandlerFactory> factoryClass) {
@@ -101,7 +101,7 @@ public enum FileSystemMajorType {
     public List<Class<? extends FileSystemHandlerFactory>> getFactoryClasses() {
         return new ArrayList<Class<? extends FileSystemHandlerFactory>>(factoryClasses);
     }
-    
+
     /**
      * Returns a newly created factory from the type's default factory class.
      * If there is no factory classes defined for the type, <code>null</code> is
@@ -118,7 +118,7 @@ public enum FileSystemMajorType {
             return createHandlerFactory(factoryClass);
         }
     }
-    
+
     /**
      * Returns a newly created factory from a specified factory class.
      *

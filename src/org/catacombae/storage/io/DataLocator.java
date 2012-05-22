@@ -33,18 +33,18 @@ public abstract class DataLocator {
     }
     */
     public abstract ReadableRandomAccessStream createReadOnlyFile();
-    
+
     /**
      * Returns whether or not this DataLocator supports creating writable
      * streams or if it's read only. If this method returns false
-     * 
+     *
      * @return whether or not this DataLocator supports creating writable
      * streams.
      */
     public abstract boolean isWritable();
-    
+
     /**
-     * 
+     *
      * @return a readable and writable stream.
      * @throws java.lang.UnsupportedOperationException if this DataLocator is
      * not writable.

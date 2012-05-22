@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006-2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -59,9 +59,9 @@ public class MasterBootRecord {
     protected final byte[] reserved3 = new byte[2];
     protected final MBRPartition[] partitions = new MBRPartition[4];
     protected final byte[] mbrSignature = new byte[2];
-    
+
     private final LinkedList<Partition> tempList = new LinkedList<Partition>(); // getUsedPartitionEntries()
-    
+
     /** <code>data</code> is assumed to be at least (<code>offset</code>+512) bytes in length. */
     public MasterBootRecord(byte[] data, int offset, int sectorSize) {
 	System.arraycopy(data, offset+0, reserved1, 0, reserved1.length);
@@ -75,11 +75,11 @@ public class MasterBootRecord {
 	for(int i = 0; i < 4; ++i)
 	    partitions[i] = new MBRPartition(data, offset+MBR_PARTITIONS_OFFSET+i*16, sectorSize);
 	System.arraycopy(data, offset+MBR_PARTITIONS_OFFSET+64, mbrSignature, 0, 2);
-	
+
 	if(!Util.arrayRegionsEqual(getBytes(), 0, getStructSize(), data, offset, getStructSize()))
 	    throw new RuntimeException("Internal error!");
     }
-    
+
     public MasterBootRecord(MasterBootRecord source) {
 	System.arraycopy(source.reserved1, 0, reserved1, 0, reserved1.length);
 	System.arraycopy(source.optIBMExtendedData1, 0, optIBMExtendedData1, 0, optIBMExtendedData1.length);
@@ -93,9 +93,9 @@ public class MasterBootRecord {
 	    partitions[i] = new MBRPartition(source.partitions[i]);
 	System.arraycopy(source.mbrSignature, 0, mbrSignature, 0, mbrSignature.length);
     }
-    
+
     public static int getStructSize() { return 512; }
-    
+
     /** This is an optional field, and might contain unexpected and invalid data. */
     public byte[] getOptionalIBMExtendedData1() { return Util.createCopy(optIBMExtendedData1); }
     /** This is an optional field, and might contain unexpected and invalid data. */
@@ -113,7 +113,7 @@ public class MasterBootRecord {
 	return result;
     }
     public short getMBRSignature() { return Util.readShortBE(mbrSignature); }
-    
+
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " diskSignature: 0x" + Util.toHexStringBE(getOptionalDiskSignature()) + " (optional, and possibly incorrect)");
         ps.println(prefix + " partitions:");
@@ -132,13 +132,13 @@ public class MasterBootRecord {
 	ps.println(prefix + this.getClass().getSimpleName() + ":");
 	printFields(ps, prefix);
     }
-    
+
     public boolean isValid() {
 	return (getMBRSignature() == MBR_SIGNATURE) && (getValidPartitionCount() == 4);
 	// More validity contraints could be added later... like that the partitions should be in order and
 	// that their lengths should be non negative and stay within device borders...
     }
-    
+
     public int getPartitionCount() { return partitions.length; }
     public int getValidPartitionCount() {
 	int num = 0;
@@ -148,7 +148,7 @@ public class MasterBootRecord {
 	}
 	return num;
     }
-    
+
     public int getUsedPartitionCount() {
 	int num = 0;
 	for(MBRPartition mp : getPartitions()) {
@@ -157,11 +157,11 @@ public class MasterBootRecord {
 	}
 	return num;
     }
-    
+
     public Partition[] getPartitionEntries() {
 	return getPartitions();
     }
-    
+
     public Partition getPartitionEntry(int index) {
 	MBRPartition p = partitions[index];
 	if(p.isValid())
@@ -169,7 +169,7 @@ public class MasterBootRecord {
 	else
 	    throw new ArrayIndexOutOfBoundsException(index);
     }
-    
+
     public Partition[] getUsedPartitionEntries() {
 	tempList.clear();
 	for(MBRPartition mp : getPartitions()) {
@@ -196,7 +196,7 @@ public class MasterBootRecord {
 	    System.arraycopy(curData, 0, result, i, curData.length); i += curData.length;
 	}
 	System.arraycopy(mbrSignature, 0, result, i, mbrSignature.length); i += mbrSignature.length;
-	
+
 	if(i != result.length)
 	    throw new RuntimeException("Internal error!");
 	return result;

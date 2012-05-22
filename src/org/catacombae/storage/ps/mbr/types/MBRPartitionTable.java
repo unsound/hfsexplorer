@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -30,16 +30,16 @@ import org.catacombae.storage.ps.mbr.MBRPartitionType;
  * This class includes support for the MBR partition scheme, including the
  * common "Extended Boot Record" scheme (parsing of extended boot
  * records can be turned off, if desired).
- * 
+ *
  * @author Erik
  */
 public class MBRPartitionTable implements PartitionSystem, PrintableStruct {
     /* Until I figure out a way to detect sector size, it will be 512... */
     public static final int DEFAULT_SECTOR_SIZE = 512;
-    
+
     private final MasterBootRecord masterBootRecord;
     private final PartitionSystem[] embeddedPartitionSystems;
- 
+
     public MBRPartitionTable(byte[] data, int offset) {
         this(new ReadableByteArrayStream(data), offset, false);
     }
@@ -60,7 +60,7 @@ public class MBRPartitionTable implements PartitionSystem, PrintableStruct {
         raf.seek(offset);
         raf.readFully(block);
         masterBootRecord = new MasterBootRecord(block, 0, sectorSize);
-        
+
         // Check for embedded partition systems
         MBRPartition[] mbrPartitions = masterBootRecord.getPartitions();
         embeddedPartitionSystems = new PartitionSystem[mbrPartitions.length];
@@ -83,9 +83,9 @@ public class MBRPartitionTable implements PartitionSystem, PrintableStruct {
             embeddedPartitionSystems[i] = embeddedPS;
         }
     }
-    
+
     public MasterBootRecord getMasterBootRecord() { return masterBootRecord; }
-    
+
     /**
      * This will return an array of exactly 4 elements, corresponding to the
      * four entries in the Master Boot Record. If the element at position i is
@@ -100,11 +100,11 @@ public class MBRPartitionTable implements PartitionSystem, PrintableStruct {
         System.arraycopy(embeddedPartitionSystems, 0, result, 0, result.length);
         return result;
     }
-    
+
     public PartitionSystem getEmbeddedPartitionSystem(int index) {
         return embeddedPartitionSystems[index];
     }
-    
+
     public boolean isValid() {
         if(masterBootRecord.isValid()) {
             for(PartitionSystem ebr : embeddedPartitionSystems) {
@@ -124,7 +124,7 @@ public class MBRPartitionTable implements PartitionSystem, PrintableStruct {
 	}
 	return num;
    }
-    
+
     public int getUsedPartitionCount() {
 	int num = masterBootRecord.getUsedPartitionCount();
 	for(PartitionSystem ps : embeddedPartitionSystems) {
@@ -133,19 +133,19 @@ public class MBRPartitionTable implements PartitionSystem, PrintableStruct {
 	}
 	return num;
     }
-    
+
     public Partition[] getUsedPartitionEntries() {
         LinkedList<Partition> tempList = new LinkedList<Partition>();
         for(Partition p : masterBootRecord.getUsedPartitionEntries())
             tempList.addLast(p);
-        
+
 	for(PartitionSystem ps : embeddedPartitionSystems) {
 	    if(ps != null) {
                 for(Partition p : ps.getUsedPartitionEntries())
                     tempList.addLast(p);
             }
 	}
-        
+
         return tempList.toArray(new Partition[tempList.size()]);
     }
 
@@ -162,7 +162,7 @@ public class MBRPartitionTable implements PartitionSystem, PrintableStruct {
                 curIndex += psPartitions;
             }
         }
-        
+
         throw new IllegalArgumentException("index out of bounds (index=" + index + ")");
     }
 
@@ -170,20 +170,20 @@ public class MBRPartitionTable implements PartitionSystem, PrintableStruct {
         LinkedList<Partition> tempList = new LinkedList<Partition>();
         for(Partition p : masterBootRecord.getPartitionEntries())
             tempList.addLast(p);
-        
+
 	for(PartitionSystem ps : embeddedPartitionSystems) {
 	    if(ps != null) {
                 for(Partition p : ps.getPartitionEntries())
                     tempList.addLast(p);
             }
 	}
-        
+
         return tempList.toArray(new Partition[tempList.size()]);
     }
 
 
     public String getLongName() { return "Master Boot Record"; }
-    
+
     public String getShortName() { return "MBR"; }
 
     public void printFields(PrintStream ps, String prefix) {
@@ -207,5 +207,5 @@ public class MBRPartitionTable implements PartitionSystem, PrintableStruct {
         printFields(ps, prefix);
     }
 
-    
+
 }

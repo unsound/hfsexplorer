@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -29,13 +29,13 @@ import org.catacombae.io.ReadableRandomAccessStream;
 
 /**
  * Accessor class for the data inside a resource fork.
- * 
+ *
  * @author Erik Larsson
  */
 public class ResourceForkReader {
     /*
      * Resource fork abstract data model:
-     * 
+     *
      * -----------------      -------------
      * | Resource fork |1----*| Data type | <- fourcc identifer
      * -----------------      -------------

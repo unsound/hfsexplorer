@@ -22,12 +22,12 @@ package org.catacombae.hfsexplorer.testcode;
  * @author  erik
  */
 public class JavaPartitionEditor extends javax.swing.JPanel {
-    
+
     /** Creates new form JavaPartitionEditor */
     public JavaPartitionEditor() {
         initComponents();
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -76,11 +76,11 @@ public class JavaPartitionEditor extends javax.swing.JPanel {
                 .addContainerGap(92, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-    
-    
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
-    
+
 }

@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -28,13 +28,13 @@ public class ReadableWin32FileStream implements ReadableRandomAccessStream {
     protected long filePointer = 0;
     private static final Object loadLibSync = new Object();
     private static boolean libraryLoaded = false;
-    
+
     /**
      * Set this variable to true if you want some messages printed to stderr when the library is
      * loaded.
      */
     public static boolean verboseLoadLibrary = false;
-    
+
     private enum ArchitectureIdentifier {
 
         I386("i386"), AMD64("amd64"), IA64("ia64"),
@@ -42,7 +42,7 @@ public class ReadableWin32FileStream implements ReadableRandomAccessStream {
         SPARC("sparc32"), SPARC64("sparc64"),
         MIPS("mips32"), MIPS64("mips64"), ALPHA("alpha"),
         UNKNOWN;
-        
+
         private final String idString;
 
         private ArchitectureIdentifier() {
@@ -57,7 +57,7 @@ public class ReadableWin32FileStream implements ReadableRandomAccessStream {
             return idString;
         }
     };
-    
+
     private static ArchitectureIdentifier getJVMArchitecture() {
         // Trying to cover all thinkable cases here...
         // Got some hints from http://lopica.sourceforge.net/os.html
@@ -86,7 +86,7 @@ public class ReadableWin32FileStream implements ReadableRandomAccessStream {
                 archId == ArchitectureIdentifier.AMD64 ||
                 archId == ArchitectureIdentifier.IA64);
     }
-    
+
     /**
      * Does not check if the system is supported, and just tries to load the approprate library
      * from the architecture string specified in this system's ArchitectureIdentifier.
@@ -111,7 +111,7 @@ public class ReadableWin32FileStream implements ReadableRandomAccessStream {
             }
         }
     }
-    
+
     public ReadableWin32FileStream(String filename) {
         synchronized(loadLibSync) {
             if(!libraryLoaded) {
@@ -133,7 +133,7 @@ public class ReadableWin32FileStream implements ReadableRandomAccessStream {
             sectorSize = 512; // The only reasonable standard value
         }
     }
-    
+
     /* @Override */
     public void seek(long pos) {
         //System.err.println("WindowsLowLevelIO.seek(" + pos + ");");
@@ -146,7 +146,7 @@ public class ReadableWin32FileStream implements ReadableRandomAccessStream {
         else
             throw new RuntimeException("File closed!");
     }
-    
+
     /* @Override */
     public int read() {
         //System.err.println("WindowsLowLevelIO.read();");
@@ -156,7 +156,7 @@ public class ReadableWin32FileStream implements ReadableRandomAccessStream {
         else
             return -1;
     }
-    
+
     /* @Override */
     public int read(byte[] data) {
         //System.err.println("WindowsLowLevelIO.read(byte[" + data.length + "]);");
@@ -250,7 +250,7 @@ public class ReadableWin32FileStream implements ReadableRandomAccessStream {
         else
             throw new RuntimeException("File closed!");
     }
-	
+
     /* @Override */
     public long getFilePointer() {
         //System.err.println("WindowsLowLevelIO.getFilePointer();");
@@ -261,7 +261,7 @@ public class ReadableWin32FileStream implements ReadableRandomAccessStream {
         else
             throw new RuntimeException("File closed!");
     }
-    
+
     /* @Override */
     public void close() {
         if(fileHandle != null) {
@@ -290,7 +290,7 @@ public class ReadableWin32FileStream implements ReadableRandomAccessStream {
         //System.out.println("Java: WindowsLowLevelIO.open(" + filename + ");");
         return openNative(filename);
     }
-    
+
     protected static native byte[] openNative(String filename);
     protected static native void seek(long pos, byte[] handle);
     protected static native int read(byte[] data, int pos, int len, byte[] handle);

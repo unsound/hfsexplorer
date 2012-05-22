@@ -29,19 +29,19 @@ public class CatKeyRec implements DynamicStruct, StructElements {
     /*
      * struct CatKeyRec
      * size: 38 bytes
-     * description: 
-     * 
-     * BP  Size  Type      Identifier  Description                  
+     * description:
+     *
+     * BP  Size  Type      Identifier  Description
      * -------------------------------------------------------------
-     * 0   1     SInt8     ckrKeyLen   key length (SignedByte)      
-     * 1   1     SInt8     ckrResrv1   reserved (SignedByte)        
+     * 0   1     SInt8     ckrKeyLen   key length (SignedByte)
+     * 1   1     SInt8     ckrResrv1   reserved (SignedByte)
      * 2   4     SInt32    ckrParID    parent directory ID (LongInt)
      * 6   1     UInt8     ckrCNameLen length of catalog node name (part of Str31)
      * 7   1*31  Char[31]  ckrCName    catalog node name (part of Str31)
      */
-    
+
     private static final int MAX_STRUCTSIZE = 38;
-    
+
     private final byte[] ckrKeyLen = new byte[1];
     private final byte[] ckrResrv1 = new byte[1];
     private final byte[] ckrParID = new byte[4];
@@ -66,7 +66,7 @@ public class CatKeyRec implements DynamicStruct, StructElements {
                 if(cNameLen > trailingBytes)
                     throw new RuntimeException("Malformed CatKeyRec: ckrCNameLen=" +
                             cNameLen + " > trailingBytes=" + trailingBytes);
-                
+
                 ckrCName = new byte[cNameLen];
                 System.arraycopy(data, offset+7, ckrCName, 0, ckrCName.length);
 
@@ -115,14 +115,14 @@ public class CatKeyRec implements DynamicStruct, StructElements {
     }
 
     //public int length() { return occupiedSize(); }
-    
+
     public byte getCkrKeyLen() { return Util.readByteBE(ckrKeyLen); }
     public byte getCkrResrv1() { return Util.readByteBE(ckrResrv1); }
     public int getCkrParID() { return Util.readIntBE(ckrParID); }
     public byte getCkrCNameLen() { return Util.readByteBE(ckrCNameLen); }
     public byte[] getCkrCName() { return Util.createCopy(ckrCName); }
     public byte[] getCkrPad() { return Util.createCopy(ckrPad); }
-    
+
     public void printFields(PrintStream ps, String prefix) {
         ps.println(prefix + " ckrKeyLen: " + getCkrKeyLen());
         ps.println(prefix + " ckrResrv1: " + getCkrResrv1());
@@ -136,7 +136,7 @@ public class CatKeyRec implements DynamicStruct, StructElements {
         ps.println(prefix + "CatKeyRec:");
         printFields(ps, prefix);
     }
-    
+
     public byte[] getBytes() {
         byte[] result = new byte[occupiedSize()];
         int offset = 0;
@@ -161,13 +161,13 @@ public class CatKeyRec implements DynamicStruct, StructElements {
     /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(CatKeyRec.class.getSimpleName());
-        
+
         db.addUIntBE("ckrKeyLen", ckrKeyLen, "Key length", "bytes");
         db.addUIntBE("ckrResrv1", ckrResrv1, "Reserved", HEXADECIMAL);
         db.addUIntBE("ckrParID", ckrParID, "Parent ID");
         db.addUIntBE("ckrCNameLen", ckrCNameLen, "Length of record name", "bytes");
         db.add("ckrCName", new ASCIIStringField(ckrCName), "Record name");
-        
+
         return db.getResult();
     }
 }

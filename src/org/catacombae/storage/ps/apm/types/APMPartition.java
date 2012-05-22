@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006-2011 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -74,9 +74,9 @@ public class APMPartition implements Partition {
     private final byte[] pmBootCksum = new byte[4];
     private final byte[] pmProcessor = new byte[16];
     private final byte[] pmPad = new byte[2*188];
-    
+
     private final int blockSize;
-    
+
     public APMPartition(byte[] data, int offset, int blockSize) {
         System.arraycopy(data, offset + 0, pmSig, 0, 2);
         System.arraycopy(data, offset + 2, pmSigPad, 0, 2);
@@ -207,7 +207,7 @@ public class APMPartition implements Partition {
 					    Util.unsign(getPmLgDataStart()) )*blockSize; }
     public long getLength() { return Util.unsign(getPmDataCnt())*blockSize; }
     public PartitionType getType() { return convertPartitionType(getPmParType()); }
-    
+
     /** partition signature */
     public short getPmSig()        { return Util.readShortBE(pmSig); }
     /** reserved */
@@ -267,7 +267,7 @@ public class APMPartition implements Partition {
     public boolean getPmPartStatusOSPicCode() { return getBit(pmPartStatus, 6); }
     public boolean getPmPartStatusOSSpecific1() { return getBit(pmPartStatus, 7); }
     public boolean getPmPartStatusOSSpecific2() { return getBit(pmPartStatus, 8); }
-    
+
     /**
      * Returns the partition signature as a String. (Should always be "PM".)
      * @return the partition signature as a String.
@@ -292,17 +292,17 @@ public class APMPartition implements Partition {
      */
     public String getPmProcessorAsString() { return Util.readNullTerminatedASCIIString(pmProcessor); }
     public byte[] getPmPadRaw()      { return Util.createCopy(pmPad); }
-    
+
     public boolean isValid() {
         // Signature check
         int pmSigInt = getPmSig() & 0xFFFF;
         if(pmSigInt != APM_PARTITION_SIGNATURE && // Signature "PM", in ASCII
            pmSigInt != APM_PARTITION_OLD_SIGNATURE) // Older signature, but still supported.
             return false;
-        
+
         return true;
     }
-    
+
     public void printPartitionInfo(PrintStream ps) {
         printPartitionInfo(ps, "");
     }
@@ -377,7 +377,7 @@ public class APMPartition implements Partition {
         else
             return result;
     }
-    
+
     public void printFields(PrintStream ps, String prefix) {
         printPartitionInfo(ps, prefix + " ");
         ps.println(prefix + " Partition methods: ");

@@ -30,18 +30,18 @@ public class TreeViewConcept extends javax.swing.JPanel {
     /** Creates new form TreeViewConcept */
     public TreeViewConcept() {
         initComponents();
-        
+
         DefaultMutableTreeNode rootNode =
                 new DefaultMutableTreeNode("File [/Users/erik/totalimage.dmg]", true);
-        
+
         DefaultMutableTreeNode udifNode =
                 new DefaultMutableTreeNode("UDIF Backing Store [type=UDBZ]", true);
         rootNode.add(udifNode);
-        
+
         DefaultMutableTreeNode mbrNode =
                 new DefaultMutableTreeNode("MBR Partition Table [4 partitions]", true);
         udifNode.add(mbrNode);
-        
+
         {
             mbrNode.add(new DefaultMutableTreeNode("1. Microsoft Basic Data", false));
 
@@ -66,11 +66,11 @@ public class TreeViewConcept extends javax.swing.JPanel {
                 dosxNode.add(new DefaultMutableTreeNode("2. FAT16 File System", false));
             }
         }
-       
+
         DefaultMutableTreeNode gptNode =
                 new DefaultMutableTreeNode("GPT Partition Table [6 partitions]", true);
         udifNode.add(gptNode);
-        
+
         {
             gptNode.add(new DefaultMutableTreeNode("1. Microsoft Basic Data", false));
 
@@ -95,7 +95,7 @@ public class TreeViewConcept extends javax.swing.JPanel {
                 new DefaultMutableTreeNode("", true);
         Node.add(Node);
         */
-        
+
         jTree1.setModel(new DefaultTreeModel(rootNode));
     }
 
@@ -137,7 +137,7 @@ public class TreeViewConcept extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTree jTree1;
     // End of variables declaration//GEN-END:variables
-    
+
     public static void main(String[] args) {
         JFrame w = new JFrame("jParted Tree view concept");
         w.add(new TreeViewConcept());

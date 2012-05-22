@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@ import org.catacombae.io.ReadableRandomAccessStream;
  */
 public class DOSExtendedPartitionSystem implements PartitionSystem {
     private final ExtendedBootRecord[] extendedBootRecords;
-    
+
     public DOSExtendedPartitionSystem(ReadableRandomAccessStream llf, long extendedPartitionOffset,
                                       long extendedPartitionLength, int sectorSize) {
         // System.err.println("creating a new DOSExtendedPartitionSystem with:");
@@ -76,7 +76,7 @@ public class DOSExtendedPartitionSystem implements PartitionSystem {
     public int getPartitionCount() {
         return extendedBootRecords.length;
     }
-    
+
     public int getUsedPartitionCount() {
         // There shouldn't be any superfluous entries as it would be meaningless
         return getPartitionCount();
@@ -98,7 +98,7 @@ public class DOSExtendedPartitionSystem implements PartitionSystem {
         return getPartitionEntries();
     }
     public String getLongName() { return "DOS Extended"; }
-    
+
     public String getShortName() { return "EBR"; }
 
     public void printFields(PrintStream ps, String prefix) {

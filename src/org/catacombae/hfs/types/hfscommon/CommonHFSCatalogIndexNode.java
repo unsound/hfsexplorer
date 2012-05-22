@@ -31,7 +31,7 @@ public abstract class CommonHFSCatalogIndexNode extends CommonBTIndexNode<Common
             FSType type) {
 	super(data, offset, nodeSize, type);
     }
-    
+
     public static CommonHFSCatalogIndexNode createHFS(byte[] data, int offset, int nodeSize) {
         return new HFSImplementation(data, offset, nodeSize).getNode();
     }
@@ -41,10 +41,10 @@ public abstract class CommonHFSCatalogIndexNode extends CommonBTIndexNode<Common
     public static CommonHFSCatalogIndexNode createHFSX(byte[] data, int offset, int nodeSize, BTHeaderRec bthr) {
         return new HFSXImplementation(data, offset, nodeSize, bthr).getNode();
     }
-    
+
     private static class HFSImplementation {
         private final Internal i;
-        
+
         private class Internal extends CommonHFSCatalogIndexNode {
             public Internal(byte[] data, int offset, int nodeSize) {
                 super(data, offset, nodeSize, FSType.HFS);
@@ -59,15 +59,15 @@ public abstract class CommonHFSCatalogIndexNode extends CommonBTIndexNode<Common
         public HFSImplementation(byte[] data, int offset, int nodeSize) {
             this.i = new Internal(data, offset, nodeSize);
         }
-        
+
         public CommonHFSCatalogIndexNode getNode() {
             return i;
         }
     }
-    
+
     private static class HFSPlusImplementation {
         private final Internal i;
-        
+
         private class Internal extends CommonHFSCatalogIndexNode {
             public Internal(byte[] data, int offset, int nodeSize) {
                 super(data, offset, nodeSize, FSType.HFS_PLUS);
@@ -82,12 +82,12 @@ public abstract class CommonHFSCatalogIndexNode extends CommonBTIndexNode<Common
         public HFSPlusImplementation(byte[] data, int offset, int nodeSize) {
             this.i = new Internal(data, offset, nodeSize);
         }
-        
+
         public CommonHFSCatalogIndexNode getNode() {
             return i;
         }
     }
-    
+
     private static class HFSXImplementation {
         private final Internal i;
         private final BTHeaderRec catalogHeaderRec;
@@ -108,7 +108,7 @@ public abstract class CommonHFSCatalogIndexNode extends CommonBTIndexNode<Common
             this.catalogHeaderRec = catalogHeaderRec;
             this.i = new Internal(data, offset, nodeSize);
         }
-        
+
         public CommonHFSCatalogIndexNode getNode() {
             return i;
         }

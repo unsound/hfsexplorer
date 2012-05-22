@@ -37,15 +37,15 @@ import org.catacombae.csjc.structelements.StructElement;
 public class ContainerPanel extends javax.swing.JPanel {
     private LinkedList<ContainerPanel> subPanels = new LinkedList<ContainerPanel>();
     private LinkedList<EditStringValuePanel> fields = new LinkedList<EditStringValuePanel>();
-    
+
     public ContainerPanel() {
         this(null);
     }
-    
+
     /** Creates new form ContainerPanel */
     public ContainerPanel(String label) {
         initComponents();
-        
+
         if(label != null) {
             descriptionLabel.setText(label);
             saveButton.setVisible(false);
@@ -111,7 +111,7 @@ public class ContainerPanel extends javax.swing.JPanel {
     public void setFields(Dictionary rootDict) {
         contentsPanel.removeAll();
         String[] keys = rootDict.getKeys();
-        
+
         for(String key : keys) {
             System.err.println("setFields processing key \"" + key + "\"...");
             StructElement curElem = rootDict.getElement(key);
@@ -147,11 +147,11 @@ public class ContainerPanel extends javax.swing.JPanel {
         }
         contentsPanel.add(Box.createVerticalGlue());
     }
-    
+
     public void setFields(Array rootArray) {
         contentsPanel.removeAll();
         StructElement[] elements = rootArray.getElements();
-        
+
         for(int i = 0; i < elements.length; ++i) {
             StructElement curElem = elements[i];
             System.err.println("setFields processing array element...");
@@ -184,8 +184,8 @@ public class ContainerPanel extends javax.swing.JPanel {
         }
         contentsPanel.add(Box.createVerticalGlue());
     }
-    
-    
+
+
     private void actionSave() {
         // Gather all the modified components
         List<EditStringValuePanel> modifiedFields = getModifiedFields();
@@ -194,7 +194,7 @@ public class ContainerPanel extends javax.swing.JPanel {
                     JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        
+
         // Validate their data
         StringBuilder messageBuilder = new StringBuilder();
         for(EditStringValuePanel vp : modifiedFields) {
@@ -205,7 +205,7 @@ public class ContainerPanel extends javax.swing.JPanel {
                 messageBuilder.append(" [").append(validateRes).append("]\n");
             }
         }
-        
+
         if(messageBuilder.length() != 0) {
             JOptionPane.showMessageDialog(this, "The following fields failed to validate:\n\n" +
                     messageBuilder.toString(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -217,31 +217,31 @@ public class ContainerPanel extends javax.swing.JPanel {
                         .append("\"\n");
             }
             messageBuilder.append("\nCarry on with save?");
-            
+
             JOptionPane.showConfirmDialog(this, messageBuilder.toString(), "Confirm save",
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         }
     }
-    
+
     private List<EditStringValuePanel> getModifiedFields() {
         LinkedList<EditStringValuePanel> tmpList = new LinkedList<EditStringValuePanel>();
         for(EditStringValuePanel field : fields) {
             if(field.isModified())
                 tmpList.add(field);
         }
-        
+
         for(ContainerPanel cp : subPanels)
             tmpList.addAll(cp.getModifiedFields());
-        
+
         return tmpList;
     }
-    
+
     private void addComponent(JComponent jc) {
-        
+
         contentsPanel.add(jc);
-        
+
     }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel contentsPanel;
     private javax.swing.JLabel descriptionLabel;

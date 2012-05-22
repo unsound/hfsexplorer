@@ -32,7 +32,7 @@ import org.catacombae.hfs.types.hfsplus.HFSPlusBSDInfo;
  * @author erik
  */
 public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCatalogAttributes, StructElements {
-    
+
     public abstract CommonHFSCatalogNodeID getFileID();
     public abstract CommonHFSForkData getDataFork();
     public abstract CommonHFSForkData getResourceFork();
@@ -47,14 +47,14 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
     public CommonHFSCatalogNodeID getCatalogNodeID() {
         return getFileID();
     }
-    
+
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + CommonHFSCatalogFile.class.getSimpleName() + ":");
         printFields(ps, prefix + " ");
     }
 
     public abstract void printFields(PrintStream ps, String string);
-    
+
     public static CommonHFSCatalogFile create(HFSPlusCatalogFile data) {
         return new HFSPlusImplementation(data);
     }
@@ -69,7 +69,7 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
         private static final int HARD_DIRECTORY_LINK_FILE_TYPE = 0x66647270; // "fdrp"
         private static final int HARD_DIRECTORY_LINK_CREATOR = 0x4d414353; // "MACS"
         private HFSPlusCatalogFile data;
-        
+
         private HFSPlusImplementation(HFSPlusCatalogFile data) {
             this.data = data;
         }
@@ -236,10 +236,10 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
             return CommonHFSFinderInfo.create(data);
         }
     }
-    
+
     public static class HFSImplementation extends CommonHFSCatalogFile {
         private CdrFilRec data;
-        
+
         private HFSImplementation(CdrFilRec data) {
             this.data = data;
         }

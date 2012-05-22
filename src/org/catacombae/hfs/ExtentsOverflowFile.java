@@ -330,7 +330,7 @@ public class ExtentsOverflowFile extends BTreeFile {
     protected CommonHFSExtentKey createCommonHFSExtentKey(
             CommonHFSForkType forkType, CommonHFSCatalogNodeID fileID,
             int startBlock) {
-        
+
         return ops.createCommonHFSExtentKey(forkType, fileID, startBlock);
     }
 

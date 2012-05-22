@@ -35,7 +35,7 @@ public abstract class CommonHFSExtentKey extends CommonBTKey<CommonHFSExtentKey>
         ps.println(prefix + getClass().getSimpleName() + ":");
         printFields(ps, prefix + " ");
     }
-    
+
     public static CommonHFSExtentKey create(HFSPlusExtentKey key) {
         return new HFSPlusImplementation(key);
     }
@@ -43,7 +43,7 @@ public abstract class CommonHFSExtentKey extends CommonBTKey<CommonHFSExtentKey>
     public static CommonHFSExtentKey create(ExtKeyRec key) {
         return new HFSImplementation(key);
     }
-    
+
     private static int commonCompare(CommonHFSExtentKey k1, CommonHFSExtentKey k2) {
         int forkType1 = k1.getForkType();
         int forkType2 = k2.getForkType();
@@ -70,35 +70,35 @@ public abstract class CommonHFSExtentKey extends CommonBTKey<CommonHFSExtentKey>
         else
             return 1;
     }
-    
+
     public abstract int getForkType();
 
     public abstract CommonHFSCatalogNodeID getFileID();
 
     public abstract long getStartBlock();
-    
+
     public static class HFSPlusImplementation extends CommonHFSExtentKey {
         private final HFSPlusExtentKey key;
-        
+
         public HFSPlusImplementation(HFSPlusExtentKey key) {
             this.key = key;
         }
-        
+
         @Override
         public int getForkType() {
             return key.getUnsignedForkType();
         }
-        
+
         @Override
         public CommonHFSCatalogNodeID getFileID() {
             return CommonHFSCatalogNodeID.create(key.getFileID());
         }
-        
+
         @Override
         public long getStartBlock() {
             return key.getUnsignedStartBlock();
         }
-        
+
         @Override
         public byte[] getBytes() {
             return key.getBytes();
@@ -139,14 +139,14 @@ public abstract class CommonHFSExtentKey extends CommonBTKey<CommonHFSExtentKey>
             }
         }
     }
-    
+
     public static class HFSImplementation extends CommonHFSExtentKey {
         private final ExtKeyRec key;
-        
+
         public HFSImplementation(ExtKeyRec key) {
             this.key = key;
         }
-        
+
         @Override
         public int getForkType() {
             return Util.unsign(key.getXkrFkType());
@@ -161,7 +161,7 @@ public abstract class CommonHFSExtentKey extends CommonBTKey<CommonHFSExtentKey>
         public long getStartBlock() {
             return Util.unsign(key.getXkrFABN());
         }
-        
+
         @Override
         public byte[] getBytes() {
             return key.getBytes();
@@ -203,4 +203,4 @@ public abstract class CommonHFSExtentKey extends CommonBTKey<CommonHFSExtentKey>
         }
     }
 }
-    
+

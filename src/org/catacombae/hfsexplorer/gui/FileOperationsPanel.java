@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@ import java.awt.event.ActionListener;
  * @author  Erik
  */
 public class FileOperationsPanel extends javax.swing.JPanel {
-    
+
     /** Creates new form FileOperationsPanel */
     public FileOperationsPanel(JDialog dialog, String filename, long fileSize,
                                ActionListener openListener,
@@ -47,9 +47,9 @@ public class FileOperationsPanel extends javax.swing.JPanel {
             dialog.getRootPane().setDefaultButton(saveFileButton);
         }
         saveFileButton.addActionListener(saveListener);
-        
+
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -123,8 +123,8 @@ public class FileOperationsPanel extends javax.swing.JPanel {
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
-    
-    
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField filenameField;
     private javax.swing.JLabel jLabel1;
@@ -133,5 +133,5 @@ public class FileOperationsPanel extends javax.swing.JPanel {
     private javax.swing.JButton saveFileButton;
     private javax.swing.JTextField sizeField;
     // End of variables declaration//GEN-END:variables
-    
+
 }

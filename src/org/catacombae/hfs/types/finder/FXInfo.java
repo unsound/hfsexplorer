@@ -27,27 +27,27 @@ public class FXInfo implements StructElements {
     /*
      * struct FXInfo
      * size: 16 bytes
-     * description: 
-     * 
-     * BP  Size  Type       Identifier  Description                                                                                                                                                                                                                                                             
+     * description:
+     *
+     * BP  Size  Type       Identifier  Description
      * ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-     * 0   2     SInt16     fdIconID    An ID number for the file's icon; the numbers that identify icons are assigned by the Finder.                                                                                                                                                                           
-     * 2   2*3   SInt16[3]  fdReserved  Reserved.                                                                                                                                                                                                                                                               
-     * 8   1     SInt8      fdScript    Extended flags. Script code if high-bit is set.                                                                                                                                                                                                                         
-     * 9   1     SInt8      fdXFlags    Extended flags.                                                                                                                                                                                                                                                         
+     * 0   2     SInt16     fdIconID    An ID number for the file's icon; the numbers that identify icons are assigned by the Finder.
+     * 2   2*3   SInt16[3]  fdReserved  Reserved.
+     * 8   1     SInt8      fdScript    Extended flags. Script code if high-bit is set.
+     * 9   1     SInt8      fdXFlags    Extended flags.
      * 10  2     SInt16     fdComment   Reserved (set to 0). If the high-bit is clear, an ID number for the comment that is displayed in the information window when the user selects a file and chooses the Get Info command from the File menu. The numbers that identify comments are assigned by the Finder.
-     * 12  4     SInt32     fdPutAway   If the user moves the file onto the desktop, the directory ID of the folder from which the user moves the file.                                                                                                                                                         
+     * 12  4     SInt32     fdPutAway   If the user moves the file onto the desktop, the directory ID of the folder from which the user moves the file.
      */
-    
+
     public static final int STRUCTSIZE = 16;
-    
+
     private final byte[] fdIconID = new byte[2];
     private final byte[] fdReserved = new byte[2*3];
     private final byte[] fdScript = new byte[1];
     private final byte[] fdXFlags = new byte[1];
     private final byte[] fdComment = new byte[2];
     private final byte[] fdPutAway = new byte[4];
-    
+
     public FXInfo(byte[] data, int offset) {
 	System.arraycopy(data, offset+0, fdIconID, 0, 2);
 	System.arraycopy(data, offset+2, fdReserved, 0, 2*3);
@@ -56,9 +56,9 @@ public class FXInfo implements StructElements {
 	System.arraycopy(data, offset+10, fdComment, 0, 2);
 	System.arraycopy(data, offset+12, fdPutAway, 0, 4);
     }
-    
+
     public static int length() { return STRUCTSIZE; }
-    
+
     /** An ID number for the file's icon; the numbers that identify icons are assigned by the Finder. */
     public short getFdIconID() { return Util.readShortBE(fdIconID); }
     /** Reserved. */
@@ -71,7 +71,7 @@ public class FXInfo implements StructElements {
     public short getFdComment() { return Util.readShortBE(fdComment); }
     /** If the user moves the file onto the desktop, the directory ID of the folder from which the user moves the file. */
     public int getFdPutAway() { return Util.readIntBE(fdPutAway); }
-    
+
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " fdIconID: " + getFdIconID());
 	ps.println(prefix + " fdReserved: " + getFdReserved());
@@ -80,12 +80,12 @@ public class FXInfo implements StructElements {
 	ps.println(prefix + " fdComment: " + getFdComment());
 	ps.println(prefix + " fdPutAway: " + getFdPutAway());
     }
-    
+
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "FXInfo:");
 	printFields(ps, prefix);
     }
-    
+
     public byte[] getBytes() {
 	byte[] result = new byte[STRUCTSIZE];
 	int offset = 0;
@@ -101,14 +101,14 @@ public class FXInfo implements StructElements {
     /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(FXInfo.class.getSimpleName());
-        
+
         db.addSIntBE("fdIconID", fdIconID);
         db.addIntArray("fdReserved", fdReserved, BITS_16, UNSIGNED, BIG_ENDIAN);
         db.addSIntBE("fdScript", fdScript);
         db.addUIntBE("fdXFlags", fdXFlags);
         db.addSIntBE("fdComment", fdComment);
         db.addSIntBE("fdPutAway", fdPutAway);
-        
+
         return db.getResult();
     }
 }

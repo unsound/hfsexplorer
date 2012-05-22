@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -28,14 +28,14 @@ package org.catacombae.hfsexplorer.gui;
  * @author  Erik
  */
 public class SelectWindowsDevicePanel extends javax.swing.JPanel {
-    
+
     /** Creates new form SelectWindowsDevicePanel */
     public SelectWindowsDevicePanel() {
         initComponents();
         selectSpecifyGroup.add(selectDeviceButton);
         selectSpecifyGroup.add(specifyDeviceNameButton);
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -134,8 +134,8 @@ public class SelectWindowsDevicePanel extends javax.swing.JPanel {
                     .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             );
         }// </editor-fold>//GEN-END:initComponents
-    
-    
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JButton autodetectButton;
     private javax.swing.JLabel autodetectLabel;
@@ -150,5 +150,5 @@ public class SelectWindowsDevicePanel extends javax.swing.JPanel {
     public javax.swing.JTextField specifyDeviceNameField;
     private javax.swing.JLabel warningLabel;
     // End of variables declaration//GEN-END:variables
-    
+
 }

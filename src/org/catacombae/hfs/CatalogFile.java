@@ -112,7 +112,7 @@ public class CatalogFile extends BTreeFile {
         catalogCache = null;
     }
     */
-    
+
     public CommonHFSCatalogFolderRecord getRootFolder() {
         CatalogFileSession ses = openSession();
 

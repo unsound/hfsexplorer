@@ -42,37 +42,37 @@ import org.catacombae.storage.ps.apm.types.APMPartition;
 public class MainController {
     private MainWindow mainWindow;
     private MainPanel mainPanel;
-    
+
     // Model variables
     LinkedList<PartitionSystemHandler> psHandlers =
             new LinkedList<PartitionSystemHandler>();
-    
+
     public MainController() {
         this.mainPanel = new MainPanel();
         this.mainWindow = new MainWindow(this.mainPanel);
-        
+
         mainWindow.setLoadFileItemListener(new LoadFileItemListener());
         mainWindow.setLoadPathItemListener(new LoadPathItemListener());
         mainWindow.setExitItemListener(new ExitItemListener());
         mainWindow.setAboutItemListener(new AboutItemListener());
         mainPanel.setPartitionSystemsBoxListener(new PartitionSystemsBoxListener());
         mainPanel.setSynchronizeButtonListener(new SynchronizeButtonListener());
-        
+
         mainWindow.setDefaultCloseOperation(MainWindow.EXIT_ON_CLOSE);
     }
     public JPanel getPanel() {
         return mainPanel;
     }
-    
+
     public void showMainWindow() {
         // Initialize
         mainPanel.setPartitionSystemsBoxContents(new Vector<String>());
         mainPanel.setPartitionSystemsBoxEnabled(false);
         mainPanel.setSynchronizeButtonEnabled(false);
-        
+
         mainWindow.setVisible(true);
     }
-    
+
     private void exitProgram() {
         mainWindow.setVisible(false);
         System.exit(0);
@@ -125,7 +125,7 @@ public class MainController {
                 String name = "";
                 if(p instanceof APMPartition)
                     name = ((APMPartition)p).getPmPartNameAsString();
-                
+
                 mainPanel.addPartition("" + ((i++) + 1), p.getType().toString(),
                         name, "" + p.getStartOffset(),
                         (p.getStartOffset() + p.getLength()) + "");
@@ -170,7 +170,7 @@ public class MainController {
                             "    " + path);
                 else {
                     mainWindow.setCurrentFilename(selectedFile.getPath());
-                    
+
                     RandomAccessFileDataLocator loc =
                             new RandomAccessFileDataLocator(selectedFile);
 
@@ -194,7 +194,7 @@ public class MainController {
     }
     private class PartitionSystemsBoxListener implements ActionListener {
         public void actionPerformed(ActionEvent evt) {
-            
+
         }
     }
     private class SynchronizeButtonListener implements ActionListener {

@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -24,32 +24,32 @@ public class BTHeaderRec {
     /*
      * struct BTHeaderRec
      * size: 106 bytes
-     * description: 
-     * 
-     * BP  Size  Type        Identifier      Description          
+     * description:
+     *
+     * BP  Size  Type        Identifier      Description
      * -----------------------------------------------------------
-     * 0   2     UInt16      treeDepth                            
-     * 2   4     UInt32      rootNode                             
-     * 6   4     UInt32      leafRecords                          
-     * 10  4     UInt32      firstLeafNode                        
-     * 14  4     UInt32      lastLeafNode                         
-     * 18  2     UInt16      nodeSize                             
-     * 20  2     UInt16      maxKeyLength                         
-     * 22  4     UInt32      totalNodes                           
-     * 26  4     UInt32      freeNodes                            
-     * 30  2     UInt16      reserved1                            
-     * 32  4     UInt32      clumpSize       // misaligned        
-     * 36  1     UInt8       btreeType                            
-     * 37  1     UInt8       keyCompareType                       
+     * 0   2     UInt16      treeDepth
+     * 2   4     UInt32      rootNode
+     * 6   4     UInt32      leafRecords
+     * 10  4     UInt32      firstLeafNode
+     * 14  4     UInt32      lastLeafNode
+     * 18  2     UInt16      nodeSize
+     * 20  2     UInt16      maxKeyLength
+     * 22  4     UInt32      totalNodes
+     * 26  4     UInt32      freeNodes
+     * 30  2     UInt16      reserved1
+     * 32  4     UInt32      clumpSize       // misaligned
+     * 36  1     UInt8       btreeType
+     * 37  1     UInt8       keyCompareType
      * 38  4     UInt32      attributes      // long aligned again
-     * 42  4*16  UInt32[16]  reserved3                            
+     * 42  4*16  UInt32[16]  reserved3
      */
-    
+
     /** Case folding (case-insensitive). Possible return value from getKeyCompareType(). */
     public static final byte kHFSCaseFolding = (byte)0xCF;
     /** Binary compare (case-sensitive). Possible return value from getKeyCompareType(). */
     public static final byte kHFSBinaryCompare = (byte)0xBC;
-    
+
     private final byte[] treeDepth = new byte[2];
     private final byte[] rootNode = new byte[4];
     private final byte[] leafRecords = new byte[4];
@@ -65,7 +65,7 @@ public class BTHeaderRec {
     private final byte[] keyCompareType = new byte[1];
     private final byte[] attributes = new byte[4];
     private final byte[] reserved3 = new byte[4*16];
-    
+
     public BTHeaderRec(byte[] data, int offset) {
 	System.arraycopy(data, offset+0, treeDepth, 0, 2);
 	System.arraycopy(data, offset+2, rootNode, 0, 4);
@@ -96,18 +96,18 @@ public class BTHeaderRec {
     public short getReserved1() { return Util.readShortBE(reserved1); }
     public int getClumpSize() { return Util.readIntBE(clumpSize); }
     public byte getBtreeType() { return Util.readByteBE(btreeType); }
-    /** Specifies what type of key compare algorithm to use. For HFS+ volumes, this field is to be treated as reserved. 
+    /** Specifies what type of key compare algorithm to use. For HFS+ volumes, this field is to be treated as reserved.
 	For HFSX (at least version 5) volumes, the value of this field will be one of the constants
 	<code>kHFSCaseFolding</code> or <code>kHFSBinaryCompare</code> defined as static constants of this class. */
     public byte getKeyCompareType() { return Util.readByteBE(keyCompareType); }
     public int getAttributes() { return Util.readIntBE(attributes); }
     public int[] getReserved3() { return Util.readIntArrayBE(reserved3); }
-    
+
     // Access to attributes:
     public boolean isBTBadCloseSet() { return Util.getBit(getAttributes(), 0); }
     public boolean isBTBigKeysSet() { return Util.getBit(getAttributes(), 1); }
     public boolean isBTVariableIndexKeysSet() { return Util.getBit(getAttributes(), 2); }
-    
+
     public static int length() { return 106; }
 
     public void printFields(PrintStream ps, String prefix) {
@@ -127,16 +127,16 @@ public class BTHeaderRec {
 	ps.println(prefix + " attributes: " + getAttributes());
 	ps.println(prefix + " reserved3: " + getReserved3());
     }
-    
+
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "BTHeaderRec:");
 	printFields(ps, prefix);
     }
-    
+
     public byte[] getBytes() {
         byte[] result = new byte[length()];
 	int offset = 0;
-        
+
         System.arraycopy(treeDepth, 0, result, offset, treeDepth.length); offset += treeDepth.length;
         System.arraycopy(rootNode, 0, result, offset, rootNode.length); offset += rootNode.length;
         System.arraycopy(leafRecords, 0, result, offset, leafRecords.length); offset += leafRecords.length;
@@ -152,7 +152,7 @@ public class BTHeaderRec {
         System.arraycopy(keyCompareType, 0, result, offset, keyCompareType.length); offset += keyCompareType.length;
         System.arraycopy(attributes, 0, result, offset, attributes.length); offset += attributes.length;
         System.arraycopy(reserved3, 0, result, offset, reserved3.length); offset += reserved3.length;
-        
+
         return result;
     }
 }

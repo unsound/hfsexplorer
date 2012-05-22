@@ -30,7 +30,7 @@ public class DateSummaryPanel extends javax.swing.JPanel implements ChainedPanel
     /** Creates new form DateSummaryPanel */
     public DateSummaryPanel(FSAttributes attributes) {
         initComponents();
-        
+
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
         if(attributes.hasCreateDate())
             createField.setText(df.format(attributes.getCreateDate()));
@@ -38,39 +38,39 @@ public class DateSummaryPanel extends javax.swing.JPanel implements ChainedPanel
             //createLabel.setVisible(false);
             createField.setText("<not available>");
         }
-            
+
         if(attributes.hasModifyDate())
             contentModField.setText(df.format(attributes.getModifyDate()));
         else {
             //contentModLabel.setVisible(false);
             contentModField.setText("<not available>");
         }
-            
+
         if(attributes.hasAttributeModifyDate())
             attributeModField.setText(df.format(attributes.getAttributeModifyDate()));
         else {
             //attributeModLabel.setVisible(false);
             attributeModField.setText("<not available>");
         }
-            
+
         if(attributes.hasAccessDate())
             accessField.setText(df.format(attributes.getAccessDate()));
         else {
             //accessLabel.setVisible(false);
             accessField.setText("<not available>");
         }
-            
+
         if(attributes.hasBackupDate())
             backupField.setText(df.format(attributes.getBackupDate()));
         else {
             //backupLabel.setVisible(false);
             backupField.setText("<not available>");
         }
-                    
+
         //if(attributes.hasDate())
         //    createField.setText(attributes.getDate().toString());
     }
-    
+
     /* @Override */
     public void setChainedContents(Component c) {
         chainedContentsPanel.removeAll();

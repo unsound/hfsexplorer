@@ -28,9 +28,9 @@ import org.catacombae.storage.ps.PartitionSystemHandler;
  * @author erik
  */
 public class MBRHandler extends PartitionSystemHandler {
-    
+
     private DataLocator partitionData;
-    
+
     public MBRHandler(DataLocator partitionData) {
         this.partitionData = partitionData;
     }
@@ -40,7 +40,7 @@ public class MBRHandler extends PartitionSystemHandler {
         MBRPartitionTable apm = readPartitionTable();
         return apm.getUsedPartitionCount();
     }
-    
+
     @Override
     public Partition[] getPartitions() {
         MBRPartitionTable partitionTable = readPartitionTable();
@@ -49,7 +49,7 @@ public class MBRHandler extends PartitionSystemHandler {
 
     @Override
     public void close() {
-        
+
     }
 
     public MBRPartitionTable readPartitionTable() {
@@ -57,7 +57,7 @@ public class MBRHandler extends PartitionSystemHandler {
         try {
             llf = partitionData.createReadOnlyFile();
             byte[] firstBlock = new byte[512];
-            
+
             llf.readFully(firstBlock);
 
             MBRPartitionTable mbt = new MBRPartitionTable(firstBlock, 0);

@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,7 +22,7 @@ import org.catacombae.util.Util;
 
 public class HFSPlusCatalogLeafNode extends BTLeafNode {
     protected HFSPlusCatalogLeafRecord[] leafRecords;
-    
+
     public HFSPlusCatalogLeafNode(byte[] data, int offset, int nodeSize) {
 	this(data, offset, nodeSize, null);
     }
@@ -42,7 +42,7 @@ public class HFSPlusCatalogLeafNode extends BTLeafNode {
 		leafRecords[i] = new HFSXCatalogLeafRecord(data, offset+currentOffset, catalogHeaderRec);
 	}
     }
-    
+
     public HFSPlusCatalogLeafRecord getLeafRecord(int index) { return leafRecords[index]; }
     public HFSPlusCatalogLeafRecord[] getLeafRecords() {
 	HFSPlusCatalogLeafRecord[] copy = new HFSPlusCatalogLeafRecord[leafRecords.length];

@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -41,10 +41,10 @@ public class HelpBrowserPanel extends javax.swing.JPanel {
     private final URL homePage;
     private URL currentPage = null;
     private LinkedList<URL> history = new LinkedList<URL>();
-    
+
     /**
      * Creates new HelpBrowserPanel.
-     * 
+     *
      * @param iHomePage the start page URL of this help browser.
      */
     public HelpBrowserPanel(URL iHomePage) {
@@ -74,14 +74,14 @@ public class HelpBrowserPanel extends javax.swing.JPanel {
                 goHome();
             }
         });
-        
+
         goHome();
     }
 
     protected void goHome() {
         goToPage(homePage);
     }
-    
+
     protected void goBack() {
         try {
             URL previousPage = history.getLast();
@@ -128,7 +128,7 @@ public class HelpBrowserPanel extends javax.swing.JPanel {
                     "Could not load page " + iUrl, ex);
         }
     }
-    
+
     public static void showHelpBrowserWindow(String iTitle, URL iHomePage) {
         JFrame f = new JFrame(iTitle);
         f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -192,7 +192,7 @@ public class HelpBrowserPanel extends javax.swing.JPanel {
     private javax.swing.JScrollPane htmlViewScroller;
     // End of variables declaration//GEN-END:variables
 
-    
+
     /*
     public static void main(String[] args) throws MalformedURLException {
         try {

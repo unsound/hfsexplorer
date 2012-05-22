@@ -45,24 +45,24 @@ public class HFSCommonFSFile extends HFSCommonFSEntry implements FSFile {
      * structure of HFS.
      */
     private final CommonHFSCatalogFileRecord fileRecord;
-    
+
     private final HFSCommonFSAttributes attributes;
     private final FSFork dataFork;
     private final FSFork resourceFork;
-    
+
     HFSCommonFSFile(HFSCommonFileSystemHandler iParent, CommonHFSCatalogFileRecord iFileRecord) {
         this(iParent, null, iFileRecord);
     }
-    
+
     HFSCommonFSFile(HFSCommonFileSystemHandler iParent, CommonHFSCatalogLeafRecord iHardLinkRecord, CommonHFSCatalogFileRecord iFileRecord) {
         super(iParent, iFileRecord.getData());
-        
+
         // Input check
         if(iParent == null)
             throw new IllegalArgumentException("iParent must not be null!");
         if(iFileRecord == null)
             throw new IllegalArgumentException("iFileRecord must not be null!");
-        
+
         this.fileRecord = iFileRecord;
         if(iHardLinkRecord != null)
             this.keyRecord = iHardLinkRecord;
@@ -73,7 +73,7 @@ public class HFSCommonFSFile extends HFSCommonFSEntry implements FSFile {
         this.dataFork = new HFSCommonFSFork(this, FSForkType.DATA, catalogFile.getDataFork());
         this.resourceFork = new HFSCommonFSFork(this, FSForkType.MACOS_RESOURCE, catalogFile.getResourceFork());
     }
-    
+
     /* @Override */
     public FSAttributes getAttributes() {
         return attributes;
@@ -140,11 +140,11 @@ public class HFSCommonFSFile extends HFSCommonFSEntry implements FSFile {
     ReadableRandomAccessStream getReadableDataForkStream() {
         return fsHandler.getReadableDataForkStream(fileRecord);
     }
-    
+
     ReadableRandomAccessStream getReadableResourceForkStream() {
         return fsHandler.getReadableResourceForkStream(fileRecord);
     }
-    
+
     public CommonHFSCatalogFile getInternalCatalogFile() {
         return fileRecord.getData();
     }

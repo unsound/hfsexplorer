@@ -48,7 +48,7 @@ public abstract class CommonHFSVolumeHeader implements StructElements {
      * Returns a byte pointer (not block) to the end of the volume, that is,
      * a pointer to byte following the last byte of the volume. You could call
      * this method getFileSystemLength if you wanted to.
-     * 
+     *
      * @return a byte pointer to the end of the volume.
      */
     public abstract long getFileSystemEnd();
@@ -62,9 +62,9 @@ public abstract class CommonHFSVolumeHeader implements StructElements {
     public abstract CommonHFSForkData getCatalogFile();
     //public abstract long getExtentsOverflowFileSize();
     public abstract CommonHFSForkData getExtentsOverflowFile();
-    
+
     public abstract void print(PrintStream err, String prefix);
-    
+
     public static CommonHFSVolumeHeader create(HFSPlusVolumeHeader hdr) {
         return new HFSPlusImplementation(hdr);
     }
@@ -75,14 +75,14 @@ public abstract class CommonHFSVolumeHeader implements StructElements {
 
     /**
      * Validates the data of this volume header.
-     * 
+     *
      * @return whether or not this volume header has valid data.
      */
     public abstract boolean isValid();
-    
+
     public static class HFSPlusImplementation extends CommonHFSVolumeHeader {
         private final HFSPlusVolumeHeader hdr;
-        
+
         public HFSPlusImplementation(HFSPlusVolumeHeader hdr) {
             this.hdr = hdr;
         }
@@ -168,7 +168,7 @@ public abstract class CommonHFSVolumeHeader implements StructElements {
              */
             return 0;
         }
-        
+
         /* @Override */
         public Dictionary getStructElements() {
             return hdr.getStructElements();
@@ -185,10 +185,10 @@ public abstract class CommonHFSVolumeHeader implements StructElements {
             return hdr.isValid();
         }
     }
-    
+
     public static class HFSImplementation extends CommonHFSVolumeHeader {
         private final MasterDirectoryBlock hdr;
-        
+
         public HFSImplementation(MasterDirectoryBlock hdr) {
             this.hdr = hdr;
         }

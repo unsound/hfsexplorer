@@ -44,7 +44,7 @@ public abstract class CommonBTHeaderNode extends CommonBTNode<CommonBTRecord> {
         if(ic.records.size() != 3)
             throw new IllegalArgumentException("Illegal length of record array: " +
                     ic.records.size() + " (expected 3)");
-        
+
         if(!(ic.records.get(0) instanceof CommonBTHeaderRecord)) {
             throw new IllegalArgumentException("Illegal record type at index 0: " +
                     ic.records.get(0).getClass());

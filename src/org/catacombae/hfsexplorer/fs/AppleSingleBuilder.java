@@ -92,7 +92,7 @@ public class AppleSingleBuilder {
             return versionNumber;
         }
     }
-    
+
     public static enum FileSystem {
         MACOS("Macintosh"),
         MACOS_X("Mac OS X"),
@@ -159,7 +159,7 @@ public class AppleSingleBuilder {
     public void addDataFork(byte[] resourceForkData) {
         entryList.add(new Pair<EntryType, byte[]>(EntryType.DATA_FORK, resourceForkData));
     }
-    
+
     public void addResourceFork(byte[] resourceForkData) {
         entryList.add(new Pair<EntryType, byte[]>(EntryType.RESOURCE_FORK, resourceForkData));
     }
@@ -174,10 +174,10 @@ public class AppleSingleBuilder {
         int dataSize = AppleSingleHeader.length();
         dataSize += EntryDescriptor.length()*entryList.size();
         int dataStartOffset = dataSize;
-        
+
         for(Pair<EntryType, byte[]> p : entryList)
             dataSize += p.getB().length;
-        
+
 
         byte[] result = new byte[dataSize];
         int pointer = 0;
@@ -193,7 +193,7 @@ public class AppleSingleBuilder {
             byte[] entryData = p.getB();
             EntryDescriptor ed = new EntryDescriptor(p.getA().getTypeNumber(), dataOffset, entryData.length);
             dataOffset += entryData.length;
-            
+
             byte[] entryDescriptorData = ed.getBytes();
             System.arraycopy(entryDescriptorData, 0, result, pointer, entryDescriptorData.length);
             pointer += entryDescriptorData.length;

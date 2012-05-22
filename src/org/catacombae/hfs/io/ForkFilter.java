@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006-2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -51,11 +51,11 @@ public class ForkFilter implements ReadableRandomAccessStream {
     private long logicalPosition; // The current position in the fork
     private long lastLogicalPos; // The position in the fork where we stopped reading last time
     private long lastPhysicalPos; // The position in the fork where we stopped reading last time
-    
+
     /**
      * Creates a new ForkFilter. This class assumes that it has exclusive access to
      * <code>sourceFile</code>.
-     * 
+     *
      * @param forkData
      * @param extentDescriptors
      * @param sourceFile
@@ -69,7 +69,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
         this(forkData.getLogicalSize(), extentDescriptors, sourceFile, fsOffset,
                 allocationBlockSize, firstBlockByteOffset);
     }
-    
+
     /**
      * Creates a new ForkFilter. This class assumes that it has exclusive access to
      * <code>sourceFile</code>.

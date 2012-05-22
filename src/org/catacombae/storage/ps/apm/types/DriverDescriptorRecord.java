@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006-2011 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -30,23 +30,23 @@ public class DriverDescriptorRecord {
     /*
      * struct DriverDescriptorRecord
      * size: 269 bytes
-     * description: 
-     * 
-     * BP   Size  Type                       Identifier   Description                          
+     * description:
+     *
+     * BP   Size  Type                       Identifier   Description
      * ----------------------------------------------------------------------------------------
-     * 0    2     UInt16                     sbSig        {device signature}                   
-     * 2    2     UInt16                     sbBlkSize    {block size of the device}           
-     * 4    4     UInt32                     sbBlkCount   {number of blocks on the device}     
-     * 8    2     UInt16                     reserved1    {reserved}                           
-     * 10   2     UInt16                     reserved2    {reserved}                           
-     * 12   4     UInt32                     reserved3    {reserved}                           
+     * 0    2     UInt16                     sbSig        {device signature}
+     * 2    2     UInt16                     sbBlkSize    {block size of the device}
+     * 4    4     UInt32                     sbBlkCount   {number of blocks on the device}
+     * 8    2     UInt16                     reserved1    {reserved}
+     * 10   2     UInt16                     reserved2    {reserved}
+     * 12   4     UInt32                     reserved3    {reserved}
      * 16   2     UInt16                     sbDrvrCount  {number of driver descriptor entries}
-     * 18   8     DriverDescriptorEntry      firstEntry   {first driver descriptor entry}      
-     * 26   8*30  DriverDescriptorEntry[30]  additional   {additional drivers, if any}         
-     * 266  3     byte[3]                    ddPad        {reserved}                           
+     * 18   8     DriverDescriptorEntry      firstEntry   {first driver descriptor entry}
+     * 26   8*30  DriverDescriptorEntry[30]  additional   {additional drivers, if any}
+     * 266  3     byte[3]                    ddPad        {reserved}
      *
      */
-    
+
     private final byte[] sbSig = new byte[2];
     private final byte[] sbBlkSize = new byte[2];
     private final byte[] sbBlkCount = new byte[4];
@@ -56,7 +56,7 @@ public class DriverDescriptorRecord {
     private final byte[] sbDrvrCount = new byte[2];
     private final DriverDescriptorEntry[] entries;
     private final byte[] ddPad;
-    
+
     public DriverDescriptorRecord(ReadableRandomAccessStream llf, long offset) {
 	this(readData(llf, offset), 0);
     }
@@ -114,9 +114,9 @@ public class DriverDescriptorRecord {
 	    throw new RuntimeException("Could not read enough bytes from LowLevelFile!");
 	return data;
     }
-    
+
     public static int length() { return 269; }
-    
+
     /** Device signature. (Should be "ER"...) */
     public short getSbSig() { return Util.readShortBE(sbSig); }
     /** Block size of the device. */
@@ -141,12 +141,12 @@ public class DriverDescriptorRecord {
 
     /** Returns a String representation of the device signature. */
     public String getSbSigAsString() { return Util.toASCIIString(sbSig); }
-    
+
     public boolean isValid() {
 	int driverCount = Util.unsign(getSbDrvrCount());
 	return getSbSig() == DDR_SIGNATURE && driverCount <= 31 && entries.length == driverCount;
     }
-    
+
     public byte[] getData() {
 	byte[] result = new byte[length()];
 	int offset = 0;
@@ -168,7 +168,7 @@ public class DriverDescriptorRecord {
 	else
 	    return result;
     }
-    
+
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " sbSig: \"" + getSbSigAsString() + "\"");
 	ps.println(prefix + " sbBlkSize: " + getSbBlkSize());
@@ -198,7 +198,7 @@ public class DriverDescriptorRecord {
             e.printStackTrace();
         }
     }
-    
+
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "DriverDescriptorRecord:");
 	printFields(ps, prefix);

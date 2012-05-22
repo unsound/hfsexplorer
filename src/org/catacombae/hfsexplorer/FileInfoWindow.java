@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -39,7 +39,7 @@ import org.catacombae.storage.fs.hfscommon.HFSCommonFSFolder;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFSLink;
 
 public class FileInfoWindow extends JFrame {
-    
+
     public FileInfoWindow(FSEntry fsEntry, String[] parentPath) {
         super("Info - " + fsEntry.getName());
 
@@ -129,13 +129,13 @@ public class FileInfoWindow extends JFrame {
         int width = getSize().width;
         int height = getSize().height;
         int adjustedHeight = width + width / 2;
-        
+
         if(adjustedHeight < height)
             setSize(width, adjustedHeight);
 
         setLocationRelativeTo(null);
     }
-    
+
     /*
     public void setFields(FSFile file) {
         if(file instanceof HFSCommonFSFile) {
@@ -155,7 +155,7 @@ public class FileInfoWindow extends JFrame {
                     " not yet supported!");
     }
      * */
-    
+
     /*
     public void setFields(HFSPlusCatalogFile vh) {
 	infoPanel.setFields(vh);

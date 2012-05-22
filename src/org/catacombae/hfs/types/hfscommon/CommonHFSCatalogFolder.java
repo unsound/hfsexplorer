@@ -34,7 +34,7 @@ import org.catacombae.hfs.types.hfs.HFSDate;
  */
 public abstract class CommonHFSCatalogFolder implements CommonHFSCatalogAttributes, PrintableStruct, StructElements {
     public abstract CommonHFSCatalogNodeID getFolderID();
-    
+
     public static CommonHFSCatalogFolder create(HFSPlusCatalogFolder data) {
         return new HFSPlusImplementation(data);
     }
@@ -44,11 +44,11 @@ public abstract class CommonHFSCatalogFolder implements CommonHFSCatalogAttribut
     }
 
     public abstract long getValence();
-    
+
     public abstract int length();
 
     public abstract byte[] getBytes();
-    
+
     public CommonHFSCatalogNodeID getCatalogNodeID() {
         return getFolderID();
     }
@@ -61,7 +61,7 @@ public abstract class CommonHFSCatalogFolder implements CommonHFSCatalogAttribut
 
     public static class HFSPlusImplementation extends CommonHFSCatalogFolder {
         private HFSPlusCatalogFolder data;
-        
+
         public HFSPlusImplementation(HFSPlusCatalogFolder data) {
             this.data = data;
         }
@@ -70,7 +70,7 @@ public abstract class CommonHFSCatalogFolder implements CommonHFSCatalogAttribut
         public HFSPlusCatalogFolder getUnderlying() {
             return data;
         }
-        
+
         @Override
         public CommonHFSCatalogNodeID getFolderID() {
             return CommonHFSCatalogNodeID.create(data.getFolderID());
@@ -89,7 +89,7 @@ public abstract class CommonHFSCatalogFolder implements CommonHFSCatalogAttribut
         public byte[] getBytes() {
             return data.getBytes();
         }
-        
+
         /* @Override */
         public short getRecordType() {
             return data.getRecordType();
@@ -200,10 +200,10 @@ public abstract class CommonHFSCatalogFolder implements CommonHFSCatalogAttribut
             return CommonHFSFinderInfo.create(data);
         }
     }
-    
+
     public static class HFSImplementation extends CommonHFSCatalogFolder {
         private CdrDirRec data;
-        
+
         public HFSImplementation(CdrDirRec data) {
             this.data = data;
         }
@@ -226,7 +226,7 @@ public abstract class CommonHFSCatalogFolder implements CommonHFSCatalogAttribut
         public byte[] getBytes() {
             return data.getBytes();
         }
-        
+
 
         /* @Override */
         public short getRecordType() {

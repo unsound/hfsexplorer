@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -32,7 +32,7 @@ public class MutableMBRPartition extends MBRPartition {
     public void setLastSector(byte[] chs, int off) { copyData(chs, off, lastSector); }
     public void setLBAFirstSector(int lba) { Util.arrayCopy(Util.toByteArrayLE(lba), lbaFirstSector); }
     public void setLBAPartitionLength(int lba) { Util.arrayCopy(Util.toByteArrayLE(lba), lbaPartitionLength); }
-    
+
     private static void copyData(byte[] data, int off, byte[] dest) {
 	copyData(data, off, dest, dest.length);
     }

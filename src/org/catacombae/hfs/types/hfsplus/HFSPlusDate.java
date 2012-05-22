@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -26,15 +26,15 @@ public class HFSPlusDate extends HFSDate {
 
     protected HFSPlusDate() {}
 
-    /** 
+    /**
      * Pre-calculated. This is the amount of milliseconds between 01-01-1904 00:00:00.0000
      * (HFS+ starting date) and 01-01-1970 00:00:00.0000 (the start of the java "epoch").
      */
     //public static final long DIFF_TO_JAVA_DATE_IN_MILLIS = 2082844800000L;
-    
+
     /**
      * Converts a HFS+ date stored in GMT to a Java Date.
-     * 
+     *
      * @param hfsPlusTimestamp an HFS+ timestamp stored in GMT.
      * @return a java.util.Date set to the time of the HFS+ GMT timestamp.
      */
@@ -56,6 +56,4 @@ public class HFSPlusDate extends HFSDate {
 	//return timestampToDate(hfsPlusTimestamp, TimeZone.getTimeZone("GMT"));
 	//return new Date((hfsPlusTimestamp & 0xFFFFFFFFL)*1000 - DIFF_TO_JAVA_DATE_IN_MILLIS);
     }
-    
-    
 }

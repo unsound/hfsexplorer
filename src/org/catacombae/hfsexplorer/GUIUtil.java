@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,7 +19,7 @@ package org.catacombae.hfsexplorer;
 
 /**
  * Utility functions that the GUI designer can use to ease his/her existential suffering.
- * 
+ *
  * @author Erik Larsson
  */
 public class GUIUtil extends org.catacombae.util.GUIUtil {

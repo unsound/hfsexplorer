@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006-2009 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -63,7 +63,7 @@ public class HFSCatalogNodeID implements StructElements, PrintableStruct {
     public static final HFSCatalogNodeID kHFSBogusExtentFileID       = new HFSCatalogNodeID(15);
     /** This catalog node ID is the first ID that's available for user files. */
     public static final HFSCatalogNodeID kHFSFirstUserCatalogNodeID  = new HFSCatalogNodeID(16);
-    
+
     private int hfsCatalogNodeID;
 
     /**

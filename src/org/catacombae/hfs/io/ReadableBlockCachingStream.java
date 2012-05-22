@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -32,20 +32,20 @@ public class ReadableBlockCachingStream extends ReadableFilterStream {
      * the history block. In the future the implementation should allow for tuning how many of the
      * cache blocks are history blocks.
      */
-    
+
     /** The maximum age of an entry in the cache. When an entry's last accessed time has passed
 	this age, it is thrown out, regardless of its access count. Unit: milliseconds. */
     private static final long TIME_TO_KEEP_IN_CACHE = 5000; // Tune this later
-    
+
     /** Block size. */
     private final int blockSize;
-    
+
     /** The logical file pointer. */
     private long virtualFP;
-    
+
     /** Length of the file. If the length of the underlying file should change, this one doesn't. */
     private final long virtualLength;
-    
+
     /** Hashtable mapping block numbers to BlockStore objects. Every block that has ever been
 	accessed will get an entry here, which leads to uncontrollable memory allocation up to
 	a maximum of length()/blockSize entries. TODO: Think out a smarter solution with a space
@@ -56,22 +56,22 @@ public class ReadableBlockCachingStream extends ReadableFilterStream {
 	regardless of its access count, so that subsequent sequential reads won't suffer if
 	accessCount isn't high enough. */
     private final BlockStore[] cache;
-    
+
     /** Set when the close method is called. Prohibits further access. */
     private boolean closed = false;
-    
+
     private static class BlockStore/* implements Comparable<LongContainer>*/ {
 	public long accessCount = 0;
 	public long lastAccessTime = Long.MAX_VALUE;
 	public final long blockNumber;
 	/** Might be null at any time when the data is thrown out of the cache. */
 	public byte[] data = null;
-	
+
 	public BlockStore(long blockNumber) {
 	    this.blockNumber = blockNumber;
 	}
     }
-			    
+
     public ReadableBlockCachingStream(ReadableRandomAccessStream backing, int blockSize, int maxItemCount) {
 	super(backing);
         //System.err.println("ReadableBlockCachingStream(" + backing + ", " + blockSize + ", " + maxItemCount + ");");
@@ -81,7 +81,7 @@ public class ReadableBlockCachingStream extends ReadableFilterStream {
 	    throw new IllegalArgumentException("blockSize must be positive and non-zero");
 	if(maxItemCount < 1)
 	    throw new IllegalArgumentException("maxItemCount must be at least 1");
-	
+
 	this.blockSize = blockSize;
     long length;
 	try {
@@ -100,7 +100,7 @@ public class ReadableBlockCachingStream extends ReadableFilterStream {
 	}
 	this.cache = new BlockStore[actualItemCount];
     }
-    
+
     @Override
     public void seek(long pos) {
 	if(closed) throw new RuntimeException("File is closed.");
@@ -141,7 +141,7 @@ public class ReadableBlockCachingStream extends ReadableFilterStream {
 	    bytesProcessed += bytesToCopy;
 	    virtualFP += bytesToCopy;
 	}
-	
+
 	return bytesProcessed;
     }
     @Override
@@ -157,7 +157,7 @@ public class ReadableBlockCachingStream extends ReadableFilterStream {
 	while(bytesRead < length) {
 	    int curBytesRead = read(data, offset+bytesRead, length-bytesRead);
 	    if(curBytesRead > 0) bytesRead += curBytesRead;
-	    else 
+	    else
 		throw new RuntimeException("Couldn't read the entire length.");
 	}
     }
@@ -176,14 +176,14 @@ public class ReadableBlockCachingStream extends ReadableFilterStream {
 	closed = true;
 	backingStore.close();
     }
-    
+
     /**
      * If the block is present in the cache, return it immediately. Otherwise
      * read the block from the backing store, put it the backing store
      */
     private byte[] getCachedBlock(long filePointer) {
 	final long blockNumber = filePointer / blockSize;
-	
+
 	// 1. Increment access count and access time
 	BlockStore cur = blockMap.get(blockNumber);
 	if(cur == null) {
@@ -192,7 +192,7 @@ public class ReadableBlockCachingStream extends ReadableFilterStream {
 	}
 	++cur.accessCount;
 	cur.lastAccessTime = System.currentTimeMillis();
-	
+
 	// 2. Get the data
 	if(cur.data != null) {
 	    //System.out.println("  HIT at block number " + blockNumber + "!");
@@ -203,7 +203,7 @@ public class ReadableBlockCachingStream extends ReadableFilterStream {
 	    //System.out.println("  MISS at block number " + blockNumber + "!");
 	    // 2.2 Fetch data from backing store and put in cache IF it has a high enough access count.
 	    // (We should maintain a "last accessed" block as well)
-	    
+
 	    // Throw out the last entry (if any) from the cache and fetch its data array.
 	    // Also remove its data array. If it is a standard sized array, we can reuse it and save the garbage
 	    // collector and heap allocator some work.
@@ -216,8 +216,8 @@ public class ReadableBlockCachingStream extends ReadableFilterStream {
 		if(recoveredData == null)
 		    throw new RuntimeException("Entry in cache had a null array, which should never happen!");
 	    }
-	    
-	    
+
+
 	    // Read data from backing store
 	    long blockPos = blockNumber*blockSize;
 	    long remainingSize = length()-blockPos;
@@ -227,24 +227,24 @@ public class ReadableBlockCachingStream extends ReadableFilterStream {
 		data = recoveredData;
 	    else { // Will only happen if (1) cache isn't full or (2) if we are dealing with the last block
                 int size = (int)(dataSize <= 0 ? blockSize : dataSize);
-                
+
                 // TODO: Investigate the effect of this approach (setting the array size to blockSize for all block in -1 virtualLength streams).
 		data = new byte[size];
             }
 	    //System.err.println("  Seeking to " + blockPos + " (block number: " + blockNumber + ", blockSize: " + blockSize + ", data.length: " + data.length + ")");
 	    backingStore.seek(blockPos);
 	    backingStore.read(data, 0, data.length);
-	    
-	    
+
+
 	    // Place cur in the cache and make sure it goes to the right position. Time is O(cache.length)
-	    cur.data = data; 
+	    cur.data = data;
 	    cache[cache.length-1] = cur;
 	    bubbleIntoPosition(cache, cache.length-1);
-	    
+
 	    return cur.data;
 	}
     }
-    
+
     private static void bubbleIntoPosition(BlockStore[] array, int startIndex) {
 	long timestamp = System.currentTimeMillis();
 	for(int i = startIndex; i >= 1; --i) {
@@ -263,7 +263,7 @@ public class ReadableBlockCachingStream extends ReadableFilterStream {
 	    }
 	}
     }
-    
+
     /** Loads as much data as possible into memory starting at position 0. */
     public void preloadBlocks() {
 	preloadBlocks(0, cache.length);

@@ -31,38 +31,38 @@ import javax.swing.JPanel;
  * @author erik
  */
 public class MainWindow extends JFrame {
-    
+
     private static final String BASE_TITLE = "jParted";
-    
+
     private JMenuItem loadFileItem;
     private JMenuItem loadPathItem;
     private JMenuItem exitItem;
     private JMenuItem aboutItem;
     private JPanel mainPanel;
-    
+
     public MainWindow(JPanel mainPanel) {
         super(BASE_TITLE);
         this.mainPanel = mainPanel;
-        
+
         this.setLayout(new BorderLayout());
         this.add(mainPanel, BorderLayout.CENTER);
-        
+
         setupMenus();
-        
+
         this.pack();
         this.setLocationRelativeTo(null);
     }
-    
+
     private static void setAbstractButtonListener(AbstractButton button, ActionListener listener) {
         for(ActionListener al : button.getActionListeners())
             button.removeActionListener(al);
         button.addActionListener(listener);
     }
-    
+
     public void setLoadFileItemListener(ActionListener listener) {
         setAbstractButtonListener(loadFileItem, listener);
     }
-    
+
     public void setLoadPathItemListener(ActionListener listener) {
         setAbstractButtonListener(loadPathItem, listener);
     }
@@ -78,23 +78,23 @@ public class MainWindow extends JFrame {
     public void setCurrentFilename(String filename) {
         setTitle(MainWindow.BASE_TITLE + " - [" + filename + "]");
     }
-    
+
     private void setupMenus() {
         JMenu fileMenu = new JMenu("File");
         JMenu helpMenu = new JMenu("Help");
-        
-        // File menu items        
+
+        // File menu items
         loadFileItem = new JMenuItem("Load from file...");
         fileMenu.add(loadFileItem);
         loadPathItem = new JMenuItem("Load from path...");
         fileMenu.add(loadPathItem);
         exitItem = new JMenuItem("Quit");
         fileMenu.add(exitItem);
-        
+
         // Help menu items
         aboutItem = new JMenuItem("About...");
         helpMenu.add(aboutItem);
-        
+
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(fileMenu);
         menuBar.add(helpMenu);

@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2008 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -35,7 +35,7 @@ public class HFSDate {
      * 11:30 in Manaus, Brazil local time, and your computer's location is set
      * to Magadan, Russia, it will appear as if it was stored 11:30 in Magadan
      * time.)
-     * 
+     *
      * @param hfsTimestamp the HFS timestamp value (seconds elapsed since Jan 1 1904, local time).
      * @return a java.util.Date representation of the HFS timestamp.
      */
@@ -56,7 +56,7 @@ public class HFSDate {
 	*/
 	//return timestampToDate(hfsPlusTimestamp, TimeZone.getDefault());
     }
-    
+
     protected static Date getBaseDate(TimeZone tz) {
 	Calendar c = Calendar.getInstance(tz);
 	c.clear();

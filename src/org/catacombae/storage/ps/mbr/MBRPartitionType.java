@@ -84,7 +84,7 @@ public enum MBRPartitionType {
             throw new IllegalArgumentException("enumType == null");
         this.mbrType = mbrType;
         this.enumType = enumType;
-        
+
         addReverseLookupReference(mbrType, this);
     }
 

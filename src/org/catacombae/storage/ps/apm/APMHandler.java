@@ -30,9 +30,9 @@ import org.catacombae.storage.ps.PartitionSystemHandler;
  * @author erik
  */
 public class APMHandler extends PartitionSystemHandler {
-    
+
     private DataLocator partitionData;
-    
+
     public APMHandler(DataLocator partitionData) {
         this.partitionData = partitionData;
     }
@@ -42,7 +42,7 @@ public class APMHandler extends PartitionSystemHandler {
         ApplePartitionMap apm = readPartitionMap();
         return apm.getUsedPartitionCount();
     }
-    
+
     @Override
     public Partition[] getPartitions() {
         ApplePartitionMap apm = readPartitionMap();
@@ -74,7 +74,7 @@ public class APMHandler extends PartitionSystemHandler {
         ReadableRandomAccessStream llf = null;
         try {
             llf = partitionData.createReadOnlyFile();
-            
+
             // Look for APM
             DriverDescriptorRecord ddr = readDriverDescriptorRecord();
             if(ddr.isValid()) {

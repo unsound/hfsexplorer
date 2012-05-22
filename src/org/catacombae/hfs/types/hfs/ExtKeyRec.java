@@ -27,13 +27,13 @@ public class ExtKeyRec implements StructElements {
     /*
      * struct ExtKeyRec
      * size: 8 bytes
-     * description: 
-     * 
-     * BP  Size  Type    Identifier  Description                             
+     * description:
+     *
+     * BP  Size  Type    Identifier  Description
      * ----------------------------------------------------------------------
-     * 0   1     SInt8   xkrKeyLen   key length (SignedByte)                 
-     * 1   1     SInt8   xkrFkType   fork type (SignedByte)                  
-     * 2   4     SInt32  xkrFNum     file number (LongInt)                   
+     * 0   1     SInt8   xkrKeyLen   key length (SignedByte)
+     * 1   1     SInt8   xkrFkType   fork type (SignedByte)
+     * 2   4     SInt32  xkrFNum     file number (LongInt)
      * 6   2     SInt16  xkrFABN     starting file allocation block (Integer)
      */
 
@@ -41,28 +41,28 @@ public class ExtKeyRec implements StructElements {
     public static final byte FORK_TYPE_RESOURCE = (byte)0xFF;
 
     public static final int STRUCTSIZE = 8;
-    
+
     private final byte[] xkrKeyLen = new byte[1];
     private final byte[] xkrFkType = new byte[1];
     private final byte[] xkrFNum = new byte[4];
     private final byte[] xkrFABN = new byte[2];
-    
+
     public ExtKeyRec(byte[] data, int offset) {
 	System.arraycopy(data, offset+0, xkrKeyLen, 0, 1);
 	System.arraycopy(data, offset+1, xkrFkType, 0, 1);
 	System.arraycopy(data, offset+2, xkrFNum, 0, 4);
 	System.arraycopy(data, offset+6, xkrFABN, 0, 2);
     }
-    
+
     public ExtKeyRec(byte forkType, int fileID, short startBlock) {
         this.xkrKeyLen[0] = 7; // Constant
         this.xkrFkType[0] = forkType;
         System.arraycopy(Util.toByteArrayBE(fileID), 0, this.xkrFNum, 0, this.xkrFNum.length);
         System.arraycopy(Util.toByteArrayBE(startBlock), 0, this.xkrFABN, 0, this.xkrFABN.length);
     }
-    
+
     public static int length() { return STRUCTSIZE; }
-    
+
     /** key length (SignedByte) */
     public byte getXkrKeyLen() { return Util.readByteBE(xkrKeyLen); }
     /** fork type (SignedByte) */
@@ -71,19 +71,19 @@ public class ExtKeyRec implements StructElements {
     public int getXkrFNum() { return Util.readIntBE(xkrFNum); }
     /** starting file allocation block (Integer) */
     public short getXkrFABN() { return Util.readShortBE(xkrFABN); }
-    
+
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " xkrKeyLen: " + getXkrKeyLen());
 	ps.println(prefix + " xkrFkType: " + getXkrFkType());
 	ps.println(prefix + " xkrFNum: " + getXkrFNum());
 	ps.println(prefix + " xkrFABN: " + getXkrFABN());
     }
-    
+
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "ExtKeyRec:");
 	printFields(ps, prefix);
     }
-    
+
     public byte[] getBytes() {
 	byte[] result = new byte[STRUCTSIZE];
 	int offset = 0;
@@ -97,12 +97,12 @@ public class ExtKeyRec implements StructElements {
     /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder("ExtKeyRec", "HFS extent key");
-        
+
         db.addUIntBE("xkrKeyLen", xkrKeyLen, "Key length", "bytes");
         db.addUIntBE("xkrFkType", xkrFkType, "Fork type");
         db.addUIntBE("xkrFNum", xkrFNum, "File ID");
         db.addUIntBE("xkrFABN", xkrFABN, "Start block number");
-        
+
         return db.getResult();
     }
 }

@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -34,7 +34,7 @@ public class HFSPlusExtentDescriptor implements StructElements,
      * 0    4     UInt32            startBlock
      * 4    4     UInt32            blockCount
      */
-	
+
     private final byte[] startBlock = new byte[4]; // UInt32
     private final byte[] blockCount = new byte[4]; // UInt32
 
@@ -51,10 +51,10 @@ public class HFSPlusExtentDescriptor implements StructElements,
     public static int getSize() {
         return 8;
     }
-	
+
     public int getStartBlock() { return Util.readIntBE(startBlock); }
     public int getBlockCount() { return Util.readIntBE(blockCount); }
-	
+
     public void print(PrintStream ps, int pregap) {
         String pregapString = "";
         for(int i = 0; i < pregap; ++i)
@@ -75,10 +75,10 @@ public class HFSPlusExtentDescriptor implements StructElements,
     byte[] getBytes() {
         byte[] result = new byte[getSize()];
         int offset = 0;
-        
+
         System.arraycopy(startBlock, 0, result, offset, startBlock.length); offset += startBlock.length;
         System.arraycopy(blockCount, 0, result, offset, blockCount.length); offset += blockCount.length;
-        
+
         return result;
     }
 

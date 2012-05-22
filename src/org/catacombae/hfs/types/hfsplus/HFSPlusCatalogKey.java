@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006-2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -29,26 +29,26 @@ public class HFSPlusCatalogKey extends BTKey implements DynamicStruct, StructEle
     /*
      * struct HFSPlusCatalogKey
      * size: 518 bytes
-     * description: 
-     * 
+     * description:
+     *
      * BP  Size  Type              Identifier  Description
      * ---------------------------------------------------
-     * 0   2     UInt16            keyLength              
-     * 2   4     HFSCatalogNodeID  parentID               
+     * 0   2     UInt16            keyLength
+     * 2   4     HFSCatalogNodeID  parentID
      * 6   ~512  HFSUniStr255      nodeName    Size of string is max 512 bytes. Actual size: keyLength-4.
      */
     private static final int MAX_STRUCTSIZE = 518;
-    
+
     private final byte[] keyLength = new byte[2];
     private final HFSCatalogNodeID parentID;
     private final HFSUniStr255 nodeName;
-    
+
     public HFSPlusCatalogKey(byte[] data, int offset) {
 	System.arraycopy(data, offset+0, keyLength, 0, 2);
 	parentID = new HFSCatalogNodeID(data, offset+2);
 	nodeName = new HFSUniStr255(data, offset+6);
     }
-    
+
     public HFSPlusCatalogKey(HFSCatalogNodeID parentID, HFSUniStr255 nodeName) {
 	this.parentID = parentID;
 	this.nodeName = nodeName;
@@ -60,7 +60,7 @@ public class HFSPlusCatalogKey extends BTKey implements DynamicStruct, StructEle
 	nodeName = new HFSUniStr255(nodeNameString);
 	System.arraycopy(Util.toByteArrayBE((short)(4+nodeName.length())), 0, keyLength, 0, 2);
     }
-    
+
     @Override
     public short getKeyLength() { return Util.readShortBE(keyLength); }
     public HFSCatalogNodeID getParentID() { return parentID; }
@@ -90,7 +90,7 @@ public class HFSPlusCatalogKey extends BTKey implements DynamicStruct, StructEle
 	    return super.compareTo(btk);
 	}
     }
-    
+
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " keyLength: " + Util.unsign(getKeyLength()));
 	ps.println(prefix + " parentID: ");
@@ -98,29 +98,29 @@ public class HFSPlusCatalogKey extends BTKey implements DynamicStruct, StructEle
 	ps.println(prefix + " nodeName: ");
 	getNodeName().print(ps, prefix+"  ");
     }
-    
+
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "HFSPlusCatalogKey:");
 	printFields(ps, prefix);
     }
-    
+
     @Override
     public int length() { return occupiedSize(); }
-    
+
     /* @Override */
     public int occupiedSize() { return 2+Util.unsign(getKeyLength()); }
-    
+
     /* @Override */
     public int maxSize() { return MAX_STRUCTSIZE; }
 
     /* @Override */
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(HFSPlusCatalogKey.class.getSimpleName());
-        
+
         db.addUIntBE("keyLength", keyLength);
         db.add("parentID", parentID.getStructElements());
         db.add("nodeName", nodeName.getStructElements());
-        
+
         return db.getResult();
     }
 }
