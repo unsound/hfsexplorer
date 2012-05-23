@@ -152,6 +152,15 @@ public class GUIDPartitionTable implements PartitionSystem, StructElements {
         return entries.length;
     }
 
+    public GPTEntry[] getUsedEntries() {
+        final LinkedList<GPTEntry> tempList = new LinkedList<GPTEntry>();
+        for(GPTEntry ge : entries) {
+            if(ge.isUsed())
+                tempList.addLast(ge);
+        }
+        return tempList.toArray(new GPTEntry[tempList.size()]);
+    }
+
     public int getUsedPartitionCount() {
         int count = 0;
         for(GPTEntry ge : entries) {
@@ -171,12 +180,7 @@ public class GUIDPartitionTable implements PartitionSystem, StructElements {
 
     /** Returns only those partition entries that are non-null. */
     public Partition[] getUsedPartitionEntries() {
-        final LinkedList<GPTEntry> tempList = new LinkedList<GPTEntry>();
-        for(GPTEntry ge : entries) {
-            if(ge.isUsed())
-                tempList.addLast(ge);
-        }
-        return tempList.toArray(new GPTEntry[tempList.size()]);
+        return getUsedEntries();
     }
 
     /**
