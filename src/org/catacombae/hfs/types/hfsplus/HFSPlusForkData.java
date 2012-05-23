@@ -130,6 +130,10 @@ public class HFSPlusForkData implements StructElements {
         this._setExtents(forkData.extents);
     }
 
+    private HFSPlusExtentRecord.Mutable _getMutableExtents() {
+        return (HFSPlusExtentRecord.Mutable) this.extents;
+    }
+
     public static class Mutable extends HFSPlusForkData {
         public Mutable(byte[] data, int offset) {
             super(data, offset);
@@ -155,5 +159,8 @@ public class HFSPlusForkData implements StructElements {
             super._setExtents(extents);
         }
 
+        public HFSPlusExtentRecord.Mutable getMutableExtents() {
+            return super._getMutableExtents();
+        }
     }
 }
