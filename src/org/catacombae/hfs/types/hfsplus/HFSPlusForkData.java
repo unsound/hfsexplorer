@@ -107,23 +107,23 @@ public class HFSPlusForkData implements StructElements {
         return db.getResult();
     }
 
-    private final void _setLogicalSize(long logicalSize) {
+    private void _setLogicalSize(long logicalSize) {
         Util.arrayPutBE(this.logicalSize, 0, (long) logicalSize);
     }
 
-    private final void _setClumpSize(int clumpSize) {
+    private void _setClumpSize(int clumpSize) {
         Util.arrayPutBE(this.clumpSize, 0, (int) clumpSize);
     }
 
-    private final void _setTotalBlocks(int totalBlocks) {
+    private void _setTotalBlocks(int totalBlocks) {
         Util.arrayPutBE(this.totalBlocks, 0, (int) totalBlocks);
     }
 
-    private final void _setExtents(HFSPlusExtentRecord extents) {
+    private void _setExtents(HFSPlusExtentRecord extents) {
         ((HFSPlusExtentRecord.Mutable) this.extents).set(extents);
     }
 
-    private final void _set(HFSPlusForkData forkData) {
+    private void _set(HFSPlusForkData forkData) {
         Util.arrayCopy(forkData.logicalSize, this.logicalSize);
         Util.arrayCopy(forkData.clumpSize, this.clumpSize);
         Util.arrayCopy(forkData.totalBlocks, this.totalBlocks);

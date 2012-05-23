@@ -91,11 +91,11 @@ public class HFSPlusExtentDescriptor implements StructElements,
         return sb.getResult();
     }
 
-    private final void _setStartBlock(int startBlock) {
+    private void _setStartBlock(int startBlock) {
         Util.arrayPutBE(this.startBlock, 0, (int) startBlock);
     }
 
-    private final void _setBlockCount(int blockCount) {
+    private void _setBlockCount(int blockCount) {
         Util.arrayPutBE(this.blockCount, 0, (int) blockCount);
     }
 
