@@ -99,6 +99,11 @@ public class HFSPlusExtentDescriptor implements StructElements,
         Util.arrayPutBE(this.blockCount, 0, (int) blockCount);
     }
 
+    private void _set(HFSPlusExtentDescriptor desc) {
+        Util.arrayCopy(desc.startBlock, this.startBlock);
+        Util.arrayCopy(desc.blockCount, this.blockCount);
+    }
+
     public static class Mutable extends HFSPlusExtentDescriptor {
         public Mutable(byte[] data, int offset) {
             super(data, offset);
@@ -109,8 +114,7 @@ public class HFSPlusExtentDescriptor implements StructElements,
         }
 
         public void set(HFSPlusExtentDescriptor desc) {
-            this.setStartBlock(desc.getStartBlock());
-            this.setBlockCount(desc.getBlockCount());
+            super._set(desc);
         }
 
         public void setStartBlock(int startBlock) {
