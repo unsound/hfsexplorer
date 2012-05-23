@@ -18,7 +18,6 @@
 package org.catacombae.hfs;
 
 import org.catacombae.hfs.io.ForkFilter;
-import org.catacombae.io.ReadableRandomAccessSubstream;
 import org.catacombae.hfs.types.hfscommon.CommonBTHeaderRecord;
 import org.catacombae.hfs.types.hfscommon.CommonBTNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor;
@@ -65,8 +64,7 @@ public class AttributesFile extends BTreeFile {
 
         return new ForkFilter(
                 header.getCatalogFile(),
-                allExtents,
-                new ReadableRandomAccessSubstream(view.hfsFile),
+                allExtents, view.createFSStream(),
                 0,
                 header.getAllocationBlockSize(),
                 header.getAllocationBlockStart() * view.physicalBlockSize);
