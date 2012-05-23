@@ -59,10 +59,10 @@ public class HFSPlusForkData implements StructElements {
     public long getLogicalSize() {
 	return Util.readLongBE(logicalSize);
     }
-    public long getClumpSize() {
+    public int getClumpSize() {
 	return Util.readIntBE(clumpSize);
     }
-    public long getTotalBlocks() {
+    public int getTotalBlocks() {
 	return Util.readIntBE(totalBlocks);
     }
     public HFSPlusExtentRecord getExtents() { return extents; }
@@ -111,12 +111,12 @@ public class HFSPlusForkData implements StructElements {
         Util.arrayPutBE(this.logicalSize, 0, (long) logicalSize);
     }
 
-    private final void _setClumpSize(long clumpSize) {
-        Util.arrayPutBE(this.clumpSize, 0, (long) clumpSize);
+    private final void _setClumpSize(int clumpSize) {
+        Util.arrayPutBE(this.clumpSize, 0, (int) clumpSize);
     }
 
-    private final void _setTotalBlocks(long totalBlocks) {
-        Util.arrayPutBE(this.totalBlocks, 0, (long) totalBlocks);
+    private final void _setTotalBlocks(int totalBlocks) {
+        Util.arrayPutBE(this.totalBlocks, 0, (int) totalBlocks);
     }
 
     private final void _setExtents(HFSPlusExtentRecord extents) {
@@ -147,11 +147,11 @@ public class HFSPlusForkData implements StructElements {
             super._setLogicalSize(logicalSize);
         }
 
-        public void setClumpSize(long clumpSize) {
+        public void setClumpSize(int clumpSize) {
             super._setClumpSize(clumpSize);
         }
 
-        public void setTotalBlocks(long totalBlocks) {
+        public void setTotalBlocks(int totalBlocks) {
             super._setTotalBlocks(totalBlocks);
         }
 
