@@ -196,12 +196,16 @@ public class DictionaryBuilder {
         addInt(key, data, offset, length, UNSIGNED, BIG_ENDIAN, description, unit, rep);
     }
 
+    public void addUIntLE(String key, byte[] data, int offset, int length, String description, String unit, IntegerFieldRepresentation rep) {
+        addInt(key, data, offset, length, UNSIGNED, LITTLE_ENDIAN, description, unit, rep);
+    }
+
     public void addUIntBE(String key, Field field, Object obj, String description, String unit, IntegerFieldRepresentation rep) {
         addInt(key, field, obj, UNSIGNED, BIG_ENDIAN, description, unit, rep);
     }
 
-    public void addUIntLE(String key, byte[] data, int offset, int length, String description, String unit, IntegerFieldRepresentation rep) {
-        addInt(key, data, offset, length, UNSIGNED, LITTLE_ENDIAN, description, unit, rep);
+    public void addUIntLE(String key, Field field, Object obj, String description, String unit, IntegerFieldRepresentation rep) {
+        addInt(key, field, obj, UNSIGNED, LITTLE_ENDIAN, description, unit, rep);
     }
 
     public void addInt(String key, byte[] data, int offset, int length,
