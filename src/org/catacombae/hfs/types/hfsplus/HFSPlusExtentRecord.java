@@ -124,14 +124,14 @@ public class HFSPlusExtentRecord implements StructElements {
         return db.getResult();
     }
 
-    private final void _set(HFSPlusExtentRecord rec) {
+    private void _set(HFSPlusExtentRecord rec) {
         for(int i = 0; i < this.array.length; ++i) {
             ((HFSPlusExtentDescriptor.Mutable) this.array[i]).set(
                     rec.array[i]);
         }
     }
 
-    private final void _setExtentDescriptor(int index,
+    private void _setExtentDescriptor(int index,
             HFSPlusExtentDescriptor extentDescriptor)
     {
         if(index < 0 || index > this.array.length) {
@@ -142,7 +142,7 @@ public class HFSPlusExtentRecord implements StructElements {
                 extentDescriptor);
     }
 
-    private final void _setExtentDescriptors(
+    private void _setExtentDescriptors(
             HFSPlusExtentDescriptor[] extentDescriptors)
     {
         if(extentDescriptors.length != this.array.length) {
