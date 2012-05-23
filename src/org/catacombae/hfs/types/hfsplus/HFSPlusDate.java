@@ -24,6 +24,16 @@ import java.util.TimeZone;
 /** In the future, this could wrap a 32 bit HFS+ date. */
 public class HFSPlusDate extends HFSDate {
 
+    /**
+     * The base of the HFS+ date range, which is January 1, 1904, GMT. Since the
+     * time zone is fixed to GMT in HFS+, the value of this variable will not
+     * change as the time zone of the computer changes (as opposed to HFS where
+     * this will happen). So we can keep it as a static final variable for
+     * optimization.
+     */
+    private static final Date baseDate =
+            getBaseDate(TimeZone.getTimeZone("GMT"));
+
     protected HFSPlusDate() {}
 
     /**
@@ -39,7 +49,6 @@ public class HFSPlusDate extends HFSDate {
      * @return a java.util.Date set to the time of the HFS+ GMT timestamp.
      */
     public static Date gmtTimestampToDate(int hfsPlusTimestamp) {
-	Date baseDate = getBaseDate(TimeZone.getTimeZone("GMT"));
 	return new Date(baseDate.getTime() + (hfsPlusTimestamp & 0xFFFFFFFFL)*1000);
 	/*
 	Calendar c = Calendar.getInstance();
