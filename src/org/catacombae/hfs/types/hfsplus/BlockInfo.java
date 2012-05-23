@@ -44,9 +44,9 @@ public class BlockInfo implements StaticStruct, PrintableStruct {
     private int next;
 
     public BlockInfo(byte[] data, int offset) {
-        bnum = Util.readLongBE(data, offset+0);
-        bsize = Util.readIntBE(data, offset+8);
-        next = Util.readIntBE(data, offset+12);
+        this.bnum = Util.readLongBE(data, offset+0);
+        this.bsize = Util.readIntBE(data, offset+8);
+        this.next = Util.readIntBE(data, offset+12);
     }
 
     public static int length() { return STRUCTSIZE; }

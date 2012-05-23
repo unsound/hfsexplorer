@@ -50,12 +50,12 @@ public class BTNodeDescriptor {
     private final byte[] reserved = new byte[2];
 
     public BTNodeDescriptor(byte[] data, int offset) {
-	System.arraycopy(data, offset+0, fLink, 0, 4);
-	System.arraycopy(data, offset+4, bLink, 0, 4);
-	System.arraycopy(data, offset+8, kind, 0, 1);
-	System.arraycopy(data, offset+9, height, 0, 1);
-	System.arraycopy(data, offset+10, numRecords, 0, 2);
-	System.arraycopy(data, offset+12, reserved, 0, 2);
+	System.arraycopy(data, offset+0, this.fLink, 0, 4);
+	System.arraycopy(data, offset+4, this.bLink, 0, 4);
+	System.arraycopy(data, offset+8, this.kind, 0, 1);
+	System.arraycopy(data, offset+9, this.height, 0, 1);
+	System.arraycopy(data, offset+10, this.numRecords, 0, 2);
+	System.arraycopy(data, offset+12, this.reserved, 0, 2);
     }
 
     public static int length() { return STRUCTSIZE; }
