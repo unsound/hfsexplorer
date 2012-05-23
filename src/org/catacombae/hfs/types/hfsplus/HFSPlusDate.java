@@ -65,4 +65,22 @@ public class HFSPlusDate extends HFSDate {
 	//return timestampToDate(hfsPlusTimestamp, TimeZone.getTimeZone("GMT"));
 	//return new Date((hfsPlusTimestamp & 0xFFFFFFFFL)*1000 - DIFF_TO_JAVA_DATE_IN_MILLIS);
     }
+
+    /**
+     * Converts a Java Date into an HFS+ date timestamp.
+     *
+     * @param date a {@link java.util.Date} containing the timestamp value.
+     * @return an HFS+ date timestamp with the value of <code>date</code>. Note
+     * that this value should be interpreted as an unsigned 32-bit integer,
+     * instead of the signed standard Java interpretation.
+     */
+    public static int dateToGmtTimestamp(Date date) {
+        long timestamp = (date.getTime() - baseDate.getTime()) / 1000;
+        if(timestamp < 0 || timestamp > 0xFFFFFFFFL) {
+            throw new RuntimeException("Timestamp outside of UInt32 range:" +
+                    timestamp);
+        }
+
+        return (int) timestamp;
+    }
 }
