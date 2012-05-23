@@ -27,15 +27,18 @@ public abstract class BTIndexNode extends BTNode {
     protected BTIndexNode(byte[] data, int offset, int nodeSize) {
 	//nodeDescriptor = new BTNodeDescriptor(data, offset);
 	super(data, offset, nodeSize);
-	offsets = new short[Util.unsign(nodeDescriptor.getNumRecords())+1]; //Last one is free space index
-	for(int i = 0; i < offsets.length; ++i) {
-	    offsets[i] = Util.readShortBE(data, offset+nodeSize-((i+1)*2));
+	this.offsets = new short[Util.unsign(nodeDescriptor.getNumRecords())+1]; //Last one is free space index
+	for(int i = 0; i < this.offsets.length; ++i) {
+	    this.offsets[i] = Util.readShortBE(data, offset+nodeSize-((i+1)*2));
 	}
-	records = new BTIndexRecord[offsets.length-1];
+	this.records = new BTIndexRecord[this.offsets.length-1];
     }
 
     //public BTNodeDescriptor getNodeDescriptor() { return nodeDescriptor; }
-    public BTIndexRecord getIndexRecord(int index) { return records[index]; }
+    public BTIndexRecord getIndexRecord(int index) {
+        return this.records[index];
+    }
+
     public BTIndexRecord[] getIndexRecords() {
 	BTIndexRecord[] copy = new BTIndexRecord[records.length];
 	for(int i = 0; i < copy.length; ++i)

@@ -49,12 +49,12 @@ public class BlockListHeader implements StaticStruct, PrintableStruct {
     private final BlockInfo binfo;
 
     public BlockListHeader(byte[] data, int offset) {
-        maxBlocks = Util.readShortBE(data, offset+0);
-        numBlocks = Util.readShortBE(data, offset+2);
-        bytesUsed = Util.readIntBE(data, offset+4);
-        checksum = Util.readIntBE(data, offset+8);
-        pad = Util.readIntBE(data, offset+12);
-        binfo = new BlockInfo(data, offset+16);
+        this.maxBlocks = Util.readShortBE(data, offset+0);
+        this.numBlocks = Util.readShortBE(data, offset+2);
+        this.bytesUsed = Util.readIntBE(data, offset+4);
+        this.checksum = Util.readIntBE(data, offset+8);
+        this.pad = Util.readIntBE(data, offset+12);
+        this.binfo = new BlockInfo(data, offset+16);
     }
 
     public static int length() { return STRUCTSIZE; }
