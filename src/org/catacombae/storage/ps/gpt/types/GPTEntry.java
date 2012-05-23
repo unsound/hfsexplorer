@@ -100,7 +100,12 @@ public class GPTEntry implements Partition, StructElements {
     public GPTPartitionType getPartitionTypeGUIDAsEnum() {
         return GPTPartitionType.getType(Util.readLongBE(partitionTypeGUID, 0), Util.readLongBE(partitionTypeGUID, 8));
     }
+
     public String getPartitionNameAsString() {
+        return getPartitionNameAsString(partitionName);
+    }
+
+    public static String getPartitionNameAsString(byte[] partitionName) {
         // Find null terminator
         int stringLength = 0;
         for(int i = 0; i < partitionName.length; i += 2) {
