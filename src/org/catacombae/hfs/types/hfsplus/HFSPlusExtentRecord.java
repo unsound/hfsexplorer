@@ -155,6 +155,15 @@ public class HFSPlusExtentRecord implements StructElements {
         }
     }
 
+    private HFSPlusExtentDescriptor.Mutable[] _getMutableExtentDescriptors() {
+	HFSPlusExtentDescriptor.Mutable[] result =
+                new HFSPlusExtentDescriptor.Mutable[array.length];
+	for(int i = 0; i < array.length; ++i)
+	    result[i] = (HFSPlusExtentDescriptor.Mutable) array[i];
+	return result;
+    }
+
+
     public static class Mutable extends HFSPlusExtentRecord {
         public Mutable(byte[] data, int offset) {
             super(true, data, offset);
@@ -174,6 +183,10 @@ public class HFSPlusExtentRecord implements StructElements {
                 HFSPlusExtentDescriptor[] extentDescriptors)
         {
             super._setExtentDescriptors(extentDescriptors);
+        }
+
+        public HFSPlusExtentDescriptor.Mutable[] getMutableExtentDescriptors() {
+            return super._getMutableExtentDescriptors();
         }
     }
 }
