@@ -184,12 +184,17 @@ public class FileNameTools {
     public static boolean isReservedWindowsFilename(String filename) {
         if(reservedWindowsFilenames == null)
             reservedWindowsFilenames = buildReservedWindowsFilenames();
+
+        /* Check if the full file name matches one of the reserved Windows file
+         * names. */
         if(reservedWindowsFilenames.contains(filename))
             return true;
+
+        /* Check if the file name is a reserved name if we cut off the file
+         * extension. Apparently this can also cause problems in Windows. */
         if(filename.length() > 4 && filename.charAt(4) == '.' &&
                 reservedWindowsFilenames.contains(filename.substring(0, 4)))
             return true;
-        // WTF am I doing here?? Lesson learned: Comment your g'dam code.
         if(filename.length() > 3 && filename.charAt(3) == '.' &&
                 reservedWindowsFilenames.contains(filename.substring(0, 3)))
             return true;
