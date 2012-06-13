@@ -25,7 +25,8 @@ import java.util.HashSet;
  * @author Erik Larsson
  */
 public class FileNameTools {
-    private static HashSet<String> reservedWindowsFilenames = null;
+    private static final HashSet<String> reservedWindowsFilenames =
+            buildReservedWindowsFilenames();
 
     /**
      * This method should only return a non-null value when it's ABSOLUTELY SURE
@@ -182,9 +183,6 @@ public class FileNameTools {
     }
 
     public static boolean isReservedWindowsFilename(String filename) {
-        if(reservedWindowsFilenames == null)
-            reservedWindowsFilenames = buildReservedWindowsFilenames();
-
         /* Check if the full file name matches one of the reserved Windows file
          * names. */
         if(reservedWindowsFilenames.contains(filename))
@@ -202,7 +200,7 @@ public class FileNameTools {
         return false;
     }
 
-    public static HashSet<String> buildReservedWindowsFilenames() {
+    private static HashSet<String> buildReservedWindowsFilenames() {
         HashSet<String> result = new HashSet<String>();
         /*
          * <http://threebit.net/mail-archive/carbon-dev/msg01314.html>
