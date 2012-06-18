@@ -45,12 +45,12 @@ public abstract class CommonHFSExtentKey extends CommonBTKey<CommonHFSExtentKey>
     }
 
     private static int commonCompare(CommonHFSExtentKey k1, CommonHFSExtentKey k2) {
-        int forkType1 = k1.getForkType();
-        int forkType2 = k2.getForkType();
-        if(forkType1 == forkType2) {
-            long fileID1 = k1.getFileID().toLong();
-            long fileID2 = k2.getFileID().toLong();
-            if(fileID1 == fileID2) {
+        long fileID1 = k1.getFileID().toLong();
+        long fileID2 = k2.getFileID().toLong();
+        if(fileID1 == fileID2) {
+            int forkType1 = k1.getForkType();
+            int forkType2 = k2.getForkType();
+            if(forkType1 == forkType2) {
                 long startBlock1 = k1.getStartBlock();
                 long startBlock2 = k2.getStartBlock();
                 if(startBlock1 == startBlock2)
@@ -60,12 +60,12 @@ public abstract class CommonHFSExtentKey extends CommonBTKey<CommonHFSExtentKey>
                 else
                     return 1;
             }
-            else if(fileID1 < fileID2)
+            else if(forkType1 < forkType2)
                 return -1;
             else
                 return 1;
         }
-        else if(forkType1 < forkType2)
+        else if(fileID1 < fileID2)
             return -1;
         else
             return 1;
