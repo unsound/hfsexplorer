@@ -17,14 +17,5 @@
 
 package org.catacombae.hfsexplorer;
 
-import java.io.PrintStream;
-
 public class Util extends org.catacombae.util.Util {
-    public static <A> boolean contains(A[] array, A element) {
-        for(A a : array) {
-            if(a == element)
-                return true;
-        }
-        return false;
-    }
 }
