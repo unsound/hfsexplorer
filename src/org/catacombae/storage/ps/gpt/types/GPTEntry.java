@@ -44,19 +44,18 @@ public class GPTEntry implements Partition, StructElements {
      * 56  72    byte[72]  partitionName
      */
 
-    protected final byte[] partitionTypeGUID = new byte[16];
-    protected final byte[] uniquePartitionGUID = new byte[16];
+    protected final GUID partitionTypeGUID;
+    protected final GUID uniquePartitionGUID;
     protected final byte[] startingLBA = new byte[8];
     protected final byte[] endingLBA = new byte[8];
     protected final byte[] attributeBits = new byte[8];
     protected final byte[] partitionName = new byte[72];
 
-    private final int blockSize;
+    protected final int blockSize;
 
     public GPTEntry(byte[] data, int offset, int blockSize) {
-        this(blockSize);
-        System.arraycopy(data, offset + 0, partitionTypeGUID, 0, 16);
-        System.arraycopy(data, offset + 16, uniquePartitionGUID, 0, 16);
+        this(blockSize, new GUID(data, offset + 0),
+                new GUID(data, offset + 16));
         System.arraycopy(data, offset + 32, startingLBA, 0, 8);
         System.arraycopy(data, offset + 40, endingLBA, 0, 8);
         System.arraycopy(data, offset + 48, attributeBits, 0, 8);
@@ -67,16 +66,23 @@ public class GPTEntry implements Partition, StructElements {
      * Used by its evil mutable twin.
      * @param blockSize
      */
-    protected GPTEntry(int blockSize) { this.blockSize = blockSize; }
+    protected GPTEntry(int blockSize, GUID partitionTypeGUID,
+            GUID uniquePartitionGUID)
+    {
+        this.blockSize = blockSize;
+        this.partitionTypeGUID = partitionTypeGUID;
+        this.uniquePartitionGUID = uniquePartitionGUID;
+    }
 
     public GPTEntry(GPTEntry source) {
-        this(source.blockSize);
+        this(source.blockSize, new GUID(source.partitionTypeGUID),
+                new GUID(source.uniquePartitionGUID));
         copyFields(source);
     }
 
     protected void copyFields(GPTEntry source) {
-        System.arraycopy(source.partitionTypeGUID, 0, partitionTypeGUID, 0, partitionTypeGUID.length);
-        System.arraycopy(source.uniquePartitionGUID, 0, uniquePartitionGUID, 0, uniquePartitionGUID.length);
+        partitionTypeGUID.copyFields(source.partitionTypeGUID);
+        uniquePartitionGUID.copyFields(source.uniquePartitionGUID);
         System.arraycopy(source.startingLBA, 0, startingLBA, 0, startingLBA.length);
         System.arraycopy(source.endingLBA, 0, endingLBA, 0, endingLBA.length);
         System.arraycopy(source.attributeBits, 0, attributeBits, 0, attributeBits.length);
@@ -90,15 +96,17 @@ public class GPTEntry implements Partition, StructElements {
 
     public static int getSize() { return 128; }
 
-    public byte[] getPartitionTypeGUID() { return Util.createCopy(partitionTypeGUID); }
-    public byte[] getUniquePartitionGUID() { return Util.createCopy(uniquePartitionGUID); }
+    public GUID getPartitionTypeGUID() { return partitionTypeGUID; }
+    public GUID getUniquePartitionGUID() { return uniquePartitionGUID; }
     public long getStartingLBA() { return Util.readLongLE(startingLBA); }
     public long getEndingLBA() { return Util.readLongLE(endingLBA); }
     public long getAttributeBits() { return Util.readLongBE(attributeBits); }
     public byte[] getPartitionName() { return Util.createCopy(partitionName); }
 
     public GPTPartitionType getPartitionTypeGUIDAsEnum() {
-        return GPTPartitionType.getType(Util.readLongBE(partitionTypeGUID, 0), Util.readLongBE(partitionTypeGUID, 8));
+        byte[] guidBytes = partitionTypeGUID.getBytes();
+        return GPTPartitionType.getType(Util.readLongBE(guidBytes, 0),
+                Util.readLongBE(guidBytes, 8));
     }
 
     public String getPartitionNameAsString() {
@@ -127,8 +135,8 @@ public class GPTEntry implements Partition, StructElements {
     }
 
     public void printFields(PrintStream ps, String prefix) {
-        ps.println(prefix + " partitionTypeGUID: " + getGUIDAsString(getPartitionTypeGUID()) + " (" + getPartitionTypeGUIDAsEnum() + ")");
-        ps.println(prefix + " uniquePartitionGUID: " + getGUIDAsString(getUniquePartitionGUID()));
+        ps.println(prefix + " partitionTypeGUID: " + getPartitionTypeGUID().toString() + " (" + getPartitionTypeGUIDAsEnum() + ")");
+        ps.println(prefix + " uniquePartitionGUID: " + getUniquePartitionGUID().toString());
         ps.println(prefix + " startingLBA: " + getStartingLBA());
         ps.println(prefix + " endingLBA: " + getEndingLBA());
         ps.println(prefix + " attributeBits: " + getAttributeBits());
@@ -143,8 +151,8 @@ public class GPTEntry implements Partition, StructElements {
     public byte[] getBytes() {
         byte[] result = new byte[128];
         int offset = 0;
-        System.arraycopy(partitionTypeGUID, 0, result, offset, partitionTypeGUID.length); offset += 16;
-        System.arraycopy(uniquePartitionGUID, 0, result, offset, uniquePartitionGUID.length); offset += 16;
+        partitionTypeGUID.getBytes(result, offset); offset += GUID.length();
+        uniquePartitionGUID.getBytes(result, offset); offset += GUID.length();
         System.arraycopy(startingLBA, 0, result, offset, startingLBA.length); offset += 8;
         System.arraycopy(endingLBA, 0, result, offset, endingLBA.length); offset += 8;
         System.arraycopy(attributeBits, 0, result, offset, attributeBits.length); offset += 8;
@@ -190,8 +198,8 @@ public class GPTEntry implements Partition, StructElements {
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(GPTEntry.class.getSimpleName());
 
-        db.addByteArray("partitionTypeGUID", partitionTypeGUID);
-        db.addByteArray("uniquePartitionGUID", uniquePartitionGUID);
+        db.add("partitionTypeGUID", partitionTypeGUID.getStructElements());
+        db.add("uniquePartitionGUID", uniquePartitionGUID.getStructElements());
         db.addUIntLE("startingLBA", startingLBA);
         db.addUIntLE("endingLBA", endingLBA);
         db.add("partitionName", new EncodedStringField(partitionName, "UTF-16LE"));

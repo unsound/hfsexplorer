@@ -22,15 +22,28 @@ import java.io.PrintStream;
 
 public class MutableGPTEntry extends GPTEntry {
 
+    private final MutableGUID mutablePartitionTypeGUID;
+    private final MutableGUID mutableUniquePartitionGUID;
+
     public MutableGPTEntry(int blockSize) {
-	super(blockSize);
-    }
-    public MutableGPTEntry(GPTEntry source) {
-	super(source);
+        super(blockSize, new MutableGUID(), new MutableGUID());
+
+        this.mutablePartitionTypeGUID = (MutableGUID) this.partitionTypeGUID;
+        this.mutableUniquePartitionGUID =
+                (MutableGUID) this.uniquePartitionGUID;
     }
 
-    public void setPartitionTypeGUID(byte[] data, int off) { copyData(data, off, partitionTypeGUID); }
-    public void setUniquePartitionGUID(byte[] data, int off) { copyData(data, off, uniquePartitionGUID); }
+    public MutableGPTEntry(GPTEntry source) {
+        super(source.blockSize, new MutableGUID(source.partitionTypeGUID),
+                new MutableGUID(source.uniquePartitionGUID));
+
+        this.mutablePartitionTypeGUID = (MutableGUID) this.partitionTypeGUID;
+        this.mutableUniquePartitionGUID =
+                (MutableGUID) this.uniquePartitionGUID;
+    }
+
+    public MutableGUID getMutablePartitionTypeGUID() { return mutablePartitionTypeGUID; }
+    public MutableGUID getMutableUniquePartitionGUID() { return mutableUniquePartitionGUID; }
     public void setStartingLBA(long i) { Util.arrayCopy(Util.toByteArrayLE(i), startingLBA); }
     public void setEndingLBA(long i) { Util.arrayCopy(Util.toByteArrayLE(i), endingLBA); }
     public void setAttributeBits(long i) { Util.arrayCopy(Util.toByteArrayBE(i), attributeBits); }
