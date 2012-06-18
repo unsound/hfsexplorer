@@ -116,8 +116,16 @@ public class DictionaryBuilder {
         addSIntBE(key, data, null);
     }
 
+    public void addSIntBE(String key, Field field, Object obj) {
+        addSIntBE(key, field, obj, null);
+    }
+
     public void addSIntLE(String key, byte[] data) {
         addSIntLE(key, data, null);
+    }
+
+    public void addSIntLE(String key, Field field, Object obj) {
+        addSIntLE(key, field, obj, null);
     }
 
     public void addUIntBE(String key, byte[] data) {
@@ -132,12 +140,24 @@ public class DictionaryBuilder {
         addUIntLE(key, data, null);
     }
 
+    public void addUIntLE(String key, Field field, Object obj) {
+        addUIntLE(key, field, obj, null);
+    }
+
     public void addSIntBE(String key, byte[] data, String description) {
         addSIntBE(key, data, 0, data.length, description, null, DECIMAL);
     }
 
+    public void addSIntBE(String key, Field field, Object obj, String description) {
+        addSIntBE(key, field, obj, description, null, DECIMAL);
+    }
+
     public void addSIntLE(String key, byte[] data, String description) {
         addSIntLE(key, data, 0, data.length, description, null, DECIMAL);
+    }
+
+    public void addSIntLE(String key, Field field, Object obj, String description) {
+        addSIntLE(key, field, obj, description, null, DECIMAL);
     }
 
     public void addUIntBE(String key, byte[] data, String description) {
@@ -152,56 +172,100 @@ public class DictionaryBuilder {
         addUIntLE(key, data, 0, data.length, description, null, DECIMAL);
     }
 
+    public void addUIntLE(String key, Field field, Object obj, String description) {
+        addUIntLE(key, field, obj, description, null, DECIMAL);
+    }
+
     public void addSIntBE(String key, byte[] data, String description, String unit) {
         addSIntBE(key, data, 0, data.length, description, unit, DECIMAL);
+    }
+
+    public void addSIntBE(String key, Field field, Object obj, String description, String unit) {
+        addSIntBE(key, field, obj, description, unit, DECIMAL);
     }
 
     public void addSIntLE(String key, byte[] data, String description, String unit) {
         addSIntLE(key, data, 0, data.length, description, unit, DECIMAL);
     }
 
+    public void addSIntLE(String key, Field field, Object obj, String description, String unit) {
+        addSIntLE(key, field, obj, description, unit, DECIMAL);
+    }
+
     public void addUIntBE(String key, byte[] data, String description, String unit) {
         addUIntBE(key, data, 0, data.length, description, unit, DECIMAL);
+    }
+
+    public void addUIntBE(String key, Field field, Object obj, String description, String unit) {
+        addUIntBE(key, field, obj, description, unit, DECIMAL);
     }
 
     public void addUIntLE(String key, byte[] data, String description, String unit) {
         addUIntLE(key, data, 0, data.length, description, unit, DECIMAL);
     }
 
+    public void addUIntLE(String key, Field field, Object obj, String description, String unit) {
+        addUIntLE(key, field, obj, description, unit, DECIMAL);
+    }
+
     public void addSIntBE(String key, byte[] data, String description, IntegerFieldRepresentation rep) {
         addSIntBE(key, data, 0, data.length, description, null, rep);
+    }
+
+    public void addSIntBE(String key, Field field, Object obj, String description, IntegerFieldRepresentation rep) {
+        addSIntBE(key, field, obj, description, null, rep);
     }
 
     public void addSIntLE(String key, byte[] data, String description, IntegerFieldRepresentation rep) {
         addSIntLE(key, data, 0, data.length, description, null, rep);
     }
 
+    public void addSIntLE(String key, Field field, Object obj, String description, IntegerFieldRepresentation rep) {
+        addSIntLE(key, field, obj, description, null, rep);
+    }
+
     public void addUIntBE(String key, byte[] data, String description, IntegerFieldRepresentation rep) {
         addUIntBE(key, data, 0, data.length, description, null, rep);
+    }
+
+    public void addUIntBE(String key, Field field, Object obj, String description, IntegerFieldRepresentation rep) {
+        addUIntBE(key, field, obj, description, null, rep);
     }
 
     public void addUIntLE(String key, byte[] data, String description, IntegerFieldRepresentation rep) {
         addUIntLE(key, data, 0, data.length, description, null, rep);
     }
 
+    public void addUIntLE(String key, Field field, Object obj, String description, IntegerFieldRepresentation rep) {
+        addUIntLE(key, field, obj, description, null, rep);
+    }
+
     public void addSIntBE(String key, byte[] data, int offset, int length, String description, String unit, IntegerFieldRepresentation rep) {
         addInt(key, data, offset, length, SIGNED, BIG_ENDIAN, description, unit, rep);
+    }
+
+    public void addSIntBE(String key, Field field, Object obj, String description, String unit, IntegerFieldRepresentation rep) {
+        addInt(key, field, obj, SIGNED, BIG_ENDIAN, description, unit, rep);
     }
 
     public void addSIntLE(String key, byte[] data, int offset, int length, String description, String unit, IntegerFieldRepresentation rep) {
         addInt(key, data, offset, length, SIGNED, LITTLE_ENDIAN, description, unit, rep);
     }
 
+    public void addSIntLE(String key, Field field, Object obj, String description, String unit, IntegerFieldRepresentation rep) {
+        addInt(key, field, obj, SIGNED, LITTLE_ENDIAN, description, unit, rep);
+    }
+
     public void addUIntBE(String key, byte[] data, int offset, int length, String description, String unit, IntegerFieldRepresentation rep) {
         addInt(key, data, offset, length, UNSIGNED, BIG_ENDIAN, description, unit, rep);
     }
 
-    public void addUIntLE(String key, byte[] data, int offset, int length, String description, String unit, IntegerFieldRepresentation rep) {
-        addInt(key, data, offset, length, UNSIGNED, LITTLE_ENDIAN, description, unit, rep);
-    }
-
     public void addUIntBE(String key, Field field, Object obj, String description, String unit, IntegerFieldRepresentation rep) {
         addInt(key, field, obj, UNSIGNED, BIG_ENDIAN, description, unit, rep);
+    }
+
+    public void addUIntLE(String key, byte[] data, int offset, int length, String description, String unit, IntegerFieldRepresentation rep) {
+        addInt(key, data, offset, length, UNSIGNED, LITTLE_ENDIAN, description, unit, rep);
     }
 
     public void addUIntLE(String key, Field field, Object obj, String description, String unit, IntegerFieldRepresentation rep) {
