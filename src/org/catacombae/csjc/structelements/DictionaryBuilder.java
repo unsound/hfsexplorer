@@ -442,8 +442,17 @@ public class DictionaryBuilder {
     public void addEncodedString(String key, byte[] data, String encoding) {
         addEncodedString(key, data, 0, data.length, encoding);
     }
+
+    public void addEncodedString(String key, byte[] data, String encoding, String description) {
+        addEncodedString(key, data, 0, data.length, encoding, description);
+    }
+
     public void addEncodedString(String key, byte[] data, int offset, int length, String encoding) {
         add(key, new EncodedStringField(data, offset, length, encoding));
+    }
+
+    public void addEncodedString(String key, byte[] data, int offset, int length, String encoding, String description) {
+        add(key, new EncodedStringField(data, offset, length, encoding), description);
     }
 
     /** Adds all the key-value mappings present in <code>d</code> in order. */
