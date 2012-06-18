@@ -91,7 +91,7 @@ public class RepairMyGPTPlease5 {
 	    // First we verify that the current data is as we expect it to be.
 
 	    System.out.print("Checking if the first partition has type \"EFI System Partition\"...");
-	    byte[] currentType1 = gpt.getEntry(0).getPartitionTypeGUID();
+	    byte[] currentType1 = gpt.getEntry(0).getPartitionTypeGUID().getBytes();
 	    if(!Util.arraysEqual(currentType1, efiSystemPartitionType)) {
 		System.out.println("failed! Halting program.");
 		System.exit(0);
@@ -99,7 +99,7 @@ public class RepairMyGPTPlease5 {
 	    System.out.println("yes.");
 
 	    System.out.print("Checking if the second partition has type \"Microsoft Reserved\"...");
-	    byte[] currentType2 = gpt.getEntry(1).getPartitionTypeGUID();
+	    byte[] currentType2 = gpt.getEntry(1).getPartitionTypeGUID().getBytes();
 	    if(!Util.arraysEqual(currentType2, microsoftReservedType)) {
 		System.out.println("failed! Halting program.");
 		System.exit(0);
@@ -118,8 +118,8 @@ public class RepairMyGPTPlease5 {
 	    MutableGPTEntry modifiedPrimaryEntry2 = gpt.getMutablePrimaryEntry(1);
 	    MutableGPTEntry modifiedBackupEntry2 = gpt.getMutableBackupEntry(1);
 
-	    modifiedPrimaryEntry2.setPartitionTypeGUID(microsoftBasicDataType, 0);
-	    modifiedBackupEntry2.setPartitionTypeGUID(microsoftBasicDataType, 0);
+	    modifiedPrimaryEntry2.getMutablePartitionTypeGUID().setBytes(microsoftBasicDataType, 0);
+	    modifiedBackupEntry2.getMutablePartitionTypeGUID().setBytes(microsoftBasicDataType, 0);
 	    System.out.println("done.");
 
 	    MutableGPTHeader primaryHeader = gpt.getMutablePrimaryHeader();

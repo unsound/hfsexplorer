@@ -90,7 +90,7 @@ public class RepairMyGPTPlease6 {
 	    // First we verify that the current data is as we expect it to be.
 
 	    System.out.print("Checking if the second partition has type \"EFI System Partition\"...");
-	    byte[] currentType1 = gpt.getEntry(0).getPartitionTypeGUID();
+	    byte[] currentType1 = gpt.getEntry(0).getPartitionTypeGUID().getBytes();
 	    if(!Util.arraysEqual(currentType1, efiSystemPartitionType)) {
 		System.out.println("failed! Halting program.");
 		System.exit(0);
@@ -98,7 +98,7 @@ public class RepairMyGPTPlease6 {
 	    System.out.println("yes.");
 
 	    System.out.print("Checking if the second partition has type \"Apple HFS\"...");
-	    byte[] currentType2 = gpt.getEntry(1).getPartitionTypeGUID();
+	    byte[] currentType2 = gpt.getEntry(1).getPartitionTypeGUID().getBytes();
 	    if(!Util.arraysEqual(currentType2, appleHfsType)) {
 		System.out.println("failed! Halting program.");
 		System.exit(0);
@@ -106,7 +106,7 @@ public class RepairMyGPTPlease6 {
 	    System.out.println("yes.");
 
 	    System.out.print("Checking if the third partition has type \"Microsoft Basic Data\"...");
-	    byte[] currentType3 = gpt.getEntry(2).getPartitionTypeGUID();
+	    byte[] currentType3 = gpt.getEntry(2).getPartitionTypeGUID().getBytes();
 	    if(!Util.arraysEqual(currentType3, microsoftBasicDataType)) {
 		System.out.println("failed! Halting program.");
 		System.exit(0);
@@ -114,7 +114,7 @@ public class RepairMyGPTPlease6 {
 	    System.out.println("yes.");
 
 	    System.out.print("Checking if the fourth partition has type \"Microsoft Basic Data\"...");
-	    byte[] currentType4 = gpt.getEntry(3).getPartitionTypeGUID();
+	    byte[] currentType4 = gpt.getEntry(3).getPartitionTypeGUID().getBytes();
 	    if(!Util.arraysEqual(currentType4, microsoftBasicDataType)) {
 		System.out.println("failed! Halting program.");
 		System.exit(0);
@@ -129,8 +129,8 @@ public class RepairMyGPTPlease6 {
 	    System.out.print("  - Setting new partition type for third partition...");
 	    MutableGPTEntry modifiedEntry1 = gpt.getMutablePrimaryEntry(2);
 	    MutableGPTEntry modifiedEntry2 = gpt.getMutableBackupEntry(2);
-	    modifiedEntry1.setPartitionTypeGUID(appleHfsType, 0);
-	    modifiedEntry2.setPartitionTypeGUID(appleHfsType, 0);
+	    modifiedEntry1.getMutablePartitionTypeGUID().setBytes(appleHfsType, 0);
+	    modifiedEntry2.getMutablePartitionTypeGUID().setBytes(appleHfsType, 0);
 	    System.out.println("done.");
 
 	    MutableGPTHeader primaryHeader = gpt.getMutablePrimaryHeader();
