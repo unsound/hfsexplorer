@@ -114,8 +114,6 @@ public class AttributesInfoPanel extends javax.swing.JPanel {
         final String OTHER_NAME = "other";
         final String FILE_NAME = "file";
         final String FOLDER_NAME = "folder";
-        final String FILE_THREAD_NAME = "filethread";
-        final String FOLDER_THREAD_NAME = "folderthread";
         final String STRUCT_VIEW_PANEL_NAME = "structview";
 
         final CardLayout clRoot = new CardLayout();
@@ -125,8 +123,6 @@ public class AttributesInfoPanel extends javax.swing.JPanel {
         leafPanel.setLayout(clLeaf);
 
         leafPanel.add(new JLabel("INTERNAL ERROR!", SwingConstants.CENTER), OTHER_NAME);
-        leafPanel.add(new JLabel("Displaying file thread information is not yet supported.", SwingConstants.CENTER), FILE_THREAD_NAME);
-        leafPanel.add(new JLabel("Displaying folder thread information is not yet supported.", SwingConstants.CENTER), FOLDER_THREAD_NAME);
 
         final JScrollPane structViewPanelScroller = new JScrollPane();
         structViewPanelScroller.getVerticalScrollBar().setUnitIncrement(UNIT_INCREMENT);
