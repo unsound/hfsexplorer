@@ -488,4 +488,8 @@ public abstract class HFSVolume {
 	else
 	    return 0;
     }
+
+    public int getPhysicalBlockSize() {
+        return physicalBlockSize;
+    }
 }

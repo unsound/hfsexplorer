@@ -66,6 +66,7 @@ public class HFSPlusVolume extends HFSVolume {
 
     private final HFSPlusAllocationFile allocationFile;
     private final HFSPlusJournal journal;
+    private final AttributesFile attributesFile;
 
     public HFSPlusVolume(ReadableRandomAccessStream hfsFile,
             boolean cachingEnabled) {
@@ -82,6 +83,17 @@ public class HFSPlusVolume extends HFSVolume {
 
         this.allocationFile = createAllocationFile();
         this.journal = new HFSPlusJournal(this);
+
+        if(getHFSPlusVolumeHeader().getAttributesFile().getExtents().
+                getExtentDescriptors()[0].getBlockCount() == 0)
+        {
+            /* TODO: Is this even valid? */
+            this.attributesFile = null;
+        }
+        else {
+            this.attributesFile = new AttributesFile(this,
+                    new HFSPlusBTreeOperations());
+        }
     }
 
     SynchronizedReadableRandomAccess getBackingStream() {
@@ -129,12 +141,12 @@ public class HFSPlusVolume extends HFSVolume {
 
     @Override
     public boolean hasAttributesFile() {
-        return false; // TODO
+        return attributesFile != null;
     }
 
     @Override
     public AttributesFile getAttributesFile() {
-        return null; // TODO
+        return attributesFile;
     }
 
     @Override

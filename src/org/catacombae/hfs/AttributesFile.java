@@ -27,6 +27,9 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSExtentDescriptor;
 import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfs.plus.HFSPlusVolume;
+import org.catacombae.hfs.types.hfscommon.CommonHFSAttributesIndexNode;
+import org.catacombae.hfs.types.hfscommon.CommonHFSAttributesLeafNode;
+import org.catacombae.hfs.types.hfsplus.BTHeaderRec;
 
 /**
  *
@@ -35,43 +38,56 @@ import org.catacombae.hfs.plus.HFSPlusVolume;
 public class AttributesFile extends BTreeFile {
     private final HFSPlusVolume view;
 
-    private class Session {
-        public ReadableRandomAccessStream btreeStream;
-        public CommonBTHeaderRecord bthr;
+    private class Session extends BTreeFileSession {
+        ReadableRandomAccessStream attributesFileStream;
 
-        private Session(ReadableRandomAccessStream btreeStream) {
-            this.btreeStream = btreeStream;
-            this.bthr = readHeaderRecord(btreeStream);
+        protected ReadableRandomAccessStream getBTreeStream(
+                CommonHFSVolumeHeader header)
+        {
+            if(!(header instanceof CommonHFSVolumeHeader.HFSPlusImplementation))
+            {
+                throw new RuntimeException("Illegal CommonHFSVolumeHeader " +
+                        "flavour (expected HFSPlusImplementation, got " +
+                        header.getClass() + ").");
+            }
+
+            if(this.attributesFileStream == null) {
+                this.attributesFileStream = getAttributesFileStream(
+                        (CommonHFSVolumeHeader.HFSPlusImplementation) header);
+            }
+
+            return this.attributesFileStream;
         }
 
-        public void close() {
-            btreeStream.close();
+        private void close() {
+            if(attributesFileStream != null)
+                attributesFileStream.close();
         }
     }
 
-    AttributesFile(HFSPlusVolume view, BTreeOperations ops) {
+    public AttributesFile(HFSPlusVolume view, BTreeOperations ops) {
         super(view, ops);
         this.view = view;
     }
 
-    protected ReadableRandomAccessStream getAttributesFileStream(
-            CommonHFSVolumeHeader header) {
+    private ReadableRandomAccessStream getAttributesFileStream(
+            CommonHFSVolumeHeader.HFSPlusImplementation header) {
 
         CommonHFSExtentDescriptor[] allExtents =
                 view.getExtentsOverflowFile().getAllDataExtentDescriptors(
                 view.getCommonHFSCatalogNodeID(ReservedID.ATTRIBUTES_FILE),
-                header.getCatalogFile());
+                header.getAttributesFile());
 
         return new ForkFilter(
-                header.getCatalogFile(),
+                header.getAttributesFile(),
                 allExtents, view.createFSStream(),
                 0,
                 header.getAllocationBlockSize(),
-                header.getAllocationBlockStart() * view.physicalBlockSize);
+                header.getAllocationBlockStart() * view.getPhysicalBlockSize());
     }
 
     private Session openSession() {
-        return new Session(getAttributesFileStream(view.getVolumeHeader()));
+        return new Session();
     }
 
     /**
@@ -132,7 +148,7 @@ public class AttributesFile extends BTreeFile {
                     "Printing additional information:");
             System.err.println("  nodeNumber=" + nodeNumber);
             System.err.println("  nodeSize=" + nodeSize);
-            System.err.println("  init.extentsFile.length()=" +
+            System.err.println("  init.btreeStream.length()=" +
                     ses.btreeStream.length());
             System.err.println("  (currentNodeNumber * nodeSize)=" +
                     (nodeNumber * nodeSize));
@@ -145,10 +161,9 @@ public class AttributesFile extends BTreeFile {
         if(nodeDescriptor.getNodeType() == NodeType.HEADER)
             return createCommonBTHeaderNode(nodeData, 0, nodeSize);
         else if(nodeDescriptor.getNodeType() == NodeType.INDEX)
-            return view.extentsOverflowFile.createCommonHFSExtentIndexNode(nodeData, 0,
-                    nodeSize);
+            return CommonHFSAttributesIndexNode.createHFSPlus(nodeData, 0, nodeSize);
         else if(nodeDescriptor.getNodeType() == NodeType.LEAF)
-            return view.extentsOverflowFile.createCommonHFSExtentLeafNode(nodeData, 0,
+            return CommonHFSAttributesLeafNode.createHFSPlus(nodeData, 0,
                     nodeSize);
         else
             return null;
