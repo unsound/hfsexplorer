@@ -39,10 +39,10 @@ import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfsexplorer.FileSystemBrowser.NoLeafMutableTreeNode;
 import org.catacombae.hfsexplorer.io.JTextAreaOutputStream;
-import org.catacombae.hfs.types.hfscommon.CommonHFSExtentIndexNode;
-import org.catacombae.hfs.types.hfscommon.CommonHFSExtentKey;
-import org.catacombae.hfs.types.hfscommon.CommonHFSExtentLeafNode;
-import org.catacombae.hfs.types.hfscommon.CommonHFSExtentLeafRecord;
+import org.catacombae.hfs.types.hfscommon.CommonHFSAttributesIndexNode;
+import org.catacombae.hfs.types.hfscommon.CommonHFSAttributesKey;
+import org.catacombae.hfs.types.hfscommon.CommonHFSAttributesLeafNode;
+import org.catacombae.hfs.types.hfscommon.CommonHFSAttributesLeafRecord;
 import org.catacombae.hfs.types.hfscommon.CommonBTIndexRecord;
 import org.catacombae.hfs.types.hfscommon.CommonBTNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor;
@@ -181,8 +181,9 @@ public class AttributesInfoPanel extends javax.swing.JPanel {
 
                         clRoot.show(infoPanel, INDEX_NAME);
                     }
-                    else if(o2 instanceof ExtentLeafStorage) {
-                        CommonHFSExtentLeafRecord rec = ((ExtentLeafStorage) o2).getRecord();
+                    else if(o2 instanceof AttributesLeafStorage) {
+                        CommonHFSAttributesLeafRecord rec =
+                                ((AttributesLeafStorage) o2).getRecord();
                         //HFSPlusCatalogLeafRecordData data = rec.getData();
                         if(rec instanceof StructElements) {
                             Dictionary dict = ((StructElements) rec).getStructElements();
@@ -220,22 +221,29 @@ public class AttributesInfoPanel extends javax.swing.JPanel {
     }
 
     public void expandNode(DefaultMutableTreeNode dmtn, CommonBTNode node, HFSVolume fsView) {
-        if(node instanceof CommonHFSExtentIndexNode) {
-            List<CommonBTIndexRecord<CommonHFSExtentKey>> recs = ((CommonHFSExtentIndexNode) node).getBTRecords();
-            for(CommonBTIndexRecord<CommonHFSExtentKey> rec : recs) {
+        if(node instanceof CommonHFSAttributesIndexNode) {
+            List<CommonBTIndexRecord<CommonHFSAttributesKey>> recs =
+                    ((CommonHFSAttributesIndexNode) node).getBTRecords();
+            for(CommonBTIndexRecord<CommonHFSAttributesKey> rec : recs) {
 
-                CommonBTNode curNode = fsView.getExtentsOverflowFile().getExtentsOverflowNode(rec.getIndex());
-                CommonHFSExtentKey key = rec.getKey();
-                dmtn.add(new NoLeafMutableTreeNode(new BTNodeStorage(curNode, key.getForkType() +
-                        ":" + key.getFileID().toLong() + ":" + key.getStartBlock())));
+                CommonBTNode curNode = fsView.getAttributesFile().getNode(rec.getIndex());
+                CommonHFSAttributesKey key = rec.getKey();
+                dmtn.add(new NoLeafMutableTreeNode(new BTNodeStorage(curNode,
+                        key.getFileID().toLong() + ":" + key.getAttrNameLen() +
+                        ":" + new String(key.getAttrName()) + ":" +
+                        key.getStartBlock())));
             }
         }
-        else if(node instanceof CommonHFSExtentLeafNode) {
-            CommonHFSExtentLeafRecord[] recs = ((CommonHFSExtentLeafNode) node).getLeafRecords();
-            for(CommonHFSExtentLeafRecord rec : recs) {
-                CommonHFSExtentKey key = rec.getKey();
-                dmtn.add(new DefaultMutableTreeNode(new ExtentLeafStorage(rec, key.getForkType() +
-                        ":" + key.getFileID().toLong() + ":" + key.getStartBlock())));
+        else if(node instanceof CommonHFSAttributesLeafNode) {
+            CommonHFSAttributesLeafRecord[] recs =
+                    ((CommonHFSAttributesLeafNode) node).getLeafRecords();
+            for(CommonHFSAttributesLeafRecord rec : recs) {
+                CommonHFSAttributesKey key = rec.getKey();
+                dmtn.add(new DefaultMutableTreeNode(new AttributesLeafStorage(
+                        rec, key.getFileID().toLong() + ":" +
+                        key.getAttrNameLen() + ":" +
+                        new String(key.getAttrName()) + ":" +
+                        key.getStartBlock())));
             }
         }
         else
@@ -262,17 +270,19 @@ public class AttributesInfoPanel extends javax.swing.JPanel {
         }
     }
 
-    private static class ExtentLeafStorage {
+    private static class AttributesLeafStorage {
 
-        private CommonHFSExtentLeafRecord rec;
+        private CommonHFSAttributesLeafRecord rec;
         private String text;
 
-        public ExtentLeafStorage(CommonHFSExtentLeafRecord rec, String text) {
+        public AttributesLeafStorage(CommonHFSAttributesLeafRecord rec,
+                String text)
+        {
             this.rec = rec;
             this.text = text;
         }
 
-        public CommonHFSExtentLeafRecord getRecord() {
+        public CommonHFSAttributesLeafRecord getRecord() {
             return rec;
         }
 
