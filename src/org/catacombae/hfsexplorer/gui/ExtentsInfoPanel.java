@@ -230,16 +230,18 @@ public class ExtentsInfoPanel extends javax.swing.JPanel {
 
                 CommonBTNode curNode = fsView.getExtentsOverflowFile().getExtentsOverflowNode(rec.getIndex());
                 CommonHFSExtentKey key = rec.getKey();
-                dmtn.add(new NoLeafMutableTreeNode(new BTNodeStorage(curNode, key.getForkType() +
-                        ":" + key.getFileID().toLong() + ":" + key.getStartBlock())));
+                dmtn.add(new NoLeafMutableTreeNode(new BTNodeStorage(curNode,
+                        key.getFileID().toLong() + ":" + key.getForkType() +
+                        ":" + key.getStartBlock())));
             }
         }
         else if(node instanceof CommonHFSExtentLeafNode) {
             CommonHFSExtentLeafRecord[] recs = ((CommonHFSExtentLeafNode) node).getLeafRecords();
             for(CommonHFSExtentLeafRecord rec : recs) {
                 CommonHFSExtentKey key = rec.getKey();
-                dmtn.add(new DefaultMutableTreeNode(new ExtentLeafStorage(rec, key.getForkType() +
-                        ":" + key.getFileID().toLong() + ":" + key.getStartBlock())));
+                dmtn.add(new DefaultMutableTreeNode(new ExtentLeafStorage(rec,
+                        key.getFileID().toLong() + ":" + key.getForkType() +
+                        ":" + key.getStartBlock())));
             }
         }
         else
