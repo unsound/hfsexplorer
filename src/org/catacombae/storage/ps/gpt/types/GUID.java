@@ -39,11 +39,11 @@ public class GUID implements StaticStruct, StructElements {
             throw new IllegalArgumentException("Not enough bytes for a " +
                     "GUID (need 16, got " + (data.length - offset) + ").");
 
-        copyBytes(data, offset);
+        copyBytesInternal(data, offset);
     }
 
     public GUID(GUID source) {
-        copyFields(source);
+        copyFieldsInternal(source);
     }
 
     public GUID(byte[] data) {
@@ -57,18 +57,26 @@ public class GUID implements StaticStruct, StructElements {
         this.part4 = 0;
     }
 
-    protected void copyFields(GUID source) {
+    private void copyFieldsInternal(GUID source) {
         this.part1 = source.part1;
         this.part2 = source.part2;
         this.part3 = source.part3;
         this.part4 = source.part4;
     }
 
-    protected void copyBytes(byte[] data, int offset) {
+    private void copyBytesInternal(byte[] data, int offset) {
         this.part1 = Util.readIntLE(data, offset + 0);
         this.part2 = Util.readShortLE(data, offset + 4);
         this.part3 = Util.readShortLE(data, offset + 6);
         this.part4 = Util.readLongBE(data, offset + 8);
+    }
+
+    protected void copyFields(GUID source) {
+        copyFieldsInternal(source);
+    }
+
+    protected void copyBytes(byte[] data, int offset) {
+        copyBytesInternal(data, offset);
     }
 
     public byte[] getBytes() {
