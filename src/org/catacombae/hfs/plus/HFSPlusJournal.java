@@ -61,6 +61,19 @@ class HFSPlusJournal extends Journal {
          * don't know the size of the journal? */
         JournalInfoBlock infoBlock = getJournalInfoBlock();
 
+        if(!infoBlock.getFlagJournalInFS()) {
+            /* Searching other devices for the journal is unsupported at this
+             * time. */
+            return null;
+        }
+
+        if(infoBlock.getFlagJournalNeedInit()) {
+            /* Journal needs to be initialized and does not contain any valid
+             * data. In this case we also return null, because whatever data
+             * might be in the journal is definitely invalid. */
+            return null;
+        }
+
         if(infoBlock.getRawOffset() < 0)
             throw new Error("SInt64 overflow for JournalInfoBlock.offset!");
         if(infoBlock.getRawSize() < 0)
