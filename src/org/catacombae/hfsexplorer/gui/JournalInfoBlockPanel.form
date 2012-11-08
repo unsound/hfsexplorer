@@ -251,12 +251,12 @@
     </Component>
     <Component class="javax.swing.JLabel" name="journalOffsetField">
       <Properties>
-        <Property name="text" type="java.lang.String" value="0x&#xd6;&#xd6;&#xd6;&#xd6;&#xd6;&#xd6;&#xd6;&#xd6;&#xd6;&#xd6;&#xd6;&#xd6;&#xd6;&#xd6;&#xd6;&#xd6;"/>
+        <Property name="text" type="java.lang.String" value="0 bytes"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="journalSizeField">
       <Properties>
-        <Property name="text" type="java.lang.String" value="0 B"/>
+        <Property name="text" type="java.lang.String" value="0 bytes"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="reservedField0">
