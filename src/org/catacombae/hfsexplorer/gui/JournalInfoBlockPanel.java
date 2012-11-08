@@ -48,7 +48,7 @@ public class JournalInfoBlockPanel extends javax.swing.JPanel {
 	deviceSignatureField2.setText(Util.toHexStringBE(deviceSignature[4]) + Util.toHexStringBE(deviceSignature[5]));
 	deviceSignatureField3.setText(Util.toHexStringBE(deviceSignature[6]) + Util.toHexStringBE(deviceSignature[7]));
 
-	journalOffsetField.setText("0x" + Util.toHexStringBE(jib.getRawOffset()));
+	journalOffsetField.setText(jib.getOffset() + " bytes");
 	journalSizeField.setText(jib.getSize() + " bytes");
 	int[] reserved = jib.getReserved();
 	reservedField0.setText(Util.toHexStringBE(reserved[0]) + Util.toHexStringBE(reserved[1]));
@@ -140,9 +140,9 @@ public class JournalInfoBlockPanel extends javax.swing.JPanel {
 
         deviceSignatureField0.setText("\u00d6\u00d6 \u00d6\u00d6 \u00d6\u00d6 \u00d6\u00d6 \u00d6\u00d6 \u00d6\u00d6 \u00d6\u00d6 \u00d6\u00d6");
 
-        journalOffsetField.setText("0x\u00d6\u00d6\u00d6\u00d6\u00d6\u00d6\u00d6\u00d6\u00d6\u00d6\u00d6\u00d6\u00d6\u00d6\u00d6\u00d6");
+        journalOffsetField.setText("0 bytes");
 
-        journalSizeField.setText("0 B");
+        journalSizeField.setText("0 bytes");
 
         reservedField0.setText("\u00d6\u00d6 \u00d6\u00d6 \u00d6\u00d6 \u00d6\u00d6 \u00d6\u00d6 \u00d6\u00d6 \u00d6\u00d6 \u00d6\u00d6");
 
