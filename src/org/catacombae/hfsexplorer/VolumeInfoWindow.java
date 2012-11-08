@@ -31,6 +31,7 @@ import org.catacombae.hfsexplorer.gui.HFSPlusVolumeInfoPanel;
 import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.hfs.types.hfsplus.JournalInfoBlock;
 import org.catacombae.hfs.HFSVolume;
+import org.catacombae.hfs.Journal;
 import org.catacombae.hfs.plus.HFSPlusVolume;
 
 /**
@@ -115,8 +116,9 @@ public class VolumeInfoWindow extends JFrame {
         // The "Journal info" tab (optional)
 
         try {
-            JournalInfoBlock jib = fsView.getJournal().getJournalInfoBlock();
-            if(jib != null) {
+            Journal journal = fsView.getJournal();
+            if(journal != null) {
+                JournalInfoBlock jib = journal.getJournalInfoBlock();
                 JournalInfoPanel journalInfoPanel = new JournalInfoPanel(jib);
                 JScrollPane journalInfoPanelScroller = new JScrollPane(journalInfoPanel,
                         JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
