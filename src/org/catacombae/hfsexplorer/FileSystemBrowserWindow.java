@@ -625,6 +625,8 @@ public class FileSystemBrowserWindow extends JFrame {
     }
 
     private void exitApplication() {
+        boolean doExit = true;
+
         try {
         // Clean up temp files.
             if(tempFiles.size() > 0) {
@@ -660,6 +662,7 @@ public class FileSystemBrowserWindow extends JFrame {
                     }
                 }
                 else if(res != JOptionPane.NO_OPTION) {
+                    doExit = false;
                     return;
                 }
             }
@@ -671,7 +674,9 @@ public class FileSystemBrowserWindow extends JFrame {
         } catch(Throwable t) {
             GUIUtil.displayExceptionDialog(t, 20, this, "Exception when exiting application");
         } finally {
-            System.exit(0);
+            if(doExit) {
+                System.exit(0);
+            }
         }
     }
 
