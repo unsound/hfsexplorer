@@ -21,10 +21,12 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 import org.catacombae.hfs.Journal;
 
 public class JournalInfoPanel extends JPanel {
+    private JTabbedPane tabbedPane;
     private JPanel contentsPanel;
     private JournalInfoBlockPanel infoBlockPanel;
     private JPanel noJournalPanel;
@@ -32,6 +34,7 @@ public class JournalInfoPanel extends JPanel {
     private CardLayout layout;
 
     public JournalInfoPanel(Journal journal) {
+        tabbedPane = new JTabbedPane();
 	contentsPanel = new JPanel();
 	infoBlockPanel = new JournalInfoBlockPanel();
 	noJournalPanel = new JPanel();
@@ -40,13 +43,15 @@ public class JournalInfoPanel extends JPanel {
 
 	contentsPanel.setLayout(new BorderLayout());
 	contentsPanel.add(infoBlockPanel, BorderLayout.CENTER);
+        tabbedPane.insertTab("Info block", null, contentsPanel, "The journal " +
+                "info block, describing the location of the journal.", 0);
 
 	noJournalPanel.setLayout(new BorderLayout());
 	noJournalPanel.add(noJournalLabel, BorderLayout.CENTER);
 
 	setLayout(layout);
 	add(noJournalPanel, "A");
-	add(contentsPanel, "B");
+        add(tabbedPane, "B");
 	layout.show(this, "A");
 
 	//pack();
