@@ -19,6 +19,7 @@ package org.catacombae.hfs;
 
 import org.catacombae.hfs.types.hfsplus.JournalHeader;
 import org.catacombae.hfs.types.hfsplus.JournalInfoBlock;
+import org.catacombae.io.ReadableRandomAccessStream;
 
 /**
  *
@@ -26,6 +27,7 @@ import org.catacombae.hfs.types.hfsplus.JournalInfoBlock;
  */
 public abstract class Journal {
     public abstract byte[] getInfoBlockData();
+    public abstract ReadableRandomAccessStream getJournalDataStream();
     public abstract byte[] getJournalData();
 
     /**

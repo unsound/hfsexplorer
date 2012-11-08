@@ -22,6 +22,7 @@ import org.catacombae.hfs.types.hfsplus.JournalInfoBlock;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfs.Journal;
 import org.catacombae.hfs.types.hfsplus.JournalHeader;
+import org.catacombae.io.ReadableConcatenatedStream;
 import org.catacombae.util.Util;
 
 /**
@@ -57,9 +58,7 @@ class HFSPlusJournal extends Journal {
     }
 
     @Override
-    public byte[] getJournalData() {
-        /* TODO: Maybe it's sane to return a stream and not a byte[] since we
-         * don't know the size of the journal? */
+    public ReadableRandomAccessStream getJournalDataStream() {
         JournalInfoBlock infoBlock = getJournalInfoBlock();
 
         if(!infoBlock.getFlagJournalInFS()) {
@@ -79,14 +78,21 @@ class HFSPlusJournal extends Journal {
             throw new Error("SInt64 overflow for JournalInfoBlock.offset!");
         if(infoBlock.getRawSize() < 0)
             throw new Error("SInt64 overflow for JournalInfoBlock.size!");
-        else if(infoBlock.getRawSize() > Integer.MAX_VALUE)
+
+        return new ReadableConcatenatedStream(vol.createFSStream(),
+                infoBlock.getRawOffset(), infoBlock.getRawSize());
+    }
+
+    @Override
+    public byte[] getJournalData() {
+        /* TODO: Maybe it's sane to return a stream and not a byte[] since we
+         * don't know the size of the journal? */
+        ReadableRandomAccessStream fsStream = getJournalDataStream();
+        if(fsStream.length() > Integer.MAX_VALUE)
             throw new RuntimeException("Java int overflow!");
 
-        byte[] dataBuffer = new byte[(int)infoBlock.getRawSize()];
-
-        ReadableRandomAccessStream fsStream = vol.createFSStream();
+        byte[] dataBuffer = new byte[(int) fsStream.length()];
         try {
-            fsStream.seek(infoBlock.getRawOffset());
             fsStream.readFully(dataBuffer);
         } finally {
             fsStream.close();
