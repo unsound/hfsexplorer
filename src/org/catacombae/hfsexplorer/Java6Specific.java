@@ -83,7 +83,7 @@ public class Java6Specific {
 	    iconImages.addLast(ii.getImage());
 
         try {
-            Class c = window.getClass();
+            Class<? extends Window> c = window.getClass();
             Method m = c.getMethod("setIconImages", List.class);
             m.invoke(window, iconImages);
         } catch(NoSuchMethodException ex) {
@@ -121,7 +121,7 @@ public class Java6Specific {
         sorter.toggleSortOrder(defaultSortColumn);
 
         try {
-            Class c = table.getClass();
+            Class<? extends JTable> c = table.getClass();
             Method m = c.getMethod("setRowSorter", RowSorter.class);
             m.invoke(table, sorter);
         } catch(NoSuchMethodException ex) {
