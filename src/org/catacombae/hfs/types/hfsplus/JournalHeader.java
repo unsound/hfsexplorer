@@ -212,4 +212,21 @@ public class JournalHeader implements StaticStruct, PrintableStruct,
 
         return db.getResult();
     }
+
+    public int calculateChecksum() {
+        byte[] data = getBytes();
+        int cksum = 0;
+
+        /* Set checksum field to 0 before checksumming. */
+        data[36] = 0;
+        data[37] = 0;
+        data[38] = 0;
+        data[39] = 0;
+
+        for(int i = 0; i < data.length; i++) {
+            cksum = (cksum << 8) ^ (cksum + Util.unsign(data[i]));
+        }
+
+        return (~cksum);
+    }
 }
