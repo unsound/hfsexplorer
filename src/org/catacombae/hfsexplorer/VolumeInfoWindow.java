@@ -118,8 +118,7 @@ public class VolumeInfoWindow extends JFrame {
         try {
             Journal journal = fsView.getJournal();
             if(journal != null) {
-                JournalInfoBlock jib = journal.getJournalInfoBlock();
-                JournalInfoPanel journalInfoPanel = new JournalInfoPanel(jib);
+                JournalInfoPanel journalInfoPanel = new JournalInfoPanel(journal);
                 JScrollPane journalInfoPanelScroller = new JScrollPane(journalInfoPanel,
                         JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                         JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
