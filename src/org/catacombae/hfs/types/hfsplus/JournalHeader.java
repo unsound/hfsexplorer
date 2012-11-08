@@ -190,22 +190,22 @@ public class JournalHeader implements StaticStruct, PrintableStruct,
                 "is valid and other properties.");
 
        try {
-            db.addUIntBE("magic", getPrivateField("magic"), this, null, null,
+            db.addUIntBE("magic", getPrivateField("magic"), this, "Magic", null,
                     HEXADECIMAL);
-            db.addUIntBE("endian", getPrivateField("endian"), this, null, null,
-                    HEXADECIMAL);
-            db.addUIntBE("start", getPrivateField("start"), this, null, "bytes",
-                    DECIMAL);
-            db.addUIntBE("end", getPrivateField("end"), this, null, "bytes",
-                    DECIMAL);
-            db.addUIntBE("size", getPrivateField("size"), this, null, "bytes",
-                    DECIMAL);
-            db.addUIntBE("blhdrSize", getPrivateField("blhdrSize"), this, null,
+            db.addUIntBE("endian", getPrivateField("endian"), this,
+                    "Endian magic", null, HEXADECIMAL);
+            db.addUIntBE("start", getPrivateField("start"), this,
+                    "Oldest transaction offset (start)", "bytes", DECIMAL);
+            db.addUIntBE("end", getPrivateField("end"), this,
+                    "Newest transaction offset (end)", "bytes", DECIMAL);
+            db.addUIntBE("size", getPrivateField("size"), this, "Journal size",
                     "bytes", DECIMAL);
-            db.addUIntBE("checksum", getPrivateField("checksum"), this, null,
-                    null, HEXADECIMAL);
-            db.addUIntBE("jhdrSize", getPrivateField("jhdrSize"), this, null,
-                    "bytes", DECIMAL);
+            db.addUIntBE("blhdrSize", getPrivateField("blhdrSize"), this,
+                    "Block list header size", "bytes", DECIMAL);
+            db.addUIntBE("checksum", getPrivateField("checksum"), this,
+                    "Journal header checksum", null, HEXADECIMAL);
+            db.addUIntBE("jhdrSize", getPrivateField("jhdrSize"), this,
+                    "Journal header size", "bytes", DECIMAL);
         } catch(NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
