@@ -17,6 +17,7 @@
 
 package org.catacombae.hfs;
 
+import org.catacombae.hfs.types.hfsplus.JournalHeader;
 import org.catacombae.hfs.types.hfsplus.JournalInfoBlock;
 
 /**
@@ -32,4 +33,10 @@ public abstract class Journal {
      * @return the journal info block if a journal is present, null otherwise.
      */
     public abstract JournalInfoBlock getJournalInfoBlock();
+
+    /**
+     * Returns the journal info block if a journal is present, null otherwise.
+     * @return the journal info block if a journal is present, null otherwise.
+     */
+    public abstract JournalHeader getJournalHeader();
 }
