@@ -54,8 +54,12 @@ public class JournalInfoPanel extends JPanel {
         setFields(journal);
     }
 
-    public void setFields(Journal journal) {
+    private void _setFields(Journal journal) {
         infoBlockPanel.setFields(journal.getJournalInfoBlock());
 	layout.show(this, "B");
+    }
+
+    public void setFields(Journal journal) {
+        _setFields(journal);
     }
 }
