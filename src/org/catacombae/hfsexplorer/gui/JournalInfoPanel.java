@@ -32,7 +32,7 @@ public class JournalInfoPanel extends JPanel {
     private JLabel noJournalLabel;
     private CardLayout layout;
 
-    public JournalInfoPanel(JournalInfoBlock jib) {
+    public JournalInfoPanel(Journal journal) {
 	contentsPanel = new JPanel();
 	infoBlockPanel = new JournalInfoBlockPanel();
 	noJournalPanel = new JPanel();
@@ -51,11 +51,11 @@ public class JournalInfoPanel extends JPanel {
 	layout.show(this, "A");
 
 	//pack();
-        setFields(jib);
+        setFields(journal);
     }
 
-    public void setFields(JournalInfoBlock jib) {
-	infoBlockPanel.setFields(jib);
+    public void setFields(Journal journal) {
+        infoBlockPanel.setFields(journal.getJournalInfoBlock());
 	layout.show(this, "B");
     }
 }
