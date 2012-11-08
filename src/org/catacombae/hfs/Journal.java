@@ -39,4 +39,10 @@ public abstract class Journal {
      * @return the journal header if a journal is present, null otherwise.
      */
     public abstract JournalHeader getJournalHeader();
+
+    /**
+     * Returns whether the journal is clean, i.e. has no pending transactions.
+     * @return whether the journal is clean, i.e. has no pending transactions.
+     */
+    public abstract boolean isClean();
 }
