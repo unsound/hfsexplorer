@@ -112,4 +112,11 @@ class HFSPlusJournal extends Journal {
         else
             return null;
     }
+
+    @Override
+    public boolean isClean() {
+        final JournalHeader journalHeader = getJournalHeader();
+
+        return journalHeader.getRawStart() == journalHeader.getRawEnd();
+    }
 }
