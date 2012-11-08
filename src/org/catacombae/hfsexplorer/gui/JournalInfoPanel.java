@@ -17,9 +17,13 @@
 
 package org.catacombae.hfsexplorer.gui;
 
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import org.catacombae.hfs.Journal;
 import org.catacombae.hfs.types.hfsplus.JournalInfoBlock;
-import javax.swing.*;
-import java.awt.*;
 
 public class JournalInfoPanel extends JPanel {
     private JPanel contentsPanel;
