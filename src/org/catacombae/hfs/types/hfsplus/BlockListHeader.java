@@ -41,6 +41,8 @@ public class BlockListHeader implements DynamicStruct, PrintableStruct {
 
     public static final int STRUCTSIZE = 32;
 
+    private final boolean isLittleEndian;
+
     private short maxBlocks;
     private short numBlocks;
     private int bytesUsed;
@@ -48,17 +50,28 @@ public class BlockListHeader implements DynamicStruct, PrintableStruct {
     private int pad;
     private final BlockInfo[] binfo;
 
-    public BlockListHeader(byte[] data, int offset) {
-        this.maxBlocks = Util.readShortBE(data, offset+0);
-        this.numBlocks = Util.readShortBE(data, offset+2);
-        this.bytesUsed = Util.readIntBE(data, offset+4);
-        this.checksum = Util.readIntBE(data, offset+8);
-        this.pad = Util.readIntBE(data, offset+12);
+    public BlockListHeader(byte[] data, int offset, boolean isLittleEndian) {
+        this.isLittleEndian = isLittleEndian;
+
+        if(!isLittleEndian) {
+            this.maxBlocks = Util.readShortBE(data, offset+0);
+            this.numBlocks = Util.readShortBE(data, offset+2);
+            this.bytesUsed = Util.readIntBE(data, offset+4);
+            this.checksum = Util.readIntBE(data, offset+8);
+            this.pad = Util.readIntBE(data, offset+12);
+        }
+        else {
+            this.maxBlocks = Util.readShortLE(data, offset+0);
+            this.numBlocks = Util.readShortLE(data, offset+2);
+            this.bytesUsed = Util.readIntLE(data, offset+4);
+            this.checksum = Util.readIntLE(data, offset+8);
+            this.pad = Util.readIntLE(data, offset+12);
+        }
 
         this.binfo = new BlockInfo[Util.unsign(this.numBlocks) + 1];
         for(int i = 0; i < binfo.length; ++i) {
             this.binfo[i] = new BlockInfo(data,
-                    offset+16 + i*BlockInfo.length());
+                    offset+16 + i*BlockInfo.length(), isLittleEndian);
         }
     }
 
@@ -117,11 +130,21 @@ public class BlockListHeader implements DynamicStruct, PrintableStruct {
     public byte[] getBytes() {
         byte[] result = new byte[occupiedSize()];
         int offset = 0;
-        Util.arrayPutBE(result, offset, maxBlocks); offset += 2;
-        Util.arrayPutBE(result, offset, numBlocks); offset += 2;
-        Util.arrayPutBE(result, offset, bytesUsed); offset += 4;
-        Util.arrayPutBE(result, offset, checksum); offset += 4;
-        Util.arrayPutBE(result, offset, pad); offset += 4;
+
+        if(!isLittleEndian) {
+            Util.arrayPutBE(result, offset, maxBlocks); offset += 2;
+            Util.arrayPutBE(result, offset, numBlocks); offset += 2;
+            Util.arrayPutBE(result, offset, bytesUsed); offset += 4;
+            Util.arrayPutBE(result, offset, checksum); offset += 4;
+            Util.arrayPutBE(result, offset, pad); offset += 4;
+        }
+        else {
+            Util.arrayPutLE(result, offset, maxBlocks); offset += 2;
+            Util.arrayPutLE(result, offset, numBlocks); offset += 2;
+            Util.arrayPutLE(result, offset, bytesUsed); offset += 4;
+            Util.arrayPutLE(result, offset, checksum); offset += 4;
+            Util.arrayPutLE(result, offset, pad); offset += 4;
+        }
 
         for(int i = 0; i < this.binfo.length; ++i) {
             byte[] tempData = this.binfo[i].getBytes();

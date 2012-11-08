@@ -39,14 +39,25 @@ public class BlockInfo implements StaticStruct, PrintableStruct {
 
     public static final int STRUCTSIZE = 16;
 
+    private final boolean isLittleEndian;
+
     private long bnum;
     private int bsize;
     private int next;
 
-    public BlockInfo(byte[] data, int offset) {
-        this.bnum = Util.readLongBE(data, offset+0);
-        this.bsize = Util.readIntBE(data, offset+8);
-        this.next = Util.readIntBE(data, offset+12);
+    public BlockInfo(byte[] data, int offset, boolean isLittleEndian) {
+        this.isLittleEndian = isLittleEndian;
+
+        if(!isLittleEndian) {
+            this.bnum = Util.readLongBE(data, offset+0);
+            this.bsize = Util.readIntBE(data, offset+8);
+            this.next = Util.readIntBE(data, offset+12);
+        }
+        else {
+            this.bnum = Util.readLongLE(data, offset+0);
+            this.bsize = Util.readIntLE(data, offset+8);
+            this.next = Util.readIntLE(data, offset+12);
+        }
     }
 
     public static int length() { return STRUCTSIZE; }
@@ -81,9 +92,18 @@ public class BlockInfo implements StaticStruct, PrintableStruct {
     public byte[] getBytes() {
         byte[] result = new byte[length()];
         int offset = 0;
-        Util.arrayPutBE(result, offset, bnum); offset += 8;
-        Util.arrayPutBE(result, offset, bsize); offset += 4;
-        Util.arrayPutBE(result, offset, next); offset += 4;
+
+        if(!isLittleEndian) {
+            Util.arrayPutBE(result, offset, bnum); offset += 8;
+            Util.arrayPutBE(result, offset, bsize); offset += 4;
+            Util.arrayPutBE(result, offset, next); offset += 4;
+        }
+        else {
+            Util.arrayPutLE(result, offset, bnum); offset += 8;
+            Util.arrayPutLE(result, offset, bsize); offset += 4;
+            Util.arrayPutLE(result, offset, next); offset += 4;
+        }
+
         return result;
     }
 }
