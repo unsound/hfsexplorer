@@ -29,6 +29,7 @@ public class JournalInfoPanel extends JPanel {
     private JTabbedPane tabbedPane;
     private JPanel contentsPanel;
     private JournalInfoBlockPanel infoBlockPanel;
+    private StructViewPanel journalHeaderPanel;
     private JPanel noJournalPanel;
     private JLabel noJournalLabel;
     private CardLayout layout;
@@ -37,6 +38,7 @@ public class JournalInfoPanel extends JPanel {
         tabbedPane = new JTabbedPane();
 	contentsPanel = new JPanel();
 	infoBlockPanel = new JournalInfoBlockPanel();
+        journalHeaderPanel = null;
 	noJournalPanel = new JPanel();
 	noJournalLabel = new JLabel("No journal present", SwingConstants.CENTER);
 	layout = new CardLayout();
@@ -59,7 +61,18 @@ public class JournalInfoPanel extends JPanel {
     }
 
     private void _setFields(Journal journal) {
+        if(journalHeaderPanel != null) {
+            tabbedPane.remove(1);
+        }
+
         infoBlockPanel.setFields(journal.getJournalInfoBlock());
+
+        journalHeaderPanel =
+                new StructViewPanel("Journal header",
+                journal.getJournalHeader().getStructElements());
+        tabbedPane.insertTab("Header", null, journalHeaderPanel, "The " +
+                "journal header, describing the data inside the journal.", 1);
+
 	layout.show(this, "B");
     }
 

@@ -21,6 +21,7 @@ import org.catacombae.hfs.types.hfsplus.HFSPlusVolumeHeader;
 import org.catacombae.hfs.types.hfsplus.JournalInfoBlock;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfs.Journal;
+import org.catacombae.hfs.types.hfsplus.JournalHeader;
 import org.catacombae.util.Util;
 
 /**
@@ -99,6 +100,15 @@ class HFSPlusJournal extends Journal {
         byte[] infoBlockData = getInfoBlockData();
         if(infoBlockData != null)
             return new JournalInfoBlock(infoBlockData, 0);
+        else
+            return null;
+    }
+
+    @Override
+    public JournalHeader getJournalHeader() {
+        byte[] journalData = getJournalData();
+        if(journalData != null)
+            return new JournalHeader(journalData, 0);
         else
             return null;
     }
