@@ -31,8 +31,10 @@ public class JournalHeader implements StaticStruct, PrintableStruct,
         StructElements
 {
 
-    public static final int JOURNAL_HEADER_MAGIC = 0x4a4e4c78;
-    public static final int ENDIAN_MAGIC = 0x12345678;
+    public static final int JOURNAL_HEADER_MAGIC_BE = 0x4a4e4c78;
+    public static final int ENDIAN_MAGIC_BE = 0x12345678;
+    public static final int JOURNAL_HEADER_MAGIC_LE = 0x784c4e4a;
+    public static final int ENDIAN_MAGIC_LE = 0x78563412;
 
     /*
      * struct JournalHeader
@@ -53,6 +55,8 @@ public class JournalHeader implements StaticStruct, PrintableStruct,
 
     public static final int STRUCTSIZE = 44;
 
+    private final boolean isLittleEndian;
+
     private int magic;
     private int endian;
     private long start;
@@ -65,12 +69,31 @@ public class JournalHeader implements StaticStruct, PrintableStruct,
     public JournalHeader(byte[] data, int offset) {
         magic = Util.readIntBE(data, offset+0);
         endian = Util.readIntBE(data, offset+4);
-        start = Util.readLongBE(data, offset+8);
-        end = Util.readLongBE(data, offset+16);
-        size = Util.readLongBE(data, offset+24);
-        blhdrSize = Util.readIntBE(data, offset+32);
-        checksum = Util.readIntBE(data, offset+36);
-        jhdrSize = Util.readIntBE(data, offset+40);
+
+        if(magic == JOURNAL_HEADER_MAGIC_BE && endian == ENDIAN_MAGIC_BE) {
+            isLittleEndian = false;
+            start = Util.readLongBE(data, offset+8);
+            end = Util.readLongBE(data, offset+16);
+            size = Util.readLongBE(data, offset+24);
+            blhdrSize = Util.readIntBE(data, offset+32);
+            checksum = Util.readIntBE(data, offset+36);
+            jhdrSize = Util.readIntBE(data, offset+40);
+        }
+        else if(magic == JOURNAL_HEADER_MAGIC_LE && endian == ENDIAN_MAGIC_LE) {
+            isLittleEndian = true;
+            magic = Util.byteSwap(magic);
+            endian = Util.byteSwap(endian);
+            start = Util.readLongLE(data, offset+8);
+            end = Util.readLongLE(data, offset+16);
+            size = Util.readLongLE(data, offset+24);
+            blhdrSize = Util.readIntLE(data, offset+32);
+            checksum = Util.readIntLE(data, offset+36);
+            jhdrSize = Util.readIntLE(data, offset+40);
+        }
+        else {
+            throw new RuntimeException("Unrecognized magic '0x" +
+                    Util.toHexStringBE(magic) + "'.");
+        }
     }
 
     public static int length() { return STRUCTSIZE; }
@@ -130,16 +153,31 @@ public class JournalHeader implements StaticStruct, PrintableStruct,
     public byte[] getBytes() {
         byte[] result = new byte[length()];
         int offset = 0;
-        Util.arrayPutBE(result, offset, magic); offset += 4;
-        Util.arrayPutBE(result, offset, endian); offset += 4;
-        Util.arrayPutBE(result, offset, start); offset += 8;
-        Util.arrayPutBE(result, offset, end); offset += 8;
-        Util.arrayPutBE(result, offset, size); offset += 8;
-        Util.arrayPutBE(result, offset, blhdrSize); offset += 4;
-        Util.arrayPutBE(result, offset, checksum); offset += 4;
-        Util.arrayPutBE(result, offset, jhdrSize); offset += 4;
+
+        if(!isLittleEndian) {
+            Util.arrayPutBE(result, offset, magic); offset += 4;
+            Util.arrayPutBE(result, offset, endian); offset += 4;
+            Util.arrayPutBE(result, offset, start); offset += 8;
+            Util.arrayPutBE(result, offset, end); offset += 8;
+            Util.arrayPutBE(result, offset, size); offset += 8;
+            Util.arrayPutBE(result, offset, blhdrSize); offset += 4;
+            Util.arrayPutBE(result, offset, checksum); offset += 4;
+            Util.arrayPutBE(result, offset, jhdrSize); offset += 4;
+        }
+        else {
+            Util.arrayPutLE(result, offset, magic); offset += 4;
+            Util.arrayPutLE(result, offset, endian); offset += 4;
+            Util.arrayPutLE(result, offset, start); offset += 8;
+            Util.arrayPutLE(result, offset, end); offset += 8;
+            Util.arrayPutLE(result, offset, size); offset += 8;
+            Util.arrayPutLE(result, offset, blhdrSize); offset += 4;
+            Util.arrayPutLE(result, offset, checksum); offset += 4;
+            Util.arrayPutLE(result, offset, jhdrSize); offset += 4;
+        }
+
         return result;
     }
+
     private Field getPrivateField(String name) throws NoSuchFieldException {
         Field f = getClass().getDeclaredField(name);
         f.setAccessible(true);
