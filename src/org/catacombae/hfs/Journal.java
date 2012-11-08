@@ -35,8 +35,8 @@ public abstract class Journal {
     public abstract JournalInfoBlock getJournalInfoBlock();
 
     /**
-     * Returns the journal info block if a journal is present, null otherwise.
-     * @return the journal info block if a journal is present, null otherwise.
+     * Returns the journal header if a journal is present, null otherwise.
+     * @return the journal header if a journal is present, null otherwise.
      */
     public abstract JournalHeader getJournalHeader();
 }
