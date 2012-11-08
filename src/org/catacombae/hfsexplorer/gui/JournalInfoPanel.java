@@ -23,7 +23,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import org.catacombae.hfs.Journal;
-import org.catacombae.hfs.types.hfsplus.JournalInfoBlock;
 
 public class JournalInfoPanel extends JPanel {
     private JPanel contentsPanel;
