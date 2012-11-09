@@ -37,12 +37,9 @@ public class JournalInfoBlockPanel extends javax.swing.JPanel {
     }
 
     public void setFields(JournalInfoBlock jib) {
-	int flags = jib.getFlags();
-	journalInFSBox.setSelected((flags & jib.kJIJournalInFSMask) != 0);
-        journalOnOtherDeviceBox.setSelected(
-                (flags & jib.kJIJournalOnOtherDeviceMask) != 0);
-        journalNeedInitBox.setSelected(
-                (flags & jib.kJIJournalNeedInitMask) != 0);
+        journalInFSBox.setSelected(jib.getFlagJournalInFS());
+        journalOnOtherDeviceBox.setSelected(jib.getFlagJournalOnOtherDevice());
+        journalNeedInitBox.setSelected(jib.getFlagJournalNeedInit());
 
 	int[] deviceSignature = jib.getDeviceSignature();
         deviceSignatureField0.setText(Util.toHexStringBE(deviceSignature[0]) +
