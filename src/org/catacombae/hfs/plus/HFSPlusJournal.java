@@ -17,12 +17,17 @@
 
 package org.catacombae.hfs.plus;
 
+import java.util.LinkedList;
 import org.catacombae.hfs.types.hfsplus.HFSPlusVolumeHeader;
 import org.catacombae.hfs.types.hfsplus.JournalInfoBlock;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfs.Journal;
+import org.catacombae.hfs.types.hfsplus.BlockInfo;
+import org.catacombae.hfs.types.hfsplus.BlockList;
+import org.catacombae.hfs.types.hfsplus.BlockListHeader;
 import org.catacombae.hfs.types.hfsplus.JournalHeader;
 import org.catacombae.io.ReadableConcatenatedStream;
+import org.catacombae.io.RuntimeIOException;
 import org.catacombae.util.Util;
 
 /**
@@ -158,5 +163,129 @@ class HFSPlusJournal extends Journal {
         final JournalHeader journalHeader = getJournalHeader();
 
         return journalHeader.getRawStart() == journalHeader.getRawEnd();
+    }
+
+    public class Transaction {
+        public final BlockList[] blockLists;
+
+        public Transaction(BlockList[] blockLists) {
+            this.blockLists = blockLists;
+        }
+    }
+
+    private boolean wrappedReadFully(ReadableRandomAccessStream stream,
+            byte[] data, int offset, int length)
+    {
+        boolean wrappedAround = false;
+        int bytesRead;
+
+        bytesRead = stream.read(data, 0, length);
+        if(bytesRead != length) {
+            /* Short read. Wrap around. */
+            wrappedAround = true;
+            stream.seek(0);
+            bytesRead += stream.read(data, bytesRead, length - bytesRead);
+        }
+
+        if(bytesRead != length) {
+            throw new RuntimeIOException("Failed to read requested " +
+                    "amount when doing wrapped read. Expected " + length + " " +
+                    "bytes, got " + bytesRead + " bytes.");
+        }
+
+        return wrappedAround;
+    }
+
+    private boolean wrappedReadFully(ReadableRandomAccessStream stream,
+            byte[] data)
+    {
+        return wrappedReadFully(stream, data, 0, data.length);
+    }
+
+    public Transaction[] getPendingTransactions() {
+        final JournalInfoBlock infoBlock = getJournalInfoBlock();
+        final ReadableRandomAccessStream journalStream =
+                getJournalDataStream(infoBlock);
+        final JournalHeader jh = getJournalHeader(infoBlock, journalStream);
+        final long start = jh.getRawStart();
+        final long end = jh.getRawEnd();
+        final long size = jh.getRawSize();
+
+        if(start < 0)
+            throw new RuntimeException("'start' overflows.");
+        if(end < 0)
+            throw new RuntimeException("'end' overflows.");
+        if(size < 0)
+            throw new RuntimeException("'size' overflows.");
+        if(start == end) {
+            return new Transaction[0];
+        }
+
+        final LinkedList<Transaction> pendingTransactionList =
+                new LinkedList<Transaction>();
+        final LinkedList<BlockList> curBlockListList =
+                new LinkedList<BlockList>();
+        final LinkedList<BlockInfo> curBlockInfoList =
+                new LinkedList<BlockInfo>();
+
+        boolean wrappedAround = false;
+        byte[] tmpData = new byte[Math.max(BlockListHeader.length(),
+                BlockInfo.length())];
+
+        journalStream.seek(start);
+        for(long i = start; i != end;) {
+            if(wrappedReadFully(journalStream, tmpData, 0,
+                BlockListHeader.length()))
+            {
+                if(!wrappedAround) {
+                    wrappedAround = true;
+                }
+                else {
+                    throw new RuntimeException("Wrapped around twice!");
+                }
+            }
+
+            BlockListHeader curHeader =
+                    new BlockListHeader(tmpData, 0, jh.isLittleEndian());
+            if(curHeader.getNumBlocks() < 1) {
+                throw new RuntimeException("Empty block list makes no sense.");
+            }
+
+            i = (i + BlockListHeader.length()) % size;
+
+            curBlockInfoList.clear();
+            for(int j = 0; j < curHeader.getNumBlocks(); ++j) {
+                if(wrappedReadFully(journalStream, tmpData, 0,
+                    BlockInfo.length()))
+                {
+                    if(!wrappedAround) {
+                        wrappedAround = true;
+                    }
+                    else {
+                        throw new RuntimeException("Wrapped around twice!");
+                    }
+                }
+
+                curBlockInfoList.add(new BlockInfo(tmpData, 0,
+                        jh.isLittleEndian()));
+
+                i = (i + BlockInfo.length()) % size;
+            }
+
+            BlockList curBlockList = new BlockList(curHeader,
+                    curBlockInfoList.toArray(
+                    new BlockInfo[curBlockInfoList.size()]));
+            curBlockListList.add(curBlockList);
+
+            if(curBlockList.getBlockInfo(0).getNext() == 0) {
+                pendingTransactionList.add(new Transaction(
+                        curBlockListList.toArray(
+                        new BlockList[curBlockListList.size()])));
+                curBlockListList.clear();
+            }
+        }
+
+        return pendingTransactionList.toArray(
+                new Transaction[pendingTransactionList.size()]);
     }
 }
