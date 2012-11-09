@@ -55,7 +55,7 @@ public class JournalHeader implements StaticStruct, PrintableStruct,
 
     public static final int STRUCTSIZE = 44;
 
-    private final boolean isLittleEndian;
+    private final boolean littleEndian;
 
     private int magic;
     private int endian;
@@ -71,7 +71,7 @@ public class JournalHeader implements StaticStruct, PrintableStruct,
         endian = Util.readIntBE(data, offset+4);
 
         if(magic == JOURNAL_HEADER_MAGIC_BE && endian == ENDIAN_MAGIC_BE) {
-            isLittleEndian = false;
+            littleEndian = false;
             start = Util.readLongBE(data, offset+8);
             end = Util.readLongBE(data, offset+16);
             size = Util.readLongBE(data, offset+24);
@@ -80,7 +80,7 @@ public class JournalHeader implements StaticStruct, PrintableStruct,
             jhdrSize = Util.readIntBE(data, offset+40);
         }
         else if(magic == JOURNAL_HEADER_MAGIC_LE && endian == ENDIAN_MAGIC_LE) {
-            isLittleEndian = true;
+            littleEndian = true;
             magic = Util.byteSwap(magic);
             endian = Util.byteSwap(endian);
             start = Util.readLongLE(data, offset+8);
@@ -99,6 +99,8 @@ public class JournalHeader implements StaticStruct, PrintableStruct,
     public static int length() { return STRUCTSIZE; }
 
     public int size() { return length(); }
+
+    public final boolean isLittleEndian() { return littleEndian; }
 
     /**  */
     public final long getMagic() { return Util.unsign(getRawMagic()); }
@@ -154,7 +156,7 @@ public class JournalHeader implements StaticStruct, PrintableStruct,
         byte[] result = new byte[length()];
         int offset = 0;
 
-        if(!isLittleEndian) {
+        if(!littleEndian) {
             Util.arrayPutBE(result, offset, magic); offset += 4;
             Util.arrayPutBE(result, offset, endian); offset += 4;
             Util.arrayPutBE(result, offset, start); offset += 8;

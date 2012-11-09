@@ -41,7 +41,7 @@ public class BlockListHeader implements DynamicStruct, PrintableStruct {
 
     public static final int STRUCTSIZE = 32;
 
-    private final boolean isLittleEndian;
+    private final boolean littleEndian;
 
     private short maxBlocks;
     private short numBlocks;
@@ -50,10 +50,10 @@ public class BlockListHeader implements DynamicStruct, PrintableStruct {
     private int pad;
     private final BlockInfo[] binfo;
 
-    public BlockListHeader(byte[] data, int offset, boolean isLittleEndian) {
-        this.isLittleEndian = isLittleEndian;
+    public BlockListHeader(byte[] data, int offset, boolean littleEndian) {
+        this.littleEndian = littleEndian;
 
-        if(!isLittleEndian) {
+        if(!littleEndian) {
             this.maxBlocks = Util.readShortBE(data, offset+0);
             this.numBlocks = Util.readShortBE(data, offset+2);
             this.bytesUsed = Util.readIntBE(data, offset+4);
@@ -71,7 +71,7 @@ public class BlockListHeader implements DynamicStruct, PrintableStruct {
         this.binfo = new BlockInfo[Util.unsign(this.numBlocks) + 1];
         for(int i = 0; i < binfo.length; ++i) {
             this.binfo[i] = new BlockInfo(data,
-                    offset+16 + i*BlockInfo.length(), isLittleEndian);
+                    offset+16 + i*BlockInfo.length(), littleEndian);
         }
     }
 
@@ -82,6 +82,8 @@ public class BlockListHeader implements DynamicStruct, PrintableStruct {
     public int occupiedSize() {
         return STRUCTSIZE + (this.binfo.length - 1) * BlockInfo.length();
     }
+
+    public final boolean isLittleEndian() { return littleEndian; }
 
     /**  */
     public final int getMaxBlocks() { return Util.unsign(getRawMaxBlocks()); }
@@ -131,7 +133,7 @@ public class BlockListHeader implements DynamicStruct, PrintableStruct {
         byte[] result = new byte[occupiedSize()];
         int offset = 0;
 
-        if(!isLittleEndian) {
+        if(!littleEndian) {
             Util.arrayPutBE(result, offset, maxBlocks); offset += 2;
             Util.arrayPutBE(result, offset, numBlocks); offset += 2;
             Util.arrayPutBE(result, offset, bytesUsed); offset += 4;

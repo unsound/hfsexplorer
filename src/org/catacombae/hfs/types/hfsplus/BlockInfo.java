@@ -39,16 +39,16 @@ public class BlockInfo implements StaticStruct, PrintableStruct {
 
     public static final int STRUCTSIZE = 16;
 
-    private final boolean isLittleEndian;
+    private final boolean littleEndian;
 
     private long bnum;
     private int bsize;
     private int next;
 
-    public BlockInfo(byte[] data, int offset, boolean isLittleEndian) {
-        this.isLittleEndian = isLittleEndian;
+    public BlockInfo(byte[] data, int offset, boolean littleEndian) {
+        this.littleEndian = littleEndian;
 
-        if(!isLittleEndian) {
+        if(!littleEndian) {
             this.bnum = Util.readLongBE(data, offset+0);
             this.bsize = Util.readIntBE(data, offset+8);
             this.next = Util.readIntBE(data, offset+12);
@@ -63,6 +63,8 @@ public class BlockInfo implements StaticStruct, PrintableStruct {
     public static int length() { return STRUCTSIZE; }
 
     public int size() { return length(); }
+
+    public final boolean isLittleEndian() { return littleEndian; }
 
     /**  */
     public final BigInteger getBnum() { return Util.unsign(getRawBnum()); }
@@ -93,7 +95,7 @@ public class BlockInfo implements StaticStruct, PrintableStruct {
         byte[] result = new byte[length()];
         int offset = 0;
 
-        if(!isLittleEndian) {
+        if(!littleEndian) {
             Util.arrayPutBE(result, offset, bnum); offset += 8;
             Util.arrayPutBE(result, offset, bsize); offset += 4;
             Util.arrayPutBE(result, offset, next); offset += 4;
