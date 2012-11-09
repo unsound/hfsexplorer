@@ -36,7 +36,7 @@ public class BlockList implements DynamicStruct, PrintableStruct {
 
     public BlockList(byte[] data, int offset, boolean littleEndian) {
         this.header = new BlockListHeader(data, offset, littleEndian);
-        this.binfo = new BlockInfo[this.header.getNumBlocks() + 1];
+        this.binfo = new BlockInfo[this.header.getNumBlocks()];
         for(int i = 0; i < binfo.length; ++i) {
             this.binfo[i] = new BlockInfo(data,
                     offset+16 + i*BlockInfo.length(), littleEndian);
