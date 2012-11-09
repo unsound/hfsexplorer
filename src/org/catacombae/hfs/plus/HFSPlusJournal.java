@@ -112,11 +112,16 @@ class HFSPlusJournal extends Journal {
 
     @Override
     public JournalHeader getJournalHeader() {
-        byte[] journalData = getJournalData();
-        if(journalData != null)
-            return new JournalHeader(journalData, 0);
-        else
-            return null;
+        byte[] headerData = new byte[JournalHeader.length()];
+        ReadableRandomAccessStream journalStream = getJournalDataStream();
+
+        try {
+            journalStream.readFully(headerData);
+        } finally {
+            journalStream.close();
+        }
+
+        return new JournalHeader(headerData, 0);
     }
 
     @Override
