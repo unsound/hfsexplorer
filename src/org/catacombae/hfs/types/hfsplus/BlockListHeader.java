@@ -152,4 +152,21 @@ public class BlockListHeader implements DynamicStruct, PrintableStruct {
         }
         return result;
     }
+
+    public int calculateChecksum() {
+        byte[] data = getBytes();
+        int cksum = 0;
+
+        /* Set checksum field to 0 before checksumming. */
+        data[8] = 0;
+        data[9] = 0;
+        data[10] = 0;
+        data[11] = 0;
+
+        for(int i = 0; i < data.length; i++) {
+            cksum = (cksum << 8) ^ (cksum + Util.unsign(data[i]));
+        }
+
+        return (~cksum);
+    }
 }
