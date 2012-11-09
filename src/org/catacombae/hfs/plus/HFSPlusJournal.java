@@ -121,7 +121,15 @@ class HFSPlusJournal extends Journal {
             journalStream.close();
         }
 
-        return new JournalHeader(headerData, 0);
+        JournalHeader jh = new JournalHeader(headerData, 0);
+        if(jh.getRawChecksum() != jh.calculateChecksum()) {
+            throw new RuntimeException("Invalid journal header checksum " +
+                    "(expected 0x" + Util.toHexStringBE(jh.getRawChecksum()) +
+                    ", got 0x" + Util.toHexStringBE(jh.calculateChecksum()) +
+                    ").");
+        }
+
+        return jh;
     }
 
     @Override
