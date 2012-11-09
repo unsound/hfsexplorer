@@ -61,6 +61,12 @@ class HFSPlusJournal extends Journal {
     public ReadableRandomAccessStream getJournalDataStream() {
         JournalInfoBlock infoBlock = getJournalInfoBlock();
 
+        return getJournalDataStream(infoBlock);
+    }
+
+    private ReadableRandomAccessStream getJournalDataStream(
+            JournalInfoBlock infoBlock)
+    {
         if(!infoBlock.getFlagJournalInFS()) {
             /* Searching other devices for the journal is unsupported at this
              * time. */
@@ -112,14 +118,23 @@ class HFSPlusJournal extends Journal {
 
     @Override
     public JournalHeader getJournalHeader() {
-        byte[] headerData = new byte[JournalHeader.length()];
-        ReadableRandomAccessStream journalStream = getJournalDataStream();
+        final JournalInfoBlock infoBlock = getJournalInfoBlock();
+        final ReadableRandomAccessStream journalStream =
+                getJournalDataStream(infoBlock);
 
         try {
-            journalStream.readFully(headerData);
+            return getJournalHeader(infoBlock, journalStream);
         } finally {
             journalStream.close();
         }
+    }
+
+    private JournalHeader getJournalHeader(JournalInfoBlock infoBlock,
+            ReadableRandomAccessStream journalStream)
+    {
+        final byte[] headerData = new byte[JournalHeader.length()];
+
+        journalStream.readFully(headerData);
 
         JournalHeader jh = new JournalHeader(headerData, 0);
         if(jh.getRawChecksum() != jh.calculateChecksum()) {
