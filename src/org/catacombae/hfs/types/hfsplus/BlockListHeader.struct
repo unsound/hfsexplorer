@@ -4,5 +4,4 @@ struct BlockListHeader {
     UInt32    bytesUsed;
     UInt32    checksum;
     UInt32    pad;
-    BlockInfo  binfo[1];
 };
