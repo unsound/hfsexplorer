@@ -43,30 +43,30 @@ public class JournalInfoBlockPanel extends javax.swing.JPanel {
 	journalNeedInitBox.setSelected((flags & jib.kJIJournalNeedInitMask) != 0);
 
 	int[] deviceSignature = jib.getDeviceSignature();
-	deviceSignatureField0.setText(Util.toHexStringBE(deviceSignature[0]) + Util.toHexStringBE(deviceSignature[1]));
-	deviceSignatureField1.setText(Util.toHexStringBE(deviceSignature[2]) + Util.toHexStringBE(deviceSignature[3]));
-	deviceSignatureField2.setText(Util.toHexStringBE(deviceSignature[4]) + Util.toHexStringBE(deviceSignature[5]));
-	deviceSignatureField3.setText(Util.toHexStringBE(deviceSignature[6]) + Util.toHexStringBE(deviceSignature[7]));
+	deviceSignatureField0.setText(Util.toHexStringBE(deviceSignature[0]) + " " + Util.toHexStringBE(deviceSignature[1]));
+	deviceSignatureField1.setText(Util.toHexStringBE(deviceSignature[2]) + " " + Util.toHexStringBE(deviceSignature[3]));
+	deviceSignatureField2.setText(Util.toHexStringBE(deviceSignature[4]) + " " + Util.toHexStringBE(deviceSignature[5]));
+	deviceSignatureField3.setText(Util.toHexStringBE(deviceSignature[6]) + " " + Util.toHexStringBE(deviceSignature[7]));
 
 	journalOffsetField.setText(jib.getOffset() + " bytes");
 	journalSizeField.setText(jib.getSize() + " bytes");
 	int[] reserved = jib.getReserved();
-	reservedField0.setText(Util.toHexStringBE(reserved[0]) + Util.toHexStringBE(reserved[1]));
-	reservedField1.setText(Util.toHexStringBE(reserved[2]) + Util.toHexStringBE(reserved[3]));
-	reservedField2.setText(Util.toHexStringBE(reserved[4]) + Util.toHexStringBE(reserved[5]));
-	reservedField3.setText(Util.toHexStringBE(reserved[6]) + Util.toHexStringBE(reserved[7]));
-	reservedField4.setText(Util.toHexStringBE(reserved[8]) + Util.toHexStringBE(reserved[9]));
-	reservedField5.setText(Util.toHexStringBE(reserved[10]) + Util.toHexStringBE(reserved[11]));
-	reservedField6.setText(Util.toHexStringBE(reserved[12]) + Util.toHexStringBE(reserved[13]));
-	reservedField7.setText(Util.toHexStringBE(reserved[14]) + Util.toHexStringBE(reserved[15]));
-	reservedField8.setText(Util.toHexStringBE(reserved[16]) + Util.toHexStringBE(reserved[17]));
-	reservedField9.setText(Util.toHexStringBE(reserved[18]) + Util.toHexStringBE(reserved[19]));
-	reservedField10.setText(Util.toHexStringBE(reserved[20]) + Util.toHexStringBE(reserved[21]));
-	reservedField11.setText(Util.toHexStringBE(reserved[22]) + Util.toHexStringBE(reserved[23]));
-	reservedField12.setText(Util.toHexStringBE(reserved[24]) + Util.toHexStringBE(reserved[25]));
-	reservedField13.setText(Util.toHexStringBE(reserved[26]) + Util.toHexStringBE(reserved[27]));
-	reservedField14.setText(Util.toHexStringBE(reserved[28]) + Util.toHexStringBE(reserved[29]));
-	reservedField15.setText(Util.toHexStringBE(reserved[30]) + Util.toHexStringBE(reserved[31]));
+	reservedField0.setText(Util.toHexStringBE(reserved[0]) + " " + Util.toHexStringBE(reserved[1]));
+	reservedField1.setText(Util.toHexStringBE(reserved[2]) + " " + Util.toHexStringBE(reserved[3]));
+	reservedField2.setText(Util.toHexStringBE(reserved[4]) + " " + Util.toHexStringBE(reserved[5]));
+	reservedField3.setText(Util.toHexStringBE(reserved[6]) + " " + Util.toHexStringBE(reserved[7]));
+	reservedField4.setText(Util.toHexStringBE(reserved[8]) + " " + Util.toHexStringBE(reserved[9]));
+	reservedField5.setText(Util.toHexStringBE(reserved[10]) + " " + Util.toHexStringBE(reserved[11]));
+	reservedField6.setText(Util.toHexStringBE(reserved[12]) + " " + Util.toHexStringBE(reserved[13]));
+	reservedField7.setText(Util.toHexStringBE(reserved[14]) + " " + Util.toHexStringBE(reserved[15]));
+	reservedField8.setText(Util.toHexStringBE(reserved[16]) + " " + Util.toHexStringBE(reserved[17]));
+	reservedField9.setText(Util.toHexStringBE(reserved[18]) + " " + Util.toHexStringBE(reserved[19]));
+	reservedField10.setText(Util.toHexStringBE(reserved[20]) + " " + Util.toHexStringBE(reserved[21]));
+	reservedField11.setText(Util.toHexStringBE(reserved[22]) + " " + Util.toHexStringBE(reserved[23]));
+	reservedField12.setText(Util.toHexStringBE(reserved[24]) + " " + Util.toHexStringBE(reserved[25]));
+	reservedField13.setText(Util.toHexStringBE(reserved[26]) + " " + Util.toHexStringBE(reserved[27]));
+	reservedField14.setText(Util.toHexStringBE(reserved[28]) + " " + Util.toHexStringBE(reserved[29]));
+	reservedField15.setText(Util.toHexStringBE(reserved[30]) + " " + Util.toHexStringBE(reserved[31]));
     }
 
     /** This method is called from within the constructor to
