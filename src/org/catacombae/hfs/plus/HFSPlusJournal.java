@@ -143,6 +143,12 @@ class HFSPlusJournal extends Journal {
                     ", got 0x" + Util.toHexStringBE(jh.calculateChecksum()) +
                     ").");
         }
+        if(infoBlock.getRawSize() != jh.getRawSize()) {
+            throw new RuntimeException("Inconsistency between journal size " +
+                    "as described by journal info block (" +
+                    infoBlock.getSize() + ") and journal header (" +
+                    jh.getSize() + ").");
+        }
 
         return jh;
     }
