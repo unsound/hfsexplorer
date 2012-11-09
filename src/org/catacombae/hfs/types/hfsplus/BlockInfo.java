@@ -93,7 +93,12 @@ public class BlockInfo implements StaticStruct, PrintableStruct {
 
     public byte[] getBytes() {
         byte[] result = new byte[length()];
-        int offset = 0;
+        getBytes(result, 0);
+        return result;
+    }
+
+    public int getBytes(byte[] result, int offset) {
+        final int originalOffset = offset;
 
         if(!littleEndian) {
             Util.arrayPutBE(result, offset, bnum); offset += 8;
@@ -106,6 +111,6 @@ public class BlockInfo implements StaticStruct, PrintableStruct {
             Util.arrayPutLE(result, offset, next); offset += 4;
         }
 
-        return result;
+        return offset - originalOffset;
     }
 }

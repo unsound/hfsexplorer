@@ -110,7 +110,12 @@ public class BlockListHeader implements StaticStruct, PrintableStruct {
 
     public byte[] getBytes() {
         byte[] result = new byte[length()];
-        int offset = 0;
+        getBytes(result, 0);
+        return result;
+    }
+
+    public int getBytes(byte[] result, int offset) {
+        final int originalOffset = offset;
 
         if(!littleEndian) {
             Util.arrayPutBE(result, offset, maxBlocks); offset += 2;
@@ -126,7 +131,8 @@ public class BlockListHeader implements StaticStruct, PrintableStruct {
             Util.arrayPutLE(result, offset, checksum); offset += 4;
             Util.arrayPutLE(result, offset, pad); offset += 4;
         }
-        return result;
+
+        return offset - originalOffset;
     }
 
     public int calculateChecksum() {
