@@ -290,5 +290,7 @@ public class DumpHfs {
                 throw new RuntimeIOException(ioe);
             }
         }
+
+        fsStream.close();
     }
 }
