@@ -118,8 +118,6 @@ public class DumpHfs {
          * sector size. */
         final CommonHFSVolumeHeader volumeHeader = vol.getVolumeHeader();
         final short sectorSize = 512;
-        final long sectorCount =
-                ((volumeHeader.getFileSystemEnd() - 1) / sectorSize) + 1;
         final long allocationBlockSize =
                 volumeHeader.getAllocationBlockSize();
         final long sectorsPerAllocationBlock = allocationBlockSize / sectorSize;
@@ -128,6 +126,8 @@ public class DumpHfs {
         final long allocationBlockCount =
                 volumeHeader.getTotalBlocks();
         SortedSet<Long> inUseSectors = new TreeSet<Long>();
+        final ReadableRandomAccessStream fsStream = vol.createFSStream();
+        final byte[] buffer = new byte[sectorSize];
 
         if((allocationBlockSize % sectorSize) != 0) {
             throw new RuntimeException("Uneven block size: " +
@@ -155,8 +155,38 @@ public class DumpHfs {
                     (allocationBlockCount - 1) * sectorsPerAllocationBlock + i);
         }
 
-        /* Mark last sector of the volume as in use (it's reserved). */
+        /* Determine the last sector of the volume.
+         *
+         * There may be up to one allocation block of data after the last
+         * allocation block before the volume actually ends. This is due to
+         * alignment issues and that the last sector (512 bytes) must be
+         * considered reserved because of legacy stuff.
+         */
+        long sectorCount =
+                ((volumeHeader.getFileSystemEnd() - 1) / sectorSize) + 1;
+
+        /* Mark the sector following the last allocation block as in use.
+         * We know that there's always at least one sector after the last
+         * allocation block. If there's only one, then it's reserved. Otherwise,
+         * we want to include it in the output anyway because it may hold the
+         * backup boot sector. */
         inUseSectors.add(sectorCount - 1);
+
+        /* Iterate to determine where the volume ends (this is not specified in
+         * the volume header). */
+        for(int i = 0; i < sectorsPerAllocationBlock - 1; ++i) {
+            fsStream.seek(sectorCount * sectorSize);
+
+            int res = fsStream.read(buffer);
+            if(res == -1)
+                break;
+
+            /* Mark sector as in use to make sure it is included in the
+             * resulting output (may contain reserved data or backup volume
+             * header). */
+            inUseSectors.add(sectorCount);
+            ++sectorCount;
+        }
 
         /* Now proceed to gather the allocations connected to system files. */
         final LinkedList<Pair<CommonHFSForkData, ReservedID>> metadataForks =
@@ -239,9 +269,7 @@ public class DumpHfs {
         /* TODO: Mark all symlink targets 'in use'. */
 
         /* We have gathered all allocations. Time to dump the data. */
-        final byte[] buffer = new byte[sectorSize];
         final byte[] zeroBuffer = new byte[sectorSize];
-        final ReadableRandomAccessStream fsStream = vol.createFSStream();
 
         Util.zero(zeroBuffer);
         for(long i = 0; i < sectorCount; ++i) {
