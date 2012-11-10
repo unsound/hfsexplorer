@@ -220,6 +220,10 @@ public abstract class CommonHFSVolumeHeader implements StructElements {
         public boolean isValid() {
             return hdr.isValid();
         }
+
+        public long getJournalInfoBlock() {
+            return Util.unsign(hdr.getJournalInfoBlock());
+        }
     }
 
     public static class HFSImplementation extends CommonHFSVolumeHeader {
