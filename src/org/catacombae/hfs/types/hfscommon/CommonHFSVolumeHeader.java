@@ -63,6 +63,39 @@ public abstract class CommonHFSVolumeHeader implements StructElements {
     //public abstract long getExtentsOverflowFileSize();
     public abstract CommonHFSForkData getExtentsOverflowFile();
 
+    /**
+     * Get the fork data of the allocation file.
+     *
+     * The allocation file only exists in HFS+ and HFSX. For HFS file systems
+     * this function will return <code>null</code>.
+     *
+     * @return the initial fork data of the allocation file if the allocation
+     * file exists, or <code>null</code> otherwise.
+     */
+    public abstract CommonHFSForkData getAllocationFile();
+
+    /**
+     * Get the fork data of the attributes file.
+     *
+     * The attributes file only exists in HFS+ and HFSX. For HFS file systems
+     * this function will return <code>null</code>.
+     *
+     * @return the initial fork data of the attributes file if the attributes
+     * file exists, or <code>null</code> otherwise.
+     */
+    public abstract CommonHFSForkData getAttributesFile();
+
+    /**
+     * Get the fork data of the startup file.
+     *
+     * The startup file only exists in HFS+ and HFSX. For HFS file systems this
+     * function will return <code>null</code>.
+     *
+     * @return the initial fork data of the startup file if the startup file
+     * exists, or <code>null</code> otherwise.
+     */
+    public abstract CommonHFSForkData getStartupFile();
+
     public abstract void print(PrintStream err, String prefix);
 
     public static CommonHFSVolumeHeader create(HFSPlusVolumeHeader hdr) {
@@ -142,14 +175,17 @@ public abstract class CommonHFSVolumeHeader implements StructElements {
             return CommonHFSForkData.create(hdr.getExtentsFile());
         }
 
+        @Override
         public CommonHFSForkData getAllocationFile() {
             return CommonHFSForkData.create(hdr.getAllocationFile());
         }
 
+        @Override
         public CommonHFSForkData getAttributesFile() {
             return CommonHFSForkData.create(hdr.getAttributesFile());
         }
 
+        @Override
         public CommonHFSForkData getStartupFile() {
             return CommonHFSForkData.create(hdr.getStartupFile());
         }
@@ -243,6 +279,21 @@ public abstract class CommonHFSVolumeHeader implements StructElements {
         public CommonHFSForkData getExtentsOverflowFile() {
             return CommonHFSForkData.create(hdr.getDrXTExtRec(),
                     Util.unsign(hdr.getDrXTFlSize()));
+        }
+
+        @Override
+        public CommonHFSForkData getAllocationFile() {
+            return null;
+        }
+
+        @Override
+        public CommonHFSForkData getAttributesFile() {
+            return null;
+        }
+
+        @Override
+        public CommonHFSForkData getStartupFile() {
+            return null;
         }
 
         @Override
