@@ -175,9 +175,12 @@ public class DumpHfs {
         /* Iterate to determine where the volume ends (this is not specified in
          * the volume header). */
         for(int i = 0; i < sectorsPerAllocationBlock - 1; ++i) {
-            fsStream.seek(sectorCount * sectorSize);
+            int res;
+            try {
+                fsStream.seek(sectorCount * sectorSize);
+                res = fsStream.read(buffer);
+            } catch(Exception e) { break; }
 
-            int res = fsStream.read(buffer);
             if(res == -1)
                 break;
 
