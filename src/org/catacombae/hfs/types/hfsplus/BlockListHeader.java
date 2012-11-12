@@ -135,8 +135,11 @@ public class BlockListHeader implements StaticStruct, PrintableStruct {
         return offset - originalOffset;
     }
 
-    public int calculateChecksum() {
-        byte[] data = getBytes();
+    public int calculateChecksum(BlockInfo firstBlockInfo) {
+        byte[] data = new byte[length() + BlockInfo.length()];
+        getBytes(data, 0);
+        firstBlockInfo.getBytes(data, length());
+
         int cksum = 0;
 
         /* Set checksum field to 0 before checksumming. */
