@@ -329,7 +329,10 @@ class HFSPlusJournal extends Journal {
 
             BlockList curBlockList = new BlockList(curHeader,
                     curBlockInfoList.toArray(
-                    new BlockInfo[curBlockInfoList.size()]));
+                    new BlockInfo[curBlockInfoList.size()]),
+                    curReserved,
+                    curBlockDataList.toArray(
+                    new byte[curBlockDataList.size()][]));
             curBlockListList.add(curBlockList);
 
             if(curBlockList.getBlockInfo(0).getNext() == 0) {
