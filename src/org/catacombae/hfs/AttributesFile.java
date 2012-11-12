@@ -18,7 +18,6 @@
 package org.catacombae.hfs;
 
 import org.catacombae.hfs.io.ForkFilter;
-import org.catacombae.hfs.types.hfscommon.CommonBTHeaderRecord;
 import org.catacombae.hfs.types.hfscommon.CommonBTNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor;
 import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor.NodeType;
@@ -29,7 +28,6 @@ import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfs.plus.HFSPlusVolume;
 import org.catacombae.hfs.types.hfscommon.CommonHFSAttributesIndexNode;
 import org.catacombae.hfs.types.hfscommon.CommonHFSAttributesLeafNode;
-import org.catacombae.hfs.types.hfsplus.BTHeaderRec;
 
 /**
  *
