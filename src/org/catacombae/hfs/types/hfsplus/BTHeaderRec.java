@@ -19,8 +19,9 @@ package org.catacombae.hfs.types.hfsplus;
 
 import org.catacombae.util.Util;
 import java.io.PrintStream;
+import org.catacombae.csjc.PrintableStruct;
 
-public class BTHeaderRec {
+public class BTHeaderRec implements PrintableStruct {
     /*
      * struct BTHeaderRec
      * size: 106 bytes

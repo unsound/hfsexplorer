@@ -19,8 +19,9 @@ package org.catacombae.hfs.types.hfsplus;
 
 import org.catacombae.util.Util;
 import java.io.PrintStream;
+import org.catacombae.csjc.PrintableStruct;
 
-public class BTNodeDescriptor {
+public class BTNodeDescriptor implements PrintableStruct {
     /*
      * struct BTNodeDescriptor
      * size: 14 bytes

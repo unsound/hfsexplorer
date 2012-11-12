@@ -23,11 +23,14 @@ import java.io.PrintStream;
 import org.catacombae.util.Util;
 import org.catacombae.csjc.MutableStruct;
 import java.util.Date;
+import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.ASCIIStringField;
 import org.catacombae.csjc.structelements.Dictionary;
 
-public class HFSPlusVolumeHeader extends MutableStruct implements StructElements {
+public class HFSPlusVolumeHeader extends MutableStruct implements
+        PrintableStruct, StructElements
+{
     public static final short SIGNATURE_HFS_PLUS = 0x482B;
     public static final short SIGNATURE_HFSX = 0x4858;
     /*
@@ -213,7 +216,7 @@ public class HFSPlusVolumeHeader extends MutableStruct implements StructElements
     public boolean getAttributeVolumeJournaled()        { return ((getAttributes() >> 13) & 0x1) != 0; }
     public boolean getAttributeVolumeSoftwareLock()     { return ((getAttributes() >> 15) & 0x1) != 0; }
 
-    public void print(PrintStream ps, String prefix) {
+    private void _printFields(PrintStream ps, String prefix) {
 
         ps.println(prefix + "signature: \"" + Util.toASCIIString(getSignature()) + "\"");
         ps.println(prefix + "version: " + getVersion());
@@ -253,6 +256,15 @@ public class HFSPlusVolumeHeader extends MutableStruct implements StructElements
         ps.println(prefix + "startupFile: ");
         startupFile.print(ps, prefix + "  ");
     // 	    ps.println(prefix + ": " + );
+    }
+
+    public void printFields(PrintStream ps, String prefix) {
+        _printFields(ps, prefix + " ");
+    }
+
+    public void print(PrintStream ps, String prefix) {
+        ps.println(prefix + "HFSPlusVolumeHeader:");
+        _printFields(ps, prefix + " ");
     }
 
     public void printAttributes(PrintStream ps, int pregap) {

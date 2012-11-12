@@ -17,6 +17,7 @@
 
 package org.catacombae.hfs.types.hfsplus;
 
+import java.io.PrintStream;
 import org.catacombae.util.Util;
 
 public abstract class BTIndexNode extends BTNode {
@@ -44,5 +45,21 @@ public abstract class BTIndexNode extends BTNode {
 	for(int i = 0; i < copy.length; ++i)
 	    copy[i] = records[i];
 	return copy;
+    }
+
+    @Override
+    public void printFields(PrintStream ps, String prefix) {
+        super.printFields(ps, prefix);
+        ps.println(prefix + " records:");
+        for(int i = 0; i < records.length; ++i) {
+            ps.println(prefix + "  [" + i + "]:");
+            records[i].printFields(ps, prefix + "   ");
+        }
+    }
+
+    @Override
+    public void print(PrintStream ps, String prefix) {
+        ps.println(prefix + "BTIndexNode:");
+        printFields(ps, prefix);
     }
 }

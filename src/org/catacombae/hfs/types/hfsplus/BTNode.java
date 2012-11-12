@@ -17,7 +17,10 @@
 
 package org.catacombae.hfs.types.hfsplus;
 
-public abstract class BTNode {
+import java.io.PrintStream;
+import org.catacombae.csjc.PrintableStruct;
+
+public abstract class BTNode implements PrintableStruct {
     protected final BTNodeDescriptor nodeDescriptor;
 
     public BTNode(byte[] data, int offset, int nodeSize) {
@@ -28,4 +31,14 @@ public abstract class BTNode {
         return nodeDescriptor;
     }
 //     BTRecord[] records;
+
+    public void printFields(PrintStream ps, String prefix) {
+        ps.println(prefix + " nodeDescriptor:");
+        nodeDescriptor.printFields(ps, prefix + "  ");
+    }
+
+    public void print(PrintStream ps, String prefix) {
+        ps.println(prefix + "BTNode:");
+        printFields(ps, prefix);
+    }
 }
