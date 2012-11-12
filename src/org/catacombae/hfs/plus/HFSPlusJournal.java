@@ -179,12 +179,13 @@ class HFSPlusJournal extends Journal {
         boolean wrappedAround = false;
         int bytesRead;
 
-        bytesRead = stream.read(data, 0, length);
+        bytesRead = stream.read(data, offset, length);
         if(bytesRead != length) {
             /* Short read. Wrap around. */
             wrappedAround = true;
             stream.seek(0);
-            bytesRead += stream.read(data, bytesRead, length - bytesRead);
+            bytesRead += stream.read(data, offset + bytesRead,
+                    length - bytesRead);
         }
 
         if(bytesRead != length) {
