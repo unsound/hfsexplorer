@@ -19,17 +19,24 @@ package org.catacombae.hfsexplorer.gui;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import org.catacombae.hfs.Journal;
+import org.catacombae.hfs.Journal.Transaction;
 
 public class JournalInfoPanel extends JPanel {
     private JTabbedPane tabbedPane;
     private JPanel contentsPanel;
     private JournalInfoBlockPanel infoBlockPanel;
     private StructViewPanel journalHeaderPanel;
+    private JComponent journalContentsPanel;
     private JPanel noJournalPanel;
     private JLabel noJournalLabel;
     private CardLayout layout;
@@ -39,6 +46,7 @@ public class JournalInfoPanel extends JPanel {
 	contentsPanel = new JPanel();
 	infoBlockPanel = new JournalInfoBlockPanel();
         journalHeaderPanel = null;
+        journalContentsPanel = null;
 	noJournalPanel = new JPanel();
 	noJournalLabel = new JLabel("No journal present", SwingConstants.CENTER);
 	layout = new CardLayout();
@@ -61,6 +69,10 @@ public class JournalInfoPanel extends JPanel {
     }
 
     private void _setFields(Journal journal) {
+        if(journalContentsPanel != null) {
+            tabbedPane.remove(2);
+        }
+
         if(journalHeaderPanel != null) {
             tabbedPane.remove(1);
         }
@@ -72,6 +84,34 @@ public class JournalInfoPanel extends JPanel {
                 journal.getJournalHeader().getStructElements());
         tabbedPane.insertTab("Header", null, journalHeaderPanel, "The " +
                 "journal header, describing the data inside the journal.", 1);
+
+        try {
+            Transaction[] transactions = journal.getPendingTransactions();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            PrintStream ps = new PrintStream(baos);
+
+            System.err.println("Number of pending transactions: " +
+                    transactions.length);
+
+            for(int i = 0; i < transactions.length; ++i) {
+                final Transaction t = transactions[i];
+                ps.println("Transaction " + i + ":");
+                for(int j = 0; j < t.blockLists.length; ++j) {
+                    ps.println(" blockLists[" + j + "]:");
+                    t.blockLists[j].print(ps, "  ");
+                }
+            }
+
+            ps.flush();
+            ps.close();
+
+            journalContentsPanel = new JScrollPane(new JTextArea(new String(
+                    baos.toByteArray())));
+            tabbedPane.insertTab("Transactions", null, journalContentsPanel,
+                    "The journal's pending transactions.", 2);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
 
 	layout.show(this, "B");
     }
