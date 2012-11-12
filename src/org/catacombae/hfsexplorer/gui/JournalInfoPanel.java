@@ -90,9 +90,6 @@ public class JournalInfoPanel extends JPanel {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             PrintStream ps = new PrintStream(baos);
 
-            System.err.println("Number of pending transactions: " +
-                    transactions.length);
-
             for(int i = 0; i < transactions.length; ++i) {
                 final Transaction t = transactions[i];
                 ps.println("Transaction " + i + ":");
