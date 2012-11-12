@@ -17,6 +17,7 @@
 
 package org.catacombae.hfs;
 
+import org.catacombae.hfs.types.hfsplus.BlockList;
 import org.catacombae.hfs.types.hfsplus.JournalHeader;
 import org.catacombae.hfs.types.hfsplus.JournalInfoBlock;
 import org.catacombae.io.ReadableRandomAccessStream;
@@ -47,4 +48,14 @@ public abstract class Journal {
      * @return whether the journal is clean, i.e. has no pending transactions.
      */
     public abstract boolean isClean();
+
+    public class Transaction {
+        public final BlockList[] blockLists;
+
+        public Transaction(BlockList[] blockLists) {
+            this.blockLists = blockLists;
+        }
+    }
+
+    public abstract Transaction[] getPendingTransactions();
 }

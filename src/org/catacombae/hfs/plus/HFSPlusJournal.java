@@ -166,14 +166,6 @@ class HFSPlusJournal extends Journal {
         return journalHeader.getRawStart() == journalHeader.getRawEnd();
     }
 
-    public class Transaction {
-        public final BlockList[] blockLists;
-
-        public Transaction(BlockList[] blockLists) {
-            this.blockLists = blockLists;
-        }
-    }
-
     private boolean wrappedReadFully(ReadableRandomAccessStream stream,
             byte[] data, int offset, int length)
     {
