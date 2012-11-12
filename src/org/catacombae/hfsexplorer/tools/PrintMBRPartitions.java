@@ -42,7 +42,7 @@ public class PrintMBRPartitions {
         System.out.println("Length of file: " + llf.length());
         MBRPartitionTable mbr = new MBRPartitionTable(llf, 0);
         mbr.print(System.out, "");
-        System.out.println("Is this parititon table valid? " + mbr.isValid() + ".");
+        System.out.println("Is this partition table valid? " + mbr.isValid() + ".");
 
         llf.close();
     }
