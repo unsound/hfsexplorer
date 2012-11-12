@@ -264,6 +264,7 @@ public class GPTHeader implements DynamicStruct, PrintableStruct, StructElements
 	return result;
     }
 
+    @Override
     public boolean equals(Object obj) {
 	if(obj instanceof GPTHeader) {
 	    GPTHeader gpth = (GPTHeader)obj;
