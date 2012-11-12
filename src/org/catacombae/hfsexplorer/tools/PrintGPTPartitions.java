@@ -45,7 +45,7 @@ public class PrintGPTPartitions {
         System.out.println("Calculated checksum for header: 0x" + Util.toHexStringBE(gpt.calculatePrimaryHeaderChecksum()));
         System.out.println("Calculated checksum for entries: 0x" + Util.toHexStringBE(gpt.calculatePrimaryEntriesChecksum()));
         gpt.print(System.out, "");
-        System.out.println("Is this parititon table valid? " + gpt.isValid() + ".");
+        System.out.println("Is this partition table valid? " + gpt.isValid() + ".");
         FileOutputStream debug = new FileOutputStream("gpt_table.debug");
         debug.write(gpt.getPrimaryTableBytes());
         debug.close();
