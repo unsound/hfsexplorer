@@ -19,10 +19,11 @@ package org.catacombae.hfs.types.hfsplus;
 
 import org.catacombae.util.Util;
 import java.io.PrintStream;
+import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.Dictionary;
 
-public class HFSPlusForkData implements StructElements {
+public class HFSPlusForkData implements StructElements, PrintableStruct {
     /*
      * struct HFSPlusForkData
      * size: 80 bytes
@@ -74,12 +75,21 @@ public class HFSPlusForkData implements StructElements {
 	print(ps, pregapString);
     }
 	
-    public void print(PrintStream ps, String prefix) {
+    private void _printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + "logicalSize: " + getLogicalSize()/* + " (0x" + Util.byteArrayToHexString(logicalSize) + ")"*/);
 	ps.println(prefix + "clumpSize: " + getClumpSize());
 	ps.println(prefix + "totalBlocks: " + getTotalBlocks());
 	ps.println(prefix + "extents:");
 	extents.print(ps, prefix + "  ");
+    }
+
+    public void printFields(PrintStream ps, String prefix) {
+        _printFields(ps, prefix + " ");
+    }
+
+    public void print(PrintStream ps, String prefix) {
+        ps.println(prefix + "HFSPlusForkData:");
+        _printFields(ps, prefix + " ");
     }
 
     byte[] getBytes() {

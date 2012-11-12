@@ -17,6 +17,7 @@
 
 package org.catacombae.hfs.types.hfsplus;
 
+import java.io.PrintStream;
 import org.catacombae.hfs.types.hfsx.HFSXCatalogLeafRecord;
 import org.catacombae.util.Util;
 
@@ -49,5 +50,20 @@ public class HFSPlusCatalogLeafNode extends BTLeafNode {
 	for(int i = 0; i < copy.length; ++i)
 	    copy[i] = leafRecords[i];
 	return copy;
+    }
+
+    @Override
+    public void printFields(PrintStream ps, String prefix) {
+        super.printFields(ps, prefix);
+        for(int i = 0; i < leafRecords.length; ++i) {
+            ps.println(prefix + " leafRecords[" + i + "]:");
+            leafRecords[i].printFields(ps, prefix + "  ");
+        }
+    }
+
+    @Override
+    public void print(PrintStream ps, String prefix) {
+        ps.println(prefix + "HFSPlusCatalogLeafNode:");
+        printFields(ps, prefix);
     }
 }

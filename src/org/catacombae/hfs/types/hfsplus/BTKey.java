@@ -17,7 +17,9 @@
 
 package org.catacombae.hfs.types.hfsplus;
 
-public abstract class BTKey implements Comparable<BTKey> {
+import org.catacombae.csjc.PrintableStruct;
+
+public abstract class BTKey implements Comparable<BTKey>, PrintableStruct {
     public abstract short getKeyLength();
     public abstract int length();
     public abstract byte[] getBytes();

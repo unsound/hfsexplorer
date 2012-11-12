@@ -20,8 +20,9 @@ package org.catacombae.hfs.types.hfsplus;
 import org.catacombae.hfs.types.hfsx.HFSXCatalogKey;
 import org.catacombae.util.Util;
 import java.io.PrintStream;
+import org.catacombae.csjc.PrintableStruct;
 
-public class HFSPlusCatalogLeafRecord {
+public class HFSPlusCatalogLeafRecord implements PrintableStruct {
     public static final int HFS_PLUS_FOLDER_RECORD = 0x0001;
     public static final int HFS_PLUS_FILE_RECORD = 0x0002;
     public static final int HFS_PLUS_FOLDER_THREAD_RECORD = 0x0003;

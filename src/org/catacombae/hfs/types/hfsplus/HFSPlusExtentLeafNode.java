@@ -57,15 +57,16 @@ public class HFSPlusExtentLeafNode extends BTLeafNode {
 	return copy;
     }
 
+    @Override
     public void printFields(PrintStream ps, String prefix) {
-	ps.println(prefix + " nodeDescriptor:");
-	nodeDescriptor.printFields(ps, prefix + "  ");
+        super.printFields(ps, prefix);
 	for(int i = 0; i < leafRecords.length; ++i) {
 	    ps.println(prefix + " leafRecords[" + i + "]:");
 	    leafRecords[i].printFields(ps, prefix + "  ");
 	}
     }
 
+    @Override
     public void print(PrintStream ps, String prefix) {
 	ps.println(prefix + "HFSPlusExtentLeafNode:");
 	printFields(ps, prefix);

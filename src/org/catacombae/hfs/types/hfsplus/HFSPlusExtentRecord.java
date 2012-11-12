@@ -18,11 +18,12 @@
 package org.catacombae.hfs.types.hfsplus;
 
 import java.io.PrintStream;
+import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.ArrayBuilder;
 import org.catacombae.csjc.structelements.Dictionary;
 
-public class HFSPlusExtentRecord implements StructElements {
+public class HFSPlusExtentRecord implements PrintableStruct, StructElements {
     /*
      * HFSPlusExtentDescriptor (typedef HFSPlusExtentDescriptor[8])
      * size: 64 bytes
@@ -88,12 +89,21 @@ public class HFSPlusExtentRecord implements StructElements {
 	    pregapString += " ";
 	print(ps, pregapString);
     }
-    public void print(PrintStream ps, String prefix) {
-	    
+
+    private void _printFields(PrintStream ps, String prefix) {
 	for(int i = 0; i < array.length; ++i) {
 	    ps.println(prefix + "array[" + i + "]:");
 	    array[i].print(ps, prefix + "  ");
 	}
+    }
+
+    public void printFields(PrintStream ps, String prefix) {
+        _printFields(ps, prefix + " ");
+    }
+
+    public void print(PrintStream ps, String prefix) {
+        ps.println(prefix + "HFSPlusExtentRecord:");
+        _printFields(ps, prefix + " ");
     }
 
     public byte[] getBytes() {
