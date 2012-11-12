@@ -35,7 +35,7 @@ public class PrintGPTHeader {
 	if(args.length > 1)
 	    offset = Long.parseLong(args[1]);
 
-	byte[] data = new byte[GPTHeader.getSize()];
+	byte[] data = new byte[512];
 	RandomAccessFile sourceRaf = new RandomAccessFile(sourceFile, "r");
 	sourceRaf.seek(offset);
 	sourceRaf.read(data);

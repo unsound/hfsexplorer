@@ -24,8 +24,9 @@ public class MutableGUIDPartitionTable extends GUIDPartitionTable {
     protected MutableGPTEntry[] mutableBackupEntries;
 
     public MutableGUIDPartitionTable(GUIDPartitionTable source) {
-	super(new MutableGPTHeader(source.header), new MutableGPTHeader(source.backupHeader),
-	      source.entries.length, source.backupEntries.length);
+        super(source.blockSize, new MutableGPTHeader(source.header),
+                new MutableGPTHeader(source.backupHeader),
+                source.entries.length, source.backupEntries.length);
 
 	this.mutableHeader = (MutableGPTHeader)header;
 	this.mutableEntries = new MutableGPTEntry[source.entries.length];

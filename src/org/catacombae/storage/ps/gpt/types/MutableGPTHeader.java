@@ -23,6 +23,10 @@ import java.io.PrintStream;
 public class MutableGPTHeader extends GPTHeader {
     public MutableGPTHeader(int blockSize) {
 	super(blockSize);
+
+        System.arraycopy(Util.toByteArrayBE(GPT_SIGNATURE), 0, signature, 0, 8);
+        Util.zero(reserved1);
+        Util.zero(reserved2);
     }
     public MutableGPTHeader(GPTHeader source) {
 	super(source);
