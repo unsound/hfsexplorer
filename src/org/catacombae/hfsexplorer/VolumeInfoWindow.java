@@ -119,11 +119,7 @@ public class VolumeInfoWindow extends JFrame {
             Journal journal = fsView.getJournal();
             if(journal != null) {
                 JournalInfoPanel journalInfoPanel = new JournalInfoPanel(journal);
-                JScrollPane journalInfoPanelScroller = new JScrollPane(journalInfoPanel,
-                        JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                        JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-                tabs.addTab("Journal", journalInfoPanelScroller);
-                journalInfoPanelScroller.getVerticalScrollBar().setUnitIncrement(10);
+                tabs.addTab("Journal", journalInfoPanel);
             }
         } catch(Exception e) {
             e.printStackTrace();
