@@ -354,6 +354,11 @@ class HFSPlusJournal extends Journal {
             i = (i + curBytesRead) % size;
         }
 
+        if(curBlockListList.size() != 0) {
+            pendingTransactionList.add(new Transaction(curBlockListList.toArray(
+                    new BlockList[curBlockListList.size()])));
+        }
+
         return pendingTransactionList.toArray(
                 new Transaction[pendingTransactionList.size()]);
     }
