@@ -21,11 +21,13 @@ import org.catacombae.util.Util;
 import java.io.PrintStream;
 import java.util.zip.CRC32;
 import org.catacombae.csjc.DynamicStruct;
+import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.ByteArrayField;
 import org.catacombae.csjc.structelements.IntegerField;
 
-public class GPTHeader implements DynamicStruct, StructElements {
+public class GPTHeader implements DynamicStruct, PrintableStruct, StructElements
+{
     // Header is 92 bytes long. The rest of the sector is reserved.
     public static final int STATIC_SIZE = 92;
 
