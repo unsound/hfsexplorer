@@ -17,6 +17,7 @@
 
 package org.catacombae.hfs.plus;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import org.catacombae.hfs.types.hfsplus.HFSPlusVolumeHeader;
 import org.catacombae.hfs.types.hfsplus.JournalInfoBlock;
@@ -211,6 +212,7 @@ class HFSPlusJournal extends Journal {
         final long start = jh.getRawStart();
         final long end = jh.getRawEnd();
         final long size = jh.getRawSize();
+        final int blockListHeaderSize = jh.getRawBlhdrSize();
 
         if(start < 0)
             throw new RuntimeException("'start' overflows.");
@@ -218,6 +220,8 @@ class HFSPlusJournal extends Journal {
             throw new RuntimeException("'end' overflows.");
         if(size < 0)
             throw new RuntimeException("'size' overflows.");
+        if(blockListHeaderSize < 0)
+            throw new RuntimeException("'blockListHeaderSize' overflows.");
         if(start == end) {
             return new Transaction[0];
         }
@@ -235,6 +239,8 @@ class HFSPlusJournal extends Journal {
 
         journalStream.seek(start);
         for(long i = start; i != end;) {
+            long curBytesRead = 0;
+
             if(wrappedReadFully(journalStream, tmpData, 0,
                 BlockListHeader.length()))
             {
@@ -252,7 +258,7 @@ class HFSPlusJournal extends Journal {
                 throw new RuntimeException("Empty block list makes no sense.");
             }
 
-            i = (i + BlockListHeader.length()) % size;
+            curBytesRead += BlockListHeader.length();
 
             curBlockInfoList.clear();
             for(int j = 0; j < curHeader.getNumBlocks(); ++j) {
@@ -270,7 +276,55 @@ class HFSPlusJournal extends Journal {
                 curBlockInfoList.add(new BlockInfo(tmpData, 0,
                         jh.isLittleEndian()));
 
-                i = (i + BlockInfo.length()) % size;
+                curBytesRead += BlockInfo.length();
+            }
+
+            byte[] curReserved =
+                    new byte[(int) (blockListHeaderSize - curBytesRead)];
+            if(wrappedReadFully(journalStream, curReserved)) {
+                if(!wrappedAround) {
+                    wrappedAround = true;
+                }
+                else {
+                    throw new RuntimeException("Wrapped around twice!");
+                }
+            }
+
+            curBytesRead += curReserved.length;
+
+            LinkedList<byte[]> curBlockDataList = new LinkedList<byte[]>();
+            for(Iterator<BlockInfo> it = curBlockInfoList.iterator();
+                it.hasNext();)
+            {
+                final BlockInfo bi = it.next();
+
+                if(curBlockDataList.size() < 1) {
+                    /* Skip first BlockInfo because it's not actually
+                     * referencing any data. */
+                    curBlockDataList.add(new byte[0]);
+                    continue;
+                }
+
+                final int bsize = bi.getRawBsize();
+
+                if(bsize > Integer.MAX_VALUE) {
+                    throw new RuntimeException("'int' overflow in 'bsize' (" +
+                            bi.getBsize() + ").");
+                }
+
+                final byte[] data = new byte[bsize];
+                if(wrappedReadFully(journalStream, data)) {
+                    if(!wrappedAround) {
+                        wrappedAround = true;
+                    }
+                    else {
+                        throw new RuntimeException("Wrapped around twice!");
+                    }
+                }
+
+                curBytesRead += data.length;
+
+                curBlockDataList.add(data);
             }
 
             BlockList curBlockList = new BlockList(curHeader,
@@ -284,6 +338,8 @@ class HFSPlusJournal extends Journal {
                         new BlockList[curBlockListList.size()])));
                 curBlockListList.clear();
             }
+
+            i = (i + curBytesRead) % size;
         }
 
         return pendingTransactionList.toArray(
