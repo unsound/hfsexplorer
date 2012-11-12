@@ -29,6 +29,7 @@ import org.catacombae.hfs.types.hfsplus.BlockListHeader;
 import org.catacombae.hfs.types.hfsplus.JournalHeader;
 import org.catacombae.io.ReadableConcatenatedStream;
 import org.catacombae.io.RuntimeIOException;
+import org.catacombae.util.ObjectContainer;
 import org.catacombae.util.Util;
 
 /**
@@ -166,19 +167,28 @@ class HFSPlusJournal extends Journal {
         return journalHeader.getRawStart() == journalHeader.getRawEnd();
     }
 
-    private boolean wrappedReadFully(ReadableRandomAccessStream stream,
-            byte[] data, int offset, int length)
+    private long wrappedReadFully(ReadableRandomAccessStream stream,
+            long currentPos, byte[] data, int offset, int length,
+            ObjectContainer<Boolean> wrappedAround)
     {
-        boolean wrappedAround = false;
         int bytesRead;
+        long res;
 
         bytesRead = stream.read(data, offset, length);
         if(bytesRead != length) {
             /* Short read. Wrap around. */
-            wrappedAround = true;
+            if(wrappedAround.o) {
+                throw new RuntimeException("Wrapped around twice!");
+            }
+
+            res = length - bytesRead;
+            wrappedAround.o = true;
             stream.seek(0);
             bytesRead += stream.read(data, offset + bytesRead,
                     length - bytesRead);
+        }
+        else {
+            res = currentPos + length;
         }
 
         if(bytesRead != length) {
@@ -187,13 +197,15 @@ class HFSPlusJournal extends Journal {
                     "bytes, got " + bytesRead + " bytes.");
         }
 
-        return wrappedAround;
+        return res;
     }
 
-    private boolean wrappedReadFully(ReadableRandomAccessStream stream,
-            byte[] data)
+    private long wrappedReadFully(ReadableRandomAccessStream stream,
+            long currentPos, byte[] data,
+            ObjectContainer<Boolean> wrappedAround)
     {
-        return wrappedReadFully(stream, data, 0, data.length);
+        return wrappedReadFully(stream, currentPos, data, 0, data.length,
+                wrappedAround);
     }
 
     public Transaction[] getPendingTransactions() {
@@ -225,7 +237,8 @@ class HFSPlusJournal extends Journal {
         final LinkedList<BlockInfo> curBlockInfoList =
                 new LinkedList<BlockInfo>();
 
-        boolean wrappedAround = false;
+        ObjectContainer<Boolean> wrappedAround =
+                new ObjectContainer<Boolean>(false);
         byte[] tmpData = new byte[Math.max(BlockListHeader.length(),
                 BlockInfo.length())];
 
@@ -233,16 +246,8 @@ class HFSPlusJournal extends Journal {
         for(long i = start; i != end;) {
             long curBytesRead = 0;
 
-            if(wrappedReadFully(journalStream, tmpData, 0,
-                BlockListHeader.length()))
-            {
-                if(!wrappedAround) {
-                    wrappedAround = true;
-                }
-                else {
-                    throw new RuntimeException("Wrapped around twice!");
-                }
-            }
+            i = wrappedReadFully(journalStream, i, tmpData, 0,
+                BlockListHeader.length(), wrappedAround);
 
             BlockListHeader curHeader =
                     new BlockListHeader(tmpData, 0, jh.isLittleEndian());
@@ -260,16 +265,8 @@ class HFSPlusJournal extends Journal {
 
             curBlockInfoList.clear();
             for(int j = 0; j < curHeader.getNumBlocks(); ++j) {
-                if(wrappedReadFully(journalStream, tmpData, 0,
-                    BlockInfo.length()))
-                {
-                    if(!wrappedAround) {
-                        wrappedAround = true;
-                    }
-                    else {
-                        throw new RuntimeException("Wrapped around twice!");
-                    }
-                }
+                i = wrappedReadFully(journalStream, i, tmpData, 0,
+                    BlockInfo.length(), wrappedAround);
 
                 curBlockInfoList.add(new BlockInfo(tmpData, 0,
                         jh.isLittleEndian()));
@@ -290,14 +287,7 @@ class HFSPlusJournal extends Journal {
 
             byte[] curReserved =
                     new byte[(int) (blockListHeaderSize - curBytesRead)];
-            if(wrappedReadFully(journalStream, curReserved)) {
-                if(!wrappedAround) {
-                    wrappedAround = true;
-                }
-                else {
-                    throw new RuntimeException("Wrapped around twice!");
-                }
-            }
+            i = wrappedReadFully(journalStream, i, curReserved, wrappedAround);
 
             curBytesRead += curReserved.length;
 
@@ -322,14 +312,7 @@ class HFSPlusJournal extends Journal {
                 }
 
                 final byte[] data = new byte[bsize];
-                if(wrappedReadFully(journalStream, data)) {
-                    if(!wrappedAround) {
-                        wrappedAround = true;
-                    }
-                    else {
-                        throw new RuntimeException("Wrapped around twice!");
-                    }
-                }
+                i = wrappedReadFully(journalStream, i, data, wrappedAround);
 
                 curBytesRead += data.length;
 
@@ -350,8 +333,6 @@ class HFSPlusJournal extends Journal {
                         new BlockList[curBlockListList.size()])));
                 curBlockListList.clear();
             }
-
-            i = (i + curBytesRead) % size;
         }
 
         if(curBlockListList.size() != 0) {
