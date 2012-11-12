@@ -20,12 +20,15 @@ import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.util.Util;
 import java.io.PrintStream;
 import java.util.zip.CRC32;
+import org.catacombae.csjc.DynamicStruct;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.ByteArrayField;
 import org.catacombae.csjc.structelements.IntegerField;
 
-public class GPTHeader implements StructElements {
-    // Header is 92 bytes long. The rest of the 512 bytes (420 bytes) is reserved.
+public class GPTHeader implements DynamicStruct, StructElements {
+    // Header is 92 bytes long. The rest of the sector is reserved.
+    public static final int STATIC_SIZE = 92;
+
     public static final long GPT_SIGNATURE = 0x4546492050415254L;
 
     /* Structure of the GPT Header:
@@ -96,13 +99,13 @@ public class GPTHeader implements StructElements {
     protected final byte[] numberOfPartitionEntries = new byte[4];
     protected final byte[] sizeOfPartitionEntry = new byte[4];
     protected final byte[] partitionEntryArrayCRC32 = new byte[4];
-    protected final byte[] reserved2 = new byte[420];
+    protected final byte[] reserved2;
 
-    protected int blockSize;
+    protected final int blockSize;
     private final CRC32 crc = new CRC32();
 
     public GPTHeader(byte[] data, int offset, int blockSize) {
-	this.blockSize = blockSize;
+        this(blockSize);
 
 	System.arraycopy(data, offset+0, signature, 0, 8);
 	System.arraycopy(data, offset+8, revision, 0, 4);
@@ -118,20 +121,23 @@ public class GPTHeader implements StructElements {
 	System.arraycopy(data, offset+80, numberOfPartitionEntries, 0, 4);
 	System.arraycopy(data, offset+84, sizeOfPartitionEntry, 0, 4);
 	System.arraycopy(data, offset+88, partitionEntryArrayCRC32, 0, 4);
-	System.arraycopy(data, offset+92, reserved2, 0, 420);
+        System.arraycopy(data, offset+92, reserved2, 0, reserved2.length);
     }
     protected GPTHeader(int blockSize) {
 	this.blockSize = blockSize;
-	System.arraycopy(Util.toByteArrayBE(GPT_SIGNATURE), 0, signature, 0, 8);
-	Util.zero(reserved1);
-	Util.zero(reserved2);
+        this.reserved2 = new byte[blockSize - STATIC_SIZE];
     }
     public GPTHeader(GPTHeader source) {
+        this(source.blockSize);
 	setFieldsInternal(source);
     }
 
     protected void setFieldsInternal(GPTHeader source) {
-	this.blockSize = source.blockSize;
+        if(source.blockSize != this.blockSize) {
+            throw new RuntimeException("Block sizes don't match (" +
+                    source.blockSize + " != " + this.blockSize + ")!");
+        }
+
 	System.arraycopy(source.signature, 0, signature, 0, signature.length);
 	System.arraycopy(source.revision, 0, revision, 0, revision.length);
 	System.arraycopy(source.headerSize, 0, headerSize, 0, headerSize.length);
@@ -154,7 +160,17 @@ public class GPTHeader implements StructElements {
 // 		     int partitionEntryArrayCRC32, byte[] reserved2) {
 //     }
 
-    public static int getSize() { return 512; }
+    public int maxSize() {
+        /* Depends on the sector size. We don't have a fixed maximum size.
+         * However, in this case let's say 4096 because I don't know of any
+         * media that has a larger sector size. Change this when such media
+         * becomes available. */
+        return 4096;
+    }
+
+    public int occupiedSize() {
+        return blockSize;
+    }
 
     public long getSignature()               { return Util.readLongBE(signature); }
     public int getRevision()                 { return Util.readIntLE(revision); }
@@ -221,7 +237,7 @@ public class GPTHeader implements StructElements {
     }
 
     public byte[] getBytes() {
-	byte[] result = new byte[512];
+	byte[] result = new byte[occupiedSize()];
 	int offset = 0;
 	System.arraycopy(signature, 0, result, offset, signature.length); offset += 8;
 	System.arraycopy(revision, 0, result, offset, revision.length); offset += 4;
