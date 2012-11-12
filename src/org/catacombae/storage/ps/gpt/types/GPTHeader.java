@@ -104,7 +104,7 @@ public class GPTHeader implements DynamicStruct, PrintableStruct, StructElements
     protected final byte[] reserved2;
 
     protected final int blockSize;
-    private final CRC32 crc = new CRC32();
+    private CRC32 crc = null;
 
     public GPTHeader(byte[] data, int offset, int blockSize) {
         this(blockSize);
@@ -197,6 +197,10 @@ public class GPTHeader implements DynamicStruct, PrintableStruct, StructElements
 
     /** Calculates the CRC32 as it should appear in the crc32Checksum field in the header. */
     public int calculateCRC32() {
+        if(crc == null) {
+            crc = new CRC32();
+        }
+
 	crc.reset();
 	crc.update(signature);
 	crc.update(revision);
