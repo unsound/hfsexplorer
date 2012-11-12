@@ -257,6 +257,12 @@ class HFSPlusJournal extends Journal {
             if(curHeader.getNumBlocks() < 1) {
                 throw new RuntimeException("Empty block list makes no sense.");
             }
+            else if((curHeader.getMaxBlocks() * 16 + 16) != blockListHeaderSize)
+            {
+                throw new RuntimeException("Unexpected value for maxBlocks " +
+                        "member of BlockListHeader: " +
+                        curHeader.getMaxBlocks());
+            }
 
             curBytesRead += BlockListHeader.length();
 
@@ -277,6 +283,17 @@ class HFSPlusJournal extends Journal {
                         jh.isLittleEndian()));
 
                 curBytesRead += BlockInfo.length();
+            }
+
+            if(curHeader.calculateChecksum(curBlockInfoList.getFirst()) !=
+                    curHeader.getRawChecksum())
+            {
+                throw new RuntimeException("Checksum mismatch for header "
+                        + "(expected: 0x" +
+                        Util.toHexStringBE(curHeader.getRawChecksum()) + " "
+                        + "actual: 0x" +
+                        Util.toHexStringBE(curHeader.calculateChecksum(
+                        curBlockInfoList.getFirst())) + ")");
             }
 
             byte[] curReserved =
