@@ -64,7 +64,14 @@ public class ExtendedFileInfo extends CommonExtendedFinderInfo implements Struct
 
     @Override
     public void printFields(PrintStream ps, String prefix) {
-	ps.println(prefix + " reserved1: " + getReserved1());
+        {
+            short[] tmp = getReserved1();
+            ps.println(prefix + " reserved1: { " +
+                    "0x" + Util.toHexStringBE(tmp[0]) + ", " +
+                    "0x" + Util.toHexStringBE(tmp[1]) + ", " +
+                    "0x" + Util.toHexStringBE(tmp[2]) + ", " +
+                    "0x" + Util.toHexStringBE(tmp[3]) + " }");
+        }
         super.printFields(ps, prefix);
     }
 

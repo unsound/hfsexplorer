@@ -60,9 +60,17 @@ public abstract class CommonExtendedFinderInfo implements StructElements, Printa
 
     /* @Override */
     public void printFields(PrintStream ps, String prefix) {
-	ps.println(prefix + " extendedFinderFlags: " + getExtendedFinderFlags());
-	ps.println(prefix + " reserved2: " + getReserved2());
-	ps.println(prefix + " putAwayFolderID: " + getPutAwayFolderID());
+        ps.println(prefix + " extendedFinderFlags: 0x" +
+                Util.toHexStringBE(getExtendedFinderFlags()));
+        ps.println(prefix + "  kExtendedFlagsAreInvalid: " +
+                (getExtendedFinderFlagExtendedFlagsAreInvalid() ? "1" : "0"));
+        ps.println(prefix + "  kExtendedFlagHasCustomBadge: " +
+                (getExtendedFinderFlagExtendedFlagHasCustomBadge() ? "1" : "0"));
+        ps.println(prefix + "  kExtendedFlagHasRoutingInfo: " +
+                (getExtendedFinderFlagExtendedFlagHasRoutingInfo() ? "1" : "0"));
+        ps.println(prefix + " reserved2: 0x" +
+                Util.toHexStringBE(getReserved2()));
+        ps.println(prefix + " putAwayFolderID: " + Util.unsign(getPutAwayFolderID()));
     }
 
     /* @Override */

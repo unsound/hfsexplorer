@@ -107,10 +107,34 @@ public abstract class CommonFinderInfo implements StructElements, PrintableStruc
 
     /* @Override */
     public void printFields(PrintStream ps, String prefix) {
-	ps.println(prefix + " finderFlags: " + getFinderFlags());
+        ps.println(prefix + " finderFlags: 0x" +
+                Util.toHexStringBE(getFinderFlags()));
+        ps.println(prefix + "  kIsOnDesk: " +
+                (getFinderFlagIsOnDesk() ? "1" : "0"));
+        ps.println(prefix + "  kColor: 0x" +
+                Util.toHexStringBE(getFinderFlagColor()));
+        ps.println(prefix + "  kIsShared: " +
+                (getFinderFlagIsShared() ? "1" : "0"));
+        ps.println(prefix + "  kHasNoINITs: " +
+                (getFinderFlagHasNoINITs() ? "1" : "0"));
+        ps.println(prefix + "  kHasBeenInited: " +
+                (getFinderFlagHasBeenInited() ? "1" : "0"));
+        ps.println(prefix + "  kHasCustomIcon: " +
+                (getFinderFlagHasCustomIcon() ? "1" : "0"));
+        ps.println(prefix + "  kIsStationery: " +
+                (getFinderFlagIsStationery() ? "1" : "0"));
+        ps.println(prefix + "  kNameLocked: " +
+                (getFinderFlagNameLocked() ? "1" : "0"));
+        ps.println(prefix + "  kHasBundle: " +
+                (getFinderFlagHasBundle() ? "1" : "0"));
+        ps.println(prefix + "  kIsInvisible: " +
+                (getFinderFlagIsInvisible() ? "1" : "0"));
+        ps.println(prefix + "  kIsAlias: " +
+                (getFinderFlagIsAlias() ? "1" : "0"));
 	ps.println(prefix + " location: ");
 	getLocation().print(ps, prefix+"  ");
-	ps.println(prefix + " reservedField: " + getReservedField());
+        ps.println(prefix + " reservedField: 0x" +
+                Util.toHexStringBE(getReservedField()));
     }
 
     /* @Override */
