@@ -97,6 +97,10 @@ public class PartitionSystemDetector {
                 new LinkedList<PartitionSystemType>();
 
         for(PartitionSystemType type : PartitionSystemType.values()) {
+            if(!type.isTopLevelCapable()) {
+                continue;
+            }
+
             PartitionSystemHandlerFactory fact =
                     type.createDefaultHandlerFactory();
 
