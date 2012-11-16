@@ -799,7 +799,7 @@ public class FileSystemBrowserWindow extends JFrame {
 
         // Detect partition system
         PartitionSystemType[] matchingTypes =
-                PartitionSystemDetector.detectPartitionSystem(fsFile);
+                PartitionSystemDetector.detectPartitionSystem(fsFile, false);
 
         if(matchingTypes.length > 1) {
             String message = "Multiple partition system types detected:";
