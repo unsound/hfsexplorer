@@ -102,8 +102,10 @@ public class JournalInfoPanel extends JPanel {
             ps.flush();
             ps.close();
 
-            journalContentsPanel = new JScrollPane(new JTextArea(new String(
-                    baos.toByteArray())));
+            JTextArea transactionsTextArea =
+                    new JTextArea(new String(baos.toByteArray()));
+            transactionsTextArea.setEditable(false);
+            journalContentsPanel = new JScrollPane(transactionsTextArea);
             tabbedPane.insertTab("Transactions", null, journalContentsPanel,
                     "The journal's pending transactions.", 2);
         } catch(Exception e) {
