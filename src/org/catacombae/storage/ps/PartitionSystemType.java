@@ -38,7 +38,7 @@ public enum PartitionSystemType {
     MBR(true, MBRHandlerFactory.class, "Master Boot Record"),
 
     /** The GUID Partition Table partition system. */
-    GPT(true, GPTHandlerFactory.class, "GUID Partition Table"),
+    GPT(true, GPTHandlerFactory.class, "GUID Partition Table", MBR),
 
     /** The Apple Partition Map partition system. */
     APM(true, APMHandlerFactory.class, "Apple Partition Map"),
@@ -51,19 +51,24 @@ public enum PartitionSystemType {
 
     private final boolean isTopLevelCapable;
     private final String longName;
+    private final PartitionSystemType[] overriddenPartitionSystems;
 
     private LinkedList<Class<? extends PartitionSystemHandlerFactory>> factoryClasses =
             new LinkedList<Class<? extends PartitionSystemHandlerFactory>>();
 
-    private PartitionSystemType(boolean pIsTopLevelCapable, String longName) {
+    private PartitionSystemType(boolean pIsTopLevelCapable, String longName,
+            PartitionSystemType... overriddenPartitionSystems)
+    {
         this.isTopLevelCapable = pIsTopLevelCapable;
         this.longName = longName;
+        this.overriddenPartitionSystems = overriddenPartitionSystems;
     }
 
     private PartitionSystemType(boolean pIsTopLevelCapable,
             Class<? extends PartitionSystemHandlerFactory> pDefaultFactoryClass,
-            String longName) {
-        this(pIsTopLevelCapable, longName);
+            String longName, PartitionSystemType... overriddenPartitionSystems)
+    {
+        this(pIsTopLevelCapable, longName, overriddenPartitionSystems);
 
 
         this.factoryClasses.addLast(pDefaultFactoryClass);
@@ -91,6 +96,18 @@ public enum PartitionSystemType {
      */
     public String getLongName() {
         return longName;
+    }
+
+    /**
+     * Returns an array of partition system types that this partition system
+     * overrides. For instance if there's both an MBR layout and a GPT layout
+     * on a disk, the GPT layout should be preferred.
+     *
+     * @return an array of partition system types that this partition system
+     * overrides.
+     */
+    public PartitionSystemType[] getOverriddenPartitionSystems() {
+        return overriddenPartitionSystems;
     }
 
     /**
