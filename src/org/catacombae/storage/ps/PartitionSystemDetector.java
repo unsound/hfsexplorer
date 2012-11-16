@@ -42,9 +42,11 @@ public class PartitionSystemDetector {
      * this list will be empty (0 elements).
      */
     public static PartitionSystemType[] detectPartitionSystem(
-            DataLocator inputDataLocator) {
+            DataLocator inputDataLocator, boolean includeOverridden)
+    {
         ReadableRandomAccessStream dlStream = inputDataLocator.createReadOnlyFile();
-        PartitionSystemType[] result = detectPartitionSystem(dlStream);
+        PartitionSystemType[] result =
+                detectPartitionSystem(dlStream, includeOverridden);
         dlStream.close();
         return result;
     }
@@ -61,14 +63,15 @@ public class PartitionSystemDetector {
      * this list will be empty (0 elements).
      */
     public static PartitionSystemType[] detectPartitionSystem(
-            ReadableRandomAccessStream psStream) {
+            ReadableRandomAccessStream psStream, boolean includeOverridden)
+    {
         long len;
         try {
             len = psStream.length();
         } catch(RuntimeIOException e) {
             len = -1;
         }
-        return detectPartitionSystem(psStream, 0, len);
+        return detectPartitionSystem(psStream, 0, len, includeOverridden);
     }
 
     /**
@@ -86,9 +89,11 @@ public class PartitionSystemDetector {
      * this list will be empty (0 elements).
      */
     public static PartitionSystemType[] detectPartitionSystem(
-            ReadableRandomAccessStream psStream, long off, long len) {
+            ReadableRandomAccessStream psStream, long off, long len,
+            boolean includeOverridden)
+    {
 
-        LinkedList<PartitionSystemType> result =
+        LinkedList<PartitionSystemType> rawResult =
                 new LinkedList<PartitionSystemType>();
 
         for(PartitionSystemType type : PartitionSystemType.values()) {
@@ -97,7 +102,39 @@ public class PartitionSystemDetector {
 
             if(fact != null) {
                 if(fact.getRecognizer().detect(psStream, off, len))
+                    rawResult.add(type);
+            }
+        }
+
+        /* Clean out overridden types from result. */
+        LinkedList<PartitionSystemType> result;
+        if(includeOverridden) {
+            result = rawResult;
+        }
+        else {
+            result = new LinkedList<PartitionSystemType>();
+
+            for(PartitionSystemType type : rawResult) {
+                boolean isOverridden = false;
+
+                for(PartitionSystemType type2 : rawResult) {
+                    for(PartitionSystemType overriddenType :
+                        type2.getOverriddenPartitionSystems())
+                    {
+                        if(overriddenType == type) {
+                            isOverridden = true;
+                            break;
+                        }
+                    }
+
+                    if(isOverridden) {
+                        break;
+                    }
+                }
+
+                if(!isOverridden) {
                     result.add(type);
+                }
             }
         }
 

@@ -303,7 +303,8 @@ public class UnHFS {
         DataLocator inputDataLocator = new ReadableStreamDataLocator(inFileStream);
 
         PartitionSystemType[] psTypes =
-                PartitionSystemDetector.detectPartitionSystem(inputDataLocator);
+                PartitionSystemDetector.detectPartitionSystem(inputDataLocator,
+                false);
         if(psTypes.length >= 1) {
 
             outer:

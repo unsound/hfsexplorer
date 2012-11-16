@@ -252,7 +252,8 @@ public class SelectWindowsDeviceDialog extends JDialog {
                 llf = new ReadableWin32FileStream(DEVICE_PREFIX + deviceName);
 
                 PartitionSystemType[] detectedTypes =
-                        PartitionSystemDetector.detectPartitionSystem(llf);
+                        PartitionSystemDetector.detectPartitionSystem(llf,
+                        false);
 
                 PartitionSystemType pst;
                 if(detectedTypes.length == 1)

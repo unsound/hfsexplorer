@@ -102,7 +102,7 @@ public class DumpFSInfo {
         int partNum = -1;
 
         PartitionSystemType[] detectedTypes =
-                PartitionSystemDetector.detectPartitionSystem(fsFile);
+                PartitionSystemDetector.detectPartitionSystem(fsFile, false);
 
         PartitionSystemType detectedType;
         PartitionSystemHandler partSys;
