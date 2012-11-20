@@ -27,79 +27,83 @@ import org.catacombae.hfs.types.carbon.Point;
 public class DXInfo implements StructElements {
     /*
      * struct DXInfo
-     * size: 11 bytes
+     * size: 16 bytes
      * description:
      *
      * BP  Size  Type    Identifier   Description
      * ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
      * 0   4     Point   frScroll     Scroll position within the Finder window. The Finder does not necessarily save this position immediately upon user action.
-     * -1  4     SInt32  frOpenChain  Chain of directory IDs for open folders. The Finder numbers directory IDs. The Finder does not necessarily save this information immediately upon user action.
-     * 3   1     SInt8   frScript     Extended flags. If the high-bit is set, the script system for displaying the folder's name.
-     * 4   1     SInt8   frXFlags     Extended flags. See ÒExtended Finder Flags .Ó
-     * 5   2     SInt16  frComment    Reserved (set to 0). If the high-bit is clear, an ID number for the comment that is displayed in the information window when the user selects a folder and chooses the Get Info command from the File menu. The numbers that identify comments are assigned by the Finder.
-     * 7   4     SInt32  frPutAway    If the user moves the folder onto the desktop, the directory ID of the folder from which the user moves it.
+     * 4   4     SInt32  frOpenChain  Chain of directory IDs for open folders. The Finder numbers directory IDs. The Finder does not necessarily save this information immediately upon user action.
+     * 8   1     SInt8   frScript     Extended flags. If the high-bit is set, the script system for displaying the folder's name.
+     * 9   1     SInt8   frXFlags     Extended flags. See "Extended Finder Flags".
+     * 10  2     SInt16  frComment    Reserved (set to 0). If the high-bit is clear, an ID number for the comment that is displayed in the information window when the user selects a folder and chooses the Get Info command from the File menu. The numbers that identify comments are assigned by the Finder.
+     * 12  4     SInt32  frPutAway    If the user moves the folder onto the desktop, the directory ID of the folder from which the user moves it.
      */
 
-    public static final int STRUCTSIZE = 11;
+    public static final int STRUCTSIZE = 16;
 
     private final Point frScroll;
-    private final byte[] frOpenChain = new byte[4];
-    private final byte[] frScript = new byte[1];
-    private final byte[] frXFlags = new byte[1];
-    private final byte[] frComment = new byte[2];
-    private final byte[] frPutAway = new byte[4];
+    private int frOpenChain;
+    private byte frScript;
+    private byte frXFlags;
+    private short frComment;
+    private int frPutAway;
 
     public DXInfo(byte[] data, int offset) {
-	frScroll = new Point(data, offset+0);
-	System.arraycopy(data, offset+-1, frOpenChain, 0, 4);
-	System.arraycopy(data, offset+3, frScript, 0, 1);
-	System.arraycopy(data, offset+4, frXFlags, 0, 1);
-	System.arraycopy(data, offset+5, frComment, 0, 2);
-	System.arraycopy(data, offset+7, frPutAway, 0, 4);
+        this.frScroll = new Point(data, offset+0);
+        this.frOpenChain = Util.readIntBE(data, offset+4);
+        this.frScript = Util.readByteBE(data, offset+8);
+        this.frXFlags = Util.readByteBE(data, offset+9);
+        this.frComment = Util.readShortBE(data, offset+10);
+        this.frPutAway = Util.readIntBE(data, offset+12);
     }
 
     public static int length() { return STRUCTSIZE; }
 
     /** Scroll position within the Finder window. The Finder does not necessarily save this position immediately upon user action. */
-    public Point getFrScroll() { return frScroll; }
+    public final Point getFrScroll() { return this.frScroll; }
     /** Chain of directory IDs for open folders. The Finder numbers directory IDs. The Finder does not necessarily save this information immediately upon user action. */
-    public int getFrOpenChain() { return Util.readIntBE(frOpenChain); }
+    public final int getFrOpenChain() { return this.frOpenChain; }
     /** Extended flags. If the high-bit is set, the script system for displaying the folder's name. */
-    public byte getFrScript() { return Util.readByteBE(frScript); }
-    /** Extended flags. See ÒExtended Finder Flags .Ó */
-    public byte getFrXFlags() { return Util.readByteBE(frXFlags); }
+    public final byte getFrScript() { return this.frScript; }
+    /** Extended flags. See "Extended Finder Flags". */
+    public final byte getFrXFlags() { return this.frXFlags; }
     /** Reserved (set to 0). If the high-bit is clear, an ID number for the comment that is displayed in the information window when the user selects a folder and chooses the Get Info command from the File menu. The numbers that identify comments are assigned by the Finder. */
-    public short getFrComment() { return Util.readShortBE(frComment); }
+    public final short getFrComment() { return this.frComment; }
     /** If the user moves the folder onto the desktop, the directory ID of the folder from which the user moves it. */
-    public int getFrPutAway() { return Util.readIntBE(frPutAway); }
+    public final int getFrPutAway() { return this.frPutAway; }
+
 
     public void printFields(PrintStream ps, String prefix) {
-	ps.println(prefix + " frScroll: ");
-	getFrScroll().print(ps, prefix+"  ");
-	ps.println(prefix + " frOpenChain: " + getFrOpenChain());
-	ps.println(prefix + " frScript: " + getFrScript());
-	ps.println(prefix + " frXFlags: " + getFrXFlags());
-	ps.println(prefix + " frComment: " + getFrComment());
-	ps.println(prefix + " frPutAway: " + getFrPutAway());
+        ps.println(prefix + " frScroll: ");
+        getFrScroll().print(ps, prefix + "  ");
+        ps.println(prefix + " frOpenChain: " + getFrOpenChain());
+        ps.println(prefix + " frScript: " + getFrScript());
+        ps.println(prefix + " frXFlags: " + getFrXFlags());
+        ps.println(prefix + " frComment: " + getFrComment());
+        ps.println(prefix + " frPutAway: " + getFrPutAway());
     }
 
     public void print(PrintStream ps, String prefix) {
-	ps.println(prefix + "DXInfo:");
-	printFields(ps, prefix);
+        ps.println(prefix + "DXInfo:");
+        printFields(ps, prefix);
     }
 
     public byte[] getBytes() {
-	byte[] result = new byte[STRUCTSIZE];
-	byte[] tempData;
-	int offset = 0;
-	tempData = frScroll.getBytes();
-	System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
-	System.arraycopy(frOpenChain, 0, result, offset, frOpenChain.length); offset += frOpenChain.length;
-	System.arraycopy(frScript, 0, result, offset, frScript.length); offset += frScript.length;
-	System.arraycopy(frXFlags, 0, result, offset, frXFlags.length); offset += frXFlags.length;
-	System.arraycopy(frComment, 0, result, offset, frComment.length); offset += frComment.length;
-	System.arraycopy(frPutAway, 0, result, offset, frPutAway.length); offset += frPutAway.length;
-	return result;
+        byte[] result = new byte[length()];
+        int offset = 0;
+
+        {
+            byte[] tempData = this.frScroll.getBytes();
+            System.arraycopy(tempData, 0, result, offset, tempData.length); offset += tempData.length;
+        }
+        Util.arrayPutBE(result, offset, this.frOpenChain); offset += 4;
+        Util.arrayPutBE(result, offset, this.frScript); offset += 1;
+        Util.arrayPutBE(result, offset, this.frXFlags); offset += 1;
+        Util.arrayPutBE(result, offset, this.frComment); offset += 2;
+        Util.arrayPutBE(result, offset, this.frPutAway); offset += 4;
+
+        return offset - startOffset;
     }
 
     /* @Override */
