@@ -80,7 +80,7 @@
 	   includes="**"
 	   debug="true"
 	   debuglevel="${debuglevel}"
-	   encoding="iso-8859-1"
+	   encoding="utf-8"
 	   source="${java.source.level}"
 	   target="${java.target.level}"
 	   deprecation="on">
@@ -99,7 +99,7 @@
 	   includes="org/catacombae/hfsexplorer/**"
 	   debug="true"
 	   debuglevel="${debuglevel}"
-	   encoding="iso-8859-1"
+	   encoding="utf-8"
 	   source="${java.source.level}"
 	   target="${java.target.level}">
       <classpath refid="java.build.classpath"/>
@@ -114,7 +114,7 @@
 	   includes="org/catacombae/jparted/**"
 	   debug="true"
 	   debuglevel="${debuglevel}"
-	   encoding="iso-8859-1"
+	   encoding="utf-8"
 	   source="${java.source.level}"
 	   target="${java.target.level}">
       <classpath refid="java.build.classpath"/>
@@ -133,7 +133,7 @@
 	   includes="org/catacombae/storage/**"
 	   debug="true"
 	   debuglevel="${debuglevel}"
-	   encoding="iso-8859-1"
+	   encoding="utf-8"
 	   source="${java.source.level}"
 	   target="${java.target.level}">
       <classpath refid="java.build.classpath"/>
@@ -151,7 +151,7 @@
 	   includes="org/catacombae/hfsexplorer/tools/MkAPM.java"
 	   debug="true"
 	   debuglevel="${debuglevel}"
-	   encoding="iso-8859-1"
+	   encoding="utf-8"
 	   source="${java.source.level}"
 	   target="${java.target.level}">
       <src path="${java.source.dir}"/>
@@ -171,7 +171,7 @@
              author="true"
              version="true"
              use="true"
-	     encoding="iso-8859-1"
+	     encoding="utf-8"
              windowtitle="HFSExplorer API">
       
       <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>

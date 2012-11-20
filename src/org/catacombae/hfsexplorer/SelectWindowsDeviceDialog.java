@@ -157,7 +157,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
      * This method is only tested with Windows XP (SP2, x86).
      * Also, it won't work with devices that are not mounted
      * using the Windows XP standard names. For example, Bo
-     * Brantén's filedisk creates a device with another name.
+     * BrantÃ©n's filedisk creates a device with another name.
      * However, if your file system is on a file, this method
      * is not needed.
      * @return a list of the names of the detected devices
