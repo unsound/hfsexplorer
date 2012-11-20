@@ -175,25 +175,25 @@
                       <Properties>
                         <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
                           <Table columnCount="4" rowCount="4">
-                            <Column editable="false" title="Namn" type="java.lang.Object">
+                            <Column editable="false" title="Name" type="java.lang.Object">
                               <Data value="yada.txt"/>
                               <Data value="null"/>
                               <Data value="null"/>
                               <Data value="null"/>
                             </Column>
-                            <Column editable="false" title="Storlek" type="java.lang.Object">
+                            <Column editable="false" title="Size" type="java.lang.Object">
                               <Data value="1 KiB"/>
                               <Data value="null"/>
                               <Data value="null"/>
                               <Data value="null"/>
                             </Column>
-                            <Column editable="false" title="Typ" type="java.lang.Object">
-                              <Data value="Textdokument"/>
+                            <Column editable="false" title="Type" type="java.lang.Object">
+                              <Data value="File"/>
                               <Data value="null"/>
                               <Data value="null"/>
                               <Data value="null"/>
                             </Column>
-                            <Column editable="false" title="Senast &#xe4;ndrad" type="java.lang.Object">
+                            <Column editable="false" title="Date modified" type="java.lang.Object">
                               <Data value="2006-06-11 14:34"/>
                               <Data value="null"/>
                               <Data value="null"/>
