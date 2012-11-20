@@ -127,14 +127,15 @@ public class HFSPlusExtentDescriptor implements StructElements,
     }
 }
 
-/* Maximal filstorlek i HFS+ måste vara blockSize*2^32*8. Dvs. vid blockSize = 4096:
+/* Maxium file size in HFS+ has got to be blockSize*2^32*8.
+ * I.e. for block size 4096:
  * 140737488355328 B
  * 137438953472 KiB
  * 134217728 MiB
  * 131072 GiB
  * 128 TiB
  *
- * vid blocksize 32768:
+ * ...and for block size 32768:
  * 1125899906842624 B
  * 1099511627776 KiB
  * 1073741824 MiB

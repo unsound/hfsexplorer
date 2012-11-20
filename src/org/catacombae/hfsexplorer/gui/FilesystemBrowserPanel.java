@@ -119,13 +119,13 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
 
         fileTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"yada.txt", "1 KiB", "Textdokument", "2006-06-11 14:34"},
+                {"yada.txt", "1 KiB", "File", "2006-06-11 14:34"},
                 {null, null, null, null},
                 {null, null, null, null},
                 {null, null, null, null}
             },
             new String [] {
-                "Namn", "Storlek", "Typ", "Senast ändrad"
+                "Name", "Size", "Type", "Date modified"
             }
         ) {
             boolean[] canEdit = new boolean [] {
