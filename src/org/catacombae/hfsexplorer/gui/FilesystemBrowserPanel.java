@@ -125,7 +125,7 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
                 {null, null, null, null}
             },
             new String [] {
-                "Namn", "Storlek", "Typ", "Senast ändrad"
+                "Namn", "Storlek", "Typ", "Senast Ã¤ndrad"
             }
         ) {
             boolean[] canEdit = new boolean [] {

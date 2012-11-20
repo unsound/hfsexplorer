@@ -127,7 +127,7 @@ public class HFSPlusExtentDescriptor implements StructElements,
     }
 }
 
-/* Maximal filstorlek i HFS+ måste vara blockSize*2^32*8. Dvs. vid blockSize = 4096:
+/* Maximal filstorlek i HFS+ mÃ¥ste vara blockSize*2^32*8. Dvs. vid blockSize = 4096:
  * 140737488355328 B
  * 137438953472 KiB
  * 134217728 MiB
