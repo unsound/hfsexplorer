@@ -216,7 +216,7 @@ public class HFSCatalogNodeID implements StructElements, PrintableStruct {
     }
 
     private Field getPrivateField(String name) throws NoSuchFieldException {
-        Field f = getClass().getDeclaredField("hfsCatalogNodeID");
+        Field f = getClass().getDeclaredField(name);
         f.setAccessible(true);
         return f;
     }
