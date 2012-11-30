@@ -56,7 +56,7 @@ public class WelcomePanel extends javax.swing.JPanel {
         jButton1.setText("Load");
 
         jList1.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "Macintosh HD (\\\\?\\GLOBALROOT\\Device\\Harddisk0\\Partition2)", "Leopard HD (\\\\?\\GLOBALROOT\\Device\\Harddisk0\\Partition3)", "Snow Leopard HD (GPT:5@\\\\?\\GLOBALROOT\\Device\\Harddisk0\\Partition0)", "Time Machine-sŠkerhetskopior (EBR:2@MBR:4@\\\\?\\GLOBALROOT\\Device\\Harddisk1\\Partition0)", "Mac OS X Install DVD (\\\\?\\GLOBALROOT\\Device\\CdRom0\\Partition0)", " ", "eller:", " ", "Macintosh HD (/dev/hda2)", "Leopard HD (/dev/hda3)", "Snow Leopard HD (GPT:5@/dev/hda)", "etc.", " " };
+            String[] strings = { "Macintosh HD (\\\\?\\GLOBALROOT\\Device\\Harddisk0\\Partition2)", "Leopard HD (\\\\?\\GLOBALROOT\\Device\\Harddisk0\\Partition3)", "Snow Leopard HD (GPT:5@\\\\?\\GLOBALROOT\\Device\\Harddisk0\\Partition0)", "Time Machine-sï¿½kerhetskopior (EBR:2@MBR:4@\\\\?\\GLOBALROOT\\Device\\Harddisk1\\Partition0)", "Mac OS X Install DVD (\\\\?\\GLOBALROOT\\Device\\CdRom0\\Partition0)", " ", "eller:", " ", "Macintosh HD (/dev/hda2)", "Leopard HD (/dev/hda3)", "Snow Leopard HD (GPT:5@/dev/hda)", "etc.", " " };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
