@@ -1,0 +1,5 @@
+struct DecmpfsHeader {
+    le32 magic;
+    le32 compressionType;
+    le64 fileSize;
+};
