@@ -100,16 +100,18 @@ public class VolumeInfoWindow extends JFrame {
 
         // The "Attributes file info" tab
 
-        try {
-            AttributesInfoPanel attributesInfoPanel =
-                    new AttributesInfoPanel((HFSPlusVolume)fsView);
-            JScrollPane scroller = new JScrollPane(attributesInfoPanel,
-                    JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                    JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-            tabs.addTab("Attributes file", scroller);
-            scroller.getVerticalScrollBar().setUnitIncrement(10);
-        } catch(Exception e) {
-            e.printStackTrace();
+        if(fsView instanceof HFSPlusVolume) {
+            try {
+                    AttributesInfoPanel attributesInfoPanel =
+                            new AttributesInfoPanel((HFSPlusVolume)fsView);
+                    JScrollPane scroller = new JScrollPane(attributesInfoPanel,
+                            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                    tabs.addTab("Attributes file", scroller);
+                    scroller.getVerticalScrollBar().setUnitIncrement(10);
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
         }
 
 
