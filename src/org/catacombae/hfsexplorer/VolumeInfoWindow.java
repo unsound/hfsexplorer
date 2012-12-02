@@ -22,6 +22,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import org.catacombae.hfs.AttributesFile;
 import org.catacombae.hfsexplorer.gui.AttributesInfoPanel;
 import org.catacombae.hfsexplorer.gui.CatalogInfoPanel;
 import org.catacombae.hfsexplorer.gui.ExtentsInfoPanel;
@@ -100,18 +101,20 @@ public class VolumeInfoWindow extends JFrame {
 
         // The "Attributes file info" tab
 
-        if(fsView instanceof HFSPlusVolume) {
-            try {
-                    AttributesInfoPanel attributesInfoPanel =
-                            new AttributesInfoPanel((HFSPlusVolume)fsView);
-                    JScrollPane scroller = new JScrollPane(attributesInfoPanel,
-                            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-                    tabs.addTab("Attributes file", scroller);
-                    scroller.getVerticalScrollBar().setUnitIncrement(10);
-            } catch(Exception e) {
-                e.printStackTrace();
+        try {
+            final AttributesFile attributesFile = fsView.getAttributesFile();
+
+            if(attributesFile != null) {
+                AttributesInfoPanel attributesInfoPanel =
+                        new AttributesInfoPanel(fsView.getAttributesFile());
+                JScrollPane scroller = new JScrollPane(attributesInfoPanel,
+                        JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                        JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                tabs.addTab("Attributes file", scroller);
+                scroller.getVerticalScrollBar().setUnitIncrement(10);
             }
+        } catch(Exception e) {
+            e.printStackTrace();
         }
 
 
