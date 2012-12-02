@@ -30,10 +30,8 @@ import org.catacombae.hfsexplorer.gui.JournalInfoPanel;
 import org.catacombae.hfsexplorer.gui.StructViewPanel;
 import org.catacombae.hfsexplorer.gui.HFSPlusVolumeInfoPanel;
 import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
-import org.catacombae.hfs.types.hfsplus.JournalInfoBlock;
 import org.catacombae.hfs.HFSVolume;
 import org.catacombae.hfs.Journal;
-import org.catacombae.hfs.plus.HFSPlusVolume;
 
 /**
  * A window that queries a HFSish file system about its volume properties and displays them
