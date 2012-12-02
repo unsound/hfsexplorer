@@ -220,7 +220,7 @@ public class AttributesInfoPanel extends javax.swing.JPanel {
         });
     }
 
-    public void expandNode(DefaultMutableTreeNode dmtn, CommonBTNode node,
+    private void expandNode(DefaultMutableTreeNode dmtn, CommonBTNode node,
             AttributesFile attributesFile)
     {
         if(node instanceof CommonHFSAttributesIndexNode) {
