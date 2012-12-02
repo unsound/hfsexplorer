@@ -37,6 +37,7 @@ import javax.swing.tree.TreePath;
 import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.Dictionary;
+import org.catacombae.hfs.AttributesFile;
 import org.catacombae.hfsexplorer.FileSystemBrowser.NoLeafMutableTreeNode;
 import org.catacombae.hfsexplorer.io.JTextAreaOutputStream;
 import org.catacombae.hfs.types.hfscommon.CommonHFSAttributesIndexNode;
@@ -46,7 +47,6 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSAttributesLeafRecord;
 import org.catacombae.hfs.types.hfscommon.CommonBTIndexRecord;
 import org.catacombae.hfs.types.hfscommon.CommonBTNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor;
-import org.catacombae.hfs.HFSVolume;
 
 /**
  *
@@ -57,7 +57,7 @@ public class AttributesInfoPanel extends javax.swing.JPanel {
     private static final int UNIT_INCREMENT = 10;
 
     /** Creates new form CatalogInfoPanel */
-    public AttributesInfoPanel(final HFSVolume fsView) {
+    public AttributesInfoPanel(final AttributesFile attributesFile) {
 
         initComponents();
 
@@ -67,7 +67,7 @@ public class AttributesInfoPanel extends javax.swing.JPanel {
          * What we need is a method that gets us the children of the "current" node.
          * A B-tree starts with a header node,
          */
-        CommonBTNode iNode = fsView.getAttributesFile().getRootNode(); // Get root index node.
+        CommonBTNode iNode = attributesFile.getRootNode(); // Get root index node.
 
         if(iNode == null) {
             DefaultTreeModel model = new DefaultTreeModel(new NoLeafMutableTreeNode("<empty>"));
@@ -76,7 +76,7 @@ public class AttributesInfoPanel extends javax.swing.JPanel {
         }
 
         DefaultMutableTreeNode rootNode = new NoLeafMutableTreeNode(new BTNodeStorage(iNode, "Attributes root"));
-        expandNode(rootNode, iNode, fsView);
+        expandNode(rootNode, iNode, attributesFile);
 
         DefaultTreeModel model = new DefaultTreeModel(rootNode);
         dirTree.setModel(model);
@@ -94,7 +94,7 @@ public class AttributesInfoPanel extends javax.swing.JPanel {
                     Object obj2 = dmtn.getUserObject();
                     if(obj2 instanceof BTNodeStorage) {
                         CommonBTNode node = ((BTNodeStorage) obj2).getNode();
-                        expandNode(dmtn, node, fsView);
+                        expandNode(dmtn, node, attributesFile);
                     }
                     else
                         throw new RuntimeException("Wrong user object type in expandable node!");
@@ -220,13 +220,15 @@ public class AttributesInfoPanel extends javax.swing.JPanel {
         });
     }
 
-    public void expandNode(DefaultMutableTreeNode dmtn, CommonBTNode node, HFSVolume fsView) {
+    public void expandNode(DefaultMutableTreeNode dmtn, CommonBTNode node,
+            AttributesFile attributesFile)
+    {
         if(node instanceof CommonHFSAttributesIndexNode) {
             List<CommonBTIndexRecord<CommonHFSAttributesKey>> recs =
                     ((CommonHFSAttributesIndexNode) node).getBTRecords();
             for(CommonBTIndexRecord<CommonHFSAttributesKey> rec : recs) {
 
-                CommonBTNode curNode = fsView.getAttributesFile().getNode(rec.getIndex());
+                CommonBTNode curNode = attributesFile.getNode(rec.getIndex());
                 CommonHFSAttributesKey key = rec.getKey();
                 dmtn.add(new NoLeafMutableTreeNode(new BTNodeStorage(curNode,
                         key.getFileID().toLong() + ":" + key.getAttrNameLen() +
