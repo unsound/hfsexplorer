@@ -23,15 +23,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import org.catacombae.hfs.AttributesFile;
+import org.catacombae.hfs.HFSVolume;
+import org.catacombae.hfs.Journal;
+import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.hfsexplorer.gui.AttributesInfoPanel;
 import org.catacombae.hfsexplorer.gui.CatalogInfoPanel;
 import org.catacombae.hfsexplorer.gui.ExtentsInfoPanel;
+import org.catacombae.hfsexplorer.gui.HFSPlusVolumeInfoPanel;
 import org.catacombae.hfsexplorer.gui.JournalInfoPanel;
 import org.catacombae.hfsexplorer.gui.StructViewPanel;
-import org.catacombae.hfsexplorer.gui.HFSPlusVolumeInfoPanel;
-import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
-import org.catacombae.hfs.HFSVolume;
-import org.catacombae.hfs.Journal;
 
 /**
  * A window that queries a HFSish file system about its volume properties and displays them
