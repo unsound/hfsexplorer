@@ -33,7 +33,13 @@ public class InternalStructViewPanel extends javax.swing.JPanel {
 
     /** Creates new form StructViewPanel */
     public InternalStructViewPanel(String label, Dictionary dict) {
-        this(label);
+        this(label, null, dict);
+    }
+
+    public InternalStructViewPanel(String label, String tooltip,
+            Dictionary dict)
+    {
+        this(label, tooltip);
 
         String[] keys = dict.getKeys();
         JPanel[] subPanels = new JPanel[keys.length];
@@ -58,7 +64,11 @@ public class InternalStructViewPanel extends javax.swing.JPanel {
     }
 
     public InternalStructViewPanel(String label, Array array) {
-        this(label);
+        this(label, null, array);
+    }
+
+    public InternalStructViewPanel(String label, String tooltip, Array array) {
+        this(label, tooltip);
 
         StructElement[] elems = array.getElements();
         JPanel[] subPanels = new JPanel[elems.length];
@@ -75,10 +85,13 @@ public class InternalStructViewPanel extends javax.swing.JPanel {
             fieldsPanel.add(subPanel);
     }
 
-    private InternalStructViewPanel(String label) {
+    private InternalStructViewPanel(String label, String tooltip) {
         initComponents();
 
         structNameLabel.setText(label);
+        if(tooltip != null) {
+            structNameLabel.setToolTipText(tooltip);
+        }
     }
 
     private static JPanel createPanel(String label, StructElement elem) {
