@@ -88,7 +88,7 @@ public class JournalInfoPanel extends JPanel {
         try {
             Transaction[] transactions = journal.getPendingTransactions();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            PrintStream ps = new PrintStream(baos);
+            PrintStream ps = new PrintStream(baos, false, "UTF-8");
 
             for(int i = 0; i < transactions.length; ++i) {
                 final Transaction t = transactions[i];
@@ -103,7 +103,7 @@ public class JournalInfoPanel extends JPanel {
             ps.close();
 
             JTextArea transactionsTextArea =
-                    new JTextArea(new String(baos.toByteArray()));
+                    new JTextArea(new String(baos.toByteArray(), "UTF-8"));
 
             baos.close();
 
