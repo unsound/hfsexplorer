@@ -187,7 +187,7 @@ public class JournalHeader implements StaticStruct, PrintableStruct,
     }
 
     public Dictionary getStructElements() {
-        DictionaryBuilder db = new DictionaryBuilder("JournalInfoBlock",
+        DictionaryBuilder db = new DictionaryBuilder("JournalHeader",
                 "Header for the journal data, describing what region of data " +
                 "is valid and other properties.");
 
