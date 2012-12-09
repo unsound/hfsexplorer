@@ -30,9 +30,20 @@ public class StructViewPanel extends javax.swing.JPanel {
         this();
         containerPanel.add(new InternalStructViewPanel(label, dict));
     }
+
+    public StructViewPanel(String label, String tooltip, Dictionary dict) {
+        this();
+        containerPanel.add(new InternalStructViewPanel(label, tooltip, dict));
+    }
+
     public StructViewPanel(String label, Array array) {
         this();
         containerPanel.add(new InternalStructViewPanel(label, array));
+    }
+
+    public StructViewPanel(String label, String tooltip, Array array) {
+        this();
+        containerPanel.add(new InternalStructViewPanel(label, tooltip, array));
     }
 
     /** Creates new form StructViewPanel */

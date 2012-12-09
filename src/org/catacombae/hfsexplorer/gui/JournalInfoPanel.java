@@ -30,6 +30,7 @@ import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import org.catacombae.hfs.Journal;
 import org.catacombae.hfs.Journal.Transaction;
+import org.catacombae.hfs.types.hfsplus.JournalHeader;
 
 public class JournalInfoPanel extends JPanel {
     private JTabbedPane tabbedPane;
@@ -79,9 +80,11 @@ public class JournalInfoPanel extends JPanel {
 
         infoBlockPanel.setFields(journal.getJournalInfoBlock());
 
+        final JournalHeader journalHeader = journal.getJournalHeader();
         journalHeaderPanel =
                 new StructViewPanel("Journal header",
-                journal.getJournalHeader().getStructElements());
+                (journalHeader.isLittleEndian() ? "Little" : "Big") +
+                "-endian fields", journalHeader.getStructElements());
         tabbedPane.insertTab("Header", null, journalHeaderPanel, "The " +
                 "journal header, describing the data inside the journal.", 1);
 
