@@ -104,6 +104,9 @@ public class JournalInfoPanel extends JPanel {
 
             JTextArea transactionsTextArea =
                     new JTextArea(new String(baos.toByteArray()));
+
+            baos.close();
+
             transactionsTextArea.setEditable(false);
             journalContentsPanel = new JScrollPane(transactionsTextArea);
             tabbedPane.insertTab("Transactions", null, journalContentsPanel,
