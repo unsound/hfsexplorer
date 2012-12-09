@@ -131,8 +131,8 @@ public class JournalInfoBlock implements StaticStruct, PrintableStruct,
 
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder("JournalInfoBlock",
-                "Header for the journal data, describing what region of data " +
-                "is valid and other properties.");
+                "Journal info block, describing the location and size of the " +
+                "journal.");
 
        try {
             db.addUIntBE("flags", getPrivateField("flags"), this, null, null,
