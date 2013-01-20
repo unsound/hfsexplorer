@@ -60,8 +60,6 @@ public class MasterBootRecord {
     protected final MBRPartition[] partitions = new MBRPartition[4];
     protected final byte[] mbrSignature = new byte[2];
 
-    private final LinkedList<Partition> tempList = new LinkedList<Partition>(); // getUsedPartitionEntries()
-
     /** <code>data</code> is assumed to be at least (<code>offset</code>+512) bytes in length. */
     public MasterBootRecord(byte[] data, int offset, int sectorSize) {
 	System.arraycopy(data, offset+0, reserved1, 0, reserved1.length);
@@ -171,6 +169,9 @@ public class MasterBootRecord {
     }
 
     public MBRPartition[] getUsedPartitionEntries() {
+        final LinkedList<MBRPartition> tempList =
+                new LinkedList<MBRPartition>();
+
 	tempList.clear();
 	for(MBRPartition mp : getPartitions()) {
 	    if(mp.isUsed()) tempList.addLast(mp);
