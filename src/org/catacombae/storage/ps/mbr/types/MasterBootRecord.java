@@ -158,11 +158,11 @@ public class MasterBootRecord {
 	return num;
     }
 
-    public Partition[] getPartitionEntries() {
+    public MBRPartition[] getPartitionEntries() {
 	return getPartitions();
     }
 
-    public Partition getPartitionEntry(int index) {
+    public MBRPartition getPartitionEntry(int index) {
 	MBRPartition p = partitions[index];
 	if(p.isValid())
 	    return p;
@@ -170,13 +170,13 @@ public class MasterBootRecord {
 	    throw new ArrayIndexOutOfBoundsException(index);
     }
 
-    public Partition[] getUsedPartitionEntries() {
+    public MBRPartition[] getUsedPartitionEntries() {
 	tempList.clear();
 	for(MBRPartition mp : getPartitions()) {
 	    if(mp.isUsed()) tempList.addLast(mp);
 	    //else break; // we don't check the later ones
 	}
-	return tempList.toArray(new Partition[tempList.size()]);
+        return tempList.toArray(new MBRPartition[tempList.size()]);
     }
 
 
