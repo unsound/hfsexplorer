@@ -637,7 +637,11 @@ public class FileSystemBrowser<A> {
      */
     private void actionGetInfo() {
         if(ensureFileSystemLoaded()) {
-            controller.actionGetInfo(getSelectionParentPath(), getSelection());
+            final List<Record<A>> selection = getSelection();
+
+            if(selection != null) {
+                controller.actionGetInfo(getSelectionParentPath(), selection);
+            }
         }
     }
 
@@ -983,8 +987,13 @@ public class FileSystemBrowser<A> {
         final List<Record<A>> result;
         if(dirTreeLastFocus >= fileTableLastFocus) {
             Record<A> treeSelection = getTreeSelection();
-            result = new ArrayList<Record<A>>(1);
-            result.add(treeSelection);
+            if(treeSelection != null) {
+                result = new ArrayList<Record<A>>(1);
+                result.add(treeSelection);
+            }
+            else {
+                result = null;
+            }
         }
         else {
             result = getTableSelection();
