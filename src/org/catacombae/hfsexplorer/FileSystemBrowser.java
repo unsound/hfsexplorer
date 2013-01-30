@@ -981,7 +981,7 @@ public class FileSystemBrowser<A> {
      */
     public List<Record<A>> getSelection() {
         final List<Record<A>> result;
-        if(dirTreeLastFocus > fileTableLastFocus) {
+        if(dirTreeLastFocus >= fileTableLastFocus) {
             Record<A> treeSelection = getTreeSelection();
             result = new ArrayList<Record<A>>(1);
             result.add(treeSelection);
@@ -993,7 +993,7 @@ public class FileSystemBrowser<A> {
     }
 
     public List<Record<A>> getSelectionParentPath() {
-        if(dirTreeLastFocus > fileTableLastFocus)
+        if(dirTreeLastFocus >= fileTableLastFocus)
             return getRecordPath(lastTreeSelectionPath.getParentPath());
         else
             return getRecordPath(lastTreeSelectionPath);
