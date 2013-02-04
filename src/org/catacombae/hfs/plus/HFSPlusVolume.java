@@ -63,6 +63,10 @@ import org.catacombae.util.Util;
 public class HFSPlusVolume extends HFSVolume {
     private static final CommonHFSCatalogString EMPTY_STRING =
             CommonHFSCatalogString.createHFSPlus(new HFSUniStr255(""));
+    private static final BTreeOperations btreeOperations =
+            new HFSPlusBTreeOperations();
+    private static final ExtentsOverflowOperations extentsOverflowOperations =
+            new HFSPlusExtentsOverflowOperations();
 
     private final HFSPlusAllocationFile allocationFile;
     private final HFSPlusJournal journal;
@@ -77,9 +81,8 @@ public class HFSPlusVolume extends HFSVolume {
     protected HFSPlusVolume(ReadableRandomAccessStream hfsFile,
             boolean cachingEnabled, CatalogOperations catalogOperations) {
 
-        super(hfsFile, cachingEnabled, new HFSPlusBTreeOperations(),
-                catalogOperations,
-                new HFSPlusExtentsOverflowOperations());
+        super(hfsFile, cachingEnabled, btreeOperations, catalogOperations,
+                extentsOverflowOperations);
 
         this.allocationFile = createAllocationFile();
         this.journal = new HFSPlusJournal(this);
