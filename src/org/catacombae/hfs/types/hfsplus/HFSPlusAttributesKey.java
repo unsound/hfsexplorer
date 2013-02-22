@@ -178,7 +178,7 @@ public class HFSPlusAttributesKey extends BTKey
                     "bytes");
             db.addUIntBE("pad", padField, this, "Padding",
                     IntegerFieldRepresentation.HEXADECIMAL);
-            db.add("fileID", this.fileID.getStructElements(), "File ID");
+            db.add("fileID", this.fileID.getOpaqueStructElement(), "File ID");
             db.addUIntBE("startBlock", startBlockField, this,
                     "Start block number");
             db.addUIntBE("attrNameLen", attrNameLenField, this,
