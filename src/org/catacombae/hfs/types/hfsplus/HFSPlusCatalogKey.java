@@ -118,7 +118,7 @@ public class HFSPlusCatalogKey extends BTKey implements DynamicStruct, StructEle
         DictionaryBuilder db = new DictionaryBuilder(HFSPlusCatalogKey.class.getSimpleName());
 
         db.addUIntBE("keyLength", keyLength);
-        db.add("parentID", parentID.getStructElements());
+        db.add("parentID", parentID.getOpaqueStructElement());
         db.add("nodeName", nodeName.getStructElements());
 
         return db.getResult();

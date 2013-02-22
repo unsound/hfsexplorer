@@ -181,7 +181,7 @@ public class HFSPlusCatalogFolder extends HFSPlusCatalogLeafRecordData implement
         db.addUIntBE("recordType", recordType);
         db.addUIntBE("flags", flags);
         db.addUIntBE("valence", valence);
-        db.add("folderID", folderID.getStructElements());
+        db.add("folderID", folderID.getOpaqueStructElement());
         db.add("createDate", new HFSPlusDateField(createDate, false));
         db.add("contentModDate", new HFSPlusDateField(contentModDate, false));
         db.add("attributeModDate", new HFSPlusDateField(attributeModDate, false));

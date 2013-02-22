@@ -138,7 +138,7 @@ public class HFSPlusExtentKey extends BTKey implements StructElements {
         db.addUIntBE("keyLength", keyLength, "Key length", "bytes");
         db.addUIntBE("forkType", forkType, "Fork type");
         db.addUIntBE("pad", pad, "Padding", IntegerFieldRepresentation.HEXADECIMAL);
-        db.add("fileID", fileID.getStructElements(), "File ID");
+        db.add("fileID", fileID.getOpaqueStructElement(), "File ID");
         db.addUIntBE("startBlock", startBlock, "Start block number");
 
         return db.getResult();

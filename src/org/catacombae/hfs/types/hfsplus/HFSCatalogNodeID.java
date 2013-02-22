@@ -21,8 +21,12 @@ import org.catacombae.util.Util;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import org.catacombae.csjc.PrintableStruct;
-import org.catacombae.csjc.StructElements;
-import org.catacombae.csjc.structelements.Dictionary;
+import org.catacombae.csjc.structelements.Endianness;
+import org.catacombae.csjc.structelements.IntegerField;
+import org.catacombae.csjc.structelements.IntegerFieldBits;
+import org.catacombae.csjc.structelements.IntegerFieldRepresentation;
+import org.catacombae.csjc.structelements.Signedness;
+import org.catacombae.csjc.structelements.StructElement;
 
 /**
  * This struct is a representation of the C typedef HFSCatalogNodeID present in
@@ -31,7 +35,7 @@ import org.catacombae.csjc.structelements.Dictionary;
  *
  * @author Erik Larsson
  */
-public class HFSCatalogNodeID implements StructElements, PrintableStruct {
+public class HFSCatalogNodeID implements PrintableStruct {
     /*
      * HFSCatalogNodeID (typedef UInt32)
      * size: 4 bytes
@@ -224,12 +228,12 @@ public class HFSCatalogNodeID implements StructElements, PrintableStruct {
     /**
      * {@inheritDoc}
      */
-    public Dictionary getStructElements() {
+    public StructElement getOpaqueStructElement() {
         try {
-            DictionaryBuilder db = new DictionaryBuilder(HFSCatalogNodeID.class.getSimpleName());
-            db.addInt("hfsCatalogNodeID", getPrivateField("hfsCatalogNodeID"), this, UNSIGNED, BIG_ENDIAN, null, null, DECIMAL);
-
-            return db.getResult();
+            return new IntegerField(this, getPrivateField("hfsCatalogNodeID"),
+                    0, IntegerFieldBits.BITS_32, Signedness.UNSIGNED,
+                    Endianness.BIG_ENDIAN, IntegerFieldRepresentation.DECIMAL,
+                    null);
         } catch(NoSuchFieldException e) {
             throw new RuntimeException(e);
         }

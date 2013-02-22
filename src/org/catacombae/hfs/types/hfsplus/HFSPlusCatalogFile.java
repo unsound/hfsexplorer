@@ -126,7 +126,7 @@ public class HFSPlusCatalogFile extends HFSPlusCatalogLeafRecordData implements
         db.addFlag("fileLocked", flags, 0);
         db.addFlag("threadExists", flags, 1);
         db.addUIntBE("reserved1", reserved1);
-        db.add("fileID", fileID.getStructElements());
+        db.add("fileID", fileID.getOpaqueStructElement());
         db.add("createDate", new HFSPlusDateField(createDate, false));
         db.add("contentModDate", new HFSPlusDateField(contentModDate, false));
         db.add("attributeModDate", new HFSPlusDateField(attributeModDate, false));

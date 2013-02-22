@@ -100,7 +100,7 @@ public class HFSPlusCatalogThread extends HFSPlusCatalogLeafRecordData implement
 
         db.addUIntBE("recordType", recordType);
         db.addUIntBE("reserved", reserved);
-        db.add("parentID", parentID.getStructElements());
+        db.add("parentID", parentID.getOpaqueStructElement());
         db.add("nodeName", nodeName.getStructElements());
 
         return db.getResult();

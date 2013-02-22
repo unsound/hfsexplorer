@@ -341,7 +341,7 @@ public class HFSPlusVolumeHeader extends MutableStruct implements
         db.addUIntBE("nextAllocation", nextAllocation);
         db.addUIntBE("rsrcClumpSize", rsrcClumpSize);
         db.addUIntBE("dataClumpSize", dataClumpSize);
-        db.add("nextCatalogID", nextCatalogID.getStructElements());
+        db.add("nextCatalogID", nextCatalogID.getOpaqueStructElement());
         db.addUIntBE("writeCount", writeCount);
         db.addUIntBE("encodingsBitmap", encodingsBitmap);
         db.addIntArray("finderInfo", finderInfo, BITS_32, SIGNED, BIG_ENDIAN);
