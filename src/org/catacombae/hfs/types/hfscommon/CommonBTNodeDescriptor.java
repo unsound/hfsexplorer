@@ -83,7 +83,7 @@ public abstract class CommonBTNodeDescriptor implements PrintableStruct {
                 case BTNodeDescriptor.BT_LEAF_NODE:
                     return NodeType.LEAF;
                 default:
-                    throw new RuntimeException("Unknown node type: " + b);
+                    throw new RuntimeException("Unknown HFS+ node type: " + b);
             }
         }
 
@@ -138,7 +138,7 @@ public abstract class CommonBTNodeDescriptor implements PrintableStruct {
                 case NodeDescriptor.ndLeafNode:
                     return NodeType.LEAF;
                 default:
-                    throw new RuntimeException("Unknown node type: " + b);
+                    throw new RuntimeException("Unknown HFS node type: " + b);
             }
         }
 
