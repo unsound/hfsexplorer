@@ -89,7 +89,7 @@ public class BTNodeDescriptor implements PrintableStruct {
 	else if(kind == BT_MAP_NODE)
 	    result = "kBTMapNode";
 	else
-	    result = "UNKNOWN!";
+	    result = "UNKNOWN (kind: " + kind + ")!";
 	return result;
     }
 
