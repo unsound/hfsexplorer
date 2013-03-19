@@ -36,10 +36,10 @@ public class BTNodeDescriptor implements PrintableStruct {
      * 12   2     UInt16            reserved
      */
 
-    public static final int BT_LEAF_NODE = -1;
-    public static final int BT_INDEX_NODE = 0;
-    public static final int BT_HEADER_NODE = 1;
-    public static final int BT_MAP_NODE = 2;
+    public static final byte BT_LEAF_NODE = -1;
+    public static final byte BT_INDEX_NODE = 0;
+    public static final byte BT_HEADER_NODE = 1;
+    public static final byte BT_MAP_NODE = 2;
 
     private static final int STRUCTSIZE = 14;
 
