@@ -93,7 +93,7 @@ public abstract class CommonHFSCatalogLeafRecord extends CommonBTRecord implemen
                 recordData = new HFSPlusCatalogThread(data, offset + key.length());
                 break;
             default:
-                throw new RuntimeException("Ivalid record type!");
+                throw new RuntimeException("Invalid record type!");
         }
         return create(key, recordData);
     }
@@ -119,7 +119,7 @@ public abstract class CommonHFSCatalogLeafRecord extends CommonBTRecord implemen
                 recordData = new HFSPlusCatalogThread(data, offset + key.length());
                 break;
             default:
-                throw new RuntimeException("Ivalid record type!");
+                throw new RuntimeException("Invalid record type!");
         }
         return create(key, recordData);
     }
