@@ -149,14 +149,20 @@ public class IntegerField extends StringRepresentableField {
             BigInteger bi = new BigInteger(value);
             byte[] ba = bi.toByteArray();
             if(signedness == Signedness.SIGNED && ba.length != bits.getBytes())
-                throw new RuntimeException("UNEXPECTED: ba.length (" + ba.length + ") != bits.getBytes()(" + bits.getBytes() + ")");
+                throw new RuntimeException("UNEXPECTED: ba.length (" +
+                        ba.length + ") != bits.getBytes()(" + bits.getBytes() +
+                        ")");
             if(signedness == Signedness.UNSIGNED && ba.length != (bits.getBytes() + 1))
-                throw new RuntimeException("UNEXPECTED: ba.length (" + ba.length + ") != bits.getBytes()+1(" + bits.getBytes() + "+1=" + (bits.getBytes() + 1) + ")");
+                throw new RuntimeException("UNEXPECTED: ba.length (" +
+                        ba.length + ") != bits.getBytes()+1(" +
+                        bits.getBytes() + "+1=" + (bits.getBytes() + 1) + ")");
             byte[] trueContents;
             if(endianness == Endianness.LITTLE_ENDIAN)
-                trueContents = Util.createReverseCopy(ba, ba.length - bits.getBytes(), bits.getBytes());
+                trueContents = Util.createReverseCopy(ba,
+                        ba.length - bits.getBytes(), bits.getBytes());
             else if(endianness == Endianness.BIG_ENDIAN)
-                trueContents = Util.createCopy(ba, ba.length - bits.getBytes(), bits.getBytes());
+                trueContents = Util.createCopy(ba, ba.length - bits.getBytes(),
+                        bits.getBytes());
             else
                 throw new RuntimeException("Illegal endianness value: " + endianness);
             System.arraycopy(trueContents, 0, fieldData, offset, bits.getBytes());
