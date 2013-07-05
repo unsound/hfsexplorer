@@ -1284,6 +1284,7 @@ public class FileSystemBrowser<A> {
         System.err.println("setCurrentDirectory(): selecting the following path in tree:");
         for(Object o : treePath.getPath())
             System.err.print(" \"" + o.toString() + "\"");
+        System.err.println();
 
         selectInTree(treePath);
     }
