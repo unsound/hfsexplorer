@@ -109,8 +109,48 @@ public class HFSPlusCatalogFile extends HFSPlusCatalogLeafRecordData implements
     public HFSPlusForkData getDataFork() { return dataFork; }
     public HFSPlusForkData getResourceFork() { return resourceFork; }
 
-    public boolean getFileLockedFlag() { return (getFlags() & 0x1) != 0; }
-    public boolean getThreadExistsFlag() { return (getFlags() & 0x2) != 0; }
+    /** File is locked and cannot be written to. */
+    public boolean getFileLockedFlag() {
+        return (getFlags() & kHFSFileLockedMask) != 0;
+    }
+
+    /** A file thread record exists for this file. */
+    public boolean getThreadExistsFlag() {
+        return (getFlags() & kHFSThreadExistsMask) != 0;
+    }
+
+    /** Object has extended attributes. */
+    public boolean getHasAttributesFlag() {
+        return (getFlags() & kHFSHasAttributesMask) != 0;
+    }
+
+    /** Object has security data (ACLs). */
+    public boolean getHasSecurityMaskFlag() {
+        return (getFlags() & kHFSHasSecurityMask) != 0;
+    }
+
+    /**
+     * Only for HFSX, folder maintains a separate sub-folder count (sum of
+     * folder records and directory hard links).
+     */
+    public boolean getHasFolderCountFlag() {
+        return (getFlags() & kHFSHasFolderCountMask) != 0;
+    }
+
+    /** Has hardlink chain (inode or link). */
+    public boolean getHasLinkChainFlag() {
+        return (getFlags() & kHFSHasLinkChainMask) != 0;
+    }
+
+    /** Folder has a child that's a dir link. */
+    public boolean getHasChildLinkFlag() {
+        return (getFlags() & kHFSHasChildLinkMask) != 0;
+    }
+
+    /** File/Folder has the date-added stored in the finder info. */
+    public boolean getHasDateAddedFlag() {
+        return (getFlags() & kHFSHasDateAddedMask) != 0;
+    }
 
     public Date getCreateDateAsDate() { return HFSPlusDate.gmtTimestampToDate(getCreateDate()); }
     public Date getContentModDateAsDate() { return HFSPlusDate.gmtTimestampToDate(getContentModDate()); }
@@ -123,8 +163,14 @@ public class HFSPlusCatalogFile extends HFSPlusCatalogLeafRecordData implements
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(HFSPlusCatalogFile.class.getSimpleName());
 
-        db.addFlag("fileLocked", flags, 0);
-        db.addFlag("threadExists", flags, 1);
+        db.addFlag("fileLocked", flags, kHFSFileLockedBit);
+        db.addFlag("threadExists", flags, kHFSThreadExistsBit);
+        db.addFlag("hasAttributes", flags, kHFSHasAttributesBit);
+        db.addFlag("hasSecurity", flags, kHFSHasSecurityBit);
+        db.addFlag("hasFolderCount", flags, kHFSHasFolderCountBit);
+        db.addFlag("hasLinkChain", flags, kHFSHasLinkChainBit);
+        db.addFlag("hasChildLink", flags, kHFSHasChildLinkBit);
+        db.addFlag("hasDateAdded", flags, kHFSHasDateAddedBit);
         db.addUIntBE("reserved1", reserved1);
         db.add("fileID", fileID.getOpaqueStructElement());
         db.add("createDate", new HFSPlusDateField(createDate, false));

@@ -99,6 +99,49 @@ public class HFSPlusCatalogFolder extends HFSPlusCatalogLeafRecordData implement
     public int getTextEncoding() { return Util.readIntBE(textEncoding); }
     public int getReserved() { return Util.readIntBE(reserved); }
 
+    /** File is locked and cannot be written to. */
+    public boolean getFileLockedFlag() {
+        return (getFlags() & kHFSFileLockedMask) != 0;
+    }
+
+    /** A file thread record exists for this file. */
+    public boolean getThreadExistsFlag() {
+        return (getFlags() & kHFSThreadExistsMask) != 0;
+    }
+
+    /** Object has extended attributes. */
+    public boolean getHasAttributesFlag() {
+        return (getFlags() & kHFSHasAttributesMask) != 0;
+    }
+
+    /** Object has security data (ACLs). */
+    public boolean getHasSecurityMaskFlag() {
+        return (getFlags() & kHFSHasSecurityMask) != 0;
+    }
+
+    /**
+     * Only for HFSX, folder maintains a separate sub-folder count (sum of
+     * folder records and directory hard links).
+     */
+    public boolean getHasFolderCountFlag() {
+        return (getFlags() & kHFSHasFolderCountMask) != 0;
+    }
+
+    /** Has hardlink chain (inode or link). */
+    public boolean getHasLinkChainFlag() {
+        return (getFlags() & kHFSHasLinkChainMask) != 0;
+    }
+
+    /** Folder has a child that's a dir link. */
+    public boolean getHasChildLinkFlag() {
+        return (getFlags() & kHFSHasChildLinkMask) != 0;
+    }
+
+    /** File/Folder has the date-added stored in the finder info. */
+    public boolean getHasDateAddedFlag() {
+        return (getFlags() & kHFSHasDateAddedMask) != 0;
+    }
+
     public Date getCreateDateAsDate() { return HFSPlusDate.gmtTimestampToDate(getCreateDate()); }
     public Date getContentModDateAsDate() { return HFSPlusDate.gmtTimestampToDate(getContentModDate()); }
     public Date getAttributeModDateAsDate() { return HFSPlusDate.gmtTimestampToDate(getAttributeModDate()); }
@@ -180,6 +223,14 @@ public class HFSPlusCatalogFolder extends HFSPlusCatalogLeafRecordData implement
          */
         db.addUIntBE("recordType", recordType);
         db.addUIntBE("flags", flags);
+        db.addFlag("fileLocked", flags, kHFSFileLockedBit);
+        db.addFlag("threadExists", flags, kHFSThreadExistsBit);
+        db.addFlag("hasAttributes", flags, kHFSHasAttributesBit);
+        db.addFlag("hasSecurity", flags, kHFSHasSecurityBit);
+        db.addFlag("hasFolderCount", flags, kHFSHasFolderCountBit);
+        db.addFlag("hasLinkChain", flags, kHFSHasLinkChainBit);
+        db.addFlag("hasChildLink", flags, kHFSHasChildLinkBit);
+        db.addFlag("hasDateAdded", flags, kHFSHasDateAddedBit);
         db.addUIntBE("valence", valence);
         db.add("folderID", folderID.getOpaqueStructElement());
         db.add("createDate", new HFSPlusDateField(createDate, false));
