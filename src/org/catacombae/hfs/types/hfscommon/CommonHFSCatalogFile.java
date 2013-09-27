@@ -199,7 +199,9 @@ public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCat
         public boolean isHardDirectoryLink() {
             int fileType = data.getUserInfo().getFileType().getOSType().getFourCharCode();
             int creator = data.getUserInfo().getFileCreator().getOSType().getFourCharCode();
-            return fileType == HARD_DIRECTORY_LINK_FILE_TYPE && creator == HARD_DIRECTORY_LINK_CREATOR;
+            return fileType == HARD_DIRECTORY_LINK_FILE_TYPE &&
+                    creator == HARD_DIRECTORY_LINK_CREATOR &&
+                    data.getHasLinkChainFlag();
         }
 
         @Override
