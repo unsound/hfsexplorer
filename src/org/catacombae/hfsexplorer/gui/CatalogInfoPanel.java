@@ -88,7 +88,9 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
             return;
         }
 
-        DefaultMutableTreeNode rootNode = new NoLeafMutableTreeNode(new BTNodeStorage(iNode, "Catalog root"));
+        DefaultMutableTreeNode rootNode =
+                new NoLeafMutableTreeNode(new BTNodeStorage(fsView.
+                getCatalogFile().getRootNodeNumber(), iNode, "Catalog root"));
         expandNode(rootNode, iNode, fsView);
 
         DefaultTreeModel model = new DefaultTreeModel(rootNode);
@@ -178,16 +180,22 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
                 if(o instanceof DefaultMutableTreeNode) {
                     Object o2 = ((DefaultMutableTreeNode) o).getUserObject();
                     if(o2 instanceof BTNodeStorage) {
-                        CommonBTNode btn = ((BTNodeStorage) o2).getNode();
+                        final BTNodeStorage nodeStorage = (BTNodeStorage) o2;
+                        final CommonBTNode btn = nodeStorage.getNode();
                         CommonBTNodeDescriptor btnd = btn.getNodeDescriptor();
                         switch(btnd.getNodeType()) {
                             case INDEX:
-                                indexNodeLabel.setText("Index node with " +
-                                        btnd.getNumberOfRecords() + " records.");
+                                indexNodeLabel.setText("Index node " +
+                                        nodeStorage.getNodeNumber() + " " +
+                                        "with " +
+                                        btnd.getNumberOfRecords() + " " +
+                                        "records.");
                                 break;
                             case LEAF:
-                                indexNodeLabel.setText("Leaf node with " +
-                                        btnd.getNumberOfRecords() + " records.");
+                                indexNodeLabel.setText("Leaf node " +
+                                        nodeStorage.getNodeNumber() + " with " +
+                                        btnd.getNumberOfRecords() + " " +
+                                        "records.");
                                 break;
                             default:
                                 indexNodeLabel.setText("Unknown error!");
@@ -268,9 +276,12 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
             List<CommonBTIndexRecord<CommonHFSCatalogKey>> recs = ((CommonHFSCatalogIndexNode) node).getBTRecords();
             for(CommonBTIndexRecord<CommonHFSCatalogKey> rec : recs) {
 
-                CommonBTNode curNode = fsView.getCatalogFile().getCatalogNode(rec.getIndex());
+                final long nodeNumber = rec.getIndex();
+                final CommonBTNode curNode =
+                        fsView.getCatalogFile().getCatalogNode(nodeNumber);
                 CommonHFSCatalogKey key = rec.getKey();
-                dmtn.add(new NoLeafMutableTreeNode(new BTNodeStorage(curNode,
+                dmtn.add(new NoLeafMutableTreeNode(new BTNodeStorage(nodeNumber,
+                        curNode,
                         key.getParentID().toLong() + ":" + fsView.decodeString(key.getNodeName()))));
             }
         }
@@ -287,12 +298,18 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
 
     private static class BTNodeStorage {
 
+        private long nodeNumber;
         private CommonBTNode node;
         private String text;
 
-        public BTNodeStorage(CommonBTNode node, String text) {
+        public BTNodeStorage(long nodeNumber, CommonBTNode node, String text) {
+            this.nodeNumber = nodeNumber;
             this.node = node;
             this.text = text;
+        }
+
+        public long getNodeNumber() {
+            return nodeNumber;
         }
 
         public CommonBTNode getNode() {

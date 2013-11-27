@@ -113,6 +113,12 @@ public class CatalogFile extends BTreeFile {
     }
     */
 
+    public long getRootNodeNumber() {
+        CatalogFileSession ses = openSession();
+
+        return ses.bthr.getRootNodeNumber();
+    }
+
     public CommonHFSCatalogFolderRecord getRootFolder() {
         CatalogFileSession ses = openSession();
 
