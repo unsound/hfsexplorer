@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2007 Erik Larsson
+ * Copyright (C) 2007-2013 Erik Larsson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,9 +29,8 @@ import java.util.Comparator;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JTable;
-import javax.swing.RowSorter;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableRowSorter;
+import javax.swing.table.TableModel;
 
 /**
  * This class should encapsulate all of the logic in HFSExplorer that is
@@ -111,19 +110,40 @@ public class Java6Specific {
      */
     public static void addRowSorter(JTable table, DefaultTableModel tableModel,
             int defaultSortColumn, List<Comparator<?>> columnComparators) {
-        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<DefaultTableModel>(tableModel);
-        int i = 0;
-        for(Comparator<?> c : columnComparators) {
-            if(c != null)
-                sorter.setComparator(i, c);
-            ++i;
-        }
-        sorter.toggleSortOrder(defaultSortColumn);
 
         try {
+            final Class<? extends Object> rowSorterClass =
+                Class.forName("javax.swing.RowSorter");
+            final Class<? extends Object> tableRowSorterClass =
+                Class.forName("javax.swing.table.TableRowSorter");
+            final Method tableRowSorterSetComparatorMethod =
+                    tableRowSorterClass.getMethod("setComparator", int.class,
+                    Comparator.class);
+            final Method tableRowSorterToggleSortOrderMethod =
+                    tableRowSorterClass.getMethod("toggleSortOrder", int.class);
+            final Object sorter =
+                    tableRowSorterClass.getConstructor(TableModel.class).
+                    newInstance(tableModel);
+
+            int i = 0;
+            for(Comparator<?> c : columnComparators) {
+                if(c != null) {
+                    tableRowSorterSetComparatorMethod.invoke(sorter, i, c);
+                }
+
+                ++i;
+            }
+
+            tableRowSorterToggleSortOrderMethod.invoke(sorter,
+                    defaultSortColumn);
+
             Class<? extends JTable> c = table.getClass();
-            Method m = c.getMethod("setRowSorter", RowSorter.class);
+            Method m = c.getMethod("setRowSorter", rowSorterClass);
             m.invoke(table, sorter);
+        } catch(ClassNotFoundException ex) {
+            throw new RuntimeException(ex);
+        } catch(InstantiationException ex) {
+            throw new RuntimeException(ex);
         } catch(NoSuchMethodException ex) {
             throw new RuntimeException(ex);
         } catch (IllegalAccessException ex) {
