@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2007 Erik Larsson
+ * Copyright (C) 2007-2013 Erik Larsson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ public class MasterDirectoryBlock implements StructElements {
      * 82   2     UInt16      drNmRtDirs  number of directories in root directory
      * 84   4     UInt32      drFilCnt    number of files in volume
      * 88   4     UInt32      drDirCnt    number of directories in volume
-     * 92   4*8   UInt32[8]   drFndrInfo  information used by the Finder
+     * 92   32    HFSVolumeFinderInfo drFndrInfo information used by the Finder
      * 124  2     UInt16      drVCSize    size (in blocks) of volume cache
      * 126  2     UInt16      drVBMCSize  size (in blocks) of volume bitmap cache
      * 128  2     UInt16      drCtlCSize  size (in blocks) of common volume cache
@@ -93,7 +93,7 @@ public class MasterDirectoryBlock implements StructElements {
     private final byte[] drNmRtDirs = new byte[2];
     private final byte[] drFilCnt = new byte[4];
     private final byte[] drDirCnt = new byte[4];
-    private final byte[] drFndrInfo = new byte[4*8];
+    private final HFSVolumeFinderInfo drFndrInfo;
     private final byte[] drVCSize = new byte[2];
     private final byte[] drVBMCSize = new byte[2];
     private final byte[] drCtlCSize = new byte[2];
@@ -126,7 +126,7 @@ public class MasterDirectoryBlock implements StructElements {
         System.arraycopy(data, offset + 82, drNmRtDirs, 0, 2);
         System.arraycopy(data, offset + 84, drFilCnt, 0, 4);
         System.arraycopy(data, offset + 88, drDirCnt, 0, 4);
-        System.arraycopy(data, offset + 92, drFndrInfo, 0, 4 * 8);
+        drFndrInfo = new HFSVolumeFinderInfo(data, offset + 92);
         System.arraycopy(data, offset + 124, drVCSize, 0, 2);
         System.arraycopy(data, offset + 126, drVBMCSize, 0, 2);
         System.arraycopy(data, offset + 128, drCtlCSize, 0, 2);
@@ -185,7 +185,7 @@ public class MasterDirectoryBlock implements StructElements {
     /** number of directories in volume */
     public int getDrDirCnt() { return Util.readIntBE(drDirCnt); }
     /** information used by the Finder */
-    public int[] getDrFndrInfo() { return Util.readIntArrayBE(drFndrInfo); }
+    public HFSVolumeFinderInfo getDrFndrInfo() { return drFndrInfo; }
     /** size (in blocks) of volume cache */
     public short getDrVCSize() { return Util.readShortBE(drVCSize); }
     /** size (in blocks) of volume bitmap cache */
@@ -229,7 +229,8 @@ public class MasterDirectoryBlock implements StructElements {
         ps.println(prefix + " drNmRtDirs: " + Util.unsign(getDrNmRtDirs()));
         ps.println(prefix + " drFilCnt: " + Util.unsign(getDrFilCnt()));
         ps.println(prefix + " drDirCnt: " + Util.unsign(getDrDirCnt()));
-        ps.println(prefix + " drFndrInfo: int[" + getDrFndrInfo().length + "]");
+        ps.println(prefix + " drFndrInfo:");
+        getDrFndrInfo().printFields(ps, prefix + "  ");
         ps.println(prefix + " drVCSize: " + Util.unsign(getDrVCSize()));
         ps.println(prefix + " drVBMCSize: " + Util.unsign(getDrVBMCSize()));
         ps.println(prefix + " drCtlCSize: " + Util.unsign(getDrCtlCSize()));
@@ -273,7 +274,7 @@ public class MasterDirectoryBlock implements StructElements {
         System.arraycopy(drNmRtDirs, 0, result, offset, drNmRtDirs.length); offset += drNmRtDirs.length;
         System.arraycopy(drFilCnt, 0, result, offset, drFilCnt.length); offset += drFilCnt.length;
         System.arraycopy(drDirCnt, 0, result, offset, drDirCnt.length); offset += drDirCnt.length;
-        System.arraycopy(drFndrInfo, 0, result, offset, drFndrInfo.length); offset += drFndrInfo.length;
+        offset += drFndrInfo.getBytes(result, offset);
         System.arraycopy(drVCSize, 0, result, offset, drVCSize.length); offset += drVCSize.length;
         System.arraycopy(drVBMCSize, 0, result, offset, drVBMCSize.length); offset += drVBMCSize.length;
         System.arraycopy(drCtlCSize, 0, result, offset, drCtlCSize.length); offset += drCtlCSize.length;
@@ -323,7 +324,7 @@ public class MasterDirectoryBlock implements StructElements {
         db.addUIntBE("drNmRtDirs", drNmRtDirs, "Number of directories in root dir");
         db.addUIntBE("drFilCnt", drFilCnt, "Volume file count");
         db.addUIntBE("drDirCnt", drDirCnt, "Volume directory count");
-        db.addIntArray("drFndrInfo", drFndrInfo, BITS_32, UNSIGNED, BIG_ENDIAN, "Finder info", HEXADECIMAL);
+        db.add("drFndrInfo", drFndrInfo.getStructElements(), "Finder info");
         db.addUIntBE("drVCSize", drVCSize, "Volume cache size", "blocks");
         db.addUIntBE("drVBMCSize", drVBMCSize, "Volume bitmap cache size", "blocks");
         db.addUIntBE("drCtlCSize", drCtlCSize, "Common volume cache size", "blocks");

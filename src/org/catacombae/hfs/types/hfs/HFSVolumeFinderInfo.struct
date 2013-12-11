@@ -1,0 +1,9 @@
+struct HFSVolumeFinderInfo {
+    be32 blessedSystemFolder;
+    be32 startupApplicationParentFolder;
+    be32 openFolderList;
+    be32 alternateMacOSBlessedSystemFolder;
+    be32 reserved;
+    be32 alternateMacOSXBlessedSystemFolder;
+    be64 volumeUUID;
+};
