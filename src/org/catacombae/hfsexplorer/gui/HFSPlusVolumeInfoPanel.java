@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2007 Erik Larsson
+ * Copyright (C) 2007-2013 Erik Larsson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ import org.catacombae.util.Util;
 import org.catacombae.hfs.types.hfsplus.HFSPlusVolumeHeader;
 import org.catacombae.hfs.types.hfsplus.HFSPlusForkData;
 import java.text.DateFormat;
+import org.catacombae.hfs.types.hfs.HFSVolumeFinderInfo;
 
 /**
  * A panel for displaying the values in a HFSPlusVolumeHeader in a good looking
@@ -82,15 +83,19 @@ public class HFSPlusVolumeInfoPanel extends javax.swing.JPanel {
 	writeCountField.setText("" + vh.getWriteCount());
 	encodingsBitmapField.setText("0x" +
                 Util.toHexStringBE(vh.getEncodingsBitmap()));
-	int[] finderInfo = vh.getFinderInfo();
-	finderInfo1Field.setText("" + finderInfo[0]);
-	finderInfo2Field.setText("" + finderInfo[1]);
-	finderInfo3Field.setText("" + finderInfo[2]);
-	finderInfo4Field.setText("" + finderInfo[3]);
-	finderInfo5Field.setText("0x" + Util.toHexStringBE(finderInfo[4]));
-	finderInfo6Field.setText("" + finderInfo[5]);
-	finderInfo78Field.setText("0x" + Util.toHexStringBE(finderInfo[6]) +
-                Util.toHexStringBE(finderInfo[7]));
+	HFSVolumeFinderInfo finderInfo = vh.getFinderInfo();
+	finderInfo1Field.setText("" + finderInfo.getBlessedSystemFolder());
+	finderInfo2Field.setText("" +
+                finderInfo.getStartupApplicationParentFolder());
+	finderInfo3Field.setText("" + finderInfo.getOpenFolderList());
+	finderInfo4Field.setText("" +
+                finderInfo.getAlternateMacOSBlessedSystemFolder());
+	finderInfo5Field.setText("0x" +
+                Util.toHexStringBE(finderInfo.getRawReserved()));
+	finderInfo6Field.setText("" +
+                finderInfo.getAlternateMacOSXBlessedSystemFolder());
+	finderInfo78Field.setText("0x" +
+                Util.toHexStringBE(finderInfo.getRawVolumeUUID()));
 
         // Allocation file fields
         HFSPlusForkData allocationFileData = vh.getAllocationFile();

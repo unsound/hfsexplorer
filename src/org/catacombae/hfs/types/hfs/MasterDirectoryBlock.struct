@@ -22,7 +22,7 @@ struct MasterDirectoryBlock {
 	UInt16 		drNmRtDirs; 	number of directories in root directory
 	UInt32 		drFilCnt; 	number of files in volume
 	UInt32 		drDirCnt; 	number of directories in volume
-	UInt32 		drFndrInfo[8]; 	information used by the Finder
+	HFSVolumeFinderInfo drFndrInfo; information used by the Finder
 	UInt16 		drVCSize; 	size (in blocks) of volume cache
 	UInt16 		drVBMCSize; 	size (in blocks) of volume bitmap cache
 	UInt16 		drCtlCSize; 	size (in blocks) of common volume cache

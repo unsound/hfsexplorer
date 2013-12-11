@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2006 Erik Larsson
+ * Copyright (C) 2006-2013 Erik Larsson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.ASCIIStringField;
 import org.catacombae.csjc.structelements.Dictionary;
+import org.catacombae.hfs.types.hfs.HFSVolumeFinderInfo;
 
 public class HFSPlusVolumeHeader extends MutableStruct implements
         PrintableStruct, StructElements
@@ -87,7 +88,7 @@ public class HFSPlusVolumeHeader extends MutableStruct implements
     private final HFSCatalogNodeID nextCatalogID;
     private final byte[] writeCount = new byte[4];
     private final byte[] encodingsBitmap = new byte[8];
-    private final byte[] finderInfo = new byte[4*8];
+    private final HFSVolumeFinderInfo finderInfo;
     private final HFSPlusForkData allocationFile;
     private final HFSPlusForkData extentsFile;
     private final HFSPlusForkData catalogFile;
@@ -127,7 +128,9 @@ public class HFSPlusVolumeHeader extends MutableStruct implements
             new HFSCatalogNodeID(data, offset+64));
 	System.arraycopy(data, offset+68, writeCount, 0, 4);
 	System.arraycopy(data, offset+72, encodingsBitmap, 0, 4);
-	System.arraycopy(data, offset+80, finderInfo, 0, 4*8);
+        finderInfo = (mutable ?
+            new HFSVolumeFinderInfo.Mutable(data, offset+80) :
+            new HFSVolumeFinderInfo(data, offset+80));
 	//System.arraycopy(data, 112, allocationFile, 0, 80);
 	allocationFile = (mutable ?
             new HFSPlusForkData.Mutable(data, offset+112) :
@@ -178,7 +181,7 @@ public class HFSPlusVolumeHeader extends MutableStruct implements
     public HFSCatalogNodeID getNextCatalogID() { return nextCatalogID; } // typedef HFSCatalogNodeID UInt32 0x40
     public int getWriteCount()                 { return Util.readIntBE(writeCount); } // UInt32 0x44
     public long getEncodingsBitmap()           { return Util.readLongBE(encodingsBitmap); } // UInt64 0x48
-    public int[] getFinderInfo()               { return Util.readIntArrayBE(finderInfo); } // UInt32[8] 0x50
+    public HFSVolumeFinderInfo getFinderInfo() { return finderInfo; } // UInt32[8] 0x50
 
     public HFSPlusForkData getAllocationFile() { return allocationFile; } // 0x70
     public HFSPlusForkData getExtentsFile()    { return extentsFile; } // 0xC0
@@ -241,9 +244,8 @@ public class HFSPlusVolumeHeader extends MutableStruct implements
         ps.println(prefix + "encodingsBitmap: " + getEncodingsBitmap());
         ps.println(prefix + "encodingsBitmap (hex): 0x" + Util.toHexStringBE(getEncodingsBitmap()));
 
-        int[] finderInfoInts = getFinderInfo();
-        for(int i = 0; i < finderInfoInts.length; ++i)
-            ps.println(prefix + "finderInfo[" + i + "]: " + finderInfoInts[i]);
+        ps.println(prefix + "finderInfo:");
+        finderInfo.printFields(ps, prefix + "  ");
 
         ps.println(prefix + "allocationFile: ");
         allocationFile.print(ps, prefix + "  ");
@@ -344,7 +346,7 @@ public class HFSPlusVolumeHeader extends MutableStruct implements
         db.add("nextCatalogID", nextCatalogID.getOpaqueStructElement());
         db.addUIntBE("writeCount", writeCount);
         db.addUIntBE("encodingsBitmap", encodingsBitmap);
-        db.addIntArray("finderInfo", finderInfo, BITS_32, SIGNED, BIG_ENDIAN);
+        db.add("finderInfo", finderInfo.getStructElements());
         db.add("allocationFile", allocationFile.getStructElements());
         db.add("extentsFile", extentsFile.getStructElements());
         db.add("catalogFile", catalogFile.getStructElements());
@@ -446,13 +448,12 @@ public class HFSPlusVolumeHeader extends MutableStruct implements
         Util.arrayPutBE(this.encodingsBitmap, 0, (long) encodingsBitmap);
     }
 
-    private void _setFinderInfo(int[] finderInfo) {
-        if(finderInfo.length != 8)
-            throw new RuntimeException("Invalid length of finderInfo array.");
+    private HFSVolumeFinderInfo.Mutable _getMutableFinderInfo() {
+        return (HFSVolumeFinderInfo.Mutable) this.finderInfo;
+    }
 
-        for(int i = 0; i < 8; ++i) {
-            Util.arrayPutBE(this.finderInfo, i*4, (int) finderInfo[i]);
-        }
+    private void _setFinderInfo(HFSVolumeFinderInfo finderInfo) {
+        this._getMutableFinderInfo().set(finderInfo);
     }
 
     private HFSPlusForkData.Mutable _getMutableAllocationFile() {
@@ -516,7 +517,7 @@ public class HFSPlusVolumeHeader extends MutableStruct implements
         this._setNextCatalogID(header.nextCatalogID);
         Util.arrayCopy(header.writeCount, this.writeCount);
         Util.arrayCopy(header.encodingsBitmap, this.encodingsBitmap);
-        Util.arrayCopy(header.finderInfo, this.finderInfo);
+        this._setFinderInfo(header.finderInfo);
         this._setAllocationFile(header.allocationFile);
         this._setExtentsFile(header.extentsFile);
         this._setCatalogFile(header.catalogFile);
@@ -626,7 +627,7 @@ public class HFSPlusVolumeHeader extends MutableStruct implements
             super._setEncodingsBitmap(encodingsBitmap);
         }
 
-        public void setFinderInfo(int[] finderInfo) {
+        public void setFinderInfo(HFSVolumeFinderInfo finderInfo) {
             super._setFinderInfo(finderInfo);
         }
 
