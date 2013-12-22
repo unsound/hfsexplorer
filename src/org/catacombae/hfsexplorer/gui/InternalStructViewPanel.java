@@ -148,9 +148,9 @@ public class InternalStructViewPanel extends javax.swing.JPanel {
             .add(layout.createSequentialGroup()
                 .add(structNameLabel)
                 .addContainerGap())
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .add(fieldsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 342, Short.MAX_VALUE))
+            .add(layout.createSequentialGroup()
+                .add(24, 24, 24)
+                .add(fieldsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
