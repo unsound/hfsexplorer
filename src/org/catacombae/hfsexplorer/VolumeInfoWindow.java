@@ -72,12 +72,32 @@ public class VolumeInfoWindow extends JFrame {
         // The "Catalog file info" tab
 
         try {
+            final JTabbedPane catalogTabs = new JTabbedPane();
+
+            try {
+                StructViewPanel headerRecordPanel =
+                        new StructViewPanel("B-tree header record",
+                        fsView.getCatalogFile().getCatalogHeaderNode().
+                        getHeaderRecord().getStructElements());
+                JScrollPane headerRecordPanelScroller = new JScrollPane(
+                        headerRecordPanel,
+                        JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                        JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                headerRecordPanelScroller.getVerticalScrollBar().
+                        setUnitIncrement(10);
+                catalogTabs.addTab("Header record", headerRecordPanelScroller);
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+
             CatalogInfoPanel catalogInfoPanel = new CatalogInfoPanel(fsView);
             JScrollPane catalogInfoPanelScroller = new JScrollPane(catalogInfoPanel,
                     JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-            tabs.addTab("Catalog file", catalogInfoPanelScroller);
             catalogInfoPanelScroller.getVerticalScrollBar().setUnitIncrement(10);
+            catalogTabs.addTab("Tree", catalogInfoPanelScroller);
+
+            tabs.addTab("Catalog file", catalogTabs);
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -86,12 +106,33 @@ public class VolumeInfoWindow extends JFrame {
         // The "Extents overflow file info" tab
 
         try {
+            final JTabbedPane extentsTabs = new JTabbedPane();
+
+            try {
+                StructViewPanel headerRecordPanel =
+                        new StructViewPanel("B-tree header record",
+                        fsView.getExtentsOverflowFile().
+                        getHeaderNode().getHeaderRecord().
+                        getStructElements());
+                JScrollPane headerRecordPanelScroller = new JScrollPane(
+                        headerRecordPanel,
+                        JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                        JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                headerRecordPanelScroller.getVerticalScrollBar().
+                        setUnitIncrement(10);
+                extentsTabs.addTab("Header record", headerRecordPanelScroller);
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+
             ExtentsInfoPanel extentsInfoPanel = new ExtentsInfoPanel(fsView);
             JScrollPane scroller = new JScrollPane(extentsInfoPanel,
                     JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-            tabs.addTab("Extents overflow file", scroller);
             scroller.getVerticalScrollBar().setUnitIncrement(10);
+            extentsTabs.addTab("Tree", scroller);
+
+            tabs.addTab("Extents overflow file", extentsTabs);
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -103,14 +144,35 @@ public class VolumeInfoWindow extends JFrame {
             final AttributesFile attributesFile = fsView.getAttributesFile();
 
             if(attributesFile != null) {
+                final JTabbedPane attributesTabs = new JTabbedPane();
+
+                try {
+                    StructViewPanel headerRecordPanel =
+                            new StructViewPanel("B-tree header record",
+                            attributesFile.getHeaderNode().getHeaderRecord().
+                            getStructElements());
+                    JScrollPane headerRecordPanelScroller = new JScrollPane(
+                            headerRecordPanel,
+                            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                    headerRecordPanelScroller.getVerticalScrollBar().
+                            setUnitIncrement(10);
+                    attributesTabs.addTab("Header record",
+                            headerRecordPanelScroller);
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+
                 AttributesInfoPanel attributesInfoPanel =
                         new AttributesInfoPanel(fsView.getAttributesFile());
                 JScrollPane scroller = new JScrollPane(attributesInfoPanel,
                         JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                         JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-                tabs.addTab("Attributes file", scroller);
                 scroller.getVerticalScrollBar().setUnitIncrement(10);
-            }
+                attributesTabs.addTab("Tree", scroller);
+
+                tabs.addTab("Attributes file", attributesTabs);
+}
         } catch(Exception e) {
             e.printStackTrace();
         }

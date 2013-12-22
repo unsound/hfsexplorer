@@ -20,8 +20,11 @@ package org.catacombae.hfs.types.hfsplus;
 import org.catacombae.util.Util;
 import java.io.PrintStream;
 import org.catacombae.csjc.PrintableStruct;
+import org.catacombae.csjc.StructElements;
+import org.catacombae.csjc.structelements.Dictionary;
+import org.catacombae.csjc.structelements.IntegerFieldRepresentation;
 
-public class BTHeaderRec implements PrintableStruct {
+public class BTHeaderRec implements PrintableStruct, StructElements {
     /*
      * struct BTHeaderRec
      * size: 106 bytes
@@ -155,5 +158,43 @@ public class BTHeaderRec implements PrintableStruct {
         System.arraycopy(reserved3, 0, result, offset, reserved3.length); offset += reserved3.length;
 
         return result;
+    }
+
+    public Dictionary getStructElements() {
+        DictionaryBuilder db =
+                new DictionaryBuilder(BTHeaderRec.class.getSimpleName());
+
+        db.addUIntBE("treeDepth", treeDepth, "Depth");
+        db.addUIntBE("rootNode", rootNode, "Root node");
+        db.addUIntBE("leafRecords", leafRecords, "Number of leaf records");
+        db.addUIntBE("firstLeafNode", firstLeafNode, "First leaf node");
+        db.addUIntBE("lastLeafNode", lastLeafNode, "Last leaf node");
+        db.addUIntBE("nodeSize", nodeSize, "Node size");
+        db.addUIntBE("maxKeyLength", maxKeyLength, "Maximum key length");
+        db.addUIntBE("totalNodes", totalNodes, "Total number of nodes");
+        db.addUIntBE("freeNodes", freeNodes, "Number of free nodes");
+
+        /* No need to add 'reserved1' to dictionary because it's not a field
+         * that we want to expose. */
+
+        db.addUIntBE("clumpSize", clumpSize, "Clump size");
+        db.addUIntBE("btreeType", btreeType, "B-tree type");
+        db.addUIntBE("keyCompareType", keyCompareType, "Key compare type",
+                IntegerFieldRepresentation.HEXADECIMAL);
+
+        DictionaryBuilder attributesDict = new DictionaryBuilder("");
+        attributesDict.addFlag("kBTBadClose", attributes, 0, "B-tree was not " +
+                "closed properly");
+        attributesDict.addFlag("kBTBigKeys", attributes, 1, "B-tree uses big " +
+                "keys");
+        attributesDict.addFlag("kBTVariableIndexKeys", attributes, 2,
+                "B-tree uses variable-length index node keys");
+
+        db.add("attributes", attributesDict.getResult(), "Attributes");
+
+        /* No need to add 'reserved3' to dictionary because it's not a field
+         * that we want to expose. */
+
+        return db.getResult();
     }
 }
