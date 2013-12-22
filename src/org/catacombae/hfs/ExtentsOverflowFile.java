@@ -19,6 +19,7 @@ package org.catacombae.hfs;
 
 import java.util.LinkedList;
 import org.catacombae.hfs.io.ForkFilter;
+import org.catacombae.hfs.types.hfscommon.CommonBTHeaderNode;
 import org.catacombae.io.ReadableRandomAccessSubstream;
 import org.catacombae.hfs.types.hfscommon.CommonBTIndexNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTIndexRecord;
@@ -76,6 +77,17 @@ public class ExtentsOverflowFile extends BTreeFile {
 
     ExtentsOverflowFileSession openSession() {
         return new ExtentsOverflowFileSession();
+    }
+
+    public CommonBTHeaderNode getHeaderNode() {
+        CommonBTNode firstNode = getExtentsOverflowNode(0);
+        if(firstNode instanceof CommonBTHeaderNode) {
+            return (CommonBTHeaderNode) firstNode;
+        }
+        else {
+            throw new RuntimeException("Unexpected node type at catalog node " +
+                    "0: " + firstNode.getClass());
+        }
     }
 
     /**

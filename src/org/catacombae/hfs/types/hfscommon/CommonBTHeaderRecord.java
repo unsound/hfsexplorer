@@ -19,6 +19,8 @@ package org.catacombae.hfs.types.hfscommon;
 
 import java.io.PrintStream;
 import org.catacombae.csjc.PrintableStruct;
+import org.catacombae.csjc.StructElements;
+import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.util.Util;
 import org.catacombae.hfs.types.hfsplus.BTHeaderRec;
 import org.catacombae.hfs.types.hfs.BTHdrRec;
@@ -27,8 +29,9 @@ import org.catacombae.hfs.types.hfs.BTHdrRec;
  *
  * @author erik
  */
-public abstract class CommonBTHeaderRecord extends CommonBTRecord implements PrintableStruct {
-
+public abstract class CommonBTHeaderRecord extends CommonBTRecord
+        implements PrintableStruct, StructElements
+{
     public enum CompareType {
         CASE_FOLDING, BINARY_COMPARE;
     }
@@ -146,6 +149,10 @@ public abstract class CommonBTHeaderRecord extends CommonBTRecord implements Pri
         public BTHeaderRec getInternal() {
             return bthr;
         }
+
+        public Dictionary getStructElements() {
+            return bthr.getStructElements();
+        }
     }
 
     public static class HFSImplementation extends CommonBTHeaderRecord {
@@ -224,6 +231,10 @@ public abstract class CommonBTHeaderRecord extends CommonBTRecord implements Pri
         @Override
         public int getSize() {
             return BTHdrRec.length();
+        }
+
+        public Dictionary getStructElements() {
+            return bthr.getStructElements();
         }
     }
 }

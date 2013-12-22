@@ -26,6 +26,7 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSExtentDescriptor;
 import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfs.plus.HFSPlusVolume;
+import org.catacombae.hfs.types.hfscommon.CommonBTHeaderNode;
 import org.catacombae.hfs.types.hfscommon.CommonHFSAttributesIndexNode;
 import org.catacombae.hfs.types.hfscommon.CommonHFSAttributesLeafNode;
 
@@ -115,6 +116,17 @@ public class AttributesFile extends BTreeFile {
 
         } finally {
             ses.close();
+        }
+    }
+
+    public CommonBTHeaderNode getHeaderNode() {
+        CommonBTNode firstNode = getNode(0);
+        if(firstNode instanceof CommonBTHeaderNode) {
+            return (CommonBTHeaderNode) firstNode;
+        }
+        else {
+            throw new RuntimeException("Unexpected node type at catalog node " +
+                    "0: " + firstNode.getClass());
         }
     }
 
