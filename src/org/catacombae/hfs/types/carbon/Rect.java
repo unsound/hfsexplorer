@@ -93,10 +93,10 @@ public class Rect implements PrintableStruct, StructElements {
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(Rect.class.getSimpleName());
 
-        db.addUIntBE("top", top);
-        db.addUIntBE("left", left);
-        db.addUIntBE("bottom", bottom);
-        db.addUIntBE("right", right);
+        db.addUIntBE("top", top, "Top");
+        db.addUIntBE("left", left, "Left");
+        db.addUIntBE("bottom", bottom, "Bottom");
+        db.addUIntBE("right", right, "Right");
 
         return db.getResult();
     }
