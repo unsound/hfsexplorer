@@ -113,7 +113,7 @@ public class HFSPlusAttributesExtents extends HFSPlusAttributesLeafRecordData
             db.addAll(super.getStructElements());
             db.addUIntBE("reserved", reservedField, this, "Reserved",
                     IntegerFieldRepresentation.HEXADECIMAL);
-            db.add("extents", this.extents.getStructElements());
+            db.add("extents", this.extents.getStructElements(), "Extents");
 
             return db.getResult();
         }
