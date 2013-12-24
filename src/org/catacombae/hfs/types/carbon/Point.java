@@ -79,8 +79,8 @@ public class Point implements PrintableStruct, StructElements {
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(Point.class.getSimpleName());
 
-        db.addUIntBE("v", v);
-        db.addUIntBE("h", h);
+        db.addUIntBE("v", v, "Vertical coordinate");
+        db.addUIntBE("h", h, "Horizontal coordinate");
 
         return db.getResult();
     }
