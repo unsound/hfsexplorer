@@ -171,9 +171,9 @@ public abstract class CommonFinderInfo implements StructElements, PrintableStruc
 
             finderFlagsDictionary = db.getResult();
         }
-        db.add("finderFlags", finderFlagsDictionary);
-        db.add("location", location.getStructElements());
-        db.addUIntBE("reservedField", reservedField);
+        db.add("finderFlags", finderFlagsDictionary, "Finder flags");
+        db.add("location", location.getStructElements(), "Location");
+        db.addUIntBE("reservedField", reservedField, "Reserved");
 
         return db.getResult();
     }
