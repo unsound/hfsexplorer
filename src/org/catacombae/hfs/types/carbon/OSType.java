@@ -18,10 +18,11 @@
 package org.catacombae.hfs.types.carbon;
 
 import java.io.PrintStream;
+import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.Dictionary;
 
-public class OSType implements StructElements {
+public class OSType implements PrintableStruct, StructElements {
     /*
      * struct OSType
      * size: 4 bytes

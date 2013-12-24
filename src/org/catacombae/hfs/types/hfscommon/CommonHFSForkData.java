@@ -18,6 +18,7 @@
 package org.catacombae.hfs.types.hfscommon;
 
 import java.io.PrintStream;
+import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.hfs.types.hfsplus.HFSPlusExtentDescriptor;
 import org.catacombae.hfs.types.hfsplus.HFSPlusForkData;
 import org.catacombae.hfs.types.hfs.ExtDataRec;
@@ -27,7 +28,7 @@ import org.catacombae.hfs.types.hfs.ExtDescriptor;
  *
  * @author erik
  */
-public abstract class CommonHFSForkData {
+public abstract class CommonHFSForkData implements PrintableStruct {
     public abstract long getLogicalSize();
 
     public abstract CommonHFSExtentDescriptor[] getBasicExtents();
@@ -39,8 +40,6 @@ public abstract class CommonHFSForkData {
     public static CommonHFSForkData create(HFSPlusForkData hper) {
         return new HFSPlusImplementation(hper);
     }
-
-    public abstract void print(PrintStream err, String prefix);
 
     public static class HFSImplementation extends CommonHFSForkData {
         private final ExtDataRec edr;
@@ -64,9 +63,14 @@ public abstract class CommonHFSForkData {
             return result;
         }
 
-        @Override
+        /* @Override */
         public void print(PrintStream ps, String prefix) {
             edr.print(ps, prefix);
+        }
+
+        /* @Override */
+        public void printFields(PrintStream ps, String prefix) {
+            edr.printFields(ps, prefix);
         }
     }
 
@@ -90,9 +94,14 @@ public abstract class CommonHFSForkData {
             return result;
         }
 
-        @Override
+        /* @Override */
         public void print(PrintStream ps, String prefix) {
             hper.print(ps, prefix);
+        }
+
+        /* @Override */
+        public void printFields(PrintStream ps, String prefix) {
+            hper.printFields(ps, prefix);
         }
     }
 }

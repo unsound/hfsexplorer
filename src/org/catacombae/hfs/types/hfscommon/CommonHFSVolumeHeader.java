@@ -19,6 +19,7 @@ package org.catacombae.hfs.types.hfscommon;
 
 import java.io.PrintStream;
 import java.util.Date;
+import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.util.Util;
@@ -31,7 +32,9 @@ import org.catacombae.hfs.types.hfs.MasterDirectoryBlock;
  *
  * @author Erik Larsson
  */
-public abstract class CommonHFSVolumeHeader implements StructElements {
+public abstract class CommonHFSVolumeHeader
+        implements PrintableStruct, StructElements
+{
     public abstract short getSignature();
 
     /**
@@ -95,8 +98,6 @@ public abstract class CommonHFSVolumeHeader implements StructElements {
      * exists, or <code>null</code> otherwise.
      */
     public abstract CommonHFSForkData getStartupFile();
-
-    public abstract void print(PrintStream err, String prefix);
 
     public static CommonHFSVolumeHeader create(HFSPlusVolumeHeader hdr) {
         return new HFSPlusImplementation(hdr);
@@ -190,9 +191,14 @@ public abstract class CommonHFSVolumeHeader implements StructElements {
             return CommonHFSForkData.create(hdr.getStartupFile());
         }
 
-        @Override
+        /* @Override */
         public void print(PrintStream err, String prefix) {
             hdr.print(err, prefix);
+        }
+
+        /* @Override */
+        public void printFields(PrintStream err, String prefix) {
+            hdr.printFields(err, prefix);
         }
 
         @Override
@@ -300,9 +306,14 @@ public abstract class CommonHFSVolumeHeader implements StructElements {
             return null;
         }
 
-        @Override
+        /* @Override */
         public void print(PrintStream err, String prefix) {
             hdr.print(err, prefix);
+        }
+
+        /* @Override */
+        public void printFields(PrintStream err, String prefix) {
+            hdr.printFields(err, prefix);
         }
 
         @Override
