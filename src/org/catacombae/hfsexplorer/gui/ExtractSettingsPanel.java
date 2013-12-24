@@ -615,4 +615,4 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
         jf.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
     */
-};
+}
