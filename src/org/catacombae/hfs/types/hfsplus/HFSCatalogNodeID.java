@@ -225,9 +225,6 @@ public class HFSCatalogNodeID implements PrintableStruct {
         return f;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public StructElement getOpaqueStructElement() {
         try {
             return new IntegerField(this, getPrivateField("hfsCatalogNodeID"),
