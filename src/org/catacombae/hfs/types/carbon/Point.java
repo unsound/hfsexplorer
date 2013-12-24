@@ -30,9 +30,9 @@ public class Point implements StructElements {
      * description:
      *
      * BP  Size  Type    Identifier  Description
-     * -----------------------------------------
-     * 0   2     SInt16  v
-     * 2   2     SInt16  h
+     * ---------------------------------------------------
+     * 0   2     SInt16  v           Vertical coordinate
+     * 2   2     SInt16  h           Horizontal coordinate
      */
 
     public static final int STRUCTSIZE = 4;
@@ -47,7 +47,10 @@ public class Point implements StructElements {
 
     public static int length() { return 4; }
 
+    /** Get the vertical coordinate of the point. */
     public short getV() { return Util.readShortBE(v); }
+
+    /** Get the horizontal coordinate of the point. */
     public short getH() { return Util.readShortBE(h); }
 
     @Override
