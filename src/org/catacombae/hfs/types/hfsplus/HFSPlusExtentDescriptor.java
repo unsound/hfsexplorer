@@ -85,8 +85,8 @@ public class HFSPlusExtentDescriptor implements StructElements,
     public Dictionary getStructElements() {
         DictionaryBuilder sb = new DictionaryBuilder(HFSPlusExtentDescriptor.class.getSimpleName());
 
-        sb.addUIntBE("startBlock", startBlock);
-        sb.addUIntBE("blockCount", blockCount);
+        sb.addUIntBE("startBlock", startBlock, "Start block");
+        sb.addUIntBE("blockCount", blockCount, "Block count");
 
         return sb.getResult();
     }
