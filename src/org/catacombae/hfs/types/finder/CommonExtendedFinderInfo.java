@@ -21,6 +21,7 @@ import java.io.PrintStream;
 import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.Dictionary;
+import org.catacombae.csjc.structelements.IntegerFieldRepresentation;
 import org.catacombae.util.Util;
 
 /**
@@ -87,9 +88,11 @@ public abstract class CommonExtendedFinderInfo implements StructElements, Printa
 
              extendedFinderFlagsDict = dbExtendedFinderFlags.getResult();
          }
-         db.add("extendedFinderFlags", extendedFinderFlagsDict);
-         db.addUIntBE("reserved2", reserved2);
-         db.addUIntBE("putAwayFolderID", putAwayFolderID);
+         db.add("extendedFinderFlags", extendedFinderFlagsDict,
+                 "Extended Finder flags");
+         db.addUIntBE("reserved2", reserved2, "Reserved",
+                 IntegerFieldRepresentation.HEXADECIMAL);
+         db.addUIntBE("putAwayFolderID", putAwayFolderID, "Put away folder ID");
 
          return db.getResult();
     }
