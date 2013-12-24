@@ -109,10 +109,10 @@ public class HFSPlusForkData implements StructElements, PrintableStruct {
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(HFSPlusForkData.class.getSimpleName());
 
-        db.addUIntBE("logicalSize", logicalSize);
-        db.addUIntBE("clumpSize", clumpSize);
-        db.addUIntBE("totalBlocks", totalBlocks);
-        db.add("extents", extents.getStructElements());
+        db.addUIntBE("logicalSize", logicalSize, "Logical size", "bytes");
+        db.addUIntBE("clumpSize", clumpSize, "Clump size", "bytes");
+        db.addUIntBE("totalBlocks", totalBlocks, "Total blocks");
+        db.add("extents", extents.getStructElements(), "Extents");
 
         return db.getResult();
     }
