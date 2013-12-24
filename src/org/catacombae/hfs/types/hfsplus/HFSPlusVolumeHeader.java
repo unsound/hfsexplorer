@@ -27,6 +27,7 @@ import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.ASCIIStringField;
 import org.catacombae.csjc.structelements.Dictionary;
+import org.catacombae.csjc.structelements.IntegerFieldRepresentation;
 import org.catacombae.hfs.types.hfs.HFSVolumeFinderInfo;
 
 public class HFSPlusVolumeHeader extends MutableStruct implements
@@ -311,14 +312,22 @@ public class HFSPlusVolumeHeader extends MutableStruct implements
     private Dictionary getAttributeElements() {
         DictionaryBuilder db = new DictionaryBuilder("Attributes");
 
-        db.addFlag("kHFSVolumeHardwareLockBit", attributes, 7);
-        db.addFlag("kHFSVolumeUnmountedBit", attributes, 8);
-        db.addFlag("kHFSVolumeSparedBlocksBit", attributes, 9);
-        db.addFlag("kHFSVolumeNoCacheRequiredBit", attributes, 10);
-        db.addFlag("kHFSBootVolumeInconsistentBit", attributes, 11);
-        db.addFlag("kHFSCatalogNodeIDsReusedBit", attributes, 12);
-        db.addFlag("kHFSVolumeJournaledBit", attributes, 13);
-        db.addFlag("kHFSVolumeSoftwareLockBit", attributes, 15);
+        db.addFlag("kHFSVolumeHardwareLockBit", attributes, 7,
+                "Volume hardware lock");
+        db.addFlag("kHFSVolumeUnmountedBit", attributes, 8,
+                "Volume unmounted");
+        db.addFlag("kHFSVolumeSparedBlocksBit", attributes, 9,
+                "Volume spared blocks");
+        db.addFlag("kHFSVolumeNoCacheRequiredBit", attributes, 10,
+                "No cache required");
+        db.addFlag("kHFSBootVolumeInconsistentBit", attributes, 11,
+                "Boot volume inconsistent");
+        db.addFlag("kHFSCatalogNodeIDsReusedBit", attributes, 12,
+                "Catalog node IDs reused");
+        db.addFlag("kHFSVolumeJournaledBit", attributes, 13,
+                "Volume journaled");
+        db.addFlag("kHFSVolumeSoftwareLockBit", attributes, 15,
+                "Volume software lock");
 
         return db.getResult();
     }
@@ -326,32 +335,46 @@ public class HFSPlusVolumeHeader extends MutableStruct implements
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(HFSPlusVolumeHeader.class.getSimpleName());
 
-        db.add("signature", new ASCIIStringField(signature));
-        db.addUIntBE("version", version);
-        db.add("attributes", getAttributeElements());
-        db.addUIntBE("lastMountedVersion", lastMountedVersion);
-        db.addUIntBE("journalInfoBlock", journalInfoBlock);
-        db.add("createDate", new HFSPlusDateField(createDate, true));
-        db.add("modifyDate", new HFSPlusDateField(modifyDate, true));
-        db.add("backupDate", new HFSPlusDateField(backupDate, true));
-        db.add("checkedDate", new HFSPlusDateField(checkedDate, true));
-        db.addUIntBE("fileCount", fileCount);
-        db.addUIntBE("folderCount", folderCount);
-        db.addUIntBE("blockSize", blockSize);
-        db.addUIntBE("totalBlocks", totalBlocks);
-        db.addUIntBE("freeBlocks", freeBlocks);
-        db.addUIntBE("nextAllocation", nextAllocation);
-        db.addUIntBE("rsrcClumpSize", rsrcClumpSize);
-        db.addUIntBE("dataClumpSize", dataClumpSize);
-        db.add("nextCatalogID", nextCatalogID.getOpaqueStructElement());
-        db.addUIntBE("writeCount", writeCount);
-        db.addUIntBE("encodingsBitmap", encodingsBitmap);
-        db.add("finderInfo", finderInfo.getStructElements());
-        db.add("allocationFile", allocationFile.getStructElements());
-        db.add("extentsFile", extentsFile.getStructElements());
-        db.add("catalogFile", catalogFile.getStructElements());
-        db.add("attributesFile", attributesFile.getStructElements());
-        db.add("startupFile", startupFile.getStructElements());
+        db.add("signature", new ASCIIStringField(signature),
+                "Volume signature");
+        db.addUIntBE("version", version, "File system version");
+        db.add("attributes", getAttributeElements(), "Attributes");
+        db.add("lastMountedVersion", new ASCIIStringField(lastMountedVersion),
+                "Last mounted version");
+        db.addUIntBE("journalInfoBlock", journalInfoBlock,
+                "Journal info block ID");
+        db.add("createDate", new HFSPlusDateField(createDate, true),
+                "Date created");
+        db.add("modifyDate", new HFSPlusDateField(modifyDate, true),
+                "Date last modified");
+        db.add("backupDate", new HFSPlusDateField(backupDate, true),
+                "Date last backuped");
+        db.add("checkedDate", new HFSPlusDateField(checkedDate, true),
+                "Date last checked");
+        db.addUIntBE("fileCount", fileCount, "File count");
+        db.addUIntBE("folderCount", folderCount, "Folder count");
+        db.addUIntBE("blockSize", blockSize, "Block size", "bytes");
+        db.addUIntBE("totalBlocks", totalBlocks, "Number of blocks");
+        db.addUIntBE("freeBlocks", freeBlocks, "Number of free blocks");
+        db.addUIntBE("nextAllocation", nextAllocation,
+                "Start of next allocation search");
+        db.addUIntBE("rsrcClumpSize", rsrcClumpSize,
+                "Resource fork default clump size", "bytes");
+        db.addUIntBE("dataClumpSize", dataClumpSize,
+                "Data fork default clump size", "bytes");
+        db.add("nextCatalogID", nextCatalogID.getOpaqueStructElement(),
+                "Next unused catalog ID");
+        db.addUIntBE("writeCount", writeCount, "Write count");
+        db.addUIntBE("encodingsBitmap", encodingsBitmap, "Encodings bitmap",
+                IntegerFieldRepresentation.HEXADECIMAL);
+        db.add("finderInfo", finderInfo.getStructElements(), "Finder info");
+        db.add("allocationFile", allocationFile.getStructElements(),
+                "Allocation file");
+        db.add("extentsFile", extentsFile.getStructElements(), "Extents file");
+        db.add("catalogFile", catalogFile.getStructElements(), "Catalog file");
+        db.add("attributesFile", attributesFile.getStructElements(),
+                "Attributes file");
+        db.add("startupFile", startupFile.getStructElements(), "Startup file");
 
         return db.getResult();
     }
