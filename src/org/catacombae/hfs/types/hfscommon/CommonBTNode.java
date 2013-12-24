@@ -21,6 +21,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.util.Util;
 import org.catacombae.hfs.types.hfsplus.BTNodeDescriptor;
 import org.catacombae.hfs.types.hfs.NodeDescriptor;
@@ -31,7 +32,9 @@ import org.catacombae.hfs.types.hfs.NodeDescriptor;
  *
  * @author Erik Larsson
  */
-public abstract class CommonBTNode <R extends CommonBTRecord> {
+public abstract class CommonBTNode <R extends CommonBTRecord>
+        implements PrintableStruct
+{
     protected final InternalContainer ic;
 
     protected static enum FSType { HFS, HFS_PLUS };
@@ -66,6 +69,10 @@ public abstract class CommonBTNode <R extends CommonBTRecord> {
 
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + "CommonBTNode:");
+        printFields(ps, prefix);
+    }
+
+    public void printFields(PrintStream ps, String prefix) {
         ic.printFields(ps, prefix);
     }
 

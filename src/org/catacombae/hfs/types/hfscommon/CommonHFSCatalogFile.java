@@ -19,6 +19,7 @@ package org.catacombae.hfs.types.hfscommon;
 
 import java.io.PrintStream;
 import java.util.Date;
+import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.csjc.StaticStruct;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.Dictionary;
@@ -31,8 +32,10 @@ import org.catacombae.hfs.types.hfsplus.HFSPlusBSDInfo;
  *
  * @author erik
  */
-public abstract class CommonHFSCatalogFile implements StaticStruct, CommonHFSCatalogAttributes, StructElements {
-
+public abstract class CommonHFSCatalogFile
+        implements StaticStruct, PrintableStruct, StructElements,
+        CommonHFSCatalogAttributes
+{
     public abstract CommonHFSCatalogNodeID getFileID();
     public abstract CommonHFSForkData getDataFork();
     public abstract CommonHFSForkData getResourceFork();

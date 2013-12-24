@@ -20,9 +20,10 @@ package org.catacombae.hfs.types.carbon;
 import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.util.Util;
 import java.io.PrintStream;
+import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.csjc.StructElements;
 
-public class FourCharCode implements StructElements {
+public class FourCharCode implements PrintableStruct, StructElements {
     /*
      * struct FourCharCode
      * size: 4 bytes

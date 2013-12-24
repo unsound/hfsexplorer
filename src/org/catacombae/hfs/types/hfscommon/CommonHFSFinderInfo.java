@@ -17,6 +17,8 @@
 
 package org.catacombae.hfs.types.hfscommon;
 
+import java.io.PrintStream;
+import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.hfs.types.hfs.CdrDirRec;
 import org.catacombae.hfs.types.hfs.CdrFilRec;
 import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogFile;
@@ -26,7 +28,7 @@ import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogFolder;
  *
  * @author erik
  */
-public abstract class CommonHFSFinderInfo {
+public abstract class CommonHFSFinderInfo implements PrintableStruct {
 
     /**
      * Returns a byte array with 32 elements containing the raw FinderInfo data
@@ -107,6 +109,16 @@ public abstract class CommonHFSFinderInfo {
         public void setBytes(byte[] finderInfo) {
             throw new UnsupportedOperationException("Not supported yet.");
         }
+
+        /* @Override */
+        public void print(PrintStream ps, String prefix) {
+            filRec.print(ps, prefix);
+        }
+
+        /* @Override */
+        public void printFields(PrintStream ps, String prefix) {
+            filRec.printFields(ps, prefix);
+        }
     }
 
     private static class HFSFolderImplementation extends CommonHFSFinderInfo {
@@ -129,6 +141,16 @@ public abstract class CommonHFSFinderInfo {
         @Override
         public void setBytes(byte[] finderInfo) {
             throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        /* @Override */
+        public void print(PrintStream ps, String prefix) {
+            dirRec.print(ps, prefix);
+        }
+
+        /* @Override */
+        public void printFields(PrintStream ps, String prefix) {
+            dirRec.printFields(ps, prefix);
         }
     }
 
@@ -153,6 +175,16 @@ public abstract class CommonHFSFinderInfo {
         public void setBytes(byte[] finderInfo) {
             throw new UnsupportedOperationException("Not supported yet.");
         }
+
+        /* @Override */
+        public void print(PrintStream ps, String prefix) {
+            file.print(ps, prefix);
+        }
+
+        /* @Override */
+        public void printFields(PrintStream ps, String prefix) {
+            file.printFields(ps, prefix);
+        }
     }
 
     private static class HFSPlusFolderImplementation extends CommonHFSFinderInfo {
@@ -175,6 +207,16 @@ public abstract class CommonHFSFinderInfo {
         @Override
         public void setBytes(byte[] finderInfo) {
             throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        /* @Override */
+        public void print(PrintStream ps, String prefix) {
+            folder.print(ps, prefix);
+        }
+
+        /* @Override */
+        public void printFields(PrintStream ps, String prefix) {
+            folder.printFields(ps, prefix);
         }
     }
 }
