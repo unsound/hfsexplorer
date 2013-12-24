@@ -68,7 +68,6 @@ public class Point implements StructElements {
 
     public byte[] getBytes() {
 	byte[] result = new byte[STRUCTSIZE];
-	byte[] tempData;
 	int offset = 0;
 	System.arraycopy(v, 0, result, offset, v.length); offset += v.length;
 	System.arraycopy(h, 0, result, offset, h.length); offset += h.length;
