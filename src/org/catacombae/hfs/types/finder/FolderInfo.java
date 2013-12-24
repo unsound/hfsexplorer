@@ -83,7 +83,8 @@ public class FolderInfo extends CommonFinderInfo
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(FolderInfo.class.getSimpleName());
 
-        db.add("windowBounds", windowBounds.getStructElements());
+        db.add("windowBounds", windowBounds.getStructElements(),
+                "Window bounds");
         db.addAll(super.getStructElements());
 
         return db.getResult();
