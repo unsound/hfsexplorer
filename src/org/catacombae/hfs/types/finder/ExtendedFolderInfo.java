@@ -85,8 +85,9 @@ public class ExtendedFolderInfo extends CommonExtendedFinderInfo {
     public Dictionary getStructElements() {
          DictionaryBuilder db = new DictionaryBuilder(ExtendedFolderInfo.class.getName());
 
-         db.add("scrollPosition", scrollPosition.getStructElements());
-         db.addUIntBE("reserved1", reserved1);
+         db.add("scrollPosition", scrollPosition.getStructElements(),
+                 "Scroll position");
+         db.addUIntBE("reserved1", reserved1, "Reserved");
          db.addAll(super.getStructElements());
 
          return db.getResult();
