@@ -130,9 +130,12 @@ class HFSPlusJournal extends Journal {
                 getJournalDataStream(infoBlock);
 
         try {
-            return getJournalHeader(infoBlock, journalStream);
+            return journalStream != null ?
+                getJournalHeader(infoBlock, journalStream) : null;
         } finally {
-            journalStream.close();
+            if(journalStream != null) {
+                journalStream.close();
+            }
         }
     }
 
