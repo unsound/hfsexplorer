@@ -31,6 +31,8 @@ import javax.swing.SwingConstants;
 import org.catacombae.hfs.Journal;
 import org.catacombae.hfs.Journal.Transaction;
 import org.catacombae.hfs.types.hfsplus.JournalHeader;
+import org.catacombae.hfs.types.hfsplus.JournalInfoBlock;
+import org.catacombae.util.Util;
 
 public class JournalInfoPanel extends JPanel {
     private JTabbedPane tabbedPane;
@@ -70,6 +72,8 @@ public class JournalInfoPanel extends JPanel {
     }
 
     private void _setFields(Journal journal) {
+        JournalInfoBlock infoBlock = journal.getJournalInfoBlock();
+
         if(journalContentsPanel != null) {
             tabbedPane.remove(2);
         }
@@ -78,9 +82,32 @@ public class JournalInfoPanel extends JPanel {
             tabbedPane.remove(1);
         }
 
-        infoBlockPanel.setFields(journal.getJournalInfoBlock());
+        infoBlockPanel.setFields(infoBlock);
 
         final JournalHeader journalHeader = journal.getJournalHeader();
+        if(journalHeader == null) {
+            if(infoBlock.getFlagJournalNeedInit()) {
+                noJournalLabel.setText("Journal not initialized.");
+            }
+            else if(infoBlock.getFlagJournalOnOtherDevice()) {
+                noJournalLabel.setText("Journal is located on other device " +
+                        "(0x" +
+                        Util.toHexStringBE(infoBlock.getDeviceSignature()) +
+                        ").");
+            }
+            else if(!infoBlock.getFlagJournalInFS()) {
+                noJournalLabel.setText("Journal is not located inside the " +
+                        "filesystem (but where?).");
+            }
+            else {
+                noJournalLabel.setText("Unknown error while loading the " +
+                        "journal header.\n");
+            }
+
+            layout.show(this, "A");
+            return;
+        }
+
         journalHeaderPanel =
                 new StructViewPanel("Journal header",
                 (journalHeader.isLittleEndian() ? "Little" : "Big") +
