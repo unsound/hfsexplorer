@@ -104,8 +104,8 @@ public class HFSUniStr255 implements StructElements, PrintableStruct {
     public Dictionary getStructElements() {
         DictionaryBuilder db = new DictionaryBuilder(HFSUniStr255.class.getSimpleName());
 
-        db.addUIntBE("length", length);
-        db.addEncodedString("unicode", unicode, "UTF-16BE");
+        db.addUIntBE("length", length, "Length");
+        db.addEncodedString("unicode", unicode, "UTF-16BE", "Unicode data");
 
         return db.getResult();
     }
