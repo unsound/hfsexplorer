@@ -19,6 +19,7 @@ package org.catacombae.hfs.types.hfscommon;
 
 import org.catacombae.hfs.types.hfsplus.BTHeaderRec;
 import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogKey;
+import org.catacombae.util.Util;
 
 /**
  *

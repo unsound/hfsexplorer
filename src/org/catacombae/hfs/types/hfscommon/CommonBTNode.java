@@ -64,6 +64,16 @@ public abstract class CommonBTNode <R extends CommonBTRecord>
         return ic.getBTRecords();
     }
 
+    public int[] getRecordOffsets() {
+        int[] result = new int[ic.offsets.length];
+
+        for(int i = 0; i < ic.offsets.length; ++i) {
+            result[i] = Util.unsign(ic.offsets[i]);
+        }
+
+        return result;
+    }
+
     protected abstract R createBTRecord(int recordNumber,
             byte[] data, int offset, int length);
 
