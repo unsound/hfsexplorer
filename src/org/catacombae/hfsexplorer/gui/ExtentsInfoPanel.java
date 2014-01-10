@@ -17,6 +17,7 @@
 
 package org.catacombae.hfsexplorer.gui;
 
+import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.io.PrintStream;
 import java.util.List;
@@ -129,22 +130,43 @@ public class ExtentsInfoPanel extends javax.swing.JPanel {
         structViewPanelScroller.getHorizontalScrollBar().setUnitIncrement(UNIT_INCREMENT);
         leafPanel.add(structViewPanelScroller, STRUCT_VIEW_PANEL_NAME);
 
+        final LeafInfoPanel fileInfoPanelHeader = new LeafInfoPanel();
         final FileInfoPanel fileInfoPanel = new FileInfoPanel();
-        JScrollPane fileInfoPanelScroller = new JScrollPane(fileInfoPanel);
+        final JPanel fileInfoPanelContainer = new JPanel(new BorderLayout());
+        fileInfoPanelContainer.add(fileInfoPanelHeader, BorderLayout.NORTH);
+        fileInfoPanelContainer.add(fileInfoPanel, BorderLayout.CENTER);
+
+        JScrollPane fileInfoPanelScroller =
+                new JScrollPane(fileInfoPanelContainer);
         fileInfoPanelScroller.getVerticalScrollBar().setUnitIncrement(UNIT_INCREMENT);
         fileInfoPanelScroller.getHorizontalScrollBar().setUnitIncrement(UNIT_INCREMENT);
         leafPanel.add(fileInfoPanelScroller, FILE_NAME);
 
+        final LeafInfoPanel folderInfoPanelHeader = new LeafInfoPanel();
         final FolderInfoPanel folderInfoPanel = new FolderInfoPanel();
-        JScrollPane folderInfoPanelScroller = new JScrollPane(folderInfoPanel);
+        final JPanel folderInfoPanelContainer = new JPanel(new BorderLayout());
+        folderInfoPanelContainer.add(folderInfoPanelHeader, BorderLayout.NORTH);
+        folderInfoPanelContainer.add(folderInfoPanel, BorderLayout.CENTER);
+
+        JScrollPane folderInfoPanelScroller =
+                new JScrollPane(folderInfoPanelContainer);
         folderInfoPanelScroller.getVerticalScrollBar().setUnitIncrement(UNIT_INCREMENT);
         folderInfoPanelScroller.getHorizontalScrollBar().setUnitIncrement(UNIT_INCREMENT);
         leafPanel.add(folderInfoPanelScroller, FOLDER_NAME);
 
+        final LeafInfoPanel printFieldsTextAreaHeader = new LeafInfoPanel();
         final JTextArea printFieldsTextArea = new JTextArea(0, 0);
         printFieldsTextArea.setEditable(false);
         printFieldsTextArea.setLineWrap(false);
-        JScrollPane printFieldsTextAreaScroller = new JScrollPane(printFieldsTextArea);
+        final JPanel printFieldsTextAreaContainer =
+                new JPanel(new BorderLayout());
+        printFieldsTextAreaContainer.add(printFieldsTextAreaHeader,
+                BorderLayout.NORTH);
+        printFieldsTextAreaContainer.add(printFieldsTextArea,
+                BorderLayout.CENTER);
+
+        JScrollPane printFieldsTextAreaScroller =
+                new JScrollPane(printFieldsTextAreaContainer);
         printFieldsTextAreaScroller.getVerticalScrollBar().setUnitIncrement(UNIT_INCREMENT);
         printFieldsTextAreaScroller.getHorizontalScrollBar().setUnitIncrement(UNIT_INCREMENT);
         leafPanel.add(printFieldsTextAreaScroller, PRINT_FIELDS_AREA_NAME);
@@ -182,7 +204,8 @@ public class ExtentsInfoPanel extends javax.swing.JPanel {
                         clRoot.show(infoPanel, INDEX_NAME);
                     }
                     else if(o2 instanceof ExtentLeafStorage) {
-                        CommonHFSExtentLeafRecord rec = ((ExtentLeafStorage) o2).getRecord();
+                        ExtentLeafStorage leafStorage = (ExtentLeafStorage) o2;
+                        CommonHFSExtentLeafRecord rec = leafStorage.getRecord();
                         //HFSPlusCatalogLeafRecordData data = rec.getData();
                         if(rec instanceof StructElements) {
                             Dictionary dict = ((StructElements) rec).getStructElements();
@@ -190,12 +213,34 @@ public class ExtentsInfoPanel extends javax.swing.JPanel {
                             if(label == null)
                                 label = dict.getTypeName();
 
+                            final LeafInfoPanel leafInfoPanel =
+                                    new LeafInfoPanel();
+                            leafInfoPanel.setRecordNumber(
+                                    leafStorage.getRecordNumber());
+                            leafInfoPanel.setRecordOffset(
+                                    leafStorage.getRecordOffset());
+                            leafInfoPanel.setRecordSize(
+                                    leafStorage.getRecordSize());
+
+                            final JPanel containerPanel =
+                                    new JPanel(new BorderLayout());
+                            containerPanel.add(leafInfoPanel, BorderLayout.NORTH);
+                            containerPanel.add(
+                                    new StructViewPanel(label + ":", dict),
+                                    BorderLayout.CENTER);
+
                             structViewPanelScroller.setViewportView(
-                                    new StructViewPanel(label + ":", dict));
+                                    containerPanel);
                             clLeaf.show(leafPanel, STRUCT_VIEW_PANEL_NAME);
                         }
                         else if(rec instanceof PrintableStruct) {
                             PrintStream ps = new PrintStream(new JTextAreaOutputStream(System.err, printFieldsTextArea));
+                            printFieldsTextAreaHeader.setRecordNumber(
+                                    leafStorage.getRecordNumber());
+                            printFieldsTextAreaHeader.setRecordOffset(
+                                    leafStorage.getRecordOffset());
+                            printFieldsTextAreaHeader.setRecordSize(
+                                    leafStorage.getRecordSize());
                             printFieldsTextArea.setText("");
                             ((PrintableStruct) rec).print(ps, "");
                             ps.close();
@@ -232,10 +277,16 @@ public class ExtentsInfoPanel extends javax.swing.JPanel {
             }
         }
         else if(node instanceof CommonHFSExtentLeafNode) {
-            CommonHFSExtentLeafRecord[] recs = ((CommonHFSExtentLeafNode) node).getLeafRecords();
-            for(CommonHFSExtentLeafRecord rec : recs) {
+            CommonHFSExtentLeafNode leafNode = (CommonHFSExtentLeafNode) node;
+            CommonHFSExtentLeafRecord[] recs = leafNode.getLeafRecords();
+            int[] recordOffsets = leafNode.getRecordOffsets();
+
+            for(int i = 0; i < recs.length; ++i) {
+                final CommonHFSExtentLeafRecord rec = recs[i];
                 CommonHFSExtentKey key = rec.getKey();
-                dmtn.add(new DefaultMutableTreeNode(new ExtentLeafStorage(rec,
+                dmtn.add(new DefaultMutableTreeNode(new ExtentLeafStorage(i,
+                        recordOffsets[i],
+                        recordOffsets[i + 1] - recordOffsets[i], rec,
                         key.getFileID().toLong() + ":" + key.getForkType() +
                         ":" + key.getStartBlock())));
             }
@@ -266,12 +317,32 @@ public class ExtentsInfoPanel extends javax.swing.JPanel {
 
     private static class ExtentLeafStorage {
 
+        private final int recordNumber;
+        private final int recordOffset;
+        private final int recordSize;
         private CommonHFSExtentLeafRecord rec;
         private String text;
 
-        public ExtentLeafStorage(CommonHFSExtentLeafRecord rec, String text) {
+        public ExtentLeafStorage(int recordNumber, int recordOffset,
+                int recordSize, CommonHFSExtentLeafRecord rec, String text)
+        {
+            this.recordNumber = recordNumber;
+            this.recordOffset = recordOffset;
+            this.recordSize = recordSize;
             this.rec = rec;
             this.text = text;
+        }
+
+        public int getRecordNumber() {
+            return recordNumber;
+        }
+
+        public int getRecordOffset() {
+            return recordOffset;
+        }
+
+        public int getRecordSize() {
+            return recordSize;
         }
 
         public CommonHFSExtentLeafRecord getRecord() {
