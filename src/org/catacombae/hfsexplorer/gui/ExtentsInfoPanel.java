@@ -158,6 +158,7 @@ public class ExtentsInfoPanel extends javax.swing.JPanel {
         final JTextArea printFieldsTextArea = new JTextArea(0, 0);
         printFieldsTextArea.setEditable(false);
         printFieldsTextArea.setLineWrap(false);
+        printFieldsTextArea.setOpaque(false);
         final JPanel printFieldsTextAreaContainer =
                 new JPanel(new BorderLayout());
         printFieldsTextAreaContainer.add(printFieldsTextAreaHeader,
