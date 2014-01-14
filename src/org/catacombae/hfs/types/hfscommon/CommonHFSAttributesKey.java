@@ -55,21 +55,26 @@ public abstract class CommonHFSAttributesKey
         if(fileID1 == fileID2) {
             final int attrNameLen1 = k1.getAttrNameLen();
             final int attrNameLen2 = k2.getAttrNameLen();
+            final int minAttrNameLen = Math.min(attrNameLen1, attrNameLen2);
 
-            if(attrNameLen1 == attrNameLen2) {
-                final char[] attrName1 = k1.getAttrName();
-                final char[] attrName2 = k2.getAttrName();
+            final char[] attrName1 = k1.getAttrName();
+            final char[] attrName2 = k2.getAttrName();
 
-                for(int i = 0; i < attrNameLen1; ++i) {
-                    final int curChar1 = Util.unsign(attrName1[i]);
-                    final int curChar2 = Util.unsign(attrName2[i]);
+            for(int i = 0; i < minAttrNameLen; ++i) {
+                final int curChar1 = Util.unsign(attrName1[i]);
+                final int curChar2 = Util.unsign(attrName2[i]);
 
-                    if(curChar1 < curChar2)
-                        return -1;
-                    else if(curChar1 > curChar2)
-                        return 1;
-                }
+                if(curChar1 < curChar2)
+                    return -1;
+                else if(curChar1 > curChar2)
+                    return 1;
+            }
 
+            if(attrNameLen1 < attrNameLen2)
+                return -1;
+            else if(attrNameLen1 > attrNameLen2)
+                return 1;
+            else {
                 /* If we got here, then the names are equal. */
                 final long startBlock1 = k1.getStartBlock();
                 final long startBlock2 = k2.getStartBlock();
@@ -80,10 +85,6 @@ public abstract class CommonHFSAttributesKey
                 else
                     return 1;
             }
-            else if(attrNameLen1 < attrNameLen2)
-                return -1;
-            else
-                return 1;
         }
         else if(fileID1 < fileID2)
             return -1;
