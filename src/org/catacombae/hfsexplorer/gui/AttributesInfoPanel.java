@@ -277,8 +277,8 @@ public class AttributesInfoPanel extends javax.swing.JPanel {
                 CommonBTNode curNode = attributesFile.getNode(rec.getIndex());
                 CommonHFSAttributesKey key = rec.getKey();
                 dmtn.add(new NoLeafMutableTreeNode(new BTNodeStorage(curNode,
-                        key.getFileID().toLong() + ":" + key.getAttrNameLen() +
-                        ":" + new String(key.getAttrName()) + ":" +
+                        key.getFileID().toLong() + ":" +
+                        new String(key.getAttrName()) + ":" +
                         key.getStartBlock())));
             }
         }
@@ -294,8 +294,8 @@ public class AttributesInfoPanel extends javax.swing.JPanel {
                 dmtn.add(new DefaultMutableTreeNode(new AttributesLeafStorage(i,
                         recordOffsets[i],
                         recordOffsets[i + 1] - recordOffsets[i], rec,
-                        key.getFileID().toLong() + ":" +  key.getAttrNameLen() +
-                        ":" + new String(key.getAttrName()) + ":" +
+                        key.getFileID().toLong() + ":" +
+                        new String(key.getAttrName()) + ":" +
                         key.getStartBlock())));
             }
         }
