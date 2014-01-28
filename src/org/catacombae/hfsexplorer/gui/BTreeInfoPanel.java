@@ -74,6 +74,8 @@ public abstract class BTreeInfoPanel<R, B extends BTreeFile>
 
         initComponents();
 
+        descriptionLabel.setText(getHeaderText());
+
         JTree dirTree = catalogTree;
         // Populate the root
 	/*
@@ -94,7 +96,7 @@ public abstract class BTreeInfoPanel<R, B extends BTreeFile>
 
         DefaultMutableTreeNode rootNode =
                 new NoLeafMutableTreeNode(new BTNodeStorage(
-                bTree.getRootNodeNumber(), iNode, "Catalog root"));
+                bTree.getRootNodeNumber(), iNode, getRootNodeName()));
         expandNode(rootNode, iNode, bTree);
 
         DefaultTreeModel model = new DefaultTreeModel(rootNode);
@@ -264,6 +266,10 @@ public abstract class BTreeInfoPanel<R, B extends BTreeFile>
             }
         });
     }
+
+    public abstract String getRootNodeName();
+
+    public abstract String getHeaderText();
 
     public abstract void createCustomPanels(
             List<Pair<JPanel, String>> customPanelsList);

@@ -57,6 +57,14 @@ public class CatalogInfoPanel
         super(vol.getCatalogFile());
     }
 
+    public String getRootNodeName() {
+        return "Catalog root";
+    }
+
+    public String getHeaderText() {
+        return "View of the catalog file's B*-tree:";
+    }
+
     public void createCustomPanels(List<Pair<JPanel, String>> panelsList) {
         fileInfoPanelHeader = new LeafInfoPanel();
         fileInfoPanel = new FileInfoPanel();
