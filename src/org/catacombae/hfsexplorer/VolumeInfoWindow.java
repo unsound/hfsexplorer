@@ -27,7 +27,7 @@ import org.catacombae.hfs.HFSVolume;
 import org.catacombae.hfs.Journal;
 import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.hfsexplorer.gui.AttributesInfoPanel;
-import org.catacombae.hfsexplorer.gui.CatalogInfoPanel;
+import org.catacombae.hfsexplorer.gui.BTreeInfoPanel;
 import org.catacombae.hfsexplorer.gui.ExtentsInfoPanel;
 import org.catacombae.hfsexplorer.gui.HFSPlusVolumeInfoPanel;
 import org.catacombae.hfsexplorer.gui.JournalInfoPanel;
@@ -90,7 +90,8 @@ public class VolumeInfoWindow extends JFrame {
                 e.printStackTrace();
             }
 
-            CatalogInfoPanel catalogInfoPanel = new CatalogInfoPanel(fsView);
+            BTreeInfoPanel.Catalog catalogInfoPanel =
+                    new BTreeInfoPanel.Catalog(fsView);
             JScrollPane catalogInfoPanelScroller = new JScrollPane(catalogInfoPanel,
                     JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);

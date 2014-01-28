@@ -16,7 +16,7 @@
  */
 
 /*
- * CatalogInfoPanel.java
+ * BTreeInfoPanel.java
  *
  * Created on den 20 mars 2007, 19:28
  */
@@ -25,6 +25,7 @@ package org.catacombae.hfsexplorer.gui;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.io.PrintStream;
+import java.util.LinkedList;
 import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -43,6 +44,7 @@ import javax.swing.tree.TreePath;
 import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.Dictionary;
+import org.catacombae.hfs.BTreeFile;
 import org.catacombae.hfsexplorer.FileSystemBrowser.NoLeafMutableTreeNode;
 import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogFile;
 import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogFolder;
@@ -61,17 +63,27 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogLeafNode;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.hfsexplorer.io.JTextAreaOutputStream;
 import org.catacombae.hfs.HFSVolume;
+import org.catacombae.util.Util.Pair;
 
 /**
  *
  * @author  Erik
  */
-public class CatalogInfoPanel extends javax.swing.JPanel {
+public abstract class BTreeInfoPanel<R> extends javax.swing.JPanel {
 
     private static final int UNIT_INCREMENT = 10;
 
-    /** Creates new form CatalogInfoPanel */
-    public CatalogInfoPanel(final HFSVolume fsView) {
+    protected final String INDEX_NAME = "index";
+    protected final String LEAF_NAME = "leaf";
+    protected final String PRINT_FIELDS_AREA_NAME = "printfieldsarea";
+    protected final String OTHER_NAME = "other";
+    protected final String STRUCT_VIEW_PANEL_NAME = "structview";
+
+    protected final JPanel leafPanel;
+    protected final CardLayout clLeaf;
+
+    /** Creates new form BTreeInfoPanel */
+    public BTreeInfoPanel(final BTreeFile bTree) {
 
         initComponents();
 
@@ -81,18 +93,22 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
          * What we need is a method that gets us the children of the "current" node.
          * A B-tree starts with a header node,
          */
-        CommonBTNode iNode = fsView.getCatalogFile().getCatalogNode(-1); // Get root index node.
+        CommonBTNode iNode = bTree.getRootNode(); // Get root index node.
 
         if(iNode == null) {
             DefaultTreeModel model = new DefaultTreeModel(new NoLeafMutableTreeNode("<empty>"));
             dirTree.setModel(model);
+
+            leafPanel = null;
+            clLeaf = null;
+
             return;
         }
 
         DefaultMutableTreeNode rootNode =
-                new NoLeafMutableTreeNode(new BTNodeStorage(fsView.
-                getCatalogFile().getRootNodeNumber(), iNode, "Catalog root"));
-        expandNode(rootNode, iNode, fsView);
+                new NoLeafMutableTreeNode(new BTNodeStorage(
+                bTree.getRootNodeNumber(), iNode, "Catalog root"));
+        expandNode(rootNode, iNode, bTree);
 
         DefaultTreeModel model = new DefaultTreeModel(rootNode);
         dirTree.setModel(model);
@@ -109,7 +125,7 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
                     Object obj2 = dmtn.getUserObject();
                     if(obj2 instanceof BTNodeStorage) {
                         CommonBTNode node = ((BTNodeStorage) obj2).getNode();
-                        expandNode(dmtn, node, fsView);
+                        expandNode(dmtn, node, bTree);
                     }
                     else
                         throw new RuntimeException("Wrong user object type in expandable node!");
@@ -122,18 +138,10 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
             }
         });
 
-        final String INDEX_NAME = "index";
-        final String LEAF_NAME = "leaf";
-        final String PRINT_FIELDS_AREA_NAME = "printfieldsarea";
-        final String OTHER_NAME = "other";
-        final String FILE_NAME = "file";
-        final String FOLDER_NAME = "folder";
-        final String STRUCT_VIEW_PANEL_NAME = "structview";
-
         final CardLayout clRoot = new CardLayout();
-        final JPanel leafPanel = new JPanel();
+        leafPanel = new JPanel();
 
-        final CardLayout clLeaf = new CardLayout();
+        clLeaf = new CardLayout();
         leafPanel.setLayout(clLeaf);
 
         leafPanel.add(new JLabel("INTERNAL ERROR!", SwingConstants.CENTER), OTHER_NAME);
@@ -143,29 +151,18 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
         structViewPanelScroller.getHorizontalScrollBar().setUnitIncrement(UNIT_INCREMENT);
         leafPanel.add(structViewPanelScroller, STRUCT_VIEW_PANEL_NAME);
 
-        final LeafInfoPanel fileInfoPanelHeader = new LeafInfoPanel();
-        final FileInfoPanel fileInfoPanel = new FileInfoPanel();
-        final JPanel fileInfoPanelContainer = new JPanel(new BorderLayout());
-        fileInfoPanelContainer.add(fileInfoPanelHeader, BorderLayout.NORTH);
-        fileInfoPanelContainer.add(fileInfoPanel, BorderLayout.CENTER);
+        LinkedList<Pair<JPanel, String>> customPanelsList =
+                new LinkedList<Pair <JPanel, String>>();
+        createCustomPanels(customPanelsList);
 
-        JScrollPane fileInfoPanelScroller =
-                new JScrollPane(fileInfoPanelContainer);
-        fileInfoPanelScroller.getVerticalScrollBar().setUnitIncrement(UNIT_INCREMENT);
-        fileInfoPanelScroller.getHorizontalScrollBar().setUnitIncrement(UNIT_INCREMENT);
-        leafPanel.add(fileInfoPanelScroller, FILE_NAME);
-
-        final LeafInfoPanel folderInfoPanelHeader = new LeafInfoPanel();
-        final FolderInfoPanel folderInfoPanel = new FolderInfoPanel();
-        final JPanel folderInfoPanelContainer = new JPanel(new BorderLayout());
-        folderInfoPanelContainer.add(folderInfoPanelHeader, BorderLayout.NORTH);
-        folderInfoPanelContainer.add(folderInfoPanel, BorderLayout.CENTER);
-
-        JScrollPane folderInfoPanelScroller =
-                new JScrollPane(folderInfoPanelContainer);
-        folderInfoPanelScroller.getVerticalScrollBar().setUnitIncrement(UNIT_INCREMENT);
-        folderInfoPanelScroller.getHorizontalScrollBar().setUnitIncrement(UNIT_INCREMENT);
-        leafPanel.add(folderInfoPanelScroller, FOLDER_NAME);
+        for(Pair<JPanel, String> panel : customPanelsList) {
+            JScrollPane customPanelScroller = new JScrollPane(panel.getA());
+            customPanelScroller.getVerticalScrollBar().setUnitIncrement(
+                    UNIT_INCREMENT);
+            customPanelScroller.getHorizontalScrollBar().setUnitIncrement(
+                    UNIT_INCREMENT);
+            leafPanel.add(customPanelScroller, panel.getB());
+        }
 
         final LeafInfoPanel printFieldsTextAreaHeader = new LeafInfoPanel();
         final JTextArea printFieldsTextArea = new JTextArea(0, 0);
@@ -192,7 +189,6 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
         //infoScroller.setViewportView(infoPanel);
 
         catalogTree.addTreeSelectionListener(new TreeSelectionListener() {
-
             public void valueChanged(TreeSelectionEvent te) {
                 //System.err.println("Tree selection");
                 Object o = te.getPath().getLastPathComponent();
@@ -222,49 +218,11 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
 
                         clRoot.show(infoPanel, INDEX_NAME);
                     }
-                    else if(o2 instanceof BTLeafStorage) {
+                    else {
                         final BTLeafStorage leafStorage = (BTLeafStorage) o2;
-                        final CommonHFSCatalogLeafRecord rec =
-                                leafStorage.getRecord();
-                        //HFSPlusCatalogLeafRecordData data = rec.getData();
-                        if(rec instanceof CommonHFSCatalogFileRecord.HFSPlusImplementation) {
-                            CommonHFSCatalogFile fil = ((CommonHFSCatalogFileRecord)rec).getData();
-                            if(fil instanceof CommonHFSCatalogFile.HFSPlusImplementation) {
-                                HFSPlusCatalogFile underlying =
-                                        ((CommonHFSCatalogFile.HFSPlusImplementation)fil).getUnderlying();
-                                fileInfoPanelHeader.setRecordNumber(
-                                        leafStorage.getRecordNumber());
-                                fileInfoPanelHeader.setRecordOffset(
-                                        leafStorage.getRecordOffset());
-                                fileInfoPanelHeader.setRecordSize(
-                                        leafStorage.getRecordSize());
-                                fileInfoPanel.setFields(underlying);
-                                clLeaf.show(leafPanel, FILE_NAME);
-                            }
-                            else {
-                                System.err.println("CatalogInfoPanel: Could not show file record type " + fil.getClass());
-                                clLeaf.show(leafPanel, OTHER_NAME);
-                            }
-                        }
-                        else if(rec instanceof CommonHFSCatalogFolderRecord.HFSPlusImplementation) {
-                            CommonHFSCatalogFolder fld = ((CommonHFSCatalogFolderRecord)rec).getData();
-                            if(fld instanceof CommonHFSCatalogFolder.HFSPlusImplementation) {
-                                HFSPlusCatalogFolder underlying =
-                                        ((CommonHFSCatalogFolder.HFSPlusImplementation)fld).getUnderlying();
-                                folderInfoPanelHeader.setRecordNumber(
-                                        leafStorage.getRecordNumber());
-                                folderInfoPanelHeader.setRecordOffset(
-                                        leafStorage.getRecordOffset());
-                                folderInfoPanelHeader.setRecordSize(
-                                        leafStorage.getRecordSize());
-                                folderInfoPanel.setFields(underlying);
-                                clLeaf.show(leafPanel, FOLDER_NAME);
-                            }
-                            else {
-                                System.err.println("CatalogInfoPanel: Could not show folder record type " + fld.getClass());
-                                clLeaf.show(leafPanel, OTHER_NAME);
-                            }
-                        }
+                        final R rec = leafStorage.getRecord();
+
+                        if(handleLeafRecord(leafStorage));
                         else if(rec instanceof StructElements) {
                             Dictionary dict = ((StructElements) rec).getStructElements();
                             String label = dict.getTypeDescription();
@@ -307,14 +265,12 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
 
                         }
                         else {
-                            System.err.println("CatalogInfoPanel: Could not show record type " + rec.getClass());
+                            System.err.println("BTreeInfoPanel: Could not show record type " + rec.getClass());
                             clLeaf.show(leafPanel, OTHER_NAME);
                         }
                         clRoot.show(infoPanel, LEAF_NAME);
 
                     }
-                    else
-                        System.err.println("WARNING: unknown type in catalog tree user object - " + o2.getClass().toString());
                 }
                 else
                     System.err.println("WARNING: unknown type in catalog tree - " + o.getClass().toString());
@@ -322,39 +278,15 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
         });
     }
 
-    public void expandNode(DefaultMutableTreeNode dmtn, CommonBTNode node, HFSVolume fsView) {
-        if(node instanceof CommonHFSCatalogIndexNode) {
-            List<CommonBTIndexRecord<CommonHFSCatalogKey>> recs = ((CommonHFSCatalogIndexNode) node).getBTRecords();
-            for(CommonBTIndexRecord<CommonHFSCatalogKey> rec : recs) {
+    public abstract void createCustomPanels(
+            List<Pair<JPanel, String>> customPanelsList);
 
-                final long nodeNumber = rec.getIndex();
-                final CommonBTNode curNode =
-                        fsView.getCatalogFile().getCatalogNode(nodeNumber);
-                CommonHFSCatalogKey key = rec.getKey();
-                dmtn.add(new NoLeafMutableTreeNode(new BTNodeStorage(nodeNumber,
-                        curNode,
-                        key.getParentID().toLong() + ":" + fsView.decodeString(key.getNodeName()))));
-            }
-        }
-        else if(node instanceof CommonHFSCatalogLeafNode) {
-            CommonHFSCatalogLeafNode leafNode = (CommonHFSCatalogLeafNode) node;
-            CommonHFSCatalogLeafRecord[] recs = leafNode.getLeafRecords();
-            int[] recordOffsets = leafNode.getRecordOffsets();
+    public abstract void expandNode(DefaultMutableTreeNode dmtn,
+            CommonBTNode node, BTreeFile bTree);
 
-            for(int i = 0; i < recs.length; ++i) {
-                final CommonHFSCatalogLeafRecord rec = recs[i];
-                dmtn.add(new DefaultMutableTreeNode(new BTLeafStorage(i,
-                        recordOffsets[i],
-                        recordOffsets[i + 1] - recordOffsets[i], rec,
-                        rec.getKey().getParentID().toLong() + ":" +
-                        fsView.decodeString(rec.getKey().getNodeName()))));
-            }
-        }
-        else
-            throw new RuntimeException("Invalid node type in tree.");
-    }
+    public abstract boolean handleLeafRecord(BTLeafStorage leafStorage);
 
-    private static class BTNodeStorage {
+    protected static class BTNodeStorage {
 
         private long nodeNumber;
         private CommonBTNode node;
@@ -380,16 +312,16 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
         }
     }
 
-    private static class BTLeafStorage {
+    protected class BTLeafStorage {
 
         private final int recordNumber;
         private final int recordOffset;
         private final int recordSize;
-        private CommonHFSCatalogLeafRecord rec;
+        private R rec;
         private String text;
 
         public BTLeafStorage(int recordNumber, int recordOffset, int recordSize,
-                CommonHFSCatalogLeafRecord rec, String text)
+                R rec, String text)
         {
             this.recordNumber = recordNumber;
             this.recordOffset = recordOffset;
@@ -410,13 +342,145 @@ public class CatalogInfoPanel extends javax.swing.JPanel {
             return recordSize;
         }
 
-        public CommonHFSCatalogLeafRecord getRecord() {
+        public R getRecord() {
             return rec;
         }
 
         @Override
         public String toString() {
             return text;
+        }
+    }
+
+    public static class Catalog
+            extends BTreeInfoPanel<CommonHFSCatalogLeafRecord>
+    {
+        private final String FILE_NAME = "file";
+        private final String FOLDER_NAME = "folder";
+
+        private LeafInfoPanel fileInfoPanelHeader;
+        private FileInfoPanel fileInfoPanel;
+        private LeafInfoPanel folderInfoPanelHeader;
+        private FolderInfoPanel folderInfoPanel;
+
+        public Catalog(HFSVolume vol) {
+            super(vol.getCatalogFile());
+        }
+
+        public void createCustomPanels(List<Pair<JPanel, String>> panelsList) {
+            fileInfoPanelHeader = new LeafInfoPanel();
+            fileInfoPanel = new FileInfoPanel();
+            final JPanel fileInfoPanelContainer =
+                    new JPanel(new BorderLayout());
+            fileInfoPanelContainer.add(fileInfoPanelHeader, BorderLayout.NORTH);
+            fileInfoPanelContainer.add(fileInfoPanel, BorderLayout.CENTER);
+            panelsList.add(new Pair<JPanel, String>(fileInfoPanelContainer,
+                    FILE_NAME));
+
+            folderInfoPanelHeader = new LeafInfoPanel();
+            folderInfoPanel = new FolderInfoPanel();
+            final JPanel folderInfoPanelContainer =
+                    new JPanel(new BorderLayout());
+            folderInfoPanelContainer.add(folderInfoPanelHeader,
+                    BorderLayout.NORTH);
+            folderInfoPanelContainer.add(folderInfoPanel, BorderLayout.CENTER);
+            panelsList.add(new Pair<JPanel, String>(folderInfoPanelContainer,
+                    FOLDER_NAME));
+        }
+
+        public void expandNode(DefaultMutableTreeNode dmtn, CommonBTNode node,
+                BTreeFile bTree)
+        {
+            if(node instanceof CommonHFSCatalogIndexNode) {
+                List<CommonBTIndexRecord<CommonHFSCatalogKey>> recs =
+                        ((CommonHFSCatalogIndexNode) node).getBTRecords();
+                for(CommonBTIndexRecord<CommonHFSCatalogKey> rec : recs) {
+
+                    final long nodeNumber = rec.getIndex();
+                    final CommonBTNode curNode =
+                            bTree.getNode(nodeNumber);
+                    CommonHFSCatalogKey key = rec.getKey();
+                    dmtn.add(new NoLeafMutableTreeNode(new BTNodeStorage(nodeNumber,
+                            curNode,
+                            key.getParentID().toLong() + ":" + bTree.
+                            getVolume().decodeString(key.getNodeName()))));
+                }
+            }
+            else if(node instanceof CommonHFSCatalogLeafNode) {
+                CommonHFSCatalogLeafNode leafNode =
+                        (CommonHFSCatalogLeafNode) node;
+                CommonHFSCatalogLeafRecord[] recs = leafNode.getLeafRecords();
+                int[] recordOffsets = leafNode.getRecordOffsets();
+
+                for(int i = 0; i < recs.length; ++i) {
+                    final CommonHFSCatalogLeafRecord rec = recs[i];
+                    dmtn.add(new DefaultMutableTreeNode(new BTLeafStorage(i,
+                            recordOffsets[i],
+                            recordOffsets[i + 1] - recordOffsets[i], rec,
+                            rec.getKey().getParentID().toLong() + ":" +
+                            bTree.getVolume().decodeString(rec.getKey().
+                            getNodeName()))));
+                }
+            }
+            else
+                throw new RuntimeException("Invalid node type in tree.");
+        }
+
+        public boolean handleLeafRecord(BTLeafStorage leafStorage) {
+            CommonHFSCatalogLeafRecord rec = leafStorage.getRecord();
+            //HFSPlusCatalogLeafRecordData data = rec.getData();
+            if(rec instanceof CommonHFSCatalogFileRecord.HFSPlusImplementation) {
+                CommonHFSCatalogFile fil =
+                        ((CommonHFSCatalogFileRecord)rec).getData();
+                if(fil instanceof CommonHFSCatalogFile.HFSPlusImplementation) {
+                    HFSPlusCatalogFile underlying =
+                            ((CommonHFSCatalogFile.HFSPlusImplementation) fil).
+                            getUnderlying();
+                    fileInfoPanelHeader.setRecordNumber(
+                            leafStorage.getRecordNumber());
+                    fileInfoPanelHeader.setRecordOffset(
+                            leafStorage.getRecordOffset());
+                    fileInfoPanelHeader.setRecordSize(
+                            leafStorage.getRecordSize());
+                    fileInfoPanel.setFields(underlying);
+                    clLeaf.show(leafPanel, FILE_NAME);
+                }
+                else {
+                    System.err.println("BTreeInfoPanel: Could not show file " +
+                            "record type " + fil.getClass());
+                    clLeaf.show(leafPanel, OTHER_NAME);
+                }
+            }
+            else if(rec instanceof CommonHFSCatalogFolderRecord.
+                    HFSPlusImplementation)
+            {
+                CommonHFSCatalogFolder fld =
+                        ((CommonHFSCatalogFolderRecord)rec).getData();
+                if(fld instanceof CommonHFSCatalogFolder.HFSPlusImplementation)
+                {
+                    HFSPlusCatalogFolder underlying =
+                            ((CommonHFSCatalogFolder.HFSPlusImplementation)
+                            fld).getUnderlying();
+                    folderInfoPanelHeader.setRecordNumber(
+                            leafStorage.getRecordNumber());
+                    folderInfoPanelHeader.setRecordOffset(
+                            leafStorage.getRecordOffset());
+                    folderInfoPanelHeader.setRecordSize(
+                            leafStorage.getRecordSize());
+                    folderInfoPanel.setFields(underlying);
+                    clLeaf.show(leafPanel, FOLDER_NAME);
+                }
+                else {
+                    System.err.println("BTreeInfoPanel: Could not show " +
+                            "folder record type " + fld.getClass());
+                    clLeaf.show(leafPanel, OTHER_NAME);
+                }
+            }
+            else {
+                return false;
+            }
+
+            return true;
         }
     }
 

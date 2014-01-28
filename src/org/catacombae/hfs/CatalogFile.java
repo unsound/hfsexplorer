@@ -119,6 +119,36 @@ public class CatalogFile extends BTreeFile {
         return ses.bthr.getRootNodeNumber();
     }
 
+    /**
+     * Returns the B-tree root node of the catalog file. If it does not exist
+     * <code>null</code> is returned. The catalog file will have no meaningful
+     * content if there is no root node.
+     *
+     * @return the B-tree root node of the catalog file.
+     */
+    public CommonBTNode getRootNode() {
+        CatalogFileSession ses = openSession();
+
+        try {
+            long rootNode = ses.bthr.getRootNodeNumber();
+
+            if(rootNode == 0) {
+                // There is no index node, or other content. So the node we
+                // seek does not exist. Return null.
+                return null;
+            }
+            else if(rootNode < 0 || rootNode > Integer.MAX_VALUE * 2L) {
+                throw new RuntimeException("Internal error - rootNode out of " +
+                        "range: " + rootNode);
+            }
+            else {
+                return getCatalogNode(rootNode);
+            }
+        } finally {
+            ses.close();
+        }
+    }
+
     public CommonHFSCatalogFolderRecord getRootFolder() {
         CatalogFileSession ses = openSession();
 
@@ -180,6 +210,10 @@ public class CatalogFile extends BTreeFile {
         else
             throw new RuntimeException("Unexpected node type at catalog node 0: " +
                     firstNode.getClass());
+    }
+
+    public CommonBTNode getNode(long nodeNumber) {
+        return getCatalogNode(nodeNumber);
     }
 
     /**
