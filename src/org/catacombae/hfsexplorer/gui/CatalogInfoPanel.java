@@ -21,7 +21,7 @@ import java.awt.BorderLayout;
 import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
-import org.catacombae.hfs.BTreeFile;
+import org.catacombae.hfs.CatalogFile;
 import org.catacombae.hfs.HFSVolume;
 import org.catacombae.hfs.types.hfscommon.CommonBTIndexRecord;
 import org.catacombae.hfs.types.hfscommon.CommonBTNode;
@@ -42,7 +42,8 @@ import org.catacombae.util.Util.Pair;
  *
  * @author erik
  */
-public class CatalogInfoPanel extends BTreeInfoPanel<CommonHFSCatalogLeafRecord>
+public class CatalogInfoPanel
+        extends BTreeInfoPanel<CommonHFSCatalogLeafRecord, CatalogFile>
 {
     private final String FILE_NAME = "file";
     private final String FOLDER_NAME = "folder";
@@ -78,7 +79,7 @@ public class CatalogInfoPanel extends BTreeInfoPanel<CommonHFSCatalogLeafRecord>
     }
 
     public void expandNode(DefaultMutableTreeNode dmtn, CommonBTNode node,
-            BTreeFile bTree)
+            CatalogFile catalogFile)
     {
         if(node instanceof CommonHFSCatalogIndexNode) {
             List<CommonBTIndexRecord<CommonHFSCatalogKey>> recs =
@@ -87,11 +88,11 @@ public class CatalogInfoPanel extends BTreeInfoPanel<CommonHFSCatalogLeafRecord>
 
                 final long nodeNumber = rec.getIndex();
                 final CommonBTNode curNode =
-                        bTree.getNode(nodeNumber);
+                        catalogFile.getNode(nodeNumber);
                 CommonHFSCatalogKey key = rec.getKey();
                 dmtn.add(new NoLeafMutableTreeNode(new BTNodeStorage(nodeNumber,
                         curNode,
-                        key.getParentID().toLong() + ":" + bTree.
+                        key.getParentID().toLong() + ":" + catalogFile.
                         getVolume().decodeString(key.getNodeName()))));
             }
         }
@@ -107,7 +108,7 @@ public class CatalogInfoPanel extends BTreeInfoPanel<CommonHFSCatalogLeafRecord>
                         recordOffsets[i],
                         recordOffsets[i + 1] - recordOffsets[i], rec,
                         rec.getKey().getParentID().toLong() + ":" +
-                        bTree.getVolume().decodeString(rec.getKey().
+                        catalogFile.getVolume().decodeString(rec.getKey().
                         getNodeName()))));
             }
         }

@@ -55,8 +55,9 @@ import org.catacombae.util.Util.Pair;
  *
  * @author  Erik
  */
-public abstract class BTreeInfoPanel<R> extends javax.swing.JPanel {
-
+public abstract class BTreeInfoPanel<R, B extends BTreeFile>
+        extends javax.swing.JPanel
+{
     private static final int UNIT_INCREMENT = 10;
 
     protected final String INDEX_NAME = "index";
@@ -69,7 +70,7 @@ public abstract class BTreeInfoPanel<R> extends javax.swing.JPanel {
     protected final CardLayout clLeaf;
 
     /** Creates new form BTreeInfoPanel */
-    public BTreeInfoPanel(final BTreeFile bTree) {
+    public BTreeInfoPanel(final B bTree) {
 
         initComponents();
 
@@ -268,7 +269,7 @@ public abstract class BTreeInfoPanel<R> extends javax.swing.JPanel {
             List<Pair<JPanel, String>> customPanelsList);
 
     public abstract void expandNode(DefaultMutableTreeNode dmtn,
-            CommonBTNode node, BTreeFile bTree);
+            CommonBTNode node, B bTree);
 
     public abstract boolean handleLeafRecord(BTLeafStorage leafStorage);
 
