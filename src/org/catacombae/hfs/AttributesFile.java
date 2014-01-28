@@ -89,6 +89,12 @@ public class AttributesFile extends BTreeFile {
         return new Session();
     }
 
+    public long getRootNodeNumber() {
+        Session ses = openSession();
+
+        return ses.bthr.getRootNodeNumber();
+    }
+
     /**
      * Returns the B-tree root node of the attributes file. If it does not exist
      * <code>null</code> is returned. The attributes file will have no

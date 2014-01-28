@@ -22,6 +22,7 @@ import org.catacombae.hfs.types.hfscommon.CommonBTHeaderRecord;
 import org.catacombae.hfs.types.hfscommon.CommonBTIndexNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTIndexRecord;
 import org.catacombae.hfs.types.hfscommon.CommonBTKey;
+import org.catacombae.hfs.types.hfscommon.CommonBTNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor;
 import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.io.Readable;
@@ -117,4 +118,14 @@ public abstract class BTreeFile {
             byte[] currentNodeData, int offset) {
         return ops.createCommonBTNodeDescriptor(currentNodeData, offset);
     }
+
+    public HFSVolume getVolume() {
+        return vol;
+    }
+
+    public abstract CommonBTNode getRootNode();
+
+    public abstract long getRootNodeNumber();
+
+    public abstract CommonBTNode getNode(long nodeNumber);
 }

@@ -79,6 +79,42 @@ public class ExtentsOverflowFile extends BTreeFile {
         return new ExtentsOverflowFileSession();
     }
 
+    public long getRootNodeNumber() {
+        ExtentsOverflowFileSession ses = openSession();
+
+        return ses.bthr.getRootNodeNumber();
+    }
+
+    /**
+     * Returns the B-tree root node of the extents overflow file. If it does not
+     * exist <code>null</code> is returned. The extents overflow file will have
+     * no meaningful content if there is no root node.
+     *
+     * @return the B-tree root node of the extents overflow file.
+     */
+    public CommonBTNode getRootNode() {
+        ExtentsOverflowFileSession ses = openSession();
+
+        try {
+            long rootNode = ses.bthr.getRootNodeNumber();
+
+            if(rootNode == 0) {
+                // There is no index node, or other content. So the node we
+                // seek does not exist. Return null.
+                return null;
+            }
+            else if(rootNode < 0 || rootNode > Integer.MAX_VALUE * 2L) {
+                throw new RuntimeException("Internal error - rootNode out of " +
+                        "range: " + rootNode);
+            }
+            else {
+                return getExtentsOverflowNode(rootNode);
+            }
+        } finally {
+            ses.close();
+        }
+    }
+
     public CommonBTHeaderNode getHeaderNode() {
         CommonBTNode firstNode = getExtentsOverflowNode(0);
         if(firstNode instanceof CommonBTHeaderNode) {
@@ -88,6 +124,10 @@ public class ExtentsOverflowFile extends BTreeFile {
             throw new RuntimeException("Unexpected node type at catalog node " +
                     "0: " + firstNode.getClass());
         }
+    }
+
+    public CommonBTNode getNode(long nodeNumber) {
+        return getExtentsOverflowNode(nodeNumber);
     }
 
     /**
