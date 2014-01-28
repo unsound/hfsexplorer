@@ -76,7 +76,6 @@ public abstract class BTreeInfoPanel<R, B extends BTreeFile>
 
         descriptionLabel.setText(getHeaderText());
 
-        JTree dirTree = catalogTree;
         // Populate the root
 	/*
          * What we need is a method that gets us the children of the "current" node.
@@ -86,7 +85,7 @@ public abstract class BTreeInfoPanel<R, B extends BTreeFile>
 
         if(iNode == null) {
             DefaultTreeModel model = new DefaultTreeModel(new NoLeafMutableTreeNode("<empty>"));
-            dirTree.setModel(model);
+            bTreeFileTree.setModel(model);
 
             leafPanel = null;
             clLeaf = null;
@@ -100,9 +99,9 @@ public abstract class BTreeInfoPanel<R, B extends BTreeFile>
         expandNode(rootNode, iNode, bTree);
 
         DefaultTreeModel model = new DefaultTreeModel(rootNode);
-        dirTree.setModel(model);
+        bTreeFileTree.setModel(model);
 
-        dirTree.addTreeWillExpandListener(new TreeWillExpandListener() {
+        bTreeFileTree.addTreeWillExpandListener(new TreeWillExpandListener() {
 
             public void treeWillExpand(TreeExpansionEvent e)
                     throws ExpandVetoException {
@@ -177,7 +176,7 @@ public abstract class BTreeInfoPanel<R, B extends BTreeFile>
         infoPanel.add(leafPanel, LEAF_NAME);
         //infoScroller.setViewportView(infoPanel);
 
-        catalogTree.addTreeSelectionListener(new TreeSelectionListener() {
+        bTreeFileTree.addTreeSelectionListener(new TreeSelectionListener() {
             public void valueChanged(TreeSelectionEvent te) {
                 //System.err.println("Tree selection");
                 Object o = te.getPath().getLastPathComponent();
@@ -262,7 +261,8 @@ public abstract class BTreeInfoPanel<R, B extends BTreeFile>
                     }
                 }
                 else
-                    System.err.println("WARNING: unknown type in catalog tree - " + o.getClass().toString());
+                    System.err.println("WARNING: Unknown node type in " +
+                            "bTreeFileTree - " + o.getClass().toString());
             }
         });
     }
@@ -355,8 +355,8 @@ public abstract class BTreeInfoPanel<R, B extends BTreeFile>
 
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel1 = new javax.swing.JPanel();
-        catalogTreeScroller = new javax.swing.JScrollPane();
-        catalogTree = new javax.swing.JTree();
+        bTreeFileTreeScroller = new javax.swing.JScrollPane();
+        bTreeFileTree = new javax.swing.JTree();
         infoPanel = new javax.swing.JPanel();
         descriptionLabel = new javax.swing.JLabel();
 
@@ -364,17 +364,17 @@ public abstract class BTreeInfoPanel<R, B extends BTreeFile>
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         jSplitPane1.setResizeWeight(1.0);
 
-        catalogTreeScroller.setViewportView(catalogTree);
+        bTreeFileTreeScroller.setViewportView(bTreeFileTree);
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(catalogTreeScroller, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE)
+            .add(bTreeFileTreeScroller, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, catalogTreeScroller, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, bTreeFileTreeScroller, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
         );
 
         jSplitPane1.setLeftComponent(jPanel1);
@@ -394,7 +394,7 @@ public abstract class BTreeInfoPanel<R, B extends BTreeFile>
 
         jSplitPane1.setRightComponent(infoPanel);
 
-        descriptionLabel.setText("View of the catalog file's B*-tree:");
+        descriptionLabel.setText("View of the B*-tree:");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -418,8 +418,8 @@ public abstract class BTreeInfoPanel<R, B extends BTreeFile>
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    public javax.swing.JTree catalogTree;
-    private javax.swing.JScrollPane catalogTreeScroller;
+    public javax.swing.JTree bTreeFileTree;
+    private javax.swing.JScrollPane bTreeFileTreeScroller;
     private javax.swing.JLabel descriptionLabel;
     private javax.swing.JPanel infoPanel;
     private javax.swing.JPanel jPanel1;
