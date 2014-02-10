@@ -112,7 +112,7 @@ public class HFSPlusForkData implements StructElements, PrintableStruct {
         db.addUIntBE("logicalSize", logicalSize, "Logical size", "bytes");
         db.addUIntBE("clumpSize", clumpSize, "Clump size", "bytes");
         db.addUIntBE("totalBlocks", totalBlocks, "Total blocks");
-        db.add("extents", extents.getStructElements(), "Extents");
+        db.add("extents", extents.getStructElement(), "Extents");
 
         return db.getResult();
     }

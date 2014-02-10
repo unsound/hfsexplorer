@@ -20,10 +20,10 @@ package org.catacombae.hfs.types.hfsplus;
 import java.io.PrintStream;
 import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.csjc.StructElements;
+import org.catacombae.csjc.structelements.Array;
 import org.catacombae.csjc.structelements.ArrayBuilder;
-import org.catacombae.csjc.structelements.Dictionary;
 
-public class HFSPlusExtentRecord implements PrintableStruct, StructElements {
+public class HFSPlusExtentRecord implements PrintableStruct {
     /*
      * HFSPlusExtentDescriptor (typedef HFSPlusExtentDescriptor[8])
      * size: 64 bytes
@@ -119,19 +119,13 @@ public class HFSPlusExtentRecord implements PrintableStruct, StructElements {
         return result;
     }
 
-    public Dictionary getStructElements() {
-        DictionaryBuilder db = new DictionaryBuilder(HFSPlusExtentRecord.class.getSimpleName());
+    public Array getStructElement() {
+        ArrayBuilder ab = new ArrayBuilder("HFSPlusExtentDescriptor[8]");
 
-        {
-            ArrayBuilder ab = new ArrayBuilder("HFSPlusExtentDescriptor[8]");
+        for(HFSPlusExtentDescriptor descriptor : array)
+            ab.add(descriptor.getStructElements());
 
-            for(HFSPlusExtentDescriptor descriptor : array)
-                ab.add(descriptor.getStructElements());
-            
-            db.add("array", ab.getResult());
-        }
-
-        return db.getResult();
+        return ab.getResult();
     }
 
     private void _set(HFSPlusExtentRecord rec) {
