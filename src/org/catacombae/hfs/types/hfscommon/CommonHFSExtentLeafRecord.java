@@ -185,7 +185,7 @@ public abstract class CommonHFSExtentLeafRecord extends CommonBTRecord implement
                     "HFS+ extents overflow file leaf record");
 
             db.add("key", key.getStructElements(), "Key");
-            db.add("recordData", recordData.getStructElements(), "Record data");
+            db.add("recordData", recordData.getStructElement(), "Record data");
 
             return db.getResult();
         }
