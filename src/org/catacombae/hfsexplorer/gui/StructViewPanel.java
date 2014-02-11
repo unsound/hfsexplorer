@@ -27,13 +27,20 @@ import org.catacombae.csjc.structelements.Array;
 public class StructViewPanel extends javax.swing.JPanel {
 
     public StructViewPanel(String label, Dictionary dict) {
+        this(label, dict, false);
+    }
+
+    public StructViewPanel(String label, Dictionary dict,
+            boolean noRootEntry) {
         this();
-        containerPanel.add(new InternalStructViewPanel(label, dict));
+        containerPanel.add(new InternalStructViewPanel(label, dict,
+            noRootEntry));
     }
 
     public StructViewPanel(String label, String tooltip, Dictionary dict) {
         this();
-        containerPanel.add(new InternalStructViewPanel(label, tooltip, dict));
+        containerPanel.add(new InternalStructViewPanel(label, tooltip, dict,
+                false));
     }
 
     public StructViewPanel(String label, Array array) {
