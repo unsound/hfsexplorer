@@ -29,7 +29,6 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.hfsexplorer.gui.AttributesInfoPanel;
 import org.catacombae.hfsexplorer.gui.CatalogInfoPanel;
 import org.catacombae.hfsexplorer.gui.ExtentsInfoPanel;
-import org.catacombae.hfsexplorer.gui.HFSPlusVolumeInfoPanel;
 import org.catacombae.hfsexplorer.gui.JournalInfoPanel;
 import org.catacombae.hfsexplorer.gui.StructViewPanel;
 
@@ -52,11 +51,7 @@ public class VolumeInfoWindow extends JFrame {
         try {
             final JPanel volumeInfoPanel;
             CommonHFSVolumeHeader volHeader = fsView.getVolumeHeader();
-            if(volHeader instanceof CommonHFSVolumeHeader.HFSPlusImplementation)
-                volumeInfoPanel = new HFSPlusVolumeInfoPanel(
-                        ((CommonHFSVolumeHeader.HFSPlusImplementation)volHeader).getUnderlying());
-            else
-                volumeInfoPanel = new StructViewPanel("Volume header",
+            volumeInfoPanel = new StructViewPanel("Volume header",
                     volHeader.getStructElements(), true);
 
             JScrollPane volumeInfoPanelScroller = new JScrollPane(volumeInfoPanel,
