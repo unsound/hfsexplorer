@@ -67,7 +67,9 @@ public class InternalStructViewPanel extends javax.swing.JPanel {
                 subLabel = curKey;
 
             subPanels[i] = createPanel(subLabel, curElement);
-            subPanels[i].setBorder(new EmptyBorder(0, 0, 5, 0));
+            if(i != keys.length - 1) {
+                subPanels[i].setBorder(new EmptyBorder(0, 0, 5, 0));
+            }
         }
 
         fieldsPanel.removeAll();
