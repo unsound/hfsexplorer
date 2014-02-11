@@ -33,13 +33,25 @@ public class InternalStructViewPanel extends javax.swing.JPanel {
 
     /** Creates new form StructViewPanel */
     public InternalStructViewPanel(String label, Dictionary dict) {
-        this(label, null, dict);
+        this(label, null, dict, false);
+    }
+
+    public InternalStructViewPanel(String label, Dictionary dict,
+            boolean noRootEntry)
+    {
+        this(label, null, dict, noRootEntry);
     }
 
     public InternalStructViewPanel(String label, String tooltip,
             Dictionary dict)
     {
-        this(label, tooltip);
+        this(label, tooltip, false);
+    }
+
+    public InternalStructViewPanel(String label, String tooltip,
+            Dictionary dict, boolean noRootEntry)
+    {
+        this(label, tooltip, noRootEntry);
 
         String[] keys = dict.getKeys();
         JPanel[] subPanels = new JPanel[keys.length];
@@ -86,11 +98,26 @@ public class InternalStructViewPanel extends javax.swing.JPanel {
     }
 
     private InternalStructViewPanel(String label, String tooltip) {
-        initComponents();
+        this(label, tooltip, false);
+    }
 
-        structNameLabel.setText(label);
-        if(tooltip != null) {
-            structNameLabel.setToolTipText(tooltip);
+    private InternalStructViewPanel(String label, String tooltip,
+            boolean noRootEntry)
+    {
+        if(!noRootEntry) {
+            initComponents();
+
+            structNameLabel.setText(label);
+            if(tooltip != null) {
+                structNameLabel.setToolTipText(tooltip);
+            }
+        }
+        else {
+            this.setLayout(new java.awt.BorderLayout());
+            fieldsPanel = new JPanel();
+            fieldsPanel.setLayout(new javax.swing.BoxLayout(fieldsPanel,
+                    javax.swing.BoxLayout.PAGE_AXIS));
+            this.add(fieldsPanel, java.awt.BorderLayout.CENTER);
         }
     }
 

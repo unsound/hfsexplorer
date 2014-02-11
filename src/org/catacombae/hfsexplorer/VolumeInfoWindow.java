@@ -57,7 +57,7 @@ public class VolumeInfoWindow extends JFrame {
                         ((CommonHFSVolumeHeader.HFSPlusImplementation)volHeader).getUnderlying());
             else
                 volumeInfoPanel = new StructViewPanel("Volume header",
-                    volHeader.getStructElements());
+                    volHeader.getStructElements(), true);
 
             JScrollPane volumeInfoPanelScroller = new JScrollPane(volumeInfoPanel,
                     JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
