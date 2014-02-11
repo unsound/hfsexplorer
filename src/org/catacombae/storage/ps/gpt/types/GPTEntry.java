@@ -91,7 +91,14 @@ public class GPTEntry implements Partition, StructElements {
 
     // Defined in Partition
     public long getStartOffset() { return getStartingLBA()*blockSize; }
-    public long getLength() { return getEndingLBA()*blockSize - getStartOffset(); }
+
+    public long getLength() {
+        /* NOTE: I think this is an appropriate length calculation. If we don't
+         * add 1 to getEndingLBA() (which specifies the last sector LBA,
+         * inclusive) we are missing one sector. */
+        return (getEndingLBA() + 1) * blockSize - getStartOffset();
+    }
+
     public PartitionType getType() { return convertPartitionType(getPartitionTypeGUIDAsEnum()); }
 
     public static int getSize() { return 128; }
