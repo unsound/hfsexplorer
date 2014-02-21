@@ -434,7 +434,7 @@ public class UnHFS {
         }
         if(wasEmpty) {
             long lastModified = folder.getAttributes().getModifyDate().getTime();
-            targetDir.setLastModified(lastModified);
+            targetDir.setLastModified(lastModified < 0 ? 0 : lastModified);
         }
     }
 
@@ -450,7 +450,7 @@ public class UnHFS {
         else if(verbose) {
             System.out.println(dataFile.getPath());
         }
-        dataFile.setLastModified(lastModified);
+        dataFile.setLastModified(lastModified < 0 ? 0 : lastModified);
         if(extractResourceForks) {
             FSFork resourceFork = file.getForkByType(FSForkType.MACOS_RESOURCE);
 
@@ -463,7 +463,7 @@ public class UnHFS {
                 else if(verbose) {
                     System.out.println(resFile.getPath());
                 }
-                resFile.setLastModified(lastModified);
+                resFile.setLastModified(lastModified < 0 ? 0 : lastModified);
             }
         }
     }
