@@ -1991,8 +1991,13 @@ public class FileSystemBrowserWindow extends JFrame {
                     extractForkToStream(theFork, fos, progressDialog);
                 fos.close();
 
-                if(rec.getAttributes().hasModifyDate())
-                    outFile.setLastModified(rec.getAttributes().getModifyDate().getTime());
+                if(rec.getAttributes().hasModifyDate()) {
+                    final long lastModifiedTime =
+                            rec.getAttributes().getModifyDate().getTime();
+
+                    outFile.setLastModified(lastModifiedTime < 0 ? 0 :
+                        lastModifiedTime);
+                }
 
                 if(curFileName != (Object) originalFileName && !curFileName.equals(originalFileName))
                     errorMessages.addLast("File \"" + originalFileName +
