@@ -148,7 +148,7 @@ public class UnHFS {
                 }
             }
             else if(curArg.equals("-create")) {
-            	extractFolderDirectly = false;
+                extractFolderDirectly = false;
             }
             else if(curArg.equals("-resforks")) {
                 if(i+1 < args.length) {
@@ -265,7 +265,7 @@ public class UnHFS {
             ReadableRandomAccessStream inFileStream, File outputDir,
             String fsRoot, char[] password, boolean extractFolderDirectly,
             boolean extractResourceForks, int partitionNumber, boolean verbose)
-    		throws RuntimeIOException {
+            throws RuntimeIOException {
 
         // First detect any outer layers of UDIF and/or encryption.
         logDebug("Trying to detect encrypted structure...");
@@ -391,21 +391,21 @@ public class UnHFS {
         FSEntry entry = fsHandler.getEntryByPosixPath(fsRoot);
         if(entry instanceof FSFolder) {
             FSFolder folder = (FSFolder)entry;
-			File dirForFolder;
+            File dirForFolder;
             String folderName = folder.getName();
-			if(extractFolderDirectly || folderName.equals("/") || folderName.length() == 0) {
-    			dirForFolder = outputDir;
+            if(extractFolderDirectly || folderName.equals("/") || folderName.length() == 0) {
+                dirForFolder = outputDir;
             }
             else {
-            	dirForFolder = getFileForFolder(outputDir, folder, verbose);
+                dirForFolder = getFileForFolder(outputDir, folder, verbose);
             }
-			if(dirForFolder != null) {
-				extractFolder(folder, dirForFolder, extractResourceForks, verbose);
-			}
+            if(dirForFolder != null) {
+                extractFolder(folder, dirForFolder, extractResourceForks, verbose);
+            }
         }
         else if(entry instanceof FSFile) {
-        	FSFile file = (FSFile)entry;
-        	extractFile(file, outputDir, extractResourceForks, verbose);
+            FSFile file = (FSFile)entry;
+            extractFile(file, outputDir, extractResourceForks, verbose);
         }
         else {
             System.err.println("Requested path is not a folder or a file!");
@@ -415,11 +415,11 @@ public class UnHFS {
 
     private static void extractFolder(FSFolder folder, File targetDir,
             boolean extractResourceForks, boolean verbose) {
-    	boolean wasEmpty = targetDir.list().length == 0;
+        boolean wasEmpty = targetDir.list().length == 0;
         for(FSEntry e : folder.listEntries()) {
             if(e instanceof FSFile) {
                 FSFile file = (FSFile)e;
-				extractFile(file, targetDir, extractResourceForks, verbose);
+                extractFile(file, targetDir, extractResourceForks, verbose);
             }
             else if(e instanceof FSFolder) {
                 FSFolder subFolder = (FSFolder)e;
@@ -433,55 +433,55 @@ public class UnHFS {
             }
         }
         if(wasEmpty) {
-			long lastModified = folder.getAttributes().getModifyDate().getTime();
-			targetDir.setLastModified(lastModified);
+            long lastModified = folder.getAttributes().getModifyDate().getTime();
+            targetDir.setLastModified(lastModified);
         }
     }
 
-	private static void extractFile(FSFile file, File targetDir,
-			boolean extractResourceForks, boolean verbose)
-			throws RuntimeIOException {
-		long lastModified = file.getAttributes().getModifyDate().getTime();
-		File dataFile = new File(targetDir, scrub(file.getName()));
-		if(!extractRawForkToFile(file.getMainFork(), dataFile)) {
-		    System.err.println("Failed to extract data " +
-		            "fork to " + dataFile.getPath());
-		}
-		else if(verbose) {
-		    System.out.println(dataFile.getPath());
-		}
-		dataFile.setLastModified(lastModified);
-		if(extractResourceForks) {
-		    FSFork resourceFork = file.getForkByType(FSForkType.MACOS_RESOURCE);
+    private static void extractFile(FSFile file, File targetDir,
+            boolean extractResourceForks, boolean verbose)
+            throws RuntimeIOException {
+        long lastModified = file.getAttributes().getModifyDate().getTime();
+        File dataFile = new File(targetDir, scrub(file.getName()));
+        if(!extractRawForkToFile(file.getMainFork(), dataFile)) {
+            System.err.println("Failed to extract data " +
+                    "fork to " + dataFile.getPath());
+        }
+        else if(verbose) {
+            System.out.println(dataFile.getPath());
+        }
+        dataFile.setLastModified(lastModified);
+        if(extractResourceForks) {
+            FSFork resourceFork = file.getForkByType(FSForkType.MACOS_RESOURCE);
 
-		    if(resourceFork.getLength() > 0) {
-		        File resFile = new File(targetDir, "._" + scrub(file.getName()));
-		        if(!extractResourceForkToAppleDoubleFile(resourceFork, resFile)) {
-		            System.err.println("Failed to extract resource " +
-		                    "fork to " + resFile.getPath());
-		        }
-		        else if(verbose) {
-		            System.out.println(resFile.getPath());
-		        }
-		        resFile.setLastModified(lastModified);
-		    }
-		}
-	}
+            if(resourceFork.getLength() > 0) {
+                File resFile = new File(targetDir, "._" + scrub(file.getName()));
+                if(!extractResourceForkToAppleDoubleFile(resourceFork, resFile)) {
+                    System.err.println("Failed to extract resource " +
+                            "fork to " + resFile.getPath());
+                }
+                else if(verbose) {
+                    System.out.println(resFile.getPath());
+                }
+                resFile.setLastModified(lastModified);
+            }
+        }
+    }
 
-	private static File getFileForFolder(File targetDir, FSFolder folder,
-			boolean verbose) {
-		File folderFile = new File(targetDir, scrub(folder.getName()));
-		if(folderFile.isDirectory() || folderFile.mkdir()) {
-		    if(verbose)
-		        System.out.println(folderFile.getPath());
-		}
-		else {
-		    System.err.println("Failed to create directory " +
-		            folderFile.getPath());
-		    folderFile = null;
-		}
-		return folderFile;
-	}
+    private static File getFileForFolder(File targetDir, FSFolder folder,
+            boolean verbose) {
+        File folderFile = new File(targetDir, scrub(folder.getName()));
+        if(folderFile.isDirectory() || folderFile.mkdir()) {
+            if(verbose)
+                System.out.println(folderFile.getPath());
+        }
+        else {
+            System.err.println("Failed to create directory " +
+                    folderFile.getPath());
+            folderFile = null;
+        }
+        return folderFile;
+    }
 
     private static boolean extractRawForkToFile(FSFork fork, File targetFile) throws RuntimeIOException {
         FileOutputStream os = null;
