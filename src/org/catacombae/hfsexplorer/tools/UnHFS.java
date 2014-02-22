@@ -433,15 +433,20 @@ public class UnHFS {
             }
         }
         if(wasEmpty) {
-            long lastModified = folder.getAttributes().getModifyDate().getTime();
-            targetDir.setLastModified(lastModified < 0 ? 0 : lastModified);
+            if(folder.getAttributes().hasModifyDate()) {
+                long lastModified =
+                        folder.getAttributes().getModifyDate().getTime();
+                targetDir.setLastModified(lastModified < 0 ? 0 : lastModified);
+            }
         }
     }
 
     private static void extractFile(FSFile file, File targetDir,
             boolean extractResourceForks, boolean verbose)
             throws RuntimeIOException {
-        long lastModified = file.getAttributes().getModifyDate().getTime();
+        final Long lastModified = file.getAttributes().hasModifyDate() ?
+            file.getAttributes().getModifyDate().getTime() : null;
+
         File dataFile = new File(targetDir, scrub(file.getName()));
         if(!extractRawForkToFile(file.getMainFork(), dataFile)) {
             System.err.println("Failed to extract data " +
@@ -450,7 +455,11 @@ public class UnHFS {
         else if(verbose) {
             System.out.println(dataFile.getPath());
         }
-        dataFile.setLastModified(lastModified < 0 ? 0 : lastModified);
+
+        if(lastModified != null) {
+            dataFile.setLastModified(lastModified < 0 ? 0 : lastModified);
+        }
+
         if(extractResourceForks) {
             FSFork resourceFork = file.getForkByType(FSForkType.MACOS_RESOURCE);
 
@@ -463,7 +472,11 @@ public class UnHFS {
                 else if(verbose) {
                     System.out.println(resFile.getPath());
                 }
-                resFile.setLastModified(lastModified < 0 ? 0 : lastModified);
+
+                if(lastModified != null) {
+                    resFile.setLastModified(lastModified < 0 ? 0 :
+                        lastModified);
+                }
             }
         }
     }
