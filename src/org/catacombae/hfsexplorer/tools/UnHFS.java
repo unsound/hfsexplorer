@@ -449,7 +449,12 @@ public class UnHFS {
                     lastModified = 0;
                 }
 
-                targetDir.setLastModified(lastModified);
+                if(targetDir.setLastModified(lastModified)) {
+                    System.err.println("Warning: Failed to set last " +
+                            "modified timestamp (" + lastModified + ") for " +
+                            "directory \"" + targetDir.getPath() + "\" after " +
+                            "extraction.");
+                }
             }
         }
     }
@@ -470,6 +475,8 @@ public class UnHFS {
         }
 
         if(lastModified != null) {
+            boolean setLastModifiedResult;
+
             if(lastModified < 0) {
                 System.err.println("Warning: Can not set data file's last " +
                         "modified timestamp to pre-1970 date " +
@@ -477,10 +484,17 @@ public class UnHFS {
                         "(raw: " + lastModified + "). Setting to earliest " +
                         "possible timestamp (" + new Date(0) + ").");
 
-                dataFile.setLastModified(0);
+                setLastModifiedResult = dataFile.setLastModified(0);
             }
             else {
-                dataFile.setLastModified(lastModified);
+                setLastModifiedResult = dataFile.setLastModified(lastModified);
+            }
+
+            if(!setLastModifiedResult) {
+                System.err.println("Warning: Failed to set last " +
+                        "modified timestamp (" + lastModified + ") for data " +
+                        "file \"" + dataFile.getPath() + "\" after " +
+                        "extraction.");
             }
         }
 
@@ -498,6 +512,8 @@ public class UnHFS {
                 }
 
                 if(lastModified != null) {
+                    boolean setLastModifiedResult;
+
                     if(lastModified < 0) {
                         System.err.println("Warning: Can not set resource " +
                                 "fork AppleDouble file's last modified " +
@@ -507,10 +523,18 @@ public class UnHFS {
                                 "earliest possible timestamp " +
                                 "(" + new Date(0) + ").");
 
-                        resFile.setLastModified(0);
+                        setLastModifiedResult = resFile.setLastModified(0);
                     }
                     else {
-                        resFile.setLastModified(lastModified);
+                        setLastModifiedResult =
+                                resFile.setLastModified(lastModified);
+                    }
+
+                    if(!setLastModifiedResult) {
+                        System.err.println("Warning: Failed to set last " +
+                                "modified timestamp  (" + lastModified + ") " +
+                                "for resource fork AppleDouble file after " +
+                                "extraction.");
                     }
                 }
             }
