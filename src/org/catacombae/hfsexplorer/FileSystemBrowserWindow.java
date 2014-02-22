@@ -59,6 +59,7 @@ import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -1992,11 +1993,29 @@ public class FileSystemBrowserWindow extends JFrame {
                 fos.close();
 
                 if(rec.getAttributes().hasModifyDate()) {
-                    final long lastModifiedTime =
+                    long lastModifiedTime =
                             rec.getAttributes().getModifyDate().getTime();
+                    boolean setLastModifiedResult;
 
-                    outFile.setLastModified(lastModifiedTime < 0 ? 0 :
-                        lastModifiedTime);
+                    if(lastModifiedTime < 0) {
+                        errorMessages.addLast("Cannot to set last modified " +
+                                "time for \"" + outFile.getPath() + "\" to " +
+                                "pre-1970 date. Adjusting last modified time " +
+                                "from " + new Date(lastModifiedTime) + " to " +
+                                new Date(0) + ".");
+
+                        lastModifiedTime = 0;
+                    }
+
+                    setLastModifiedResult =
+                            outFile.setLastModified(lastModifiedTime);
+
+                    if(!setLastModifiedResult) {
+                        errorMessages.addLast("Failed to set last modified " +
+                                "time for \"" + outFile.getPath() + "\" to " +
+                                new Date(lastModifiedTime) + " " +
+                                "(raw: " + lastModifiedTime + ").\n");
+                    }
                 }
 
                 if(curFileName != (Object) originalFileName && !curFileName.equals(originalFileName))
