@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.util.Date;
 import org.catacombae.dmg.encrypted.ReadableCEncryptedEncodingStream;
 import org.catacombae.dmg.udif.UDIFDetector;
 import org.catacombae.dmg.udif.UDIFRandomAccessStream;
@@ -436,7 +437,19 @@ public class UnHFS {
             if(folder.getAttributes().hasModifyDate()) {
                 long lastModified =
                         folder.getAttributes().getModifyDate().getTime();
-                targetDir.setLastModified(lastModified < 0 ? 0 : lastModified);
+
+                if(lastModified < 0) {
+                    System.err.println("Warning: Can not set folder last " +
+                            "modified timestamp to pre-1970 date " +
+                            new Date(lastModified) + " " +
+                            "(raw: " + lastModified + "). Setting to " +
+                            "earliest possible timestamp " +
+                            "(" + new Date(0) + ").");
+
+                    lastModified = 0;
+                }
+
+                targetDir.setLastModified(lastModified);
             }
         }
     }
@@ -457,7 +470,18 @@ public class UnHFS {
         }
 
         if(lastModified != null) {
-            dataFile.setLastModified(lastModified < 0 ? 0 : lastModified);
+            if(lastModified < 0) {
+                System.err.println("Warning: Can not set data file's last " +
+                        "modified timestamp to pre-1970 date " +
+                        new Date(lastModified) + " " +
+                        "(raw: " + lastModified + "). Setting to earliest " +
+                        "possible timestamp (" + new Date(0) + ").");
+
+                dataFile.setLastModified(0);
+            }
+            else {
+                dataFile.setLastModified(lastModified);
+            }
         }
 
         if(extractResourceForks) {
@@ -474,8 +498,20 @@ public class UnHFS {
                 }
 
                 if(lastModified != null) {
-                    resFile.setLastModified(lastModified < 0 ? 0 :
-                        lastModified);
+                    if(lastModified < 0) {
+                        System.err.println("Warning: Can not set resource " +
+                                "fork AppleDouble file's last modified " +
+                                "timestamp to pre-1970 date " +
+                                new Date(lastModified) + " " +
+                                "(raw: " + lastModified + "). Setting to " +
+                                "earliest possible timestamp " +
+                                "(" + new Date(0) + ").");
+
+                        resFile.setLastModified(0);
+                    }
+                    else {
+                        resFile.setLastModified(lastModified);
+                    }
                 }
             }
         }
