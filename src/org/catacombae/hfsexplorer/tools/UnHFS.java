@@ -215,7 +215,9 @@ public class UnHFS {
 
         String inputFilename = args[i];
         File inputFile = new File(inputFilename);
-        if(!(inputFile.exists() && inputFile.isFile() && inputFile.canRead())) {
+        if(!(inputFile.exists() && !inputFile.isDirectory() &&
+                inputFile.canRead()))
+        {
             System.err.println("Error: Input file \"" + inputFilename + "\" can not be read!");
             printUsage(System.err);
             System.exit(1);
