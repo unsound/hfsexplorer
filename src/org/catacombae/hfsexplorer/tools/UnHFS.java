@@ -578,6 +578,7 @@ public class UnHFS {
         } catch(FileNotFoundException fnfe) {
             return false;
         } catch(Exception ioe) {
+            ioe.printStackTrace();
             return false;
             //throw new RuntimeIOException(ioe);
         } finally {
