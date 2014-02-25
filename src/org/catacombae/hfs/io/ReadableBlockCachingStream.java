@@ -20,6 +20,7 @@ package org.catacombae.hfs.io;
 import java.util.HashMap;
 import org.catacombae.io.ReadableFilterStream;
 import org.catacombae.io.ReadableRandomAccessStream;
+import org.catacombae.io.RuntimeIOException;
 
 public class ReadableBlockCachingStream extends ReadableFilterStream {
     /*
@@ -137,6 +138,16 @@ public class ReadableBlockCachingStream extends ReadableFilterStream {
 	    int bytesLeftInBlock = blockData.length-posInBlock;
 	    int bytesLeftInTransfer = len-bytesProcessed;
 	    int bytesToCopy = (bytesLeftInTransfer < bytesLeftInBlock ? bytesLeftInTransfer : bytesLeftInBlock);
+
+            if(bytesLeftInBlock == 0) {
+                /* If bytesLeftInBlock is 0 here, we have visisted this block
+                 * before but didn't manage to get the amount of bytes that we
+                 * requested. Since the block still has the same size, we are
+                 * requesting data that is beyond the end of the file. */
+                throw new RuntimeIOException("Attempted to read after the " +
+                        "end of the file.");
+            }
+
 	    System.arraycopy(blockData, posInBlock, data, pos+bytesProcessed, bytesToCopy);
 	    bytesProcessed += bytesToCopy;
 	    virtualFP += bytesToCopy;
