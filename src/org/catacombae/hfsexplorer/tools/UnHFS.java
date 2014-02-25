@@ -451,7 +451,7 @@ public class UnHFS {
                     lastModified = 0;
                 }
 
-                if(targetDir.setLastModified(lastModified)) {
+                if(!targetDir.setLastModified(lastModified)) {
                     System.err.println("Warning: Failed to set last " +
                             "modified timestamp (" + lastModified + ") for " +
                             "directory \"" + targetDir.getPath() + "\" after " +
