@@ -312,7 +312,8 @@ public class MasterDirectoryBlock implements PrintableStruct, StructElements {
         db.addUIntBE("drNmAlBlks", drNmAlBlks, "Number of allocation blocks in volume");
         db.addUIntBE("drAlBlkSiz", drAlBlkSiz, "Allocation block size", "bytes");
         db.addUIntBE("drClpSiz", drClpSiz, "Default clump size", "bytes");
-        db.addUIntBE("drAlBlSt", drAlBlSt, "Start of the allocation blocks");
+        db.addUIntBE("drAlBlSt", drAlBlSt, "Sector number of first allocation " +
+                "block");
         db.addUIntBE("drNxtCNID", drNxtCNID, "Next catalog node ID");
         db.addUIntBE("drFreeBks", drFreeBks, "Number of unused allocation blocks");
         db.addUIntBE("drVNLength", drVNLength, "Length of volume name");
