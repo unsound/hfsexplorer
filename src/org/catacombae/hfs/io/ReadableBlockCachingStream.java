@@ -105,7 +105,7 @@ public class ReadableBlockCachingStream extends ReadableFilterStream {
     @Override
     public void seek(long pos) {
 	if(closed) throw new RuntimeException("File is closed.");
-	if((virtualLength == -1 || pos < virtualLength) && pos >= 0)
+	if((virtualLength == -1 || pos <= virtualLength) && pos >= 0)
 	    virtualFP = pos;
 	else
 	    throw new IllegalArgumentException("pos out of range (pos=" + pos +
