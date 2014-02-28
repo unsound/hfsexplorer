@@ -2382,7 +2382,34 @@ public class FileSystemBrowserWindow extends JFrame {
 
         @Override
         public void endDirectory(String[] parentPath, FSFolder folder) {
-            outDirStack.removeLast();
+            File outDir = outDirStack.removeLast();
+
+            if(folder.getAttributes().hasModifyDate()) {
+                long lastModifiedTime =
+                        folder.getAttributes().getModifyDate().getTime();
+                boolean setLastModifiedResult;
+
+                if(lastModifiedTime < 0) {
+                    errorMessages.addLast("Cannot to set last modified time " +
+                            "for \"" + outDir.getPath() + "\" to pre-1970 " +
+                            "date. Adjusting last modified time from " +
+                            new Date(lastModifiedTime) + " to " + new Date(0) +
+                            ".");
+
+                    lastModifiedTime = 0;
+                }
+
+                setLastModifiedResult =
+                        outDir.setLastModified(lastModifiedTime);
+
+                if(!setLastModifiedResult) {
+                    errorMessages.addLast("Failed to set last modified time " +
+                            "for \"" + outDir.getPath() + "\" to " +
+                            new Date(lastModifiedTime) + " " + "(raw: " +
+                            lastModifiedTime + ").\n");
+                }
+            }
+
             skipDirectory.o = false;
         }
 
