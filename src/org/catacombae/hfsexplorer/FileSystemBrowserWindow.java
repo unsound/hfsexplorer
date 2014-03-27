@@ -1992,9 +1992,41 @@ public class FileSystemBrowserWindow extends JFrame {
                     extractForkToStream(theFork, fos, progressDialog);
                 fos.close();
 
+                Long createTime = null;
+                Long lastAccessTime = null;
+                Long lastModifiedTime = null;
+
+                if(rec.getAttributes().hasCreateDate()) {
+                    createTime = rec.getAttributes().getCreateDate().getTime();
+                }
+
+                if(rec.getAttributes().hasAccessDate()) {
+                    lastAccessTime =
+                            rec.getAttributes().getAccessDate().getTime();
+                }
+
                 if(rec.getAttributes().hasModifyDate()) {
-                    long lastModifiedTime =
+                    lastModifiedTime =
                             rec.getAttributes().getModifyDate().getTime();
+                }
+
+                boolean fileTimesSet = false;
+                if(Java7Util.isJava7OrHigher()) {
+                    try {
+                        Java7Specific.setFileTimes(outFile.getPath(),
+                                createTime != null ? new Date(createTime) :
+                                null,
+                                lastAccessTime != null ?
+                                new Date(lastAccessTime) : null,
+                                lastModifiedTime != null ?
+                                new Date(lastModifiedTime) : null);
+                        fileTimesSet = true;
+                    } catch(Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                if(!fileTimesSet && lastModifiedTime != null) {
                     boolean setLastModifiedResult;
 
                     if(lastModifiedTime < 0) {
@@ -2004,7 +2036,7 @@ public class FileSystemBrowserWindow extends JFrame {
                                 "from " + new Date(lastModifiedTime) + " to " +
                                 new Date(0) + ".");
 
-                        lastModifiedTime = 0;
+                        lastModifiedTime = (long) 0;
                     }
 
                     setLastModifiedResult =
