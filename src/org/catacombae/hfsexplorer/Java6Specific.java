@@ -21,9 +21,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.io.File;
 import java.io.IOException;
-import java.awt.Desktop;
 import java.awt.Image;
 import java.awt.Window;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Comparator;
 import java.util.List;
@@ -50,7 +50,50 @@ public class Java6Specific {
      * @return whether openFile can be invoked for this platform.
      */
     public static boolean canOpen() {
-	return Desktop.getDesktop().isSupported(Desktop.Action.OPEN);
+        try {
+            return canOpenInternal();
+        } catch(Exception e) {
+            if(e instanceof InvocationTargetException) {
+                Throwable cause = e.getCause();
+
+                if(cause instanceof RuntimeException) {
+                    throw (RuntimeException) cause;
+                }
+            }
+
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static boolean canOpenInternal()
+            throws ClassNotFoundException, NoSuchMethodException,
+            InvocationTargetException, IllegalAccessException,
+            NoSuchFieldException
+    {
+        Class<?> desktopClass = Class.forName("java.awt.Desktop");
+        Class<?> desktopActionClass = Class.forName("java.awt.Desktop$Action");
+
+        /* Desktop desktop = Desktop.getDesktop(); */
+        Method desktopGetDesktopMethod = desktopClass.getMethod("getDesktop");
+        Object desktopObject = desktopGetDesktopMethod.invoke(null);
+
+        /* Desktop.Action openAction = Desktop.Action.OPEN); */
+        Field desktopActionOpenField = desktopActionClass.getField("OPEN");
+        Object openActionObject = desktopActionOpenField.get(null);
+
+        /* return desktop.isSupported(openAction); */
+        Method desktopIsSupportedMethod =
+                desktopClass.getMethod("isSupported", desktopActionClass);
+        Object returnObject =
+                desktopIsSupportedMethod.invoke(desktopObject,
+                openActionObject);
+        if(!(returnObject instanceof Boolean)) {
+            throw new RuntimeException("Unexpected type returned from " +
+                    "java.awt.Desktop.isSupported(java.awt.Desktop.Action): " +
+                    returnObject.getClass());
+        }
+
+        return ((Boolean) returnObject).booleanValue();
     }
 
     /**
@@ -63,7 +106,39 @@ public class Java6Specific {
      * @throws java.io.IOException if the file could not be opened.
      */
     public static void openFile(File f) throws IOException {
-	Desktop.getDesktop().open(f);
+	try {
+            openFileInternal(f);
+        } catch(Exception e) {
+            if(e instanceof InvocationTargetException) {
+                Throwable cause = e.getCause();
+
+                if(cause instanceof RuntimeException) {
+                    throw (RuntimeException) cause;
+                }
+                else if(cause instanceof IOException) {
+                    throw (IOException) cause;
+                }
+            }
+
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void openFileInternal(File f)
+            throws ClassNotFoundException, NoSuchMethodException,
+            InvocationTargetException, IllegalAccessException,
+            NoSuchFieldException
+    {
+        Class<?> desktopClass = Class.forName("java.awt.Desktop");
+
+        /* Desktop desktop = Desktop.getDesktop(); */
+        Method desktopGetDesktopMethod = desktopClass.getMethod("getDesktop");
+        Object desktopObject = desktopGetDesktopMethod.invoke(null);
+
+        /* desktop.openFile(f); */
+        Method desktopOpenFileMethod =
+                desktopClass.getMethod("open", File.class);
+        desktopOpenFileMethod.invoke(desktopObject, f);
     }
 
     /**
