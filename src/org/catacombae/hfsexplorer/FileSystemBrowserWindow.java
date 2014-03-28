@@ -1075,6 +1075,8 @@ public class FileSystemBrowserWindow extends JFrame {
                             Process p = Runtime.getRuntime().exec(finalCommand, null, tempDir);
                             fopFrame.dispose();
                         } catch(Exception e) {
+                            e.printStackTrace();
+
                             String stackTrace = e.toString() + "\n";
                             for(StackTraceElement ste : e.getStackTrace()) {
                                 stackTrace += "    " + ste.toString() + "\n";
@@ -1114,6 +1116,8 @@ public class FileSystemBrowserWindow extends JFrame {
                                     "until you exit the program.",
                                     "Error", JOptionPane.ERROR_MESSAGE);
                         } catch(Exception e) {
+                            e.printStackTrace();
+
                             String stackTrace = e.toString() + "\n";
                             for(StackTraceElement ste : e.getStackTrace()) {
                                 stackTrace += "    " + ste.toString() + "\n";
@@ -1146,6 +1150,8 @@ public class FileSystemBrowserWindow extends JFrame {
                             Process p = Runtime.getRuntime().exec(finalCommand, null, tempDir);
                             fopFrame.dispose();
                         } catch(Exception e) {
+                            e.printStackTrace();
+
                             String stackTrace = e.toString() + "\n";
                             for(StackTraceElement ste : e.getStackTrace()) {
                                 stackTrace += "    " + ste.toString() + "\n";
