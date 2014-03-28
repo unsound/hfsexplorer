@@ -36,7 +36,8 @@ public class Java7Util {
      * @return whether or not the current VM is a Java 7 or higher VM.
      */
     public static boolean isJava7OrHigher() {
-    	return System.getProperty("java.vm.version").compareTo("1.7") >= 0;
+    	return System.getProperty("java.specification.version").
+                compareTo("1.7") >= 0;
     }
 
     public static void setFileTimes(String path, Date creationTime,
