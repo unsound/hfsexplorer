@@ -27,7 +27,6 @@ import org.catacombae.dmg.encrypted.ReadableCEncryptedEncodingStream;
 import org.catacombae.dmg.udif.UDIFDetector;
 import org.catacombae.dmg.udif.UDIFRandomAccessStream;
 import org.catacombae.hfsexplorer.IOUtil;
-import org.catacombae.hfsexplorer.Java7Specific;
 import org.catacombae.hfsexplorer.Java7Util;
 import org.catacombae.hfsexplorer.fs.AppleSingleBuilder;
 import org.catacombae.hfsexplorer.fs.AppleSingleBuilder.AppleSingleVersion;
@@ -439,7 +438,7 @@ public class UnHFS {
         boolean fileTimesSet = false;
         if(Java7Util.isJava7OrHigher()) {
             try {
-                Java7Specific.setFileTimes(file.getPath(),
+                Java7Util.setFileTimes(file.getPath(),
                         createdTime != null ? new Date(createdTime) : null,
                         lastAccessedTime != null ? new Date(lastAccessedTime) :
                         null,
