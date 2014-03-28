@@ -2013,7 +2013,7 @@ public class FileSystemBrowserWindow extends JFrame {
                 boolean fileTimesSet = false;
                 if(Java7Util.isJava7OrHigher()) {
                     try {
-                        Java7Specific.setFileTimes(outFile.getPath(),
+                        Java7Util.setFileTimes(outFile.getPath(),
                                 createTime != null ? new Date(createTime) :
                                 null,
                                 lastAccessTime != null ?
