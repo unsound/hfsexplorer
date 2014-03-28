@@ -418,6 +418,62 @@ public class UnHFS {
         }
     }
 
+    private static void setFileTimes(File file, FSEntry entry, String fileType)
+    {
+        Long createdTime = null;
+        Long lastAccessedTime = null;
+        Long lastModifiedTime = null;
+
+        if(entry.getAttributes().hasCreateDate()) {
+            createdTime = entry.getAttributes().getCreateDate().getTime();
+        }
+
+        if(entry.getAttributes().hasAccessDate()) {
+            lastAccessedTime = entry.getAttributes().getAccessDate().getTime();
+        }
+
+        if(entry.getAttributes().hasModifyDate()) {
+            lastModifiedTime = entry.getAttributes().getModifyDate().getTime();
+        }
+
+        boolean fileTimesSet = false;
+        if(Java7Util.isJava7OrHigher()) {
+            try {
+                Java7Specific.setFileTimes(file.getPath(),
+                        createdTime != null ? new Date(createdTime) : null,
+                        lastAccessedTime != null ? new Date(lastAccessedTime) :
+                        null,
+                        lastModifiedTime != null ? new Date(lastModifiedTime) :
+                        null);
+                fileTimesSet = true;
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        if(!fileTimesSet && lastModifiedTime != null) {
+            boolean setLastModifiedResult;
+
+            if(lastModifiedTime < 0) {
+                System.err.println("Warning: Can not set " + fileType + "'s " +
+                        "last modified timestamp to pre-1970 date " +
+                        new Date(lastModifiedTime) + " " + "(raw: " +
+                        lastModifiedTime + "). Setting to earliest possible " +
+                        "timestamp (" + new Date(0) + ").");
+
+                lastModifiedTime = (long) 0;
+            }
+
+            setLastModifiedResult = file.setLastModified(lastModifiedTime);
+            if(!setLastModifiedResult) {
+                System.err.println("Warning: Failed to set last modified " +
+                        "timestamp (" + lastModifiedTime + ") for " +
+                        fileType + " \"" + file.getPath() + "\" after " +
+                        "extraction.");
+            }
+        }
+    }
+
     private static void extractFolder(FSFolder folder, File targetDir,
             boolean extractResourceForks, boolean verbose) {
         boolean wasEmpty = targetDir.list().length == 0;
@@ -438,58 +494,7 @@ public class UnHFS {
             }
         }
         if(wasEmpty) {
-            Long createTime = null;
-            Long lastAccessTime = null;
-            Long lastModifiedTime = null;
-
-            if(folder.getAttributes().hasCreateDate()) {
-                createTime = folder.getAttributes().getCreateDate().getTime();
-            }
-
-            if(folder.getAttributes().hasAccessDate()) {
-                lastAccessTime =
-                        folder.getAttributes().getAccessDate().getTime();
-            }
-
-            if(folder.getAttributes().hasModifyDate()) {
-                lastModifiedTime =
-                        folder.getAttributes().getModifyDate().getTime();
-            }
-
-            boolean fileTimesSet = false;
-            if(Java7Util.isJava7OrHigher()) {
-                try {
-                    Java7Specific.setFileTimes(targetDir.getPath(),
-                            createTime != null ? new Date(createTime) : null,
-                            lastAccessTime != null ? new Date(lastAccessTime) :
-                            null,
-                            lastModifiedTime != null ?
-                            new Date(lastModifiedTime) : null);
-                    fileTimesSet = true;
-                } catch(Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if(!fileTimesSet && lastModifiedTime != null) {
-                if(lastModifiedTime < 0) {
-                    System.err.println("Warning: Can not set folder last " +
-                            "modified timestamp to pre-1970 date " +
-                            new Date(lastModifiedTime) + " " +
-                            "(raw: " + lastModifiedTime + "). Setting to " +
-                            "earliest possible timestamp " +
-                            "(" + new Date(0) + ").");
-
-                    lastModifiedTime = (long) 0;
-                }
-
-                if(!targetDir.setLastModified(lastModifiedTime)) {
-                    System.err.println("Warning: Failed to set last " +
-                            "modified timestamp (" + lastModifiedTime + ") " +
-                            "for directory \"" + targetDir.getPath() + "\" " +
-                            "after extraction.");
-                }
-            }
+            setFileTimes(targetDir, folder, "folder");
         }
     }
 
@@ -505,63 +510,7 @@ public class UnHFS {
             System.out.println(dataFile.getPath());
         }
 
-        Long createTime = null;
-        Long lastAccessTime = null;
-        Long lastModifiedTime = null;
-
-        if(file.getAttributes().hasCreateDate()) {
-            createTime = file.getAttributes().getCreateDate().getTime();
-        }
-
-        if(file.getAttributes().hasAccessDate()) {
-            lastAccessTime =
-                    file.getAttributes().getAccessDate().getTime();
-        }
-
-        if(file.getAttributes().hasModifyDate()) {
-            lastModifiedTime =
-                    file.getAttributes().getModifyDate().getTime();
-        }
-
-        boolean fileTimesSet = false;
-        if(Java7Util.isJava7OrHigher()) {
-            try {
-                Java7Specific.setFileTimes(dataFile.getPath(),
-                        createTime != null ? new Date(createTime) : null,
-                        lastAccessTime != null ? new Date(lastAccessTime) :
-                        null,
-                        lastModifiedTime != null ? new Date(lastModifiedTime) :
-                        null);
-                fileTimesSet = true;
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        if(!fileTimesSet && lastModifiedTime != null) {
-            boolean setLastModifiedResult;
-
-            if(lastModifiedTime < 0) {
-                System.err.println("Warning: Can not set data file's last " +
-                        "modified timestamp to pre-1970 date " +
-                        new Date(lastModifiedTime) + " " +
-                        "(raw: " + lastModifiedTime + "). Setting to " +
-                        "earliest possible timestamp (" + new Date(0) + ").");
-
-                setLastModifiedResult = dataFile.setLastModified(0);
-            }
-            else {
-                setLastModifiedResult =
-                        dataFile.setLastModified(lastModifiedTime);
-            }
-
-            if(!setLastModifiedResult) {
-                System.err.println("Warning: Failed to set last " +
-                        "modified timestamp (" + lastModifiedTime + ") for " +
-                        "data file \"" + dataFile.getPath() + "\" after " +
-                        "extraction.");
-            }
-        }
+        setFileTimes(dataFile, file, "data file");
 
         if(extractResourceForks) {
             FSFork resourceFork = file.getForkByType(FSForkType.MACOS_RESOURCE);
@@ -576,48 +525,7 @@ public class UnHFS {
                     System.out.println(resFile.getPath());
                 }
 
-                boolean resFileTimesSet = false;
-                if(Java7Util.isJava7OrHigher()) {
-                    try {
-                        Java7Specific.setFileTimes(resFile.getPath(),
-                                createTime != null ? new Date(createTime) :
-                                null,
-                                lastAccessTime != null ?
-                                new Date(lastAccessTime) : null,
-                                lastModifiedTime != null ?
-                                new Date(lastModifiedTime) : null);
-                        resFileTimesSet = true;
-                    } catch(Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                if(!resFileTimesSet && lastModifiedTime != null) {
-                    boolean setLastModifiedResult;
-
-                    if(lastModifiedTime < 0) {
-                        System.err.println("Warning: Can not set resource " +
-                                "fork AppleDouble file's last modified " +
-                                "timestamp to pre-1970 date " +
-                                new Date(lastModifiedTime) + " " +
-                                "(raw: " + lastModifiedTime + "). Setting to " +
-                                "earliest possible timestamp " +
-                                "(" + new Date(0) + ").");
-
-                        setLastModifiedResult = resFile.setLastModified(0);
-                    }
-                    else {
-                        setLastModifiedResult =
-                                resFile.setLastModified(lastModifiedTime);
-                    }
-
-                    if(!setLastModifiedResult) {
-                        System.err.println("Warning: Failed to set last " +
-                                "modified timestamp  " +
-                                "(" + lastModifiedTime + ") for resource " +
-                                "fork AppleDouble file after extraction.");
-                    }
-                }
+                setFileTimes(resFile, file, "resource fork AppleDouble file");
             }
         }
     }
