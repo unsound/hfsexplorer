@@ -17,15 +17,17 @@
 
 package org.catacombae.hfsexplorer;
 
-import com.apple.eawt.Application;
-import com.apple.eawt.ApplicationAdapter;
-import com.apple.eawt.ApplicationEvent;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 
 /**
- * This class implements all the calls in the application that are purely Mac-specific. A static
- * initialization of this class on other platforms than Mac OS X would probably lead to a
- * ClassLoader exception.
+ * This class implements all the calls in the application that are purely
+ * Mac OS X-specific. Reflection is used for all the Mac OS X-specific calls, so
+ * there is no danger during static initialization of the class. However all
+ * methods will throw exceptions if invoked on other platforms than Mac OS X.
  *
  * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
  */
@@ -52,22 +54,92 @@ public class MacSpecific {
      *
      * @param qh the QuitHandler to register.
      */
-    public static void registerMacApplicationHandler(final MacApplicationHandler qh) {
-        Application thisApplication = Application.getApplication();
-        thisApplication.addApplicationListener(new ApplicationAdapter() {
-            @Override
-            public void handleQuit(ApplicationEvent ae) {
-                if(qh.acceptQuit())
-                    ae.setHandled(true);
-                else
-                    ae.setHandled(false);
+    public static void registerMacApplicationHandler(
+            final MacApplicationHandler qh)
+    {
+        try {
+            registerMacApplicationHandlerInternal(qh);
+        } catch(Exception e) {
+            if(e instanceof InvocationTargetException) {
+                Throwable cause = e.getCause();
+
+                if(cause instanceof RuntimeException) {
+                    throw (RuntimeException) cause;
+                }
             }
 
-            @Override
-            public void handleAbout(ApplicationEvent event) {
-                qh.showAboutDialog();
-                event.setHandled(true);
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void registerMacApplicationHandlerInternal(
+            final MacApplicationHandler qh)
+            throws ClassNotFoundException, NoSuchMethodException,
+            InvocationTargetException, IllegalAccessException
+    {
+        Class<?> applicationClass = Class.forName("com.apple.eawt.Application");
+        Class<?> applicationListenerClass =
+                Class.forName("com.apple.eawt.ApplicationListener");
+        Class<?> applicationEventClass =
+                Class.forName("com.apple.eawt.ApplicationEvent");
+
+        Method applicationGetApplicationMethod =
+                applicationClass.getMethod("getApplication");
+        Object applicationObject =
+                applicationGetApplicationMethod.invoke(null);
+
+        final Method applicationEventSetHandledMethod =
+                applicationEventClass.getMethod("setHandled", boolean.class);
+
+        InvocationHandler invocationHandler = new InvocationHandler() {
+            public Object invoke(Object proxy, Method method, Object[] args)
+                    throws Throwable
+            {
+                if(method.getName().equals("handleQuit")) {
+                    Object event = args[0];
+
+                    if(qh.acceptQuit()) {
+                        applicationEventSetHandledMethod.invoke(event, true);
+                    }
+                    else {
+                        applicationEventSetHandledMethod.invoke(event, false);
+                    }
+
+                    return null;
+                }
+                else if(method.getName().equals("handleAbout")) {
+                    Object event = args[0];
+
+                    qh.showAboutDialog();
+                    applicationEventSetHandledMethod.invoke(event, true);
+
+                    return null;
+                }
+                else if(method.getName().equals("handleOpenApplication") ||
+                        method.getName().equals("handleOpenFile") ||
+                        method.getName().equals("handlePreferences") ||
+                        method.getName().equals("handlePrintFile") ||
+                        method.getName().equals("handleReOpenApplication"))
+                {
+                    return null;
+                }
+
+                throw new NoSuchMethodException("No " +
+                        "\"" + method.getName() + "\" defined.");
             }
-        });
+        };
+
+        Object applicationAdapterObject =
+                Proxy.newProxyInstance(
+                applicationListenerClass.getClassLoader(),
+                new Class[] { applicationListenerClass },
+                invocationHandler);
+
+        Method applicationAddApplicationListenerMethod =
+                applicationClass.getMethod("addApplicationListener",
+                applicationListenerClass);
+
+        applicationAddApplicationListenerMethod.invoke(applicationObject,
+                applicationAdapterObject);
     }
 }
