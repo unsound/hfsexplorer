@@ -148,7 +148,7 @@ public class FileSystemBrowserWindow extends JFrame {
         this.dcw = dcw;
 
         if(Java6Util.isJava6OrHigher()) {
-            Java6Specific.setIconImages(WINDOW_ICONS, this);
+            Java6Util.setIconImages(WINDOW_ICONS, this);
         }
         else {
             setIconImage(WINDOW_ICONS[0].getImage());
@@ -1094,7 +1094,7 @@ public class FileSystemBrowserWindow extends JFrame {
                 }
             };
         }
-        else if(Java6Util.isJava6OrHigher() && Java6Specific.canOpen()) {
+        else if(Java6Util.isJava6OrHigher() && Java6Util.canOpen()) {
             //System.err.println("Java 1.6 detected.");
             alOpen = new ActionListener() {
                 /* @Override */
@@ -1106,7 +1106,7 @@ public class FileSystemBrowserWindow extends JFrame {
                         File extractedFile = new File(tempDir, rec.getName());
                         tempFiles.add(new File(tempDir, rec.getName()));
                         try {
-                            Java6Specific.openFile(extractedFile);
+                            Java6Util.openFile(extractedFile);
                             fopFrame.dispose();
                         } catch(IOException e) {
                             JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,

@@ -217,7 +217,7 @@ public class FileSystemBrowser<A> {
             ArrayList<Comparator<?>> rowComparators = new ArrayList<Comparator<?>>(5);
             for(int i = 0; i < 5; ++i) // 5 rows currently
                 rowComparators.add(c);
-            Java6Specific.addRowSorter(fileTable, tableModel, 4, rowComparators);
+            Java6Util.addRowSorter(fileTable, tableModel, 4, rowComparators);
         }
 
         TableColumnModelListener columnListener = new TableColumnModelListener() {
