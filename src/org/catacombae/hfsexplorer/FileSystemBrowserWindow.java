@@ -158,7 +158,7 @@ public class FileSystemBrowserWindow extends JFrame {
         //final Class objectClass = new Object().getClass();
         setUpMenus();
 
-        if(System.getProperty("os.name").toLowerCase().startsWith("mac os x")) {
+        if(MacUtil.isMacOSX()) {
             MacUtil.registerMacApplicationHandler(new MacUtil.MacApplicationHandler() {
                 /* @Override */
                 public boolean acceptQuit() {
