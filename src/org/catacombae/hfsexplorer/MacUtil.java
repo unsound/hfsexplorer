@@ -31,7 +31,7 @@ import java.lang.reflect.Proxy;
  *
  * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
  */
-public class MacSpecific {
+public class MacUtil {
     /**
      * Interface for a handler for Mac OS X application events.
      */

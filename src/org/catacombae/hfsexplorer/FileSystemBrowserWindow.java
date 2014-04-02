@@ -159,7 +159,7 @@ public class FileSystemBrowserWindow extends JFrame {
         setUpMenus();
 
         if(System.getProperty("os.name").toLowerCase().startsWith("mac os x")) {
-            MacSpecific.registerMacApplicationHandler(new MacSpecific.MacApplicationHandler() {
+            MacUtil.registerMacApplicationHandler(new MacUtil.MacApplicationHandler() {
                 /* @Override */
                 public boolean acceptQuit() {
                     exitApplication();
