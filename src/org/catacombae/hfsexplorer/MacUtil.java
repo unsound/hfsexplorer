@@ -33,6 +33,18 @@ import java.lang.reflect.Proxy;
  */
 public class MacUtil {
     /**
+     * Check whether the running VM's underlying operating operating system is
+     * Mac OS X.
+     *
+     * @return <code>true</code> if the operating system is Mac OS X,
+     * <code>false</code> otherwise.
+     */
+    public static boolean isMacOSX() {
+        return System.getProperty("os.name").toLowerCase().
+                startsWith("mac os x");
+    }
+
+    /**
      * Interface for a handler for Mac OS X application events.
      */
     public static interface MacApplicationHandler {
