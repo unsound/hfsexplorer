@@ -17,6 +17,7 @@
 
 #define UNICODE
 #define _UNICODE
+#define _CRT_SECURE_NO_WARNINGS
 
 #include "llio_common.h"
 
