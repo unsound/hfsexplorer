@@ -50,7 +50,9 @@ JNIEXPORT void JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStr
   hnd = getHandle(env, handleData);
   oldFP.QuadPart = pos;
   if(SetFilePointerEx(hnd, oldFP, &newFP, FILE_BEGIN) == FALSE)
-    throwByName(env, "java/lang/RuntimeException", "Couldn't set file pointer.");
+    throwByName(env, "java/lang/RuntimeException",
+                "Error 0x%08X while attempting to set file pointer to %lld.",
+                GetLastError(), (long long) pos);
 }
 
 /*
@@ -62,18 +64,30 @@ JNIEXPORT jint JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStr
 						   jint offset, jint length, jbyteArray handleData) {
   // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
+  LARGE_INTEGER distance;
+  LARGE_INTEGER position;
   BYTE *buffer;
-  DWORD bytesRead;
+  DWORD bytesRead = 0;
   
   //_tprintf(_T("Java_WindowsLowLevelIO_read called\n"));  
   if(DEBUG) printf("Java_WindowsLowLevelIO_read called\n");
   hnd = getHandle(env, handleData);
+
+  distance.QuadPart = 0;
+  if(!SetFilePointerEx(hnd, distance, &position, FILE_CURRENT)) {
+    position.QuadPart = 0x7FFFFFFFFFFFFFFFLL;
+  }
+
   buffer = (BYTE*)malloc(length);
   //printf("Calling: ReadFile(0x%x, 0x%x, %d, 0x%x, NULL);\n", hnd, buffer, length, &bytesRead);
   if(ReadFile(hnd, buffer, length, &bytesRead, NULL) == FALSE) {
     //printf("bytesRead: %u\n", (int)bytesRead);
     //printf("GetLastError(): %u\n", (int)GetLastError());
-    throwByName(env, "java/lang/RuntimeException", "Couldn't read from file.");
+    throwByName(env, "java/lang/RuntimeException",
+                "Error 0x%08X while attempting to read %d bytes from position "
+                "%lld in file (read %lu bytes).",
+                GetLastError(), length, (long long) position.QuadPart,
+                (unsigned long) bytesRead);
     bytesRead = -1;
   }
   else
@@ -93,7 +107,9 @@ JNIEXPORT void JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStr
   
   hnd = getHandle(env, handleData);
   if(CloseHandle(hnd) == FALSE) {
-    throwByName(env, "java/lang/RuntimeException", "Could not close file.");
+    throwByName(env, "java/lang/RuntimeException",
+                "Error 0x%08X while closing file.",
+                GetLastError());
   }
 }
 
@@ -109,7 +125,9 @@ JNIEXPORT void JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStr
   
   hnd = getHandle(env, handleData);
   if(DeviceIoControl(hnd, IOCTL_STORAGE_EJECT_MEDIA, NULL, 0, NULL, 0, &bytesReturned, NULL) == FALSE)
-    throwByName(env, "java/lang/RuntimeException", "Could not eject media.");  
+    throwByName(env, "java/lang/RuntimeException",
+                "Error 0x%08X while attempting to eject media.",
+                GetLastError());
 }
 
 /*
@@ -124,7 +142,9 @@ JNIEXPORT void JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStr
   
   hnd = getHandle(env, handleData);
   if(DeviceIoControl(hnd, IOCTL_STORAGE_LOAD_MEDIA, NULL, 0, NULL, 0, &bytesReturned, NULL) == FALSE)
-    throwByName(env, "java/lang/RuntimeException", "Could not load media.");  
+    throwByName(env, "java/lang/RuntimeException",
+                "Error 0x%08X while attempting to load media.",
+                GetLastError());
 }
 
 /*
@@ -142,7 +162,9 @@ JNIEXPORT jlong JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileSt
     GET_LENGTH_INFORMATION info;
     DWORD bytesReturned;
     if(DeviceIoControl(hnd, IOCTL_DISK_GET_LENGTH_INFO, NULL, 0, &info, sizeof(GET_LENGTH_INFORMATION), &bytesReturned, NULL) == FALSE) {
-      throwByName(env, "java/lang/RuntimeException", "Could not get file size.");
+      throwByName(env, "java/lang/RuntimeException",
+                  "Error 0x%08X while attempting to get file size.",
+                  GetLastError());
       return -1;
     }
     else {
@@ -169,7 +191,9 @@ JNIEXPORT jlong JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileSt
   hnd = getHandle(env, handleData);
   
   if(SetFilePointerEx(hnd, distance, &fp, FILE_CURRENT) == FALSE) {
-    throwByName(env, "java/lang/RuntimeException", "Could not get file pointer!");
+    throwByName(env, "java/lang/RuntimeException",
+                "Error 0x%08X while attempting to get file pointer!",
+                GetLastError());
     return -1;
   }
   else
