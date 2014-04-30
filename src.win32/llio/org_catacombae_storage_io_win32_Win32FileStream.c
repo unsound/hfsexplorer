@@ -60,6 +60,14 @@ JNIEXPORT void JNICALL Java_org_catacombae_catacombae_storage_io_win32_Win32File
   }
 
   buffer = (BYTE*)malloc(length);
+  if(!buffer) {
+    throwByName(env, "java/lang/RuntimeException",
+                "Error %d (%s) while allocating %d-byte temporary buffer for "
+                "writing.",
+                errno, strerror(errno), length);
+    return;
+  }
+
   (*env)->GetByteArrayRegion(env, data, offset, length, buffer); // (jbyteArray)data->(BYTE*)buffer
   //printf("Calling: ReadFile(0x%x, 0x%x, %d, 0x%x, NULL);\n", hnd, buffer, length, &bytesRead);
   if(WriteFile(hnd, buffer, length, &bytesWritten, NULL) == FALSE) {

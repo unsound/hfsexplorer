@@ -79,6 +79,14 @@ JNIEXPORT jint JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStr
   }
 
   buffer = (BYTE*)malloc(length);
+  if(!buffer) {
+    throwByName(env, "java/lang/RuntimeException",
+                "Error %d (%s) while allocating %d-byte temporary buffer for "
+                "reading.",
+                errno, strerror(errno), length);
+    return -1;
+  }
+
   //printf("Calling: ReadFile(0x%x, 0x%x, %d, 0x%x, NULL);\n", hnd, buffer, length, &bytesRead);
   if(ReadFile(hnd, buffer, length, &bytesRead, NULL) == FALSE) {
     //printf("bytesRead: %u\n", (int)bytesRead);
