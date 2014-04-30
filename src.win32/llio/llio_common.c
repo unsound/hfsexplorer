@@ -19,18 +19,64 @@
 #define _UNICODE
 
 #include "llio_common.h"
+
+#include <stdio.h>
+#include <stdarg.h>
+
 #define DEBUG FALSE
 
 /* Ripped from the tutorial at "http://java.sun.com/docs/books/jni/html/".
    Makes it a little bit easier to throw java exceptions from C code. */
-void throwByName(JNIEnv *env, const char *name, const char *msg) {
-  jclass cls = (*env)->FindClass(env, name);
+void throwByName(JNIEnv *env, const char *name, const char *fmt, ...) {
+  const char *msg = fmt;
+  va_list ap;
+  char *allocated_msg = NULL;
+  size_t allocated_msg_capacity = 1024 / 2;
+  int allocated_msg_length = 0;
+  jclass cls;
+
+  va_start(ap, fmt);
+
+  do {
+    char *new_allocated_msg;
+
+    new_allocated_msg = calloc(1, allocated_msg_capacity * 2);
+    if (!new_allocated_msg) {
+      /* No memory? */
+      break;
+    }
+
+    if (allocated_msg) {
+      free(allocated_msg);
+    }
+    allocated_msg = new_allocated_msg;
+    allocated_msg_capacity *= 2;
+
+    allocated_msg_length =
+      vsnprintf(allocated_msg, allocated_msg_capacity, fmt, ap);
+
+    /* Always ensure that a NULL terminator exists. */
+    allocated_msg[allocated_msg_capacity - 1] = '\0';
+
+    msg = allocated_msg;
+  } while ((allocated_msg_length == -1 ||
+            allocated_msg_length == allocated_msg_capacity) &&
+           allocated_msg_capacity < (1UL << 20));
+
+  va_end(ap);
+
+  cls = (*env)->FindClass(env, name);
   /* if cls is NULL, an exception has already been thrown */
   if (cls != NULL) {
     (*env)->ThrowNew(env, cls, msg);
   }
   /* free the local ref */
   (*env)->DeleteLocalRef(env, cls);
+
+  /* Free the allocated message string, if existent. */
+  if (allocated_msg) {
+    free(allocated_msg);
+  }
 }
 
 /* Takes care of parsing the error after a call to MultiByteToWideChar

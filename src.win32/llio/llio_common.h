@@ -23,7 +23,7 @@
 #include <windows.h>
 #include <jni.h>
 
-void throwByName(JNIEnv *env, const char *name, const char *msg);
+void throwByName(JNIEnv *env, const char *name, const char *fmt, ...);
 void handleMultiByteToWideCharError(JNIEnv *env, DWORD errorCode);
 jbyteArray getHandleData(JNIEnv *env, HANDLE hnd);
 HANDLE getHandle(JNIEnv *env, jbyteArray handleData);
