@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006-2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -48,8 +48,8 @@ JNIEXPORT void JNICALL Java_org_catacombae_catacombae_storage_io_win32_Win32File
   LARGE_INTEGER position;
   BYTE *buffer;
   DWORD bytesWritten = 0;
-  
-  //_tprintf(_T("Java_WindowsLowLevelIO_read called\n"));  
+
+  //_tprintf(_T("Java_WindowsLowLevelIO_read called\n"));
   if(DEBUG) printf("Java_WritableWin32File_write called\n");
 
   hnd = getHandle(env, handleData);
@@ -85,6 +85,6 @@ JNIEXPORT void JNICALL Java_org_catacombae_catacombae_storage_io_win32_Win32File
                 "Could not write entire buffer to file! Managed to write %lu / "
                 "%d bytes.",
                 (unsigned long) bytesWritten, length);
-  
+
   free(buffer); // Clean up
 }

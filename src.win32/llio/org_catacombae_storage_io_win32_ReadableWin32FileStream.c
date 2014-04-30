@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -32,7 +32,7 @@
  */
 JNIEXPORT jbyteArray JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStream_openNative(JNIEnv *env, jclass cls, jstring str) {
   if(DEBUG) printf("Java_org_catacombae_storage_io_win32_ReadableWin32FileStream_openNative called\n");
-  return openWin32File(env, str, GENERIC_READ, (FILE_SHARE_READ | FILE_SHARE_WRITE), 
+  return openWin32File(env, str, GENERIC_READ, (FILE_SHARE_READ | FILE_SHARE_WRITE),
 		       NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 }
 
@@ -45,7 +45,7 @@ JNIEXPORT void JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStr
   // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
   LARGE_INTEGER oldFP, newFP;
-  
+
   if(DEBUG) printf("Java_WindowsLowLevelIO_seek called\n");
   hnd = getHandle(env, handleData);
   oldFP.QuadPart = pos;
@@ -60,7 +60,7 @@ JNIEXPORT void JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStr
  * Method:    read
  * Signature: ([BII[B)I
  */
-JNIEXPORT jint JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStream_read(JNIEnv *env, jclass cls, jbyteArray data, 
+JNIEXPORT jint JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStream_read(JNIEnv *env, jclass cls, jbyteArray data,
 						   jint offset, jint length, jbyteArray handleData) {
   // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
@@ -68,8 +68,8 @@ JNIEXPORT jint JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStr
   LARGE_INTEGER position;
   BYTE *buffer;
   DWORD bytesRead = 0;
-  
-  //_tprintf(_T("Java_WindowsLowLevelIO_read called\n"));  
+
+  //_tprintf(_T("Java_WindowsLowLevelIO_read called\n"));
   if(DEBUG) printf("Java_WindowsLowLevelIO_read called\n");
   hnd = getHandle(env, handleData);
 
@@ -112,7 +112,7 @@ JNIEXPORT jint JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStr
 JNIEXPORT void JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStream_close(JNIEnv *env, jclass cls, jbyteArray handleData) {
   // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
-  
+
   hnd = getHandle(env, handleData);
   if(CloseHandle(hnd) == FALSE) {
     throwByName(env, "java/lang/RuntimeException",
@@ -130,7 +130,7 @@ JNIEXPORT void JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStr
   // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
   DWORD bytesReturned;
-  
+
   hnd = getHandle(env, handleData);
   if(DeviceIoControl(hnd, IOCTL_STORAGE_EJECT_MEDIA, NULL, 0, NULL, 0, &bytesReturned, NULL) == FALSE)
     throwByName(env, "java/lang/RuntimeException",
@@ -147,7 +147,7 @@ JNIEXPORT void JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStr
   // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
   DWORD bytesReturned;
-  
+
   hnd = getHandle(env, handleData);
   if(DeviceIoControl(hnd, IOCTL_STORAGE_LOAD_MEDIA, NULL, 0, NULL, 0, &bytesReturned, NULL) == FALSE)
     throwByName(env, "java/lang/RuntimeException",
@@ -164,7 +164,7 @@ JNIEXPORT jlong JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileSt
   // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
   LARGE_INTEGER length;
-  
+
   hnd = getHandle(env, handleData);
   if(GetFileSizeEx(hnd, &length) == FALSE) {
     GET_LENGTH_INFORMATION info;
@@ -194,10 +194,10 @@ JNIEXPORT jlong JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileSt
   // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
   LARGE_INTEGER distance, fp;
-  
+
   distance.QuadPart = 0;
   hnd = getHandle(env, handleData);
-  
+
   if(SetFilePointerEx(hnd, distance, &fp, FILE_CURRENT) == FALSE) {
     throwByName(env, "java/lang/RuntimeException",
                 "Error 0x%08X while attempting to get file pointer!",

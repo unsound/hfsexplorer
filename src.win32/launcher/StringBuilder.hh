@@ -26,7 +26,7 @@ public:
     asciiBackBuffer = NULL;
     backBufferLength = 0;
   }
-  
+
   /** Destroys the StringBuilder and deallocates its structures. */
   virtual ~StringBuilder() {
     if(backBuffer != NULL)
@@ -34,7 +34,7 @@ public:
     if(asciiBackBuffer != NULL)
       delete[] asciiBackBuffer;
   }
-  
+
   /**
    * The length, in UTF-16 characters, of the built string. Does NOT include the terminating NULL
    * character that may or may not be needed in an exported NULL-terminated string.
@@ -42,15 +42,15 @@ public:
   int length() {
     return backBufferLength;
   }
-  
+
   void append(const char *cstr) {
     append(cstr, 0, strlen(cstr));
   }
-  
+
   void append(const char *cstr, int pos, int len) {
     append(cstr, pos, len, CODEPAGE_ASCII, 0);
   }
-  
+
   void append(const char *cstr, int pos, int len, UINT codePage, DWORD dwFlags) {
     int wstrLength = MultiByteToWideChar(codePage, dwFlags, cstr+pos, len, NULL, 0);
     wchar_t *wstr = new wchar_t[wstrLength];
@@ -62,11 +62,11 @@ public:
     append(wstr, 0, wstrLength);
     delete[] wstr;
   }
-  
+
   void append(const wchar_t *wstr) {
     append(wstr, 0, wcslen(wstr));
   }
-  
+
   void append(const wchar_t *wstr, int pos, int len) {
     int newBackBufferLength = backBufferLength+len;
     wchar_t *newBackBuffer = new wchar_t[newBackBufferLength+1];
@@ -75,26 +75,26 @@ public:
     for(int i = 0; i < len; ++i)
       newBackBuffer[backBufferLength+i] = wstr[pos+i];
     newBackBuffer[newBackBufferLength] = L'\0';
-    
+
     wchar_t *oldBackBuffer = backBuffer;
     backBuffer = newBackBuffer;
     backBufferLength = newBackBufferLength;
     if(oldBackBuffer != NULL)
       delete[] oldBackBuffer;
-    
+
     char *oldAsciiBackBuffer = asciiBackBuffer;
     asciiBackBuffer = toASCIIString(new char[backBufferLength+1]);
     if(oldAsciiBackBuffer != NULL)
       delete[] oldAsciiBackBuffer;
   }
-  
+
   /**
    * Returns a pre-generated wchar_t (UTF-16LE?) representation of the built string.
    */
   const wchar_t* toWideCharString() {
     return backBuffer;
   }
-  
+
   /**
    * Stores the built string in <code>wstr</code>, which is assumed to be at least length()+1
    * wchar_t elements long to accommodate the string and the null terminator.<br>
@@ -109,14 +109,14 @@ public:
     wstr[backBufferLength] = _T('\0');
     return wstr;
   }
-  
+
   /**
    * Returns a pre-generated US-ASCII representation of the built string.
    */
   const char* toASCIIString() {
     return asciiBackBuffer;
   }
-  
+
   /**
    * Stores the built string in <code>cstr</code>, which is assumed to be at least length()+1
    * char elements long to accommodate the string and the null terminator.<br>
@@ -128,7 +128,7 @@ public:
   char* toASCIIString(char* cstr) {
     return toCString(cstr, CODEPAGE_ASCII, 0, NULL, NULL);
   }
-  
+
   /**
    * Stores the built string in <code>cstr</code>, which is assumed to be at least length()+1
    * char elements long to accommodate the string and the null terminator.<br>

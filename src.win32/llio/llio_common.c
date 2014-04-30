@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006-2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -148,20 +148,20 @@ jbyteArray openWin32File(JNIEnv *env,
   int wcFilenameSize;
   WCHAR *wcFilename;
   HANDLE hnd;
-  
+
   if(DEBUG) printf("openWin32File called\n");
   if(str == NULL) { // Must check input, or we can crash the jvm.
     throwByName(env, "java/lang/NullPointerException", "Filename is null.");
     return 0;
   }
-  
+
   /* First, we convert the jstring to a jbyte array with the string encoded
      into UTF-8. */
   utf8FilenameLength = (*env)->GetStringUTFLength(env, str);
   utf8Filename = (*env)->GetStringUTFChars(env, str, NULL);
   if(DEBUG) printf("utf8FilenameLength: %d bytes\n", utf8FilenameLength);
 
-  
+
   /* Then, we convert the UTF-8 string into windows WCHARs */
   wcFilenameSize = MultiByteToWideChar(CP_UTF8, 0, utf8Filename, utf8FilenameLength, NULL, 0);
   if(wcFilenameSize == 0) {
@@ -180,13 +180,13 @@ jbyteArray openWin32File(JNIEnv *env,
   }
   wcFilename[wcFilenameSize-1] = L'\0'; // Null termination.
   (*env)->ReleaseStringUTFChars(env, str, utf8Filename); // Release allocated resources.
-  
-  
+
+
   /* Perfect. */
   if(DEBUG) printf("Attempting to open \"");
   if(DEBUG) wprintf(L"%s", wcFilename);
   if(DEBUG) printf("\"\n");
-  hnd = CreateFileW(wcFilename, dwDesiredAccess, dwShareMode, lpSecurityAttributes, 
+  hnd = CreateFileW(wcFilename, dwDesiredAccess, dwShareMode, lpSecurityAttributes,
 		    dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
   free(wcFilename); // Done with that one now
   if(hnd == INVALID_HANDLE_VALUE) {
@@ -195,6 +195,6 @@ jbyteArray openWin32File(JNIEnv *env,
   }
   else {
     return getHandleData(env, hnd);
-  }  
+  }
 }
 

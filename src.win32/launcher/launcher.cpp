@@ -1,6 +1,6 @@
 /*-
  * Copyright (C) 2006-2007 Erik Larsson
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -130,7 +130,7 @@
 
 /* Other */
 #define ASCII_CODEPAGE 20127
- 
+
 /* Function prototype for entry to dynamically loaded JVM library. */
 typedef jint (JNICALL JNI_CreateJavaVM_t)(JavaVM ** pJvm, JNIEnv ** pEnv, void * vmArgs);
 
@@ -229,16 +229,16 @@ static inline _TCHAR* ___A2T_copyChars(const char *source, _TCHAR* dest) {
  */
 static inline void printError(const _TCHAR *const prefix, const DWORD errorVal) {
   LOG(trace, "void printError((_TCHAR*) 0x%X, %d)", prefix, errorVal);
-  
+
   /* Get human-readable message from Win32 API.  */
   _TCHAR *fmtMsgMessage;
   _TCHAR *message;
   DWORD messageLength =
     FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, errorVal,
 		  LANG_USER_DEFAULT, (LPTSTR)(&fmtMsgMessage), 0, NULL);
-  
+
   //LOG(debug, "&message=0x%X messageLength=%d", &fmtMsgMessage, messageLength);
-  
+
   if(messageLength == 0) {
     //printError(_T("printError: Error after FormatMessage: "), GetLastError());
     _TCHAR *disasterMessage = _T("[NO ERROR MESSAGE FOUND]");
@@ -257,18 +257,18 @@ static inline void printError(const _TCHAR *const prefix, const DWORD errorVal) 
       if(curChar == _T('\n') || curChar == _T('\r') || curChar == _T('\0'))
 	break; // cut here
     }
-    
+
     message = new _TCHAR[cutPosition]; // Add one for '\0'
     _tcsncpy(message, fmtMsgMessage, cutPosition-1);
     message[cutPosition-1] = _T('\0');
   }
-  
+
   LOG(error, "%s%i: \"%s\"", prefix, errorVal, message);
-  
+
   delete[] message;
   if(fmtMsgMessage != NULL)
     LocalFree(fmtMsgMessage);
-  
+
   LOG(trace, "returning from void printError((_TCHAR*) 0x%X, %d)", prefix, errorVal);
 }
 
@@ -290,7 +290,7 @@ static bool initializeCOM() {
   LOG(trace, "bool initializeCOM()");
   typedef HRESULT (WINAPI *FN_COINITIALIZEEX) (void*, DWORD);
   bool retval = false;
-  
+
   HMODULE libHandle = LoadLibrary(_T("ole32.dll"));
   //LOG(debug, "libHandle=0x%X", libHandle);
   if(libHandle != NULL) {
@@ -306,12 +306,12 @@ static bool initializeCOM() {
     }
     else
       LOG(error, "Could not locate CoInitializeEx in ole32.dll!");
-    
+
     FreeLibrary(libHandle);
   }
   else
     printError(_T("LoadLibrary returned error "), GetLastError());
-  
+
   LOG(trace, "returning from bool initializeCOM() with retval %d (true=%d, false=%d)", retval, true, false);
   return retval;
 }
@@ -323,7 +323,7 @@ static bool initializeCOM() {
 static void uninitializeCOM() {
   LOG(trace, "void uninitializeCOM()");
   typedef void (WINAPI *FN_COUNINITIALIZE) (void);
-  
+
   HMODULE libHandle = LoadLibrary(_T("ole32.dll"));
   //LOG(debug, "libHandle=0x%X", libHandle);
   if(libHandle != NULL) {
@@ -333,12 +333,12 @@ static void uninitializeCOM() {
       fnCoUninitialize();
     else
       LOG(error, "Could not locate CoUninitializeEx in ole32.dll!");
-    
+
     FreeLibrary(libHandle);
   }
   else
     printError(_T("LoadLibrary returned error "), GetLastError());
-  
+
   LOG(trace, "returning from void uninitializeCOM()");
 }
 
@@ -353,28 +353,28 @@ static inline const _TCHAR* bool2str(bool b) {
 /* </Utility functions and macros> */
 
 /* Begin: Code from Sun's forums. http://forum.java.sun.com/thread.jspa?threadID=5124559&messageID=9441051 */
- 
+
 static int readStringFromRegistry(HKEY key, const _TCHAR *name, LPBYTE buf, DWORD bufsize) {
   LOG(trace, "int readStringFromRegistry(%d, \"%s\", (_TCHAR*) 0x%X, %d)", key, name, buf, bufsize);
-  
+
   DWORD type, size;
-  
+
   if((RegQueryValueEx(key, name, NULL, &type, NULL, &size) == ERROR_SUCCESS)
      && (type == REG_SZ)
      && (size < bufsize)) {
     if(RegQueryValueEx(key, name, NULL, NULL, buf, &size) == ERROR_SUCCESS)
       return 0;
   }
-  
+
   return -1;
 }
- 
+
 static int readJvmPathFromRegistry(_TCHAR *buf, int bufsize) {
   LOG(trace, "int readJvmPathFromRegistry((_TCHAR*) 0x%X, %d)", buf, bufsize);
-  
+
   HKEY key, subkey;
   BYTE version[MAX_PATH];
-  
+
   LOG(debug, "  readJvmPathFromRegistry(__out _TCHAR *buf [ptr: 0x%X], %i)", (int)buf, bufsize);
   if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, JRE_KEY, 0, KEY_READ, &key) != ERROR_SUCCESS) {
     LOG(debug, "  Could not open key HKLM\\%s. Aborting.", JRE_KEY);
@@ -406,17 +406,17 @@ static int readJvmPathFromRegistry(_TCHAR *buf, int bufsize) {
 static bool locateSunJVMInRegistry(JNI_CreateJavaVM_t **JNI_CreateJavaVM_f, HINSTANCE *jvmLibOut) {
   LOG(trace, "bool locateSunJVMInRegistry((JNI_CreateJavaVM_t**) 0x%X, (HINSTANCE*) 0x%X)", JNI_CreateJavaVM_f, jvmLibOut);
   bool retval = false;
-  
+
   _TCHAR jvmPath[MAX_PATH];
-  
+
   *JNI_CreateJavaVM_f = NULL;
   *jvmLibOut = NULL;
-  
+
   LOG(debug, "calling locateSunJVMInRegistry(jvmPath, sizeof(jvmPath)");
   if(readJvmPathFromRegistry(jvmPath, MAX_PATH) == 0) {
     LOG(debug, "LoadLibrary(%s);", jvmPath);
     HINSTANCE jvmLib = LoadLibrary(jvmPath);
-    
+
     if(jvmLib == NULL) {
       printError(_T("LoadLibrary failed with error "), GetLastError());
     }
@@ -424,7 +424,7 @@ static bool locateSunJVMInRegistry(JNI_CreateJavaVM_t **JNI_CreateJavaVM_f, HINS
       LOG(debug, "GetProcAddress(..)");
       JNI_CreateJavaVM_t *jniCreateAddress = (JNI_CreateJavaVM_t *)GetProcAddress(jvmLib, "JNI_CreateJavaVM");
       LOG(debug, "JNI_CreateJavaVM_f set to 0x%X", jniCreateAddress);
-      
+
       if(jniCreateAddress != NULL) {
 	retval = true;
 	*JNI_CreateJavaVM_f = jniCreateAddress;
@@ -436,7 +436,7 @@ static bool locateSunJVMInRegistry(JNI_CreateJavaVM_t **JNI_CreateJavaVM_f, HINS
       }
     }
   }
-  
+
   LOG(trace, "returning from bool locateSunJVMInRegistry((JNI_CreateJavaVM_t**) 0x%X, (HINSTANCE*) 0x%X) with retval %s",
       JNI_CreateJavaVM_f, jvmLibOut, bool2str(retval));
   return retval;
@@ -444,25 +444,25 @@ static bool locateSunJVMInRegistry(JNI_CreateJavaVM_t **JNI_CreateJavaVM_f, HINS
 
 static bool locateJVMThroughJavaHome(JNI_CreateJavaVM_t **JNI_CreateJavaVM_f, HINSTANCE *jvmLibOut) {
   LOG(trace, "bool locateJVMThroughJavaHome((JNI_CreateJavaVM_t**) 0x%X, (HINSTANCE*) 0x%X)", JNI_CreateJavaVM_f, jvmLibOut);
-  
+
   bool returnValue = false;
-  
+
   *JNI_CreateJavaVM_f = NULL;
   *jvmLibOut = NULL;
-  
+
   _TCHAR *envString = new _TCHAR[32767];
-  
+
   const int endingsLength = 2;
   _TCHAR *endings[endingsLength] = { _T("\\jre\\bin\\client\\jvm.dll"), _T("\\jre\\bin\\server\\jvm.dll") };
-  
+
   for(int i = 0; i < endingsLength; ++i) {
     if(GetEnvironmentVariable(_T("JAVA_HOME"), envString, 32767) > 0) {
       // The JAVA_HOME variable should (?) contain a single string pointing to the JDK(JRE?) home dir
       _TCHAR *trailing = endings[i];
-      
+
       int trailingLength = _tcslen(trailing);
       LOG(debug, "sizeof(trailing)=%d", trailingLength);
-    
+
       _TCHAR *destination = new _TCHAR[32767+trailingLength];
       destination[0] = _T('\0');
       _tcscat(destination, envString);
@@ -470,7 +470,7 @@ static bool locateJVMThroughJavaHome(JNI_CreateJavaVM_t **JNI_CreateJavaVM_f, HI
       LOG(debug, "LoadLibrary(%s);", destination);
       HINSTANCE jvmLib = LoadLibrary(destination);
       delete[] destination;
-      
+
       if(jvmLib == NULL) {
 	printError(_T("LoadLibrary failed with error "), GetLastError());
       }
@@ -478,7 +478,7 @@ static bool locateJVMThroughJavaHome(JNI_CreateJavaVM_t **JNI_CreateJavaVM_f, HI
 	LOG(debug, "GetProcAddress(..)");
 	JNI_CreateJavaVM_t *jniCreateAddress = (JNI_CreateJavaVM_t *)GetProcAddress(jvmLib, "JNI_CreateJavaVM");
 	LOG(debug, "JNI_CreateJavaVM_f set to %X", jniCreateAddress);
-      
+
 	if(jniCreateAddress != NULL) {
 	  LOG(debug, "Returning from locateJVMThroughJavaHome...");
 	  returnValue = true;
@@ -494,11 +494,11 @@ static bool locateJVMThroughJavaHome(JNI_CreateJavaVM_t **JNI_CreateJavaVM_f, HI
     }
     else
       LOG(debug, " JAVA_HOME environment variable not found.");
-  
+
   }
-  
+
   delete[] envString;
-  
+
   return returnValue;
 }
 
@@ -510,7 +510,7 @@ static bool locateJavaVM(JNI_CreateJavaVM_t **JNI_CreateJavaVM_f, HINSTANCE *jvm
     if(DISABLE_JAVA_HOME_SEARCH || locateJVMThroughJavaHome(JNI_CreateJavaVM_f, jvmLibOut) == FALSE)
       retval = false;
   }
-  
+
   return retval;
 }
 
@@ -529,7 +529,7 @@ static bool createJavaVM(JavaVM **jvmOut, HINSTANCE *jvmLibOut) {
     JNIEnv *env;
     JavaVM *jvm;
     jint res;
-    
+
     /* <Build classpath string> */
     int classpathStringLength = 0;
     int pathSeparatorLength = strlen(PATH_SEPARATOR);
@@ -539,14 +539,14 @@ static bool createJavaVM(JavaVM **jvmOut, HINSTANCE *jvmLibOut) {
       classpathStringLength += strlen(T2A(classpathComponents[i]));
     }
     ++classpathStringLength; // '\0'
-    
+
     char* classpathString = new char[classpathStringLength];
     int pos = 0;
     for(int i = 0; i < classpathComponentsLength; ++i) {
       if(i > 0) {
 	strncpy(classpathString+pos, PATH_SEPARATOR, pathSeparatorLength); pos += pathSeparatorLength;
       }
-      
+
       char *currentComponent = T2A(classpathComponents[i]);
       int currentComponentLength = strlen(currentComponent);
       strncpy(classpathString+pos, currentComponent, currentComponentLength); pos += currentComponentLength;
@@ -555,7 +555,7 @@ static bool createJavaVM(JavaVM **jvmOut, HINSTANCE *jvmLibOut) {
     if(pos != classpathStringLength)
       LOG(error, "FATAL ERROR: classpath string did not build correctly! pos(%d) != classpathStringLength(%d)", pos, classpathStringLength);
     /* </Build classpath string> */
-    
+
 #ifdef JNI_VERSION_1_2
     const char* optionPrefix = "-Djava.class.path=";
     const int optionPrefixLength = strlen(optionPrefix);
@@ -566,7 +566,7 @@ static bool createJavaVM(JavaVM **jvmOut, HINSTANCE *jvmLibOut) {
     classpathOptionString[optionPrefixLength+classpathStringLength-1] = '\0';
     _TCHAR *tClasspathOptionString = A2T(classpathOptionString);
     LOG(debug, "Classpath option string: \"%s\"", tClasspathOptionString);
-    
+
     JavaVMInitArgs vm_args;
     const int nOptions = 2;
     JavaVMOption options[nOptions];
@@ -580,7 +580,7 @@ static bool createJavaVM(JavaVM **jvmOut, HINSTANCE *jvmLibOut) {
     vm_args.ignoreUnrecognized = JNI_TRUE;
     /* Create the Java VM */
     res = JNI_CreateJavaVM_f(&jvm, &env, &vm_args);
-    
+
     //res = JNI_CreateJavaVM(&jvm, (void**)&env, &vm_args); // We now use the dynamically loaded address
 #else
     JDK1_1InitArgs vm_args;
@@ -594,7 +594,7 @@ static bool createJavaVM(JavaVM **jvmOut, HINSTANCE *jvmLibOut) {
     /* Create the Java VM */
     res = JNI_CreateJavaVM_f(&jvm, &env, &vm_args);
 #endif /* JNI_VERSION_1_2 */
-    
+
     if(res == 0) {
       *jvmOut = jvm;
       *jvmLibOut = jvmLibInstance;
@@ -605,7 +605,7 @@ static bool createJavaVM(JavaVM **jvmOut, HINSTANCE *jvmLibOut) {
       FreeLibrary(jvmLibInstance);
     }
   }
-  
+
   LOG(trace, "Returning from int createJavaVM(JavaVM**) 0x%X, (HINSTANCE*) 0x%X) with retval=%s",
       jvmOut, jvmLibOut, bool2str(retval));
   return retval;
@@ -621,7 +621,7 @@ static void destroyJavaVM(JavaVM *jvmInstance, HINSTANCE jvmLibInstance) {
 static bool startJavaVM(JavaVM *jvmInstance, const int javaArgsLength, const _TCHAR **javaArgs) {
   LOG(trace, "bool startJavaVM((JavaVM*) 0x%X, %d, (_TCHAR**) 0x%X)", jvmInstance, javaArgsLength, javaArgs);
   bool retval = false;
-  
+
   StringBuilder startClassDirsyntaxBuilder;
   for(int i = 0; i < startClassComponentsLength; ++i) {
     if(i > 0)
@@ -629,7 +629,7 @@ static bool startJavaVM(JavaVM *jvmInstance, const int javaArgsLength, const _TC
     startClassDirsyntaxBuilder.append(startClassComponents[i]);
   }
   const char *startClassDirsyntax = startClassDirsyntaxBuilder.toASCIIString();
-  
+
   _TCHAR currentWorkingDirectory[MAX_PATH];
   GetCurrentDirectory(MAX_PATH, currentWorkingDirectory);
   LOG(debug, "Current working dir: \"%s\"", currentWorkingDirectory);
@@ -643,7 +643,7 @@ static bool startJavaVM(JavaVM *jvmInstance, const int javaArgsLength, const _TC
     LOG(debug, "    - Exception occurred!");
     MessageBox(NULL, _T("Could not find the required class files!"), _T("HFSExplorer launch error"), MB_OK | MB_ICONERROR);
   }
-      
+
   if(cls != NULL) {
     LOG(debug, "    - Class found");
     jmethodID mid = env->GetStaticMethodID(cls, "main", "([Ljava/lang/String;)V");
@@ -651,7 +651,7 @@ static bool startJavaVM(JavaVM *jvmInstance, const int javaArgsLength, const _TC
       LOG(debug, "    - main method found");
       jclass stringClass = env->FindClass("java/lang/String");
       LOG(debug, "    - got String class");
-      
+
       // Create array to hold args (cast to jobjectArray is neccessary for g++ to accept code)
       jobjectArray argsArray = (jobjectArray)env->NewObjectArray(javaArgsLength, stringClass, NULL);
       LOG(debug, "    - created args array");
@@ -662,8 +662,8 @@ static bool startJavaVM(JavaVM *jvmInstance, const int javaArgsLength, const _TC
 	  int curLength = _tcslen(cur);
 	  WCHAR *wcCur = NULL;
 	  int wcCurLength = -1;
-	    
-	    
+
+
 #ifdef _UNICODE
 	  wcCurLength = curLength;
 	  wcCur = new WCHAR[wcCurLength];
@@ -683,7 +683,7 @@ static bool startJavaVM(JavaVM *jvmInstance, const int javaArgsLength, const _TC
 	    }
 	  }
 #endif
-	      
+
 	  if(wcCur != NULL && wcCurLength != -1) {
 	    LOG(debug, "Converting \"%s\" to UTF-8...", wcCur);
 	    char* utf8String;
@@ -703,7 +703,7 @@ static bool startJavaVM(JavaVM *jvmInstance, const int javaArgsLength, const _TC
 	    LOG(error, "Failed to convert argv[%d] to WCHAR!", newi);
 	  delete[] wcCur;
 	}
-	  
+
 	LOG(debug, "    - args array built. Calling main(String[])...");
 	env->CallStaticVoidMethod(cls, mid, argsArray);
 	if(env->ExceptionOccurred()) {
@@ -711,7 +711,7 @@ static bool startJavaVM(JavaVM *jvmInstance, const int javaArgsLength, const _TC
 	  LOG(error, "    - Exception occurred!");
 	}
 	else {
-	  LOG(debug, "    - Successfully invoked main method!");	  
+	  LOG(debug, "    - Successfully invoked main method!");
 	  retval = true;
 	}
       }
@@ -733,7 +733,7 @@ static bool createExternalJavaProcess(const _TCHAR *imageFile, int javaArgsLengt
   LOG(trace, "bool createExternalJavaProcess((_TCHAR*) 0x%X, %d, (_TCHAR **) 0x%X)",
       imageFile, javaArgsLength, javaArgs);
   bool retval = false;
-  
+
   if(!DISABLE_JAVA_PROCESS_CREATION) {
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
@@ -741,7 +741,7 @@ static bool createExternalJavaProcess(const _TCHAR *imageFile, int javaArgsLengt
     ZeroMemory( &si, sizeof(si) );
     si.cb = sizeof(si);
     ZeroMemory( &pi, sizeof(pi) );
-    
+
     StringBuilder argsStringBuilder;
     argsStringBuilder.append(imageFile);
     argsStringBuilder.append(" ");
@@ -763,43 +763,43 @@ static bool createExternalJavaProcess(const _TCHAR *imageFile, int javaArgsLengt
       argsStringBuilder.append("\"");
     }
     _TCHAR *commandLine = argsStringBuilder.toWideCharString(new _TCHAR[argsStringBuilder.length()+1]);
-    
+
     LOG(debug, "commandLine=\"%s\"", commandLine);
     //LOG(debug, "printing characters in commandLine detailed:");
     //for(int i = 0; commandLine[i] != _T('\0'); ++i)
     //  LOG(debug, "  commandLine[%d]: '%c' (0x%X)", i, commandLine[i], commandLine[i]);
     LOG(debug, "Trying to spawn process from commandLine...");
     // This is PATHETIC. A simpler API please, MS.. null null false null 0 null bla bla unreadable
-    if(CreateProcess(NULL, commandLine, 
+    if(CreateProcess(NULL, commandLine,
 		     NULL, NULL, FALSE, CREATE_UNICODE_ENVIRONMENT, NULL, NULL, &si, &pi)) {
       LOG(debug, "Process created successfully.");
       retval = true;
-      
+
       // Wait until child process exits.
       WaitForSingleObject( pi.hProcess, INFINITE );
-      
-      // Close process and thread handles. 
+
+      // Close process and thread handles.
       CloseHandle( pi.hProcess );
       CloseHandle( pi.hThread );
     }
     else {
       printError(_T("Could not create process! Error "), GetLastError());
     }
-    
+
     delete[] commandLine;
   }
   else
     LOG(debug, "Creation of external Java processes disabled at build time. Returning without doing anything.");
-  
+
   LOG(trace, "returning from bool createExternalJavaProcess((_TCHAR*) 0x%X, %d, (_TCHAR **) 0x%X) with retval %s",
       imageFile, javaArgsLength, javaArgs, bool2str(retval));
-  return retval;  
+  return retval;
 }
 
 static bool createExternalJavaProcesses(int javaArgsLength, const _TCHAR **javaArgs) {
   LOG(trace, "createExternalJavaProcesses(%d, (_TCHAR **) 0x%X)", javaArgsLength, javaArgs);
   bool retval = false;
-  
+
   if(createExternalJavaProcess(_T("javaw.exe"), javaArgsLength, javaArgs) ||
      createExternalJavaProcess(_T("java.exe"), javaArgsLength, javaArgs))
     retval = true;
@@ -812,7 +812,7 @@ static bool createExternalJavaProcesses(int javaArgsLength, const _TCHAR **javaA
       if(createExternalJavaProcess(_T("javaw.exe"), javaArgsLength, javaArgs) ||
 	 createExternalJavaProcess(_T("java.exe"), javaArgsLength, javaArgs))
 	retval = true;
-      
+
       if(!WOW64Operations::revertWOW64FileSystemRedirection(&oldValue))
 	printError(_T("Couldn't revert WOW64 file system redirection! Error: "), GetLastError());
     }
@@ -821,9 +821,9 @@ static bool createExternalJavaProcesses(int javaArgsLength, const _TCHAR **javaA
     }
   }
 
-      
 
-    
+
+
   LOG(trace, "returning from bool createExternalJavaProcesses(%d, (_TCHAR **) 0x%X) with retval %s",
       javaArgsLength, javaArgs, bool2str(retval));
   return retval;
@@ -836,12 +836,12 @@ static void resolveClasspath(const _TCHAR *const prefix) {
   LOG(trace, "void resolveClasspath((_TCHAR*) 0x%X)", prefix);
   int prefixLength = _tcslen(prefix);
   int i;
-  
+
   int classpathStringLength = -1;
   for(i = 0; i < classpathComponentsLength; ++i) {
     /*
      * Each part of the new classpath string consists of:
-     * 
+     *
      * ';"'                   - 2 characters (except for first entry, where ';' is not included,
      *                          which is why classpathStringLength is initialized to -1)
      * prefix                 - prefixLength characters
@@ -852,7 +852,7 @@ static void resolveClasspath(const _TCHAR *const prefix) {
     classpathStringLength += 2 + prefixLength + 1 + _tcslen(classpathComponents[i]) + 1;
   }
   ++classpathStringLength; // null terminator
-  
+
   if(classpathString != NULL)
     delete[] classpathString;
   classpathString = new _TCHAR[classpathStringLength];
@@ -882,11 +882,11 @@ static bool spawnElevatedProcess(_TCHAR *imageFile, _TCHAR *currentWorkingDirect
   LOG(trace, "bool spawnElevatedProcess((_TCHAR*) 0x%X, (_TCHAR*) 0x%X, %d, (_TCHAR**) 0x%X)",
       imageFile, currentWorkingDirectory, argc, argv);
   bool retval = false;
-  
+
   // Initialize COM for ShellExecuteEx (because MSDN says it's safest)
   LOG(debug, "Initializing COM...");
   initializeCOM();
-      
+
   /* Build a space separated argv string that we can pass to ShellExecuteEx
    * excluding the first argument (argv[1]), which is the "-invokeuac" switch. */
   int argvStringLength = 0;
@@ -902,7 +902,7 @@ static bool spawnElevatedProcess(_TCHAR *imageFile, _TCHAR *currentWorkingDirect
 
   _TCHAR *argvString = new _TCHAR[argvStringLength];
   ZeroMemory(argvString, argvStringLength*sizeof(_TCHAR));
-  
+
   for(i = 0; i < argc; ++i) {
     _TCHAR *cur = argv[i];
     if(i == 0)
@@ -967,10 +967,10 @@ static bool spawnElevatedProcess(_TCHAR *imageFile, _TCHAR *currentWorkingDirect
     LOG(debug, "  ERROR_SHARING_VIOLATION=%d", ERROR_SHARING_VIOLATION);
     MessageBox(NULL, _T("Error while trying to create elevated process..."), _T("HFSExplorer launch error"), MB_OK);
   }
-  
+
   // Clean up
   delete[] argvString;
-  
+
   // Uninitialize COM (no more need for it)
   LOG(debug, "Uninitializing COM...");
   uninitializeCOM();
@@ -994,7 +994,7 @@ int main(int original_argc, char** original_argv) {
   _TCHAR **argv = original_argv;
   int argc = original_argc;
 #endif
-  
+
   /* <Get the fully qualified path of this executable> */
   int processFilenameLength = MAX_PATH;
   _TCHAR *processFilename = NULL;
@@ -1003,11 +1003,11 @@ int main(int original_argc, char** original_argv) {
       delete[] processFilename;
     }
     processFilename = new _TCHAR[processFilenameLength];
-    
+
     int gmfRes = GetModuleFileName(NULL, processFilename, processFilenameLength);
     if(gmfRes == 0) {
       printError(_T("GetModuleFileName failed with error "), GetLastError());
-      MessageBox(NULL, _T("Problem (1) with getting the fully qualified path of the executable! FATAL..."), 
+      MessageBox(NULL, _T("Problem (1) with getting the fully qualified path of the executable! FATAL..."),
 		 _T("HFSExplorer launch error"), MB_OK);
       return RETVAL_COULD_NOT_GET_EXE_PATH;
     }
@@ -1020,8 +1020,8 @@ int main(int original_argc, char** original_argv) {
   }
   LOG(debug, "Got fully qualified path: \"%s\"", processFilename);
   /* </Get the fully qualified path of this executable> */
-  
-  
+
+
   /* <Extract the parent directory from the fully qualified path> */
   int processFilenameStrlen = _tcslen(processFilename);
   int psIndex;
@@ -1035,15 +1035,15 @@ int main(int original_argc, char** original_argv) {
   processParentDir[psIndex] = _T('\0');
   LOG(debug, "Got fully qualified parent dir: \"%s\"", processParentDir);
   /* <//Extract the parent directory from the fully qualified path> */
-  
-  
+
+
   // Resolve the absolute classpath variables
   resolveClasspath(processParentDir);
-  
+
   // Get the current working directory
   const DWORD currentWorkingDirectoryLength = GetCurrentDirectory(0, NULL);
   _TCHAR *currentWorkingDirectory = new _TCHAR[currentWorkingDirectoryLength];
-  
+
   int returnValue = RETVAL_UNKNOWN_ERROR;
   DWORD actualCWDLength = GetCurrentDirectory(currentWorkingDirectoryLength, currentWorkingDirectory);
   if(actualCWDLength+1 != currentWorkingDirectoryLength) {
@@ -1054,10 +1054,10 @@ int main(int original_argc, char** original_argv) {
   }
   else {
     LOG(debug, "CWD: \"%s\"", currentWorkingDirectory);
-    
+
     if(argc > 1 && _tcscmp(argv[1], _T("-invokeuac")) == 0) {
       LOG(debug, "\"-invokeuac\" specified. Forking off elevated process...");
-      
+
       if(spawnElevatedProcess(argv[0], currentWorkingDirectory, argc-2, argv+2))
 	returnValue = RETVAL_OK;
       else {
@@ -1101,11 +1101,11 @@ int main(int original_argc, char** original_argv) {
 	}
       }
       // </Ugly hack which converts argv[1] into an absolute path name>
-      
+
       // <Set the working dir to the process parent dir />
       // This is really ugly too. If possible, try not to alter working dir.
       SetCurrentDirectory(processParentDir);
-      
+
       /* <Alter environment variable PATH to include .dll dir> */
       {
 	const DWORD envPathLength = GetEnvironmentVariable(_T("PATH"), NULL, 0);
@@ -1129,32 +1129,32 @@ int main(int original_argc, char** original_argv) {
 	    newEnvPath[ptr++] = _T('\0');
 	  }
 	  LOG(debug, "Setting new PATH variable: \"%s\"", newEnvPath);
-	  
+
 	  if(SetEnvironmentVariable(_T("PATH"), newEnvPath) == TRUE)
 	    LOG(debug, "Successfully set PATH variable!");
 	  else
 	    printError(_T("Path variable could not be set! Error "), GetLastError());
-	  
+
 	}
-	
-	LPTSTR lpszVariable; 
-	LPTCH lpvEnv; 
-	
-	// Get a pointer to the environment block. 
-	
+
+	LPTSTR lpszVariable;
+	LPTCH lpvEnv;
+
+	// Get a pointer to the environment block.
+
 	lpvEnv = GetEnvironmentStrings();
-	
+
 	// If the returned pointer is NULL, exit.
 	if(lpvEnv == NULL) {
 	  printError(_T("GetEnvironmentStrings failed: "), GetLastError());
 	  return 0;
 	}
-	
-	// Variable strings are separated by NULL byte, and the block is 
-	// terminated by a NULL byte. 
-	
+
+	// Variable strings are separated by NULL byte, and the block is
+	// terminated by a NULL byte.
+
 	lpszVariable = (LPTSTR) lpvEnv;
-	
+
 	LOG(debug, "Current environment:");
 	while(*lpszVariable) {
 	  LOG(debug, "  %s", lpszVariable);
@@ -1163,12 +1163,12 @@ int main(int original_argc, char** original_argv) {
 	FreeEnvironmentStrings(lpvEnv);
       }
       /* </Alter environment variable PATH to include .dll dir> */
-      
-      
-      /* <Build the argument list to pass to the JVM and our main method> */      
+
+
+      /* <Build the argument list to pass to the JVM and our main method> */
       const int javaArgsLength = (argc - 1) + prefixArgsLength;
       const _TCHAR **javaArgs = new const _TCHAR*[javaArgsLength];
-      
+
       int curArg = 0;
       for(int i = 0; i < prefixArgsLength; ++i) {
 	javaArgs[curArg++] = prefixArgs[i];
@@ -1176,12 +1176,12 @@ int main(int original_argc, char** original_argv) {
       for(int i = 1; i < argc; ++i) {
 	javaArgs[curArg++] = argv[i];
       }
-      
+
       if(curArg != javaArgsLength)
 	LOG(error, "ASSERTION FAILED: curArg(%d) != javaArgsLength(%d)", curArg, javaArgsLength);
       /* </Build the argument list to pass to the JVM and our main method> */
-      
-      
+
+
       /* <Try different methods to locate and start a JVM> */
       JavaVM *jvmInstance;
       HINSTANCE jvmLibInstance;
@@ -1191,9 +1191,9 @@ int main(int original_argc, char** original_argv) {
 	  returnValue = RETVAL_OK;
 	  jvmStarted = true;
 	}
-	
+
 	destroyJavaVM(jvmInstance, jvmLibInstance);
-	
+
 	if(!jvmStarted) {
 	  if(createExternalJavaProcesses(javaArgsLength, javaArgs) == true)
 	    returnValue = RETVAL_OK;
@@ -1209,15 +1209,15 @@ int main(int original_argc, char** original_argv) {
 	returnValue = RETVAL_JVM_NOT_FOUND;
       }
       /* </Try different methods to locate and start a JVM> */
-      
-      
+
+
       /* <Clean up> */
       if(fullPathName != NULL)
 	delete[] fullPathName;
       /* </Clean up> */
     }
   }
-  
+
   // <Cleanup>
   delete[] currentWorkingDirectory;
   delete[] processParentDir;
