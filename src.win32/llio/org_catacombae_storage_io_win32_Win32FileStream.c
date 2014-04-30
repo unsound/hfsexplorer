@@ -17,6 +17,8 @@
 
 #define UNICODE
 #define _UNICODE
+#define _CRT_SECURE_NO_WARNINGS
+
 #define _WIN32_WINNT 0x0500 // Minimum windows 2000 required, beacuse of GetFileSizeEx.
 #include <windows.h>
 #include <winioctl.h>
