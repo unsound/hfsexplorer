@@ -243,6 +243,9 @@ public abstract class HFSVolume {
     public abstract CommonHFSCatalogNodeID getCommonHFSCatalogNodeID(
             ReservedID requestedNodeID);
 
+    public abstract CommonHFSExtentKey createCommonHFSExtentKey(
+            boolean isResource, int cnid, long startBlock);
+
     /*protected CommonHFSCatalogString createCommonHFSCatalogString(
             String name);*/
 
@@ -330,9 +333,8 @@ public abstract class HFSVolume {
             CommonHFSCatalogFile catFile =
                     ((CommonHFSCatalogFileRecord) fileRecord).getData();
             CommonHFSForkData dataFork = catFile.getDataFork();
-            return extractForkToStream(dataFork,
-                    extentsOverflowFile.getAllDataExtentDescriptors(fileRecord),
-                    os, pm);
+            return extractForkToStream(ForkFilter.ForkType.DATA,
+                    catFile.getFileID().toLong(), dataFork, os, pm);
         }
         else
             throw new IllegalArgumentException("fileRecord.getData() it not " +
@@ -347,20 +349,23 @@ public abstract class HFSVolume {
             CommonHFSCatalogFile catFile =
                     ((CommonHFSCatalogFileRecord) fileRecord).getData();
             CommonHFSForkData resFork = catFile.getResourceFork();
-            return extractForkToStream(resFork,
-                    extentsOverflowFile.getAllResourceExtentDescriptors(fileRecord),
-                    os, pm);
+            return extractForkToStream(ForkFilter.ForkType.RESOURCE,
+                    catFile.getFileID().toLong(), resFork, os, pm);
         }
         else
             throw new IllegalArgumentException("fileRecord.getData() it not " +
                     "of type RECORD_TYPE_FILE");
     }
 
-    public long extractForkToStream(CommonHFSForkData forkData,
-            CommonHFSExtentDescriptor[] extentDescriptors, OutputStream os,
-            ProgressMonitor pm) throws IOException {
+    private long extractForkToStream(ForkFilter.ForkType forkType,
+            long cnid, CommonHFSForkData forkData, OutputStream os,
+            ProgressMonitor pm) throws IOException
+    {
         CommonHFSVolumeHeader header = getVolumeHeader();
-        ForkFilter forkFilter = new ForkFilter(forkData, extentDescriptors,
+        ForkFilter forkFilter = new ForkFilter(forkType,
+                cnid,
+                forkData,
+                extentsOverflowFile,
                 new ReadableRandomAccessSubstream(hfsFile), 0,
                 header.getAllocationBlockSize(),
                 header.getAllocationBlockStart() * physicalBlockSize);
@@ -400,8 +405,8 @@ public abstract class HFSVolume {
 	if(fileRecord instanceof CommonHFSCatalogFileRecord) {
 	    CommonHFSCatalogFile catFile = ((CommonHFSCatalogFileRecord)fileRecord).getData();
 	    CommonHFSForkData fork = catFile.getDataFork();
-	    return getReadableForkStream(fork,
-                    extentsOverflowFile.getAllDataExtentDescriptors(fileRecord));
+	    return getReadableForkStream(ForkFilter.ForkType.DATA,
+                    catFile.getFileID().toLong(), fork);
 	}
 	else
 	    throw new IllegalArgumentException("fileRecord.getData() it not of type RECORD_TYPE_FILE");
@@ -419,17 +424,22 @@ public abstract class HFSVolume {
 	if(fileRecord instanceof CommonHFSCatalogFileRecord) {
 	    CommonHFSCatalogFile catFile = ((CommonHFSCatalogFileRecord)fileRecord).getData();
 	    CommonHFSForkData fork = catFile.getResourceFork();
-	    return getReadableForkStream(fork,
-                    extentsOverflowFile.getAllResourceExtentDescriptors(fileRecord));
+	    return getReadableForkStream(ForkFilter.ForkType.RESOURCE,
+                    catFile.getFileID().toLong(), fork);
 	}
 	else
 	    throw new IllegalArgumentException("fileRecord.getData() it not of type RECORD_TYPE_FILE");
     }
 
-    private ReadableRandomAccessStream getReadableForkStream(CommonHFSForkData forkData,
-            CommonHFSExtentDescriptor[] extentDescriptors) {
+    private ReadableRandomAccessStream getReadableForkStream(
+            ForkFilter.ForkType forkType, long cnid, CommonHFSForkData forkData)
+    {
         CommonHFSVolumeHeader header = getVolumeHeader();
-        return new ForkFilter(forkData, extentDescriptors, new ReadableRandomAccessSubstream(hfsFile),
+        return new ForkFilter(forkType,
+                cnid,
+                forkData,
+                extentsOverflowFile,
+                new ReadableRandomAccessSubstream(hfsFile),
                 fileReadOffset,
                 header.getAllocationBlockSize(),
                 header.getAllocationBlockStart() * physicalBlockSize);

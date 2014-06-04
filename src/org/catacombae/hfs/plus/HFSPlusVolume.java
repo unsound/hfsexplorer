@@ -125,14 +125,12 @@ public class HFSPlusVolume extends HFSVolume {
         CommonHFSForkData allocationFileFork =
                 CommonHFSForkData.create(vh.getAllocationFile());
 
-        CommonHFSExtentDescriptor[] extDescriptors =
-                extentsOverflowFile.getAllExtentDescriptors(
-                CommonHFSCatalogNodeID.getHFSPlusReservedID(ReservedID.ALLOCATION_FILE),
+        ForkFilter allocationFileStream = new ForkFilter(
+                ForkFilter.ForkType.DATA,
+                getCommonHFSCatalogNodeID(ReservedID.ALLOCATION_FILE).toLong(),
                 allocationFileFork,
-                CommonHFSForkType.DATA_FORK);
-
-        ForkFilter allocationFileStream = new ForkFilter(allocationFileFork,
-                extDescriptors, new ReadableRandomAccessSubstream(hfsFile),
+                extentsOverflowFile,
+                new ReadableRandomAccessSubstream(hfsFile),
                 0, Util.unsign(vh.getBlockSize()), 0);
 
         return new HFSPlusAllocationFile(this, allocationFileStream);
@@ -180,6 +178,22 @@ public class HFSPlusVolume extends HFSVolume {
             ReservedID requestedNodeID) {
 
         return CommonHFSCatalogNodeID.getHFSPlusReservedID(requestedNodeID);
+    }
+
+    @Override
+    public CommonHFSExtentKey createCommonHFSExtentKey(boolean isResource,
+            int cnid, long startBlock)
+    {
+        if(startBlock > 0xFFFFFFFFL) {
+            throw new IllegalArgumentException("Value of 'startBlock' is too " +
+                    "large for an HFS+ extent key.");
+        }
+
+        return CommonHFSExtentKey.create(new HFSPlusExtentKey(
+                isResource ? HFSPlusExtentKey.RESOURCE_FORK :
+                    HFSPlusExtentKey.DATA_FORK,
+                new HFSCatalogNodeID(cnid),
+                (int) startBlock));
     }
 
     @Override

@@ -30,6 +30,7 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFile;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFileRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogNodeID;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogNodeID.ReservedID;
 import org.catacombae.hfs.types.hfscommon.CommonHFSExtentDescriptor;
 import org.catacombae.hfs.types.hfscommon.CommonHFSExtentIndexNode;
 import org.catacombae.hfs.types.hfscommon.CommonHFSExtentKey;
@@ -66,8 +67,11 @@ public class ExtentsOverflowFile extends BTreeFile {
         @Override
         protected ReadableRandomAccessStream getBTreeStream(
                 CommonHFSVolumeHeader header) {
-            return new ForkFilter(header.getExtentsOverflowFile(),
-                    header.getExtentsOverflowFile().getBasicExtents(),
+            return new ForkFilter(ForkFilter.ForkType.DATA,
+                    vol.getCommonHFSCatalogNodeID(ReservedID.EXTENTS_FILE).
+                    toLong(),
+                    header.getExtentsOverflowFile(),
+                    null,
                     new ReadableRandomAccessSubstream(vol.hfsFile),
                     0,
                     header.getAllocationBlockSize(),
@@ -242,6 +246,13 @@ public class ExtentsOverflowFile extends BTreeFile {
 	else
 	    throw new RuntimeException("Expected leaf node. Found other kind: " +
 				       nodeDescriptor.getNodeType());
+    }
+
+    public CommonHFSExtentLeafRecord getOverflowExtent(boolean isResource,
+            int cnid, long startBlock)
+    {
+        return getOverflowExtent(vol.createCommonHFSExtentKey(isResource, cnid,
+                startBlock));
     }
 
     public CommonHFSExtentDescriptor[] getAllExtents(CommonHFSCatalogNodeID fileID,

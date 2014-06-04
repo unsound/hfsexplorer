@@ -72,14 +72,12 @@ public class AttributesFile extends BTreeFile {
     private ReadableRandomAccessStream getAttributesFileStream(
             CommonHFSVolumeHeader.HFSPlusImplementation header) {
 
-        CommonHFSExtentDescriptor[] allExtents =
-                view.getExtentsOverflowFile().getAllDataExtentDescriptors(
-                view.getCommonHFSCatalogNodeID(ReservedID.ATTRIBUTES_FILE),
-                header.getAttributesFile());
-
-        return new ForkFilter(
+        return new ForkFilter(ForkFilter.ForkType.DATA,
+                vol.getCommonHFSCatalogNodeID(ReservedID.ATTRIBUTES_FILE).
+                toLong(),
                 header.getAttributesFile(),
-                allExtents, view.createFSStream(),
+                vol.extentsOverflowFile,
+                view.createFSStream(),
                 0,
                 header.getAllocationBlockSize(),
                 header.getAllocationBlockStart() * view.getPhysicalBlockSize());

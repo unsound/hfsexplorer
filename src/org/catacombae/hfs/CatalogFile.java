@@ -73,14 +73,13 @@ public class CatalogFile extends BTreeFile {
                 CommonHFSVolumeHeader header) {
             //if(catalogCache != null)
             //    return catalogCache;
-            CommonHFSExtentDescriptor[] allCatalogFileDescriptors =
-                    vol.extentsOverflowFile.getAllDataExtentDescriptors(
-                    vol.getCommonHFSCatalogNodeID(ReservedID.CATALOG_FILE),
-                    header.getCatalogFile());
             //printStructArray(System.err, "    ", "allCatalogFileDescriptors",
             //        allCatalogFileDescriptors);
-            return new ForkFilter(header.getCatalogFile(),
-                    allCatalogFileDescriptors,
+            return new ForkFilter(ForkFilter.ForkType.DATA,
+                    vol.getCommonHFSCatalogNodeID(ReservedID.CATALOG_FILE).
+                    toLong(),
+                    header.getCatalogFile(),
+                    vol.extentsOverflowFile,
                     new ReadableRandomAccessSubstream(vol.hfsFile),
                     0,
                     header.getAllocationBlockSize(),
