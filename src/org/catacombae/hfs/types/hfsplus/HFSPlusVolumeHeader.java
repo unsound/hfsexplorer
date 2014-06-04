@@ -298,7 +298,8 @@ public class HFSPlusVolumeHeader extends MutableStruct implements
         else {
             Long pos = Long.parseLong(args[1]);
 
-            RandomAccessFile raf = new RandomAccessFile(args[0], "r");
+            java.io.RandomAccessFile raf =
+                new java.io.RandomAccessFile(args[0], "r");
             raf.seek(pos);
             byte[] buf = new byte[_getSize()];
             raf.readFully(buf);
