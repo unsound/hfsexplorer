@@ -159,8 +159,9 @@ public class CatalogInfoPanel
                 HFSPlusCatalogFolder underlying =
                         ((CommonHFSCatalogFolder.HFSPlusImplementation)
                         fld).getUnderlying();
-                System.err.println("folderInfoPanelHeader: " + folderInfoPanelHeader);
-                System.err.println("leafStorage: " + leafStorage);
+                // System.err.println("folderInfoPanelHeader: " +
+                //         folderInfoPanelHeader);
+                // System.err.println("leafStorage: " + leafStorage);
                 folderInfoPanelHeader.setRecordNumber(
                         leafStorage.getRecordNumber());
                 folderInfoPanelHeader.setRecordOffset(
