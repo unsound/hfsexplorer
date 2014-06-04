@@ -53,7 +53,7 @@ public class HFSCommonFileSystemRecognizer {
     public static FileSystemType detectFileSystem(ReadableRandomAccessStream bitstream, long offset) {
         try {
             bitstream.seek(offset);
-            byte[] signatureData = new byte[1024 + 512];
+            byte[] signatureData = new byte[4096];
             bitstream.readFully(signatureData);
             short signature = Util.readShortBE(signatureData, 1024);
             switch(signature) {
