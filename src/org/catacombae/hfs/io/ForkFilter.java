@@ -17,10 +17,15 @@
 
 package org.catacombae.hfs.io;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import org.catacombae.util.Util;
+import org.catacombae.hfs.ExtentsOverflowFile;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfs.types.hfscommon.CommonHFSExtentDescriptor;
+import org.catacombae.hfs.types.hfscommon.CommonHFSExtentLeafRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSForkData;
+import org.catacombae.io.RuntimeIOException;
 
 /**
  * Facilitates reading the data of a file system fork by abstracting the extents
@@ -42,8 +47,11 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSForkData;
  */
 public class ForkFilter implements ReadableRandomAccessStream {
 
+    private final ForkType forkType;
+    private final long cnid;
     private final long forkLength;
-    private final CommonHFSExtentDescriptor[] extentDescriptors;
+    private final ArrayList<CommonHFSExtentDescriptor> extentDescriptors;
+    private final ExtentsOverflowFile extentsOverflowFile;
     private final ReadableRandomAccessStream sourceFile;
     private final long fsOffset;
     private final long allocationBlockSize;
@@ -51,6 +59,9 @@ public class ForkFilter implements ReadableRandomAccessStream {
     private long logicalPosition; // The current position in the fork
     private long lastLogicalPos; // The position in the fork where we stopped reading last time
     private long lastPhysicalPos; // The position in the fork where we stopped reading last time
+    private boolean all_extents_mapped = false;
+
+    public enum ForkType { DATA, RESOURCE };
 
     /**
      * Creates a new ForkFilter. This class assumes that it has exclusive access to
@@ -63,11 +74,13 @@ public class ForkFilter implements ReadableRandomAccessStream {
      * @param allocationBlockSize
      * @param firstBlockByteOffset
      */
-    public ForkFilter(CommonHFSForkData forkData, CommonHFSExtentDescriptor[] extentDescriptors,
+    public ForkFilter(ForkType forkType, long cnid, CommonHFSForkData forkData,
+            ExtentsOverflowFile extentsOverflowFile,
             ReadableRandomAccessStream sourceFile, long fsOffset, long allocationBlockSize,
             long firstBlockByteOffset) {
-        this(forkData.getLogicalSize(), extentDescriptors, sourceFile, fsOffset,
-                allocationBlockSize, firstBlockByteOffset);
+        this(forkType, cnid, forkData.getLogicalSize(),
+                forkData.getBasicExtents(), extentsOverflowFile, sourceFile,
+                fsOffset, allocationBlockSize, firstBlockByteOffset);
     }
 
     /**
@@ -81,7 +94,9 @@ public class ForkFilter implements ReadableRandomAccessStream {
      * @param allocationBlockSize
      * @param firstBlockByteOffset
      */
-    public ForkFilter(long forkLength, CommonHFSExtentDescriptor[] extentDescriptors,
+    public ForkFilter(ForkType forkType, long cnid, long forkLength,
+            CommonHFSExtentDescriptor[] basicExtents,
+            ExtentsOverflowFile extentsOverflowFile,
             ReadableRandomAccessStream sourceFile, long fsOffset, long allocationBlockSize,
             long firstBlockByteOffset) {
         //System.err.println("ForkFilter.<init>(" + forkLength + ", " +
@@ -91,10 +106,23 @@ public class ForkFilter implements ReadableRandomAccessStream {
         //System.err.println("  fork has " + extentDescriptors.length +
         //        " extents.");
 
-        this.forkLength = forkLength;
-        this.extentDescriptors = Util.arrayCopy(extentDescriptors,
-                new CommonHFSExtentDescriptor[extentDescriptors.length]);
+        if(forkType == null) {
+            throw new IllegalArgumentException("A null value is not allowed " +
+                    "in 'forkType'.");
+        }
 
+        if(cnid > 0xFFFFFFFFL) {
+            throw new IllegalArgumentException("Value of 'cnid' is too " +
+                    "large: " + cnid);
+        }
+
+        this.forkType = forkType;
+        this.cnid = cnid;
+        this.forkLength = forkLength;
+        this.extentDescriptors =
+                new ArrayList<CommonHFSExtentDescriptor>(Arrays.asList(
+                basicExtents));
+        this.extentsOverflowFile = extentsOverflowFile;
         this.sourceFile = sourceFile;
         this.fsOffset = fsOffset;
         this.allocationBlockSize = allocationBlockSize;
@@ -133,6 +161,58 @@ public class ForkFilter implements ReadableRandomAccessStream {
         return read(data, 0, data.length);
     }
 
+    private CommonHFSExtentDescriptor getExtent(int extIndex, long startBlock) {
+        long curStartBlock = startBlock;
+
+        while(extIndex >= extentDescriptors.size()) {
+            /* Need to read the next overflow extent into
+             * extentDescriptors. */
+
+            if(extentsOverflowFile == null) {
+                throw new RuntimeIOException("No extents overflow file to " +
+                        "query for overflow extents.");
+            }
+
+            CommonHFSExtentLeafRecord extentRecord;
+
+            if(all_extents_mapped) {
+                extentRecord = null;
+            }
+            else {
+                extentRecord =
+                        extentsOverflowFile.getOverflowExtent(
+                        forkType == ForkType.RESOURCE ? true : false,
+                        (int) cnid, curStartBlock);
+            }
+
+            if(extentRecord == null) {
+                throw new RuntimeIOException("Unable to find extent record " +
+                        "for " + (forkType == ForkType.RESOURCE ? "resource" :
+                            "data") + " fork of CNID " + cnid + ", start " +
+                            "block " + startBlock + ".");
+            }
+
+            final CommonHFSExtentDescriptor[] descriptors =
+                    extentRecord.getRecordData();
+
+            for(int i = 0; i < descriptors.length; ++i) {
+                final CommonHFSExtentDescriptor curDescriptor = descriptors[i];
+                final long blockCount = curDescriptor.getBlockCount();
+
+                if(blockCount == 0) {
+                    /* End-of-fork at first occurrence of block count 0. */
+                    all_extents_mapped = true;
+                    break;
+                }
+
+                extentDescriptors.add(curDescriptor);
+                curStartBlock += blockCount;
+            }
+        }
+
+        return extentDescriptors.get(extIndex);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -141,30 +221,31 @@ public class ForkFilter implements ReadableRandomAccessStream {
         //System.err.println("ForkFilter.read(" + data + ", " + pos + ", " + len);
         long offset = Long.MAX_VALUE; // MAX_VALUE as a sentinel for seek
         long bytesToSkip = logicalPosition;
+        long curLogicalBlock = 0;
         int extIndex;
         long currentExtentLength;
 
-        if(extentDescriptors.length < 1)
+        if(extentDescriptors.size() < 1 || logicalPosition > forkLength) {
             return -1; // EOF
+        }
 
         // Skip all extents whose range is located before the requested position (logicalPosition)
         //System.out.println("ForkFilter.read: skipping extents (bytesToSkip=" +
         //        bytesToSkip + ")...");
-        for(extIndex = 0; extIndex < extentDescriptors.length; ++extIndex) {
-            CommonHFSExtentDescriptor cur = extentDescriptors[extIndex];
-            currentExtentLength = cur.getBlockCount() * allocationBlockSize;
-            if(bytesToSkip >= currentExtentLength) {
-                if(extIndex < extentDescriptors.length - 1)
-                    bytesToSkip -= currentExtentLength;
-                else {
-                    //System.err.println("Extent descriptors:");
-                    //for(int i = 0; i < extentDescriptors.length; ++i) {
-                    //    extentDescriptors[i].print(System.err, "");
-                    //}
+        for(extIndex = 0; ; ++extIndex) {
+            CommonHFSExtentDescriptor cur =
+                    getExtent(extIndex, curLogicalBlock);
+            if(cur == null) {
+                /* No such extent available. */
+                return -1;
+            }
 
-                    //throw new RuntimeException("Extent out of bounds!");
-                    return -1; // This is the proper way
-                }
+            long currentBlockCount = cur.getBlockCount();
+            currentExtentLength = currentBlockCount * allocationBlockSize;
+
+            if(bytesToSkip >= currentExtentLength) {
+                bytesToSkip -= currentExtentLength;
+                curLogicalBlock += currentBlockCount;
             }
             else {
                 offset = fsOffset + firstBlockByteOffset +
@@ -191,11 +272,14 @@ public class ForkFilter implements ReadableRandomAccessStream {
         int bytesLeftToRead = totalBytesToRead;
         //System.err.println("bytesLeftToRead: " + bytesLeftToRead);
         // Start reading. Extent by extent if needed.
-        for(; extIndex < extentDescriptors.length; ++extIndex) {
+        for(; ; ++extIndex) {
             //System.out.println("ForkFilter.read: reading extent " + extIndex + ".");
-            CommonHFSExtentDescriptor cur = extentDescriptors[extIndex];
 
-            long bytesInExtent = cur.getBlockCount() * allocationBlockSize - bytesToSkip;
+            CommonHFSExtentDescriptor cur =
+                    getExtent(extIndex, curLogicalBlock);
+
+            long blockCount = cur.getBlockCount();
+            long bytesInExtent = blockCount * allocationBlockSize - bytesToSkip;
             int bytesToReadFromExtent = (bytesInExtent < bytesLeftToRead) ? (int) bytesInExtent : bytesLeftToRead;
 
             int bytesReadFromExtent = 0;
@@ -217,6 +301,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
 
             bytesLeftToRead -= bytesReadFromExtent;
             bytesToSkip = 0;
+            curLogicalBlock += blockCount;
 
             if(bytesLeftToRead == 0)
                 break;

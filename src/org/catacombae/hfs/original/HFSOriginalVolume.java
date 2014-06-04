@@ -140,6 +140,22 @@ public class HFSOriginalVolume extends HFSVolume {
     }
 
     @Override
+    public CommonHFSExtentKey createCommonHFSExtentKey(boolean isResource,
+            int cnid, long startBlock)
+    {
+        if(startBlock > 0xFFFF) {
+            throw new IllegalArgumentException("Value of 'startBlock' is too " +
+                    "large for an HFS extent key.");
+        }
+
+        return CommonHFSExtentKey.create(new ExtKeyRec(
+                isResource ? ExtKeyRec.FORK_TYPE_RESOURCE :
+                    ExtKeyRec.FORK_TYPE_DATA,
+                cnid,
+                (short) startBlock));
+    }
+
+    @Override
     public CommonHFSCatalogString getEmptyString() {
         return EMPTY_STRING;
     }
