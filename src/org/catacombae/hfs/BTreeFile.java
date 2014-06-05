@@ -24,9 +24,11 @@ import org.catacombae.hfs.types.hfscommon.CommonBTIndexRecord;
 import org.catacombae.hfs.types.hfscommon.CommonBTKey;
 import org.catacombae.hfs.types.hfscommon.CommonBTNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor;
+import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor.NodeType;
 import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.io.Readable;
 import org.catacombae.io.ReadableRandomAccessStream;
+import org.catacombae.io.RuntimeIOException;
 
 /**
  *
@@ -57,6 +59,11 @@ public abstract class BTreeFile {
 
             this.btnd = readNodeDescriptor(this.btreeStream);
             //this.btnd.print(System.err, "    ");
+            if(btnd.getNodeType() != NodeType.HEADER) {
+                throw new RuntimeIOException("Invalid node type for header " +
+                        "node.");
+            }
+
             this.bthr = readHeaderRecord(this.btreeStream);
             //this.bthr.print(System.err, "    ");
         }
