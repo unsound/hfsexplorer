@@ -1882,6 +1882,89 @@ public class FileSystemBrowserWindow extends JFrame {
     }
     */
 
+    private void setExtractedEntryAttributes(File outNode, FSEntry entry,
+            final LinkedList<String> errorMessages)
+    {
+        if(entry.getAttributes().hasPOSIXFileAttributes()) {
+            POSIXFileAttributes attrs =
+                    entry.getAttributes().getPOSIXFileAttributes();
+            try {
+                Java7Util.setPosixPermissions(outNode.getPath(),
+                        (int) attrs.getUserID(),
+                        (int) attrs.getGroupID(),
+                        attrs.canUserRead(),
+                        attrs.canUserWrite(),
+                        attrs.canUserExecute(),
+                        attrs.canGroupRead(),
+                        attrs.canGroupWrite(),
+                        attrs.canGroupExecute(),
+                        attrs.canOthersRead(),
+                        attrs.canOthersWrite(),
+                        attrs.canOthersExecute());
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        Long createTime = null;
+        Long lastAccessTime = null;
+        Long lastModifiedTime = null;
+
+        if(entry.getAttributes().hasCreateDate()) {
+            createTime = entry.getAttributes().getCreateDate().getTime();
+        }
+
+        if(entry.getAttributes().hasAccessDate()) {
+            lastAccessTime =
+                    entry.getAttributes().getAccessDate().getTime();
+        }
+
+        if(entry.getAttributes().hasModifyDate()) {
+            lastModifiedTime =
+                    entry.getAttributes().getModifyDate().getTime();
+        }
+
+        boolean fileTimesSet = false;
+        if(Java7Util.isJava7OrHigher()) {
+            try {
+                Java7Util.setFileTimes(outNode.getPath(),
+                        createTime != null ? new Date(createTime) :
+                        null,
+                        lastAccessTime != null ?
+                        new Date(lastAccessTime) : null,
+                        lastModifiedTime != null ?
+                        new Date(lastModifiedTime) : null);
+                fileTimesSet = true;
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        if(!fileTimesSet && lastModifiedTime != null) {
+            boolean setLastModifiedResult;
+
+            if(lastModifiedTime < 0) {
+                errorMessages.addLast("Cannot to set last modified time for " +
+                        "\"" + outNode.getPath() + "\" to pre-1970 date. " +
+                        "Adjusting last modified time from " +
+                        new Date(lastModifiedTime) + " to " + new Date(0) +
+                        ".");
+
+                lastModifiedTime = (long) 0;
+            }
+
+            setLastModifiedResult =
+                    outNode.setLastModified(lastModifiedTime);
+
+            if(!setLastModifiedResult) {
+                errorMessages.addLast("Failed to set last modified time for " +
+                        "\"" + outNode.getPath() + "\" to " +
+                        new Date(lastModifiedTime) + " (raw: " +
+                        lastModifiedTime + ").\n");
+            }
+        }
+    }
+
     private void extractFile(final FSFile rec, final File outDir, final ExtractProgressMonitor progressDialog,
             final LinkedList<String> errorMessages, final ExtractProperties extractProperties,
             final ObjectContainer<Boolean> skipDirectory, final FSForkType forkType) {
@@ -1999,84 +2082,7 @@ public class FileSystemBrowserWindow extends JFrame {
                     extractForkToStream(theFork, fos, progressDialog);
                 fos.close();
 
-                if(rec.getAttributes().hasPOSIXFileAttributes()) {
-                    POSIXFileAttributes attrs =
-                            rec.getAttributes().getPOSIXFileAttributes();
-                    try {
-                        Java7Util.setPosixPermissions(outFile.getPath(),
-                                (int) attrs.getUserID(),
-                                (int) attrs.getGroupID(),
-                                attrs.canUserRead(),
-                                attrs.canUserWrite(),
-                                attrs.canUserExecute(),
-                                attrs.canGroupRead(),
-                                attrs.canGroupWrite(),
-                                attrs.canGroupExecute(),
-                                attrs.canOthersRead(),
-                                attrs.canOthersWrite(),
-                                attrs.canOthersExecute());
-                    } catch(Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                Long createTime = null;
-                Long lastAccessTime = null;
-                Long lastModifiedTime = null;
-
-                if(rec.getAttributes().hasCreateDate()) {
-                    createTime = rec.getAttributes().getCreateDate().getTime();
-                }
-
-                if(rec.getAttributes().hasAccessDate()) {
-                    lastAccessTime =
-                            rec.getAttributes().getAccessDate().getTime();
-                }
-
-                if(rec.getAttributes().hasModifyDate()) {
-                    lastModifiedTime =
-                            rec.getAttributes().getModifyDate().getTime();
-                }
-
-                boolean fileTimesSet = false;
-                if(Java7Util.isJava7OrHigher()) {
-                    try {
-                        Java7Util.setFileTimes(outFile.getPath(),
-                                createTime != null ? new Date(createTime) :
-                                null,
-                                lastAccessTime != null ?
-                                new Date(lastAccessTime) : null,
-                                lastModifiedTime != null ?
-                                new Date(lastModifiedTime) : null);
-                        fileTimesSet = true;
-                    } catch(Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                if(!fileTimesSet && lastModifiedTime != null) {
-                    boolean setLastModifiedResult;
-
-                    if(lastModifiedTime < 0) {
-                        errorMessages.addLast("Cannot to set last modified " +
-                                "time for \"" + outFile.getPath() + "\" to " +
-                                "pre-1970 date. Adjusting last modified time " +
-                                "from " + new Date(lastModifiedTime) + " to " +
-                                new Date(0) + ".");
-
-                        lastModifiedTime = (long) 0;
-                    }
-
-                    setLastModifiedResult =
-                            outFile.setLastModified(lastModifiedTime);
-
-                    if(!setLastModifiedResult) {
-                        errorMessages.addLast("Failed to set last modified " +
-                                "time for \"" + outFile.getPath() + "\" to " +
-                                new Date(lastModifiedTime) + " " +
-                                "(raw: " + lastModifiedTime + ").\n");
-                    }
-                }
+                setExtractedEntryAttributes(outFile, rec, errorMessages);
 
                 if(curFileName != (Object) originalFileName && !curFileName.equals(originalFileName))
                     errorMessages.addLast("File \"" + originalFileName +
@@ -2444,84 +2450,7 @@ public class FileSystemBrowserWindow extends JFrame {
         public void endDirectory(String[] parentPath, FSFolder folder) {
             File outDir = outDirStack.removeLast();
 
-            if(folder.getAttributes().hasPOSIXFileAttributes()) {
-                POSIXFileAttributes attrs =
-                        folder.getAttributes().getPOSIXFileAttributes();
-                try {
-                    Java7Util.setPosixPermissions(outDir.getPath(),
-                            (int) attrs.getUserID(),
-                            (int) attrs.getGroupID(),
-                            attrs.canUserRead(),
-                            attrs.canUserWrite(),
-                            attrs.canUserExecute(),
-                            attrs.canGroupRead(),
-                            attrs.canGroupWrite(),
-                            attrs.canGroupExecute(),
-                            attrs.canOthersRead(),
-                            attrs.canOthersWrite(),
-                            attrs.canOthersExecute());
-                } catch(Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            Long createTime = null;
-            Long lastAccessTime = null;
-            Long lastModifiedTime = null;
-
-            if(folder.getAttributes().hasCreateDate()) {
-                createTime = folder.getAttributes().getCreateDate().getTime();
-            }
-
-            if(folder.getAttributes().hasAccessDate()) {
-                lastAccessTime =
-                        folder.getAttributes().getAccessDate().getTime();
-            }
-
-            if(folder.getAttributes().hasModifyDate()) {
-                lastModifiedTime =
-                        folder.getAttributes().getModifyDate().getTime();
-            }
-
-            boolean fileTimesSet = false;
-            if(Java7Util.isJava7OrHigher()) {
-                try {
-                    Java7Util.setFileTimes(outDir.getPath(),
-                            createTime != null ? new Date(createTime) :
-                            null,
-                            lastAccessTime != null ?
-                            new Date(lastAccessTime) : null,
-                            lastModifiedTime != null ?
-                            new Date(lastModifiedTime) : null);
-                    fileTimesSet = true;
-                } catch(Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if(!fileTimesSet && lastModifiedTime != null) {
-                boolean setLastModifiedResult;
-
-                if(lastModifiedTime < 0) {
-                    errorMessages.addLast("Cannot to set last modified time " +
-                            "for \"" + outDir.getPath() + "\" to pre-1970 " +
-                            "date. Adjusting last modified time from " +
-                            new Date(lastModifiedTime) + " to " + new Date(0) +
-                            ".");
-
-                    lastModifiedTime = (long) 0;
-                }
-
-                setLastModifiedResult =
-                        outDir.setLastModified(lastModifiedTime);
-
-                if(!setLastModifiedResult) {
-                    errorMessages.addLast("Failed to set last modified time " +
-                            "for \"" + outDir.getPath() + "\" to " +
-                            new Date(lastModifiedTime) + " " + "(raw: " +
-                            lastModifiedTime + ").\n");
-                }
-            }
+            setExtractedEntryAttributes(outDir, folder, errorMessages);
 
             skipDirectory.o = false;
         }
