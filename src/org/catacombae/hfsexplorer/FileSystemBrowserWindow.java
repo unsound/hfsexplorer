@@ -1885,7 +1885,9 @@ public class FileSystemBrowserWindow extends JFrame {
     private void setExtractedEntryAttributes(File outNode, FSEntry entry,
             final LinkedList<String> errorMessages)
     {
-        if(entry.getAttributes().hasPOSIXFileAttributes()) {
+        if(entry.getAttributes().hasPOSIXFileAttributes() &&
+                Java7Util.isJava7OrHigher())
+        {
             POSIXFileAttributes attrs =
                     entry.getAttributes().getPOSIXFileAttributes();
             try {
