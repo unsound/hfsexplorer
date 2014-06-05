@@ -1942,6 +1942,10 @@ public class FileSystemBrowserWindow extends JFrame {
                         new Date(lastModifiedTime) : null);
                 fileTimesSet = true;
             } catch(Exception e) {
+                errorMessages.addLast("Got " + e.getClass().getName() + " " +
+                        "when attempting to set Java 7 file times for " +
+                        "\"" + outNode.getPath() + "\" (see stack trace for " +
+                        "more info).");
                 e.printStackTrace();
             }
         }
