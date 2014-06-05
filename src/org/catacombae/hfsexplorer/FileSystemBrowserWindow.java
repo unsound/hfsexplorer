@@ -1904,6 +1904,10 @@ public class FileSystemBrowserWindow extends JFrame {
                         attrs.canOthersWrite(),
                         attrs.canOthersExecute());
             } catch(Exception e) {
+                errorMessages.addLast("Got " + e.getClass().getName() + " " +
+                        "when attempting to set Java 7 POSIX permissions for " +
+                        "\"" + outNode.getPath() + "\" (see stack trace for " +
+                        "more info).");
                 e.printStackTrace();
             }
         }
