@@ -19,7 +19,6 @@ package org.catacombae.hfs.io;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import org.catacombae.util.Util;
 import org.catacombae.hfs.ExtentsOverflowFile;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfs.types.hfscommon.CommonHFSExtentDescriptor;

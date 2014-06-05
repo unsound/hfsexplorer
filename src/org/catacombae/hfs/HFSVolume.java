@@ -31,7 +31,6 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogNodeID;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogNodeID.ReservedID;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogString;
-import org.catacombae.hfs.types.hfscommon.CommonHFSExtentDescriptor;
 import org.catacombae.hfs.types.hfscommon.CommonHFSExtentKey;
 import org.catacombae.hfs.types.hfscommon.CommonHFSForkData;
 import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
