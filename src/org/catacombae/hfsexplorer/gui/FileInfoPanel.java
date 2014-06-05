@@ -30,6 +30,7 @@ import org.catacombae.hfs.types.finder.FileInfo;
 import org.catacombae.util.Util;
 import java.awt.Color;
 import java.text.DateFormat;
+import org.catacombae.hfs.types.hfsplus.HFSPlusExtentDescriptor;
 
 /**
  *
@@ -46,6 +47,8 @@ public class FileInfoPanel extends javax.swing.JPanel {
     }
 
     public void setFields(HFSPlusCatalogFile cf) {
+        int i;
+
 	recordTypeField.setText("0x" + Util.toHexStringBE(cf.getRecordType()));
 
         //flagsDebugField.setText("0x" + Util.toHexStringBE(cf.getFlags()));
@@ -122,10 +125,43 @@ public class FileInfoPanel extends javax.swing.JPanel {
 	dataForkClumpSizeField.setText("" + df.getClumpSize() + " bytes");
 	dataForkTotalBlocksField.setText("" + df.getTotalBlocks());
 
+        dataForkExtentsPanel.setLayout(new javax.swing.BoxLayout(
+                dataForkExtentsPanel,
+                javax.swing.BoxLayout.Y_AXIS));
+        i = 0;
+        for(HFSPlusExtentDescriptor d : df.getExtents().getExtentDescriptors())
+        {
+            if(d.getBlockCount() == 0) {
+                break;
+            }
+
+            StructViewPanel p =
+                    new StructViewPanel("Extent " + (i++ + 1),
+                    d.getStructElements());
+            dataForkExtentsPanel.add(p);
+        }
+
 	HFSPlusForkData rf = cf.getResourceFork();
 	resForkLogicalSizeField.setText("" + rf.getLogicalSize() + " bytes");
 	resForkClumpSizeField.setText("" + rf.getClumpSize() + " bytes");
 	resForkTotalBlocksField.setText("" + rf.getTotalBlocks());
+
+        dataForkExtentsPanel.setLayout(new javax.swing.BoxLayout(
+                dataForkExtentsPanel,
+                javax.swing.BoxLayout.Y_AXIS));
+
+        i = 0;
+        for(HFSPlusExtentDescriptor d : df.getExtents().getExtentDescriptors())
+        {
+            if(d.getBlockCount() == 0) {
+                break;
+            }
+
+            StructViewPanel p =
+                    new StructViewPanel("Extent " + (i++ + 1),
+                    d.getStructElements());
+            resourceForkExtentsPanel.add(p);
+        }
     }
 
     /** This method is called from within the constructor to
@@ -251,6 +287,8 @@ public class FileInfoPanel extends javax.swing.JPanel {
         recordTypeField = new javax.swing.JTextField();
         jLabel63 = new javax.swing.JLabel();
         reserved1Field = new javax.swing.JTextField();
+        dataForkExtentsPanel = new javax.swing.JPanel();
+        resourceForkExtentsPanel = new javax.swing.JPanel();
 
         jLabel1.setText("Flags:");
 
@@ -627,6 +665,28 @@ public class FileInfoPanel extends javax.swing.JPanel {
         reserved1Field.setBorder(null);
         reserved1Field.setOpaque(false);
 
+        org.jdesktop.layout.GroupLayout dataForkExtentsPanelLayout = new org.jdesktop.layout.GroupLayout(dataForkExtentsPanel);
+        dataForkExtentsPanel.setLayout(dataForkExtentsPanelLayout);
+        dataForkExtentsPanelLayout.setHorizontalGroup(
+            dataForkExtentsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 389, Short.MAX_VALUE)
+        );
+        dataForkExtentsPanelLayout.setVerticalGroup(
+            dataForkExtentsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 0, Short.MAX_VALUE)
+        );
+
+        org.jdesktop.layout.GroupLayout resourceForkExtentsPanelLayout = new org.jdesktop.layout.GroupLayout(resourceForkExtentsPanel);
+        resourceForkExtentsPanel.setLayout(resourceForkExtentsPanelLayout);
+        resourceForkExtentsPanelLayout.setHorizontalGroup(
+            resourceForkExtentsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 389, Short.MAX_VALUE)
+        );
+        resourceForkExtentsPanelLayout.setVerticalGroup(
+            resourceForkExtentsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 0, Short.MAX_VALUE)
+        );
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -853,7 +913,22 @@ public class FileInfoPanel extends javax.swing.JPanel {
                             .add(layout.createSequentialGroup()
                                 .add(jLabel57)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(dataForkTotalBlocksField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 287, Short.MAX_VALUE))))
+                                .add(dataForkTotalBlocksField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 287, Short.MAX_VALUE))
+                            .add(dataForkExtentsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jLabel7)
+                            .add(jLabel8)
+                            .add(jLabel9)
+                            .add(jLabel6)
+                            .add(jLabel5))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(createDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
+                            .add(contentModifyDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
+                            .add(backupDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
+                            .add(accessDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
+                            .add(attributesModifyDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)))
                     .add(jLabel58)
                     .add(layout.createSequentialGroup()
                         .add(24, 24, 24)
@@ -869,21 +944,8 @@ public class FileInfoPanel extends javax.swing.JPanel {
                             .add(layout.createSequentialGroup()
                                 .add(jLabel61)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(resForkTotalBlocksField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 287, Short.MAX_VALUE))))
-                    .add(layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jLabel7)
-                            .add(jLabel8)
-                            .add(jLabel9)
-                            .add(jLabel6)
-                            .add(jLabel5))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(createDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
-                            .add(contentModifyDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
-                            .add(backupDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
-                            .add(accessDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
-                            .add(attributesModifyDateField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE))))
+                                .add(resForkTotalBlocksField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 287, Short.MAX_VALUE))
+                            .add(resourceForkExtentsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -1108,6 +1170,8 @@ public class FileInfoPanel extends javax.swing.JPanel {
                     .add(jLabel57)
                     .add(dataForkTotalBlocksField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(dataForkExtentsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(jLabel58)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
@@ -1121,6 +1185,8 @@ public class FileInfoPanel extends javax.swing.JPanel {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel61)
                     .add(resForkTotalBlocksField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(resourceForkExtentsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -1133,6 +1199,7 @@ public class FileInfoPanel extends javax.swing.JPanel {
     private javax.swing.JTextField contentModifyDateField;
     private javax.swing.JTextField createDateField;
     private javax.swing.JTextField dataForkClumpSizeField;
+    private javax.swing.JPanel dataForkExtentsPanel;
     private javax.swing.JTextField dataForkLogicalSizeField;
     private javax.swing.JTextField dataForkTotalBlocksField;
     private javax.swing.JTextField fileIDField;
@@ -1226,6 +1293,7 @@ public class FileInfoPanel extends javax.swing.JPanel {
     private javax.swing.JTextField resForkTotalBlocksField;
     private javax.swing.JTextField reserved1Field;
     private javax.swing.JTextField reserved2Field;
+    private javax.swing.JPanel resourceForkExtentsPanel;
     private javax.swing.JTextField textEncodingField;
     private javax.swing.JCheckBox threadExistsBox;
     private javax.swing.JTextField userInfoFileCreatorField;
