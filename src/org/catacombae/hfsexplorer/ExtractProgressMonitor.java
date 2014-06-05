@@ -38,6 +38,8 @@ public interface ExtractProgressMonitor extends ProgressMonitor {
     public CreateFileFailedAction createFileFailed(String filename, File parentDirectory);
     public DirectoryExistsAction directoryExists(File directory);
     public FileExistsAction fileExists(File file);
+    public UnhandledExceptionAction unhandledException(String filename,
+            Throwable t);
     public String displayRenamePrompt(String currentName, File outDir);
     public ExtractProperties getExtractProperties();
 
@@ -52,6 +54,8 @@ public interface ExtractProgressMonitor extends ProgressMonitor {
         private volatile CreateFileFailedAction createFileAction = CreateFileFailedAction.PROMPT_USER;
         private volatile DirectoryExistsAction dirExistsAction = DirectoryExistsAction.PROMPT_USER;
         private volatile FileExistsAction fileExistsAction = FileExistsAction.PROMPT_USER;
+        private volatile UnhandledExceptionAction unhandledExceptionAction =
+                UnhandledExceptionAction.PROMPT_USER;
 
         public CreateDirectoryFailedAction getCreateDirectoryFailedAction() {
             return createDirAction;
@@ -67,6 +71,10 @@ public interface ExtractProgressMonitor extends ProgressMonitor {
 
         public FileExistsAction getFileExistsAction() {
             return fileExistsAction;
+        }
+
+        public UnhandledExceptionAction getUnhandledExceptionAction() {
+            return unhandledExceptionAction;
         }
 
         public void setCreateDirectoryFailedAction(CreateDirectoryFailedAction action) {
@@ -89,6 +97,12 @@ public interface ExtractProgressMonitor extends ProgressMonitor {
             notifyListeners(action);
         }
 
+        public void setUnhandledExceptionAction(UnhandledExceptionAction action)
+        {
+            unhandledExceptionAction = action;
+            notifyListeners(action);
+        }
+
         public void addListener(ExtractPropertiesListener listener) {
             listeners.addLast(listener);
         }
@@ -108,4 +122,10 @@ public interface ExtractProgressMonitor extends ProgressMonitor {
     public static enum CreateFileFailedAction { PROMPT_USER, SKIP_FILE, SKIP_DIRECTORY, RENAME, AUTO_RENAME, CANCEL }
     public static enum DirectoryExistsAction { PROMPT_USER, CONTINUE, SKIP_DIRECTORY, RENAME, AUTO_RENAME, CANCEL }
     public static enum FileExistsAction { PROMPT_USER, SKIP_FILE, SKIP_DIRECTORY, OVERWRITE, OVERWRITE_ALL, RENAME, AUTO_RENAME, CANCEL }
+    public static enum UnhandledExceptionAction {
+        PROMPT_USER,
+        CONTINUE,
+        ALWAYS_CONTINUE,
+        ABORT,
+    }
 }
