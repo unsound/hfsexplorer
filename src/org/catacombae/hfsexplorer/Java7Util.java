@@ -22,6 +22,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Erik Larsson
@@ -159,5 +161,142 @@ public class Java7Util {
         basicFileAttributeViewSetTimesMethod.invoke(attrViewObject,
                 lastModifiedFileTimeObject, lastAccessFileTimeObject,
                 creationFileTimeObject);
+    }
+
+    public static void setPosixPermissions(String path,
+            int ownerId, int groupId,
+            boolean ownerRead, boolean ownerWrite, boolean ownerExecute,
+            boolean groupRead, boolean groupWrite, boolean groupExecute,
+            boolean othersRead, boolean othersWrite, boolean othersExecute)
+            throws ClassNotFoundException, NoSuchMethodException,
+            IllegalAccessException, IllegalArgumentException,
+            InvocationTargetException, NoSuchFieldException
+    {
+        Class<?> fileSystemsClass = Class.forName("java.nio.file.FileSystems");
+        Class<?> fileSystemClass = Class.forName("java.nio.file.FileSystem");
+        Class<?> pathClass = Class.forName("java.nio.file.Path");
+        Class<?> posixFileAttributeViewClass =
+                Class.forName("java.nio.file.attribute.PosixFileAttributeView");
+        Class<?> filesClass = Class.forName("java.nio.file.Files");
+        Class<?> linkOptionClass = Class.forName("java.nio.file.LinkOption");
+        Class<?> posixFilePermissionClass =
+                Class.forName("java.nio.file.attribute.PosixFilePermission");
+
+        /* java.nio.file.FileSystem defaultFileSystem =
+                   java.nio.file.FileSystems.getDefault(); */
+        Method fileSystemsGetDefaultMethod =
+                fileSystemsClass.getMethod("getDefault");
+        Object defaultFileSystemObject =
+                fileSystemsGetDefaultMethod.invoke(null);
+
+        /* java.nio.file.Path p = defaultFileSystem.getPath(path); */
+        Method fileSystemGetPathMethod =
+                fileSystemClass.getMethod("getPath", String.class,
+                String[].class);
+        Object pObject =
+                fileSystemGetPathMethod.invoke(defaultFileSystemObject, path,
+                new String[0]);
+
+        /* java.nio.file.attribute.PosixFileAttributeView attrView =
+         *         java.nio.file.Files.getFileAttributeView(p,
+         *         java.nio.file.attribute.PosixFileAttributeView.class,
+         *         java.nio.file.LinkOption.NOFOLLOW_LINKS); */
+        Field noFollowLinksField = linkOptionClass.getField("NOFOLLOW_LINKS");
+        Object noFollowLinksObject = noFollowLinksField.get(null);
+
+        Object linkOptionsArray = Array.newInstance(linkOptionClass, 1);
+        Array.set(linkOptionsArray, 0, noFollowLinksObject);
+
+        Method getFileAttributeViewMethod =
+                filesClass.getMethod("getFileAttributeView", pathClass,
+                Class.class, linkOptionsArray.getClass());
+        Object attrViewObject =
+                getFileAttributeViewMethod.invoke(null, pObject,
+                posixFileAttributeViewClass, linkOptionsArray);
+
+        if(attrViewObject == null) {
+            /* No PosixFileAttributeView available. Platform does not support
+             * POSIX attributes. Just return quietly here. */
+            return;
+        }
+
+        HashSet<Object> perms = new HashSet<Object>();
+
+        if(ownerRead) {
+            Field curField = posixFilePermissionClass.getField("OWNER_READ");
+            Object curObject = curField.get(null);
+            perms.add(curObject);
+        }
+
+        if(ownerWrite) {
+            Field curField = posixFilePermissionClass.getField("OWNER_WRITE");
+            Object curObject = curField.get(null);
+            perms.add(curObject);
+        }
+
+        if(ownerExecute) {
+            Field curField = posixFilePermissionClass.getField("OWNER_EXECUTE");
+            Object curObject = curField.get(null);
+            perms.add(curObject);
+        }
+
+        if(groupRead) {
+            Field curField = posixFilePermissionClass.getField("GROUP_READ");
+            Object curObject = curField.get(null);
+            perms.add(curObject);
+        }
+
+        if(groupWrite) {
+            Field curField = posixFilePermissionClass.getField("GROUP_WRITE");
+            Object curObject = curField.get(null);
+            perms.add(curObject);
+        }
+
+        if(groupExecute) {
+            Field curField = posixFilePermissionClass.getField("GROUP_EXECUTE");
+            Object curObject = curField.get(null);
+            perms.add(curObject);
+        }
+
+        if(othersRead) {
+            Field curField = posixFilePermissionClass.getField("OTHERS_READ");
+            Object curObject = curField.get(null);
+            perms.add(curObject);
+        }
+
+        if(othersWrite) {
+            Field curField = posixFilePermissionClass.getField("OTHERS_WRITE");
+            Object curObject = curField.get(null);
+            perms.add(curObject);
+        }
+
+        if(othersExecute) {
+            Field curField =
+                    posixFilePermissionClass.getField("OTHERS_EXECUTE");
+            Object curObject = curField.get(null);
+            perms.add(curObject);
+        }
+
+        /* attrView.setPermissions(perms); */
+        Method posixFileAttributeViewSetPermissionMethod =
+                posixFileAttributeViewClass.getMethod("setPermissions",
+                Set.class);
+        posixFileAttributeViewSetPermissionMethod.invoke(attrViewObject,
+                perms);
+
+        /* java.nio.file.Files.setAttribute(p, "unix:uid",
+                Integer.valueOf(ownerId),
+                java.nio.file.LinkOption.NOFOLLOW_LINKS);*/
+        Method filesSetAttributeMethod =
+                filesClass.getMethod("setAttribute", pathClass,
+                String.class, Object.class, linkOptionsArray.getClass());
+        filesSetAttributeMethod.invoke(null, pObject, "unix:uid",
+                Integer.valueOf(ownerId), linkOptionsArray);
+
+        /* java.nio.file.Files.setAttribute(p, "unix:gid",
+                Integer.valueOf(groupId),
+                java.nio.file.LinkOption.NOFOLLOW_LINKS); */
+        filesSetAttributeMethod.invoke(null, pObject, "unix:gid",
+                Integer.valueOf(groupId), linkOptionsArray);
     }
 }

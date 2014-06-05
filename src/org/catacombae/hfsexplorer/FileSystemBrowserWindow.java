@@ -95,6 +95,7 @@ import org.catacombae.hfsexplorer.fs.AppleSingleBuilder.FileSystem;
 import org.catacombae.hfsexplorer.fs.AppleSingleBuilder.FileType;
 import org.catacombae.hfsexplorer.gui.ErrorSummaryPanel;
 import org.catacombae.hfsexplorer.gui.MemoryStatisticsPanel;
+import org.catacombae.storage.fs.FSAttributes.POSIXFileAttributes;
 import org.catacombae.storage.io.DataLocator;
 import org.catacombae.storage.fs.FSLink;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer;
@@ -1998,6 +1999,27 @@ public class FileSystemBrowserWindow extends JFrame {
                     extractForkToStream(theFork, fos, progressDialog);
                 fos.close();
 
+                if(rec.getAttributes().hasPOSIXFileAttributes()) {
+                    POSIXFileAttributes attrs =
+                            rec.getAttributes().getPOSIXFileAttributes();
+                    try {
+                        Java7Util.setPosixPermissions(outFile.getPath(),
+                                (int) attrs.getUserID(),
+                                (int) attrs.getGroupID(),
+                                attrs.canUserRead(),
+                                attrs.canUserWrite(),
+                                attrs.canUserExecute(),
+                                attrs.canGroupRead(),
+                                attrs.canGroupWrite(),
+                                attrs.canGroupExecute(),
+                                attrs.canOthersRead(),
+                                attrs.canOthersWrite(),
+                                attrs.canOthersExecute());
+                    } catch(Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 Long createTime = null;
                 Long lastAccessTime = null;
                 Long lastModifiedTime = null;
@@ -2421,6 +2443,27 @@ public class FileSystemBrowserWindow extends JFrame {
         @Override
         public void endDirectory(String[] parentPath, FSFolder folder) {
             File outDir = outDirStack.removeLast();
+
+            if(folder.getAttributes().hasPOSIXFileAttributes()) {
+                POSIXFileAttributes attrs =
+                        folder.getAttributes().getPOSIXFileAttributes();
+                try {
+                    Java7Util.setPosixPermissions(outDir.getPath(),
+                            (int) attrs.getUserID(),
+                            (int) attrs.getGroupID(),
+                            attrs.canUserRead(),
+                            attrs.canUserWrite(),
+                            attrs.canUserExecute(),
+                            attrs.canGroupRead(),
+                            attrs.canGroupWrite(),
+                            attrs.canGroupExecute(),
+                            attrs.canOthersRead(),
+                            attrs.canOthersWrite(),
+                            attrs.canOthersExecute());
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+            }
 
             if(folder.getAttributes().hasModifyDate()) {
                 long lastModifiedTime =
