@@ -2465,9 +2465,41 @@ public class FileSystemBrowserWindow extends JFrame {
                 }
             }
 
+            Long createTime = null;
+            Long lastAccessTime = null;
+            Long lastModifiedTime = null;
+
+            if(folder.getAttributes().hasCreateDate()) {
+                createTime = folder.getAttributes().getCreateDate().getTime();
+            }
+
+            if(folder.getAttributes().hasAccessDate()) {
+                lastAccessTime =
+                        folder.getAttributes().getAccessDate().getTime();
+            }
+
             if(folder.getAttributes().hasModifyDate()) {
-                long lastModifiedTime =
+                lastModifiedTime =
                         folder.getAttributes().getModifyDate().getTime();
+            }
+
+            boolean fileTimesSet = false;
+            if(Java7Util.isJava7OrHigher()) {
+                try {
+                    Java7Util.setFileTimes(outDir.getPath(),
+                            createTime != null ? new Date(createTime) :
+                            null,
+                            lastAccessTime != null ?
+                            new Date(lastAccessTime) : null,
+                            lastModifiedTime != null ?
+                            new Date(lastModifiedTime) : null);
+                    fileTimesSet = true;
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if(!fileTimesSet && lastModifiedTime != null) {
                 boolean setLastModifiedResult;
 
                 if(lastModifiedTime < 0) {
@@ -2477,7 +2509,7 @@ public class FileSystemBrowserWindow extends JFrame {
                             new Date(lastModifiedTime) + " to " + new Date(0) +
                             ".");
 
-                    lastModifiedTime = 0;
+                    lastModifiedTime = (long) 0;
                 }
 
                 setLastModifiedResult =
