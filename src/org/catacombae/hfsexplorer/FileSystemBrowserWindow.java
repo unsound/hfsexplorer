@@ -2065,6 +2065,8 @@ public class FileSystemBrowserWindow extends JFrame {
                     throw new RuntimeException("Internal error! Did not expect a: " + a);
                 }
             }
+
+            FileOutputStream fos = null;
             try {
 // 		    try {
 // 			PrintStream p = System.out;
@@ -2088,14 +2090,12 @@ public class FileSystemBrowserWindow extends JFrame {
                 if(!outFile.getParentFile().equals(outDir) || !outFile.getName().equals(curFileName)) {
                     throw new FileNotFoundException();
                 }
-                FileOutputStream fos = new FileOutputStream(outFile);
+                fos = new FileOutputStream(outFile);
                 if(forkType == FSForkType.MACOS_RESOURCE)
                     extractResourceForkToAppleDoubleStream(theFork, fos, progressDialog);
                 else
                     extractForkToStream(theFork, fos, progressDialog);
                 fos.close();
-
-                setExtractedEntryAttributes(outFile, rec, errorMessages);
 
                 if(curFileName != (Object) originalFileName && !curFileName.equals(originalFileName))
                     errorMessages.addLast("File \"" + originalFileName +
@@ -2207,6 +2207,14 @@ public class FileSystemBrowserWindow extends JFrame {
                             "expect a " + a + " here.");
                 }
             }
+            finally {
+                if(fos != null) {
+                    /* If "fos" is non-null, then the file should exist. It
+                     * should have been created when "fos" was initialized. */
+                    setExtractedEntryAttributes(outFile, rec, errorMessages);
+                }
+            }
+
             break;
         }
 
