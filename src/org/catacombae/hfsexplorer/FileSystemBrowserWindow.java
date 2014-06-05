@@ -2172,8 +2172,9 @@ public class FileSystemBrowserWindow extends JFrame {
                 }
             } catch(Throwable e) {
                 e.printStackTrace();
-                errorMessages.addLast("An unhandled exception occurred when exctracting file \"" +
-                        curFileName + "\". See debug console for more info.");
+                errorMessages.addLast("An unhandled exception occurred when " +
+                        "extracting file \"" + curFileName + "\". See debug " +
+                        "console for more info.");
 
                 UnhandledExceptionAction a;
                 if(defaultUnhandledExceptionAction ==
