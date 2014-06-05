@@ -2171,7 +2171,10 @@ public class FileSystemBrowserWindow extends JFrame {
                     progressDialog.signalCancel();
                 }
             } catch(Throwable e) {
+                System.err.println("An unhandled exception occurred when " +
+                        "extracting file \"" + curFileName + "\":");
                 e.printStackTrace();
+
                 errorMessages.addLast("An unhandled exception occurred when " +
                         "extracting file \"" + curFileName + "\". See debug " +
                         "console for more info.");
