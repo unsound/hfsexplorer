@@ -186,6 +186,13 @@ public class ExtractProgressDialog extends JDialog implements ExtractProgressMon
     }
 
     /* @Override */
+    public UnhandledExceptionAction unhandledException(String filename,
+            Throwable t)
+    {
+        return SimpleGUIProgressMonitor.unhandledException(this, filename, t);
+    }
+
+    /* @Override */
     public String displayRenamePrompt(String currentName, File outDir) {
         return SimpleGUIProgressMonitor.displayRenamePrompt(this, currentName, outDir);
     }

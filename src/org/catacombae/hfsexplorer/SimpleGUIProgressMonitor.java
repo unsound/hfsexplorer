@@ -126,6 +126,17 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
     }
 
     /**
+     * @see #unhandledException(java.awt.Component, java.lang.String,
+     * java.lang.Throwable)
+     */
+    /* @Override */
+    public UnhandledExceptionAction unhandledException(String filename,
+            Throwable t)
+    {
+        return unhandledException(parentComponent, filename, t);
+    }
+
+    /**
      * @see #displayRenamePrompt(java.awt.Component, java.lang.String,
      * java.io.File)
      */
@@ -286,6 +297,59 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
             default:
                 return FileExistsAction.CANCEL;
         }
+    }
+
+    /**
+     * Default Swing implementation of an unhandled execption prompt.<br/>
+     * This method will never return null.
+     *
+     * @param parentComponent the parent component of the user prompt dialog
+     * box.
+     * @param filename the name of the file that is currently being extracted.
+     * @param t the unhandled exception.
+     * @return one of CONTINUE, ALWAYS_CONTINUE or ABORT.
+     */
+    public static UnhandledExceptionAction unhandledException(
+            Component parentComponent, String filename, Throwable t)
+    {
+        String[] options = new String[] {
+            "Continue",
+            "Always continue",
+            "Abort",
+        };
+
+        String message = "An exception occurred while extracting " +
+                "\"" + filename + "\"!";
+        message += "\n  " + t.toString();
+        for(StackTraceElement ste : t.getStackTrace()) {
+            message += "\n    " + ste.toString();
+        }
+        message += "\n\nThe file has not been completely extracted.";
+        message += "\nDo you want to continue with the extraction?";
+
+        int reply = JOptionPane.showOptionDialog(parentComponent,
+                message,
+                "Error",
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.ERROR_MESSAGE,
+                null,
+                options,
+                options[2]);
+
+        UnhandledExceptionAction ret;
+        switch(reply) {
+            case 0:
+                ret = UnhandledExceptionAction.CONTINUE;
+                break;
+            case 1:
+                ret = UnhandledExceptionAction.ALWAYS_CONTINUE;
+                break;
+            default:
+                ret = UnhandledExceptionAction.ABORT;
+                break;
+        }
+
+        return ret;
     }
 
     /**

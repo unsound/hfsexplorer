@@ -88,6 +88,7 @@ import org.catacombae.hfsexplorer.ExtractProgressMonitor.CreateFileFailedAction;
 import org.catacombae.hfsexplorer.ExtractProgressMonitor.DirectoryExistsAction;
 import org.catacombae.hfsexplorer.ExtractProgressMonitor.ExtractProperties;
 import org.catacombae.hfsexplorer.ExtractProgressMonitor.FileExistsAction;
+import org.catacombae.hfsexplorer.ExtractProgressMonitor.UnhandledExceptionAction;
 import org.catacombae.storage.ps.PartitionSystemType;
 import org.catacombae.hfsexplorer.fs.AppleSingleBuilder;
 import org.catacombae.hfsexplorer.fs.AppleSingleBuilder.AppleSingleVersion;
@@ -1992,6 +1993,8 @@ public class FileSystemBrowserWindow extends JFrame {
                 extractProperties.getCreateFileFailedAction();
         FileExistsAction defaultFileExistsAction =
                 extractProperties.getFileExistsAction();
+        UnhandledExceptionAction defaultUnhandledExceptionAction =
+                extractProperties.getUnhandledExceptionAction();
 
         String fileName = originalFileName;
 
@@ -2169,20 +2172,35 @@ public class FileSystemBrowserWindow extends JFrame {
                 }
             } catch(Throwable e) {
                 e.printStackTrace();
-                String message = "An exception occurred while extracting \"" + curFileName + "\"!";
-                message += "\n  " + e.toString();
-                for(StackTraceElement ste : e.getStackTrace()) {
-                    message += "\n    " + ste.toString();
-                }
-                message += "\n\nThe file has probably not been extracted.";
-                int reply = JOptionPane.showConfirmDialog(this, message +
-                        "\nDo you want to continue with the extraction?",
-                        "Error", JOptionPane.YES_NO_OPTION,
-                        JOptionPane.ERROR_MESSAGE);
                 errorMessages.addLast("An unhandled exception occurred when exctracting file \"" +
                         curFileName + "\". See debug console for more info.");
-                if(reply == JOptionPane.NO_OPTION) {
+
+                UnhandledExceptionAction a;
+                if(defaultUnhandledExceptionAction ==
+                        UnhandledExceptionAction.PROMPT_USER)
+                {
+                    a = progressDialog.unhandledException(curFileName, e);
+                }
+                else {
+                    a = defaultUnhandledExceptionAction;
+                }
+
+                if(a == UnhandledExceptionAction.ABORT) {
                     progressDialog.signalCancel();
+                }
+                else if(a == UnhandledExceptionAction.CONTINUE ||
+                        a == UnhandledExceptionAction.ALWAYS_CONTINUE)
+                {
+                    if(a == UnhandledExceptionAction.ALWAYS_CONTINUE) {
+                        extractProperties.setUnhandledExceptionAction(
+                                UnhandledExceptionAction.CONTINUE);
+                        defaultUnhandledExceptionAction =
+                                UnhandledExceptionAction.CONTINUE;
+                    }
+                }
+                else {
+                    throw new RuntimeException("Internal error! Did not " +
+                            "expect a " + a + " here.");
                 }
             }
             break;

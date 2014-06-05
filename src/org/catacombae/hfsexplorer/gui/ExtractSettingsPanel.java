@@ -31,6 +31,7 @@ import org.catacombae.hfsexplorer.ExtractProgressMonitor.DirectoryExistsAction;
 import org.catacombae.hfsexplorer.ExtractProgressMonitor.ExtractProperties;
 import org.catacombae.hfsexplorer.ExtractProgressMonitor.ExtractPropertiesListener;
 import org.catacombae.hfsexplorer.ExtractProgressMonitor.FileExistsAction;
+import org.catacombae.hfsexplorer.ExtractProgressMonitor.UnhandledExceptionAction;
 
 /**
  *
@@ -133,6 +134,11 @@ public class ExtractSettingsPanel extends javax.swing.JPanel {
                         default:
                             throw new RuntimeException("Unknown property: " + changedProperty);
                     }
+                }
+                else if(changedProperty instanceof UnhandledExceptionAction) {
+                    /* Ignore for now, until we have implemented this in the
+                     * GUI. */
+                    theButton = null;
                 }
                 else
                     throw new RuntimeException("Unknown property: " +
