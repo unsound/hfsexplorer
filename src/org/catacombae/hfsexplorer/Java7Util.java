@@ -164,7 +164,6 @@ public class Java7Util {
     }
 
     public static void setPosixPermissions(String path,
-            int ownerId, int groupId,
             boolean ownerRead, boolean ownerWrite, boolean ownerExecute,
             boolean groupRead, boolean groupWrite, boolean groupExecute,
             boolean othersRead, boolean othersWrite, boolean othersExecute)
@@ -283,6 +282,40 @@ public class Java7Util {
                 Set.class);
         posixFileAttributeViewSetPermissionMethod.invoke(attrViewObject,
                 perms);
+    }
+
+    public static void setPosixOwners(String path, int ownerId, int groupId)
+            throws ClassNotFoundException, NoSuchMethodException,
+            IllegalAccessException, IllegalArgumentException,
+            InvocationTargetException, NoSuchFieldException
+    {
+        Class<?> fileSystemsClass = Class.forName("java.nio.file.FileSystems");
+        Class<?> fileSystemClass = Class.forName("java.nio.file.FileSystem");
+        Class<?> pathClass = Class.forName("java.nio.file.Path");
+        Class<?> filesClass = Class.forName("java.nio.file.Files");
+        Class<?> linkOptionClass = Class.forName("java.nio.file.LinkOption");
+
+        Method fileSystemsGetDefaultMethod =
+                fileSystemsClass.getMethod("getDefault");
+        Method fileSystemGetPathMethod =
+                fileSystemClass.getMethod("getPath", String.class,
+                String[].class);
+
+        Field noFollowLinksField = linkOptionClass.getField("NOFOLLOW_LINKS");
+
+        Object noFollowLinksObject = noFollowLinksField.get(null);
+        Object linkOptionsArray = Array.newInstance(linkOptionClass, 1);
+        Array.set(linkOptionsArray, 0, noFollowLinksObject);
+
+        /* java.nio.file.FileSystem defaultFileSystem =
+                   java.nio.file.FileSystems.getDefault(); */
+        Object defaultFileSystemObject =
+                fileSystemsGetDefaultMethod.invoke(null);
+
+        /* java.nio.file.Path p = defaultFileSystem.getPath(path); */
+        Object pObject =
+                fileSystemGetPathMethod.invoke(defaultFileSystemObject, path,
+                new String[0]);
 
         /* java.nio.file.Files.setAttribute(p, "unix:uid",
                 Integer.valueOf(ownerId),
