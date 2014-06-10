@@ -2531,6 +2531,13 @@ public class FileSystemBrowserWindow extends JFrame {
                                 "\" was renamed to \"" + curDirName + "\" in parent folder \"" +
                                 outDir.getAbsolutePath() + "\".");
 
+                    /* Set attributes for directory right after creation, even
+                     * though the directory is likely to have its attributes
+                     * modified before we are done with it. This is done so that
+                     * any created files will have a sane ownership in case
+                     * setting ownership manually fails. */
+                    setExtractedEntryAttributes(thisDir, folder, errorMessages);
+
                     outDirStack.addLast(thisDir);
                     return true;
                 }
@@ -2586,6 +2593,10 @@ public class FileSystemBrowserWindow extends JFrame {
         public void endDirectory(String[] parentPath, FSFolder folder) {
             File outDir = outDirStack.removeLast();
 
+            /* Finally reset the attributes of the directory to the attributes
+             * of the FSFolder to make sure that times, mode, ownership, etc.
+             * matches what we have in the file system (provided that there is
+             * support for these attributes in the target file system). */
             setExtractedEntryAttributes(outDir, folder, errorMessages);
 
             skipDirectory.o = false;
