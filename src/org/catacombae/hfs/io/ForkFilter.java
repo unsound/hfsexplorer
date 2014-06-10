@@ -274,8 +274,17 @@ public class ForkFilter implements ReadableRandomAccessStream {
         for(; ; ++extIndex) {
             //System.out.println("ForkFilter.read: reading extent " + extIndex + ".");
 
-            CommonHFSExtentDescriptor cur =
-                    getExtent(extIndex, curLogicalBlock);
+            CommonHFSExtentDescriptor cur;
+            try {
+                cur = getExtent(extIndex, curLogicalBlock);
+            } catch(RuntimeException e) {
+                if(bytesLeftToRead == totalBytesToRead) {
+                    throw e;
+                }
+                else {
+                    break;
+                }
+            }
 
             long blockCount = cur.getBlockCount();
             long bytesInExtent = blockCount * allocationBlockSize - bytesToSkip;
