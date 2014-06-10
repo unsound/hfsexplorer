@@ -2221,6 +2221,69 @@ public class FileSystemBrowserWindow extends JFrame {
         //return errorCount;
     }
 
+    private void extractLink(final FSLink fsl, final File outDir,
+            final ExtractProgressMonitor pm,
+            final LinkedList<String> errorMessages,
+            final ExtractProperties extractProperties)
+    {
+        final File linkFile = new File(outDir, fsl.getName());
+
+        final UnhandledExceptionAction defaultUnhandledExceptionAction =
+                extractProperties.getUnhandledExceptionAction();
+
+        try {
+            if(Java7Util.isJava7OrHigher()) {
+                    Java7Util.createSymbolicLink(linkFile.getPath(),
+                            fsl.getLinkTargetString());
+            }
+            else {
+                /* Create the link in OS-specific way? Need native code for
+                 * that... unless we create a new 'ln -s' process, but it will
+                 * be slow... UNLESS we thread it out, and don't wait for it to
+                 * finish. OK, flooding the OS with ln processes isn't good
+                 * either... */
+            }
+
+            setExtractedEntryAttributes(linkFile, fsl, errorMessages);
+        } catch(Exception e) {
+            final String message =
+                    "Exception while attempting to create symbolic link " +
+                    "\"" + linkFile.getPath() + "\" with target " +
+                    "\"" + fsl.getLinkTargetString() + "\"";
+
+            System.err.println(message + ":");
+            e.printStackTrace();
+
+            errorMessages.add(message + ". See debug console for more info.");
+
+            UnhandledExceptionAction a;
+            if(defaultUnhandledExceptionAction ==
+                    UnhandledExceptionAction.PROMPT_USER)
+            {
+                a = pm.unhandledException(fsl.getName(), e);
+            }
+            else {
+                a = defaultUnhandledExceptionAction;
+            }
+
+            if(a == UnhandledExceptionAction.ABORT) {
+                pm.signalCancel();
+            }
+            else if(a == UnhandledExceptionAction.CONTINUE ||
+                    a == UnhandledExceptionAction.ALWAYS_CONTINUE)
+            {
+                if(a == UnhandledExceptionAction.ALWAYS_CONTINUE) {
+                    extractProperties.setUnhandledExceptionAction(
+                            UnhandledExceptionAction.CONTINUE);
+                }
+            }
+            else {
+                throw new RuntimeException("Internal error! Did not expect a " +
+                        a + " here.");
+            }
+        }
+    }
+
     /**
      * An interface for visitors that can be used in the traverseTree method.
      */
@@ -2507,9 +2570,9 @@ public class FileSystemBrowserWindow extends JFrame {
 
         @Override
         public void link(FSLink fsl) {
-            // Create the link in OS-specific way? Need native code for that... unless we create a
-            // new 'ln -s' process, but it will be slow... UNLESS we thread it out, and don't wait
-            // for it to finish. OK, flooding the OS with ln processes isn't good either...
+            File outDir = outDirStack.getLast();
+
+            extractLink(fsl, outDir, pm, errorMessages, extractProperties);
         }
 
         @Override
