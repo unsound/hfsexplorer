@@ -1,7 +1,9 @@
 HFSExplorer TODO:
 
 - All in bugs.txt [LÅT STÅ]
-
+- Native file dialog in OS X
+- Options menu (whether to set ownership, permissions, dates, etc. for extracted
+  content).
 
 Known issues in 0.20.1
 ----------------------
