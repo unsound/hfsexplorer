@@ -992,7 +992,7 @@ public class FileSystemBrowserWindow extends JFrame {
         //System.out.println("extractForkToStream working with a " + forkFilter.getClass());
         final long originalLength = theFork.getLength();
         long bytesToRead = originalLength;
-        byte[] buffer = new byte[4096];
+        byte[] buffer = new byte[1*1024*1024];
         while(bytesToRead > 0) {
             if(pm.cancelSignaled()) {
                 break;
