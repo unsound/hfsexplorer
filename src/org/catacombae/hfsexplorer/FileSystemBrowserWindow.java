@@ -1903,6 +1903,11 @@ public class FileSystemBrowserWindow extends JFrame {
                         attrs.canOthersWrite(),
                         attrs.canOthersExecute());
             } catch(Exception e) {
+                System.err.println("Got " + e.getClass().getName() + " when " +
+                        "attempting to set Java 7 POSIX permissions for " +
+                        "\"" + outNode.getPath() + "\":");
+                e.printStackTrace();
+
                 errorMessages.addLast("Got " + e.getClass().getName() + " " +
                         "when attempting to set Java 7 POSIX permissions for " +
                         "\"" + outNode.getPath() + "\" (see stack trace for " +
@@ -1957,11 +1962,15 @@ public class FileSystemBrowserWindow extends JFrame {
                         new Date(lastModifiedTime) : null);
                 fileTimesSet = true;
             } catch(Exception e) {
+                System.err.println("Got " + e.getClass().getName() + " when " +
+                        "attempting to set Java 7 file times for " +
+                        "\"" + outNode.getPath() + "\":");
+                e.printStackTrace();
+
                 errorMessages.addLast("Got " + e.getClass().getName() + " " +
                         "when attempting to set Java 7 file times for " +
                         "\"" + outNode.getPath() + "\" (see stack trace for " +
                         "more info).");
-                e.printStackTrace();
             }
         }
 
@@ -2171,27 +2180,37 @@ public class FileSystemBrowserWindow extends JFrame {
                 }
                 // </Prompt user for action, if needed>
             } catch(IOException ioe) {
-                System.err.println("Received I/O exception when trying to write to file \"" + outFile + "\":");
+                final String message =
+                        "Encountered an I/O exception while " +
+                        "trying to write to file " +
+                        "\"" + outFile.getPath() + "\"";
+                System.err.println(message + ":");
                 ioe.printStackTrace();
-                String msg = ioe.getMessage();
-                int reply = JOptionPane.showConfirmDialog(this, "Could not write to file \"" + curFileName +
-                        "\" under folder:\n  " + outDir.getAbsolutePath() +
-                        (msg != null ? "\nSystem message: \"" + msg + "\"" : "") +
+
+                errorMessages.addLast(message + ". See debug console for " +
+                        "more info.");
+                String exceptionMessage = ioe.getMessage();
+                int reply = JOptionPane.showConfirmDialog(this, "Encountered " +
+                        "an I/O exception while attempting to write to file " +
+                        "\"" + curFileName + "\" in folder:\n  " +
+                        outDir.getAbsolutePath() +
+                        (exceptionMessage != null ? "\nSystem message: " +
+                        "\"" + exceptionMessage + "\"" : "") +
                         "\nDo you want to continue?",
                         "I/O Error", JOptionPane.YES_NO_OPTION,
                         JOptionPane.ERROR_MESSAGE);
-                errorMessages.addLast("Could not write to file \"" + curFileName + "\"");
                 if(reply == JOptionPane.NO_OPTION) {
                     progressDialog.signalCancel();
                 }
             } catch(Throwable e) {
-                System.err.println("An unhandled exception occurred when " +
-                        "extracting file \"" + curFileName + "\":");
+                final String message =
+                        "An unhandled exception occurred when " +
+                        "extracting to file \"" + outFile.getPath() + "\"";
+                System.err.println(message + ":");
                 e.printStackTrace();
 
-                errorMessages.addLast("An unhandled exception occurred when " +
-                        "extracting file \"" + curFileName + "\". See debug " +
-                        "console for more info.");
+                errorMessages.addLast(message + ". See debug console for " +
+                        "more info.");
 
                 UnhandledExceptionAction a;
                 if(defaultUnhandledExceptionAction ==
