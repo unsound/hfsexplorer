@@ -1985,7 +1985,7 @@ public class FileSystemBrowserWindow extends JFrame {
                 errorMessages.addLast("Failed to set last modified time for " +
                         "\"" + outNode.getPath() + "\" to " +
                         new Date(lastModifiedTime) + " (raw: " +
-                        lastModifiedTime + ").\n");
+                        lastModifiedTime + ").");
             }
         }
     }
