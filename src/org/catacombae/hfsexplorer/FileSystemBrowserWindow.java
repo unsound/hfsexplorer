@@ -1015,12 +1015,13 @@ public class FileSystemBrowserWindow extends JFrame {
     }
 
     private long extractResourceForkToAppleDoubleStream(FSFork resourceFork, OutputStream os, ProgressMonitor pm) throws IOException {
+        ByteArrayOutputStream baos = null;
         ReadableRandomAccessStream in = null;
         try {
             AppleSingleBuilder builder = new AppleSingleBuilder(FileType.APPLEDOUBLE,
                     AppleSingleVersion.VERSION_2_0, FileSystem.MACOS_X);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
+            baos = new ByteArrayOutputStream();
             in = resourceFork.getReadableRandomAccessStream();
             long extractedBytes = IOUtil.streamCopy(in, baos, 128*1024);
             if(extractedBytes != resourceFork.getLength()) {
@@ -1037,6 +1038,11 @@ public class FileSystemBrowserWindow extends JFrame {
         } finally {
             if(in != null) {
                 try { in.close(); }
+                catch(Exception e) {}
+            }
+
+            if(baos != null) {
+                try { baos.close(); }
                 catch(Exception e) {}
             }
         }
