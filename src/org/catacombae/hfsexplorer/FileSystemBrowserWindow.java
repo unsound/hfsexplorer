@@ -1893,8 +1893,6 @@ public class FileSystemBrowserWindow extends JFrame {
                     entry.getAttributes().getPOSIXFileAttributes();
             try {
                 Java7Util.setPosixPermissions(outNode.getPath(),
-                        (int) attrs.getUserID(),
-                        (int) attrs.getGroupID(),
                         attrs.canUserRead(),
                         attrs.canUserWrite(),
                         attrs.canUserExecute(),
@@ -1910,6 +1908,22 @@ public class FileSystemBrowserWindow extends JFrame {
                         "\"" + outNode.getPath() + "\" (see stack trace for " +
                         "more info).");
                 e.printStackTrace();
+            }
+
+            try {
+                Java7Util.setPosixOwners(outNode.getPath(),
+                        (int) attrs.getUserID(),
+                        (int) attrs.getGroupID());
+            } catch(Exception e) {
+                final String message =
+                        "Got " + e.getClass().getName() + " when attempting " +
+                        "to set Java 7 POSIX ownership for " +
+                        "\"" + outNode.getPath() + "\"";
+                System.err.println(message + ":");
+                e.printStackTrace();
+
+                errorMessages.addLast(message + " (see stack trace for more " +
+                        "info).");
             }
         }
 
