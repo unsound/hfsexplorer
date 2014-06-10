@@ -299,4 +299,51 @@ public class Java7Util {
         filesSetAttributeMethod.invoke(null, pObject, "unix:gid",
                 Integer.valueOf(groupId), linkOptionsArray);
     }
+
+    public static void createSymbolicLink(String linkPathString,
+            String targetPathString)
+            throws ClassNotFoundException, NoSuchMethodException,
+            IllegalAccessException, IllegalArgumentException,
+            InvocationTargetException, NoSuchFieldException
+    {
+        Class<?> fileSystemsClass = Class.forName("java.nio.file.FileSystems");
+        Class<?> fileSystemClass = Class.forName("java.nio.file.FileSystem");
+        Class<?> pathClass = Class.forName("java.nio.file.Path");
+        Class<?> filesClass = Class.forName("java.nio.file.Files");
+        Class<?> fileAttributeClass =
+                Class.forName("java.nio.file.attribute.FileAttribute");
+
+        Object emptyFileAttributeArray =
+                Array.newInstance(fileAttributeClass, 0);
+
+        Method fileSystemsGetDefaultMethod =
+                fileSystemsClass.getMethod("getDefault");
+        Method fileSystemGetPathMethod =
+                fileSystemClass.getMethod("getPath", String.class,
+                String[].class);
+        Method fileSystemsCreateSymbolicLinkMethod =
+                filesClass.getMethod("createSymbolicLink", pathClass,
+                pathClass, emptyFileAttributeArray.getClass());
+
+        /* java.nio.file.FileSystem defaultFileSystem =
+                   java.nio.file.FileSystems.getDefault(); */
+        Object defaultFileSystemObject =
+                fileSystemsGetDefaultMethod.invoke(null);
+
+        /* java.nio.file.Path linkPath =
+                   defaultFileSystem.getPath(linkPathString); */
+        Object linkPathObject =
+                fileSystemGetPathMethod.invoke(defaultFileSystemObject,
+                linkPathString, new String[0]);
+
+        /* java.nio.file.Path targetPath =
+                   defaultFileSystem.getPath(targetPathString); */
+        Object targetPathObject =
+                fileSystemGetPathMethod.invoke(defaultFileSystemObject,
+                targetPathString, new String[0]);
+
+        /* java.nio.file.Files.createSymbolicLink(linkPath, targetPath); */
+        fileSystemsCreateSymbolicLinkMethod.invoke(null, linkPathObject,
+                targetPathObject, emptyFileAttributeArray);
+    }
 }
