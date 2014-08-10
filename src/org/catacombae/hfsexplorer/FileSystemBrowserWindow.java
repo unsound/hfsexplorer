@@ -34,6 +34,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.InvalidKeyException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -713,8 +714,36 @@ public class FileSystemBrowserWindow extends JFrame {
                             try {
                                 ReadableCEncryptedEncodingStream stream =
                                         new ReadableCEncryptedEncodingStream(fsFile, res);
-                                fsFile = stream;
-                                break;
+
+                                try {
+                                    stream.read(new byte[512]);
+
+                                    fsFile = stream;
+                                    break;
+                                } catch(Exception e) {
+                                    Throwable cause = e.getCause();
+
+                                    if(!(cause instanceof InvalidKeyException))
+                                    {
+                                        throw e;
+                                    }
+
+                                    JOptionPane.showMessageDialog(null,
+                                            "If you were trying to load an " +
+                                            "AES-256 encrypted image and\n" +
+                                            "are using Sun/Oracle's Java " +
+                                            "Runtime Environment, then \n" +
+                                            "please check if you have " +
+                                            "installed the Java " +
+                                            "Cryptography\n" +
+                                            "Extension (JCE) Unlimited " +
+                                            "Strength Jurisdiction Policy\n" +
+                                            "Files, which are required for " +
+                                            "AES-256 support in Java.",
+                                            "Unsupported AES key size",
+                                            JOptionPane.ERROR_MESSAGE);
+                                    break;
+                                }
                             } catch(Exception e) {
                                 JOptionPane.showMessageDialog(null,
                                         "Incorrect password.", "Reading encrypted disk image...",
