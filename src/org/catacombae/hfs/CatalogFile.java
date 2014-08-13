@@ -416,16 +416,15 @@ public class CatalogFile extends BTreeFile {
      */
     public CommonHFSCatalogLeafRecord[] listRecords(CommonHFSCatalogNodeID folderID) {
 	CatalogFileSession init = openSession();
-	final ReadableRandomAccessStream catalogFile = init.catalogFile;
-	return collectFilesInDir(folderID, init.bthr.getRootNodeNumber(),
-            new ReadableRandomAccessSubstream(vol.hfsFile), 0,
-            init.header, init.bthr, catalogFile);
+        return collectFilesInDir(folderID, init.bthr.getRootNodeNumber(),
+                init.header, init.bthr, init.catalogFile);
     }
 
-    private CommonHFSCatalogLeafRecord[] collectFilesInDir(CommonHFSCatalogNodeID dirID,
-            long currentNodeIndex, ReadableRandomAccessStream hfsFile, long fsOffset,
+    private CommonHFSCatalogLeafRecord[] collectFilesInDir(
+            final CommonHFSCatalogNodeID dirID, final long currentNodeIndex,
             final CommonHFSVolumeHeader header, final CommonBTHeaderRecord bthr,
-            final ReadableRandomAccessStream catalogFile) {
+            final ReadableRandomAccessStream catalogFile)
+    {
         final int nodeSize = bthr.getNodeSize();
 
 	byte[] currentNodeData = new byte[nodeSize];
@@ -445,8 +444,8 @@ public class CatalogFile extends BTreeFile {
 
 	    for(CommonBTIndexRecord bir : matchingRecords) {
 		CommonHFSCatalogLeafRecord[] partResult =
-                        collectFilesInDir(dirID, bir.getIndex(), hfsFile, fsOffset,
-                        header, bthr, catalogFile);
+                        collectFilesInDir(dirID, bir.getIndex(), header, bthr,
+                        catalogFile);
 		for(CommonHFSCatalogLeafRecord curRes : partResult)
 		    results.addLast(curRes);
 	    }
