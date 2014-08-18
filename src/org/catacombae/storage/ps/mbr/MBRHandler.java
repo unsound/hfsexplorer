@@ -49,7 +49,7 @@ public class MBRHandler extends PartitionSystemHandler {
 
     @Override
     public void close() {
-
+        partitionData.close();
     }
 
     public MBRPartitionTable readPartitionTable() {

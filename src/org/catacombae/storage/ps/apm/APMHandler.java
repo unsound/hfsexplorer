@@ -51,7 +51,7 @@ public class APMHandler extends PartitionSystemHandler {
 
     @Override
     public void close() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        partitionData.close();
     }
 
     public DriverDescriptorRecord readDriverDescriptorRecord() {

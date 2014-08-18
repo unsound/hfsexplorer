@@ -49,7 +49,7 @@ public class EBRHandler extends PartitionSystemHandler {
 
     @Override
     public void close() {
-
+        partitionData.close();
     }
 
     private EBRPartitionSystem readPartitionTable() {
