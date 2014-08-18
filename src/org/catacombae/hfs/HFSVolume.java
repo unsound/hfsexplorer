@@ -68,7 +68,7 @@ public abstract class HFSVolume {
     protected volatile SynchronizedReadableRandomAccess hfsFile;
     private volatile SynchronizedReadableRandomAccessStream hfsStream;
     //private final SynchronizedReadableRandomAccessStream backingFile;
-    private final ReadableRandomAccessStream sourceStream;
+    private final SynchronizedReadableRandomAccessStream sourceStream;
     protected final int physicalBlockSize;
 
     // Variables for reading cached files.
@@ -76,6 +76,8 @@ public abstract class HFSVolume {
 
     protected final CatalogFile catalogFile;
     protected final ExtentsOverflowFile extentsOverflowFile;
+
+    private boolean closed = false;
 
     protected HFSVolume(ReadableRandomAccessStream hfsFile,
             boolean cachingEnabled,
@@ -86,9 +88,11 @@ public abstract class HFSVolume {
         //System.err.println("HFSVolume(" + hfsFile + ", " +
         //        cachingEnabled + ", " + btreeOperations + ", " +
         //        catalogOperations + ", " + extentsOverflowOperations + ");");
-        this.sourceStream = hfsFile;
+        this.sourceStream =
+                new SynchronizedReadableRandomAccessStream(hfsFile);
         this.hfsStream =
-                new SynchronizedReadableRandomAccessStream(sourceStream);
+                new SynchronizedReadableRandomAccessStream(
+                new ReadableRandomAccessSubstream(sourceStream));
         this.hfsFile = hfsStream;
 
         /* This seems to be a built in assumption of HFSish file systems, even
@@ -287,7 +291,15 @@ public abstract class HFSVolume {
      * Closes the volume and flushes any data not yet committed to disk (if
      * opened in writable mode).
      */
-    public abstract void close();
+    public synchronized void close() {
+        if(closed) {
+            throw new RuntimeException("Already closed.");
+        }
+
+        hfsStream.close();
+        sourceStream.close();
+        closed = true;
+    }
 
     /*
     public boolean isFileSystemCachingEnabled() {
@@ -302,13 +314,20 @@ public abstract class HFSVolume {
     }
 
     public void enableFileSystemCaching(int blockSize, int blocksInCache) {
-        hfsStream = new SynchronizedReadableRandomAccessStream(
-                new ReadableBlockCachingStream(sourceStream, blockSize, blocksInCache));
+        hfsStream.close();
+        hfsStream =
+                new SynchronizedReadableRandomAccessStream(
+                new ReadableBlockCachingStream(
+                new ReadableRandomAccessSubstream(sourceStream), blockSize,
+                blocksInCache));
         hfsFile = hfsStream;
     }
 
     public void disableFileSystemCaching() {
-        hfsStream = new SynchronizedReadableRandomAccessStream(sourceStream);
+        hfsStream.close();
+        hfsStream =
+                new SynchronizedReadableRandomAccessStream(
+                new ReadableRandomAccessSubstream(sourceStream));
         hfsFile = hfsStream;
     }
 

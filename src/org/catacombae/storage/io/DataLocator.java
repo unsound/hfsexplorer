@@ -26,6 +26,13 @@ import org.catacombae.io.RandomAccessStream;
  * @author erik
  */
 public abstract class DataLocator {
+    private boolean closed = false;
+    private long references;
+
+    public DataLocator() {
+        this.references = 1;
+    }
+
     /*
     public InputStream createStream() {
         // RandomAccessFileInputStream doesn't exist yet
@@ -51,4 +58,37 @@ public abstract class DataLocator {
      */
     public abstract RandomAccessStream createReadWriteFile()
             throws UnsupportedOperationException;
+
+    public final synchronized void close() {
+        if(closed) {
+            throw new RuntimeException("Already closed.");
+        }
+
+        dereference(true);
+        closed = true;
+    }
+
+    private synchronized void dereference(final boolean closing) {
+        if(((closed || closing) && references <= 0) ||
+                (!(closed || closing) && references <= 1))
+        {
+            throw new RuntimeException("Too few references left!");
+        }
+
+        --references;
+
+        if(references == 0) {
+            releaseResources();
+        }
+    }
+
+    protected abstract void releaseResources();
+
+    public final synchronized void addReference(SubDataLocator l) {
+        ++references;
+    }
+
+    public final synchronized void removeReference(SubDataLocator l) {
+        dereference(false);
+    }
 }

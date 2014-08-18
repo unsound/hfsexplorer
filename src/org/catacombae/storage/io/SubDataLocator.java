@@ -35,6 +35,8 @@ public class SubDataLocator extends DataLocator {
         this.source = source;
         this.offset = offset;
         this.length = length;
+
+        this.source.addReference(this);
     }
 
     @Override
@@ -52,4 +54,8 @@ public class SubDataLocator extends DataLocator {
         return new ConcatenatedStream(source.createReadWriteFile(), offset, length);
     }
 
+    @Override
+    public void releaseResources() {
+        source.removeReference(this);
+    }
 }

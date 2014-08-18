@@ -380,6 +380,6 @@ public class ForkFilter implements ReadableRandomAccessStream {
      */
     /* @Override */
     public void close() {
-        //sourceFile.close(); // <- bad idea.
+        sourceFile.close();
     }
 }

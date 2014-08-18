@@ -66,4 +66,10 @@ public class WindowsDeviceDataLocator extends DataLocator {
     public boolean isWritable() {
         return true;
     }
+
+    @Override
+    public void releaseResources() {
+        /* Our only persistent reference is the device path string. So we don't
+         * need to release any resources. */
+    }
 }

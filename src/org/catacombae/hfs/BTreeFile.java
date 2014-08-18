@@ -68,6 +68,10 @@ public abstract class BTreeFile {
             //this.bthr.print(System.err, "    ");
         }
 
+        public final void close() {
+            this.btreeStream.close();
+        }
+
         protected abstract ReadableRandomAccessStream getBTreeStream(
                 CommonHFSVolumeHeader header);
     }

@@ -49,7 +49,7 @@ public class GPTHandler extends PartitionSystemHandler {
 
     @Override
     public void close() {
-
+        partitionData.close();
     }
 
     public GUIDPartitionTable readPartitionTable() {

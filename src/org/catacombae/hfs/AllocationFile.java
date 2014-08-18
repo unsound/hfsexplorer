@@ -297,6 +297,10 @@ public abstract class AllocationFile {
         return result;
     }
 
+    public void close() {
+        allocationFileStream.close();
+    }
+
     private class ByteRegion {
         public long offset;
         public long length;

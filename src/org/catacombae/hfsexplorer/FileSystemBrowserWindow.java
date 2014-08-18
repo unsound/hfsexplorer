@@ -84,6 +84,8 @@ import org.catacombae.hfsexplorer.helpbrowser.HelpBrowserPanel;
 import org.catacombae.io.ReadableConcatenatedStream;
 import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
+import org.catacombae.io.ReadableRandomAccessSubstream;
+import org.catacombae.io.SynchronizedReadableRandomAccessStream;
 import org.catacombae.storage.fs.FSAttributes.POSIXFileAttributes;
 import org.catacombae.storage.fs.FSEntry;
 import org.catacombae.storage.fs.FSFile;
@@ -208,14 +210,18 @@ public class FileSystemBrowserWindow extends JFrame {
                     ReadableRandomAccessStream io = deviceDialog.getPartitionStream();
                     String pathName = deviceDialog.getPathName();
                     if(io != null) {
+                        SynchronizedReadableRandomAccessStream syncStream =
+                                new SynchronizedReadableRandomAccessStream(io);
                         try {
-                            loadFS(io, pathName);
+                            loadFS(syncStream, pathName);
                         } catch(Exception e) {
                             System.err.print("INFO: Non-critical exception when trying to load file system from \"" + pathName + "\": ");
                             e.printStackTrace();
                             JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
                                     "Could not find any file systems on device!",
                                     "Error", JOptionPane.ERROR_MESSAGE);
+                        } finally {
+                            syncStream.close();
                         }
                     }
                 }
@@ -804,7 +810,14 @@ public class FileSystemBrowserWindow extends JFrame {
             } catch(Exception e) {
                 displayName = filename;
             }
-            loadFS(fsFile, displayName);
+
+            SynchronizedReadableRandomAccessStream syncStream =
+                    new SynchronizedReadableRandomAccessStream(fsFile);
+            try {
+                loadFS(syncStream, displayName);
+            } finally {
+                syncStream.close();
+            }
         } catch(Exception e) {
             System.err.println("Could not open file! Exception thrown:");
             e.printStackTrace();
@@ -821,11 +834,19 @@ public class FileSystemBrowserWindow extends JFrame {
         else {
             fsFile = new ReadableFileStream(filename);
         }
-        loadFS(fsFile, new File(filename).getName());
+
+        SynchronizedReadableRandomAccessStream syncStream =
+                new SynchronizedReadableRandomAccessStream(fsFile);
+        try {
+            loadFS(syncStream, new File(filename).getName());
+        } finally {
+            syncStream.close();
+        }
     }
 
-    public void loadFS(ReadableRandomAccessStream fsFile, String displayName) {
-
+    public void loadFS(SynchronizedReadableRandomAccessStream fsFile,
+            String displayName)
+    {
         long fsOffset;
         long fsLength;
 
@@ -856,9 +877,16 @@ public class FileSystemBrowserWindow extends JFrame {
             }
 
             PartitionSystemHandler psHandler =
-                    psFact.createHandler(new ReadableStreamDataLocator(fsFile));
+                    psFact.createHandler(new ReadableStreamDataLocator(
+                    new ReadableRandomAccessSubstream(fsFile)));
 
-            Partition[] partitions = psHandler.getPartitions();
+            Partition[] partitions;
+            try {
+                partitions = psHandler.getPartitions();
+            } finally {
+                psHandler.close();
+            }
+
             if(partitions.length == 0) {
                 // Proceed to detect file system
                 fsOffset = 0;
@@ -950,6 +978,10 @@ public class FileSystemBrowserWindow extends JFrame {
                     fsHandler.close();
                     fsHandler = null;
                 }
+                if(fsDataLocator != null) {
+                    fsDataLocator.close();
+                    fsDataLocator = null;
+                }
 
                 final FileSystemMajorType fsMajorType;
                 switch(fsType) {
@@ -980,10 +1012,11 @@ public class FileSystemBrowserWindow extends JFrame {
 
                 ReadableRandomAccessStream stage1;
                 if(fsLength > 0)
-                    stage1 = new ReadableConcatenatedStream(fsFile, fsOffset,
+                    stage1 = new ReadableConcatenatedStream(
+                            new ReadableRandomAccessSubstream(fsFile), fsOffset,
                             fsLength);
                 else if(fsOffset == 0)
-                    stage1 = fsFile;
+                    stage1 = new ReadableRandomAccessSubstream(fsFile);
                 else
                     throw new RuntimeException("length undefined and offset " +
                             "!= 0 (fsLength=" + fsLength + " fsOffset=" +

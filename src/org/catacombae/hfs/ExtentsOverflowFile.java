@@ -62,8 +62,6 @@ public class ExtentsOverflowFile extends BTreeFile {
             this.extentsFile = btreeStream;
         }
 
-        public void close() {}
-
         @Override
         protected ReadableRandomAccessStream getBTreeStream(
                 CommonHFSVolumeHeader header) {

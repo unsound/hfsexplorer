@@ -67,17 +67,25 @@ public class HFSPlusFileSystemHandlerFactory extends HFSCommonFileSystemHandlerF
         ReadableRandomAccessStream recognizerStream = data.createReadOnlyFile();
 
         final DataLocator dataToLoad;
-        FileSystemType type = HFSCommonFileSystemRecognizer.detectFileSystem(
-                recognizerStream, 0);
+        try {
+            FileSystemType type =
+                    HFSCommonFileSystemRecognizer.detectFileSystem(
+                    recognizerStream, 0);
 
-        if(type == FileSystemType.HFS_WRAPPED_HFS_PLUS)
-            dataToLoad = hfsUnwrap(data);
-        else if(type == FileSystemType.UNKNOWN)
-            throw new RuntimeException("No HFS file system found at 'data'.");
-        else
-            dataToLoad = data;
-
-        recognizerStream.close();
+            if(type == FileSystemType.HFS_WRAPPED_HFS_PLUS) {
+                dataToLoad = hfsUnwrap(data);
+            }
+            else if(type == FileSystemType.UNKNOWN) {
+                throw new RuntimeException("No HFS file system found at " +
+                        "'data'.");
+            }
+            else {
+                dataToLoad = data;
+            }
+        }
+        finally {
+            recognizerStream.close();
+        }
 
         return createHandlerInternal(dataToLoad, useCaching, composeFilename,
                 hideProtected);
