@@ -32,7 +32,7 @@ public class HFSPlusAttributesKey extends BTKey
 {
     /*
      * struct HFSPlusAttributesKey
-     * size: 16 bytes
+     * size: <=268 bytes
      * description:
      *
      * BP  Size   Type    Identifier   Description
@@ -42,7 +42,7 @@ public class HFSPlusAttributesKey extends BTKey
      * 4   4      UInt32  fileID       file associated with attribute
      * 8   4      UInt32  startBlock   first allocation block number for extents
      * 12  2      UInt16  attrNameLen  number of unicode characters
-     * 14  2*?    UInt16  attrName     attribute name (Unicode)
+     * 14  <=254  UInt16  attrName     attribute name (Unicode)
      */
 
     public static final int STATIC_SIZE = 14;
