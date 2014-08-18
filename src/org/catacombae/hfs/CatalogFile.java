@@ -66,8 +66,6 @@ public class CatalogFile extends BTreeFile {
             this.catalogFile = btreeStream;
         }
 
-        public void close() {}
-
         @Override
         protected ReadableRandomAccessStream getBTreeStream(
                 CommonHFSVolumeHeader header) {
@@ -150,7 +148,16 @@ public class CatalogFile extends BTreeFile {
 
     public CommonHFSCatalogFolderRecord getRootFolder() {
         CatalogFileSession ses = openSession();
+        try {
+            return doGetRootFolder(ses);
+        } finally {
+            ses.close();
+        }
+    }
 
+    private CommonHFSCatalogFolderRecord doGetRootFolder(
+            CatalogFileSession ses)
+    {
         // Search down through the layers of indices to the record with parentID 1.
         CommonHFSCatalogNodeID parentID =
                 vol.getCommonHFSCatalogNodeID(ReservedID.ROOT_PARENT);
@@ -416,8 +423,12 @@ public class CatalogFile extends BTreeFile {
      */
     public CommonHFSCatalogLeafRecord[] listRecords(CommonHFSCatalogNodeID folderID) {
 	CatalogFileSession init = openSession();
-        return collectFilesInDir(folderID, init.bthr.getRootNodeNumber(),
-                init.header, init.bthr, init.catalogFile);
+        try {
+            return collectFilesInDir(folderID, init.bthr.getRootNodeNumber(),
+                    init.header, init.bthr, init.catalogFile);
+        } finally {
+            init.close();
+        }
     }
 
     private CommonHFSCatalogLeafRecord[] collectFilesInDir(

@@ -28,6 +28,7 @@ import org.catacombae.io.ReadableRandomAccessStream;
  */
 public class ReadableStreamDataLocator extends DataLocator {
     private SynchronizedReadableRandomAccessStream backingStream;
+    private boolean closed = false;
 
     public ReadableStreamDataLocator(ReadableRandomAccessStream sourceStream) {
         this.backingStream =
@@ -51,5 +52,27 @@ public class ReadableStreamDataLocator extends DataLocator {
 
     public SynchronizedReadableRandomAccessStream getBackingStream() {
         return backingStream;
+    }
+
+    @Override
+    public synchronized void releaseResources() {
+        if(closed) {
+            throw new RuntimeException("Stream is already closed.");
+        }
+
+        this.backingStream.close();
+
+        closed = true;
+    }
+
+    @Override
+    public synchronized void finalize() throws Throwable {
+        try {
+            if(!closed) {
+                close();
+            }
+        } finally {
+            super.finalize();
+        }
     }
 }

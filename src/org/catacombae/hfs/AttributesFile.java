@@ -57,11 +57,6 @@ public class AttributesFile extends BTreeFile {
 
             return this.attributesFileStream;
         }
-
-        private void close() {
-            if(attributesFileStream != null)
-                attributesFileStream.close();
-        }
     }
 
     public AttributesFile(HFSPlusVolume view, BTreeOperations ops) {

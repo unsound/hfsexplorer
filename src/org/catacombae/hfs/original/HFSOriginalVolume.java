@@ -194,11 +194,6 @@ public class HFSOriginalVolume extends HFSVolume {
         return CommonHFSCatalogString.createHFS(bytes);
     }
 
-    @Override
-    public void close() {
-        // Do something here?
-    }
-
     private static class HFSBTreeOperations implements BTreeOperations {
 
         public CommonBTHeaderNode createCommonBTHeaderNode(

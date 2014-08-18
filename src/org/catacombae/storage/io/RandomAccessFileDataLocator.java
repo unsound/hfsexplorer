@@ -161,4 +161,10 @@ public class RandomAccessFileDataLocator extends DataLocator {
     public boolean isWritable() {
         return writable;
     }
+
+    @Override
+    public void releaseResources() {
+        /* Our only persistent reference is the File object, which does not need
+         * closing. */
+    }
 }

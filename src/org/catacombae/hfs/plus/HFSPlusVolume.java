@@ -220,7 +220,8 @@ public class HFSPlusVolume extends HFSVolume {
 
     @Override
     public void close() {
-        // TODO ?
+        allocationFile.close();
+        super.close();
     }
 
     private static class HFSPlusBTreeOperations implements BTreeOperations {
