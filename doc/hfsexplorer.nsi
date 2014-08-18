@@ -2,9 +2,9 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "HFSExplorer"
-!define PRODUCT_VERSION "0.21"
+!define PRODUCT_VERSION "0.22"
 !define PRODUCT_PUBLISHER "Catacombae Software"
-!define PRODUCT_WEB_SITE "http://hem.bredband.net/catacombae/"
+!define PRODUCT_WEB_SITE "http://www.catacombae.org/"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 !define PRODUCT_STARTMENU_REGVAL "NSIS:StartMenuDir"
@@ -82,7 +82,7 @@ done:
 FunctionEnd
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "hfsxsetup.exe"
+OutFile "hfsexplorer-current-setup.exe"
 InstallDir "$PROGRAMFILES\HFSExplorer"
 ShowInstDetails show
 ShowUnInstDetails show
