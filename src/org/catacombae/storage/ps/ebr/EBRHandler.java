@@ -53,8 +53,9 @@ public class EBRHandler extends PartitionSystemHandler {
     }
 
     private EBRPartitionSystem readPartitionTable() {
+        ReadableRandomAccessStream llf = null;
         try {
-            ReadableRandomAccessStream llf = partitionData.createReadOnlyFile();
+            partitionData.createReadOnlyFile();
             byte[] firstBlock = new byte[512];
 
             llf.readFully(firstBlock);
@@ -63,8 +64,12 @@ public class EBRHandler extends PartitionSystemHandler {
             if(ebs.isValid())
                 return ebs;
 
-        } catch (Exception e) {
+        } finally {
+            if(llf != null) {
+                llf.close();
+            }
         }
+
         return null;
     }
 
