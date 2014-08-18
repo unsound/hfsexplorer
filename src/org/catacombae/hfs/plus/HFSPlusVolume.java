@@ -117,8 +117,7 @@ public class HFSPlusVolume extends HFSVolume {
         return CommonHFSVolumeHeader.create(getHFSPlusVolumeHeader());
     }
 
-    public HFSPlusAllocationFile createAllocationFile() {
-
+    private HFSPlusAllocationFile createAllocationFile() {
         HFSPlusVolumeHeader vh = getHFSPlusVolumeHeader();
 
         CommonHFSForkData allocationFileFork =
