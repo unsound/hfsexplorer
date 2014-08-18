@@ -248,6 +248,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
             //    skipPrefix = null;
 
             ReadableRandomAccessStream llf = null;
+            PartitionSystemHandler partSys = null;
             try {
                 llf = new ReadableWin32FileStream(DEVICE_PREFIX + deviceName);
 
@@ -275,7 +276,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
                     PartitionSystemHandlerFactory fact =
                             pst.createDefaultHandlerFactory();
 
-                    PartitionSystemHandler partSys = fact.createHandler(
+                    partSys = fact.createHandler(
                             new ReadableStreamDataLocator(llf));
 
                     Partition[] parts = partSys.getPartitions();
@@ -312,7 +313,6 @@ public class SelectWindowsDeviceDialog extends JDialog {
                  * system is at Partition0. */
                 //else if(deviceName.endsWith("Partition0"))
                 //    skipPrefix = deviceName.substring(0, deviceName.length()-1);
-                llf.close();
             } catch(Exception e) {
                 System.out.println("INFO: Non-critical exception while " +
                         "detecting partition system at \"" + DEVICE_PREFIX +
@@ -324,7 +324,10 @@ public class SelectWindowsDeviceDialog extends JDialog {
 
                     if(HFSCommonFileSystemRecognizer.isTypeSupported(fsType))
                         plainFileSystems.add(deviceName);
-                    llf.close();
+                }
+            } finally {
+                if(partSys != null) {
+                    partSys.close(); /* Will also close llf. */
                 }
             }
         }
