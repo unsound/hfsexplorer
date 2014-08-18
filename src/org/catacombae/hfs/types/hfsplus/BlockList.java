@@ -20,7 +20,6 @@ package org.catacombae.hfs.types.hfsplus;
 import java.io.PrintStream;
 import org.catacombae.csjc.DynamicStruct;
 import org.catacombae.csjc.PrintableStruct;
-import org.catacombae.util.Util;
 
 /**
  *
