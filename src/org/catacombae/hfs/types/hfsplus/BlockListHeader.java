@@ -99,8 +99,9 @@ public class BlockListHeader implements StaticStruct, PrintableStruct {
         ps.println(prefix + " maxBlocks: " + getMaxBlocks());
         ps.println(prefix + " numBlocks: " + getNumBlocks());
         ps.println(prefix + " bytesUsed: " + getBytesUsed());
-        ps.println(prefix + " checksum: " + getChecksum());
-        ps.println(prefix + " pad: " + getPad());
+        ps.println(prefix + " checksum: 0x" +
+                Util.toHexStringBE(getChecksum()));
+        ps.println(prefix + " pad: 0x" + Util.toHexStringBE(getPad()));
     }
 
     public void print(PrintStream ps, String prefix) {
