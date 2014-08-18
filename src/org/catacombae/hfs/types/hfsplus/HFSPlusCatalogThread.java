@@ -27,7 +27,7 @@ import org.catacombae.csjc.structelements.IntegerFieldRepresentation;
 public class HFSPlusCatalogThread extends HFSPlusCatalogLeafRecordData implements DynamicStruct {
     /*
      * struct HFSPlusCatalogThread
-     * size: ~520 bytes
+     * size: <=520 bytes
      * description:
      *
      * BP  Size  Type              Identifier  Description
@@ -35,7 +35,7 @@ public class HFSPlusCatalogThread extends HFSPlusCatalogLeafRecordData implement
      * 0   2     SInt16            recordType
      * 2   2     SInt16            reserved
      * 4   4     HFSCatalogNodeID  parentID
-     * 8   ~512  HFSUniStr255      nodeName
+     * 8   <=512 HFSUniStr255      nodeName
      */
 
     private final byte[] recordType = new byte[2];
