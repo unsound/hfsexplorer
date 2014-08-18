@@ -85,7 +85,7 @@ public class HFSOriginalVolume extends HFSVolume {
         return CommonHFSVolumeHeader.create(getHFSMasterDirectoryBlock());
     }
 
-    public HFSOriginalAllocationFile createAllocationFile() {
+    private HFSOriginalAllocationFile createAllocationFile() {
         MasterDirectoryBlock mdb = getHFSMasterDirectoryBlock();
 
         int numAllocationBlocks = Util.unsign(mdb.getDrNmAlBlks());
