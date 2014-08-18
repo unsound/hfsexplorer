@@ -36,7 +36,7 @@ g++ -g -Wall -D_JNI_IMPLEMENTATION_ -c "%LAUNCHER_SRC%\launcher.cpp" -o "%BUILD_
 if not "%ERRORLEVEL%"=="0" goto error
 
 echo Building %BUILDTYPE% app...
-g++ -g -m%BUILDTYPE% -Wall -D_JNI_IMPLEMENTATION_ -Wl,--kill-at "%BUILD_DIR%\launcher_res.o" "%BUILD_DIR%\launcher.o" -o "%OUTDIR%\%OUTFILE%"
+g++ -static-libgcc -static-libstdc++ -g -m%BUILDTYPE% -Wall -D_JNI_IMPLEMENTATION_ -Wl,--kill-at "%BUILD_DIR%\launcher_res.o" "%BUILD_DIR%\launcher.o" -o "%OUTDIR%\%OUTFILE%"
 if not "%ERRORLEVEL%"=="0" goto error
 echo Done!
 goto end

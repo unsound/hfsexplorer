@@ -124,8 +124,7 @@ public class FileSystemBrowserWindow extends JFrame {
         new ImageIcon(ClassLoader.getSystemResource("res/finderdrive_folderback_48.png"))
     };
     private static final String[] VERSION_INFO_DICTIONARY = {
-        "http://www.typhontools.cjb.net/hfsx/version.sdic.txt",
-        "http://hem.bredband.net/unsound/hfsx/version.sdic.txt"
+        "http://www.catacombae.org/hfsexplorer/version.sdic.txt",
     };
     /**
      * The command line argument that makes HFSExplorer print stdout and
