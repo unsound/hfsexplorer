@@ -2,31 +2,57 @@ HFSExplorer Changelog
 ---------------------
 
 
-current
--------
+0.22
+----
+- Feature: Sparse bundles (.sparsebundle) are now supported by HFSExplorer, both
+  plain and encrypted.
+
+- Feature: AES-256 is now a supported encryption method. However this also
+  requires support in your Java runtime.
+  In most cases Sun/Oracle's Java runtime needs to be updated with the "Java
+  Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files" in
+  order to support AES-256.
+
+- Feature: Preserve file attributes for extracted files. Which attributes can be
+  preserved varies with the platform. On Java 5/6 only the last modified date
+  can be set for the extracted file. For Java 7 and higher we can also set the
+  last accessed date and creation date where the underlying file system supports
+  it. When using Java 7 on UNIX platforms, the mode and ownership can also be
+  set.
+
+- Feature: More detailed information about the B-tree files is added to the
+  "File system info" window, and a new view of the Journal is added.
+
 - Change: HFSExplorer now hides specially protected files and directories by
   default. The affected files and directories are the file and directory inode
   directories ("\u0000\u0000\u0000\u0000HFS+ Private Data" /
   ".HFS+ Private Directory Data\u000d") and the journal files
   (".journal_info_block" / ".journal").
 
-- Bugfix: Modify date now set when extracting files.
+- Bugfix: Incorrect key compare order for extent keys led to issues with
+  overflow extents in resource forks.
 
-- Bugfix: HFSCommonFileSystemRecognizer failed when operating on devices
+- Bugfix: Original HFS catalog key comparison algorithm was incorrect, leading
+  to various lookup issues on HFS. Fixed by implementing the 'relstring'
+  case-folding table.
+
+- Bugfix: Recognizing HFS/+/X filesystems failed when operating on devices
   requiring aligned I/O.
 
 - Bugfix: int overflow bug in caching layer led to OutOfMemoryError in
   certain situations when reading large disks.
 
-- Bugfix: Didn't check for String length in
-  FileNameTools.isReservedWindowsFilename. Led to an exception being thrown by
-  HFSExplorer right in the face of the user.
+- Bugfix: Missing string length check when checking for reserved Windows
+  filenames caused an exception to be thrown.
 
 - Bugfix: When extracting directories with names containing spaces, the files
   in these directores could not be extracted. The fix is to check that the
   created directory name is really equal to the name that we intended to create
   (method deepEquals) and to fail if it isn't, requiring the user to rename the
   directory to something sane.
+
+- Many other fixes are also included. Please refer to the git log for detailed
+  info.
 
 
 0.21
