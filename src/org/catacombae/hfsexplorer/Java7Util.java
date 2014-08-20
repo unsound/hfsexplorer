@@ -317,20 +317,29 @@ public class Java7Util {
                 fileSystemGetPathMethod.invoke(defaultFileSystemObject, path,
                 new String[0]);
 
-        /* java.nio.file.Files.setAttribute(p, "unix:uid",
-                Integer.valueOf(ownerId),
-                java.nio.file.LinkOption.NOFOLLOW_LINKS);*/
         Method filesSetAttributeMethod =
                 filesClass.getMethod("setAttribute", pathClass,
                 String.class, Object.class, linkOptionsArray.getClass());
-        filesSetAttributeMethod.invoke(null, pObject, "unix:uid",
-                Integer.valueOf(ownerId), linkOptionsArray);
+        try {
+            /* java.nio.file.Files.setAttribute(p, "unix:uid",
+                    Integer.valueOf(ownerId),
+                    java.nio.file.LinkOption.NOFOLLOW_LINKS);*/
+            filesSetAttributeMethod.invoke(null, pObject, "unix:uid",
+                    Integer.valueOf(ownerId), linkOptionsArray);
 
-        /* java.nio.file.Files.setAttribute(p, "unix:gid",
-                Integer.valueOf(groupId),
-                java.nio.file.LinkOption.NOFOLLOW_LINKS); */
-        filesSetAttributeMethod.invoke(null, pObject, "unix:gid",
-                Integer.valueOf(groupId), linkOptionsArray);
+            /* java.nio.file.Files.setAttribute(p, "unix:gid",
+                    Integer.valueOf(groupId),
+                    java.nio.file.LinkOption.NOFOLLOW_LINKS); */
+            filesSetAttributeMethod.invoke(null, pObject, "unix:gid",
+                    Integer.valueOf(groupId), linkOptionsArray);
+        } catch(InvocationTargetException ex) {
+            if(ex.getCause() instanceof UnsupportedOperationException) {
+                /* Do nothing. This is expected on non-UNIX platforms. */
+            }
+            else {
+                throw ex;
+            }
+        }
     }
 
     public static void createSymbolicLink(String linkPathString,
