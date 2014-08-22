@@ -23,7 +23,7 @@ import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 import javax.swing.JOptionPane;
 import org.catacombae.hfsexplorer.GUIUtil;
-import org.catacombae.hfsexplorer.SelectWindowsDeviceDialog;
+import org.catacombae.hfsexplorer.SelectDeviceDialog;
 import org.catacombae.storage.io.ReadableStreamDataLocator;
 import org.catacombae.storage.ps.apm.types.ApplePartitionMap;
 import org.catacombae.storage.ps.gpt.types.GUIDPartitionTable;
@@ -72,8 +72,8 @@ public class DumpFSInfo {
                 fsFile = new ReadableWin32FileStream(args[0]);
             }
             else if(args.length == 0) {
-                SelectWindowsDeviceDialog swdd =
-                        new SelectWindowsDeviceDialog(null, true, "Select device to extract info from");
+                SelectDeviceDialog swdd =
+                        new SelectDeviceDialog(null, true, "Select device to extract info from");
                 swdd.setVisible(true);
                 fsFile = swdd.getPartitionStream();
                 if(fsFile == null)

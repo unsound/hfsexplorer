@@ -201,8 +201,8 @@ public class FileSystemBrowserWindow extends JFrame {
             loadFSFromDeviceItem.addActionListener(new ActionListener() {
                 /* @Override */
                 public void actionPerformed(ActionEvent ae) {
-                    SelectWindowsDeviceDialog deviceDialog =
-                            new SelectWindowsDeviceDialog(FileSystemBrowserWindow.this,
+                    SelectDeviceDialog deviceDialog =
+                            new SelectDeviceDialog(FileSystemBrowserWindow.this,
                             true,
                             "Load file system from device");
                     deviceDialog.setVisible(true);

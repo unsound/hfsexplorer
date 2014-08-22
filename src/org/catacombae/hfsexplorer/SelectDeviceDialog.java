@@ -45,7 +45,7 @@ import org.catacombae.storage.ps.PartitionSystemHandlerFactory;
 import org.catacombae.storage.ps.PartitionSystemType;
 import org.catacombae.storage.ps.PartitionType;
 
-public class SelectWindowsDeviceDialog extends JDialog {
+public class SelectDeviceDialog extends JDialog {
     private static final String DEVICE_PREFIX = "\\\\?\\GLOBALROOT\\Device\\";
 
     private SelectWindowsDevicePanel guiPanel;
@@ -66,7 +66,7 @@ public class SelectWindowsDeviceDialog extends JDialog {
     private String resultCreatePath = null;
     private String[] detectedDeviceNames;
 
-    public SelectWindowsDeviceDialog(Frame owner, boolean modal, String title) {
+    public SelectDeviceDialog(Frame owner, boolean modal, String title) {
         super(owner, modal);
         setTitle(title);
 
