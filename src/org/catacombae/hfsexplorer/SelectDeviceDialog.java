@@ -34,7 +34,7 @@ import javax.swing.JTextField;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.ReadableConcatenatedStream;
 import org.catacombae.storage.io.win32.ReadableWin32FileStream;
-import org.catacombae.hfsexplorer.gui.SelectWindowsDevicePanel;
+import org.catacombae.hfsexplorer.gui.SelectDevicePanel;
 import org.catacombae.storage.ps.Partition;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer.FileSystemType;
@@ -48,7 +48,7 @@ import org.catacombae.storage.ps.PartitionType;
 public class SelectDeviceDialog extends JDialog {
     private static final String DEVICE_PREFIX = "\\\\?\\GLOBALROOT\\Device\\";
 
-    private SelectWindowsDevicePanel guiPanel;
+    private SelectDevicePanel guiPanel;
 
     // Shortcuts to variables in guiPanel
     private JButton autodetectButton;
@@ -70,7 +70,7 @@ public class SelectDeviceDialog extends JDialog {
         super(owner, modal);
         setTitle(title);
 
-        this.guiPanel = new SelectWindowsDevicePanel();
+        this.guiPanel = new SelectDevicePanel();
         this.autodetectButton = guiPanel.autodetectButton;
         this.selectDeviceButton = guiPanel.selectDeviceButton;
         this.specifyDeviceNameButton = guiPanel.specifyDeviceNameButton;

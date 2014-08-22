@@ -27,10 +27,10 @@ package org.catacombae.hfsexplorer.gui;
  *
  * @author  Erik
  */
-public class SelectWindowsDevicePanel extends javax.swing.JPanel {
+public class SelectDevicePanel extends javax.swing.JPanel {
 
     /** Creates new form SelectWindowsDevicePanel */
-    public SelectWindowsDevicePanel() {
+    public SelectDevicePanel() {
         initComponents();
         selectSpecifyGroup.add(selectDeviceButton);
         selectSpecifyGroup.add(specifyDeviceNameButton);
