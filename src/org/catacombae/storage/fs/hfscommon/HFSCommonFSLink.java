@@ -30,6 +30,14 @@ import org.catacombae.storage.fs.FSLink;
  * @author erik
  */
 public class HFSCommonFSLink extends HFSCommonFSEntry implements FSLink {
+    private static final boolean DEBUG = Util.booleanEnabledByProperties(false,
+            "org.catacombae.debug",
+            "org.catacombae.storage.debug",
+            "org.catacombae.storage.fs.debug",
+            "org.catacombae.storage.fs.hfscommon.debug",
+            "org.catacombae.storage.fs.hfscommon." +
+            HFSCommonFSLink.class.getSimpleName() + ".debug");
+
     private final CommonHFSCatalogFileRecord linkRecord;
 
     public HFSCommonFSLink(HFSCommonFileSystemHandler fsHandler,
@@ -89,29 +97,47 @@ public class HFSCommonFSLink extends HFSCommonFSEntry implements FSLink {
                 //String[] targetParentDir = Util.arrayCopy(targetPath, 0, new String[targetPath.length-1], 0, targetPath.length-1);
                 //System.err.println("getLinkTarget(): trying to resolve inner link using link path \"" + Util.concatenateStrings(targetPath, "/") + "\"");
                 res = fsHandler.resolveLinks(targetPath, (FSLink)res);
-                if(res == null)
-                    System.err.println("\ngetLinkTarget(): Could not resolve inner link \"" +
-                            Util.concatenateStrings(targetPath, "/") + "\"");
+                if(res == null) {
+                    if(DEBUG) {
+                        System.err.println("\ngetLinkTarget(): Could not " +
+                                "resolve inner link \"" +
+                                Util.concatenateStrings(targetPath, "/") +
+                                "\"");
+                    }
+                }
             }
-            else if(res == null)
-                System.err.println("\ngetLinkTarget(): Could not get entry for true path \"" +
-                        Util.concatenateStrings(targetPath, "/") + "\"");
+            else if(res == null) {
+                if(DEBUG) {
+                    System.err.println("\ngetLinkTarget(): Could not get " +
+                            "entry for true path \"" +
+                            Util.concatenateStrings(targetPath, "/") + "\"");
+                }
+            }
 
             if(res != null && res instanceof FSLink)
                 throw new RuntimeException("res still instanceof FSLink!");
         }
         else {
-            System.err.println("\ngetLinkTarget(): Could not get true path!");
+            if(DEBUG) {
+                System.err.println("\ngetLinkTarget(): Could not get true " +
+                        "path!");
+            }
+
             res = null;
         }
 
         if(res == null) {
-            System.err.println("getLinkTarget(): FAILED to get entry by posix path for link " +
-                    linkRecord.getKey().getParentID().toLong() + ":\"" +
-                    fsHandler.getProperNodeName(linkRecord) + "\":");
-            System.err.println("getLinkTarget():   posixPath=\"" + posixPath + "\"");
-            System.err.println("getLinkTarget():   parentDir=\"" + Util.concatenateStrings(parentDir, "/") + "\"");
-            System.err.println();
+            if(DEBUG) {
+                System.err.println("getLinkTarget(): FAILED to get entry by " +
+                        "posix path for link " +
+                        linkRecord.getKey().getParentID().toLong() + ":\"" +
+                        fsHandler.getProperNodeName(linkRecord) + "\":");
+                System.err.println("getLinkTarget():   posixPath=\"" +
+                        posixPath + "\"");
+                System.err.println("getLinkTarget():   parentDir=\"" +
+                        Util.concatenateStrings(parentDir, "/") + "\"");
+                System.err.println();
+            }
         }
 
         return res;

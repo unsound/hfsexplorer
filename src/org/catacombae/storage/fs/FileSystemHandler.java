@@ -25,6 +25,12 @@ import org.catacombae.util.Util;
  * @author erik
  */
 public abstract class FileSystemHandler {
+    private static final boolean DEBUG = Util.booleanEnabledByProperties(false,
+            "org.catacombae.debug",
+            "org.catacombae.storage.debug",
+            "org.catacombae.storage.fs.debug",
+            "org.catacombae.storage.fs." +
+            FileSystemHandler.class.getSimpleName() + ".debug");
 
     /**
      * Lists all entries present under the <code>path</code> supplied. Path must
@@ -240,8 +246,11 @@ public abstract class FileSystemHandler {
     }
 
     private FSEntry resolveLinks(String[] curPath, FSLink curLink, LinkedList<String[]> visitedLinks) {
-        System.err.println("resolveLinks(" + Util.concatenateStrings(curPath, "/") + ", " +
-                curLink.getLinkTargetString() + ", ...);");
+        if(DEBUG) {
+            System.err.println("resolveLinks(" +
+                    Util.concatenateStrings(curPath, "/") + ", " +
+                    curLink.getLinkTargetString() + ", ...);");
+        }
         //String prefix = globalPrefix;
         /*
          * Pseudo-code:
@@ -272,8 +281,11 @@ public abstract class FileSystemHandler {
                     Util.arrayCopy(curLinkPath, 0, new String[curLinkPath.length - 1], 0,
                         curLinkPath.length - 1);
 
-            System.err.println("  Resolving " + curLink.getLinkTargetString() + " from " +
-                    Util.concatenateStrings(parentPath, "/"));
+            if(DEBUG) {
+                System.err.println("  Resolving " +
+                        curLink.getLinkTargetString() + " from " +
+                        Util.concatenateStrings(parentPath, "/"));
+            }
 
             // Resolve the current link target path.
             String[] linkTargetPath = getTargetPath(curLink, parentPath);
