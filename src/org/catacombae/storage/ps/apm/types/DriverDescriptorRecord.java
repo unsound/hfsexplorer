@@ -60,6 +60,13 @@ public class DriverDescriptorRecord {
 	this(readData(llf, offset), 0);
     }
     public DriverDescriptorRecord(byte[] data, int offset) {
+        if((data.length - offset) < 18) {
+            throw new RuntimeException("Insufficient remaining data in " +
+                    "buffer for a " + this.getClass().getName() + " " +
+                    "(remaining: " + (data.length - offset) + " bytes, " +
+                    "required: 18 bytes).");
+        }
+
 	System.arraycopy(data, offset+0, sbSig, 0, 2);
 	System.arraycopy(data, offset+2, sbBlkSize, 0, 2);
 	System.arraycopy(data, offset+4, sbBlkCount, 0, 4);
@@ -67,16 +74,28 @@ public class DriverDescriptorRecord {
         System.arraycopy(data, offset+10, sbDevId, 0, 2);
         System.arraycopy(data, offset+12, sbData, 0, 4);
 	System.arraycopy(data, offset+16, sbDrvrCount, 0, 2);
+
 	int numEntries = Util.unsign(getSbDrvrCount());
-	if(numEntries > 31) // BUGFIX: Stucture size does not allow for more than 31 values
-	    numEntries = 31;
+        if(numEntries * DriverDescriptorEntry.length() >
+                (data.length - offset - 18))
+        {
+            numEntries = (data.length - offset - 18) /
+                    DriverDescriptorEntry.length();
+        }
+
 	entries = new DriverDescriptorEntry[numEntries];
 	int i;
 	for(i = 0; i < entries.length; ++i)
 	    entries[i] = new DriverDescriptorEntry(data, offset+18 + DriverDescriptorEntry.length()*i);
+
 	int padOffset = offset+18 + DriverDescriptorEntry.length()*i;
-	ddPad = new byte[length()-padOffset];
-	System.arraycopy(data, padOffset, ddPad, 0, ddPad.length);
+        int padLength = getSbBlkSize() - padOffset;
+        if(((data.length - offset) - padOffset) < padLength) {
+            padLength = (data.length - offset) - padOffset;
+        }
+
+        ddPad = new byte[padLength];
+        System.arraycopy(data, offset + padOffset, ddPad, 0, ddPad.length);
     }
 
     /**
@@ -102,7 +121,7 @@ public class DriverDescriptorRecord {
         Util.arrayPutBE(this.sbData, 0, (int) 0);
         Util.arrayPutBE(this.sbDrvrCount, 0, (short) 0);
         this.entries = new DriverDescriptorEntry[0];
-        this.ddPad = new byte[length()-18];
+        this.ddPad = new byte[blockSize - 18];
         Arrays.fill(ddPad, (byte) 0);
     }
 
@@ -135,10 +154,25 @@ public class DriverDescriptorRecord {
             throw mostRecentException;
         }
 
+        DriverDescriptorRecord ddrTmp =
+                new DriverDescriptorRecord(data, 0);
+        if(ddrTmp.isValid() && ddrTmp.getSbBlkSize() > data.length) {
+            /* Logical block size is different than our current block size.
+             * Re-read with logical block size to get entire driver descriptor
+             * record. */
+
+            data = new byte[ddrTmp.getSbBlkSize()];
+            llf.seek(offset);
+            llf.readFully(data);
+        }
+
         return data;
     }
 
-    public static int length() { return 269; }
+    public int length() {
+        return 18 + entries.length * DriverDescriptorEntry.length() +
+                ddPad.length;
+    }
 
     /** Device signature. (Should be "ER"...) */
     public short getSbSig() { return Util.readShortBE(sbSig); }
