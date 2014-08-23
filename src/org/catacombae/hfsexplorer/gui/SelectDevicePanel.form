@@ -100,7 +100,7 @@
     </Component>
     <Component class="javax.swing.JRadioButton" name="specifyDeviceNameButton">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Specify device name (example: \\?\GLOBALROOT\Device\Harddisk0\Partition1)"/>
+        <Property name="text" type="java.lang.String" value="Specify device name"/>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
             <EmptyBorder bottom="0" left="0" right="0" top="0"/>
@@ -116,7 +116,6 @@
     </Component>
     <Component class="javax.swing.JTextField" name="specifyDeviceNameField">
       <Properties>
-        <Property name="text" type="java.lang.String" value="\\?\"/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <AuxValues>

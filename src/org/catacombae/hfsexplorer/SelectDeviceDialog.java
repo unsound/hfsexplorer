@@ -23,6 +23,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -35,6 +42,8 @@ import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.ReadableConcatenatedStream;
 import org.catacombae.storage.io.win32.ReadableWin32FileStream;
 import org.catacombae.hfsexplorer.gui.SelectDevicePanel;
+import org.catacombae.io.ReadableFileStream;
+import org.catacombae.io.RuntimeIOException;
 import org.catacombae.storage.ps.Partition;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer.FileSystemType;
@@ -44,9 +53,9 @@ import org.catacombae.storage.ps.PartitionSystemHandler;
 import org.catacombae.storage.ps.PartitionSystemHandlerFactory;
 import org.catacombae.storage.ps.PartitionSystemType;
 import org.catacombae.storage.ps.PartitionType;
+import org.catacombae.util.ObjectContainer;
 
-public class SelectDeviceDialog extends JDialog {
-    private static final String DEVICE_PREFIX = "\\\\?\\GLOBALROOT\\Device\\";
+public abstract class SelectDeviceDialog extends JDialog {
 
     private SelectDevicePanel guiPanel;
 
@@ -66,11 +75,27 @@ public class SelectDeviceDialog extends JDialog {
     private String resultCreatePath = null;
     private String[] detectedDeviceNames;
 
-    public SelectDeviceDialog(Frame owner, boolean modal, String title) {
+    private interface SelectDeviceDialogFactory {
+        public boolean isSystemSupported();
+        public SelectDeviceDialog createDeviceDialog(Frame owner, boolean modal,
+                String title);
+    }
+
+    private static final SelectDeviceDialogFactory factories[] = {
+        new WindowsFactory(),
+        new LinuxFactory(),
+        new MacOSXFactory(),
+        new FreeBSDFactory(),
+        new SolarisFactory(),
+    };
+
+    protected SelectDeviceDialog(final Frame owner, final boolean modal,
+            final String title)
+    {
         super(owner, modal);
         setTitle(title);
 
-        this.guiPanel = new SelectDevicePanel();
+        this.guiPanel = new SelectDevicePanel(getExampleDeviceName());
         this.autodetectButton = guiPanel.autodetectButton;
         this.selectDeviceButton = guiPanel.selectDeviceButton;
         this.specifyDeviceNameButton = guiPanel.specifyDeviceNameButton;
@@ -91,7 +116,8 @@ public class SelectDeviceDialog extends JDialog {
 
         if(detectedDeviceNames.length > 0) {
             detectedDevicesCombo.setSelectedIndex(0);
-            specifyDeviceNameField.setText(DEVICE_PREFIX + detectedDevicesCombo.getSelectedItem().toString());
+            specifyDeviceNameField.setText(getDevicePrefix() +
+                    detectedDevicesCombo.getSelectedItem().toString());
         }
 
         autodetectButton.addActionListener(new ActionListener() {
@@ -104,7 +130,8 @@ public class SelectDeviceDialog extends JDialog {
                 /* @Override */
                 public void itemStateChanged(ItemEvent ie) {
                     if(ie.getStateChange() == ItemEvent.SELECTED)
-                        specifyDeviceNameField.setText(DEVICE_PREFIX + ie.getItem().toString());
+                        specifyDeviceNameField.setText(getDevicePrefix() +
+                                ie.getItem().toString());
                 }
             });
         selectDeviceButton.addActionListener(new ActionListener() {
@@ -112,7 +139,8 @@ public class SelectDeviceDialog extends JDialog {
                 public void actionPerformed(ActionEvent ae) {
                     detectedDevicesCombo.setEnabled(true);
                     specifyDeviceNameField.setEnabled(false);
-                    specifyDeviceNameField.setText(DEVICE_PREFIX + detectedDevicesCombo.getSelectedItem().toString());
+                    specifyDeviceNameField.setText(getDevicePrefix() +
+                            detectedDevicesCombo.getSelectedItem().toString());
                 }
             });
         specifyDeviceNameButton.addActionListener(new ActionListener() {
@@ -126,7 +154,7 @@ public class SelectDeviceDialog extends JDialog {
                 /* @Override */
                 public void actionPerformed(ActionEvent ae) {
                     resultCreatePath = specifyDeviceNameField.getText();
-                    result = new ReadableWin32FileStream(resultCreatePath);
+                    result = createStream(resultCreatePath);
                     setVisible(false);
                 }
             });
@@ -153,76 +181,46 @@ public class SelectDeviceDialog extends JDialog {
     /** Could include an identifier of a partitioning scheme. This should only be used to display a descriptive locator. */
     public String getPathName() { return resultCreatePath; }
 
-    /**
-     * This method is only tested with Windows XP (SP2, x86).
-     * Also, it won't work with devices that are not mounted
-     * using the Windows XP standard names. For example, Bo
-     * Brantén's filedisk creates a device with another name.
-     * However, if your file system is on a file, this method
-     * is not needed.
-     * @return a list of the names of the detected devices
-     */
-    protected String[] detectDevices() {
-        LinkedList<String> activeDeviceNames = new LinkedList<String>();
-
-        /*
-         * Since I've been too lazy to figure out how to implement
-         * a native method for reading the contents of the device
-         * tree, I'll just make up names for at least 20 harddrives,
-         * with at least 20 partitions in each and check for
-         * existence.
-         */
-
-        // 20 hard drives minimum...
-        for(int i = 0; true; ++i) {
-            boolean anyFound = false;
-            // 20 partitions each minimum...
-            for(int j = 0; true; ++j) {
-                try {
-                    /* Should I add Partition0 to the list? It really means
-                     * "the whole drive". Partition1 is the first partition... */
-                    String currentDevice = "Harddisk" + i + "\\Partition" + j;
-                    ReadableWin32FileStream curFile = new ReadableWin32FileStream(DEVICE_PREFIX + currentDevice);
-                    curFile.close();
-                    activeDeviceNames.addLast(currentDevice);
-                    anyFound = true;
-                } catch(Exception e) {
-                    if(j >= 20)
-                        break;
-                }
-            }
-            if(!anyFound && i >= 20)
-               break;
-        }
-
-        // ...and 20 CD-ROMs minimum
-        for(int i = 0; true; ++i) {
-            try {
-                String currentDevice = "CdRom" + i;
-                ReadableWin32FileStream curFile = new ReadableWin32FileStream(DEVICE_PREFIX + currentDevice);
-                curFile.close();
-                activeDeviceNames.addLast(currentDevice);
-            }
-            catch(Exception e) {
-                if(i >= 20) {
-                    break;
-                }
-            }
-        }
-
-        // Check for TrueCrypt volumes 'A'-'Z', using their special naming scheme.
-        for(char c = 'A'; c <= 'Z'; ++c) {
-            try {
-                String currentDevice = "TrueCryptVolume" + c;
-                ReadableWin32FileStream curFile = new ReadableWin32FileStream(DEVICE_PREFIX + currentDevice);
-                curFile.close();
-                activeDeviceNames.addLast(currentDevice);
-            }
-            catch (Exception e) {}
-        }
-
-        return activeDeviceNames.toArray(new String[activeDeviceNames.size()]);
+    protected ReadableRandomAccessStream createStream(final String path) {
+        return new ReadableFileStream(path);
     }
+
+    protected abstract String getDevicePrefix();
+
+    protected abstract String getExampleDeviceName();
+
+    protected abstract boolean isPartition(String deviceName);
+
+    protected abstract String[] detectDevices();
+
+    public static boolean isSystemSupported() {
+        boolean supported = false;
+
+        for(SelectDeviceDialogFactory factory : factories) {
+            if(factory.isSystemSupported()) {
+                supported = true;
+                break;
+            }
+        }
+
+        return supported;
+    }
+
+    public static SelectDeviceDialog createSelectDeviceDialog(final Frame owner,
+            final boolean modal, final String title)
+    {
+        SelectDeviceDialog dialog = null;
+
+        for(SelectDeviceDialogFactory factory : factories) {
+            if(factory.isSystemSupported()) {
+                dialog = factory.createDeviceDialog(owner, modal, title);
+                break;
+            }
+        }
+
+        return dialog;
+    }
+
     protected void autodetectFilesystems() {
         LinkedList<String> plainFileSystems = new LinkedList<String>();
         LinkedList<EmbeddedPartitionEntry> embeddedFileSystems = new LinkedList<EmbeddedPartitionEntry>();
@@ -250,7 +248,7 @@ public class SelectDeviceDialog extends JDialog {
             ReadableRandomAccessStream llf = null;
             PartitionSystemHandler partSys = null;
             try {
-                llf = new ReadableWin32FileStream(DEVICE_PREFIX + deviceName);
+                llf = createStream(getDevicePrefix() + deviceName);
 
                 PartitionSystemType[] detectedTypes =
                         PartitionSystemDetector.detectPartitionSystem(llf,
@@ -301,7 +299,7 @@ public class SelectDeviceDialog extends JDialog {
                     }
                 }
 
-                if(!fileSystemFound && (deviceName.endsWith("Partition0") || !deviceName.matches("Harddisk[0-9]+\\\\Partition[0-9]+"))) {
+                if(!fileSystemFound && !isPartition(deviceName)) {
                     FileSystemType fsType = HFSCommonFileSystemRecognizer.
                             detectFileSystem(llf, 0);
 
@@ -315,7 +313,7 @@ public class SelectDeviceDialog extends JDialog {
                 //    skipPrefix = deviceName.substring(0, deviceName.length()-1);
             } catch(Exception e) {
                 System.out.println("INFO: Non-critical exception while " +
-                        "detecting partition system at \"" + DEVICE_PREFIX +
+                        "detecting partition system at \"" + getDevicePrefix() +
                         deviceName + "\": " + e.toString());
 
                 if(llf != null) {
@@ -350,8 +348,9 @@ public class SelectDeviceDialog extends JDialog {
                 allOptions[plainStrings.length+i] = embeddedStrings[i];
 
             Object selectedValue = JOptionPane.showInputDialog(this,
-                    "Autodetection complete! Found " + allOptions.length +
-                    " HFS+ file systems.\nPlease choose which one to load:",
+                    "Autodetection complete! Found " + allOptions.length + " " +
+                    "HFS+ file systems.\n" +
+                    "Please choose which one to load:",
                     "Load HFS+ file system", JOptionPane.QUESTION_MESSAGE,
                     null, allOptions, allOptions[0]);
 
@@ -382,12 +381,11 @@ public class SelectDeviceDialog extends JDialog {
                             case GPT:
                             case MBR:
                                 ReadableRandomAccessStream llf =
-                                        new ReadableWin32FileStream(
-                                        DEVICE_PREFIX + embeddedInfo.deviceName
-                                        );
+                                        createStream(getDevicePrefix() +
+                                        embeddedInfo.deviceName);
 
                                 Partition p = embeddedInfo.partition;
-                                resultCreatePath = DEVICE_PREFIX +
+                                resultCreatePath = getDevicePrefix() +
                                         selectedValue.toString();
                                 result = new ReadableConcatenatedStream(llf,
                                         p.getStartOffset(), p.getLength());
@@ -400,9 +398,9 @@ public class SelectDeviceDialog extends JDialog {
                         }
                     }
                     else {
-                        resultCreatePath = DEVICE_PREFIX +
+                        resultCreatePath = getDevicePrefix() +
                                 selectedValue.toString();
-                        result = new ReadableWin32FileStream(resultCreatePath);
+                        result = createStream(resultCreatePath);
                         setVisible(false);
                     }
                 }
@@ -425,6 +423,512 @@ public class SelectDeviceDialog extends JDialog {
             JOptionPane.showMessageDialog(this, "No HFS+ file systems found...",
                                           "Result",
                                           JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private static class WindowsFactory implements SelectDeviceDialogFactory {
+        public boolean isSystemSupported() {
+            return System.getProperty("os.name").toLowerCase().
+                    startsWith("windows");
+        }
+
+        public SelectDeviceDialog createDeviceDialog(final Frame owner,
+                final boolean modal, final String title)
+        {
+            return new SelectDeviceDialog.Windows(owner, modal, title);
+        }
+    }
+
+    private static class Windows extends SelectDeviceDialog {
+        public Windows(final Frame owner, final boolean modal,
+                final String title)
+        {
+            super(owner, modal, title);
+        }
+
+        @Override
+        protected ReadableRandomAccessStream createStream(final String path) {
+            return new ReadableWin32FileStream(path);
+        }
+
+        protected String getDevicePrefix() {
+            return "\\\\?\\GLOBALROOT\\Device\\";
+        }
+
+        protected String getExampleDeviceName() {
+            return "\\\\?\\GLOBALROOT\\Device\\Harddisk0\\Partition1";
+        }
+
+        protected boolean isPartition(final String deviceName) {
+            return !deviceName.endsWith("Partition0") &&
+                    deviceName.matches("Harddisk[0-9]+\\\\Partition[0-9]+$");
+        }
+
+        /**
+         * This method is only tested with Windows XP (SP2, x86). Also, it won't
+         * work with devices that are not mounted using the Windows XP standard
+         * names. For example, Bo Brantén's filedisk creates a device with
+         * another name. However, if your file system is on a file, this method
+         * is not needed.
+         * @return a list of the names of the detected devices
+         */
+        protected String[] detectDevices() {
+            LinkedList<String> activeDeviceNames = new LinkedList<String>();
+
+            /*
+             * Since I've been too lazy to figure out how to implement a native
+             * method for reading the contents of the device tree, I'll just
+             * make up names for at least 20 harddrives, with at least 20
+             * partitions in each and check for existence.
+             */
+
+            /* 20 hard drives minimum... */
+            for(int i = 0; true; ++i) {
+                boolean anyFound = false;
+                /* 20 partitions each minimum... */
+                for(int j = 0; true; ++j) {
+                    try {
+                        /* Should I add Partition0 to the list? It really means
+                         * "the whole drive". Partition1 is the first
+                         * partition... */
+                        String currentDevice =
+                                "Harddisk" + i + "\\Partition" + j;
+                        ReadableRandomAccessStream curFile =
+                                createStream(getDevicePrefix() + currentDevice);
+                        curFile.close();
+                        activeDeviceNames.addLast(currentDevice);
+                        anyFound = true;
+                    } catch(Exception e) {
+                        if(j >= 20)
+                            break;
+                    }
+                }
+                if(!anyFound && i >= 20)
+                   break;
+            }
+
+            /* ...and 20 CD-ROMs minimum */
+            for(int i = 0; true; ++i) {
+                try {
+                    String currentDevice = "CdRom" + i;
+                    ReadableRandomAccessStream curFile =
+                            createStream(getDevicePrefix() + currentDevice);
+                    curFile.close();
+                    activeDeviceNames.addLast(currentDevice);
+                }
+                catch(Exception e) {
+                    if(i >= 20) {
+                        break;
+                    }
+                }
+            }
+
+            /* Check for TrueCrypt volumes 'A'-'Z', using their special naming
+             * scheme. */
+            for(char c = 'A'; c <= 'Z'; ++c) {
+                try {
+                    String currentDevice = "TrueCryptVolume" + c;
+                    ReadableRandomAccessStream curFile =
+                            createStream(getDevicePrefix() + currentDevice);
+                    curFile.close();
+                    activeDeviceNames.addLast(currentDevice);
+                }
+                catch(Exception e) {}
+            }
+
+            return activeDeviceNames.toArray(
+                    new String[activeDeviceNames.size()]);
+        }
+    }
+
+    private static abstract class CommonUNIX extends SelectDeviceDialog {
+        public CommonUNIX(final Frame owner, final boolean modal,
+                final String title)
+        {
+            super(owner, modal, title);
+        }
+
+        protected abstract FilenameFilter getDiskDeviceFileNameFilter();
+
+        protected String getDevicePrefix() {
+            return "/dev/";
+        }
+
+        protected String[] detectDevices() {
+            final File devDirFile = new File(getDevicePrefix());
+            final File[] diskDevices =
+                    devDirFile.listFiles(getDiskDeviceFileNameFilter());
+            final ArrayList<String> deviceNames =
+                    new ArrayList<String>(diskDevices.length);
+
+            for(int i = 0; i < diskDevices.length; ++i) {
+                final String curName = diskDevices[i].getName();
+                final ObjectContainer<Boolean> canRead =
+                        new ObjectContainer<Boolean>(null);
+
+                Thread t = new Thread() {
+                    @Override
+                    public void run() {
+                        FileInputStream is = null;
+                        try {
+                            is = new FileInputStream(getDevicePrefix() +
+                                    curName);
+                            canRead.o = true;
+                        } catch(IOException ex) {
+                            canRead.o = false;
+                        } finally {
+                            if(is != null) {
+                                try {
+                                    is.close();
+                                } catch(IOException ex) {
+                                    ex.printStackTrace();
+                                }
+                            }
+                        }
+                    }
+                };
+
+                t.start();
+                try {
+                    /* We wait 5 seconds for the thread to finish. */
+                    t.join(5000);
+                } catch(InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+
+                t.interrupt();
+
+                if(canRead.o == null) {
+                    System.err.println("Timeout while detecting device at: " +
+                            getDevicePrefix() + curName);
+                }
+                else if(canRead.o) {
+                    deviceNames.add(curName);
+                }
+                else {
+                    /* Just ignore device if we can't open it for reading. */
+                }
+            }
+
+            return deviceNames.toArray(new String[deviceNames.size()]);
+        }
+    }
+
+    private static class LinuxFactory implements SelectDeviceDialogFactory {
+        public boolean isSystemSupported() {
+            return System.getProperty("os.name").toLowerCase().
+                    startsWith("linux");
+        }
+
+        public SelectDeviceDialog createDeviceDialog(final Frame owner,
+                final boolean modal, final String title)
+        {
+            return new SelectDeviceDialog.Linux(owner, modal, title);
+        }
+    }
+
+    private static class Linux extends CommonUNIX {
+        private static class LinuxDeviceFilenameFilter implements FilenameFilter
+        {
+            public boolean accept(File dir, String name) {
+                return name.matches("sd[a-z]+([0-9]+)?$") ||
+                        name.matches("hd[a-z]+([0-9]+)?$") ||
+                        name.matches("sr[0-9]+$") ||
+                        name.matches("fd[0-9]+$") ||
+                        name.matches("dm-[0-9]+$") ||
+                        name.matches("mmcblk[0-9]+(p[0-9]+)?$");
+            }
+        };
+
+        private static final FilenameFilter diskDeviceFileNameFilter =
+                new LinuxDeviceFilenameFilter();
+
+        public Linux(final Frame owner, final boolean modal,
+                final String title)
+        {
+            super(owner, modal, title);
+        }
+
+        protected FilenameFilter getDiskDeviceFileNameFilter() {
+            return diskDeviceFileNameFilter;
+        }
+
+        protected String getExampleDeviceName() {
+            return "/dev/sda1";
+        }
+
+        protected boolean isPartition(final String deviceName) {
+            return deviceName.matches("[0-9]+$");
+        }
+
+        @Override
+        protected String[] detectDevices() {
+            /* Special case for Linux: We read /proc/partitions in order to get
+             * a list of all block devices. */
+
+            final LinkedList<String> deviceNames = new LinkedList<String>();
+
+            BufferedReader r = null;
+            try {
+                try {
+                    r = new BufferedReader(new InputStreamReader(
+                            new FileInputStream("/proc/partitions"), "UTF-8"));
+                } catch(IOException e) {
+                    System.err.println("Unable to open /proc/partitions for " +
+                            "reading! Falling back on common UNIX method for " +
+                            "device detection.");
+                    return super.detectDevices();
+                }
+
+                /* Skip first line, which is just a description. */
+                r.readLine();
+
+                for(String curLine; (curLine = r.readLine()) != null; ) {
+                    if(curLine.trim().length() == 0) {
+                        /* Ignore whitespace. */
+                        continue;
+                    }
+
+                    /* Parse line. */
+                    char[] curLineChars = curLine.toCharArray();
+                    int i = 0;
+
+                    /* Whitespace. */
+                    for(; i < curLineChars.length; ++i) {
+                        if(!Character.isWhitespace(curLineChars[i])) {
+                            break;
+                        }
+                    }
+
+                    /* Major device number. */
+                    for(; i < curLineChars.length; ++i) {
+                        if(Character.isWhitespace(curLineChars[i])) {
+                            break;
+                        }
+                    }
+
+                    /* Whitespace. */
+                    for(; i < curLineChars.length; ++i) {
+                        if(!Character.isWhitespace(curLineChars[i])) {
+                            break;
+                        }
+                    }
+
+                    /* Minor device number. */
+                    for(; i < curLineChars.length; ++i) {
+                        if(Character.isWhitespace(curLineChars[i])) {
+                            break;
+                        }
+                    }
+
+                    /* Whitespace. */
+                    for(; i < curLineChars.length; ++i) {
+                        if(!Character.isWhitespace(curLineChars[i])) {
+                            break;
+                        }
+                    }
+
+                    /* Block count. */
+                    for(; i < curLineChars.length; ++i) {
+                        if(Character.isWhitespace(curLineChars[i])) {
+                            break;
+                        }
+                    }
+
+                    /* Whitespace. */
+                    for(; i < curLineChars.length; ++i) {
+                        if(!Character.isWhitespace(curLineChars[i])) {
+                            break;
+                        }
+                    }
+
+                    /* Device name. */
+                    if(i < curLineChars.length) {
+                        final String curName =
+                                new String(curLineChars, i,
+                                curLineChars.length - i).trim();
+                        try {
+                            final FileInputStream is =
+                                    new FileInputStream(getDevicePrefix() +
+                                    curName);
+                            is.close();
+
+                            deviceNames.add(curName);
+                        } catch(IOException ex) {
+                            /* Just ignore device if we can't open it for
+                             * reading. */
+                        }
+                    }
+                    else {
+                        System.err.println("Error while parsing " +
+                                "/proc/partitions line \"" + curLine + "\".");
+                    }
+                }
+
+                return deviceNames.toArray(new String[deviceNames.size()]);
+            } catch(IOException ex) {
+                throw new RuntimeIOException(ex);
+            }
+        }
+    }
+
+    private static class MacOSXFactory implements SelectDeviceDialogFactory {
+        public boolean isSystemSupported() {
+            return System.getProperty("os.name").toLowerCase().
+                    startsWith("mac os x");
+        }
+
+        public SelectDeviceDialog createDeviceDialog(final Frame owner,
+                final boolean modal, final String title)
+        {
+            return new SelectDeviceDialog.MacOSX(owner, modal, title);
+        }
+    }
+
+    private static class MacOSX extends CommonUNIX {
+        private static class MacOSXDeviceFilenameFilter
+                implements FilenameFilter
+        {
+            public boolean accept(File dir, String name) {
+                return name.matches("disk[0-9]+(s[0-9]+)?$");
+            }
+        };
+
+        private static final FilenameFilter diskDeviceFileNameFilter =
+                new MacOSXDeviceFilenameFilter();
+
+        public MacOSX(final Frame owner, final boolean modal,
+                final String title)
+        {
+            super(owner, modal, title);
+        }
+
+        protected FilenameFilter getDiskDeviceFileNameFilter() {
+            return diskDeviceFileNameFilter;
+        }
+
+        protected String getExampleDeviceName() {
+            return "/dev/disk0s1";
+        }
+
+        protected boolean isPartition(final String deviceName) {
+            return deviceName.matches("s[0-9]+$");
+        }
+    }
+
+    private static class FreeBSDFactory implements SelectDeviceDialogFactory {
+        public boolean isSystemSupported() {
+            return System.getProperty("os.name").toLowerCase().
+                    startsWith("freebsd");
+        }
+
+        public SelectDeviceDialog createDeviceDialog(final Frame owner,
+                final boolean modal, final String title)
+        {
+            return new SelectDeviceDialog.FreeBSD(owner, modal, title);
+        }
+    }
+
+    private static class FreeBSD extends CommonUNIX {
+        private static class FreeBSDDeviceFilenameFilter
+                implements FilenameFilter
+        {
+            public boolean accept(File dir, String name) {
+                /* Device naming info retrieved 2014-08-22 from:
+                 *   https://www.freebsd.org/doc/handbook/disk-organization.html
+                 */
+                return name.matches("ada[0-9]+([sp][0-9]+([a-z]+)?)?$") ||
+                        name.matches("ad[0-9]+([sp][0-9]+([a-z]+)?)?$") ||
+                        name.matches("da[0-9]+([sp][0-9]+([a-z]+)?)?$") ||
+                        name.matches("cd[0-9]+([sp][0-9]+([a-z]+)?)?$") ||
+                        name.matches("acd[0-9]+([sp][0-9]+([a-z]+)?)?$") ||
+                        name.matches("fd[0-9]+([sp][0-9]+([a-z]+)?)?$") ||
+                        name.matches("mcd[0-9]+([sp][0-9]+([a-z]+)?)?$") ||
+                        name.matches("scd[0-9]+([sp][0-9]+([a-z]+)?)?$") ||
+                        name.matches("sa[0-9]+([sp][0-9]+([a-z]+)?)?$") ||
+                        name.matches("ast[0-9]+([sp][0-9]+([a-z]+)?)?$") ||
+                        name.matches("aacd[0-9]+([sp][0-9]+([a-z]+)?)?$") ||
+                        name.matches("mlxd[0-9]+([sp][0-9]+([a-z]+)?)?$") ||
+                        name.matches("mlyd[0-9]+([sp][0-9]+([a-z]+)?)?$") ||
+                        name.matches("amrd[0-9]+([sp][0-9]+([a-z]+)?)?$") ||
+                        name.matches("idad[0-9]+([sp][0-9]+([a-z]+)?)?$") ||
+                        name.matches("twed[0-9]+([sp][0-9]+([a-z]+)?)?$");
+            }
+        };
+
+        private static final FilenameFilter diskDeviceFileNameFilter =
+                new FreeBSDDeviceFilenameFilter();
+
+        public FreeBSD(final Frame owner, final boolean modal,
+                final String title)
+        {
+            super(owner, modal, title);
+        }
+
+        protected FilenameFilter getDiskDeviceFileNameFilter() {
+            return diskDeviceFileNameFilter;
+        }
+
+        protected String getExampleDeviceName() {
+            return "/dev/da0";
+        }
+
+        protected boolean isPartition(final String deviceName) {
+            return deviceName.matches("s[0-9]+$");
+        }
+    }
+
+    private static class SolarisFactory implements SelectDeviceDialogFactory {
+        public boolean isSystemSupported() {
+            return System.getProperty("os.name").toLowerCase().
+                    startsWith("sunos");
+        }
+
+        public SelectDeviceDialog createDeviceDialog(final Frame owner,
+                final boolean modal, final String title)
+        {
+            return new SelectDeviceDialog.Solaris(owner, modal, title);
+        }
+    }
+
+    private static class Solaris extends CommonUNIX {
+        private static class SolarisDeviceFilenameFilter
+                implements FilenameFilter
+        {
+            public boolean accept(File dir, String name) {
+                /* All the files in /dev/dsk should be valid block device names.
+                 * Alternatively we could use the regexp:
+                 *     c[0-9]+(t[0-9]+)?d[0-9]+([ps][0-9]+)?$
+                 */
+
+                return true;
+            }
+        };
+
+        private static final FilenameFilter diskDeviceFileNameFilter =
+                new SolarisDeviceFilenameFilter();
+
+        public Solaris(final Frame owner, final boolean modal,
+                final String title)
+        {
+            super(owner, modal, title);
+        }
+
+        protected FilenameFilter getDiskDeviceFileNameFilter() {
+            return diskDeviceFileNameFilter;
+        }
+
+        @Override
+        protected String getDevicePrefix() {
+            return "/dev/dsk/";
+        }
+
+        protected String getExampleDeviceName() {
+            return "/dev/dsk/c0t0d0s0";
+        }
+
+        protected boolean isPartition(final String deviceName) {
+            return deviceName.matches("[ps][0-9]+$");
+        }
     }
 
     private static final class EmbeddedPartitionEntry {

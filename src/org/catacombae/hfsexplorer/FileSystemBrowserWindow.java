@@ -195,14 +195,15 @@ public class FileSystemBrowserWindow extends JFrame {
     private void setUpMenus() {
         // Menus
         JMenuItem loadFSFromDeviceItem = null;
-        if(ReadableWin32FileStream.isSystemSupported()) {
+        if(SelectDeviceDialog.isSystemSupported()) {
             // Only for Windows systems...
             loadFSFromDeviceItem = new JMenuItem("Load file system from device...");
             loadFSFromDeviceItem.addActionListener(new ActionListener() {
                 /* @Override */
                 public void actionPerformed(ActionEvent ae) {
                     SelectDeviceDialog deviceDialog =
-                            new SelectDeviceDialog(FileSystemBrowserWindow.this,
+                            SelectDeviceDialog.createSelectDeviceDialog(
+                            FileSystemBrowserWindow.this,
                             true,
                             "Load file system from device");
                     deviceDialog.setVisible(true);

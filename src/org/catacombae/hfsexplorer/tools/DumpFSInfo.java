@@ -67,13 +67,19 @@ public class DumpFSInfo {
     public static void dumpInfo(String[] args) throws Exception {
         long runTimestamp = System.currentTimeMillis();
         ReadableRandomAccessStream fsFile;
-        if(ReadableWin32FileStream.isSystemSupported()) {
-            if(args.length == 1) {
+        if(args.length == 1) {
+            if(ReadableWin32FileStream.isSystemSupported()) {
                 fsFile = new ReadableWin32FileStream(args[0]);
             }
-            else if(args.length == 0) {
+            else {
+                fsFile = new ReadableFileStream(args[0]);
+            }
+        }
+        else if(SelectDeviceDialog.isSystemSupported()) {
+            if(args.length == 0) {
                 SelectDeviceDialog swdd =
-                        new SelectDeviceDialog(null, true, "Select device to extract info from");
+                        SelectDeviceDialog.createSelectDeviceDialog(null, true,
+                        "Select device to extract info from");
                 swdd.setVisible(true);
                 fsFile = swdd.getPartitionStream();
                 if(fsFile == null)
@@ -83,18 +89,14 @@ public class DumpFSInfo {
                 System.out.println("Usage: java DumpFSInfo <filename>");
                 System.out.println("        for reading directly from a specified file, or...");
                 System.out.println("       java DumpFSInfo");
-                System.out.println("        to pop up a Windows device dialog where you can choose which device to read");
+                System.out.println("        to pop up a device dialog where " +
+                        "you can choose which device to read");
                 return;
             }
         }
         else {
-            if(args.length == 1) {
-                fsFile = new ReadableFileStream(args[0]);
-            }
-            else {
-                System.out.println("Usage: java DumpFSInfo <filename>");
-                return;
-            }
+            System.out.println("Usage: java DumpFSInfo <filename>");
+            return;
         }
 
         LinkedList<File> generatedFiles = new LinkedList<File>();

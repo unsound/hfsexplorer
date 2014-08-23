@@ -30,10 +30,15 @@ package org.catacombae.hfsexplorer.gui;
 public class SelectDevicePanel extends javax.swing.JPanel {
 
     /** Creates new form SelectWindowsDevicePanel */
-    public SelectDevicePanel() {
+    public SelectDevicePanel(final String exampleDeviceName) {
         initComponents();
         selectSpecifyGroup.add(selectDeviceButton);
         selectSpecifyGroup.add(specifyDeviceNameButton);
+
+        if(exampleDeviceName != null) {
+            specifyDeviceNameButton.setText(specifyDeviceNameButton.getText() +
+                    " (example: " + exampleDeviceName + ")");
+        }
     }
 
     /** This method is called from within the constructor to
@@ -62,11 +67,10 @@ public class SelectDevicePanel extends javax.swing.JPanel {
         selectDeviceButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         selectDeviceButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
-        specifyDeviceNameButton.setText("Specify device name (example: \\\\?\\GLOBALROOT\\Device\\Harddisk0\\Partition1)");
+        specifyDeviceNameButton.setText("Specify device name");
         specifyDeviceNameButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         specifyDeviceNameButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
-        specifyDeviceNameField.setText("\\\\?\\");
             specifyDeviceNameField.setEnabled(false);
 
             detectedDevicesCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Harddisk0\\Partition1", "Harddisk0\\Partition2", "Harddisk1\\Partition1", "CdRom0", "CdRom1" }));
