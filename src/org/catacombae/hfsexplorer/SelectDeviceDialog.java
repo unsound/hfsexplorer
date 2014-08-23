@@ -30,6 +30,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -609,7 +610,13 @@ public abstract class SelectDeviceDialog extends JDialog {
                 }
             }
 
-            return deviceNames.toArray(new String[deviceNames.size()]);
+            String deviceNamesArray[] =
+                    deviceNames.toArray(new String[deviceNames.size()]);
+
+            /* Sorted output is nice. */
+            Arrays.sort(deviceNamesArray);
+
+            return deviceNamesArray;
         }
     }
 
@@ -764,7 +771,13 @@ public abstract class SelectDeviceDialog extends JDialog {
                     }
                 }
 
-                return deviceNames.toArray(new String[deviceNames.size()]);
+                final String[] deviceNamesArray =
+                        deviceNames.toArray(new String[deviceNames.size()]);
+
+                /* Sorted output is nice. */
+                Arrays.sort(deviceNamesArray);
+
+                return deviceNamesArray;
             } catch(IOException ex) {
                 throw new RuntimeIOException(ex);
             }
