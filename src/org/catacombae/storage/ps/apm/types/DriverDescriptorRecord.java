@@ -75,7 +75,7 @@ public class DriverDescriptorRecord {
         System.arraycopy(data, offset+12, sbData, 0, 4);
 	System.arraycopy(data, offset+16, sbDrvrCount, 0, 2);
 
-	int numEntries = Util.unsign(getSbDrvrCount());
+	int numEntries = getSbDrvrCount();
         if(numEntries * DriverDescriptorEntry.length() >
                 (data.length - offset - 18))
         {
@@ -175,32 +175,82 @@ public class DriverDescriptorRecord {
     }
 
     /** Device signature. (Should be "ER"...) */
-    public short getSbSig() { return Util.readShortBE(sbSig); }
+    public int getSbSig() { return Util.unsign(getRawSbSig()); }
+
     /** Block size of the device. */
-    public short getSbBlkSize() { return Util.readShortBE(sbBlkSize); }
+    public int getSbBlkSize() { return Util.unsign(getRawSbBlkSize()); }
+
     /** Number of blocks on the device. */
-    public int getSbBlkCount() { return Util.readIntBE(sbBlkCount); }
+    public long getSbBlkCount() { return Util.unsign(getRawSbBlkCount()); }
+
     /** Reserved. */
-    public short getSbDevType() { return Util.readShortBE(sbDevType); }
+    public int getSbDevType() { return Util.unsign(getRawSbDevType()); }
+
     /** Reserved. */
-    public short getSbDevId() { return Util.readShortBE(sbDevId); }
+    public int getSbDevId() { return Util.unsign(getRawSbDevId()); }
+
     /** Reserved. */
-    public int getSbData() { return Util.readIntBE(sbData); }
+    public long getSbData() { return Util.unsign(getRawSbData()); }
+
     /** Number of driver descriptor entries. Won't be more than 31 in a valid structure. */
-    public short getSbDrvrCount() { return Util.readShortBE(sbDrvrCount); }
+    public int getSbDrvrCount() { return Util.unsign(getRawSbDrvrCount()); }
+
     public DriverDescriptorEntry[] getDriverDecriptorEntries() {
 	DriverDescriptorEntry[] result = new DriverDescriptorEntry[entries.length];
 	System.arraycopy(entries, 0, result, 0, entries.length);
 	return result;
     }
+
     /** Reserved. */
     public byte[] getDdPad() { return Util.createCopy(ddPad); }
 
     /** Returns a String representation of the device signature. */
     public String getSbSigAsString() { return Util.toASCIIString(sbSig); }
 
+    /**
+     * <b>Note that the return value from this function should be interpreted as
+     * an unsigned integer, for instance using Util.unsign(...).</b>
+     */
+    public short getRawSbSig() { return Util.readShortBE(sbSig); }
+
+    /**
+     * <b>Note that the return value from this function should be interpreted as
+     * an unsigned integer, for instance using Util.unsign(...).</b>
+     */
+    public short getRawSbBlkSize() { return Util.readShortBE(sbBlkSize); }
+
+    /**
+     * <b>Note that the return value from this function should be interpreted as
+     * an unsigned integer, for instance using Util.unsign(...).</b>
+     */
+    public int getRawSbBlkCount() { return Util.readIntBE(sbBlkCount); }
+
+    /**
+     * <b>Note that the return value from this function should be interpreted as
+     * an unsigned integer, for instance using Util.unsign(...).</b>
+     */
+    public short getRawSbDevType() { return Util.readShortBE(sbDevType); }
+
+    /**
+     * <b>Note that the return value from this function should be interpreted as
+     * an unsigned integer, for instance using Util.unsign(...).</b>
+     */
+    public short getRawSbDevId() { return Util.readShortBE(sbDevId); }
+
+    /**
+     * <b>Note that the return value from this function should be interpreted as
+     * an unsigned integer, for instance using Util.unsign(...).</b>
+     */
+    public int getRawSbData() { return Util.readIntBE(sbData); }
+
+    /**
+     * <b>Note that the return value from this function should be interpreted as
+     * an unsigned integer, for instance using Util.unsign(...).</b>
+     */
+    public short getRawSbDrvrCount() { return Util.readShortBE(sbDrvrCount); }
+
     public boolean isValid() {
-	int driverCount = Util.unsign(getSbDrvrCount());
+	int driverCount = getSbDrvrCount();
 	return getSbSig() == DDR_SIGNATURE && driverCount <= 31 && entries.length == driverCount;
     }
 

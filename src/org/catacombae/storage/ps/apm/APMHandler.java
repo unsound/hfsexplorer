@@ -78,7 +78,7 @@ public class APMHandler extends PartitionSystemHandler {
             // Look for APM
             DriverDescriptorRecord ddr = readDriverDescriptorRecord();
             if(ddr.isValid()) {
-                int blockSize = Util.unsign(ddr.getSbBlkSize());
+                int blockSize = ddr.getSbBlkSize();
                 //long numberOfBlocksOnDevice = Util.unsign(ddr.getSbBlkCount());
                 //bitStream.seek(blockSize*1); // second block, first partition in list
                 ApplePartitionMap apm = new ApplePartitionMap(llf,
