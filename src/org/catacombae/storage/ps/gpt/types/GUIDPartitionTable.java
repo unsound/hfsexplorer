@@ -25,6 +25,7 @@ import java.util.zip.CRC32;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.ArrayBuilder;
 import org.catacombae.csjc.structelements.Dictionary;
+import org.catacombae.io.RuntimeIOException;
 import org.catacombae.storage.ps.legacy.PartitionSystem;
 import org.catacombae.util.Util;
 
@@ -55,8 +56,8 @@ public class GUIDPartitionTable implements PartitionSystem, StructElements {
 
     public GUIDPartitionTable(ReadableRandomAccessStream llf, int offset) {
         // Common temporary storage variables
-        byte[] headerData;
-        byte[] currentEntryData = new byte[128];
+        byte[] blockBuffer;
+        RuntimeIOException mostRecentException = null;
 
         // 1. Read the primary header and table
         int curBlockSize = 512;
@@ -67,20 +68,47 @@ public class GUIDPartitionTable implements PartitionSystem, StructElements {
              * This is done because we have no reliable way of querying the
              * operating system for the actual block size of the device (in the
              * case of images, this information might not even be available). */
-            headerData = new byte[curBlockSize];
-            llf.seek(offset + curBlockSize);
-            llf.readFully(headerData);
-            this.header = new GPTHeader(headerData, 0, curBlockSize);
-        } while(header.getSignature() != GPTHeader.GPT_SIGNATURE &&
+            blockBuffer = new byte[curBlockSize];
+            try {
+                llf.seek(offset + curBlockSize);
+                llf.readFully(blockBuffer);
+                header = new GPTHeader(blockBuffer, 0, curBlockSize);
+            } catch(RuntimeIOException ex) {
+                /* It's possible that an exception is thrown if the device
+                 * requires aligned access. In that case ignore and increase the
+                 * block size until we hit the required alignment block size. */
+
+                mostRecentException = ex;
+                header = null;
+            }
+        } while((header == null ||
+                header.getSignature() != GPTHeader.GPT_SIGNATURE) &&
                 (curBlockSize *= 2) <= 4096);
+
+        if(header == null) {
+            /* We got I/O errors when attempting to read using all attempted
+             * block sizes. This must be something unrelated to alignment, and
+             * we cannot continue so throw the most recent exception. */
+
+            throw mostRecentException;
+        }
 
         if(header.isValid()) { // Before we use any values from the header, we must check its validity
             this.blockSize = curBlockSize;
             llf.seek(offset + header.getPartitionEntryLBA() * blockSize);
             this.entries = new GPTEntry[header.getNumberOfPartitionEntries()];
-            for(int i = 0; i < entries.length; ++i) {
-                llf.readFully(currentEntryData);
-                entries[i] = new GPTEntry(currentEntryData, 0, blockSize);
+            for(int i = 0; i < entries.length; ) {
+                int offsetInBuffer = 0;
+
+                llf.readFully(blockBuffer);
+
+                while(i < entries.length && offsetInBuffer < blockBuffer.length)
+                {
+                    entries[i] = new GPTEntry(blockBuffer, offsetInBuffer,
+                            blockSize);
+                    offsetInBuffer += 128;
+                    ++i;
+                }
             }
 
             // 2. Read the backup header and table
@@ -88,17 +116,26 @@ public class GUIDPartitionTable implements PartitionSystem, StructElements {
             GPTEntry[] tBackupEntries;
             try {
                 llf.seek(offset + blockSize * header.getBackupLBA());
-                llf.readFully(headerData);
-                tBackupHeader = new GPTHeader(headerData, 0, blockSize);
+                llf.readFully(blockBuffer);
+                tBackupHeader = new GPTHeader(blockBuffer, 0, blockSize);
 
                 if(tBackupHeader.isValid()) { // Before we use any values from the backup header, we must check its validity
                     llf.seek(offset +
                             tBackupHeader.getPartitionEntryLBA() * blockSize);
                     tBackupEntries = new GPTEntry[tBackupHeader.getNumberOfPartitionEntries()];
-                    for(int i = 0; i < tBackupEntries.length; ++i) {
-                        llf.readFully(currentEntryData);
-                        tBackupEntries[i] =
-                                new GPTEntry(currentEntryData, 0, blockSize);
+                    for(int i = 0; i < tBackupEntries.length;) {
+                        int offsetInBuffer = 0;
+
+                        llf.readFully(blockBuffer);
+
+                        while(i < tBackupEntries.length &&
+                                offsetInBuffer < blockBuffer.length)
+                        {
+                            tBackupEntries[i] = new GPTEntry(blockBuffer,
+                                    offsetInBuffer, blockSize);
+                            offsetInBuffer += 128;
+                            ++i;
+                        }
                     }
                 }
                 else
