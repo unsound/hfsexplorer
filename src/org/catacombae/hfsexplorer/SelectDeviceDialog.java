@@ -832,7 +832,36 @@ public abstract class SelectDeviceDialog extends JDialog {
         private static class FreeBSDDeviceFilenameFilter
                 implements FilenameFilter
         {
+            public String[] knownDevices;
+
+            public FreeBSDDeviceFilenameFilter(String[] knownDevices) {
+                this.knownDevices = knownDevices;
+            }
+
             public boolean accept(File dir, String name) {
+                if(knownDevices != null) {
+                    return acceptSpecific(dir, name);
+                }
+                else {
+                    return acceptGeneric(dir, name);
+                }
+            }
+
+            private boolean acceptSpecific(File dir, String name) {
+                boolean acceptResult = false;
+
+                for(String device : knownDevices) {
+                    if(name.matches("^" + device + "+([sp][0-9]+([a-z]+)?)?$"))
+                    {
+                        acceptResult = true;
+                        break;
+                    }
+                }
+
+                return acceptResult;
+            }
+
+            private boolean acceptGeneric(File dir, String name) {
                 /* Device naming info retrieved 2014-08-22 from:
                  *   https://www.freebsd.org/doc/handbook/disk-organization.html
                  */
@@ -855,8 +884,8 @@ public abstract class SelectDeviceDialog extends JDialog {
             }
         };
 
-        private static final FilenameFilter diskDeviceFileNameFilter =
-                new FreeBSDDeviceFilenameFilter();
+        private static final FilenameFilter genericdiskDeviceFileNameFilter =
+                new FreeBSDDeviceFilenameFilter(null);
 
         public FreeBSD(final Frame owner, final boolean modal,
                 final String title)
@@ -865,7 +894,68 @@ public abstract class SelectDeviceDialog extends JDialog {
         }
 
         protected FilenameFilter getDiskDeviceFileNameFilter() {
-            return diskDeviceFileNameFilter;
+            String[] devices = null;
+            Process sysctlProcess = null;
+            BufferedReader sysctlStdoutReader = null;
+
+            try {
+                sysctlProcess = Runtime.getRuntime().exec(
+                        new String[] { "/sbin/sysctl", "kern.disks" });
+
+                sysctlStdoutReader =
+                        new BufferedReader(new InputStreamReader(
+                        sysctlProcess.getInputStream(), "UTF-8"));
+                String disksString = sysctlStdoutReader.readLine();
+
+                int retval = sysctlProcess.waitFor();
+                if(retval != 0) {
+                    System.err.println("sysctl returned error value (" +
+                            retval + "). Falling back on exhaustive " +
+                            "detection method.");
+                }
+                else if(disksString.startsWith("kern.disks: ")) {
+                    devices = disksString.substring("kern.disks: ".length()).
+                            split("\\s");
+                    if(devices.length == 0) {
+                        /* We should definitely have at least one disk. This
+                         * must be an error. */
+                        System.err.println("No disks returned from sysctl. " +
+                                "Falling back on exhaustive detection " +
+                                "method...");
+                        devices = null;
+                    }
+                }
+                else {
+                    System.err.println("Unexpected output from sysctl " +
+                            "command: \"" + disksString + "\" Falling back " +
+                            "on exhaustive detection method...");
+                }
+            } catch(IOException ex) {
+                System.err.println("Exception while issuing sysctl command:");
+                ex.printStackTrace();
+                System.err.println("Falling back on exhaustive detection " +
+                        "method...");
+            } catch(InterruptedException e) {
+                throw new RuntimeException(e);
+            } finally {
+                if(sysctlStdoutReader != null) {
+                    try {
+                        sysctlStdoutReader.close();
+                    } catch(IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+
+            FilenameFilter filter;
+            if(devices != null) {
+                filter = new FreeBSDDeviceFilenameFilter(devices);
+            }
+            else {
+                filter = genericdiskDeviceFileNameFilter;
+            }
+
+            return filter;
         }
 
         protected String getExampleDeviceName() {
