@@ -32,17 +32,12 @@ public class PrintAPMPartitions {
         else
             llf = new ReadableFileStream(args[0]);
 
-        final byte[] ddrBlock = new byte[DriverDescriptorRecord.length()];
-
-        int bytesRead = 0;
-        if((bytesRead = llf.read(ddrBlock)) != ddrBlock.length)
-            throw new RuntimeException("Could not read Driver Descriptor Record (read " + bytesRead + "bytes)");
-        DriverDescriptorRecord ddr = new DriverDescriptorRecord(ddrBlock, 0);
+        DriverDescriptorRecord ddr = new DriverDescriptorRecord(llf, 0);
         ddr.print(System.out, "");
 
         // Dump DDR to file for debug purposes
         FileOutputStream ddrFile = new FileOutputStream("ddr.debug");
-        ddrFile.write(ddrBlock);
+        ddrFile.write(ddr.getData());
         ddrFile.close();
         System.out.println("Wrote the Driver Descriptor Record to file: ddr.debug");
 
