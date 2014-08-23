@@ -52,6 +52,14 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
     private static final String JOURNAL_INFO_BLOCK_FILE = ".journal_info_block";
     private static final String JOURNAL_FILE = ".journal";
 
+    private static final boolean DEBUG = Util.booleanEnabledByProperties(false,
+            "org.catacombae.debug",
+            "org.catacombae.storage.debug",
+            "org.catacombae.storage.fs.debug",
+            "org.catacombae.storage.fs.hfscommon.debug",
+            "org.catacombae.storage.fs.hfscommon." +
+            HFSCommonFileSystemHandler.class.getSimpleName() + ".debug");
+
     private HFSVolume view;
     private boolean doUnicodeFileNameComposition;
     private boolean hideProtected;
@@ -195,11 +203,18 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
                     throw new RuntimeException("'assertion' failed. absPath " +
                             "shouldn't be null");
                 else if(Util.contains(curVisitedList, absPath)) {
-                    System.err.println("WARNING: Detected cyclic link structure when resolving link target.");
-                    System.err.println("         Resolve stack:");
-                    for(String[] sa : curVisitedList)
-                        System.err.println("           " + Util.concatenateStrings(sa, "/"));
-                    System.err.println("           " + Util.concatenateStrings(absPath, "/"));
+                    if(DEBUG) {
+                        System.err.println("WARNING: Detected cyclic link " +
+                                "structure when resolving link target.");
+                        System.err.println("         Resolve stack:");
+                        for(String[] sa : curVisitedList) {
+                            System.err.println("           " +
+                                    Util.concatenateStrings(sa, "/"));
+                        }
+                        System.err.println("           " +
+                                Util.concatenateStrings(absPath, "/"));
+                    }
+
                     return null; // Circular linking.
                 }
                 else {
