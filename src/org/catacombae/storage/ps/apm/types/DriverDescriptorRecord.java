@@ -30,30 +30,28 @@ public class DriverDescriptorRecord {
     public static final short DDR_SIGNATURE = 0x4552;
     /*
      * struct DriverDescriptorRecord
-     * size: 269 bytes
+     * size: >= 18 bytes
      * description:
      *
-     * BP   Size  Type                       Identifier   Description
-     * ----------------------------------------------------------------------------------------
-     * 0    2     UInt16                     sbSig        {device signature}
-     * 2    2     UInt16                     sbBlkSize    {block size of the device}
-     * 4    4     UInt32                     sbBlkCount   {number of blocks on the device}
-     * 8    2     UInt16                     reserved1    {reserved}
-     * 10   2     UInt16                     reserved2    {reserved}
-     * 12   4     UInt32                     reserved3    {reserved}
-     * 16   2     UInt16                     sbDrvrCount  {number of driver descriptor entries}
-     * 18   8     DriverDescriptorEntry      firstEntry   {first driver descriptor entry}
-     * 26   8*30  DriverDescriptorEntry[30]  additional   {additional drivers, if any}
-     * 266  3     byte[3]                    ddPad        {reserved}
-     *
+     * BP   Size  Type                      Identifier   Description
+     * --------------------------------------------------------------------------------------
+     * 0    2     be16                      sbSig        Device signature.
+     * 2    2     be16                      sbBlkSize    Block size of the device.
+     * 4    4     be32                      sbBlkCount   Number of blocks on the device.
+     * 8    2     be16                      sbDevType    Reserved.
+     * 10   2     be16                      sbDevId      Reserved.
+     * 12   4     be32                      sbData       Reserved.
+     * 16   2     be16                      sbDrvrCount  Number of driver descriptor entries.
+     * 18   ?     DriverDescriptorEntry[?]  entries      Drivers, if any.
+     * ?    ?     u8[?]                     ddPad        Reserved.
      */
 
     private final byte[] sbSig = new byte[2];
     private final byte[] sbBlkSize = new byte[2];
     private final byte[] sbBlkCount = new byte[4];
-    private final byte[] reserved1 = new byte[2];
-    private final byte[] reserved2 = new byte[2];
-    private final byte[] reserved3 = new byte[4];
+    private final byte[] sbDevType = new byte[2];
+    private final byte[] sbDevId = new byte[2];
+    private final byte[] sbData = new byte[4];
     private final byte[] sbDrvrCount = new byte[2];
     private final DriverDescriptorEntry[] entries;
     private final byte[] ddPad;
@@ -65,9 +63,9 @@ public class DriverDescriptorRecord {
 	System.arraycopy(data, offset+0, sbSig, 0, 2);
 	System.arraycopy(data, offset+2, sbBlkSize, 0, 2);
 	System.arraycopy(data, offset+4, sbBlkCount, 0, 4);
-	System.arraycopy(data, offset+8, reserved1, 0, 2);
-	System.arraycopy(data, offset+10, reserved2, 0, 2);
-	System.arraycopy(data, offset+12, reserved3, 0, 4);
+        System.arraycopy(data, offset+8, sbDevType, 0, 2);
+        System.arraycopy(data, offset+10, sbDevId, 0, 2);
+        System.arraycopy(data, offset+12, sbData, 0, 4);
 	System.arraycopy(data, offset+16, sbDrvrCount, 0, 2);
 	int numEntries = Util.unsign(getSbDrvrCount());
 	if(numEntries > 31) // BUGFIX: Stucture size does not allow for more than 31 values
@@ -99,9 +97,9 @@ public class DriverDescriptorRecord {
         Util.arrayPutBE(this.sbSig, 0, DDR_SIGNATURE);
         Util.arrayPutBE(this.sbBlkSize, 0, (short) blockSize);
         Util.arrayPutBE(this.sbBlkCount, 0, (int) blockCount);
-        Util.arrayPutBE(this.reserved1, 0, (short) 0);
-        Util.arrayPutBE(this.reserved2, 0, (short) 0);
-        Util.arrayPutBE(this.reserved3, 0, (int) 0);
+        Util.arrayPutBE(this.sbDevType, 0, (short) 0);
+        Util.arrayPutBE(this.sbDevId, 0, (short) 0);
+        Util.arrayPutBE(this.sbData, 0, (int) 0);
         Util.arrayPutBE(this.sbDrvrCount, 0, (short) 0);
         this.entries = new DriverDescriptorEntry[0];
         this.ddPad = new byte[length()-18];
@@ -149,11 +147,11 @@ public class DriverDescriptorRecord {
     /** Number of blocks on the device. */
     public int getSbBlkCount() { return Util.readIntBE(sbBlkCount); }
     /** Reserved. */
-    public short getReserved1() { return Util.readShortBE(reserved1); }
+    public short getSbDevType() { return Util.readShortBE(sbDevType); }
     /** Reserved. */
-    public short getReserved2() { return Util.readShortBE(reserved2); }
+    public short getSbDevId() { return Util.readShortBE(sbDevId); }
     /** Reserved. */
-    public int getReserved3() { return Util.readIntBE(reserved3); }
+    public int getSbData() { return Util.readIntBE(sbData); }
     /** Number of driver descriptor entries. Won't be more than 31 in a valid structure. */
     public short getSbDrvrCount() { return Util.readShortBE(sbDrvrCount); }
     public DriverDescriptorEntry[] getDriverDecriptorEntries() {
@@ -178,9 +176,16 @@ public class DriverDescriptorRecord {
 	System.arraycopy(sbSig, 0, result, offset, sbSig.length); offset += sbSig.length;
 	System.arraycopy(sbBlkSize, 0, result, offset, sbBlkSize.length); offset += sbBlkSize.length;
 	System.arraycopy(sbBlkCount, 0, result, offset, sbBlkCount.length); offset += sbBlkCount.length;
-	System.arraycopy(reserved1, 0, result, offset, reserved1.length); offset += reserved1.length;
-	System.arraycopy(reserved2, 0, result, offset, reserved2.length); offset += reserved2.length;
-	System.arraycopy(reserved3, 0, result, offset, reserved3.length); offset += reserved3.length;
+
+        System.arraycopy(sbDevType, 0, result, offset, sbDevType.length);
+        offset += sbDevType.length;
+
+        System.arraycopy(sbDevId, 0, result, offset, sbDevId.length);
+        offset += sbDevId.length;
+
+        System.arraycopy(sbData, 0, result, offset, sbData.length); 
+        offset += sbData.length;
+
 	System.arraycopy(sbDrvrCount, 0, result, offset, sbDrvrCount.length); offset += sbDrvrCount.length;
 	for(DriverDescriptorEntry dde : entries) {
 	    byte[] tmp = dde.getData();
@@ -198,9 +203,9 @@ public class DriverDescriptorRecord {
 	ps.println(prefix + " sbSig: \"" + getSbSigAsString() + "\"");
 	ps.println(prefix + " sbBlkSize: " + getSbBlkSize());
 	ps.println(prefix + " sbBlkCount: " + getSbBlkCount());
-	ps.println(prefix + " reserved1: " + getReserved1());
-	ps.println(prefix + " reserved2: " + getReserved2());
-	ps.println(prefix + " reserved3: " + getReserved3());
+        ps.println(prefix + " sbDevType: " + getSbDevType());
+        ps.println(prefix + " sbDevId: " + getSbDevId());
+        ps.println(prefix + " sbData: " + getSbData());
 	ps.println(prefix + " sbDrvrCount: " + getSbDrvrCount());
 	ps.println(prefix + " entries (" + entries.length + " elements):");
 	for(int i = 0; i < entries.length; ++i) {

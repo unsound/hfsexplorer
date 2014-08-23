@@ -1,12 +1,11 @@
 struct DriverDescriptorRecord {
-  UInt16                 sbSig;        // {device signature}
-  UInt16                 sbBlkSize;    // {block size of the device}
-  UInt32                 sbBlkCount;   // {number of blocks on the device}
-  UInt16                 reserved1;    // {reserved}
-  UInt16                 reserved2;    // {reserved}
-  UInt32                 reserved3;    // {reserved}
-  UInt16                 sbDrvrCount;  // {number of driver descriptor entries}
-  DriverDescriptorEntry  firstEntry;   // {first driver descriptor entry}
-  DriverDescriptorEntry  babab[30];    // {additional drivers, if any}
-  UInt16                 reserved4;    // {reserved}
+  be16                   sbSig;          // Device signature.
+  be16                   sbBlkSize;      // Block size of the device.
+  be32                   sbBlkCount;     // Number of blocks on the device.
+  be16                   sbDevType;      // Reserved.
+  be16                   sbDevId;        // Reserved.
+  be32                   dbData;         // Reserved.
+  be16                   sbDrvrCount;    // Number of driver descriptor entries.
+  DriverDescriptorEntry  entries[1];     // Drivers, if any.
+  u8                     ddPad[1];       // Reserved.
 };
