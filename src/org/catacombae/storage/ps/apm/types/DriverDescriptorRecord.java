@@ -249,11 +249,16 @@ public class DriverDescriptorRecord {
 	if(entries.length == 0)
 	    ps.println(prefix + "  <empty>");
 	ps.println(prefix + " ddPad:");
-        ps.print(  prefix + "  byte[" + ddPad.length +  "] {");
-        for(byte b : ddPad) {
-            ps.print(" " + Util.toHexStringBE(b));
+        ps.print(prefix + "  byte[" + ddPad.length + "] {");
+        for(int i = 0; i < ddPad.length; ++i) {
+            if(i % 16 == 0) {
+                ps.println();
+                ps.print(prefix + "  ");
+            }
+            ps.print(" " + Util.toHexStringBE(ddPad[i]));
         }
-        ps.println(" }");
+        ps.println();
+        ps.println(prefix + "  }");
 
         try {
             byte[] md5sum = MessageDigest.getInstance("MD5").digest(ddPad);

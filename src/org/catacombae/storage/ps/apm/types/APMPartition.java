@@ -336,11 +336,16 @@ public class APMPartition implements Partition {
         ps.println(prefix + "pmBootCksum: " + getPmBootCksum());
         ps.println(prefix + "pmProcessor: \"" + getPmProcessorAsString() + "\"");
         ps.println(prefix + "pmPad:");
-        ps.print(  prefix + " byte[" + pmPad.length +  "] {");
-        for(byte b : pmPad) {
-            ps.print(" " + Util.toHexStringBE(b));
+        ps.print(prefix + " byte[" + pmPad.length + "] {");
+        for(int i = 0; i < pmPad.length; ++i) {
+            if(i % 16 == 0) {
+                ps.println();
+                ps.print(prefix + " ");
+            }
+            ps.print(" " + Util.toHexStringBE(pmPad[i]));
         }
-        ps.println(" }");
+        ps.println();
+        ps.println(prefix + " }");
         try {
             byte[] md5sum = MessageDigest.getInstance("MD5").digest(pmPad);
             ps.println(prefix + " MD5: " + Util.byteArrayToHexString(md5sum));
