@@ -1,5 +1,34 @@
 #!/bin/bash
 
+GIT_CLEAN_OUTPUT="$(git clean -n -d)"
+if [ $? -ne 0 ]; then
+    echo "Error value returned from \"git clean -n -d\". Cannot check for untracked files."
+    exit 1
+fi
+
+if [ ! -z "${GIT_CLEAN_OUTPUT}" ]; then
+    echo "Source tree is not clean. Please stash all untracked files:"
+    echo "${GIT_CLEAN_OUTPUT}" | while read GIT_CLEAN_LINE; do echo "    $(echo "${GIT_CLEAN_LINE}" | sed 's/^Would remove //g')"; done
+    exit 1
+fi
+
+GIT_STATUS_OUTPUT="$(git status -s)"
+if [ $? -ne 0 ]; then
+    echo "Error value returned from \"git status -s\". Cannot check for modifications."
+    exit 1
+fi
+
+if [ ! -z "${GIT_STATUS_OUTPUT}" ]; then
+    echo "Source tree is not clean. Please stash all modifications:"
+    echo "${GIT_STATUS_OUTPUT}" | while read GIT_STATUS_LINE; do echo "    ${GIT_STATUS_LINE}"; done
+    exit 1
+fi
+
+if [ -f "dist/lib/hfsx.jar" ]; then
+    echo "Found an hfsx.jar binary in \"dist/lib\". This should not be present when building the source distribution."
+    exit 1
+fi
+
 ZIPFILE=hfsexplorer-current-src.zip
 
 match () {
