@@ -230,12 +230,6 @@ Section -Post
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
 SectionEnd
 
-; Section descriptions
-;!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-  ;!insertmacro MUI_DESCRIPTION_TEXT ${SEC01} "Contains everything."
-  ;!insertmacro MUI_DESCRIPTION_TEXT ${SEC02} "Innehåller .bat-filer för att starta enskila program inom Matematikspelet, samt för att rensa databasen."
-;!insertmacro MUI_FUNCTION_DESCRIPTION_END
-
 Function un.onUninstSuccess
   HideWindow
   MessageBox MB_ICONINFORMATION|MB_OK "$(^Name) has been removed from your computer."
