@@ -1,1 +1,1 @@
-@"%~dp0dist\unhfs.bat" %*
+@"%~dp0dist\bin\unhfs.bat" %*

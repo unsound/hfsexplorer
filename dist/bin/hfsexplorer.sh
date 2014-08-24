@@ -7,7 +7,7 @@ if [ $? -ne 0 ]; then
     BASEDIR="."
 fi
 
-LIB="${BASEDIR}/lib"
+LIB="${BASEDIR}/../lib"
 
 UNAME=`uname`
 if [ "${UNAME}" = "Darwin" ]; then

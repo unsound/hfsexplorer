@@ -7,4 +7,4 @@ if [ $? -ne 0 ]; then
     BASEDIR="."
 fi
 
-"${BASEDIR}/dist/resview.sh" "$@"
+"${BASEDIR}/dist/bin/resview.sh" "$@"

@@ -7,4 +7,4 @@ if [ $? -ne 0 ]; then
     BASEDIR="."
 fi
 
-java -cp "${BASEDIR}/lib/hfsx.jar" org.catacombae.hfsexplorer.tools.ResourceViewer "$@"
+java -cp "${BASEDIR}/../lib/hfsx.jar" org.catacombae.hfsexplorer.tools.ResourceViewer "$@"

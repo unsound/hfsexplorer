@@ -1,1 +1,1 @@
-@"%~dp0dist\resview.bat" %*
+@"%~dp0dist\bin\resview.bat" %*
