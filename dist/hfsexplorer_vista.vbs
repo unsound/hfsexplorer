@@ -5,5 +5,5 @@
 
 Set objShell = CreateObject("Shell.Application")
 Set objFolder = objShell.Namespace(WScript.ScriptFullName & "\..")
-Set objFolderItem = objFolder.ParseName("runfsb.bat")
+Set objFolderItem = objFolder.ParseName("hfsexplorer.bat")
 objFolderItem.InvokeVerb "runas"
