@@ -109,6 +109,9 @@ echo "Removing .DS_Store files..."
 recursiveRmdir "^\.DS_Store$" "$TEMPDIR"
 echo "Removing .cvsignore files..."
 recursiveRmdir "^\.cvsignore$" "$TEMPDIR"
+echo "Removing dist build scripts..."
+rm -v "${TEMPDIR}/makebindist.sh"
+rm -v "${TEMPDIR}/makesrcdist.sh"
 
 echo "Setting execute permissions for shell scripts..."
 chmod a+x $TEMPDIR/*.sh
