@@ -119,6 +119,9 @@ chmod a+x $TEMPDIR/dist/*.sh
 
 echo "Building zip file..."
 cd $TEMPDIR
+if [ ! -d ../releases ]; then
+    mkdir ../releases
+fi
 rm -fv ../releases/${ZIPFILE}
 zip -9 -r ../releases/${ZIPFILE} *
 cd ..
