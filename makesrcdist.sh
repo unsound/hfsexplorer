@@ -119,7 +119,7 @@ chmod a+x $TEMPDIR/dist/*.sh
 
 echo "Building zip file..."
 cd $TEMPDIR
-rm ../releases/${ZIPFILE}
+rm -fv ../releases/${ZIPFILE}
 zip -9 -r ../releases/${ZIPFILE} *
 cd ..
 
