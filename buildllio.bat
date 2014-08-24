@@ -2,9 +2,7 @@
 setlocal
 
 :vars
-echo Calling common_vars
-call "%~dp0common_vars.bat"
-echo Finished calling common_vars
+set CV_JAVA_BUILD_DIR=%~dp0.antbuild~
 set COMPILER=%1
 set ARCHITECTURE=%2
 set LLIO_SOURCEDIR=%~dp0\src.win32\llio
