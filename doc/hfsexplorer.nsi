@@ -96,10 +96,13 @@ Section "HFSExplorer" SEC01
   SetOutPath "$INSTDIR"
   SetOverwrite ifnewer
   File "..\dist\*.txt"
-  File "..\dist\*.exe"
-  File "..\dist\*.bat"
-  File "..\dist\*.sh"
-  File "..\dist\*.vbs"
+
+  SetOutPath "$INSTDIR\bin"
+  SetOverwrite ifnewer
+  File "..\dist\bin\*.exe"
+  File "..\dist\bin\*.bat"
+  File "..\dist\bin\*.sh"
+  File "..\dist\bin\*.vbs"
   
   SetOutPath "$INSTDIR\lib"
   SetOverwrite ifnewer
@@ -122,8 +125,8 @@ Section "HFSExplorer" SEC01
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
   CreateDirectory "$SMPROGRAMS\$ICONS_GROUP"
   SetOutPath $INSTDIR
-  CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\HFSExplorer.lnk" "$INSTDIR\hfsexplorer.exe"
-  CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Run HFSExplorer in Administrator mode.lnk" "$INSTDIR\hfsexplorer.exe" "-invokeuac"
+  CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\HFSExplorer.lnk" "$INSTDIR\bin\hfsexplorer.exe"
+  CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Run HFSExplorer in Administrator mode.lnk" "$INSTDIR\bin\hfsexplorer.exe" "-invokeuac"
   CreateDirectory "$SMPROGRAMS\$ICONS_GROUP\Tools"
   CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Tools\Resource Viewer.lnk" "javaw.exe" "-cp lib\hfsx.jar org.catacombae.hfsexplorer.tools.ResourceViewer" "" "" "" "" "An application for displaying the contents of resource forks."
   SetOutPath -
@@ -136,8 +139,8 @@ Section "Register .dmg file association" SEC02
   !define FILE_EXTENSION ".dmg"
   !define PROGRAM_EXTENSION_ID "CatacombaeHFSExplorer.DMGFile"
   !define WINDOWS_DESCRIPTION ".dmg Disk image"
-  !define ICON_FILE "$INSTDIR\hfsexplorer.exe,1"
-  !define OPEN_COMMAND '$INSTDIR\hfsexplorer.exe "%1"'
+  !define ICON_FILE "$INSTDIR\bin\hfsexplorer.exe,1"
+  !define OPEN_COMMAND '$INSTDIR\bin\hfsexplorer.exe "%1"'
   
   !define Index "Line${__LINE__}"
   ; Back up current extension mapping, if existent
@@ -176,8 +179,8 @@ Section "Register .cdr file association" SEC03
   !define FILE_EXTENSION ".cdr"
   !define PROGRAM_EXTENSION_ID "CatacombaeHFSExplorer.CDRFile"
   !define WINDOWS_DESCRIPTION ".cdr CD/DVD image"
-  !define ICON_FILE "$INSTDIR\hfsexplorer.exe,1"
-  !define OPEN_COMMAND '$INSTDIR\hfsexplorer.exe "%1"'
+  !define ICON_FILE "$INSTDIR\bin\hfsexplorer.exe,1"
+  !define OPEN_COMMAND '$INSTDIR\bin\hfsexplorer.exe "%1"'
 
   !define Index "Line${__LINE__}"
   ; Back up current extension mapping, if existent
