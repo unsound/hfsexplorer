@@ -1,5 +1,14 @@
 #!/bin/bash
 
+BASEDIR="`dirname "$0"`"
+if [ $? -ne 0 ]; then
+    echo "WARNING: No dirname utility found!"
+    echo "         Script will only work if invoked from its parent directory."
+    BASEDIR="."
+fi
+
+cd "${BASEDIR}"
+
 GIT_CLEAN_OUTPUT="$(git clean -n -d)"
 if [ $? -ne 0 ]; then
     echo "Error value returned from \"git clean -n -d\". Cannot check for untracked files."
