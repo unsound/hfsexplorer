@@ -9,7 +9,7 @@
   <property name="manifest.source.dir" value="src.META-INF"/>
   <!--<property name="builddir" value=".build~"/>-->
   <property name="builddir" value=".antbuild~"/>
-  <property name="java.build.library.dir" value="lib"/>
+  <!--<property name="java.build.library.dir" value="lib"/>-->
   <property name="java.runtime.library.dir" value="dist/lib"/>
   <!--<property name="manifest.filename" value="${manifest.source.dir}/MANIFEST.MF"/>-->
   <!--<property name="outjar.filename" value="${libdir}/torrenttoolbox.jar"/>-->
@@ -33,9 +33,11 @@
       <include name="**/*.jar"/>
       <exclude name="**/${target.all.outjarname}"/>
     </fileset>
+    <!--
     <fileset dir="${java.build.library.dir}">
       <include name="**/*.jar"/>
     </fileset>
+    -->
   </path>
   
   <path id="javadoc.classpath">

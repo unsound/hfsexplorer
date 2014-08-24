@@ -1,1 +1,1 @@
-@ant compilejparted
+@ant build-jparted
