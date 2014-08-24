@@ -1208,7 +1208,33 @@ int main(int original_argc, char** original_argv) {
 	returnValue = RETVAL_OK;
       }
       else {
-	MessageBox(NULL, _T("No Java Virtual Machine found! Please get one from http://java.sun.com ..."), _T("HFSExplorer launch error"), MB_OK);
+        int messageBoxRet =
+          MessageBox(NULL,
+                     _T("No Java runtime environment found. HFSExplorer cannot "
+                        "function without Java.\n"
+                        "Press \"OK\" to open up http://www.java.com where you "
+                        "can download a Java runtime environment for your "
+			"system."),
+                     _T("HFSExplorer: Launch error"),
+                     MB_OKCANCEL | MB_ICONEXCLAMATION);
+
+        if(messageBoxRet == IDOK) {
+          HINSTANCE shellExecuteRet =
+            ShellExecute(NULL,
+                         _T("open"),
+                         _T("http://www.java.com"),
+                         NULL,
+                         NULL,
+                         SW_SHOWNORMAL);
+          if((int) shellExecuteRet <= 32) {
+            MessageBox(NULL,
+                       _T("Error while opening your web browser. Please browse "
+                          "to http://www.java.com manually..."),
+                       _T("HFSExplorer: Error opening URL"),
+                       MB_OK | MB_ICONERROR);
+          }
+        }
+
 	returnValue = RETVAL_JVM_NOT_FOUND;
       }
       /* </Try different methods to locate and start a JVM> */
