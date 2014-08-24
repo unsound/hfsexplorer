@@ -1,4 +1,3 @@
 #!/bin/sh
 
-cd dist
-./hfsx.sh "$@"
+dist/hfsx.sh "$@"
