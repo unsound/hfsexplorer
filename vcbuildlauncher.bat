@@ -6,7 +6,7 @@ REM x64 and ia64 cross compilers.
 setlocal
 
 set BUILD_DIR=%~dp0build.~
-set TARGET_EXE_PREFIX=%~dp0dist\launcher
+set TARGET_EXE_PREFIX=%~dp0dist\bin
 set RES_TARGET=%BUILD_DIR%\launcher.res
 set OBJ_TARGET=%BUILD_DIR%\launcher.obj
 
