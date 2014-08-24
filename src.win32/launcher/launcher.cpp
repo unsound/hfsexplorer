@@ -105,7 +105,7 @@
  * Relative path to the place where JNI .dll files used by the Java application are located.<br>
  * The path is resolved against the parent directory of the executable.
  */
-#define DLL_HOME        "lib"
+#define DLL_HOME        "..\\lib"
 
 /** Path separator (':' on unix, ';' on Windows... and this is a Windows application...). */
 #define PATH_SEPARATOR  ";"
@@ -154,11 +154,11 @@ static const _TCHAR *startClassComponents[startClassComponentsLength] =
 static const int classpathComponentsLength = 5;
 static const _TCHAR *classpathComponents[classpathComponentsLength] =
   {
-    _T("lib\\hfsx.jar"),
-    _T("lib\\swing-layout-1.0.1.jar"),
-    _T("lib\\hfsx_dmglib.jar"),
-    _T("lib\\apache-ant-1.7.0-bzip2.jar"),
-    _T("lib\\iharder-base64.jar")
+    _T("..\\lib\\hfsx.jar"),
+    _T("..\\lib\\swing-layout-1.0.1.jar"),
+    _T("..\\lib\\hfsx_dmglib.jar"),
+    _T("..\\lib\\apache-ant-1.7.0-bzip2.jar"),
+    _T("..\\lib\\iharder-base64.jar")
   };
 
 /*
