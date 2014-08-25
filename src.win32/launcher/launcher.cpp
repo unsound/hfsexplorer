@@ -350,6 +350,64 @@ static inline const _TCHAR* bool2str(bool b) {
   return b?_T("true"):_T("false");
 }
 
+/**
+ * Append a string to an environment variable.
+ */
+static bool appendToEnvironmentVariable(const _TCHAR *const varName,
+        const _TCHAR *const appendedValue,
+        const size_t appendedValueLength)
+{
+    const DWORD oldValueAllocatedLength =
+        GetEnvironmentVariable(varName, NULL, 0);
+
+    bool result = false;
+    _TCHAR *oldValue = new _TCHAR[oldValueAllocatedLength];
+
+    DWORD oldValueLength =
+        GetEnvironmentVariable(varName, oldValue, oldValueAllocatedLength);
+
+    if(oldValueLength != oldValueAllocatedLength - 1) {
+        LOG(error, "Could not get environment variable %s. oldValueLength=%d, "
+            "oldValueAllocatedLength=%d.",
+            varName, oldValueLength, oldValueAllocatedLength);
+        printError(_T("Error: "), GetLastError());
+    }
+    else {
+        LOG(debug, "Read old %s variable: \"%s\"", varName, oldValue);
+
+        const DWORD newValueAllocatedLength =
+            oldValueLength + appendedValueLength + 1;
+        _TCHAR *newValue = new _TCHAR[newValueAllocatedLength];
+
+        int ptr = 0;
+
+        _tcsncpy(&newValue[ptr], oldValue, oldValueLength);
+        ptr += oldValueLength;
+
+        _tcsncpy(&newValue[ptr], appendedValue, appendedValueLength);
+        ptr += appendedValueLength;
+
+        newValue[ptr++] = _T('\0');
+
+        LOG(debug, "Setting new %s variable: \"%s\"", varName, newValue);
+
+        if(SetEnvironmentVariable(varName, newValue) == TRUE) {
+            LOG(debug, "Successfully set %s variable!", varName);
+            result = true;
+        }
+        else {
+            printError(_T("Path variable could not be set! Error "),
+                GetLastError());
+        }
+
+        delete[] newValue;
+    }
+
+    delete[] oldValue;
+
+    return result;
+}
+
 /* </Utility functions and macros> */
 
 /* Begin: Code from Sun's forums. http://forum.java.sun.com/thread.jspa?threadID=5124559&messageID=9441051 */
@@ -1111,34 +1169,28 @@ int main(int original_argc, char** original_argv) {
 
       /* <Alter environment variable PATH to include .dll dir> */
       {
-	const DWORD envPathLength = GetEnvironmentVariable(_T("PATH"), NULL, 0);
-	_TCHAR *envPath = new _TCHAR[envPathLength];
-	DWORD envLen = GetEnvironmentVariable(_T("PATH"), envPath, envPathLength);
-	if(envLen != envPathLength-1) {
-	  LOG(error, "Could not get environment variable PATH. envLen=%d, envPathLength=%d.", envLen, envPathLength);
-	  printError(_T("Error: "), GetLastError());
-	}
-	else {
-	  LOG(debug, "Read old PATH variable: \"%s\"", envPath);
-	  const DWORD newEnvPathLength = _tcslen(envPath) + 1 + _tcslen(processParentDir) + 1 + _tcslen(_T(DLL_HOME)) + 1;
-	  _TCHAR *newEnvPath = new _TCHAR[newEnvPathLength];
-	  {
-	    int ptr = 0;
-	    _tcsncpy(newEnvPath+ptr, envPath, _tcslen(envPath)); ptr += _tcslen(envPath);
-	    newEnvPath[ptr++] = _T(';');
-	    _tcsncpy(newEnvPath+ptr, processParentDir, _tcslen(processParentDir)); ptr += _tcslen(processParentDir);
-	    newEnvPath[ptr++] = _T('\\');
-	    _tcsncpy(newEnvPath+ptr, _T(DLL_HOME), _tcslen(_T(DLL_HOME))); ptr += _tcslen(_T(DLL_HOME));
-	    newEnvPath[ptr++] = _T('\0');
-	  }
-	  LOG(debug, "Setting new PATH variable: \"%s\"", newEnvPath);
+        if(!appendToEnvironmentVariable(_T("PATH"), _T(";"),
+          _tcslen(_T(";"))))
+        {
+          LOG(debug, "Error while appending \";\" to PATH.\n");
+          return 0;
+        }
 
-	  if(SetEnvironmentVariable(_T("PATH"), newEnvPath) == TRUE)
-	    LOG(debug, "Successfully set PATH variable!");
-	  else
-	    printError(_T("Path variable could not be set! Error "), GetLastError());
+        if(!appendToEnvironmentVariable(_T("PATH"), processParentDir,
+          _tcslen(processParentDir)))
+        {
+          LOG(debug, "Error while appending \"%s\" to PATH.\n",
+              processParentDir);
+          return 0;
+        }
 
-	}
+        if(!appendToEnvironmentVariable(_T("PATH"), _T("\\") _T(DLL_HOME),
+           _tcslen(_T("\\") _T(DLL_HOME))))
+        {
+          LOG(debug, "Error while appending \"" _T("\\") _T(DLL_HOME) "\" to "
+              "PATH.\n");
+          return 0;
+        }
 
 	LPTSTR lpszVariable;
 	LPTCH lpvEnv;
