@@ -119,6 +119,9 @@
 /** The Windows registry key for "RuntimeLib". */
 #define RUNLIB_STR      _T("RuntimeLib")
 
+/** The Windows registry key for "JavaHome". */
+#define JAVAHOME_STR    _T("JavaHome")
+
 /* </Some string #defines that alter the program's behavior.> */
 
 
@@ -427,13 +430,17 @@ static int readStringFromRegistry(HKEY key, const _TCHAR *name, LPBYTE buf, DWOR
   return -1;
 }
 
-static int readJvmPathFromRegistry(_TCHAR *buf, int bufsize) {
-  LOG(trace, "int readJvmPathFromRegistry((_TCHAR*) 0x%X, %d)", buf, bufsize);
+static int readJreKeyFromRegistry(const _TCHAR *leafName, _TCHAR *buf,
+    int bufsize)
+{
+  LOG(trace, "int readJreKeyFromRegistry((const _TCHAR*) 0x%X, (_TCHAR*) 0x%X, "
+    "%d)", leafName, buf, bufsize);
 
   HKEY key, subkey;
   BYTE version[MAX_PATH];
 
-  LOG(debug, "  readJvmPathFromRegistry(__out _TCHAR *buf [ptr: 0x%X], %i)", (int)buf, bufsize);
+  LOG(debug, "  readJreKeyFromRegistry(__out _TCHAR *buf [ptr: 0x%X], %i)",
+    (int) buf, bufsize);
   if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, JRE_KEY, 0, KEY_READ, &key) != ERROR_SUCCESS) {
     LOG(debug, "  Could not open key HKLM\\%s. Aborting.", JRE_KEY);
     return -1;
@@ -449,8 +456,9 @@ static int readJvmPathFromRegistry(_TCHAR *buf, int bufsize) {
     RegCloseKey(key);
     return -3;
   }
-  if(readStringFromRegistry(subkey, RUNLIB_STR, (LPBYTE)buf, bufsize) != 0) {
-    LOG(debug, "  Could not read %s string (RUNLIB) from Java registry location. Aborting...", RUNLIB_STR);
+  if(readStringFromRegistry(subkey, leafName, (LPBYTE)buf, bufsize) != 0) {
+    LOG(debug, "  Could not read %s string from Java registry location. "
+      "Aborting...", leafName);
     RegCloseKey(subkey);
     RegCloseKey(key);
     return -4;
@@ -461,38 +469,128 @@ static int readJvmPathFromRegistry(_TCHAR *buf, int bufsize) {
 }
 /* End: Code from Sun's forums. */
 
+static int readJavaHomeFromRegistry(_TCHAR *const buf, const int bufsize) {
+    return readJreKeyFromRegistry(JAVAHOME_STR, buf, bufsize);
+}
+
+static int readJvmPathFromRegistry(_TCHAR *const buf, const int bufsize) {
+    return readJreKeyFromRegistry(RUNLIB_STR, buf, bufsize);
+}
+
+static bool loadJVMLibrary(const _TCHAR *const libraryPath,
+        const _TCHAR *const javaHomePath,
+        JNI_CreateJavaVM_t **const JNI_CreateJavaVM_f,
+        HINSTANCE *const jvmLibOut)
+{
+    bool result = false;
+
+    /* Before loading the library, we append the path to the JRE's "bin"
+     * directory to the PATH. This is necessary because recent Sun/Oracle JREs
+     * depend on the bundled Microsoft Visual C++ redistributable .dll file
+     * present in this directory (e.g. msvcr100.dll). */
+
+    const DWORD oldPathValueAllocatedLength =
+        GetEnvironmentVariable(_T("PATH"), NULL, 0);
+
+    bool pathModificationSuccessful = false;
+    _TCHAR *oldPathValue = NULL;
+    DWORD oldPathValueLength = 0;
+
+    if(oldPathValueAllocatedLength == 0) {
+        LOG(error, "Unable to get value for environment variable PATH.\n");
+    }
+    else {
+        oldPathValue = new _TCHAR[oldPathValueAllocatedLength];
+        oldPathValueLength =
+            GetEnvironmentVariable(_T("PATH"), oldPathValue,
+            oldPathValueAllocatedLength);
+
+        if(oldPathValueLength != (oldPathValueAllocatedLength - 1)) {
+            LOG(error, "Unexpected length of PATH variable returned from "
+                "GetEnvironmentVariable (expected: %u, actual: %u).\n",
+                (unsigned int) (oldPathValueAllocatedLength - 1),
+                (unsigned int) oldPathValueLength);
+        }
+        else {
+            if(!appendToEnvironmentVariable(_T("PATH"), _T(";"),
+                _tcslen(_T(";"))))
+            {
+                LOG(debug, "Error while appending \";\" to PATH.\n");
+            }
+            else if(!appendToEnvironmentVariable(_T("PATH"), javaHomePath,
+                _tcslen(javaHomePath)))
+            {
+                LOG(debug, "Error while appending \"%s\" to PATH.\n",
+                    javaHomePath);
+            }
+            else if(!appendToEnvironmentVariable(_T("PATH"), _T("\\bin"),
+                _tcslen(_T("\\bin"))))
+            {
+                LOG(debug, "Error while appending \"\\bin\" to PATH.\n");
+            }
+            else {
+                pathModificationSuccessful = true;
+            }
+        }
+    }
+
+    if(pathModificationSuccessful) {
+        LOG(debug, "LoadLibrary(%s);", libraryPath);
+        HINSTANCE jvmLib = LoadLibrary(libraryPath);
+        if(jvmLib == NULL) {
+            printError(_T("LoadLibrary failed with error "), GetLastError());
+        }
+        else {
+            LOG(debug, "GetProcAddress(..)");
+            JNI_CreateJavaVM_t *jniCreateAddress =
+                (JNI_CreateJavaVM_t*) GetProcAddress(jvmLib,
+                "JNI_CreateJavaVM");
+            LOG(debug, "JNI_CreateJavaVM_f set to %X", jniCreateAddress);
+
+            if(jniCreateAddress != NULL) {
+                LOG(debug, "Returning from loadJVMLibrary...");
+                result = true;
+                *JNI_CreateJavaVM_f = jniCreateAddress;
+                *jvmLibOut = jvmLib;
+            }
+            else {
+                LOG(debug, "FreeLibrary(jvmLib);");
+                FreeLibrary(jvmLib);
+            }
+        }
+    }
+
+    if(oldPathValue != NULL) {
+        if(!result) {
+            /* Roll back to the old PATH value on error. We don't want an
+             * inconsistent PATH. */
+            if(SetEnvironmentVariable(_T("PATH"), oldPathValue) == FALSE) {
+                LOG(error, "Error while restoring PATH on error.\n");
+            }
+        }
+
+        delete[] oldPathValue;
+    }
+
+    return result;
+}
+
 static bool locateSunJVMInRegistry(JNI_CreateJavaVM_t **JNI_CreateJavaVM_f, HINSTANCE *jvmLibOut) {
   LOG(trace, "bool locateSunJVMInRegistry((JNI_CreateJavaVM_t**) 0x%X, (HINSTANCE*) 0x%X)", JNI_CreateJavaVM_f, jvmLibOut);
   bool retval = false;
 
   _TCHAR jvmPath[MAX_PATH];
+  _TCHAR javaHome[MAX_PATH];
 
   *JNI_CreateJavaVM_f = NULL;
   *jvmLibOut = NULL;
 
   LOG(debug, "calling locateSunJVMInRegistry(jvmPath, sizeof(jvmPath)");
-  if(readJvmPathFromRegistry(jvmPath, MAX_PATH) == 0) {
-    LOG(debug, "LoadLibrary(%s);", jvmPath);
-    HINSTANCE jvmLib = LoadLibrary(jvmPath);
-
-    if(jvmLib == NULL) {
-      printError(_T("LoadLibrary failed with error "), GetLastError());
-    }
-    else {
-      LOG(debug, "GetProcAddress(..)");
-      JNI_CreateJavaVM_t *jniCreateAddress = (JNI_CreateJavaVM_t *)GetProcAddress(jvmLib, "JNI_CreateJavaVM");
-      LOG(debug, "JNI_CreateJavaVM_f set to 0x%X", jniCreateAddress);
-
-      if(jniCreateAddress != NULL) {
-	retval = true;
-	*JNI_CreateJavaVM_f = jniCreateAddress;
-	*jvmLibOut = jvmLib;
-      }
-      else {
-	LOG(debug, "FreeLibrary(jvmLib);");
-	FreeLibrary(jvmLib);
-      }
-    }
+  if(readJvmPathFromRegistry(jvmPath, MAX_PATH) == 0 &&
+    readJavaHomeFromRegistry(javaHome, MAX_PATH) == 0)
+  {
+    retval =
+      loadJVMLibrary(jvmPath, javaHome, JNI_CreateJavaVM_f, jvmLibOut);
   }
 
   LOG(trace, "returning from bool locateSunJVMInRegistry((JNI_CreateJavaVM_t**) 0x%X, (HINSTANCE*) 0x%X) with retval %s",
@@ -528,29 +626,14 @@ static bool locateJVMThroughJavaHome(JNI_CreateJavaVM_t **JNI_CreateJavaVM_f, HI
       destination[0] = _T('\0');
       _tcscat(destination, envString);
       _tcscat(destination, trailing);
-      LOG(debug, "LoadLibrary(%s);", destination);
-      HINSTANCE jvmLib = LoadLibrary(destination);
+
+      returnValue =
+        loadJVMLibrary(destination, envString, JNI_CreateJavaVM_f, jvmLibOut);
+
       delete[] destination;
 
-      if(jvmLib == NULL) {
-	printError(_T("LoadLibrary failed with error "), GetLastError());
-      }
-      else {
-	LOG(debug, "GetProcAddress(..)");
-	JNI_CreateJavaVM_t *jniCreateAddress = (JNI_CreateJavaVM_t *)GetProcAddress(jvmLib, "JNI_CreateJavaVM");
-	LOG(debug, "JNI_CreateJavaVM_f set to %X", jniCreateAddress);
-
-	if(jniCreateAddress != NULL) {
-	  LOG(debug, "Returning from locateJVMThroughJavaHome...");
-	  returnValue = true;
-	  *JNI_CreateJavaVM_f = jniCreateAddress;
-	  *jvmLibOut = jvmLib;
-	  break;
-	}
-	else {
-	  LOG(debug, "FreeLibrary(jvmLib);");
-	  FreeLibrary(jvmLib);
-	}
+      if(returnValue) {
+          break;
       }
     }
     else
