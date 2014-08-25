@@ -829,7 +829,7 @@ static bool startJavaVM(JavaVM *jvmInstance, const int javaArgsLength, const _TC
 #endif
 
 	  if(wcCur != NULL && wcCurLength != -1) {
-	    LOG(debug, "Converting \"%s\" to UTF-8...", wcCur);
+            LOG(debug, "Converting \"%.*s\" to UTF-8...", wcCurLength, wcCur);
 	    char* utf8String;
 	    int utf8StringLength = WideCharToMultiByte(CP_UTF8, 0, wcCur, wcCurLength, NULL, 0, NULL, NULL);
 	    LOG(debug, "utf8StringLength=%d", utf8StringLength);
