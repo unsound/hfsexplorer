@@ -2,6 +2,28 @@ HFSExplorer Changelog
 ---------------------
 
 
+0.22.1
+------
+- Feature: The "Load file system from device" dialog is enabled for non-Windows
+  systems (Mac OS X, Linux, FreeBSD and Solaris are supported initially).
+
+- Change: The HFSExplorer Windows launcher (hfsexplorer.exe) can now open the
+  Java download page from the dialog box displayed when no Java runtime could be
+  located.
+
+- Change: Binaries and scripts have been relocated into the "bin" directory.
+
+- Bugfix: Extracting files in Windows under Java 7 or higher caused false errors
+  to be thrown because HFSExplorer tried to set UNIX-specific UID/GID properties
+  for the extracted files.
+
+- Bugfix: The HFSExplorer Windows launcher (hfsexplorer.exe) threw errors in
+  certain situations because the JVM couldn't locate the Microsoft Visual C++
+  runtime (msvcr*.dll) required by the JVM. This has now been fixed by appending
+  the path of the directory containing the required .dll to the system path
+  before loading the JVM.
+
+
 0.22
 ----
 - Feature: Sparse bundles (.sparsebundle) are now supported by HFSExplorer, both
