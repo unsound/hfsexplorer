@@ -125,6 +125,7 @@ public class FileSystemBrowserWindow extends JFrame {
     };
     private static final String[] VERSION_INFO_DICTIONARY = {
         "http://www.catacombae.org/hfsexplorer/version.sdic.txt",
+        "http://catacombae.sourceforge.net/hfsexplorer/version.sdic.txt",
     };
     /**
      * The command line argument that makes HFSExplorer print stdout and
