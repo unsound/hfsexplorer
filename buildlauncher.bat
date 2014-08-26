@@ -5,6 +5,12 @@ set OUTDIR=%~dp0dist\bin
 set OUTFILE=hfsexplorer.exe
 set BUILD_DIR=%~dp0build.~
 
+if "%JAVA_HOME%"=="" echo Please set the JAVA_HOME environment variable before executing this script. & goto error
+
+if not "%CPATH%"=="" set "CPATH=%CPATH%;"
+set CPATH=%CPATH%%JAVA_HOME%\include;%JAVA_HOME%\include\win32
+echo "CPATH: %CPATH%"
+
 if "%1"=="console" goto console
 if "%1"=="windows" goto win
 echo You must specify console or windows application...
