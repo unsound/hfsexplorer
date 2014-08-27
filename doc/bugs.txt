@@ -48,3 +48,11 @@
   incorrectly, for example when we load Partition0 with MBR partition
   scheme and a partition number, only Partition0 is displayed.
   Ex. runfsb \\?\GLOBALROOT\Device\Harddisk3\Partition0
+
+2014-08-27
+----------
+- Browsing into self-referring symlink hierarchies is halted after some level of
+  symlinks. Could have something to do with cyclic symlink detection code...
+  E.g. we have "/usr/X11" with target ".". Then we browse to "/usr/X11" in
+  HFSExplorer, browse to "/usr/X11/X11", then to "/usr/X11/X11", ... and at some
+  point HFSExplorer throws an exception.
