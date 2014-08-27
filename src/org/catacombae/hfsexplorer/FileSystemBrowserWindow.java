@@ -59,6 +59,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import org.catacombae.dmg.encrypted.ReadableCEncryptedEncodingStream;
 import org.catacombae.dmg.sparsebundle.ReadableSparseBundleStream;
+import org.catacombae.dmg.sparseimage.ReadableSparseImageStream;
+import org.catacombae.dmg.sparseimage.SparseImageRecognizer;
 import org.catacombae.dmg.udif.UDIFDetector;
 import org.catacombae.dmg.udif.UDIFRandomAccessStream;
 import org.catacombae.dmgextractor.ui.PasswordDialog;
@@ -299,6 +301,12 @@ public class FileSystemBrowserWindow extends JFrame {
 
                 };
                 fileChooser.addChoosableFileFilter(sparseBundleFilter);
+
+                SimpleFileFilter sparseimageFilter = new SimpleFileFilter();
+                sparseimageFilter.addExtension("sparseimage");
+                sparseimageFilter.setDescription("Mac OS X sparse images " +
+                        "(*.sparseimage)");
+                fileChooser.addChoosableFileFilter(sparseimageFilter);
 
                 SimpleFileFilter imgFilter = new SimpleFileFilter();
                 imgFilter.addExtension("img");
@@ -764,6 +772,28 @@ public class FileSystemBrowserWindow extends JFrame {
                 }
             } catch(Exception e) {
                 System.err.println("[INFO] Non-critical exception while trying to detect CEncryptedEncoding structure:");
+                e.printStackTrace();
+            }
+
+            try {
+                System.err.println("Detecting sparseimage structure...");
+                if(SparseImageRecognizer.isSparseImage(fsFile)) {
+                    System.err.println("sparseimage structure found! Creating " +
+                            "filter stream...");
+
+                    try {
+                        ReadableSparseImageStream stream =
+                                new ReadableSparseImageStream(fsFile);
+                        fsFile = stream;
+                    } catch(Exception e) {
+                        System.err.println("Exception while creating readable " +
+                                "sparseimage stream:");
+                        e.printStackTrace();
+                    }
+                }
+            } catch(Exception e) {
+                System.err.println("[INFO] Non-critical exception while " +
+                        "trying to detect sparseimage structure:");
                 e.printStackTrace();
             }
 

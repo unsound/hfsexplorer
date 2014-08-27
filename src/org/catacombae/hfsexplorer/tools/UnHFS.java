@@ -24,6 +24,8 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.Date;
 import org.catacombae.dmg.encrypted.ReadableCEncryptedEncodingStream;
+import org.catacombae.dmg.sparseimage.ReadableSparseImageStream;
+import org.catacombae.dmg.sparseimage.SparseImageRecognizer;
 import org.catacombae.dmg.udif.UDIFDetector;
 import org.catacombae.dmg.udif.UDIFRandomAccessStream;
 import org.catacombae.hfsexplorer.IOUtil;
@@ -288,6 +290,20 @@ public class UnHFS {
             else {
                 System.err.println("Image is encrypted, and no password was specified.");
                 System.exit(RETVAL_NEED_PASSWORD);
+            }
+        }
+
+        logDebug("Trying to detect sparseimage structure...");
+        if(SparseImageRecognizer.isSparseImage(inFileStream)) {
+            try {
+                ReadableSparseImageStream stream =
+                        new ReadableSparseImageStream(inFileStream);
+                inFileStream = stream;
+            } catch(Exception e) {
+                System.err.println("Exception while creating readable " +
+                        "sparseimage stream:");
+                e.printStackTrace();
+                System.exit(1);
             }
         }
 
