@@ -21,7 +21,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.Date;
 import org.catacombae.dmg.encrypted.ReadableCEncryptedEncodingStream;
 import org.catacombae.dmg.sparsebundle.ReadableSparseBundleStream;
@@ -59,6 +62,7 @@ import org.catacombae.storage.ps.PartitionSystemHandler;
 import org.catacombae.storage.ps.PartitionSystemHandlerFactory;
 import org.catacombae.storage.ps.PartitionSystemType;
 import org.catacombae.storage.ps.PartitionType;
+import org.catacombae.util.Util;
 
 /**
  * Command line program which extracts all or part of the contents of a
@@ -115,7 +119,8 @@ public class UnHFS {
         ps.println("      When this options is omitted, the application chooses the first");
         ps.println("      available HFS partition.");
         ps.println("    -password <password>");
-        ps.println("      Specifies the password for an encrypted image.");
+        ps.println("      Specifies the password for an encrypted image. The special marker \"-\" ");
+        ps.println("      causes the password to be read from stdin.");
         ps.println("    -v");
         ps.println("      Verbose mode. Prints the POSIX path of every extracted file to stdout.");
         ps.println("    --");
@@ -202,6 +207,58 @@ public class UnHFS {
             else if(curArg.equals("-password")) {
                 if(i+1 < args.length) {
                     password = args[++i].toCharArray();
+
+                    if(password.length == 1 && password[0] == '-') {
+                        /* Read password from stdin. */
+                        InputStreamReader r = new InputStreamReader(System.in);
+                        char[] tmp = new char[4096];
+                        int offset = 0;
+                        int readLength = 0;
+                        try {
+                            while((readLength = r.read(tmp, offset,
+                                    tmp.length - offset)) > 0)
+                            {
+                                System.err.println("readLength: " + readLength);
+
+                                char[] newTmp = new char[tmp.length * 2];
+                                System.arraycopy(tmp, 0, newTmp, 0, tmp.length);
+                                Arrays.fill(tmp, '\0');
+                                offset += readLength;
+                                tmp = newTmp;
+                            }
+                        } catch(IOException ex) {
+                            System.err.println("Got IOException while " +
+                                    "reading password from stdin:");
+                            ex.printStackTrace();
+                        }
+
+                        int passwordLength = offset;
+                        char[] lineSeparator =
+                                System.getProperty("line.separator").
+                                        toCharArray();
+                        boolean trailingLineSeparator = true;
+                        for(int j = 0; j < lineSeparator.length; ++j) {
+                            int lineSeparatorIndex =
+                                    lineSeparator.length - 1 - j;
+                            int tmpIndex =
+                                    passwordLength - 1 - j;
+
+                            if(tmp[tmpIndex] !=
+                                    lineSeparator[lineSeparatorIndex])
+                            {
+                                trailingLineSeparator = false;
+                                break;
+                            }
+                        }
+
+                        if(trailingLineSeparator) {
+                            passwordLength -= lineSeparator.length;
+                        }
+
+                        password = new char[passwordLength];
+                        System.arraycopy(tmp, 0, password, 0, passwordLength);
+                        Arrays.fill(tmp, '\0');
+                    }
                 }
                 else {
                     printUsage(System.err);
