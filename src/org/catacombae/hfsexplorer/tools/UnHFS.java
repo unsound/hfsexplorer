@@ -29,6 +29,7 @@ import org.catacombae.dmg.sparseimage.ReadableSparseImageStream;
 import org.catacombae.dmg.sparseimage.SparseImageRecognizer;
 import org.catacombae.dmg.udif.UDIFDetector;
 import org.catacombae.dmg.udif.UDIFRandomAccessStream;
+import org.catacombae.hfsexplorer.HFSExplorer;
 import org.catacombae.hfsexplorer.IOUtil;
 import org.catacombae.hfsexplorer.Java7Util;
 import org.catacombae.hfsexplorer.fs.AppleSingleBuilder;
@@ -78,6 +79,12 @@ public class UnHFS {
      */
     private static void printUsage(PrintStream ps) {
         //     80 <-------------------------------------------------------------------------------->
+        ps.println("unhfs " + HFSExplorer.VERSION);
+        ps.println(HFSExplorer.COPYRIGHT.replaceAll("\u00A9", "(C)"));
+        for(String s : HFSExplorer.NOTICES) {
+            ps.println(s.replaceAll("\u00A9", "(C)"));
+        }
+        ps.println();
         ps.println("usage: unhfs [options...] <input file>");
         ps.println("  Input file can be in raw, UDIF (.dmg) and/or encrypted format.");
         ps.println("  Options:");
