@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.Date;
 import org.catacombae.dmg.encrypted.ReadableCEncryptedEncodingStream;
+import org.catacombae.dmg.sparsebundle.ReadableSparseBundleStream;
 import org.catacombae.dmg.sparseimage.ReadableSparseImageStream;
 import org.catacombae.dmg.sparseimage.SparseImageRecognizer;
 import org.catacombae.dmg.udif.UDIFDetector;
@@ -218,8 +219,8 @@ public class UnHFS {
 
         String inputFilename = args[i];
         File inputFile = new File(inputFilename);
-        if(!(inputFile.exists() && !inputFile.isDirectory() &&
-                inputFile.canRead()))
+        if(!inputFile.isDirectory() &&
+                !(inputFile.exists() && inputFile.canRead()))
         {
             System.err.println("Error: Input file \"" + inputFilename + "\" can not be read!");
             printUsage(System.err);
@@ -234,7 +235,10 @@ public class UnHFS {
         }
 
         ReadableRandomAccessStream inputStream;
-        if(ReadableWin32FileStream.isSystemSupported())
+        if(inputFile.isDirectory()) {
+            inputStream = new ReadableSparseBundleStream(inputFile);
+        }
+        else if(ReadableWin32FileStream.isSystemSupported())
             inputStream = new ReadableWin32FileStream(inputFilename);
         else
             inputStream = new ReadableFileStream(inputFilename);
