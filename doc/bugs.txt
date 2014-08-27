@@ -1,13 +1,3 @@
-2007-03-28
-----------
-- One annoyance after today's work is that I still haven't found a
-  way to properly make the table fit at startup. As soon as you move
-  a slider or change the size or position of anything it all fits in
-  perfectly, but I can't seem to programmatically make it that way
-  at the start.
-  (Update 2008-07-18: Is this valid? It seems ok with current
-  builds...)
-
 2007-06-27
 ----------
 - INVALID? Discovered that the dates are incorrect... need to
