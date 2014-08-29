@@ -51,12 +51,6 @@ public class ExtentsOverflowFile extends BTreeFile {
     }
 
     class ExtentsOverflowFileSession extends BTreeFileSession {
-        final ReadableRandomAccessStream extentsFile;
-
-        public ExtentsOverflowFileSession() {
-            this.extentsFile = btreeStream;
-        }
-
         @Override
         protected ReadableRandomAccessStream getBTreeStream(
                 CommonHFSVolumeHeader header) {
@@ -72,48 +66,24 @@ public class ExtentsOverflowFile extends BTreeFile {
         }
     }
 
-    ExtentsOverflowFileSession openSession() {
+    protected BTreeFileSession openSession() {
         return new ExtentsOverflowFileSession();
     }
 
-    public long getRootNodeNumber() {
-        ExtentsOverflowFileSession ses = openSession();
-
-        return ses.bthr.getRootNodeNumber();
+    protected CommonBTNode createIndexNode(byte[] nodeData, int offset,
+            int nodeSize)
+    {
+        return createCommonHFSExtentIndexNode(nodeData, 0, nodeSize);
     }
 
-    /**
-     * Returns the B-tree root node of the extents overflow file. If it does not
-     * exist <code>null</code> is returned. The extents overflow file will have
-     * no meaningful content if there is no root node.
-     *
-     * @return the B-tree root node of the extents overflow file.
-     */
-    public CommonBTNode getRootNode() {
-        ExtentsOverflowFileSession ses = openSession();
-
-        try {
-            long rootNode = ses.bthr.getRootNodeNumber();
-
-            if(rootNode == 0) {
-                // There is no index node, or other content. So the node we
-                // seek does not exist. Return null.
-                return null;
-            }
-            else if(rootNode < 0 || rootNode > Integer.MAX_VALUE * 2L) {
-                throw new RuntimeException("Internal error - rootNode out of " +
-                        "range: " + rootNode);
-            }
-            else {
-                return getExtentsOverflowNode(rootNode);
-            }
-        } finally {
-            ses.close();
-        }
+    protected CommonBTNode createLeafNode(byte[] nodeData, int offset,
+            int nodeSize)
+    {
+        return createCommonHFSExtentLeafNode(nodeData, 0, nodeSize);
     }
 
     public CommonBTHeaderNode getHeaderNode() {
-        CommonBTNode firstNode = getExtentsOverflowNode(0);
+        CommonBTNode firstNode = getNode(0);
         if(firstNode instanceof CommonBTHeaderNode) {
             return (CommonBTHeaderNode) firstNode;
         }
@@ -123,67 +93,12 @@ public class ExtentsOverflowFile extends BTreeFile {
         }
     }
 
-    public CommonBTNode getNode(long nodeNumber) {
-        return getExtentsOverflowNode(nodeNumber);
-    }
-
-    /**
-     * Returns extents overflow node number <code>nodeNumber</code> Node number
-     * 0 is always the B*-tree header node. The node numbers of the rest of the
-     * node are determined by the contents of the header node.<br/>
-     * A value of -1 for nodeNumber is special and means that the root index
-     * node should be retrieved. If the root index node does not exist, null is
-     * returned.
-     *
-     * @param nodeNumber the node number of the requested node.
-     * @return the node with number <code>nodeNumber</code>.
-     */
-    public CommonBTNode getExtentsOverflowNode(long nodeNumber) {
-        ExtentsOverflowFileSession init = openSession();
-
-        long currentNodeNumber;
-        if(nodeNumber < 0) { // Means that we should get the root index node
-            currentNodeNumber = init.bthr.getRootNodeNumber();
-            if(currentNodeNumber == 0) // There is no index node, or other content. So the node we
-                return null;           // seek does not exist. Return null.
-        }
-        else
-            currentNodeNumber = nodeNumber;
-
-        final int nodeSize = init.bthr.getNodeSize();
-
-        byte[] currentNodeData = new byte[nodeSize];
-        try {
-            init.extentsFile.seek(currentNodeNumber * nodeSize);
-            init.extentsFile.readFully(currentNodeData);
-        } catch(RuntimeException e) {
-            System.err.println("RuntimeException in getCatalogNode. Printing additional information:");
-            System.err.println("  nodeNumber=" + nodeNumber);
-            System.err.println("  currentNodeNumber=" + currentNodeNumber);
-            System.err.println("  nodeSize=" + nodeSize);
-            System.err.println("  init.extentsFile.length()=" + init.extentsFile.length());
-            System.err.println("  (currentNodeNumber * nodeSize)=" + (currentNodeNumber * nodeSize));
-            //System.err.println("  =" + );
-            throw e;
-        }
-        CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
-
-        if(nodeDescriptor.getNodeType() == NodeType.HEADER)
-            return createCommonBTHeaderNode(currentNodeData, 0, nodeSize);
-        if(nodeDescriptor.getNodeType() == NodeType.INDEX)
-            return createCommonHFSExtentIndexNode(currentNodeData, 0, nodeSize);
-        else if(nodeDescriptor.getNodeType() == NodeType.LEAF)
-            return createCommonHFSExtentLeafNode(currentNodeData, 0, nodeSize);
-        else
-            return null;
-    }
-
     public CommonHFSExtentLeafRecord getOverflowExtent(CommonHFSExtentKey key) {
 	//System.err.println("getOverflowExtent(..)");
 	//System.err.println("my key:");
 	//key.printFields(System.err, "");
         //System.err.println("  Doing ExtentsInitProcedure...");
-	ExtentsOverflowFileSession init = openSession();
+        BTreeFileSession init = openSession();
         //System.err.println("  ExtentsInitProcedure done!");
 
 	final int nodeSize = init.bthr.getNodeSize();
@@ -193,8 +108,8 @@ public class ExtentsOverflowFile extends BTreeFile {
 	// Search down through the layers of indices (O(log n) steps, where n is the size of the tree)
 
 	final byte[] currentNodeData = new byte[nodeSize];
-	init.extentsFile.seek(currentNodeOffset);
-	init.extentsFile.readFully(currentNodeData);
+        init.btreeStream.seek(currentNodeOffset);
+        init.btreeStream.readFully(currentNodeData);
         //System.err.println("  Calling createCommonBTNodeDescriptor(byte[" + currentNodeData.length + "], 0)...");
 	CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
 
@@ -211,8 +126,8 @@ public class ExtentsOverflowFile extends BTreeFile {
             //matchingRecord.getKey().printFields(System.err, "getOverflowExtent():   ");
 
 	    currentNodeOffset = matchingRecord.getIndex()*nodeSize;
-	    init.extentsFile.seek(currentNodeOffset);
-	    init.extentsFile.readFully(currentNodeData);
+            init.btreeStream.seek(currentNodeOffset);
+            init.btreeStream.readFully(currentNodeData);
             //System.err.println("  Calling createCommonBTNodeDescriptor(byte[" + currentNodeData.length + "], 0)...");
 	    nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
 	}

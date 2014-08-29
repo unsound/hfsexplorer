@@ -214,6 +214,12 @@ public abstract class BTreeFile {
         return vol.createCommonBTHeaderNode(currentNodeData, offset, nodeSize);
     }
 
+    protected abstract CommonBTNode createIndexNode(byte[] nodeData, int offset,
+            int nodeSize);
+
+    protected abstract CommonBTNode createLeafNode(byte[] nodeData, int offset,
+            int nodeSize);
+
     protected CommonBTNodeDescriptor readNodeDescriptor(Readable rd) {
         return vol.readNodeDescriptor(rd);
     }
@@ -231,9 +237,94 @@ public abstract class BTreeFile {
         return vol;
     }
 
-    public abstract CommonBTNode getRootNode();
+    protected abstract BTreeFileSession openSession();
 
-    public abstract long getRootNodeNumber();
+    /**
+     * Returns the root node of the B-tree file. If it does not exist
+     * <code>null</code> is returned. The B-tree file will have no meaningful
+     * content if there is no root node.
+     *
+     * @return the B-tree root node of the B-tree file.
+     */
+    public CommonBTNode getRootNode() {
+        BTreeFileSession ses = openSession();
 
-    public abstract CommonBTNode getNode(long nodeNumber);
+        try {
+            long rootNode = ses.bthr.getRootNodeNumber();
+
+            if(rootNode == 0) {
+                // There is no index node, or other content. So the node we
+                // seek does not exist. Return null.
+                return null;
+            }
+            else if(rootNode < 0 || rootNode > Integer.MAX_VALUE * 2L) {
+                throw new RuntimeException("Internal error - rootNode out of " +
+                        "range: " + rootNode);
+            }
+            else {
+                return getNode(rootNode);
+            }
+        } finally {
+            ses.close();
+        }
+    }
+
+    public long getRootNodeNumber() {
+        BTreeFileSession ses = openSession();
+
+        try {
+            long rootNodeNumber = ses.bthr.getRootNodeNumber();
+            return rootNodeNumber;
+        } finally {
+            ses.close();
+        }
+    }
+
+    /**
+     * Returns the requested node in the B-tree file. If the requested node is
+     * not a header, index or leaf node, <code>null</code> is returned because
+     * they are the only ones that are implemented at the moment.<br>
+     *
+     * @param nodeNumber the node number of the requested node.
+     * @return the requested node if it exists and has type header, index node
+     * or leaf node, or <code>null</code> otherwise.
+     */
+    public CommonBTNode getNode(long nodeNumber) {
+        BTreeFileSession ses = openSession();
+
+        try {
+            final String METHOD = "getNode";
+            final int nodeSize = ses.bthr.getNodeSize();
+
+            byte[] nodeData = new byte[nodeSize];
+            try {
+                ses.btreeStream.seek(nodeNumber * nodeSize);
+                ses.btreeStream.readFully(nodeData);
+            } catch(RuntimeException e) {
+                System.err.println("RuntimeException in " + METHOD + ". " +
+                        "Printing additional information:");
+                System.err.println("  nodeNumber=" + nodeNumber);
+                System.err.println("  nodeSize=" + nodeSize);
+                System.err.println("  init.btreeStream.length()=" +
+                        ses.btreeStream.length());
+                System.err.println("  (currentNodeNumber * nodeSize)=" +
+                        (nodeNumber * nodeSize));
+                throw e;
+            }
+
+            CommonBTNodeDescriptor nodeDescriptor =
+                    createCommonBTNodeDescriptor(nodeData, 0);
+
+            if(nodeDescriptor.getNodeType() == NodeType.HEADER)
+                return createCommonBTHeaderNode(nodeData, 0, nodeSize);
+            else if(nodeDescriptor.getNodeType() == NodeType.INDEX)
+                return createIndexNode(nodeData, 0, nodeSize);
+            else if(nodeDescriptor.getNodeType() == NodeType.LEAF)
+                return createLeafNode(nodeData, 0, nodeSize);
+            else
+                return null;
+        } finally {
+            ses.close();
+        }
+    }
 }

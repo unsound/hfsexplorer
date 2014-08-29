@@ -55,12 +55,6 @@ public class CatalogFile extends BTreeFile {
     }
 
     class CatalogFileSession extends BTreeFileSession {
-        final ReadableRandomAccessStream catalogFile;
-
-        public CatalogFileSession() {
-            this.catalogFile = btreeStream;
-        }
-
         @Override
         protected ReadableRandomAccessStream getBTreeStream(
                 CommonHFSVolumeHeader header) {
@@ -84,8 +78,20 @@ public class CatalogFile extends BTreeFile {
      * Opens the catalog file for reading and reads the value of some important
      * variables (the "session").
      */
-    CatalogFileSession openSession() {
+    protected BTreeFileSession openSession() {
         return new CatalogFileSession();
+    }
+
+    protected CommonBTNode createIndexNode(byte[] nodeData, int offset,
+            int nodeSize)
+    {
+        return newCatalogIndexNode(nodeData, 0, nodeSize);
+    }
+
+    protected CommonBTNode createLeafNode(byte[] nodeData, int offset,
+            int nodeSize)
+    {
+        return newCatalogLeafNode(nodeData, 0, nodeSize);
     }
 
     /** Switches to cached mode for reading the catalog file. */
@@ -105,44 +111,8 @@ public class CatalogFile extends BTreeFile {
     }
     */
 
-    public long getRootNodeNumber() {
-        CatalogFileSession ses = openSession();
-
-        return ses.bthr.getRootNodeNumber();
-    }
-
-    /**
-     * Returns the B-tree root node of the catalog file. If it does not exist
-     * <code>null</code> is returned. The catalog file will have no meaningful
-     * content if there is no root node.
-     *
-     * @return the B-tree root node of the catalog file.
-     */
-    public CommonBTNode getRootNode() {
-        CatalogFileSession ses = openSession();
-
-        try {
-            long rootNode = ses.bthr.getRootNodeNumber();
-
-            if(rootNode == 0) {
-                // There is no index node, or other content. So the node we
-                // seek does not exist. Return null.
-                return null;
-            }
-            else if(rootNode < 0 || rootNode > Integer.MAX_VALUE * 2L) {
-                throw new RuntimeException("Internal error - rootNode out of " +
-                        "range: " + rootNode);
-            }
-            else {
-                return getCatalogNode(rootNode);
-            }
-        } finally {
-            ses.close();
-        }
-    }
-
     public CommonHFSCatalogFolderRecord getRootFolder() {
-        CatalogFileSession ses = openSession();
+        BTreeFileSession ses = openSession();
         try {
             return doGetRootFolder(ses);
         } finally {
@@ -150,9 +120,7 @@ public class CatalogFile extends BTreeFile {
         }
     }
 
-    private CommonHFSCatalogFolderRecord doGetRootFolder(
-            CatalogFileSession ses)
-    {
+    private CommonHFSCatalogFolderRecord doGetRootFolder(BTreeFileSession ses) {
         // Search down through the layers of indices to the record with parentID 1.
         CommonHFSCatalogNodeID parentID =
                 vol.getCommonHFSCatalogNodeID(ReservedID.ROOT_PARENT);
@@ -163,8 +131,8 @@ public class CatalogFile extends BTreeFile {
         //init.bthr.print(System.err, " ");
 
         byte[] currentNodeData = new byte[nodeSize];
-        ses.catalogFile.seek(currentNodeOffset);
-        ses.catalogFile.readFully(currentNodeData);
+        ses.btreeStream.seek(currentNodeOffset);
+        ses.btreeStream.readFully(currentNodeData);
         CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
         while(nodeDescriptor.getNodeType() == NodeType.INDEX) {
             CommonHFSCatalogIndexNode currentNode =
@@ -176,8 +144,8 @@ public class CatalogFile extends BTreeFile {
 
             //currentNodeNumber = matchingRecord.getIndex();
             currentNodeOffset = matchingRecord.getIndex()*nodeSize;
-            ses.catalogFile.seek(currentNodeOffset);
-            ses.catalogFile.readFully(currentNodeData);
+            ses.btreeStream.seek(currentNodeOffset);
+            ses.btreeStream.readFully(currentNodeData);
             nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
         }
 
@@ -214,10 +182,6 @@ public class CatalogFile extends BTreeFile {
                     firstNode.getClass());
     }
 
-    public CommonBTNode getNode(long nodeNumber) {
-        return getCatalogNode(nodeNumber);
-    }
-
     /**
      * Returns the requested node in the catalog file. If the requested node is not a header, index or
      * leaf node, <code>null</code> is returned because they are the only ones that are implemented at
@@ -229,7 +193,7 @@ public class CatalogFile extends BTreeFile {
      * @return the requested node if it exists and has type index node or leaf node, null otherwise
      */
     public CommonBTNode getCatalogNode(long nodeNumber) {
-        CatalogFileSession ses = openSession();
+        BTreeFileSession ses = openSession();
 
         long currentNodeNumber;
         if(nodeNumber < 0) { // Means that we should get the root node
@@ -240,32 +204,7 @@ public class CatalogFile extends BTreeFile {
         else
             currentNodeNumber = nodeNumber;
 
-        final int nodeSize = ses.bthr.getNodeSize();
-
-        byte[] currentNodeData = new byte[nodeSize];
-        try {
-            ses.catalogFile.seek(currentNodeNumber * nodeSize);
-            ses.catalogFile.readFully(currentNodeData);
-        } catch(RuntimeException e) {
-            System.err.println("RuntimeException in getCatalogNode. Printing additional information:");
-            System.err.println("  nodeNumber=" + nodeNumber);
-            System.err.println("  currentNodeNumber=" + currentNodeNumber);
-            System.err.println("  nodeSize=" + nodeSize);
-            System.err.println("  init.catalogFile.length()=" + ses.catalogFile.length());
-            System.err.println("  (currentNodeNumber * nodeSize)=" + (currentNodeNumber * nodeSize));
-            //System.err.println("  =" + );
-            throw e;
-        }
-        CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
-
-        if(nodeDescriptor.getNodeType() == NodeType.HEADER)
-            return createCommonBTHeaderNode(currentNodeData, 0, ses.bthr.getNodeSize());
-        if(nodeDescriptor.getNodeType() == NodeType.INDEX)
-            return newCatalogIndexNode(currentNodeData, 0, ses.bthr.getNodeSize());
-        else if(nodeDescriptor.getNodeType() == NodeType.LEAF)
-            return newCatalogLeafNode(currentNodeData, 0, ses.bthr.getNodeSize());
-        else
-            return null;
+        return getNode(currentNodeNumber);
     }
 
     /**
@@ -357,7 +296,7 @@ public class CatalogFile extends BTreeFile {
      */
     public CommonHFSCatalogLeafRecord getRecord(CommonHFSCatalogNodeID parentID,
             CommonHFSCatalogString nodeName) {
-	CatalogFileSession ses = openSession();
+        BTreeFileSession ses = openSession();
 
 	final int nodeSize = ses.bthr.getNodeSize();
 
@@ -366,8 +305,8 @@ public class CatalogFile extends BTreeFile {
 	// Search down through the layers of indices (O(log n) steps, where n is the size of the tree)
 
 	byte[] currentNodeData = new byte[ses.bthr.getNodeSize()];
-	ses.catalogFile.seek(currentNodeOffset);
-	ses.catalogFile.readFully(currentNodeData);
+        ses.btreeStream.seek(currentNodeOffset);
+        ses.btreeStream.readFully(currentNodeData);
 	CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
 
 	while(nodeDescriptor.getNodeType() == NodeType.INDEX) {
@@ -379,8 +318,8 @@ public class CatalogFile extends BTreeFile {
             if(matchingRecord == null)
                 return null;
 	    currentNodeOffset = matchingRecord.getIndex()*nodeSize;
-	    ses.catalogFile.seek(currentNodeOffset);
-	    ses.catalogFile.readFully(currentNodeData);
+            ses.btreeStream.seek(currentNodeOffset);
+            ses.btreeStream.readFully(currentNodeData);
 	    nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
 	}
 
@@ -423,10 +362,10 @@ public class CatalogFile extends BTreeFile {
      * not a file ID, or something bad will happen.
      */
     public CommonHFSCatalogLeafRecord[] listRecords(CommonHFSCatalogNodeID folderID) {
-	CatalogFileSession init = openSession();
+        BTreeFileSession init = openSession();
         try {
             return collectFilesInDir(folderID, init.bthr.getRootNodeNumber(),
-                    init.header, init.bthr, init.catalogFile);
+                    init.header, init.bthr, init.btreeStream);
         } finally {
             init.close();
         }
