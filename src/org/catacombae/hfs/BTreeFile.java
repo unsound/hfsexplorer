@@ -39,11 +39,8 @@ import org.catacombae.io.RuntimeIOException;
 public abstract class BTreeFile {
     final HFSVolume vol;
 
-    private final BTreeOperations ops;
-
-    BTreeFile(HFSVolume vol, BTreeOperations ops) {
+    BTreeFile(HFSVolume vol) {
         this.vol = vol;
-        this.ops = ops;
     }
 
     abstract class BTreeFileSession {
@@ -214,20 +211,20 @@ public abstract class BTreeFile {
 
     protected CommonBTHeaderNode createCommonBTHeaderNode(byte[] currentNodeData,
             int offset, int nodeSize) {
-        return ops.createCommonBTHeaderNode(currentNodeData, offset, nodeSize);
+        return vol.createCommonBTHeaderNode(currentNodeData, offset, nodeSize);
     }
 
     protected CommonBTNodeDescriptor readNodeDescriptor(Readable rd) {
-        return ops.readNodeDescriptor(rd);
+        return vol.readNodeDescriptor(rd);
     }
 
     protected CommonBTHeaderRecord readHeaderRecord(Readable rd) {
-        return ops.readHeaderRecord(rd);
+        return vol.readHeaderRecord(rd);
     }
 
     protected CommonBTNodeDescriptor createCommonBTNodeDescriptor(
             byte[] currentNodeData, int offset) {
-        return ops.createCommonBTNodeDescriptor(currentNodeData, offset);
+        return vol.createCommonBTNodeDescriptor(currentNodeData, offset);
     }
 
     public HFSVolume getVolume() {

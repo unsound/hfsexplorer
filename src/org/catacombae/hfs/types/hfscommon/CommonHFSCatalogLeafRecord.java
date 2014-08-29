@@ -101,11 +101,11 @@ public abstract class CommonHFSCatalogLeafRecord
         return create(key, recordData);
     }
 
-    public static CommonHFSCatalogLeafRecord createHFSX(byte[] data, int offset, int length, BTHeaderRec bthr) {
-        if(bthr == null)
-            throw new IllegalArgumentException("bthr == null");
-
-        HFSXCatalogKey key = new HFSXCatalogKey(data, offset, bthr);
+    public static CommonHFSCatalogLeafRecord createHFSX(byte[] data, int offset,
+            int length, byte keyCompareType)
+    {
+        final HFSXCatalogKey key =
+                new HFSXCatalogKey(data, offset, keyCompareType);
         final HFSPlusCatalogLeafRecordData recordData;
 
         // Peek at known 16-bit value to determine proper subtype

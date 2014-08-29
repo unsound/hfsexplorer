@@ -35,7 +35,9 @@ public class HFSPlusCatalogIndexNode extends BTIndexNode {
 	    if(catalogHeaderRec == null)
 		currentKey = new HFSPlusCatalogKey(data, offset+currentOffset);
 	    else
-		currentKey = new HFSXCatalogKey(data, offset+currentOffset, catalogHeaderRec);
+                currentKey =
+                        new HFSXCatalogKey(data, offset + currentOffset,
+                        catalogHeaderRec.getKeyCompareType());
 	    records[i] = new BTIndexRecord(currentKey, data, offset+currentOffset);
 	}
     }

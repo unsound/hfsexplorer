@@ -28,32 +28,30 @@ import org.catacombae.hfs.types.hfsplus.HFSUniStr255;
 public class HFSXCatalogKey extends HFSPlusCatalogKey {
     private final byte keyCompareType;
 
-    public HFSXCatalogKey(byte[] data, int offset, BTHeaderRec catalogHeaderRec) {
+    public HFSXCatalogKey(byte[] data, int offset, byte keyCompareType) {
 	super(data, offset);
-        if(catalogHeaderRec == null)
-            throw new IllegalArgumentException("catalogHeaderRec == null");
 
-	this.keyCompareType = catalogHeaderRec.getKeyCompareType();
+        this.keyCompareType = keyCompareType;
         if(keyCompareType != BTHeaderRec.kHFSBinaryCompare && keyCompareType != BTHeaderRec.kHFSCaseFolding)
             throw new IllegalArgumentException("Illegal key compare type: " + keyCompareType);
     }
 
-    public HFSXCatalogKey(HFSCatalogNodeID parentID, HFSUniStr255 nodeName, BTHeaderRec catalogHeaderRec) {
+    public HFSXCatalogKey(HFSCatalogNodeID parentID, HFSUniStr255 nodeName,
+            byte keyCompareType)
+    {
 	super(parentID, nodeName);
-        if(catalogHeaderRec == null)
-            throw new IllegalArgumentException("catalogHeaderRec == null");
 
-        this.keyCompareType = catalogHeaderRec.getKeyCompareType();
+        this.keyCompareType = keyCompareType;
         if(keyCompareType != BTHeaderRec.kHFSBinaryCompare && keyCompareType != BTHeaderRec.kHFSCaseFolding)
             throw new IllegalArgumentException("Illegal key compare type: " + keyCompareType);
     }
 
-    public HFSXCatalogKey(int parentIDInt, String nodeNameString, BTHeaderRec catalogHeaderRec) {
+    public HFSXCatalogKey(int parentIDInt, String nodeNameString,
+            byte keyCompareType)
+    {
 	super(parentIDInt, nodeNameString);
-        if(catalogHeaderRec == null)
-            throw new IllegalArgumentException("catalogHeaderRec == null");
 
-	this.keyCompareType = catalogHeaderRec.getKeyCompareType();
+        this.keyCompareType = keyCompareType;
         if(keyCompareType != BTHeaderRec.kHFSBinaryCompare && keyCompareType != BTHeaderRec.kHFSCaseFolding)
             throw new IllegalArgumentException("Illegal key compare type: " + keyCompareType);
     }

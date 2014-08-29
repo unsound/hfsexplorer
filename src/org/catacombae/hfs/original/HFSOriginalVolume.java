@@ -43,9 +43,6 @@ import org.catacombae.io.ReadableConcatenatedStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfs.AllocationFile;
 import org.catacombae.hfs.AttributesFile;
-import org.catacombae.hfs.BTreeOperations;
-import org.catacombae.hfs.CatalogOperations;
-import org.catacombae.hfs.ExtentsOverflowOperations;
 import org.catacombae.hfs.HFSVolume;
 import org.catacombae.hfs.HotFilesFile;
 import org.catacombae.hfs.Journal;
@@ -65,8 +62,7 @@ public class HFSOriginalVolume extends HFSVolume {
     public HFSOriginalVolume(ReadableRandomAccessStream hfsFile,
             boolean cachingEnabled, String encodingName) {
 
-        super(hfsFile, cachingEnabled, new HFSBTreeOperations(),
-                new HFSCatalogOperations(), new HFSExtentsOverflowOperations());
+        super(hfsFile, cachingEnabled);
 
         this.stringCodec = new MutableStringCodec<CharsetStringCodec>(
                 new CharsetStringCodec(encodingName));
@@ -200,114 +196,105 @@ public class HFSOriginalVolume extends HFSVolume {
         return CommonHFSCatalogString.createHFS(bytes);
     }
 
-    private static class HFSBTreeOperations implements BTreeOperations {
-
-        public CommonBTHeaderNode createCommonBTHeaderNode(
-                byte[] currentNodeData, int offset, int nodeSize) {
-
-            return CommonBTHeaderNode.createHFS(currentNodeData, offset,
-                    nodeSize);
-        }
-
-        public CommonBTNodeDescriptor readNodeDescriptor(Readable rd) {
-
-            byte[] data = new byte[NodeDescriptor.length()];
-            rd.readFully(data);
-
-            return createCommonBTNodeDescriptor(data, 0);
-        }
-
-        public CommonBTHeaderRecord readHeaderRecord(Readable rd) {
-
-            byte[] data = new byte[BTHdrRec.length()];
-            rd.readFully(data);
-            BTHdrRec bthr = new BTHdrRec(data, 0);
-
-            return CommonBTHeaderRecord.create(bthr);
-        }
-
-        public CommonBTNodeDescriptor createCommonBTNodeDescriptor(
-                byte[] currentNodeData, int i) {
-
-            final NodeDescriptor nd = new NodeDescriptor(currentNodeData, i);
-            return CommonBTNodeDescriptor.create(nd);
-        }
-
+    /* @Override */
+    public CommonBTHeaderNode createCommonBTHeaderNode(byte[] currentNodeData,
+            int offset, int nodeSize)
+    {
+        return CommonBTHeaderNode.createHFS(currentNodeData, offset, nodeSize);
     }
 
-    private static class HFSCatalogOperations implements CatalogOperations {
+    /* @Override */
+    public CommonBTNodeDescriptor readNodeDescriptor(Readable rd) {
+        byte[] data = new byte[NodeDescriptor.length()];
+        rd.readFully(data);
 
-        /* @Override */
-        public CommonHFSCatalogIndexNode newCatalogIndexNode(byte[] data,
-                int offset, int nodeSize, CommonBTHeaderRecord bthr) {
-
-            return CommonHFSCatalogIndexNode.createHFS(data, offset, nodeSize);
-        }
-
-        /* @Override */
-        public CommonHFSCatalogKey newCatalogKey(CommonHFSCatalogNodeID nodeID,
-                CommonHFSCatalogString searchString,
-                CommonBTHeaderRecord bthr) {
-
-            return CommonHFSCatalogKey.create(new CatKeyRec(
-                    (int)nodeID.toLong(), searchString.getStringBytes()));
-        }
-
-        /* @Override */
-        public CommonHFSCatalogLeafNode newCatalogLeafNode(byte[] data,
-                int offset, int nodeSize, CommonBTHeaderRecord bthr) {
-
-            return CommonHFSCatalogLeafNode.createHFS(data, offset, nodeSize);
-        }
-
-        /* @Override */
-        public CommonHFSCatalogLeafRecord newCatalogLeafRecord(
-                byte[] data, int offset, CommonBTHeaderRecord bthr) {
-
-            return CommonHFSCatalogLeafRecord.createHFS(data, offset,
-                    data.length-offset);
-        }
+        return createCommonBTNodeDescriptor(data, 0);
     }
 
-    private static class HFSExtentsOverflowOperations implements ExtentsOverflowOperations {
+    /* @Override */
+    public CommonBTHeaderRecord readHeaderRecord(Readable rd) {
+        byte[] data = new byte[BTHdrRec.length()];
+        rd.readFully(data);
+        BTHdrRec bthr = new BTHdrRec(data, 0);
 
-        public CommonHFSExtentIndexNode createCommonHFSExtentIndexNode(
-                byte[] currentNodeData, int i, int nodeSize) {
+        return CommonBTHeaderRecord.create(bthr);
+    }
 
-            return CommonHFSExtentIndexNode.createHFS(currentNodeData, i,
-                    nodeSize);
+    /* @Override */
+    public CommonBTNodeDescriptor createCommonBTNodeDescriptor(
+            byte[] currentNodeData, int i)
+    {
+        final NodeDescriptor nd = new NodeDescriptor(currentNodeData, i);
+        return CommonBTNodeDescriptor.create(nd);
+    }
+
+    /* @Override */
+    public CommonHFSCatalogIndexNode newCatalogIndexNode(byte[] data,
+            int offset, int nodeSize)
+    {
+        return CommonHFSCatalogIndexNode.createHFS(data, offset, nodeSize);
+    }
+
+    /* @Override */
+    public CommonHFSCatalogKey newCatalogKey(CommonHFSCatalogNodeID nodeID,
+            CommonHFSCatalogString searchString)
+    {
+        return CommonHFSCatalogKey.create(new CatKeyRec((int) nodeID.toLong(),
+                searchString.getStringBytes()));
+    }
+
+    /* @Override */
+    public CommonHFSCatalogLeafNode newCatalogLeafNode(byte[] data, int offset,
+            int nodeSize)
+    {
+        return CommonHFSCatalogLeafNode.createHFS(data, offset, nodeSize);
+    }
+
+    /* @Override */
+    public CommonHFSCatalogLeafRecord newCatalogLeafRecord(byte[] data,
+            int offset)
+    {
+        return CommonHFSCatalogLeafRecord.createHFS(data, offset,
+                data.length - offset);
+    }
+
+    /* @Override */
+    public CommonHFSExtentIndexNode createCommonHFSExtentIndexNode(
+            byte[] currentNodeData, int i, int nodeSize)
+    {
+        return CommonHFSExtentIndexNode.createHFS(currentNodeData, i, nodeSize);
+    }
+
+    /* @Override */
+    public CommonHFSExtentLeafNode createCommonHFSExtentLeafNode(
+            byte[] currentNodeData, int i, int nodeSize)
+    {
+        return CommonHFSExtentLeafNode.createHFS(currentNodeData, i, nodeSize);
+    }
+
+    /* @Override */
+    public CommonHFSExtentKey createCommonHFSExtentKey(
+            CommonHFSForkType forkType, CommonHFSCatalogNodeID fileID,
+            int startBlock)
+    {
+        if(startBlock < Short.MIN_VALUE || startBlock > Short.MAX_VALUE)
+            throw new IllegalArgumentException("start block out of range for " +
+                    "short (signed 16-bit integer)");
+        short startBlockShort = (short) startBlock;
+
+        final byte forkTypeByte;
+        switch(forkType) {
+            case DATA_FORK:
+                forkTypeByte = ExtKeyRec.FORK_TYPE_DATA;
+                break;
+            case RESOURCE_FORK:
+                forkTypeByte = ExtKeyRec.FORK_TYPE_RESOURCE;
+                break;
+            default:
+                throw new RuntimeException("Invalid fork type");
         }
-
-        public CommonHFSExtentLeafNode createCommonHFSExtentLeafNode(
-                byte[] currentNodeData, int i, int nodeSize) {
-
-            return CommonHFSExtentLeafNode.createHFS(currentNodeData, i,
-                    nodeSize);
-        }
-
-        public CommonHFSExtentKey createCommonHFSExtentKey(
-                CommonHFSForkType forkType, CommonHFSCatalogNodeID fileID,
-                int startBlock) {
-
-            if(startBlock < Short.MIN_VALUE || startBlock > Short.MAX_VALUE)
-                throw new IllegalArgumentException("start block out of range " +
-                        "for short (signed 16-bit integer)");
-            short startBlockShort = (short) startBlock;
-
-            final byte forkTypeByte;
-            switch(forkType) {
-                case DATA_FORK:
-                    forkTypeByte = ExtKeyRec.FORK_TYPE_DATA;
-                    break;
-                case RESOURCE_FORK:
-                    forkTypeByte = ExtKeyRec.FORK_TYPE_RESOURCE;
-                    break;
-                default:
-                    throw new RuntimeException("Invalid fork type");
-            }
-            ExtKeyRec key = new ExtKeyRec(forkTypeByte, (int) fileID.toLong(),
-                    startBlockShort);
-            return CommonHFSExtentKey.create(key);
-        }
+        ExtKeyRec key = new ExtKeyRec(forkTypeByte, (int) fileID.toLong(),
+                startBlockShort);
+        return CommonHFSExtentKey.create(key);
     }
 }

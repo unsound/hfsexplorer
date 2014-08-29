@@ -59,8 +59,8 @@ public class AttributesFile extends BTreeFile {
         }
     }
 
-    public AttributesFile(HFSPlusVolume view, BTreeOperations ops) {
-        super(view, ops);
+    public AttributesFile(HFSPlusVolume view) {
+        super(view);
         this.view = view;
     }
 

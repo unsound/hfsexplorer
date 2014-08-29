@@ -39,8 +39,11 @@ public abstract class CommonHFSCatalogLeafNode extends CommonBTNode<CommonHFSCat
         return new HFSPlusImplementation(data, offset, nodeSize);
     }
 
-    public static CommonHFSCatalogLeafNode createHFSX(byte[] data, int offset, int nodeSize, BTHeaderRec bthr) {
-        return new HFSXImplementation(data, offset, nodeSize, bthr).getInternal();
+    public static CommonHFSCatalogLeafNode createHFSX(byte[] data, int offset,
+            int nodeSize, byte keyCompareType)
+    {
+        return new HFSXImplementation(data, offset, nodeSize, keyCompareType).
+                getInternal();
     }
 
     public static CommonHFSCatalogLeafNode createHFS(byte[] data, int offset, int nodeSize) {
@@ -63,27 +66,24 @@ public abstract class CommonHFSCatalogLeafNode extends CommonBTNode<CommonHFSCat
     }
 
     public static class HFSXImplementation {
-        private final BTHeaderRec bthr;
+        private final byte keyCompareType;
         private final Internal internal;
 
         private class Internal extends CommonHFSCatalogLeafNode {
             public Internal(byte[] data, int offset, int nodeSize) {
                 super(data, offset, nodeSize, FSType.HFS_PLUS);
-                if(bthr == null)
-                    throw new IllegalArgumentException("bthr == null");
-
             }
 
             @Override
             protected CommonHFSCatalogLeafRecord createBTRecord(int recordNumber, byte[] data, int offset, int length) {
-                if(bthr == null)
-                    throw new IllegalArgumentException("bthr == null");
-                return CommonHFSCatalogLeafRecord.createHFSX(data, offset, length, bthr);
+                return CommonHFSCatalogLeafRecord.createHFSX(data, offset,
+                        length, keyCompareType);
             }
         }
 
-        public HFSXImplementation(byte[] data, int offset, int nodeSize, BTHeaderRec bthr) {
-            this.bthr = bthr;
+        public HFSXImplementation(byte[] data, int offset, int nodeSize,
+                byte keyCompareType) {
+            this.keyCompareType = keyCompareType;
             this.internal = new Internal(data, offset, nodeSize);
         }
 

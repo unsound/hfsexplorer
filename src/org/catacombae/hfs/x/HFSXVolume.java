@@ -29,7 +29,6 @@ import org.catacombae.hfs.types.hfsplus.HFSCatalogNodeID;
 import org.catacombae.hfs.types.hfsplus.HFSUniStr255;
 import org.catacombae.hfs.types.hfsx.HFSXCatalogKey;
 import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.hfs.CatalogOperations;
 import org.catacombae.hfs.plus.HFSPlusVolume;
 
 /**
@@ -37,50 +36,62 @@ import org.catacombae.hfs.plus.HFSPlusVolume;
  * @author erik
  */
 public class HFSXVolume extends HFSPlusVolume {
+    private final byte keyCompareType;
+
     public HFSXVolume(ReadableRandomAccessStream hfsFile,
             boolean cachingEnabled) {
 
-        super(hfsFile, cachingEnabled, new HFSXCatalogOperations());
+        super(hfsFile, cachingEnabled);
+
+        CommonBTHeaderRecord.CompareType keyCompareTypeEnum =
+                getCatalogFile().getCatalogHeaderNode().getHeaderRecord().
+                getKeyCompareType();
+
+
+        switch(keyCompareTypeEnum) {
+            case CASE_FOLDING:
+                this.keyCompareType = BTHeaderRec.kHFSCaseFolding;
+                break;
+            case BINARY_COMPARE:
+                this.keyCompareType = BTHeaderRec.kHFSBinaryCompare;
+                break;
+            default:
+                throw new RuntimeException("Unknown key compare type:" +
+                        keyCompareTypeEnum);
+        }
     }
 
-    private static class HFSXCatalogOperations implements CatalogOperations {
-        private BTHeaderRec getBTHeaderRec(CommonBTHeaderRecord bthr) {
-            if(bthr instanceof CommonBTHeaderRecord.HFSPlusImplementation) {
-                return ((CommonBTHeaderRecord.HFSPlusImplementation)bthr).getInternal();
-            }
-            else
-                throw new IllegalArgumentException("Invalid type of bthr: " + bthr);
-        }
+    @Override
+    public CommonHFSCatalogIndexNode newCatalogIndexNode(byte[] data,
+            int offset, int nodeSize)
+    {
+        return CommonHFSCatalogIndexNode.createHFSX(data, offset, nodeSize,
+                keyCompareType);
+    }
 
-        public CommonHFSCatalogIndexNode newCatalogIndexNode(byte[] data,
-                int offset, int nodeSize, CommonBTHeaderRecord bthr) {
+    @Override
+    public CommonHFSCatalogKey newCatalogKey(CommonHFSCatalogNodeID nodeID,
+            CommonHFSCatalogString searchString)
+    {
+        return CommonHFSCatalogKey.create(new HFSXCatalogKey(
+                new HFSCatalogNodeID((int) nodeID.toLong()),
+                new HFSUniStr255(searchString.getStructBytes(), 0),
+                keyCompareType));
+    }
 
-            BTHeaderRec trueBthr = getBTHeaderRec(bthr);
-            return CommonHFSCatalogIndexNode.createHFSX(data, offset, nodeSize, trueBthr);
-        }
+    @Override
+    public CommonHFSCatalogLeafNode newCatalogLeafNode(byte[] data, int offset,
+            int nodeSize)
+    {
+        return CommonHFSCatalogLeafNode.createHFSX(data, offset, nodeSize,
+                keyCompareType);
+    }
 
-        public CommonHFSCatalogKey newCatalogKey(CommonHFSCatalogNodeID nodeID,
-                CommonHFSCatalogString searchString, CommonBTHeaderRecord bthr) {
-
-            BTHeaderRec trueBthr = getBTHeaderRec(bthr);
-            return CommonHFSCatalogKey.create(new HFSXCatalogKey(
-                    new HFSCatalogNodeID((int) nodeID.toLong()),
-                    new HFSUniStr255(searchString.getStructBytes(), 0), trueBthr));
-        }
-
-        public CommonHFSCatalogLeafNode newCatalogLeafNode(byte[] data,
-                int offset, int nodeSize, CommonBTHeaderRecord bthr) {
-
-            BTHeaderRec trueBthr = getBTHeaderRec(bthr);
-            return CommonHFSCatalogLeafNode.createHFSX(data, offset, nodeSize, trueBthr);
-        }
-
-        public CommonHFSCatalogLeafRecord newCatalogLeafRecord(byte[] data,
-                int offset, CommonBTHeaderRecord bthr) {
-
-            BTHeaderRec trueBthr = getBTHeaderRec(bthr);
-            return CommonHFSCatalogLeafRecord.createHFSX(data, offset, offset + data.length, trueBthr);
-        }
-
+    @Override
+    public CommonHFSCatalogLeafRecord newCatalogLeafRecord(byte[] data,
+            int offset)
+    {
+        return CommonHFSCatalogLeafRecord.createHFSX(data, offset,
+                offset + data.length, keyCompareType);
     }
 }

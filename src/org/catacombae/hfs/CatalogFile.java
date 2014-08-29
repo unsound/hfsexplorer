@@ -42,7 +42,6 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogNodeID;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogNodeID.ReservedID;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogString;
-import org.catacombae.hfs.types.hfscommon.CommonHFSExtentDescriptor;
 import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.io.ReadableRandomAccessStream;
 
@@ -51,12 +50,8 @@ import org.catacombae.io.ReadableRandomAccessStream;
  * @author erik
  */
 public class CatalogFile extends BTreeFile {
-    private final CatalogOperations ops;
-
-    CatalogFile(HFSVolume vol, BTreeOperations superOps,
-            CatalogOperations ops) {
-        super(vol, superOps);
-        this.ops = ops;
+    CatalogFile(HFSVolume vol) {
+        super(vol);
     }
 
     class CatalogFileSession extends BTreeFileSession {
@@ -173,7 +168,8 @@ public class CatalogFile extends BTreeFile {
         CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
         while(nodeDescriptor.getNodeType() == NodeType.INDEX) {
             CommonHFSCatalogIndexNode currentNode =
-                    newCatalogIndexNode(currentNodeData, 0, ses.bthr.getNodeSize(), ses.bthr);
+                    newCatalogIndexNode(currentNodeData, 0,
+                    ses.bthr.getNodeSize());
             //System.err.println("currentNode:");
             //currentNode.print(System.err, "  ");
             CommonBTIndexRecord matchingRecord = findKey(currentNode, parentID);
@@ -188,7 +184,7 @@ public class CatalogFile extends BTreeFile {
         // Leaf node reached. Find record with parent id 1. (or whatever value is in the parentID variable :) )
         if(nodeDescriptor.getNodeType() == NodeType.LEAF) {
             CommonHFSCatalogLeafNode leaf =
-                    newCatalogLeafNode(currentNodeData, 0, nodeSize, ses.bthr);
+                    newCatalogLeafNode(currentNodeData, 0, nodeSize);
             CommonHFSCatalogLeafRecord[] recs = leaf.getLeafRecords();
             for(CommonHFSCatalogLeafRecord rec : recs) {
                 if(rec.getKey().getParentID().toLong() == parentID.toLong()) {
@@ -265,9 +261,9 @@ public class CatalogFile extends BTreeFile {
         if(nodeDescriptor.getNodeType() == NodeType.HEADER)
             return createCommonBTHeaderNode(currentNodeData, 0, ses.bthr.getNodeSize());
         if(nodeDescriptor.getNodeType() == NodeType.INDEX)
-            return newCatalogIndexNode(currentNodeData, 0, ses.bthr.getNodeSize(), ses.bthr);
+            return newCatalogIndexNode(currentNodeData, 0, ses.bthr.getNodeSize());
         else if(nodeDescriptor.getNodeType() == NodeType.LEAF)
-            return newCatalogLeafNode(currentNodeData, 0, ses.bthr.getNodeSize(), ses.bthr);
+            return newCatalogLeafNode(currentNodeData, 0, ses.bthr.getNodeSize());
         else
             return null;
     }
@@ -376,9 +372,9 @@ public class CatalogFile extends BTreeFile {
 
 	while(nodeDescriptor.getNodeType() == NodeType.INDEX) {
 	    CommonHFSCatalogIndexNode currentNode =
-                    newCatalogIndexNode(currentNodeData, 0, nodeSize, ses.bthr);
+                    newCatalogIndexNode(currentNodeData, 0, nodeSize);
 	    CommonBTIndexRecord matchingRecord =
-                    findLEKey(currentNode, newCatalogKey(parentID, nodeName, ses.bthr));
+                    findLEKey(currentNode, newCatalogKey(parentID, nodeName));
 
             if(matchingRecord == null)
                 return null;
@@ -390,11 +386,16 @@ public class CatalogFile extends BTreeFile {
 
 	// Leaf node reached. Find record.
 	if(nodeDescriptor.getNodeType() == NodeType.LEAF) {
-	    CommonHFSCatalogLeafNode leaf = newCatalogLeafNode(currentNodeData, 0, ses.bthr.getNodeSize(), ses.bthr);
+            CommonHFSCatalogLeafNode leaf =
+                    newCatalogLeafNode(currentNodeData, 0,
+                    ses.bthr.getNodeSize());
 	    CommonHFSCatalogLeafRecord[] recs = leaf.getLeafRecords();
 	    for(CommonHFSCatalogLeafRecord rec : recs)
-		if(rec.getKey().compareTo(newCatalogKey(parentID, nodeName, ses.bthr)) == 0)
+                if(rec.getKey().compareTo(newCatalogKey(parentID, nodeName)) ==
+                    0)
+                {
 		    return rec;
+                }
 	    return null;
 	}
 	else
@@ -446,7 +447,7 @@ public class CatalogFile extends BTreeFile {
 	if(nodeDescriptor.getNodeType() == NodeType.INDEX) {
 	    CommonBTKeyedNode<CommonBTIndexRecord<CommonHFSCatalogKey>>
                     currentNode =
-                    newCatalogIndexNode(currentNodeData, 0, nodeSize, bthr);
+                    newCatalogIndexNode(currentNodeData, 0, nodeSize);
 	    List<CommonBTIndexRecord<CommonHFSCatalogKey>> matchingRecords =
                     findLEChildKeys(currentNode, dirID);
 	    //System.out.println("Matching records: " + matchingRecords.length);
@@ -465,7 +466,7 @@ public class CatalogFile extends BTreeFile {
 	}
 	else if(nodeDescriptor.getNodeType() == NodeType.LEAF) {
 	    CommonHFSCatalogLeafNode currentNode =
-                    newCatalogLeafNode(currentNodeData, 0, nodeSize, bthr);
+                    newCatalogLeafNode(currentNodeData, 0, nodeSize);
 
 	    return getChildrenTo(currentNode, dirID);
 	}
@@ -518,23 +519,27 @@ public class CatalogFile extends BTreeFile {
     */
 
     protected CommonHFSCatalogIndexNode newCatalogIndexNode(byte[] data,
-            int offset, int nodeSize, CommonBTHeaderRecord bthr) {
-        return ops.newCatalogIndexNode(data, offset, nodeSize, bthr);
+            int offset, int nodeSize)
+    {
+        return vol.newCatalogIndexNode(data, offset, nodeSize);
     }
 
     protected CommonHFSCatalogKey newCatalogKey(CommonHFSCatalogNodeID nodeID,
-            CommonHFSCatalogString searchString, CommonBTHeaderRecord bthr) {
-        return ops.newCatalogKey(nodeID, searchString, bthr);
+            CommonHFSCatalogString searchString)
+    {
+        return vol.newCatalogKey(nodeID, searchString);
     }
 
     protected CommonHFSCatalogLeafNode newCatalogLeafNode(byte[] data,
-            int offset, int nodeSize, CommonBTHeaderRecord bthr) {
-        return ops.newCatalogLeafNode(data, offset, nodeSize, bthr);
+            int offset, int nodeSize)
+    {
+        return vol.newCatalogLeafNode(data, offset, nodeSize);
     }
 
     protected CommonHFSCatalogLeafRecord newCatalogLeafRecord(byte[] data,
-            int offset, CommonBTHeaderRecord bthr) {
-        return ops.newCatalogLeafRecord(data, offset, bthr);
+            int offset)
+    {
+        return vol.newCatalogLeafRecord(data, offset);
     }
 
     private static void printStructArray(PrintStream ps, String prefix,

@@ -21,20 +21,29 @@ import java.io.IOException;
 import java.io.OutputStream;
 import org.catacombae.hfs.io.ForkFilter;
 import org.catacombae.hfs.io.ReadableBlockCachingStream;
+import org.catacombae.hfs.types.hfscommon.CommonBTHeaderNode;
+import org.catacombae.hfs.types.hfscommon.CommonBTHeaderRecord;
+import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor;
 import org.catacombae.io.ReadableRandomAccessSubstream;
 import org.catacombae.io.SynchronizedReadableRandomAccess;
 import org.catacombae.io.SynchronizedReadableRandomAccessStream;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFile;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFileRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFolderRecord;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogIndexNode;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogKey;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogLeafNode;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogNodeID;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogNodeID.ReservedID;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogString;
+import org.catacombae.hfs.types.hfscommon.CommonHFSExtentIndexNode;
 import org.catacombae.hfs.types.hfscommon.CommonHFSExtentKey;
+import org.catacombae.hfs.types.hfscommon.CommonHFSExtentLeafNode;
 import org.catacombae.hfs.types.hfscommon.CommonHFSForkData;
+import org.catacombae.hfs.types.hfscommon.CommonHFSForkType;
 import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
+import org.catacombae.io.Readable;
 import org.catacombae.io.ReadableRandomAccessStream;
 
 /**
@@ -81,11 +90,8 @@ public abstract class HFSVolume {
     private boolean closed = false;
 
     protected HFSVolume(ReadableRandomAccessStream hfsFile,
-            boolean cachingEnabled,
-            BTreeOperations btreeOperations,
-            CatalogOperations catalogOperations,
-            ExtentsOverflowOperations extentsOverflowOperations) {
-
+            boolean cachingEnabled)
+    {
         //System.err.println("HFSVolume(" + hfsFile + ", " +
         //        cachingEnabled + ", " + btreeOperations + ", " +
         //        catalogOperations + ", " + extentsOverflowOperations + ");");
@@ -104,11 +110,9 @@ public abstract class HFSVolume {
         if(cachingEnabled)
             enableFileSystemCaching();
 
-        this.catalogFile = new CatalogFile(this,
-                btreeOperations, catalogOperations);
+        this.catalogFile = new CatalogFile(this);
 
-        this.extentsOverflowFile = new ExtentsOverflowFile(this,
-                btreeOperations, extentsOverflowOperations);
+        this.extentsOverflowFile = new ExtentsOverflowFile(this);
 
         try {
             runSanityChecks();
@@ -531,4 +535,36 @@ public abstract class HFSVolume {
     public int getPhysicalBlockSize() {
         return physicalBlockSize;
     }
+
+    public abstract CommonBTHeaderNode createCommonBTHeaderNode(
+            byte[] currentNodeData, int offset, int nodeSize);
+
+    public abstract CommonBTNodeDescriptor readNodeDescriptor(Readable rd);
+
+    public abstract CommonBTHeaderRecord readHeaderRecord(Readable rd);
+
+    public abstract CommonBTNodeDescriptor createCommonBTNodeDescriptor(
+            byte[] currentNodeData, int offset);
+
+    public abstract CommonHFSCatalogIndexNode newCatalogIndexNode(byte[] data,
+            int offset, int nodeSize);
+
+    public abstract CommonHFSCatalogKey newCatalogKey(
+            CommonHFSCatalogNodeID nodeID, CommonHFSCatalogString searchString);
+
+    public abstract CommonHFSCatalogLeafNode newCatalogLeafNode(byte[] data,
+            int offset, int nodeSize);
+
+    public abstract CommonHFSCatalogLeafRecord newCatalogLeafRecord(byte[] data,
+            int offset);
+
+    public abstract CommonHFSExtentIndexNode createCommonHFSExtentIndexNode(
+            byte[] currentNodeData, int offset, int nodeSize);
+
+    public abstract CommonHFSExtentLeafNode createCommonHFSExtentLeafNode(
+            byte[] currentNodeData, int offset, int nodeSize);
+
+    public abstract CommonHFSExtentKey createCommonHFSExtentKey(
+            CommonHFSForkType forkType, CommonHFSCatalogNodeID fileID,
+            int startBlock);
 }

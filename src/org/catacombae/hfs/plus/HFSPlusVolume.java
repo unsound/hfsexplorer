@@ -47,9 +47,6 @@ import org.catacombae.io.Readable;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfs.AllocationFile;
 import org.catacombae.hfs.AttributesFile;
-import org.catacombae.hfs.BTreeOperations;
-import org.catacombae.hfs.CatalogOperations;
-import org.catacombae.hfs.ExtentsOverflowOperations;
 import org.catacombae.hfs.HFSVolume;
 import org.catacombae.hfs.HotFilesFile;
 import org.catacombae.hfs.Journal;
@@ -62,10 +59,6 @@ import org.catacombae.util.Util;
 public class HFSPlusVolume extends HFSVolume {
     private static final CommonHFSCatalogString EMPTY_STRING =
             CommonHFSCatalogString.createHFSPlus(new HFSUniStr255(""));
-    private static final BTreeOperations btreeOperations =
-            new HFSPlusBTreeOperations();
-    private static final ExtentsOverflowOperations extentsOverflowOperations =
-            new HFSPlusExtentsOverflowOperations();
 
     private final HFSPlusAllocationFile allocationFile;
     private final HFSPlusJournal journal;
@@ -74,14 +67,7 @@ public class HFSPlusVolume extends HFSVolume {
     public HFSPlusVolume(ReadableRandomAccessStream hfsFile,
             boolean cachingEnabled) {
 
-        this(hfsFile, cachingEnabled, new HFSPlusCatalogOperations());
-    }
-
-    protected HFSPlusVolume(ReadableRandomAccessStream hfsFile,
-            boolean cachingEnabled, CatalogOperations catalogOperations) {
-
-        super(hfsFile, cachingEnabled, btreeOperations, catalogOperations,
-                extentsOverflowOperations);
+        super(hfsFile, cachingEnabled);
 
         this.allocationFile = createAllocationFile();
         this.journal = new HFSPlusJournal(this);
@@ -93,8 +79,7 @@ public class HFSPlusVolume extends HFSVolume {
             this.attributesFile = null;
         }
         else {
-            this.attributesFile = new AttributesFile(this,
-                    new HFSPlusBTreeOperations());
+            this.attributesFile = new AttributesFile(this);
         }
     }
 
@@ -229,114 +214,96 @@ public class HFSPlusVolume extends HFSVolume {
         super.close();
     }
 
-    private static class HFSPlusBTreeOperations implements BTreeOperations {
-
-        public CommonBTHeaderNode createCommonBTHeaderNode(
-                byte[] currentNodeData, int offset, int nodeSize) {
-
-            return CommonBTHeaderNode.createHFSPlus(currentNodeData, offset,
-                    nodeSize);
-        }
-
-        public CommonBTNodeDescriptor readNodeDescriptor(Readable rd) {
-
-            byte[] data = new byte[BTNodeDescriptor.length()];
-            rd.readFully(data);
-            final BTNodeDescriptor btnd = new BTNodeDescriptor(data, 0);
-
-            return CommonBTNodeDescriptor.create(btnd);
-        }
-
-        public CommonBTHeaderRecord readHeaderRecord(Readable rd) {
-
-            byte[] data = new byte[BTHeaderRec.length()];
-            rd.readFully(data);
-            BTHeaderRec bthr = new BTHeaderRec(data, 0);
-
-            return CommonBTHeaderRecord.create(bthr);
-        }
-
-        public CommonBTNodeDescriptor createCommonBTNodeDescriptor(
-                byte[] currentNodeData, int offset) {
-
-            final BTNodeDescriptor btnd = new BTNodeDescriptor(currentNodeData,
-                    offset);
-            return CommonBTNodeDescriptor.create(btnd);
-        }
-
+    public CommonBTHeaderNode createCommonBTHeaderNode(byte[] currentNodeData,
+            int offset, int nodeSize)
+    {
+        return CommonBTHeaderNode.createHFSPlus(currentNodeData, offset,
+                nodeSize);
     }
 
-    private static class HFSPlusCatalogOperations implements CatalogOperations {
+    public CommonBTNodeDescriptor readNodeDescriptor(Readable rd) {
+        byte[] data = new byte[BTNodeDescriptor.length()];
+        rd.readFully(data);
+        final BTNodeDescriptor btnd = new BTNodeDescriptor(data, 0);
 
-        public CommonHFSCatalogIndexNode newCatalogIndexNode(byte[] data,
-                int offset, int nodeSize, CommonBTHeaderRecord bthr) {
-
-            return CommonHFSCatalogIndexNode.createHFSPlus(data, offset,
-                    nodeSize);
-        }
-
-        public CommonHFSCatalogKey newCatalogKey(CommonHFSCatalogNodeID nodeID,
-                CommonHFSCatalogString searchString,
-                CommonBTHeaderRecord bthr) {
-
-            return CommonHFSCatalogKey.create(new HFSPlusCatalogKey(
-                    new HFSCatalogNodeID((int)nodeID.toLong()),
-                    new HFSUniStr255(searchString.getStructBytes(), 0)));
-        }
-
-        public CommonHFSCatalogLeafNode newCatalogLeafNode(byte[] data,
-                int offset, int nodeSize, CommonBTHeaderRecord bthr) {
-
-            return CommonHFSCatalogLeafNode.createHFSPlus(data, offset,
-                    nodeSize);
-        }
-
-        public CommonHFSCatalogLeafRecord newCatalogLeafRecord(byte[] data,
-                int offset, CommonBTHeaderRecord bthr) {
-
-            return CommonHFSCatalogLeafRecord.createHFSPlus(data, offset,
-                    data.length-offset);
-        }
-
+        return CommonBTNodeDescriptor.create(btnd);
     }
 
-    private static class HFSPlusExtentsOverflowOperations
-            implements ExtentsOverflowOperations {
+    public CommonBTHeaderRecord readHeaderRecord(Readable rd) {
+        byte[] data = new byte[BTHeaderRec.length()];
+        rd.readFully(data);
+        BTHeaderRec bthr = new BTHeaderRec(data, 0);
 
-        public CommonHFSExtentIndexNode createCommonHFSExtentIndexNode(
-                byte[] currentNodeData, int offset, int nodeSize) {
+        return CommonBTHeaderRecord.create(bthr);
+    }
 
-            return CommonHFSExtentIndexNode.createHFSPlus(currentNodeData,
-                    offset, nodeSize);
+    public CommonBTNodeDescriptor createCommonBTNodeDescriptor(
+            byte[] currentNodeData, int offset)
+    {
+        final BTNodeDescriptor btnd =
+                new BTNodeDescriptor(currentNodeData, offset);
+        return CommonBTNodeDescriptor.create(btnd);
+    }
+
+    public CommonHFSCatalogIndexNode newCatalogIndexNode(byte[] data,
+            int offset, int nodeSize)
+    {
+        return CommonHFSCatalogIndexNode.createHFSPlus(data, offset, nodeSize);
+    }
+
+    public CommonHFSCatalogKey newCatalogKey(CommonHFSCatalogNodeID nodeID,
+            CommonHFSCatalogString searchString)
+    {
+        return CommonHFSCatalogKey.create(new HFSPlusCatalogKey(
+                new HFSCatalogNodeID((int)nodeID.toLong()),
+                new HFSUniStr255(searchString.getStructBytes(), 0)));
+    }
+
+    public CommonHFSCatalogLeafNode newCatalogLeafNode(byte[] data, int offset,
+            int nodeSize)
+    {
+        return CommonHFSCatalogLeafNode.createHFSPlus(data, offset, nodeSize);
+    }
+
+    public CommonHFSCatalogLeafRecord newCatalogLeafRecord(byte[] data,
+            int offset)
+    {
+        return CommonHFSCatalogLeafRecord.createHFSPlus(data, offset,
+                data.length - offset);
+    }
+
+    public CommonHFSExtentIndexNode createCommonHFSExtentIndexNode(
+            byte[] currentNodeData, int offset, int nodeSize)
+    {
+        return CommonHFSExtentIndexNode.createHFSPlus(currentNodeData, offset,
+                nodeSize);
+    }
+
+    public CommonHFSExtentLeafNode createCommonHFSExtentLeafNode(
+            byte[] currentNodeData, int offset, int nodeSize)
+    {
+        return CommonHFSExtentLeafNode.createHFSPlus(currentNodeData, offset,
+                nodeSize);
+    }
+
+    public CommonHFSExtentKey createCommonHFSExtentKey(
+            CommonHFSForkType forkType, CommonHFSCatalogNodeID fileID,
+            int startBlock) {
+
+        final byte forkTypeByte;
+        switch(forkType) {
+            case DATA_FORK:
+                forkTypeByte = HFSPlusExtentKey.DATA_FORK;
+                break;
+            case RESOURCE_FORK:
+                forkTypeByte = HFSPlusExtentKey.RESOURCE_FORK;
+                break;
+            default:
+                throw new RuntimeException("Invalid fork type");
         }
 
-        public CommonHFSExtentLeafNode createCommonHFSExtentLeafNode(
-                byte[] currentNodeData, int offset, int nodeSize) {
-
-            return CommonHFSExtentLeafNode.createHFSPlus(currentNodeData,
-                    offset, nodeSize);
-        }
-
-        public CommonHFSExtentKey createCommonHFSExtentKey(
-                CommonHFSForkType forkType, CommonHFSCatalogNodeID fileID,
-                int startBlock) {
-
-            final byte forkTypeByte;
-            switch(forkType) {
-                case DATA_FORK:
-                    forkTypeByte = HFSPlusExtentKey.DATA_FORK;
-                    break;
-                case RESOURCE_FORK:
-                    forkTypeByte = HFSPlusExtentKey.RESOURCE_FORK;
-                    break;
-                default:
-                    throw new RuntimeException("Invalid fork type");
-            }
-
-            HFSPlusExtentKey key = new HFSPlusExtentKey(forkTypeByte,
-                    new HFSCatalogNodeID((int) fileID.toLong()), startBlock);
-            return CommonHFSExtentKey.create(key);
-        }
-
+        HFSPlusExtentKey key = new HFSPlusExtentKey(forkTypeByte,
+                new HFSCatalogNodeID((int) fileID.toLong()), startBlock);
+        return CommonHFSExtentKey.create(key);
     }
 }

@@ -38,7 +38,8 @@ public class HFSPlusCatalogLeafRecord implements PrintableStruct {
 	if(catalogHeaderRec == null)
 	    key = new HFSPlusCatalogKey(data, offset);
 	else
-	    key = new HFSXCatalogKey(data, offset, catalogHeaderRec);
+            key = new HFSXCatalogKey(data, offset,
+                    catalogHeaderRec.getKeyCompareType());
 
 	short recordType = Util.readShortBE(data, offset+key.length());
 	if(recordType == HFS_PLUS_FOLDER_RECORD)

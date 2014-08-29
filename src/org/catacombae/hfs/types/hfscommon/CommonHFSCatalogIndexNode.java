@@ -17,7 +17,6 @@
 
 package org.catacombae.hfs.types.hfscommon;
 
-import org.catacombae.hfs.types.hfsplus.BTHeaderRec;
 import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogKey;
 import org.catacombae.hfs.types.hfsx.HFSXCatalogKey;
 import org.catacombae.hfs.types.hfs.CatKeyRec;
@@ -40,8 +39,11 @@ public abstract class CommonHFSCatalogIndexNode
     public static CommonHFSCatalogIndexNode createHFSPlus(byte[] data, int offset, int nodeSize) {
         return new HFSPlusImplementation(data, offset, nodeSize).getNode();
     }
-    public static CommonHFSCatalogIndexNode createHFSX(byte[] data, int offset, int nodeSize, BTHeaderRec bthr) {
-        return new HFSXImplementation(data, offset, nodeSize, bthr).getNode();
+    public static CommonHFSCatalogIndexNode createHFSX(byte[] data, int offset,
+            int nodeSize, byte keyCompareType)
+    {
+        return new HFSXImplementation(data, offset, nodeSize, keyCompareType).
+                getNode();
     }
 
     private static class HFSImplementation {
@@ -92,7 +94,7 @@ public abstract class CommonHFSCatalogIndexNode
 
     private static class HFSXImplementation {
         private final Internal i;
-        private final BTHeaderRec catalogHeaderRec;
+        private final byte keyCompareType;
 
         private class Internal extends CommonHFSCatalogIndexNode {
             public Internal(byte[] data, int offset, int nodeSize) {
@@ -101,13 +103,14 @@ public abstract class CommonHFSCatalogIndexNode
             @Override
             protected CommonBTIndexRecord<CommonHFSCatalogKey> createBTRecord(int recordNumber, byte[] data, int offset, int length) {
                 CommonHFSCatalogKey currentKey =
-                        CommonHFSCatalogKey.create(new HFSXCatalogKey(data, offset, catalogHeaderRec));
+                        CommonHFSCatalogKey.create(new HFSXCatalogKey(data, offset, keyCompareType));
                 return CommonBTIndexRecord.createHFSPlus(currentKey, data, offset);
             }
         }
         public HFSXImplementation(byte[] data, int offset, int nodeSize,
-                BTHeaderRec catalogHeaderRec) {
-            this.catalogHeaderRec = catalogHeaderRec;
+                byte keyCompareType)
+        {
+            this.keyCompareType = keyCompareType;
             this.i = new Internal(data, offset, nodeSize);
         }
 
