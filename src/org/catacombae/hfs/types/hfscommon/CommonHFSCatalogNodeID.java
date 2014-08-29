@@ -51,6 +51,8 @@ public abstract class CommonHFSCatalogNodeID {
      */
    public abstract long toLong();
 
+   public abstract CommonHFSCatalogNodeID add(long value);
+
     /**
      * Returns a CommonHFSCatalogNodeID for a specified reserved ID, if the
      * reserved ID is supported for the implementation (otherwise null is
@@ -179,6 +181,16 @@ public abstract class CommonHFSCatalogNodeID {
                             "!");
             }
         }
+
+        @Override
+        public CommonHFSCatalogNodeID add(long value) {
+            if(value < 0 || value > 0xFFFFFFFFL) {
+                throw new RuntimeException("Invalid value: " + value);
+            }
+
+            return new HFSPlusImplementation(
+                    new HFSCatalogNodeID((int) (toLong() + value)));
+        }
     }
 
     public static class HFSImplementation extends CommonHFSCatalogNodeID {
@@ -236,6 +248,15 @@ public abstract class CommonHFSCatalogNodeID {
                     throw new RuntimeException("Unknown reserved id: " + id +
                             "!");
             }
+        }
+
+        @Override
+        public CommonHFSCatalogNodeID add(long value) {
+            if(value < 0 || value > 0xFFFFFFFFL) {
+                throw new RuntimeException("Invalid value: " + value);
+            }
+
+            return new HFSImplementation((int) (toLong() + value));
         }
     }
 }

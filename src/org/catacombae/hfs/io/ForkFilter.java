@@ -46,11 +46,9 @@ import org.catacombae.io.RuntimeIOException;
  */
 public class ForkFilter implements ReadableRandomAccessStream {
 
-    private final ForkType forkType;
-    private final long cnid;
     private final long forkLength;
     private final ArrayList<CommonHFSExtentDescriptor> extentDescriptors;
-    private final ExtentsOverflowFile extentsOverflowFile;
+    private final OverflowExtentsStore overflowExtentsStore;
     private final ReadableRandomAccessStream sourceFile;
     private final long fsOffset;
     private final long allocationBlockSize;
@@ -98,6 +96,26 @@ public class ForkFilter implements ReadableRandomAccessStream {
             ExtentsOverflowFile extentsOverflowFile,
             ReadableRandomAccessStream sourceFile, long fsOffset, long allocationBlockSize,
             long firstBlockByteOffset) {
+        this(forkLength, basicExtents,
+                new ExtentsOverflowFileStore(extentsOverflowFile, forkType,
+                cnid), sourceFile, fsOffset, allocationBlockSize,
+                firstBlockByteOffset);
+    }
+
+    public ForkFilter(long forkLength, CommonHFSExtentDescriptor[] allExtents,
+            ReadableRandomAccessStream sourceFile, long fsOffset,
+            long allocationBlockSize, long firstBlockByteOffset)
+    {
+        this(forkLength, allExtents, null, sourceFile, fsOffset,
+                allocationBlockSize, firstBlockByteOffset);
+    }
+
+    private ForkFilter(long forkLength,
+            CommonHFSExtentDescriptor[] initialExtents,
+            OverflowExtentsStore overflowExtentsStore,
+            ReadableRandomAccessStream sourceFile, long fsOffset, long allocationBlockSize,
+            long firstBlockByteOffset)
+    {
         //System.err.println("ForkFilter.<init>(" + forkLength + ", " +
         //        extentDescriptors + ", " + sourceFile + ", " + fsOffset +
         //        ", " + allocationBlockSize + ", " + firstBlockByteOffset +
@@ -105,23 +123,11 @@ public class ForkFilter implements ReadableRandomAccessStream {
         //System.err.println("  fork has " + extentDescriptors.length +
         //        " extents.");
 
-        if(forkType == null) {
-            throw new IllegalArgumentException("A null value is not allowed " +
-                    "in 'forkType'.");
-        }
-
-        if(cnid > 0xFFFFFFFFL) {
-            throw new IllegalArgumentException("Value of 'cnid' is too " +
-                    "large: " + cnid);
-        }
-
-        this.forkType = forkType;
-        this.cnid = cnid;
         this.forkLength = forkLength;
         this.extentDescriptors =
                 new ArrayList<CommonHFSExtentDescriptor>(Arrays.asList(
-                basicExtents));
-        this.extentsOverflowFile = extentsOverflowFile;
+                initialExtents));
+        this.overflowExtentsStore = overflowExtentsStore;
         this.sourceFile = sourceFile;
         this.fsOffset = fsOffset;
         this.allocationBlockSize = allocationBlockSize;
@@ -167,8 +173,8 @@ public class ForkFilter implements ReadableRandomAccessStream {
             /* Need to read the next overflow extent into
              * extentDescriptors. */
 
-            if(extentsOverflowFile == null) {
-                throw new RuntimeIOException("No extents overflow file to " +
+            if(overflowExtentsStore == null) {
+                throw new RuntimeIOException("No overflow extents store to " +
                         "query for overflow extents.");
             }
 
@@ -179,16 +185,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
             }
             else {
                 extentRecord =
-                        extentsOverflowFile.getOverflowExtent(
-                        forkType == ForkType.RESOURCE ? true : false,
-                        (int) cnid, curStartBlock);
-            }
-
-            if(extentRecord == null) {
-                throw new RuntimeIOException("Unable to find extent record " +
-                        "for " + (forkType == ForkType.RESOURCE ? "resource" :
-                            "data") + " fork of CNID " + cnid + ", start " +
-                            "block " + startBlock + ".");
+                        overflowExtentsStore.getExtentRecord(curStartBlock);
             }
 
             final CommonHFSExtentDescriptor[] descriptors =
@@ -381,5 +378,51 @@ public class ForkFilter implements ReadableRandomAccessStream {
     /* @Override */
     public void close() {
         sourceFile.close();
+    }
+
+    private static abstract class OverflowExtentsStore {
+        public abstract CommonHFSExtentLeafRecord getExtentRecord(
+                long startBlock);
+    }
+
+    private static class ExtentsOverflowFileStore extends OverflowExtentsStore {
+        private final ExtentsOverflowFile extentsOverflowFile;
+        private final ForkType forkType;
+        private final long cnid;
+
+        public ExtentsOverflowFileStore(ExtentsOverflowFile extentsOverflowFile,
+                ForkType forkType, long cnid)
+        {
+            if(forkType == null) {
+                throw new IllegalArgumentException("A null value is not " +
+                        "allowed in 'forkType'.");
+            }
+
+            if(cnid > 0xFFFFFFFFL) {
+                throw new IllegalArgumentException("Value of 'cnid' is too " +
+                        "large: " + cnid);
+            }
+
+            this.extentsOverflowFile = extentsOverflowFile;
+            this.forkType = forkType;
+            this.cnid = cnid;
+        }
+
+        @Override
+        public CommonHFSExtentLeafRecord getExtentRecord(long startBlock) {
+            final CommonHFSExtentLeafRecord rec =
+                    extentsOverflowFile.getOverflowExtent(
+                    forkType == ForkType.RESOURCE ? true : false,
+                    (int) cnid, startBlock);
+
+            if(rec == null) {
+                throw new RuntimeIOException("Unable to find extent record " +
+                        "for " + (forkType == ForkType.RESOURCE ? "resource" :
+                            "data") + " fork of CNID " + cnid + ", start " +
+                            "block " + startBlock + ".");
+            }
+
+            return rec;
+        }
     }
 }

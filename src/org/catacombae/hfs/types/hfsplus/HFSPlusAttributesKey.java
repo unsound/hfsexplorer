@@ -74,6 +74,29 @@ public class HFSPlusAttributesKey extends BTKey
                 Util.createCopy(data, offset+14, 2*this.attrNameLen);
     }
 
+    public HFSPlusAttributesKey(HFSCatalogNodeID fileID, int startBlock,
+            char[] attrName)
+    {
+        int keyLengthInt = STATIC_SIZE + 2 * attrName.length;
+        if(keyLengthInt > Short.MAX_VALUE) {
+            throw new RuntimeException("Attribute name is too long: " +
+                    attrName);
+        }
+
+        this.keyLength = (short) keyLengthInt;
+        this.pad = 0;
+        this.fileID = fileID;
+        this.startBlock = startBlock;
+        this.attrNameLen = (short) attrName.length;
+
+        if(this.attrNameLen > kHFSMaxAttrNameLen) {
+            throw new RuntimeException("Invalid attrNameLen value: " +
+                    this.attrNameLen);
+        }
+
+        this.attrName = Util.readByteArrayBE(attrName);
+    }
+
     public int length() { return occupiedSize(); }
 
 

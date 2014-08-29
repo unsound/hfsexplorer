@@ -17,12 +17,19 @@
 
 package org.catacombae.storage.fs.hfscommon;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import org.catacombae.hfs.AttributesFile;
+import org.catacombae.hfs.types.hfscommon.CommonHFSAttributesLeafRecord;
 import org.catacombae.util.Util;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogAttributes;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogNodeID;
 import org.catacombae.hfs.types.hfscommon.CommonHFSFinderInfo;
 import org.catacombae.storage.fs.BasicFSEntry;
 import org.catacombae.storage.fs.FSFork;
 import org.catacombae.storage.fs.FSForkType;
+import org.catacombae.util.Util.Pair;
 
 /**
  *
@@ -34,6 +41,7 @@ public abstract class HFSCommonFSEntry extends BasicFSEntry {
     protected final CommonHFSCatalogAttributes catalogAttributes;
     private FSFork finderInfoFork = null;
     private boolean finderInfoForkLoaded = false;
+    LinkedList<FSFork> attributeForkList = null;
 
     protected HFSCommonFSEntry(HFSCommonFileSystemHandler parentFileSystem,
             CommonHFSCatalogAttributes catalogAttributes) {
@@ -43,17 +51,84 @@ public abstract class HFSCommonFSEntry extends BasicFSEntry {
         this.catalogAttributes = catalogAttributes;
     }
 
+    private synchronized List<FSFork> getAttributeForks() {
+        if(attributeForkList == null) {
+            LinkedList<FSFork> forkList = new LinkedList<FSFork>();
+
+            AttributesFile attributesFile =
+                    fsHandler.getFSView().getAttributesFile();
+            if(attributesFile != null) {
+                LinkedList<Pair<char[],
+                        LinkedList<CommonHFSAttributesLeafRecord>>>
+                        attributeBucketList =
+                        new LinkedList<Pair<char[],
+                        LinkedList<CommonHFSAttributesLeafRecord>>>();
+
+                for(CommonHFSAttributesLeafRecord attributeRecord :
+                        attributesFile.listAttributeRecords(getCatalogNodeID()))
+                {
+                    Pair<char[], LinkedList<CommonHFSAttributesLeafRecord>> p;
+
+                    if(!attributeBucketList.isEmpty() &&
+                           (p = attributeBucketList.getLast()) != null)
+                    {
+                        if(Arrays.equals(p.getA(),
+                                attributeRecord.getKey().getAttrName()))
+                        {
+                            p.getB().addLast(attributeRecord);
+                        }
+                    }
+                    else {
+                        LinkedList<CommonHFSAttributesLeafRecord> bucket =
+                                new LinkedList<CommonHFSAttributesLeafRecord>();
+                        bucket.add(attributeRecord);
+
+                        p = new Pair<char[],
+                                LinkedList<CommonHFSAttributesLeafRecord>>(
+                                attributeRecord.getKey().getAttrName(), bucket);
+                        attributeBucketList.add(p);
+                    }
+                }
+
+                for(Pair<char[], LinkedList<CommonHFSAttributesLeafRecord>> p :
+                        attributeBucketList)
+                {
+                    LinkedList<CommonHFSAttributesLeafRecord> recordList =
+                            p.getB();
+
+                    forkList.add(new HFSCommonAttributeFork(this,
+                            recordList.toArray(
+                            new CommonHFSAttributesLeafRecord[recordList.
+                            size()])));
+                }
+            }
+
+            attributeForkList = forkList;
+        }
+
+        return attributeForkList;
+    }
+
     HFSCommonFileSystemHandler getFileSystemHandler() {
         return fsHandler;
     }
 
     /* @Override */
     public FSFork[] getAllForks() {
+        LinkedList<FSFork> forkList = new LinkedList<FSFork>();
+
         FSFork fork = getFinderInfoFork();
         if(fork != null)
-            return new FSFork[] { fork };
-        else
-            return new FSFork[0];
+            forkList.add(fork);
+
+        FSFork resourceFork = getResourceFork();
+        if(resourceFork != null) {
+            forkList.add(resourceFork);
+        }
+
+        forkList.addAll(getAttributeForks());
+
+        return forkList.toArray(new FSFork[forkList.size()]);
     }
 
     /* @Override */
@@ -75,6 +150,8 @@ public abstract class HFSCommonFSEntry extends BasicFSEntry {
             return 0;
     }
 
+    protected abstract CommonHFSCatalogNodeID getCatalogNodeID();
+
     public FSFork getFinderInfoFork() {
         if(!finderInfoForkLoaded) {
             CommonHFSFinderInfo finderInfo = catalogAttributes.getFinderInfo();
@@ -90,4 +167,6 @@ public abstract class HFSCommonFSEntry extends BasicFSEntry {
 
         return finderInfoFork;
     }
+
+    protected abstract FSFork getResourceFork();
 }

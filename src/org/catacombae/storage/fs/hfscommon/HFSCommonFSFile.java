@@ -20,6 +20,7 @@ package org.catacombae.storage.fs.hfscommon;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFile;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFileRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogLeafRecord;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogNodeID;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.storage.fs.FSAttributes;
 import org.catacombae.storage.fs.FSFile;
@@ -135,6 +136,16 @@ public class HFSCommonFSFile extends HFSCommonFSEntry implements FSFile {
     public long getCombinedLength() {
         return super.getCombinedLength() + dataFork.getLength() +
                 resourceFork.getLength();
+    }
+
+    /* @Override */
+    protected CommonHFSCatalogNodeID getCatalogNodeID() {
+        return fileRecord.getData().getFileID();
+    }
+
+    /* @Override */
+    protected FSFork getResourceFork() {
+        return resourceFork;
     }
 
     ReadableRandomAccessStream getReadableDataForkStream() {

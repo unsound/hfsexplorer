@@ -21,9 +21,11 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFileRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFolder;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFolderRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogLeafRecord;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogNodeID;
 import org.catacombae.storage.fs.FSAttributes;
 import org.catacombae.storage.fs.FSEntry;
 import org.catacombae.storage.fs.FSFolder;
+import org.catacombae.storage.fs.FSFork;
 
 /**
  *
@@ -107,6 +109,16 @@ public class HFSCommonFSFolder extends HFSCommonFSEntry implements FSFolder {
         return fsHandler.lookupParentFolder(keyRecord);
     }
      * */
+
+    /* @Override */
+    protected CommonHFSCatalogNodeID getCatalogNodeID() {
+        return folderRecord.getData().getFolderID();
+    }
+
+    /* @Override */
+    protected FSFork getResourceFork() {
+        return null;
+    }
 
     public CommonHFSCatalogFolder getInternalCatalogFolder() {
         return folderRecord.getData();

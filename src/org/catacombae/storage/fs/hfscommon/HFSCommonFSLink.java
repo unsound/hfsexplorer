@@ -29,7 +29,7 @@ import org.catacombae.storage.fs.FSLink;
  *
  * @author erik
  */
-public class HFSCommonFSLink extends HFSCommonFSEntry implements FSLink {
+public class HFSCommonFSLink extends HFSCommonFSFile implements FSLink {
     private static final boolean DEBUG = Util.booleanEnabledByProperties(false,
             "org.catacombae.debug",
             "org.catacombae.storage.debug",
@@ -42,7 +42,7 @@ public class HFSCommonFSLink extends HFSCommonFSEntry implements FSLink {
 
     public HFSCommonFSLink(HFSCommonFileSystemHandler fsHandler,
             CommonHFSCatalogFileRecord linkRecord) {
-        super(fsHandler, linkRecord.getData());
+        super(fsHandler, linkRecord);
 
         this.linkRecord = linkRecord;
 

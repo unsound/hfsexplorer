@@ -96,7 +96,16 @@ public class HFSPlusAttributesData extends HFSPlusAttributesLeafRecordData
     public final long[] getReserved() { return Util.unsign(getRawReserved()); }
     /** size of attribute data in bytes */
     public final long getAttrSize() { return Util.unsign(getRawAttrSize()); }
+
     /** variable length */
+    public final byte[] getAttrData() {
+        if(attrData2 != null) {
+            throw new RuntimeException("Attribute data size is too large for " +
+                    "Java byte[] address space.");
+        }
+
+        return Util.createCopy(attrData1);
+    }
 
     public final int readAttrData(long pos, byte[] b, int offset, int length) {
         final long unsignedAttrSize = getAttrSize();
