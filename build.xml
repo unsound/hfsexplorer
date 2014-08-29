@@ -195,7 +195,7 @@
              windowtitle="HFSExplorer API">
       
       <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
-      <link href="../../CatacombaeFramework/javadoc.~/"/>
+      <link href="../../catacombaeframework/javadoc.~/"/>
       <classpath>
 	<path refid="javadoc.classpath"/>
       </classpath>
