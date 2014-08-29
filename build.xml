@@ -57,7 +57,8 @@
     <echo message="                  hfs-jfuse."/>
     <echo message="  build-mkapm   - Builds mkapm, a utility for creating Apple"/>
     <echo message="                  Partition Map layouts."/>
-    <echo message="  javadoc       - Creates the javadoc documentation for the project."/>
+    <echo message="  javadoc       - Creates the javadoc documentation for the"/>
+    <echo message="                  project."/>
   </target>
   
   
