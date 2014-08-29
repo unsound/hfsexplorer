@@ -26,7 +26,9 @@ import org.catacombae.hfs.types.hfs.CatKeyRec;
  *
  * @author erik
  */
-public abstract class CommonHFSCatalogIndexNode extends CommonBTIndexNode<CommonHFSCatalogKey> {
+public abstract class CommonHFSCatalogIndexNode
+        extends CommonBTKeyedNode<CommonBTIndexRecord<CommonHFSCatalogKey>>
+{
     protected CommonHFSCatalogIndexNode(byte[] data, int offset, int nodeSize,
             FSType type) {
 	super(data, offset, nodeSize, type);

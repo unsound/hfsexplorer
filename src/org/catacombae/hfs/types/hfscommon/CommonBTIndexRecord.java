@@ -24,7 +24,9 @@ import org.catacombae.util.Util;
  *
  * @author erik
  */
-public abstract class CommonBTIndexRecord <K extends CommonBTKey<K>> extends CommonBTRecord {
+public abstract class CommonBTIndexRecord <K extends CommonBTKey<K>>
+        extends CommonBTKeyedRecord<K>
+{
     protected final K key;
     protected final byte[] index = new byte[4];
 

@@ -24,7 +24,7 @@ import org.catacombae.hfs.types.hfsplus.HFSPlusAttributesKey;
  * @author erik
  */
 public abstract class CommonHFSAttributesIndexNode
-        extends CommonBTIndexNode<CommonHFSAttributesKey>
+        extends CommonBTKeyedNode<CommonBTIndexRecord<CommonHFSAttributesKey>>
 {
     protected CommonHFSAttributesIndexNode(byte[] data, int offset,
             int nodeSize, FSType type)

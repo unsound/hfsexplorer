@@ -27,7 +27,8 @@ import org.catacombae.hfs.types.hfsplus.HFSPlusAttributesLeafRecordData;
  *
  * @author erik
  */
-public abstract class CommonHFSAttributesLeafRecord extends CommonBTRecord
+public abstract class CommonHFSAttributesLeafRecord
+        extends CommonBTLeafRecord<CommonHFSAttributesKey>
         implements StructElements
 {
     public static CommonHFSAttributesLeafRecord create(

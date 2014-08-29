@@ -24,7 +24,7 @@ import org.catacombae.hfs.types.hfsplus.HFSPlusAttributesLeafRecord;
  * @author erik
  */
 public abstract class CommonHFSAttributesLeafNode
-        extends CommonBTNode<CommonHFSAttributesLeafRecord>
+        extends CommonBTKeyedNode<CommonHFSAttributesLeafRecord>
 {
     protected CommonHFSAttributesLeafNode(byte[] data, int offset, int nodeSize,
             FSType type)

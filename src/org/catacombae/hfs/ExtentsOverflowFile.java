@@ -21,8 +21,8 @@ import java.util.LinkedList;
 import org.catacombae.hfs.io.ForkFilter;
 import org.catacombae.hfs.types.hfscommon.CommonBTHeaderNode;
 import org.catacombae.io.ReadableRandomAccessSubstream;
-import org.catacombae.hfs.types.hfscommon.CommonBTIndexNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTIndexRecord;
+import org.catacombae.hfs.types.hfscommon.CommonBTKeyedNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor;
 import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor.NodeType;
@@ -205,7 +205,10 @@ public class ExtentsOverflowFile extends BTreeFile {
 
 	while(nodeDescriptor.getNodeType() == NodeType.INDEX) {
             //System.err.println("getOverflowExtent(): Processing index node...");
-	    CommonBTIndexNode<CommonHFSExtentKey> currentNode = createCommonHFSExtentIndexNode(currentNodeData, 0, nodeSize);
+	    CommonBTKeyedNode<CommonBTIndexRecord<CommonHFSExtentKey>>
+                    currentNode =
+                    createCommonHFSExtentIndexNode(currentNodeData, 0,
+                    nodeSize);
 
 	    CommonBTIndexRecord<CommonHFSExtentKey> matchingRecord = findLEKey(currentNode, key);
             //System.err.println("getOverflowExtent(): findLEKey found a child node with key: " +

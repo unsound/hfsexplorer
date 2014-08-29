@@ -24,7 +24,9 @@ import org.catacombae.hfs.types.hfs.ExtKeyRec;
  *
  * @author erik
  */
-public abstract class CommonHFSExtentIndexNode extends CommonBTIndexNode<CommonHFSExtentKey> {
+public abstract class CommonHFSExtentIndexNode
+        extends CommonBTKeyedNode<CommonBTIndexRecord<CommonHFSExtentKey>>
+{
 
     protected CommonHFSExtentIndexNode(byte[] data, int offset, int nodeSize, FSType type) {
         super(data, offset, nodeSize, type);

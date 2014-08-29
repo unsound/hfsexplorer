@@ -37,7 +37,10 @@ import org.catacombae.hfs.types.hfs.CdrThdRec;
  *
  * @author erik
  */
-public abstract class CommonHFSCatalogLeafRecord extends CommonBTRecord implements StructElements {
+public abstract class CommonHFSCatalogLeafRecord
+        extends CommonBTLeafRecord<CommonHFSCatalogKey>
+        implements StructElements
+{
 
     public static CommonHFSCatalogLeafRecord createHFS(byte[] data, int offset, int length) {
         final CatKeyRec key;

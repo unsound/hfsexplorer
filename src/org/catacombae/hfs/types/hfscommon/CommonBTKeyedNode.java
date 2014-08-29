@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2008 Erik Larsson
+ * Copyright (C) 2014 Erik Larsson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,30 +17,25 @@
 
 package org.catacombae.hfs.types.hfscommon;
 
-/**
- *
- * @author erik
- */
-public abstract class CommonBTIndexNode <K extends CommonBTKey<K>> extends CommonBTNode<CommonBTIndexRecord<K>> {
+import java.util.List;
 
-    protected CommonBTIndexNode(byte[] data, int offset, int nodeSize, FSType type) {
+/**
+ * @author <a href="http://www.catacombae.org">Erik Larsson</a>
+ */
+public abstract class CommonBTKeyedNode <R extends CommonBTKeyedRecord>
+        extends CommonBTNode<R>
+{
+    protected CommonBTKeyedNode(byte[] data, int offset, int nodeSize,
+            FSType type)
+    {
         super(data, offset, nodeSize, type);
     }
 
-    /*
-    public CommonBTIndexRecord<K>[] getIndexRecords() {
-
-        CommonBTIndexRecord<K>[] res = new CommonBTIndexRecord[ic.records.];
-
-        for(int i = 0; i < res.length; ++i) {
-            CommonBTRecord rec = ic.records[i];
-            if(rec instanceof CommonBTIndexRecord)
-                res[i] = (CommonBTIndexRecord)rec;
-            else
-                throw new RuntimeException("Invalid record type: " + rec.getClass());
-        }
-
-        return res;
+    public R getBTKeyedRecord(int index) {
+        return getBTRecord(index);
     }
-    */
+
+    public List<R> getBTKeyedRecords() {
+        return getBTRecords();
+    }
 }

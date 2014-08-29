@@ -25,8 +25,8 @@ import org.catacombae.hfs.io.ForkFilter;
 import org.catacombae.io.ReadableRandomAccessSubstream;
 import org.catacombae.hfs.types.hfscommon.CommonBTHeaderNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTHeaderRecord;
-import org.catacombae.hfs.types.hfscommon.CommonBTIndexNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTIndexRecord;
+import org.catacombae.hfs.types.hfscommon.CommonBTKeyedNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor;
 import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor.NodeType;
@@ -444,7 +444,8 @@ public class CatalogFile extends BTreeFile {
 
 	CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
 	if(nodeDescriptor.getNodeType() == NodeType.INDEX) {
-	    CommonBTIndexNode<CommonHFSCatalogKey> currentNode =
+	    CommonBTKeyedNode<CommonBTIndexRecord<CommonHFSCatalogKey>>
+                    currentNode =
                     newCatalogIndexNode(currentNodeData, 0, nodeSize, bthr);
 	    List<CommonBTIndexRecord<CommonHFSCatalogKey>> matchingRecords =
                     findLEChildKeys(currentNode, dirID);
@@ -473,8 +474,10 @@ public class CatalogFile extends BTreeFile {
     }
 
     private static List<CommonBTIndexRecord<CommonHFSCatalogKey>> findLEChildKeys(
-            CommonBTIndexNode<CommonHFSCatalogKey> indexNode, CommonHFSCatalogNodeID rootFolderID) {
-
+            CommonBTKeyedNode<CommonBTIndexRecord<CommonHFSCatalogKey>>
+            indexNode,
+            CommonHFSCatalogNodeID rootFolderID)
+    {
 	LinkedList<CommonBTIndexRecord<CommonHFSCatalogKey>> result =
                 new LinkedList<CommonBTIndexRecord<CommonHFSCatalogKey>>();
 

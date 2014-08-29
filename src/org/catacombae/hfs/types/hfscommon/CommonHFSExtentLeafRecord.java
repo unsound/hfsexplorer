@@ -31,7 +31,10 @@ import org.catacombae.hfs.types.hfs.ExtKeyRec;
  *
  * @author erik
  */
-public abstract class CommonHFSExtentLeafRecord extends CommonBTRecord implements StructElements {
+public abstract class CommonHFSExtentLeafRecord
+        extends CommonBTLeafRecord<CommonHFSExtentKey>
+        implements StructElements
+{
 
     public static CommonHFSExtentLeafRecord create(ExtKeyRec key, ExtDataRec recordData) {
         return new HFSImplementation(key, recordData);

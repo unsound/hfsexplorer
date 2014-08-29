@@ -19,9 +19,9 @@ package org.catacombae.hfs;
 
 import org.catacombae.hfs.types.hfscommon.CommonBTHeaderNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTHeaderRecord;
-import org.catacombae.hfs.types.hfscommon.CommonBTIndexNode;
-import org.catacombae.hfs.types.hfscommon.CommonBTIndexRecord;
 import org.catacombae.hfs.types.hfscommon.CommonBTKey;
+import org.catacombae.hfs.types.hfscommon.CommonBTKeyedNode;
+import org.catacombae.hfs.types.hfscommon.CommonBTKeyedRecord;
 import org.catacombae.hfs.types.hfscommon.CommonBTNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor;
 import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor.NodeType;
@@ -76,7 +76,9 @@ public abstract class BTreeFile {
                 CommonHFSVolumeHeader header);
     }
 
-    static <K extends CommonBTKey<K>> CommonBTIndexRecord<K> findLEKey(CommonBTIndexNode<K> indexNode, K searchKey) {
+    static <K extends CommonBTKey<K>, R extends CommonBTKeyedRecord<K>> R
+            findLEKey(CommonBTKeyedNode<R> indexNode, K searchKey)
+    {
 	/*
 	 * Algorithm:
 	 *   input: Key searchKey
@@ -85,10 +87,10 @@ public abstract class BTreeFile {
 	 *     If n.key <= searchKey && n.key > greatestMatchingKey
 	 *       greatestMatchingKey = n.key
 	 */
-	CommonBTIndexRecord<K> largestMatchingRecord = null;
+	R largestMatchingRecord = null;
 
         //System.err.println("findLEKey(): Entering loop...");
-        for(CommonBTIndexRecord<K> record : indexNode.getBTRecords()) {
+        for(R record : indexNode.getBTKeyedRecords()) {
             K recordKey = record.getKey();
 
             //System.err.print("findLEKey():   Processing record");
