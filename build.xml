@@ -23,8 +23,8 @@
   <property name="target.jparted.jarmanifest" value="${manifest.source.dir}/jparted/MANIFEST.MF"/>
   <property name="target.jparted.outjar" value="targets/jparted/lib/jparted.jar"/>
 
-  <!--<property name="target.libhfs.jarmanifest" value="${manifest.source.dir}/jparted/MANIFEST.MF"/>-->
-  <property name="target.libhfs.outjar" value="targets/libhfs.jar"/>
+  <property name="target.hfs-jfuse_libhfs.jarmanifest" value="${manifest.source.dir}/hfs-jfuse_libhfs/MANIFEST.MF"/>
+  <property name="target.hfs-jfuse_libhfs.outjar" value="targets/hfs-jfuse_libhfs/hfs-jfuse_libhfs.jar"/>
   <property name="target.mkapm.outjar" value="targets/mkapm/mkapm.jar"/>
   <property name="target.mkapm.jarmanifest" value="${manifest.source.dir}/mkapm/MANIFEST.MF"/>
   
@@ -52,7 +52,9 @@
     <echo message="  build-jparted - Compiles the org.catacombae.jparted package, "/>
     <echo message="                  subpackages and dependencies and puts the result"/>
     <echo message="                  in targets/jparted/lib/jparted.jar."/>
-    <echo message="  build-libhfs  - Builds libhfs, which is used by hfs-jfuse."/>
+    <echo message="  build-hfs-jfuse_libhfs -"/>
+    <echo message="                  Builds hfs-jfuse_libhfs, which is used by"/>
+    <echo message="                  hfs-jfuse."/>
     <echo message="  build-mkapm   - Builds mkapm, a utility for creating Apple"/>
     <echo message="                  Partition Map layouts."/>
     <echo message="  javadoc       - Creates the javadoc documentation for the project."/>
@@ -127,9 +129,9 @@
     <jar destfile="${target.jparted.outjar}" basedir="${builddir}" manifest="${target.jparted.jarmanifest}"/>
   </target>
 
-  <target name="build-libhfs" depends="clean,jar-libhfs"/>
+  <target name="build-hfs-jfuse_libhfs" depends="clean,jar-hfs-jfuse_libhfs"/>
 
-  <target name="compile-libhfs" depends="init">
+  <target name="compile-hfs-jfuse_libhfs" depends="init">
     <javac srcdir="${java.source.dir}"
 	   destdir="${builddir}"
 	   includes="org/catacombae/storage/**"
@@ -142,8 +144,8 @@
     </javac>
   </target>
 
-  <target name="jar-libhfs" depends="compile-libhfs">
-    <jar destfile="${target.libhfs.outjar}" basedir="${builddir}"/>
+  <target name="jar-hfs-jfuse_libhfs" depends="compile-hfs-jfuse_libhfs">
+    <jar destfile="${target.hfs-jfuse_libhfs.outjar}" basedir="${builddir}" manifest="${target.hfs-jfuse_libhfs.jarmanifest}"/>
   </target>
 
   <target name="build-mkapm" depends="clean,jar-mkapm"/>
