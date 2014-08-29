@@ -134,12 +134,27 @@
   <target name="compile-hfs-jfuse_libhfs" depends="init">
     <javac srcdir="${java.source.dir}"
 	   destdir="${builddir}"
-	   includes="org/catacombae/storage/**"
 	   debug="true"
 	   debuglevel="${debuglevel}"
 	   encoding="utf-8"
 	   source="${java.source.level}"
 	   target="${java.target.level}">
+      <!-- All entry points to the HFSExplorer libraries from hfs-jfuse should be listed here. -->
+      <include name="org/catacombae/storage/fs/FSAttributes.java"/>
+      <include name="org/catacombae/storage/fs/FSEntry.java"/>
+      <include name="org/catacombae/storage/fs/FSFile.java"/>
+      <include name="org/catacombae/storage/fs/FSFolder.java"/>
+      <include name="org/catacombae/storage/fs/FSFork.java"/>
+      <include name="org/catacombae/storage/fs/FSLink.java"/>
+      <include name="org/catacombae/storage/fs/FileSystemHandler.java"/>
+      <include name="org/catacombae/storage/io/DataLocator.java.java"/>
+      <include name="org/catacombae/storage/io/RandomAccessFileDataLocator.java"/>
+      <include name="org/catacombae/storage/fs/FileSystemCapability.java"/>
+      <include name="org/catacombae/storage/fs/FileSystemHandler.java"/>
+      <include name="org/catacombae/storage/fs/FileSystemHandlerFactory.java"/>
+      <include name="org/catacombae/storage/fs/hfs/HFSFileSystemHandlerFactory.java"/>
+      <include name="org/catacombae/storage/fs/hfsplus/HFSPlusFileSystemHandlerFactory.java"/>
+      <include name="org/catacombae/storage/fs/hfsx/HFSXFileSystemHandlerFactory.java"/>
       <classpath refid="java.build.classpath"/>
     </javac>
   </target>
