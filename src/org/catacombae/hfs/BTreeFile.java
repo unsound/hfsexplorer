@@ -17,6 +17,8 @@
 
 package org.catacombae.hfs;
 
+import java.util.LinkedList;
+import java.util.List;
 import org.catacombae.hfs.types.hfscommon.CommonBTHeaderNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTHeaderRecord;
 import org.catacombae.hfs.types.hfscommon.CommonBTKey;
@@ -112,6 +114,102 @@ public abstract class BTreeFile {
 
         //System.err.println("findLEKey(): Returning...");
 	return largestMatchingRecord;
+    }
+
+    /**
+     * Find all keys <code>k</code> in the range (<code>minKeyInclusive</code>
+     * &lt;= <code>k</code> &lt; <code>maxKeyExclusive</code>) that exist in
+     * <code>indexNode</code>.<br>
+     *
+     * If no matching keys are found, then the record with the largest key that
+     * is less than <code>minKeyInclusive</code>, if any such record exists,
+     * is returned in <code>result</code> and the function returns
+     * <code>false</code>. If no such record does exist, nothing is added to
+     * <code>result</code> (and <code>false</code> is still returned).
+     *
+     * @param indexNode
+     *      <b>(in)</b> The index node to search.
+     * @param minKeyInclusive
+     *      <b>(in)</b> The smallest key in the range (inclusive).
+     * @param maxKeyExclusive
+     *      <b>(in)</b> The largest key in the range (exclusive).
+     *
+     * @return
+     *      A {@link java.util.List} of keys.
+     */
+    public static <K extends CommonBTKey<K>, R extends CommonBTKeyedRecord<K>>
+    List<R> findLEKeys(CommonBTKeyedNode<R> keyedNode,
+            K minKeyInclusive, K maxKeyExclusive)
+    {
+	final LinkedList<R> result = new LinkedList<R>();
+
+        findLEKeys(keyedNode, minKeyInclusive, maxKeyExclusive, result);
+
+        return result;
+    }
+
+    /**
+     * Find all keys <code>k</code> in the range (<code>minKeyInclusive</code>
+     * &lt;= <code>k</code> &lt; <code>maxKeyExclusive</code>) that exist in
+     * <code>keyedNode</code>.<br>
+     *
+     * If no matching keys are found, then the record with the largest key that
+     * is less than <code>minKeyInclusive</code>, if any such record exists,
+     * is returned in <code>result</code> and the function returns
+     * <code>false</code>. If no such record does exist, nothing is added to
+     * <code>result</code> (and <code>false</code> is still returned).
+     *
+     * @param keyedNode
+     *      <b>(in)</b> The keyed node to search.
+     * @param minKeyInclusive
+     *      <b>(in)</b> The smallest key in the range (inclusive).
+     * @param maxKeyExclusive
+     *      <b>(in)</b> The largest key in the range (exclusive).
+     * @param result
+     *      <b>(out)</b> A {@link java.util.LinkedList} that will receive the
+     *      matching keys.
+     *
+     * @return
+     *      <code>true</code> if at least one key matching the specified
+     *      conditions was found, and <code>false</code> otherwise.
+     */
+    public static <K extends CommonBTKey<K>, R extends CommonBTKeyedRecord<K>>
+    boolean findLEKeys(CommonBTKeyedNode<R> keyedNode, K minKeyInclusive,
+            K maxKeyExclusive, LinkedList<R> result)
+    {
+        boolean found = false;
+	K largestLEKey = null;
+	R largestLERecord = null;
+
+        /* TODO: Iteration could be optimized to binary search since keys are
+         *       (supposed to be) ordered. */
+	for(R record : keyedNode.getBTKeyedRecords()) {
+            K key = record.getKey();
+
+            if(key.compareTo(minKeyInclusive) < 0) {
+                if(largestLEKey == null ||
+                        key.compareTo(largestLEKey) > 0)
+                {
+                    largestLEKey = key;
+                    largestLERecord = record;
+                }
+            }
+            else if(key.compareTo(maxKeyExclusive) < 0) {
+                if(result != null) {
+                    result.addLast(record);
+                }
+
+                found = true;
+            }
+	}
+
+	if(largestLEKey != null) {
+            if(result != null) {
+                result.addFirst(largestLERecord);
+            }
+        }
+
+        return found;
     }
 
     protected CommonBTHeaderNode createCommonBTHeaderNode(byte[] currentNodeData,

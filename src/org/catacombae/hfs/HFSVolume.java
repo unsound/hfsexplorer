@@ -27,6 +27,7 @@ import org.catacombae.io.SynchronizedReadableRandomAccessStream;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFile;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFileRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFolderRecord;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogKey;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogNodeID;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogNodeID.ReservedID;
@@ -245,6 +246,16 @@ public abstract class HFSVolume {
 
     public abstract CommonHFSCatalogNodeID getCommonHFSCatalogNodeID(
             ReservedID requestedNodeID);
+
+    public abstract CommonHFSCatalogNodeID createCommonHFSCatalogNodeID(
+            int cnid);
+
+    public CommonHFSCatalogKey createCommonHFSCatalogKey(
+            CommonHFSCatalogNodeID parentID, CommonHFSCatalogString name)
+    {
+
+        return CommonHFSCatalogKey.create(parentID, name);
+    }
 
     public abstract CommonHFSExtentKey createCommonHFSExtentKey(
             boolean isResource, int cnid, long startBlock);

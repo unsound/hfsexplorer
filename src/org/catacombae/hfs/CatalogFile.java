@@ -473,31 +473,21 @@ public class CatalogFile extends BTreeFile {
 	    throw new RuntimeException("Illegal type for node! (" + nodeDescriptor.getNodeType() + ")");
     }
 
-    private static List<CommonBTIndexRecord<CommonHFSCatalogKey>> findLEChildKeys(
+    private List<CommonBTIndexRecord<CommonHFSCatalogKey>> findLEChildKeys(
             CommonBTKeyedNode<CommonBTIndexRecord<CommonHFSCatalogKey>>
             indexNode,
             CommonHFSCatalogNodeID rootFolderID)
     {
-	LinkedList<CommonBTIndexRecord<CommonHFSCatalogKey>> result =
-                new LinkedList<CommonBTIndexRecord<CommonHFSCatalogKey>>();
+        final CommonHFSCatalogNodeID nextCNID =
+                vol.createCommonHFSCatalogNodeID((int) (rootFolderID.toLong() +
+                1));
+        final CommonHFSCatalogKey minKeyInclusive =
+                vol.createCommonHFSCatalogKey(rootFolderID,
+                vol.getEmptyString());
+        final CommonHFSCatalogKey maxKeyExclusive =
+                vol.createCommonHFSCatalogKey(nextCNID, vol.getEmptyString());
 
-	//CommonBTIndexRecord records[] = indexNode.getIndexRecords();
-	CommonBTIndexRecord<CommonHFSCatalogKey> largestMatchingRecord = null;//records[0];
-	CommonHFSCatalogKey largestMatchingKey = null;
-	for(CommonBTIndexRecord<CommonHFSCatalogKey> record : indexNode.getBTRecords()) {
-            CommonHFSCatalogKey key = record.getKey();
-            if(key.getParentID().toLong() < rootFolderID.toLong() &&
-                    (largestMatchingKey == null || key.compareTo(largestMatchingKey) > 0)) {
-                largestMatchingKey = key;
-                largestMatchingRecord = record;
-            }
-            else if(key.getParentID().toLong() == rootFolderID.toLong())
-                result.addLast(record);
-	}
-
-	if(largestMatchingKey != null)
-	    result.addFirst(largestMatchingRecord);
-	return result;
+        return findLEKeys(indexNode, minKeyInclusive, maxKeyExclusive);
     }
 
     private static CommonHFSCatalogLeafRecord[] getChildrenTo(CommonHFSCatalogLeafNode leafNode,

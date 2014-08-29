@@ -140,6 +140,12 @@ public class HFSOriginalVolume extends HFSVolume {
     }
 
     @Override
+    public CommonHFSCatalogNodeID createCommonHFSCatalogNodeID(int cnid)
+    {
+        return CommonHFSCatalogNodeID.create(cnid);
+    }
+
+    @Override
     public CommonHFSExtentKey createCommonHFSExtentKey(boolean isResource,
             int cnid, long startBlock)
     {

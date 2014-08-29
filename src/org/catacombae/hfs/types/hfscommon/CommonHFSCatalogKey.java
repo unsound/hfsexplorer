@@ -22,6 +22,7 @@ import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogKey;
 import org.catacombae.hfs.types.hfs.CatKeyRec;
+import org.catacombae.hfs.types.hfsplus.HFSCatalogNodeID;
 
 /**
  *
@@ -35,6 +36,53 @@ public abstract class CommonHFSCatalogKey extends CommonBTKey<CommonHFSCatalogKe
     public void print(PrintStream ps, String prefix) {
         ps.println(prefix + CommonHFSCatalogKey.class.getSimpleName() + ":");
         printFields(ps, prefix + " ");
+    }
+
+    public static CommonHFSCatalogKey create(CommonHFSCatalogNodeID parentID,
+            CommonHFSCatalogString name)
+    {
+        final long parentIDLong = parentID.toLong();
+        if(parentIDLong > 0xFFFFFFFFL) {
+            throw new RuntimeException("Unexpected: UInt32 overflow in " +
+                    "value returned from CommonHFSCatalogNodeID.toLong " +
+                    "(" + parentIDLong + ").");
+        }
+
+        if(parentID instanceof CommonHFSCatalogNodeID.HFSImplementation &&
+                name instanceof CommonHFSCatalogString.HFSImplementation)
+        {
+            byte[] nameBytes = name.getStringBytes();
+            if(nameBytes.length > 31) {
+                throw new RuntimeException("Name length too large for HFS " +
+                        "catalog record (name length: " + nameBytes.length +
+                        ", max: 31).");
+            }
+
+            return CommonHFSCatalogKey.create(new CatKeyRec((int) parentIDLong,
+                    nameBytes));
+        }
+        else if(parentID instanceof CommonHFSCatalogNodeID.
+                HFSPlusImplementation &&
+                name instanceof CommonHFSCatalogString.HFSPlusImplementation)
+        {
+            byte[] nameBytes = name.getStringBytes();
+            if(nameBytes.length > 255) {
+                throw new RuntimeException("Name length too large for HFS+ " +
+                        "catalog record (name length: " + nameBytes.length +
+                        ", max: 255).");
+            }
+
+            return new HFSPlusImplementation(new HFSPlusCatalogKey(
+                    ((CommonHFSCatalogNodeID.HFSPlusImplementation) parentID).
+                    getHFSCatalogNodeID(),
+                    ((CommonHFSCatalogString.HFSPlusImplementation) name).
+                    getInternal()));
+        }
+        else {
+            throw new RuntimeException("Mismatching/unknown types for " +
+                    "parentID (" + parentID.getClass() + ") and name " +
+                    "(" + name.getClass() + ").");
+        }
     }
 
     public static CommonHFSCatalogKey create(HFSPlusCatalogKey key) {

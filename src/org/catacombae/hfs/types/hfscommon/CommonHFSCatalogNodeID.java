@@ -136,6 +136,10 @@ public abstract class CommonHFSCatalogNodeID {
         }
          * */
 
+        public HFSCatalogNodeID getHFSCatalogNodeID() {
+            return fileID;
+        }
+
         @Override
         public long toLong() {
             return fileID.toLong();
