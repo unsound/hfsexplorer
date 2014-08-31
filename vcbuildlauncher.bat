@@ -6,6 +6,7 @@ REM x64 and ia64 cross compilers.
 setlocal
 
 set BUILD_DIR=%~dp0build.~
+set SOURCE_DIR=%~dp0src\win32\launcher
 set TARGET_EXE_PREFIX=%~dp0dist\bin
 set RES_TARGET=%BUILD_DIR%\launcher.res
 set OBJ_TARGET=%BUILD_DIR%\launcher.obj
@@ -62,12 +63,12 @@ if exist "%BUILD_DIR%" echo Could not clean build dir! & goto error
 mkdir "%BUILD_DIR%"
 
 echo Compiling resources...
-rc /fo "%RES_TARGET%" "%~dp0src.win32\launcher\launcher.rc"
+rc /fo "%RES_TARGET%" "%SOURCE_DIR%\launcher.rc"
 if not "%ERRORLEVEL%"=="0" goto error
 
 echo Compiling source code...
 REM "/Fe%TARGET_EXE%" 
-cl /c "/Fo%OBJ_TARGET%" "/IC:\Program Files\Java\jdk\include" "/IC:\Program Files\Java\jdk\include\win32" src.win32\launcher\launcher.cpp
+cl /c "/Fo%OBJ_TARGET%" "/IC:\Program Files\Java\jdk\include" "/IC:\Program Files\Java\jdk\include\win32" "%SOURCE_DIR%\launcher.cpp"
 if not "%ERRORLEVEL%"=="0" goto error
 
 echo Linking...

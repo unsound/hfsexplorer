@@ -103,8 +103,6 @@ cp -r dist $TEMPDIR
 cp -r lib $TEMPDIR 
 cp -r resource $TEMPDIR 
 cp -r src $TEMPDIR 
-cp -r src.META-INF $TEMPDIR 
-cp -r src.win32 $TEMPDIR 
 
 echo "Removing CVS directories..."
 recursiveRmdir "^CVS$" "$TEMPDIR"

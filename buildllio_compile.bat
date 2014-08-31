@@ -6,7 +6,7 @@ set TARGET_PREFIX=%~dp0dist\lib\llio
 set I386_ARCHID=i386
 set AMD64_ARCHID=amd64
 set IA64_ARCHID=ia64
-set SOURCE_DIR=%~dp0src.win32\llio
+set SOURCE_DIR=%~dp0src\win32\llio
 set SOURCE_FILES="%SOURCE_DIR%\llio_common.c" "%SOURCE_DIR%\org_catacombae_storage_io_win32_ReadableWin32FileStream.c" "%SOURCE_DIR%\org_catacombae_storage_io_win32_Win32FileStream.c"
 
 :start

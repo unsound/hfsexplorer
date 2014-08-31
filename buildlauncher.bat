@@ -1,6 +1,6 @@
 @echo off
 setlocal
-set LAUNCHER_SRC=%~dp0src.win32\launcher
+set LAUNCHER_SRC=%~dp0src\win32\launcher
 set OUTDIR=%~dp0dist\bin
 set OUTFILE=hfsexplorer.exe
 set BUILD_DIR=%~dp0build.~

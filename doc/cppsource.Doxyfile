@@ -93,7 +93,7 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = "C:/Documents and Settings/Erik/My Documents/devel/HFSExplorer/src.win32"
+INPUT                  = "C:/Documents and Settings/Erik/My Documents/devel/HFSExplorer/src/win32"
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.c \
                          *.cc \

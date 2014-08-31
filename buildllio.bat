@@ -5,7 +5,7 @@ setlocal
 set CV_JAVA_BUILD_DIR=%~dp0.antbuild~
 set COMPILER=%1
 set ARCHITECTURE=%2
-set LLIO_SOURCEDIR=%~dp0\src.win32\llio
+set LLIO_SOURCEDIR=%~dp0\src\win32\llio
 
 :start
 if "%COMPILER%" == "gcc" goto check_gcc_arch
