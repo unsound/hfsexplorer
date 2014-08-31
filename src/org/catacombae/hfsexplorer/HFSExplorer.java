@@ -999,7 +999,7 @@ public class HFSExplorer {
 	// 80:  <-------------------------------------------------------------------------------->
 	println("hfsx - HFSExplorer Command Line Interface");
         println("Version " + VERSION + " Build #" + BuildNumber.BUILD_NUMBER);
-	println(COPYRIGHT);
+        println(COPYRIGHT.replaceAll("\u00A9", "(C)"));
         println();
 	println("Utility to explore various aspects of an HFS/HFS+/HFSX filesystem.");
 	println("usage: hfsx [common options] <verb> [verb options] <file/device>");
