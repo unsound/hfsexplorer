@@ -37,6 +37,7 @@ import org.catacombae.storage.fs.FSLink;
 import org.catacombae.storage.fs.FileSystemHandler;
 import org.catacombae.storage.fs.FSEntry;
 import org.catacombae.hfs.HFSVolume;
+import org.catacombae.storage.fs.FileSystemCapability;
 
 /**
  * HFS+ implementation of a FileSystemHandler. This implementation can be used
@@ -70,6 +71,17 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
         this.view = iView;
         this.doUnicodeFileNameComposition = iDoUnicodeFileNameComposition;
         this.hideProtected = hideProtected;
+    }
+
+    public static FileSystemCapability[] getStaticCapabilities() {
+        return new FileSystemCapability[] {
+            FileSystemCapability.CREATE_TIME,
+            FileSystemCapability.BACKUP_TIME,
+        };
+    }
+
+    public FileSystemCapability[] getCapabilities() {
+        return getStaticCapabilities();
     }
 
     @Override

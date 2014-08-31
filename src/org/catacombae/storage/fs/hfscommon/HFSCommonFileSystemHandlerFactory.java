@@ -17,7 +17,6 @@
 
 package org.catacombae.storage.fs.hfscommon;
 
-import org.catacombae.storage.fs.FileSystemCapability;
 import org.catacombae.storage.fs.FileSystemHandlerFactory;
 
 /**
@@ -25,12 +24,4 @@ import org.catacombae.storage.fs.FileSystemHandlerFactory;
  * @author erik
  */
 public abstract class HFSCommonFileSystemHandlerFactory  extends FileSystemHandlerFactory {
-
-    @Override
-    public FileSystemCapability[] getCapabilities() {
-        return new FileSystemCapability[] {
-            FileSystemCapability.CREATE_TIME,
-            FileSystemCapability.BACKUP_TIME,
-        };
-    }
 }

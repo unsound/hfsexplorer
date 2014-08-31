@@ -19,6 +19,7 @@ package org.catacombae.storage.fs.hfs;
 
 import org.catacombae.storage.io.DataLocator;
 import org.catacombae.storage.fs.DefaultFileSystemHandlerInfo;
+import org.catacombae.storage.fs.FileSystemCapability;
 import org.catacombae.storage.fs.FileSystemHandler;
 import org.catacombae.storage.fs.FileSystemHandlerFactory;
 import org.catacombae.storage.fs.FileSystemHandlerInfo;
@@ -42,6 +43,10 @@ public class HFSFileSystemHandlerFactory extends HFSCommonFileSystemHandlerFacto
             "The string encoding for filenames in the current HFS file system",
             "MacRoman");
 
+
+    public FileSystemCapability[] getCapabilities() {
+        return HFSFileSystemHandler.getStaticCapabilities();
+    }
 
     public FileSystemHandler createHandler(DataLocator data) {
         boolean useCaching =

@@ -32,6 +32,17 @@ public abstract class FileSystemHandler {
             "org.catacombae.storage.fs." +
             FileSystemHandler.class.getSimpleName() + ".debug");
 
+    public abstract FileSystemCapability[] getCapabilities();
+
+    public boolean hasCapability(FileSystemCapability c) {
+        for(FileSystemCapability cur : getCapabilities()) {
+            if(cur == c)
+                return true;
+        }
+
+        return false;
+    }
+
     /**
      * Lists all entries present under the <code>path</code> supplied. Path must
      * point to a folder, and is composed of a variable arguments list with each

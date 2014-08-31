@@ -23,6 +23,7 @@ import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.storage.io.DataLocator;
 import org.catacombae.storage.io.SubDataLocator;
 import org.catacombae.storage.fs.DefaultFileSystemHandlerInfo;
+import org.catacombae.storage.fs.FileSystemCapability;
 import org.catacombae.storage.fs.FileSystemHandler;
 import org.catacombae.storage.fs.FileSystemHandlerFactory;
 import org.catacombae.storage.fs.FileSystemHandlerInfo;
@@ -54,6 +55,10 @@ public class HFSPlusFileSystemHandlerFactory extends HFSCommonFileSystemHandlerF
                     "Decides whether protected files like the inode " +
                     "directories and the journal files should show up in a " +
                     "directory listing.", true);
+
+    public FileSystemCapability[] getCapabilities() {
+        return HFSPlusFileSystemHandler.getStaticCapabilities();
+    }
 
     @Override
     public FileSystemHandler createHandler(DataLocator data) {

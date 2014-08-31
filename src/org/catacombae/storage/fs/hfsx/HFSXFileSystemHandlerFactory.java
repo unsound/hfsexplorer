@@ -19,6 +19,7 @@ package org.catacombae.storage.fs.hfsx;
 
 import org.catacombae.storage.io.DataLocator;
 import org.catacombae.storage.fs.DefaultFileSystemHandlerInfo;
+import org.catacombae.storage.fs.FileSystemCapability;
 import org.catacombae.storage.fs.FileSystemHandler;
 import org.catacombae.storage.fs.FileSystemHandlerFactory;
 import org.catacombae.storage.fs.FileSystemHandlerInfo;
@@ -35,6 +36,11 @@ public class HFSXFileSystemHandlerFactory extends HFSPlusFileSystemHandlerFactor
     private static final FileSystemHandlerInfo handlerInfo =
             new DefaultFileSystemHandlerInfo("org.catacombae.hfsx_handler",
             "HFSX file system handler", "1.0", 0, "Erik Larsson, Catacombae Software");
+
+    @Override
+    public FileSystemCapability[] getCapabilities() {
+        return HFSXFileSystemHandler.getStaticCapabilities();
+    }
 
     @Override
     protected FileSystemHandler createHandlerInternal(DataLocator data,
