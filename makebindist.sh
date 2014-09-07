@@ -108,6 +108,9 @@ recursiveRmdir "^CVS$" "$TEMPDIR"
 
 echo "Building zip file..."
 cd $TEMPDIR
+if [ ! -d "../releases" ]; then
+    mkdir "../releases"
+fi
 rm "../releases/${ZIPFILE}"
 zip -9 -r "../releases/${ZIPFILE}" *
 cd ..
