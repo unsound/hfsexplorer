@@ -283,6 +283,9 @@ public class ForkFilter implements ReadableRandomAccessStream {
                 }
             }
 
+            sourceFile.seek(fsOffset + firstBlockByteOffset +
+                    (cur.getStartBlock() * allocationBlockSize) + bytesToSkip);
+
             long blockCount = cur.getBlockCount();
             long bytesInExtent = blockCount * allocationBlockSize - bytesToSkip;
             int bytesToReadFromExtent = (bytesInExtent < bytesLeftToRead) ? (int) bytesInExtent : bytesLeftToRead;
