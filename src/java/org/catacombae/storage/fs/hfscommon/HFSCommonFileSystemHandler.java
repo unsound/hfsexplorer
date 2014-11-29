@@ -37,6 +37,7 @@ import org.catacombae.storage.fs.FSLink;
 import org.catacombae.storage.fs.FileSystemHandler;
 import org.catacombae.storage.fs.FSEntry;
 import org.catacombae.hfs.HFSVolume;
+import org.catacombae.storage.fs.FSFile;
 import org.catacombae.storage.fs.FileSystemCapability;
 
 /**
@@ -45,13 +46,7 @@ import org.catacombae.storage.fs.FileSystemCapability;
  *
  * @author Erik Larsson
  */
-public class HFSCommonFileSystemHandler extends FileSystemHandler {
-    private static final String FILE_HARD_LINK_DIR = "\u0000\u0000\u0000\u0000HFS+ Private Data";
-    private static final String FILE_HARD_LINK_PREFIX = "iNode";
-    private static final String DIRECTORY_HARD_LINK_DIR = ".HFS+ Private Directory Data" + (char)0x0d;
-    private static final String DIRECTORY_HARD_LINK_PREFIX = "dir_";
-    private static final String JOURNAL_INFO_BLOCK_FILE = ".journal_info_block";
-    private static final String JOURNAL_FILE = ".journal";
+public abstract class HFSCommonFileSystemHandler extends FileSystemHandler {
 
     private static final boolean DEBUG = Util.booleanEnabledByProperties(false,
             "org.catacombae.debug",
@@ -61,9 +56,9 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
             "org.catacombae.storage.fs.hfscommon." +
             HFSCommonFileSystemHandler.class.getSimpleName() + ".debug");
 
-    private HFSVolume view;
+    protected final HFSVolume view;
     private boolean doUnicodeFileNameComposition;
-    private boolean hideProtected;
+    protected boolean hideProtected;
 
     protected HFSCommonFileSystemHandler(HFSVolume iView,
                     boolean iDoUnicodeFileNameComposition,
@@ -117,6 +112,9 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
             throw new RuntimeException("Did not excpect a " + rec.getClass() + " here!");
     }
 
+    protected abstract String[] getAbsoluteLinkPath(String[] path,
+            int pathLength, CommonHFSCatalogFileRecord rec);
+
     /**
      * Searches the hierarchy rooted in <code>rootRecord</code> for the record addressed by
      * <code>path</code>. If any symbolic or hard links exist in the path to the requested entry,
@@ -127,7 +125,9 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
      * <code>rootRecord</code> is returned.
      * @return the requested entry, or <code>null</code> if it wasn't found.
      */
-    CommonHFSCatalogLeafRecord getRecord(final CommonHFSCatalogFolderRecord rootRecord, final String... path) {
+    protected CommonHFSCatalogLeafRecord getRecord(
+            final CommonHFSCatalogFolderRecord rootRecord, final String... path)
+    {
         /*
          * Algorithm (variables are prefixed with $):
          *
@@ -174,33 +174,11 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
                         (CommonHFSCatalogFileRecord) currentRoot;
                 final String[] absPath;
 
-                if(fr.getData().isSymbolicLink()) {
-                    byte[] data = IOUtil.readFully(getReadableDataForkStream(fr));
-                    String posixPath = Util.readString(data, "UTF-8");
-                    String[] basePath = Util.arrayCopy(path, 0, new String[i - 1], 0, i - 1);
-                    absPath = getTruePathFromPosixPath(posixPath, basePath);
-                    if(absPath == null) {
-                        // Sorry pal, no luck in finding your link target
-                        //log(prefix + " getRecord: no link target found for posix path \"" + posixPath + "\" with base path \"" + Util.concatenateStrings(basePath, "/") + "\"");
-                        return null;
-                    }
-                    //else
-                    //  log(prefix + "  getRecord: absPath=" + Util.concatenateStrings(absPath, "/"));
-                }
-                else if(fr.getData().isHardFileLink()) {
-                    absPath = new String[]{
-                                FILE_HARD_LINK_DIR,
-                                FILE_HARD_LINK_PREFIX + Util.unsign(fr.getData().getHardLinkInode())
-                            };
-                }
-                else if(fr.getData().isHardDirectoryLink()) {
-                    absPath = new String[]{
-                                DIRECTORY_HARD_LINK_DIR,
-                                DIRECTORY_HARD_LINK_PREFIX + Util.unsign(fr.getData().getHardLinkInode())
-                            };
-                }
-                else
+                absPath = getAbsoluteLinkPath(path, i,
+                        (CommonHFSCatalogFileRecord) currentRoot);
+                if(absPath == null) {
                     break;
+                }
 
                 // Reset visited list before usage if this is the first time
                 if(curVisitedList == null) {
@@ -272,38 +250,26 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
         */
     }
 
-    private FSEntry entryFromRecord(CommonHFSCatalogFileRecord fileRecord) {
-
-            if(fileRecord.getData().isSymbolicLink())
-                return new HFSCommonFSLink(this, fileRecord);
-            else if(fileRecord.getData().isHardFileLink()) {
-                CommonHFSCatalogFileRecord iNode = lookupFileInode(fileRecord.getData().getHardLinkInode());
-                if(iNode != null) {
-                    return new HFSCommonFSFile(this, fileRecord, iNode);
-                }
-                else {
-                    System.err.println("Looking up file iNode " + fileRecord.getData().getHardLinkInode() +
-                        " (" + fileRecord.getKey().getParentID().toLong() +
-                        ":\"" + getProperNodeName(fileRecord) + "\") FAILED!");
-                    return new HFSCommonFSFile(this, fileRecord);
-                }
-            }
-            else if(fileRecord.getData().isHardDirectoryLink()) {
-                CommonHFSCatalogFolderRecord iNode = lookupDirectoryInode(fileRecord.getData().getHardLinkInode());
-                if(iNode != null) {
-                    return new HFSCommonFSFolder(this, fileRecord, iNode);
-                }
-                else {
-                    System.err.println("Looking up directory iNode " + fileRecord.getData().getHardLinkInode() +
-                        " (" + fileRecord.getKey().getParentID().toLong() +
-                        ":\"" + getProperNodeName(fileRecord) + "\") FAILED!");
-                    return new HFSCommonFSFile(this, fileRecord);
-                }
-            }
-            else
-                return new HFSCommonFSFile(this, fileRecord);
-
+    protected FSEntry entryFromRecord(CommonHFSCatalogFileRecord fileRecord) {
+        return new HFSCommonFSFile(this, fileRecord);
     }
+
+    protected FSFile createFSFile(CommonHFSCatalogFileRecord fileRecord) {
+        return new HFSCommonFSFile(this, fileRecord);
+    }
+
+    protected FSFile createFSFile(CommonHFSCatalogFileRecord hardLinkRecord,
+            CommonHFSCatalogFileRecord fileRecord)
+    {
+        return new HFSCommonFSFile(this, hardLinkRecord, fileRecord);
+    }
+
+    protected FSFolder createFSFolder(CommonHFSCatalogFileRecord hardLinkRecord,
+            CommonHFSCatalogFolderRecord folderRecord)
+    {
+        return new HFSCommonFSFolder(this, hardLinkRecord, folderRecord);
+    }
+
     private FSEntry entryFromRecord(CommonHFSCatalogFolderRecord folderRecord) {
         return new HFSCommonFSFolder(this, folderRecord);
     }
@@ -323,38 +289,12 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
     }
     */
 
-    CommonHFSCatalogFileRecord lookupFileInode(int inodeNumber) {
-        long trueInodeNumber = Util.unsign(inodeNumber);
-        CommonHFSCatalogLeafRecord res = getRecord(view.getCatalogFile().getRootFolder(), FILE_HARD_LINK_DIR,
-                FILE_HARD_LINK_PREFIX + trueInodeNumber);
-        if(res == null)
-            return null; // Could not find any inode
-        else if(res instanceof CommonHFSCatalogFileRecord)
-            return (CommonHFSCatalogFileRecord) res;
-        else
-            throw new RuntimeException("Error in HFS+ file system structure: Found a " +
-                    res.getClass() + " in file hard link dir for iNode" + trueInodeNumber);
-    }
-
-    CommonHFSCatalogFolderRecord lookupDirectoryInode(int inodeNumber) {
-        long trueInodeNumber = Util.unsign(inodeNumber);
-        CommonHFSCatalogLeafRecord res = getRecord(view.getCatalogFile().getRootFolder(), DIRECTORY_HARD_LINK_DIR,
-                DIRECTORY_HARD_LINK_PREFIX + trueInodeNumber);
-        if(res == null)
-            return null; // Could not find any inode
-        else if(res instanceof CommonHFSCatalogFolderRecord)
-            return (CommonHFSCatalogFolderRecord) res;
-        else
-            throw new RuntimeException("Error in HFS+ file system structure: Found a " +
-                    res.getClass() + " in directory hard link dir for dir_" + trueInodeNumber);
-    }
-
     @Override
     public FSForkType[] getSupportedForkTypes() {
         return new FSForkType[] { FSForkType.DATA, FSForkType.MACOS_RESOURCE };
     }
 
-    String getProperNodeName(CommonHFSCatalogLeafRecord record) {
+    protected String getProperNodeName(CommonHFSCatalogLeafRecord record) {
 
         //if(doUnicodeFileNameComposition)
         //    return record.getKey().getNodeName().decode(COMPOSED_UTF16_DECODER);
@@ -401,7 +341,9 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
         }
     }
 
-    ReadableRandomAccessStream getReadableDataForkStream(CommonHFSCatalogFileRecord fileRecord) {
+    protected ReadableRandomAccessStream getReadableDataForkStream(
+            CommonHFSCatalogFileRecord fileRecord)
+    {
         return view.getReadableDataForkStream(fileRecord);
     }
 
@@ -415,32 +357,7 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
     }
      * */
 
-    private boolean shouldHide(CommonHFSCatalogLeafRecord rec) {
-        // For HFS we have nothing to hide.
-        if(rec.getKey() instanceof CommonHFSCatalogKey.HFSImplementation)
-            return false;
-
-        // The only folder that contains hidden files is the root folder.
-        CommonHFSCatalogNodeID parentID = rec.getKey().getParentID();
-        if(!parentID.equals(parentID.getReservedID(CommonHFSCatalogNodeID.ReservedID.ROOT_FOLDER)))
-            return false;
-
-        String name = view.decodeString(rec.getKey().getNodeName());
-        if(rec instanceof CommonHFSCatalogFileRecord) {
-            if(name.equals(JOURNAL_INFO_BLOCK_FILE))
-                return hideProtected;
-            if(name.equals(JOURNAL_FILE))
-                return hideProtected;
-        }
-        else if(rec instanceof CommonHFSCatalogFolderRecord) {
-            if(name.equals(FILE_HARD_LINK_DIR))
-                return hideProtected;
-            if(name.equals(DIRECTORY_HARD_LINK_DIR))
-                return hideProtected;
-        }
-
-        return false;
-    }
+    protected abstract boolean shouldHide(CommonHFSCatalogLeafRecord rec);
 
     String[] listNames(CommonHFSCatalogFolderRecord folderRecord) {
         CommonHFSCatalogLeafRecord[] subRecords = view.getCatalogFile().listRecords(folderRecord);
@@ -563,4 +480,10 @@ public class HFSCommonFileSystemHandler extends FileSystemHandler {
         else
             throw new RuntimeException("Invalid type: " + link.getClass());
     }
+
+    public void setHideProtected(boolean hideProtected) {
+        this.hideProtected = hideProtected;
+    }
+
+    protected abstract Long getLinkCount(CommonHFSCatalogFileRecord fr);
 }

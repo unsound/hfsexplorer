@@ -20,6 +20,8 @@ package org.catacombae.storage.fs.hfs;
 import org.catacombae.storage.io.DataLocator;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemHandler;
 import org.catacombae.hfs.original.HFSOriginalVolume;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFileRecord;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogLeafRecord;
 
 /**
  *
@@ -32,5 +34,22 @@ public class HFSFileSystemHandler extends HFSCommonFileSystemHandler {
 
         super(new HFSOriginalVolume(fsLocator.createReadOnlyFile(),
                 useCaching, encodingName), false, false);
+    }
+
+    protected boolean shouldHide(CommonHFSCatalogLeafRecord rec) {
+        // For HFS we have nothing to hide.
+        return false;
+    }
+
+    protected Long getLinkCount(CommonHFSCatalogFileRecord fr) {
+        // HFS does not support links.
+        return null;
+    }
+
+    protected String[] getAbsoluteLinkPath(String[] path, int pathLength,
+            CommonHFSCatalogFileRecord rec)
+    {
+        // HFS does not support links.
+        return null;
     }
 }

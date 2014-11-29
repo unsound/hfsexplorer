@@ -17,8 +17,8 @@
 
 package org.catacombae.storage.fs.hfsx;
 
+import org.catacombae.storage.fs.hfsplus.HFSPlusFileSystemHandler;
 import org.catacombae.storage.io.DataLocator;
-import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemHandler;
 import org.catacombae.hfs.x.HFSXVolume;
 
 /**
@@ -29,7 +29,7 @@ import org.catacombae.hfs.x.HFSXVolume;
  *
  * @author Erik Larsson
  */
-public class HFSXFileSystemHandler extends HFSCommonFileSystemHandler {
+public class HFSXFileSystemHandler extends HFSPlusFileSystemHandler {
 
     public HFSXFileSystemHandler(DataLocator fsLocator, boolean useCaching,
             boolean doUnicodeFileNameComposition, boolean hideProtected) {

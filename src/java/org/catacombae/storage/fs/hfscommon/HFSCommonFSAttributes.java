@@ -139,21 +139,8 @@ class HFSCommonFSAttributes extends FSAttributes {
     @Override
     public Long getLinkCount() {
         if(attributes instanceof CommonHFSCatalogFileRecord) {
-            CommonHFSCatalogFileRecord fr = (CommonHFSCatalogFileRecord) attributes;
-            if(fr.getData().isHardFileLink()) {
-                int inodeNumber = fr.getData().getHardLinkInode();
-                CommonHFSCatalogFileRecord rec =
-                        parentEntry.getFileSystemHandler().lookupFileInode(inodeNumber);
-
-                return Util.unsign(rec.getData().getPermissions().getSpecial());
-            }
-            else if(fr.getData().isHardDirectoryLink()) {
-                int inodeNumber = fr.getData().getHardLinkInode();
-                CommonHFSCatalogFolderRecord rec =
-                        parentEntry.getFileSystemHandler().lookupDirectoryInode(inodeNumber);
-
-                return Util.unsign(rec.getData().getPermissions().getSpecial());
-            }
+            return parentEntry.getFileSystemHandler().getLinkCount(
+                    (CommonHFSCatalogFileRecord) attributes);
         }
 
         return null;
