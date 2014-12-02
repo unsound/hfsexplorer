@@ -45,7 +45,9 @@ import org.catacombae.io.ReadableRandomAccessStream;
  *
  * @author erik
  */
-public class ExtentsOverflowFile extends BTreeFile {
+public class ExtentsOverflowFile
+    extends BTreeFile<CommonHFSExtentKey, CommonHFSExtentLeafRecord>
+{
     ExtentsOverflowFile(HFSVolume vol) {
         super(vol);
     }
@@ -70,14 +72,14 @@ public class ExtentsOverflowFile extends BTreeFile {
         return new ExtentsOverflowFileSession();
     }
 
-    protected CommonBTNode createIndexNode(byte[] nodeData, int offset,
-            int nodeSize)
+    protected CommonHFSExtentIndexNode createIndexNode(byte[] nodeData,
+            int offset, int nodeSize)
     {
         return createCommonHFSExtentIndexNode(nodeData, 0, nodeSize);
     }
 
-    protected CommonBTNode createLeafNode(byte[] nodeData, int offset,
-            int nodeSize)
+    protected CommonHFSExtentLeafNode createLeafNode(byte[] nodeData,
+            int offset, int nodeSize)
     {
         return createCommonHFSExtentLeafNode(nodeData, 0, nodeSize);
     }

@@ -49,7 +49,9 @@ import org.catacombae.io.ReadableRandomAccessStream;
  *
  * @author erik
  */
-public class CatalogFile extends BTreeFile {
+public class CatalogFile
+    extends BTreeFile<CommonHFSCatalogKey, CommonHFSCatalogLeafRecord>
+{
     CatalogFile(HFSVolume vol) {
         super(vol);
     }
@@ -82,14 +84,14 @@ public class CatalogFile extends BTreeFile {
         return new CatalogFileSession();
     }
 
-    protected CommonBTNode createIndexNode(byte[] nodeData, int offset,
-            int nodeSize)
+    protected CommonHFSCatalogIndexNode createIndexNode(byte[] nodeData,
+            int offset, int nodeSize)
     {
         return newCatalogIndexNode(nodeData, 0, nodeSize);
     }
 
-    protected CommonBTNode createLeafNode(byte[] nodeData, int offset,
-            int nodeSize)
+    protected CommonHFSCatalogLeafNode createLeafNode(byte[] nodeData,
+            int offset, int nodeSize)
     {
         return newCatalogLeafNode(nodeData, 0, nodeSize);
     }
@@ -296,52 +298,8 @@ public class CatalogFile extends BTreeFile {
      */
     public CommonHFSCatalogLeafRecord getRecord(CommonHFSCatalogNodeID parentID,
             CommonHFSCatalogString nodeName) {
-        BTreeFileSession ses = openSession();
-
-	final int nodeSize = ses.bthr.getNodeSize();
-
-	long currentNodeOffset = ses.bthr.getRootNodeNumber()*nodeSize;
-
-	// Search down through the layers of indices (O(log n) steps, where n is the size of the tree)
-
-	byte[] currentNodeData = new byte[ses.bthr.getNodeSize()];
-        ses.btreeStream.seek(currentNodeOffset);
-        ses.btreeStream.readFully(currentNodeData);
-	CommonBTNodeDescriptor nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
-
-	while(nodeDescriptor.getNodeType() == NodeType.INDEX) {
-	    CommonHFSCatalogIndexNode currentNode =
-                    newCatalogIndexNode(currentNodeData, 0, nodeSize);
-	    CommonBTIndexRecord matchingRecord =
-                    findLEKey(currentNode, newCatalogKey(parentID, nodeName));
-
-            if(matchingRecord == null)
-                return null;
-	    currentNodeOffset = matchingRecord.getIndex()*nodeSize;
-            ses.btreeStream.seek(currentNodeOffset);
-            ses.btreeStream.readFully(currentNodeData);
-	    nodeDescriptor = createCommonBTNodeDescriptor(currentNodeData, 0);
-	}
-
-	// Leaf node reached. Find record.
-	if(nodeDescriptor.getNodeType() == NodeType.LEAF) {
-            CommonHFSCatalogLeafNode leaf =
-                    newCatalogLeafNode(currentNodeData, 0,
-                    ses.bthr.getNodeSize());
-	    CommonHFSCatalogLeafRecord[] recs = leaf.getLeafRecords();
-	    for(CommonHFSCatalogLeafRecord rec : recs)
-                if(rec.getKey().compareTo(newCatalogKey(parentID, nodeName)) ==
-                    0)
-                {
-		    return rec;
-                }
-	    return null;
-	}
-	else
-	    throw new RuntimeException("Expected leaf node. Found other kind: " +
-				       nodeDescriptor.getNodeType());
+        return getRecord(newCatalogKey(parentID, nodeName));
     }
-
 
     /**
      * More typesafe than <code>listRecords(HFSCatalogNodeID)</code> since it

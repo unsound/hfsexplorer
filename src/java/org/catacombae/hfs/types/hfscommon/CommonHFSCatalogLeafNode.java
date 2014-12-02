@@ -25,8 +25,9 @@ import org.catacombae.util.Util;
  *
  * @author erik
  */
-public abstract class CommonHFSCatalogLeafNode extends CommonBTNode<CommonHFSCatalogLeafRecord> {
-
+public abstract class CommonHFSCatalogLeafNode
+        extends CommonBTKeyedNode<CommonHFSCatalogLeafRecord>
+{
     protected CommonHFSCatalogLeafNode(byte[] data, int offset, int nodeSize, FSType type) {
         super(data, offset, nodeSize, type);
     }

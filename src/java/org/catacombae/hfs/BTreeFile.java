@@ -21,9 +21,11 @@ import java.util.LinkedList;
 import java.util.List;
 import org.catacombae.hfs.types.hfscommon.CommonBTHeaderNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTHeaderRecord;
+import org.catacombae.hfs.types.hfscommon.CommonBTIndexRecord;
 import org.catacombae.hfs.types.hfscommon.CommonBTKey;
 import org.catacombae.hfs.types.hfscommon.CommonBTKeyedNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTKeyedRecord;
+import org.catacombae.hfs.types.hfscommon.CommonBTLeafRecord;
 import org.catacombae.hfs.types.hfscommon.CommonBTNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor;
 import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor.NodeType;
@@ -36,7 +38,9 @@ import org.catacombae.io.RuntimeIOException;
  *
  * @author erik
  */
-public abstract class BTreeFile {
+public abstract class BTreeFile<K extends CommonBTKey<K>,
+        L extends CommonBTLeafRecord<K>>
+{
     final HFSVolume vol;
 
     BTreeFile(HFSVolume vol) {
@@ -214,11 +218,11 @@ public abstract class BTreeFile {
         return vol.createCommonBTHeaderNode(currentNodeData, offset, nodeSize);
     }
 
-    protected abstract CommonBTNode createIndexNode(byte[] nodeData, int offset,
-            int nodeSize);
+    protected abstract CommonBTKeyedNode<? extends CommonBTIndexRecord<K>>
+            createIndexNode(byte[] nodeData, int offset, int nodeSize);
 
-    protected abstract CommonBTNode createLeafNode(byte[] nodeData, int offset,
-            int nodeSize);
+    protected abstract CommonBTKeyedNode<L> createLeafNode(byte[] nodeData,
+            int offset, int nodeSize);
 
     protected CommonBTNodeDescriptor readNodeDescriptor(Readable rd) {
         return vol.readNodeDescriptor(rd);
@@ -323,6 +327,74 @@ public abstract class BTreeFile {
                 return createLeafNode(nodeData, 0, nodeSize);
             else
                 return null;
+        } finally {
+            ses.close();
+        }
+    }
+
+    /**
+     * Get a record from the B* tree with the specified key.<br>
+     *
+     * If none is found, the method returns <code>null</code>.<br>
+     * Tis method should execute in <code>O(log n)</code> time, where
+     * <code>n</code> is the number of elements in the tree.
+     *
+     * @param searchKey the key of the record that we are looking for.
+     *
+     * @return the requested record, if any, or <code>null</code> if no such
+     * record was found.
+     */
+    public L getRecord(K searchKey) {
+        BTreeFileSession ses = openSession();
+
+        try {
+            final int nodeSize = ses.bthr.getNodeSize();
+
+            long currentNodeOffset = ses.bthr.getRootNodeNumber() * nodeSize;
+
+            byte[] currentNodeData = new byte[nodeSize];
+            ses.btreeStream.seek(currentNodeOffset);
+            ses.btreeStream.readFully(currentNodeData);
+            CommonBTNodeDescriptor nodeDescriptor =
+                    createCommonBTNodeDescriptor(currentNodeData, 0);
+
+            /* Search down through the layers of indices (O(log n) steps, where
+             * n is the size of the tree) */
+            while(nodeDescriptor.getNodeType() == NodeType.INDEX) {
+                CommonBTKeyedNode<? extends CommonBTIndexRecord<K>>
+                        currentNode =
+                        createIndexNode(currentNodeData, 0, nodeSize);
+                CommonBTIndexRecord<K> matchingRecord =
+                        findLEKey(currentNode, searchKey);
+
+                if(matchingRecord == null) {
+                    return null;
+                }
+
+                currentNodeOffset = matchingRecord.getIndex() * nodeSize;
+                ses.btreeStream.seek(currentNodeOffset);
+                ses.btreeStream.readFully(currentNodeData);
+                nodeDescriptor =
+                        createCommonBTNodeDescriptor(currentNodeData, 0);
+            }
+
+            /* Leaf node reached. Find record. */
+            if(nodeDescriptor.getNodeType() == NodeType.LEAF) {
+                CommonBTKeyedNode<L> leaf =
+                        createLeafNode(currentNodeData, 0, nodeSize);
+
+                for(L rec : leaf.getBTRecords()) {
+                    if(rec.getKey().compareTo(searchKey) == 0) {
+                        return rec;
+                    }
+                }
+
+                return null;
+            }
+            else {
+                throw new RuntimeException("Expected leaf node. Found other " +
+                        "kind: " + nodeDescriptor.getNodeType());
+            }
         } finally {
             ses.close();
         }

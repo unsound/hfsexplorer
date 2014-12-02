@@ -40,7 +40,9 @@ import org.catacombae.hfs.types.hfsplus.HFSPlusAttributesKey;
  *
  * @author erik
  */
-public class AttributesFile extends BTreeFile {
+public class AttributesFile
+    extends BTreeFile<CommonHFSAttributesKey, CommonHFSAttributesLeafRecord>
+{
     private final HFSPlusVolume view;
 
     private class Session extends BTreeFileSession {
@@ -88,14 +90,14 @@ public class AttributesFile extends BTreeFile {
         return new Session();
     }
 
-    protected CommonBTNode createIndexNode(byte[] nodeData, int offset,
-            int nodeSize)
+    protected CommonHFSAttributesIndexNode createIndexNode(byte[] nodeData,
+            int offset, int nodeSize)
     {
         return CommonHFSAttributesIndexNode.createHFSPlus(nodeData, 0, nodeSize);
     }
 
-    protected CommonBTNode createLeafNode(byte[] nodeData, int offset,
-            int nodeSize)
+    protected CommonHFSAttributesLeafNode createLeafNode(byte[] nodeData,
+            int offset, int nodeSize)
     {
         return CommonHFSAttributesLeafNode.createHFSPlus(nodeData, 0, nodeSize);
     }
