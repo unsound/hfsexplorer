@@ -93,6 +93,9 @@ InstType "Typical"
 Section "HFSExplorer" SEC01
   SectionIn RO ; Means that the section is read-only (can't be deselected by the user)
   
+  ; Make sure that shell variables like SMPROGRAMS are evaluated in the 'all' context, applying to all users.
+  SetShellVarContext all
+
   SetOutPath "$INSTDIR"
   SetOverwrite ifnewer
   File "..\dist\*.txt"
@@ -176,6 +179,9 @@ SectionEnd
 Section "Register .cdr file association" SEC03
   SectionIn 2
   
+  ; Make sure that shell variables like SMPROGRAMS are evaluated in the 'all' context, applying to all users.
+  SetShellVarContext all
+
   !define FILE_EXTENSION ".cdr"
   !define PROGRAM_EXTENSION_ID "CatacombaeHFSExplorer.CDRFile"
   !define WINDOWS_DESCRIPTION ".cdr CD/DVD image"
@@ -215,6 +221,10 @@ SectionEnd
 
 Section -AdditionalIcons
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
+
+  ; Make sure that shell variables like SMPROGRAMS are evaluated in the 'all' context, applying to all users.
+  SetShellVarContext all
+
   WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
   CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Developer Web Site.lnk" "$INSTDIR\${PRODUCT_NAME}.url"
   CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk" "$INSTDIR\uninst.exe"
@@ -241,6 +251,9 @@ Function un.onInit
 FunctionEnd
 
 Section Uninstall
+  ; Make sure that shell variables like SMPROGRAMS are evaluated in the 'all' context, applying to all users.
+  SetShellVarContext all
+
   ; Start of restoration of registry values
   ; I should make these variables global or something... make them parameters of a function, if NSIS can do that...
   !define FILE_EXTENSION ".dmg"
