@@ -22,7 +22,6 @@ import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogKey;
 import org.catacombae.hfs.types.hfs.CatKeyRec;
-import org.catacombae.hfs.types.hfsplus.HFSCatalogNodeID;
 
 /**
  *
