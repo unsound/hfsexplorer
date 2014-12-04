@@ -138,7 +138,7 @@ public class HFSCommonFSFile extends HFSCommonFSEntry implements FSFile {
 
     /* @Override */
     protected FSFork getResourceFork() {
-        return resourceFork;
+        return resourceFork.getLength() > 0 ? resourceFork : null;
     }
 
     ReadableRandomAccessStream getReadableDataForkStream() {
