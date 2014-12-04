@@ -100,17 +100,10 @@ public class HFSCommonFSFile extends HFSCommonFSEntry implements FSFile {
     @Override
     public FSFork[] getAllForks() {
         FSFork[] superForks = super.getAllForks();
+        FSFork[] res = new FSFork[superForks.length + 1];
 
-        boolean hasResourceFork = resourceFork.getLength() > 0;
-        int numForks = superForks.length + 1;
-        if(hasResourceFork)
-            ++numForks;
-
-        FSFork[] res = new FSFork[numForks];
         System.arraycopy(superForks, 0, res, 0, superForks.length);
         res[superForks.length] = dataFork;
-        if(hasResourceFork)
-            res[superForks.length+1] = resourceFork;
 
         /*
          * TODO: Remove duplicates, in case we are overriding a fork.
