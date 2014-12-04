@@ -219,6 +219,13 @@ public class ReadableWin32FileStream implements ReadableRandomAccessStream {
     }
 
     /* @Override */
+    public byte readFully() {
+        byte[] data = new byte[1];
+        readFully(data);
+        return data[0];
+    }
+
+    /* @Override */
     public void readFully(byte[] data) {
         readFully(data, 0, data.length);
     }

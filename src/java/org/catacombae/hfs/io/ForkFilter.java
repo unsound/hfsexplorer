@@ -328,6 +328,13 @@ public class ForkFilter implements ReadableRandomAccessStream {
             return -1;
     }
 
+    /* @Override */
+    public byte readFully() throws RuntimeIOException {
+        byte[] data = new byte[1];
+        readFully(data);
+        return data[0];
+    }
+
     /**
      * {@inheritDoc}
      */
