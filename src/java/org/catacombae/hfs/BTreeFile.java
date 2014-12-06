@@ -79,7 +79,7 @@ public abstract class BTreeFile<K extends CommonBTKey<K>,
                 CommonHFSVolumeHeader header);
     }
 
-    <R extends CommonBTKeyedRecord<K>> R findLEKey(
+    protected <R extends CommonBTKeyedRecord<K>> R findLEKey(
             CommonBTKeyedNode<R> indexNode, K searchKey)
     {
 	/*
@@ -139,7 +139,7 @@ public abstract class BTreeFile<K extends CommonBTKey<K>,
      * @return
      *      A {@link java.util.List} of records.
      */
-    public <R extends CommonBTKeyedRecord<K>> List<R> findLEKeys(
+    protected <R extends CommonBTKeyedRecord<K>> List<R> findLEKeys(
             CommonBTKeyedNode<R> keyedNode, K minKeyInclusive,
             K maxKeyExclusive)
     {
@@ -177,7 +177,7 @@ public abstract class BTreeFile<K extends CommonBTKey<K>,
      *      <code>true</code> if at least one key matching the specified
      *      conditions was found, and <code>false</code> otherwise.
      */
-    public <R extends CommonBTKeyedRecord<K>> boolean findLEKeys(
+    protected <R extends CommonBTKeyedRecord<K>> boolean findLEKeys(
             CommonBTKeyedNode<R> keyedNode, K minKeyInclusive,
             K maxKeyExclusive, LinkedList<R> result)
     {
