@@ -186,10 +186,12 @@ public class AttributesFile
                     new LinkedList<CommonBTIndexRecord<CommonHFSAttributesKey>>
                     ();
 
-            if(findLEKeys(indexNode, searchKey, endKey, recList)) {
-                for(CommonBTIndexRecord<CommonHFSAttributesKey> rec : recList) {
-                    listAttributeRecords(getNode(rec.getIndex()), nodeID, list);
-                }
+            /* Search for all keys in index node between search key (inclusive)
+             * and end key (exclusive). */
+            findLEKeys(indexNode, searchKey, endKey, recList);
+
+            for(CommonBTIndexRecord<CommonHFSAttributesKey> rec : recList) {
+                listAttributeRecords(getNode(rec.getIndex()), nodeID, list);
             }
         }
         else {
