@@ -61,15 +61,32 @@ public class ForkFilter implements ReadableRandomAccessStream {
     public enum ForkType { DATA, RESOURCE };
 
     /**
-     * Creates a new ForkFilter. This class assumes that it has exclusive access to
-     * <code>sourceFile</code>.
+     * Creates a new ForkFilter. This class assumes that it has exclusive access
+     * to <code>sourceFile</code>.
      *
+     * @param forkType
+     *      <b>(in)</b> The type of the fork (for constructing extents overflow
+     *      file keys).
+     * @param cnid
+     *      <b>(in)</b> The catalog node ID of the fork's parent (for
+     *      constructing extents overflow file keys).
      * @param forkData
-     * @param extentDescriptors
+     *      <b>(in)</b> The fork data of this fork, containing the fork length
+     *      and the first basic extents.
+     * @param extentsOverflowFile
+     *      <b>(in)</b> The file systems's {@link ExtentsOverflowFile} (for
+     *      looking up extents beyond the first basic ones).
      * @param sourceFile
+     *      <b>(in)</b> A {@link ReadableRandomAccessStream} for accessing the
+     *      whole volume.
      * @param fsOffset
+     *      <b>(in)</b> The offset within <code>sourceFile</code> where the file
+     *      system starts.
      * @param allocationBlockSize
+     *      <b>(in)</b> The allocation block size of the file system.
      * @param firstBlockByteOffset
+     *      <b>(in)</b> The byte offset from the start of the volume to the
+     *      first allocation block of the file system.
      */
     public ForkFilter(ForkType forkType, long cnid, CommonHFSForkData forkData,
             ExtentsOverflowFile extentsOverflowFile,
@@ -81,15 +98,34 @@ public class ForkFilter implements ReadableRandomAccessStream {
     }
 
     /**
-     * Creates a new ForkFilter. This class assumes that it has exclusive access to
-     * <code>sourceFile</code>.
+     * Creates a new ForkFilter. This class assumes that it has exclusive access
+     * to <code>sourceFile</code>.
 
+     * @param forkType
+     *      <b>(in)</b> The type of the fork (for constructing extents overflow
+     *      file keys).
+     * @param cnid
+     *      <b>(in)</b> The catalog node ID of the fork's parent (for
+     *      constructing extents overflow file keys).
      * @param forkLength
-     * @param extentDescriptors
+     *      <b>(in)</b> The length of the fork.
+     * @param basicExtents
+     *      <b>(in)</b> The basic extents of the fork, stored in the file entry
+     *      of the fork's parent.
+     * @param extentsOverflowFile
+     *      <b>(in)</b> The file systems's {@link ExtentsOverflowFile} (for
+     *      looking up extents beyond the first basic ones).
      * @param sourceFile
+     *      <b>(in)</b> A {@link ReadableRandomAccessStream} for accessing the
+     *      whole volume.
      * @param fsOffset
+     *      <b>(in)</b> The offset within <code>sourceFile</code> where the file
+     *      system starts.
      * @param allocationBlockSize
+     *      <b>(in)</b> The allocation block size of the file system.
      * @param firstBlockByteOffset
+     *      <b>(in)</b> The byte offset from the start of the volume to the
+     *      first allocation block of the file system.
      */
     public ForkFilter(ForkType forkType, long cnid, long forkLength,
             CommonHFSExtentDescriptor[] basicExtents,
@@ -102,6 +138,28 @@ public class ForkFilter implements ReadableRandomAccessStream {
                 firstBlockByteOffset);
     }
 
+    /**
+     * Creates a new ForkFilter. This class assumes that it has exclusive access
+     * to <code>sourceFile</code>.
+
+     * @param forkLength
+     *      <b>(in)</b> The length of the fork.
+     * @param allExtents
+     *      <b>(in)</b> All the extents of the fork. All extents must have been
+     *      resolved prior to calling this constructor since no dynamic lookup
+     *      will be possible.
+     * @param sourceFile
+     *      <b>(in)</b> A {@link ReadableRandomAccessStream} for accessing the
+     *      whole volume.
+     * @param fsOffset
+     *      <b>(in)</b> The offset within <code>sourceFile</code> where the file
+     *      system starts.
+     * @param allocationBlockSize
+     *      <b>(in)</b> The allocation block size of the file system.
+     * @param firstBlockByteOffset
+     *      <b>(in)</b> The byte offset from the start of the volume to the
+     *      first allocation block of the file system.
+     */
     public ForkFilter(long forkLength, CommonHFSExtentDescriptor[] allExtents,
             ReadableRandomAccessStream sourceFile, long fsOffset,
             long allocationBlockSize, long firstBlockByteOffset)
