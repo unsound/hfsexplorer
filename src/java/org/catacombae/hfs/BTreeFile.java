@@ -79,8 +79,8 @@ public abstract class BTreeFile<K extends CommonBTKey<K>,
                 CommonHFSVolumeHeader header);
     }
 
-    static <K extends CommonBTKey<K>, R extends CommonBTKeyedRecord<K>> R
-            findLEKey(CommonBTKeyedNode<R> indexNode, K searchKey)
+    <R extends CommonBTKeyedRecord<K>> R findLEKey(
+            CommonBTKeyedNode<R> indexNode, K searchKey)
     {
 	/*
 	 * Algorithm:
@@ -127,7 +127,6 @@ public abstract class BTreeFile<K extends CommonBTKey<K>,
      * exists) is returned in <code>result</code>. If no such record exists,
      * nothing is added to <code>result</code>.
      *
-     * @param <K> The type of the keys that we operate on.
      * @param <R> The type of the records that we operate on.
      *
      * @param keyedNode
@@ -140,9 +139,9 @@ public abstract class BTreeFile<K extends CommonBTKey<K>,
      * @return
      *      A {@link java.util.List} of records.
      */
-    public static <K extends CommonBTKey<K>, R extends CommonBTKeyedRecord<K>>
-    List<R> findLEKeys(CommonBTKeyedNode<R> keyedNode,
-            K minKeyInclusive, K maxKeyExclusive)
+    public <R extends CommonBTKeyedRecord<K>> List<R> findLEKeys(
+            CommonBTKeyedNode<R> keyedNode, K minKeyInclusive,
+            K maxKeyExclusive)
     {
 	final LinkedList<R> result = new LinkedList<R>();
 
@@ -162,7 +161,6 @@ public abstract class BTreeFile<K extends CommonBTKey<K>,
      * <code>false</code>. If no such record exists, nothing is added to
      * <code>result</code> (and <code>false</code> is still returned).
      *
-     * @param <K> The type of the keys that we operate on.
      * @param <R> The type of the records that we operate on.
      *
      * @param keyedNode
@@ -179,8 +177,8 @@ public abstract class BTreeFile<K extends CommonBTKey<K>,
      *      <code>true</code> if at least one key matching the specified
      *      conditions was found, and <code>false</code> otherwise.
      */
-    public static <K extends CommonBTKey<K>, R extends CommonBTKeyedRecord<K>>
-    boolean findLEKeys(CommonBTKeyedNode<R> keyedNode, K minKeyInclusive,
+    public <R extends CommonBTKeyedRecord<K>> boolean findLEKeys(
+            CommonBTKeyedNode<R> keyedNode, K minKeyInclusive,
             K maxKeyExclusive, LinkedList<R> result)
     {
         boolean found = false;
