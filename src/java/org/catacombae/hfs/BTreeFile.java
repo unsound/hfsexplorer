@@ -118,25 +118,27 @@ public abstract class BTreeFile<K extends CommonBTKey<K>,
     }
 
     /**
-     * Find all keys <code>k</code> in the range (<code>minKeyInclusive</code>
-     * &lt;= <code>k</code> &lt; <code>maxKeyExclusive</code>) that exist in
-     * <code>indexNode</code>.<br>
+     * Find records with keys <code>k</code> in the range
+     * <code>minKeyInclusive</code> &lt;= <code>k</code> &lt;
+     * <code>maxKeyExclusive</code> that exist in <code>keyedNode</code>.<br>
      *
-     * If no matching keys are found, then the record with the largest key that
-     * is less than <code>minKeyInclusive</code>, if any such record exists,
-     * is returned in <code>result</code> and the function returns
-     * <code>false</code>. If no such record does exist, nothing is added to
-     * <code>result</code> (and <code>false</code> is still returned).
+     * If no matching records are found, then the record with the largest key
+     * that is less than <code>minKeyInclusive</code> (if any such record
+     * exists) is returned in <code>result</code>. If no such record exists,
+     * nothing is added to <code>result</code>.
      *
-     * @param indexNode
-     *      <b>(in)</b> The index node to search.
+     * @param <K> The type of the keys that we operate on.
+     * @param <R> The type of the records that we operate on.
+     *
+     * @param keyedNode
+     *      <b>(in)</b> The keyed node to search.
      * @param minKeyInclusive
      *      <b>(in)</b> The smallest key in the range (inclusive).
      * @param maxKeyExclusive
      *      <b>(in)</b> The largest key in the range (exclusive).
      *
      * @return
-     *      A {@link java.util.List} of keys.
+     *      A {@link java.util.List} of records.
      */
     public static <K extends CommonBTKey<K>, R extends CommonBTKeyedRecord<K>>
     List<R> findLEKeys(CommonBTKeyedNode<R> keyedNode,
@@ -150,15 +152,18 @@ public abstract class BTreeFile<K extends CommonBTKey<K>,
     }
 
     /**
-     * Find all keys <code>k</code> in the range (<code>minKeyInclusive</code>
-     * &lt;= <code>k</code> &lt; <code>maxKeyExclusive</code>) that exist in
-     * <code>keyedNode</code>.<br>
+     * Find records with keys <code>k</code> in the range
+     * <code>minKeyInclusive</code> &lt;= <code>k</code> &lt;
+     * <code>maxKeyExclusive</code>) that exist in <code>keyedNode</code>.<br>
      *
-     * If no matching keys are found, then the record with the largest key that
-     * is less than <code>minKeyInclusive</code>, if any such record exists,
-     * is returned in <code>result</code> and the function returns
-     * <code>false</code>. If no such record does exist, nothing is added to
+     * If no matching records are found, then the record with the largest key
+     * that is less than <code>minKeyInclusive</code> (if any such record
+     * exists) is returned in <code>result</code> and the function returns
+     * <code>false</code>. If no such record exists, nothing is added to
      * <code>result</code> (and <code>false</code> is still returned).
+     *
+     * @param <K> The type of the keys that we operate on.
+     * @param <R> The type of the records that we operate on.
      *
      * @param keyedNode
      *      <b>(in)</b> The keyed node to search.
