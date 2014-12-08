@@ -385,7 +385,7 @@ public class CatalogFile
         final CommonHFSCatalogKey maxKeyExclusive =
                 vol.createCommonHFSCatalogKey(nextCNID, vol.getEmptyString());
 
-        return findLEKeys(indexNode, minKeyInclusive, maxKeyExclusive);
+        return findLEKeys(indexNode, minKeyInclusive, maxKeyExclusive, false);
     }
 
     private static CommonHFSCatalogLeafRecord[] getChildrenTo(CommonHFSCatalogLeafNode leafNode,

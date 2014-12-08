@@ -173,7 +173,7 @@ public class AttributesFile
                     (CommonHFSAttributesLeafNode) curNode;
 
             int listSizeBefore = list.size();
-            if(!findLEKeys(leafNode, searchKey, endKey, list)) {
+            if(!findLEKeys(leafNode, searchKey, endKey, true, list)) {
                 while(list.size() > listSizeBefore) {
                     list.removeLast();
                 }
@@ -188,7 +188,7 @@ public class AttributesFile
 
             /* Search for all keys in index node between search key (inclusive)
              * and end key (exclusive). */
-            findLEKeys(indexNode, searchKey, endKey, recList);
+            findLEKeys(indexNode, searchKey, endKey, false, recList);
 
             for(CommonBTIndexRecord<CommonHFSAttributesKey> rec : recList) {
                 listAttributeRecords(getNode(rec.getIndex()), nodeID, list);

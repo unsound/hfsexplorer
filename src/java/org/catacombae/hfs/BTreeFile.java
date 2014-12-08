@@ -135,17 +135,21 @@ public abstract class BTreeFile<K extends CommonBTKey<K>,
      *      <b>(in)</b> The smallest key in the range (inclusive).
      * @param maxKeyExclusive
      *      <b>(in)</b> The largest key in the range (exclusive).
+     * @param strict
+     *      <b>(in)</b> If <code>false</code>, then the record before the first
+     *      match is always included in the result. This is appropriate when
+     *      searching index nodes, but not for leaf nodes.
      *
      * @return
      *      A {@link java.util.List} of records.
      */
     protected <R extends CommonBTKeyedRecord<K>> List<R> findLEKeys(
             CommonBTKeyedNode<R> keyedNode, K minKeyInclusive,
-            K maxKeyExclusive)
+            K maxKeyExclusive, boolean strict)
     {
 	final LinkedList<R> result = new LinkedList<R>();
 
-        findLEKeys(keyedNode, minKeyInclusive, maxKeyExclusive, result);
+        findLEKeys(keyedNode, minKeyInclusive, maxKeyExclusive, strict, result);
 
         return result;
     }
@@ -169,6 +173,10 @@ public abstract class BTreeFile<K extends CommonBTKey<K>,
      *      <b>(in)</b> The smallest key in the range (inclusive).
      * @param maxKeyExclusive
      *      <b>(in)</b> The largest key in the range (exclusive).
+     * @param strict
+     *      <b>(in)</b> If <code>false</code>, then the record before the first
+     *      match is always included in the result. This is appropriate when
+     *      searching index nodes, but not for leaf nodes.
      * @param result
      *      <b>(out)</b> A {@link java.util.LinkedList} that will receive the
      *      matching keys.
@@ -179,7 +187,7 @@ public abstract class BTreeFile<K extends CommonBTKey<K>,
      */
     protected <R extends CommonBTKeyedRecord<K>> boolean findLEKeys(
             CommonBTKeyedNode<R> keyedNode, K minKeyInclusive,
-            K maxKeyExclusive, LinkedList<R> result)
+            K maxKeyExclusive, boolean strict, LinkedList<R> result)
     {
         boolean found = false;
 	K largestLEKey = null;
@@ -207,7 +215,7 @@ public abstract class BTreeFile<K extends CommonBTKey<K>,
             }
 	}
 
-	if(largestLEKey != null) {
+        if(largestLEKey != null && (!found || !strict)) {
             if(result != null) {
                 result.addFirst(largestLERecord);
             }
