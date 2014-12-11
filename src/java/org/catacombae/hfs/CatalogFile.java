@@ -30,7 +30,6 @@ import org.catacombae.hfs.types.hfscommon.CommonBTKeyedNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor;
 import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor.NodeType;
-import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFileThread;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFileThreadRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFolder;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFolderRecord;
@@ -43,6 +42,8 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogNodeID;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogNodeID.ReservedID;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogString;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogThread;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogThreadRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.io.ReadableRandomAccessStream;
 
@@ -248,19 +249,12 @@ public class CatalogFile
             final CommonHFSCatalogNodeID parentID;
             final CommonHFSCatalogString nodeName;
 
-            if(leafThreadRec instanceof CommonHFSCatalogFileThreadRecord) {
-                final CommonHFSCatalogFileThread fileThread =
-                        ((CommonHFSCatalogFileThreadRecord) leafThreadRec).
+            if(leafThreadRec instanceof CommonHFSCatalogThreadRecord) {
+                final CommonHFSCatalogThread thread =
+                        ((CommonHFSCatalogThreadRecord) leafThreadRec).
                         getData();
-                parentID = fileThread.getParentID();
-                nodeName = fileThread.getNodeName();
-            }
-            else if(leafThreadRec instanceof CommonHFSCatalogFileThreadRecord) {
-                final CommonHFSCatalogFolderThread folderThread =
-                        ((CommonHFSCatalogFolderThreadRecord) leafThreadRec).
-                        getData();
-                parentID = folderThread.getParentID();
-                nodeName = folderThread.getNodeName();
+                parentID = thread.getParentID();
+                nodeName = thread.getNodeName();
             }
             else {
                 throw new RuntimeException("Expected a catalog thread record " +

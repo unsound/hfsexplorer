@@ -28,9 +28,10 @@ import org.catacombae.hfs.types.hfs.CdrThdRec;
  *
  * @author erik
  */
-public abstract class CommonHFSCatalogFolderThread implements PrintableStruct, StructElements {
-    public abstract CommonHFSCatalogNodeID getParentID();
-    public abstract CommonHFSCatalogString getNodeName();
+public abstract class CommonHFSCatalogFolderThread
+        extends CommonHFSCatalogThread
+        implements PrintableStruct, StructElements
+{
     public abstract int length();
     public abstract byte[] getBytes();
 

@@ -29,7 +29,10 @@ import org.catacombae.hfs.types.hfs.CdrFThdRec;
  *
  * @author erik
  */
-public class CommonHFSCatalogFileThreadRecord extends CommonHFSCatalogLeafRecord implements PrintableStruct {
+public class CommonHFSCatalogFileThreadRecord
+        extends CommonHFSCatalogThreadRecord<CommonHFSCatalogFileThread>
+        implements PrintableStruct
+{
     private CommonHFSCatalogKey key;
     private CommonHFSCatalogFileThread data;
 
@@ -44,6 +47,7 @@ public class CommonHFSCatalogFileThreadRecord extends CommonHFSCatalogLeafRecord
         return key;
     }
 
+    /* @Override */
     public CommonHFSCatalogFileThread getData() {
         return data;
     }

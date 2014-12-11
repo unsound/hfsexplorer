@@ -28,9 +28,9 @@ import org.catacombae.hfs.types.hfs.CdrFThdRec;
  *
  * @author erik
  */
-public abstract class CommonHFSCatalogFileThread implements PrintableStruct, StructElements {
-    public abstract CommonHFSCatalogNodeID getParentID();
-    public abstract CommonHFSCatalogString getNodeName();
+public abstract class CommonHFSCatalogFileThread extends CommonHFSCatalogThread
+        implements PrintableStruct, StructElements
+{
     public abstract int length();
     public abstract byte[] getBytes();
 
