@@ -34,8 +34,7 @@ import org.catacombae.hfsexplorer.gui.BTreeInfoPanel.BTLeafStorage;
 import org.catacombae.util.Util.Pair;
 
 /**
- *
- * @author  Erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class AttributesInfoPanel
         extends BTreeInfoPanel<CommonHFSAttributesLeafRecord, AttributesFile>

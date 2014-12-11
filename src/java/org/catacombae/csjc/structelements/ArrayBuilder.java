@@ -23,7 +23,7 @@ import static org.catacombae.csjc.structelements.Signedness.*;
 import static org.catacombae.csjc.structelements.Endianness.*;
 
 /**
- * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class ArrayBuilder {
 

@@ -30,8 +30,7 @@ import org.catacombae.storage.fs.FSFork;
 import org.catacombae.storage.fs.FSForkType;
 
 /**
- *
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class HFSCommonFSFork implements FSFork {
     private static final String RESOURCE_XATTR_NAME = "com.apple.ResourceFork";

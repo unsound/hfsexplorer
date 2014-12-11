@@ -18,8 +18,7 @@
 package org.catacombae.jparted.lib;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public interface AbstractFile {
     public void seek(long pos);

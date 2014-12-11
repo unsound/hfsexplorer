@@ -49,8 +49,7 @@ import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.util.Util.Pair;
 
 /**
- *
- * @author Erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class ResourceForkViewPanel extends javax.swing.JPanel {
     private ResourceForkReader reader = null;

@@ -51,8 +51,7 @@ import org.catacombae.hfsexplorer.io.JTextAreaOutputStream;
 import org.catacombae.util.Util.Pair;
 
 /**
- *
- * @author  Erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class BTreeInfoPanel<R, B extends BTreeFile>
         extends javax.swing.JPanel

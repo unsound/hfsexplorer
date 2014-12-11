@@ -24,8 +24,7 @@ import org.catacombae.storage.ps.apm.types.DriverDescriptorRecord;
 import org.catacombae.storage.ps.PartitionSystemRecognizer;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class APMRecognizer implements PartitionSystemRecognizer {
 

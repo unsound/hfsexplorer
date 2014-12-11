@@ -22,8 +22,7 @@ import java.util.LinkedList;
 import org.catacombae.hfs.ProgressMonitor;
 
 /**
- *
- * @author Erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public interface ExtractProgressMonitor extends ProgressMonitor {
 

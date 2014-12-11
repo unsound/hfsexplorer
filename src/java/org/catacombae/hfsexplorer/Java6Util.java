@@ -37,7 +37,7 @@ import javax.swing.table.TableModel;
  * Java 6-specific. I.E. when compiling the source code using a JDK 1.5, the
  * only class that should fail to compile would be this one.
  *
- * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class Java6Util extends org.catacombae.util.Java6Util {
     /**

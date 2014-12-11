@@ -21,7 +21,7 @@ package org.catacombae.storage.fs;
  * Enumerates the fork types that are recognized by the API as having a special
  * meaning.
  *
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public enum FSForkType {
     /**

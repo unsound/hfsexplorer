@@ -18,8 +18,7 @@
 package org.catacombae.hfs;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class HotFilesFile {
 

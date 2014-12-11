@@ -32,8 +32,7 @@ import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfs.plus.HFSPlusVolume;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class HFSXVolume extends HFSPlusVolume {
     private final byte keyCompareType;

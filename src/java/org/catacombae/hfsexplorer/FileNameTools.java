@@ -21,8 +21,7 @@ import java.io.IOException;
 import java.util.HashSet;
 
 /**
- *
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class FileNameTools {
     private static final HashSet<String> reservedWindowsFilenames =

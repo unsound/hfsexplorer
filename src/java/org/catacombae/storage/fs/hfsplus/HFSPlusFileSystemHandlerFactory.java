@@ -34,8 +34,7 @@ import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer.FileSys
 import org.catacombae.util.Util;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class HFSPlusFileSystemHandlerFactory extends HFSCommonFileSystemHandlerFactory {
     private static final FileSystemRecognizer recognizer = new HFSPlusFileSystemRecognizer();

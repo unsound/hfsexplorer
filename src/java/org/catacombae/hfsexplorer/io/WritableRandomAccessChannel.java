@@ -22,8 +22,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
 
 /**
- *
- * @author Erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public interface WritableRandomAccessChannel extends RandomAccessChannel, WritableByteChannel {
 

@@ -44,6 +44,8 @@ import org.catacombae.util.Util;
  *   So: crc32Checksum, primaryLBA, backupLBA and partitionEntryLBA will differ.
  *   The two partition arrays though, are supposed to be completely identical.
  * </pre>
+ *
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class GUIDPartitionTable implements PartitionSystem, StructElements {
 

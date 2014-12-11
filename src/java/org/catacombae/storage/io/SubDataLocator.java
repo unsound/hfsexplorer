@@ -23,8 +23,7 @@ import org.catacombae.io.ReadableConcatenatedStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class SubDataLocator extends DataLocator {
     private DataLocator source;

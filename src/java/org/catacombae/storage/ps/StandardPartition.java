@@ -23,7 +23,7 @@ import java.io.PrintStream;
  * A basic implementation of the Partition interface, which just takes the
  * variables as parameters.
  *
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class StandardPartition implements Partition {
     private final long startOffset;

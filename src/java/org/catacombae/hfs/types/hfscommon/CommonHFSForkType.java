@@ -18,8 +18,7 @@
 package org.catacombae.hfs.types.hfscommon;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public enum CommonHFSForkType {
     DATA_FORK, RESOURCE_FORK;

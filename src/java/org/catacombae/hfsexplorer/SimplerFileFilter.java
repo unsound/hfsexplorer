@@ -23,7 +23,7 @@ import java.io.*;
  * Even simpler file filter as it only allows one extension.<br>
  * Directories are always accepted.
  *
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class SimplerFileFilter extends javax.swing.filechooser.FileFilter {
 

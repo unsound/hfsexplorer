@@ -43,7 +43,7 @@ import org.catacombae.storage.io.win32.ReadableWin32FileStream;
 import org.catacombae.util.Util;
 
 /**
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class ScanDecmpfs {
     public static void main(String[] args) {

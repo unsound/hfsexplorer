@@ -26,8 +26,7 @@ import org.catacombae.hfs.types.hfsplus.JournalInfoBlock;
 import org.catacombae.util.Util;
 
 /**
- *
- * @author  erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class JournalInfoBlockPanel extends javax.swing.JPanel {
 

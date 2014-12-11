@@ -33,8 +33,7 @@ import java.text.DateFormat;
 import org.catacombae.hfs.types.hfsplus.HFSPlusExtentDescriptor;
 
 /**
- *
- * @author  erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class FileInfoPanel extends javax.swing.JPanel {
     private final DateFormat dti = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);

@@ -19,7 +19,8 @@ package org.catacombae.csjc;
 
 /**
  * Abstract struct superinterface.
- * @author Erik Larsson
+ *
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public interface AbstractStruct {
     /**

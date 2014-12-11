@@ -18,7 +18,7 @@
 package org.catacombae.hfs.types.hfscommon;
 
 /**
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class CommonHFSCatalogThreadRecord
         <T extends CommonHFSCatalogThread>

@@ -22,8 +22,7 @@ import org.catacombae.csjc.DynamicStruct;
 import org.catacombae.csjc.PrintableStruct;
 
 /**
- *
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class BlockList implements DynamicStruct, PrintableStruct {
     public final BlockListHeader header;

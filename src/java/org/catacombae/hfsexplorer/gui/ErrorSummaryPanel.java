@@ -25,8 +25,7 @@ import java.util.List;
 import javax.swing.JDialog;
 
 /**
- *
- * @author  Erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class ErrorSummaryPanel extends javax.swing.JPanel {
 

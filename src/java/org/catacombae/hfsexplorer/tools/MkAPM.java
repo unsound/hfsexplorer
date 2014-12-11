@@ -27,8 +27,7 @@ import org.catacombae.storage.ps.apm.types.DriverDescriptorRecord;
 import org.catacombae.util.Util;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class MkAPM {
     private static class PartitionSpec {

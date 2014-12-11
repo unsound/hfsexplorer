@@ -18,8 +18,7 @@
 package org.catacombae.jparted.app;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class Main {
     public static void main(String[] args) {

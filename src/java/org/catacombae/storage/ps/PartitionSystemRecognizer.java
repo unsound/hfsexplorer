@@ -20,8 +20,7 @@ package org.catacombae.storage.ps;
 import org.catacombae.io.ReadableRandomAccessStream;
 
 /**
- *
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public interface PartitionSystemRecognizer {
     /* TODO: detect should take a sectorSize argument... */

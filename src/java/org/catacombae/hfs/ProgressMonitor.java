@@ -17,6 +17,9 @@
 
 package org.catacombae.hfs;
 
+/**
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ */
 public interface ProgressMonitor {
 
     public void signalCancel();

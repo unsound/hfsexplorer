@@ -18,8 +18,7 @@
 package org.catacombae.hfsexplorer.testcode;
 
 /**
- *
- * @author  erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class JavaPartitionEditor extends javax.swing.JPanel {
 

@@ -20,8 +20,7 @@ package org.catacombae.hfs;
 import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class VolumeHeader {
     public abstract CommonHFSVolumeHeader getHeaderStruct();

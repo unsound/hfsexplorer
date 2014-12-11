@@ -23,8 +23,7 @@ import java.util.Vector;
 import javax.swing.table.DefaultTableModel;
 
 /**
- *
- * @author  erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class MainPanel extends javax.swing.JPanel {
     private class PartitionTableRow {

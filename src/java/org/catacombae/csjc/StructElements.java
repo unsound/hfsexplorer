@@ -31,7 +31,7 @@ import org.catacombae.csjc.structelements.IntegerFieldRepresentation;
  * externally in a controlled way.
  *
  * @see org.catacombae.csjc.structelements.StructElement
- * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public interface StructElements {
     /** Shorthand constant. */

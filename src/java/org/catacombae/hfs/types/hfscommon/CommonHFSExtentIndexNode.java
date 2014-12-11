@@ -21,8 +21,7 @@ import org.catacombae.hfs.types.hfsplus.HFSPlusExtentKey;
 import org.catacombae.hfs.types.hfs.ExtKeyRec;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class CommonHFSExtentIndexNode
         extends CommonBTKeyedNode<CommonBTIndexRecord<CommonHFSExtentKey>>

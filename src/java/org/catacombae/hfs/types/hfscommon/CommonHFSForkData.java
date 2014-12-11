@@ -25,8 +25,7 @@ import org.catacombae.hfs.types.hfs.ExtDataRec;
 import org.catacombae.hfs.types.hfs.ExtDescriptor;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class CommonHFSForkData implements PrintableStruct {
     public abstract long getLogicalSize();

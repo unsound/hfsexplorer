@@ -30,8 +30,7 @@ import org.catacombae.io.WritableRandomAccessStream;
 import org.catacombae.storage.fs.FSFork;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class HFSCommonFinderInfoFork implements FSFork {
     private final CommonHFSFinderInfo finderInfo;

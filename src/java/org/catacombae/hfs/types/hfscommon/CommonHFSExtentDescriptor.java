@@ -26,8 +26,7 @@ import org.catacombae.hfs.types.hfsplus.HFSPlusExtentDescriptor;
 import org.catacombae.hfs.types.hfs.ExtDescriptor;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class CommonHFSExtentDescriptor implements StructElements,
         PrintableStruct {

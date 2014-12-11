@@ -24,8 +24,7 @@ import org.catacombae.storage.ps.PartitionSystemHandlerFactory;
 import org.catacombae.storage.ps.PartitionSystemImplementationInfo;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class GPTHandlerFactory extends PartitionSystemHandlerFactory {
 

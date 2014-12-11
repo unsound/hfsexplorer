@@ -20,8 +20,7 @@ package org.catacombae.storage.fs.hfscommon;
 import org.catacombae.storage.fs.FileSystemHandlerFactory;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class HFSCommonFileSystemHandlerFactory  extends FileSystemHandlerFactory {
 }

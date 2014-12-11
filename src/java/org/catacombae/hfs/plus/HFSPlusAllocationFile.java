@@ -23,8 +23,7 @@ import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfs.AllocationFile;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class HFSPlusAllocationFile extends AllocationFile {
     private HFSPlusVolume hfsPlusParentView;

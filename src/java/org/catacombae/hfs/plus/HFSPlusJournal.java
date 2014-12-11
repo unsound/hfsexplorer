@@ -33,8 +33,7 @@ import org.catacombae.util.ObjectContainer;
 import org.catacombae.util.Util;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 class HFSPlusJournal extends Journal {
     private final HFSPlusVolume vol;

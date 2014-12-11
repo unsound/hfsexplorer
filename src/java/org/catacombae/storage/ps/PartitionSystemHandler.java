@@ -19,7 +19,8 @@ package org.catacombae.storage.ps;
 
 /**
  * Stub.
- * @author erik
+ *
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class PartitionSystemHandler {
 

@@ -18,8 +18,7 @@
 package org.catacombae.storage.fs;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public enum FileSystemCapability {
     /** The file system has create time for all file system objects. */

@@ -20,8 +20,7 @@ package org.catacombae.hfsexplorer.gui;
 import org.catacombae.csjc.structelements.StringRepresentableField;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class TextViewPanel extends javax.swing.JPanel {
 

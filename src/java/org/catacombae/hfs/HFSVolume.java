@@ -47,8 +47,7 @@ import org.catacombae.io.Readable;
 import org.catacombae.io.ReadableRandomAccessStream;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class HFSVolume {
     /*

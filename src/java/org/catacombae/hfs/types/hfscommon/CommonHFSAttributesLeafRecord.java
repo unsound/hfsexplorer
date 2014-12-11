@@ -24,8 +24,7 @@ import org.catacombae.hfs.types.hfsplus.HFSPlusAttributesLeafRecord;
 import org.catacombae.hfs.types.hfsplus.HFSPlusAttributesLeafRecordData;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class CommonHFSAttributesLeafRecord
         extends CommonBTLeafRecord<CommonHFSAttributesKey>

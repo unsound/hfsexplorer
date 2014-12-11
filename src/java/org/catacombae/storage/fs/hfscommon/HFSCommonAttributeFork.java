@@ -39,7 +39,7 @@ import org.catacombae.io.WritableRandomAccessStream;
 import org.catacombae.storage.fs.FSFork;
 
 /**
- * @author <a href="http://www.catacombae.org">Erik Larsson</a>
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class HFSCommonAttributeFork implements FSFork {
     private final HFSCommonFSEntry parent;

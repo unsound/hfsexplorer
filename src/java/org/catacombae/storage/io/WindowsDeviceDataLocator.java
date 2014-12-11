@@ -25,8 +25,7 @@ import org.catacombae.storage.io.win32.ReadableWin32FileStream;
 import org.catacombae.storage.io.win32.Win32FileStream;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class WindowsDeviceDataLocator extends DataLocator {
     private final String devicePath;

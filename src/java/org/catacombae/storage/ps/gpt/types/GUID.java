@@ -25,8 +25,7 @@ import org.catacombae.csjc.structelements.IntegerFieldRepresentation;
 import org.catacombae.util.Util;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class GUID implements StaticStruct, StructElements {
     private int part1;

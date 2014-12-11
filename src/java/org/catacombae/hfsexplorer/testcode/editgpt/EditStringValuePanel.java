@@ -21,8 +21,7 @@ import org.catacombae.csjc.structelements.Field;
 import org.catacombae.csjc.structelements.StringRepresentableField;
 
 /**
- *
- * @author  Erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class EditStringValuePanel extends javax.swing.JPanel {
     private StringRepresentableField userData;

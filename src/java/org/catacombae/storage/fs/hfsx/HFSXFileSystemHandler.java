@@ -27,7 +27,7 @@ import org.catacombae.hfs.x.HFSXVolume;
  * but with a few extensions, like the ability to treat file names in a case
  * sensitive manner).
  *
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class HFSXFileSystemHandler extends HFSPlusFileSystemHandler {
 

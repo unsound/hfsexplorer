@@ -36,7 +36,7 @@ import org.catacombae.hfsexplorer.gui.StructViewPanel;
  * A window that queries a HFSish file system about its volume properties and displays them
  * graphically.
  *
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class VolumeInfoWindow extends JFrame {
 

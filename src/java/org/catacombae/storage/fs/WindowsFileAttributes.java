@@ -18,8 +18,7 @@
 package org.catacombae.storage.fs;
 
 /**
- *
- * @author Erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class WindowsFileAttributes {
     private static final int FILE_ATTRIBUTE_READONLY = 0x1;

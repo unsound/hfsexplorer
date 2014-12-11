@@ -21,8 +21,7 @@ import java.awt.Component;
 import org.catacombae.storage.fs.FSLink;
 
 /**
- *
- * @author  Erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class LinkTargetPanel extends javax.swing.JPanel implements ChainedPanel {
 

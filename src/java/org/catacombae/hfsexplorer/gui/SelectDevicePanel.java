@@ -24,8 +24,7 @@
 package org.catacombae.hfsexplorer.gui;
 
 /**
- *
- * @author  Erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class SelectDevicePanel extends javax.swing.JPanel {
 

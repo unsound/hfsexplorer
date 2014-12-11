@@ -68,7 +68,7 @@ import org.catacombae.util.Util;
  * Command line program which extracts all or part of the contents of a
  * HFS/HFS+/HFSX file system to a specified path.
  *
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class UnHFS {
     private static boolean debug = false;

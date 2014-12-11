@@ -25,7 +25,7 @@ import org.catacombae.storage.ps.container.ContainerType;
  * be encountered. If FAT32 has several different partition types associated in
  * a MBR table, they all have the same general type.
  *
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public enum PartitionType {
     EMPTY(ContentType.OTHER),

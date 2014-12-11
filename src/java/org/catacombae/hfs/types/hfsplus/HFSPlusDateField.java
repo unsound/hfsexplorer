@@ -23,8 +23,7 @@ import org.catacombae.csjc.structelements.StringRepresentableField;
 import org.catacombae.util.Util;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class HFSPlusDateField extends StringRepresentableField {
     private static final Object dtiSync = new Object();

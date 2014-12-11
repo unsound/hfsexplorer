@@ -18,7 +18,7 @@
 package org.catacombae.hfs.types.hfscommon;
 
 /**
- * @author <a href="http://www.catacombae.org">Erik Larsson</a>
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class CommonBTLeafRecord <K extends CommonBTKey<K>>
         extends CommonBTKeyedRecord<K>

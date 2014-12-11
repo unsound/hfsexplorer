@@ -33,7 +33,7 @@ import org.catacombae.util.Util;
  * An implementation of OutputStream that writes all output to a JTextArea, decoded with the
  * standard platform encoding, or a user supplied one.
  *
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class JTextAreaOutputStream extends OutputStream {
     /**

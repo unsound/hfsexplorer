@@ -26,8 +26,7 @@ import org.catacombae.storage.ps.Partition;
 import org.catacombae.storage.ps.PartitionSystemHandler;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class APMHandler extends PartitionSystemHandler {
 

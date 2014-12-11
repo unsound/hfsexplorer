@@ -33,8 +33,7 @@ import org.catacombae.util.IOUtil;
 import org.catacombae.util.Util;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class HFSPlusFileSystemHandler extends HFSCommonFileSystemHandler {
     private static final String FILE_HARD_LINK_DIR =

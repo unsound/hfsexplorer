@@ -33,8 +33,7 @@ import org.catacombae.hfs.types.hfs.CdrFilRec;
 import org.catacombae.hfs.types.hfs.CdrThdRec;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class CommonHFSCatalogLeafRecord
         extends CommonBTLeafRecord<CommonHFSCatalogKey>

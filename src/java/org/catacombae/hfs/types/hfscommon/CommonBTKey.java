@@ -21,8 +21,7 @@ import org.catacombae.csjc.DynamicStruct;
 import org.catacombae.csjc.PrintableStruct;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class CommonBTKey <K extends CommonBTKey> implements Comparable<K>, DynamicStruct, PrintableStruct {
     public abstract byte[] getBytes();

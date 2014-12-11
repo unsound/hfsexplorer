@@ -26,7 +26,7 @@ import org.catacombae.storage.io.DataLocator;
  * A detector for known partition systems (see PartitionSystemType for a list
  * of known partition systems).
  *
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class PartitionSystemDetector {
 

@@ -39,8 +39,7 @@ import org.catacombae.hfsexplorer.FileSystemBrowser.NoLeafMutableTreeNode;
 import org.catacombae.util.Util.Pair;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class CatalogInfoPanel
         extends BTreeInfoPanel<CommonHFSCatalogLeafRecord, CatalogFile>

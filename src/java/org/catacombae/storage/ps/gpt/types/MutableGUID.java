@@ -18,8 +18,7 @@
 package org.catacombae.storage.ps.gpt.types;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class MutableGUID extends GUID {
     public MutableGUID() {}

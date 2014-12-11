@@ -29,8 +29,7 @@ import org.catacombae.hfs.types.hfs.CdrDirRec;
 import org.catacombae.hfs.types.hfs.HFSDate;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class CommonHFSCatalogFolder implements CommonHFSCatalogAttributes, PrintableStruct, StructElements {
     public abstract CommonHFSCatalogNodeID getFolderID();

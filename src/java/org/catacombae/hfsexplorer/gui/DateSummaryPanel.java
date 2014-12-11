@@ -22,8 +22,7 @@ import java.text.DateFormat;
 import org.catacombae.storage.fs.FSAttributes;
 
 /**
- *
- * @author  Erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class DateSummaryPanel extends javax.swing.JPanel implements ChainedPanel {
 

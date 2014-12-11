@@ -25,8 +25,7 @@ import org.catacombae.util.Util;
 import org.catacombae.hfs.types.carbon.Point;
 
 /**
- *
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class CommonFinderInfo implements StructElements, PrintableStruct {
     public static final int[] COLOR_1 = { 169, 169, 169 }; // Grey

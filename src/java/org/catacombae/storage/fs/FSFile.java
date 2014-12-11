@@ -25,7 +25,7 @@ package org.catacombae.storage.fs;
  * "main" fork or the "data" fork. Some file systems do not support forks, in
  * which case the only fork available is the "main" fork.
  *
- * @author <a href="mailto:catacombae@gmail.com">Erik Larsson</a>
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public interface FSFile extends FSEntry {
     /**

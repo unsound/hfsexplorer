@@ -22,8 +22,7 @@ import java.util.Date;
 import java.util.TimeZone;
 
 /**
- *
- * @author <a href="mailto:catacombae@gmail.com">Erik Larsson</a>
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class HFSDate {
 

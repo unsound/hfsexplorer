@@ -23,8 +23,7 @@ import javax.swing.JOptionPane;
 import org.catacombae.hfsexplorer.ExtractProgressMonitor.ExtractProperties;
 
 /**
- *
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
     private final Component parentComponent;

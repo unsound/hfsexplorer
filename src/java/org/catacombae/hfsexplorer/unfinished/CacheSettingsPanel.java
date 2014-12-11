@@ -22,8 +22,7 @@ import javax.swing.*;
 import org.catacombae.hfs.HFSVolume;
 
 /**
- *
- * @author  Erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class CacheSettingsPanel extends javax.swing.JPanel {
 

@@ -20,7 +20,7 @@ package org.catacombae.csjc.structelements;
 import org.catacombae.util.Util;
 
 /**
- * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class Array extends StructElement {
 

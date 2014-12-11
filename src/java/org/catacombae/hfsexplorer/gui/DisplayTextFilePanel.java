@@ -36,8 +36,7 @@ import org.catacombae.io.Readable;
 //import net.iharder.dnd.FileDrop;
 
 /**
- *
- * @author  Erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class DisplayTextFilePanel extends javax.swing.JPanel {
     private static final String[] sortingPrefixes =

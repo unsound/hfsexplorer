@@ -18,8 +18,7 @@
 package org.catacombae.hfsexplorer.gui;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class LeafInfoPanel extends javax.swing.JPanel {
 

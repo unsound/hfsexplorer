@@ -22,8 +22,7 @@ import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.RandomAccessStream;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class DataLocator {
     private boolean closed = false;

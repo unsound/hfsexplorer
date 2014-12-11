@@ -28,8 +28,7 @@ import org.catacombae.storage.fs.FSFolder;
 import org.catacombae.storage.fs.FSFork;
 
 /**
- *
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class HFSCommonFSFolder extends HFSCommonFSEntry implements FSFolder {
     /**

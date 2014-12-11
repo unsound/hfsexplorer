@@ -25,8 +25,7 @@ package org.catacombae.hfsexplorer.gui;
 import javax.swing.*;
 
 /**
- *
- * @author  Erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class FilesystemBrowserPanel extends javax.swing.JPanel {
     private static final ImageIcon FORWARD_ICON = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/forward.png"));

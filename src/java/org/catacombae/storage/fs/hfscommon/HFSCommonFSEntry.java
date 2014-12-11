@@ -32,8 +32,7 @@ import org.catacombae.storage.fs.FSForkType;
 import org.catacombae.util.Util.Pair;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class HFSCommonFSEntry extends BasicFSEntry {
 

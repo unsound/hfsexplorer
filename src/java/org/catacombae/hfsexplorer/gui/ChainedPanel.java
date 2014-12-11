@@ -22,7 +22,7 @@ import java.awt.Component;
 /**
  * Interface for a panel which can chain-link another Component inside itself.
  *
- * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public interface ChainedPanel {
     /**

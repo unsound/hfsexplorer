@@ -18,8 +18,7 @@
 package org.catacombae.hfs.types.hfsx;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public enum HFSXKeyCompareType {
     CASE_FOLDING, BINARY_COMPARE;

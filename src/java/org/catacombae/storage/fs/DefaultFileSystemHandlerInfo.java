@@ -21,7 +21,7 @@ package org.catacombae.storage.fs;
  * Default implementation of a FileSystemHandlerInfo object which holds static
  * fields.
  *
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class DefaultFileSystemHandlerInfo implements FileSystemHandlerInfo {
     private final String handlerIdentifier;

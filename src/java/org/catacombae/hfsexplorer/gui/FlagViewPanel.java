@@ -22,8 +22,7 @@ import java.awt.event.ActionListener;
 import org.catacombae.csjc.structelements.FlagField;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class FlagViewPanel extends javax.swing.JPanel {
 

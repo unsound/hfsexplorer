@@ -20,8 +20,7 @@ package org.catacombae.csjc.structelements;
 import org.catacombae.util.Util;
 
 /**
- *
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 class ByteArrayDataHandle implements DataHandle {
 

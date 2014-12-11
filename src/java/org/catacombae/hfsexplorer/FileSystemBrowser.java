@@ -74,7 +74,7 @@ import org.catacombae.hfsexplorer.gui.FilesystemBrowserPanel;
  * A generalization of the file system browser into a very autonomous component with very few
  * dependencies, so that it can be easily reused in the future.
  *
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class FileSystemBrowser<A> {
     private final FileSystemProvider<A> controller;

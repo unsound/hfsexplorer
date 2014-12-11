@@ -23,8 +23,7 @@ import java.util.LinkedList;
 import org.catacombae.util.Util;
 
 /**
- *
- * @author Erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class MasterBootRecord {
     public static final short MBR_SIGNATURE = 0x55AA;

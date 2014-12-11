@@ -29,7 +29,7 @@ import java.lang.reflect.Proxy;
  * there is no danger during static initialization of the class. However all
  * methods will throw exceptions if invoked on other platforms than Mac OS X.
  *
- * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class MacUtil {
     /**

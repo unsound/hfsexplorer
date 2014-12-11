@@ -18,8 +18,7 @@
 package org.catacombae.csjc.structelements;
 
 /**
- *
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public interface DataHandle {
     public byte[] getBytesAsCopy();

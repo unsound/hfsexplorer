@@ -33,7 +33,7 @@ import org.catacombae.csjc.structelements.StructElement;
  * the HFS+ specification. As the catalog node ID has some special properties
  * compared to a normal integer, we treat this as a separate class.
  *
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class HFSCatalogNodeID implements PrintableStruct {
     /*

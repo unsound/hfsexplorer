@@ -34,8 +34,7 @@ import org.catacombae.hfsexplorer.ExtractProgressMonitor.FileExistsAction;
 import org.catacombae.hfsexplorer.ExtractProgressMonitor.UnhandledExceptionAction;
 
 /**
- *
- * @author  Erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class ExtractSettingsPanel extends javax.swing.JPanel {
     private final ButtonGroup createDirButtonGroup = new ButtonGroup();

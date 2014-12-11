@@ -21,8 +21,7 @@ import java.util.LinkedList;
 import org.catacombae.util.Util;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class FileSystemHandler {
     private static final boolean DEBUG = Util.booleanEnabledByProperties(false,

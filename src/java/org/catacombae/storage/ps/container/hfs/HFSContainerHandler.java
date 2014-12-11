@@ -26,8 +26,7 @@ import org.catacombae.storage.ps.container.ContainerHandler;
 import org.catacombae.storage.ps.container.ContainerType;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class HFSContainerHandler extends ContainerHandler {
     private static final short SIGNATURE_HFS =      (short)0x4244; // ASCII: 'BD'

@@ -28,8 +28,7 @@ import javax.swing.SwingUtilities;
 import java.text.DecimalFormat;
 
 /**
- *
- * @author  Erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class ExtractProgressPanel extends javax.swing.JPanel {
 

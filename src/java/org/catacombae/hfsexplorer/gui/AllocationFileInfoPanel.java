@@ -31,8 +31,7 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSExtentDescriptor;
 import org.catacombae.hfs.AllocationFile;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class AllocationFileInfoPanel extends javax.swing.JPanel {
     private final AllocationFile afView;

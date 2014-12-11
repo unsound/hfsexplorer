@@ -26,8 +26,7 @@ import javax.swing.JDialog;
 import java.awt.event.ActionListener;
 
 /**
- *
- * @author  Erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class FileOperationsPanel extends javax.swing.JPanel {
 

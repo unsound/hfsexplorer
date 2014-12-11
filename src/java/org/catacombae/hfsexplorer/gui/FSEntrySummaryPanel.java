@@ -33,8 +33,7 @@ import org.catacombae.storage.fs.FSFolder;
 import org.catacombae.storage.fs.FSLink;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPanel {
     private volatile boolean cancelSignaled = false;

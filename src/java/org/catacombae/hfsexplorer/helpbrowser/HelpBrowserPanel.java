@@ -33,7 +33,7 @@ import javax.swing.event.HyperlinkListener;
 /**
  * A simple implemetation of a HTML help browser through Java's standard API.
  *
- * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class HelpBrowserPanel extends javax.swing.JPanel {
     private static final String TEST_HOME =

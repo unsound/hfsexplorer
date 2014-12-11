@@ -29,7 +29,7 @@ import java.nio.charset.UnsupportedCharsetException;
 /**
  * StringCodec that uses a CharsetDecoder internally.
  *
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class CharsetStringCodec implements StringCodec {
     private final String charsetName;

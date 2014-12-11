@@ -26,7 +26,7 @@ import static org.catacombae.csjc.structelements.Endianness.*;
 import static org.catacombae.csjc.structelements.IntegerFieldRepresentation.*;
 
 /**
- * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class DictionaryBuilder {
 

@@ -32,7 +32,8 @@ import org.catacombae.hfs.types.hfs.HFSVolumeFinderInfo;
 /**
  * A panel for displaying the values in a HFSPlusVolumeHeader in a good looking
  * way.
- * @author <a href="mailto:catacombae@gmail.com">Erik Larsson</a>
+ *
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class HFSPlusVolumeInfoPanel extends javax.swing.JPanel {
     private final DateFormat dti =

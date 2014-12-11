@@ -29,6 +29,8 @@ import org.catacombae.util.Util;
  * creating Unicode filenames for an HFS+ file system.
  * Created from http://developer.apple.com/technotes/tn/tn1150table.html and verified against it.
  * Also including a Hangul decomposition algorithm from the Unicode Book.
+ *
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class UnicodeNormalizationToolkit {
     private static final UnicodeNormalizationToolkit defaultInstance = new UnicodeNormalizationToolkit();

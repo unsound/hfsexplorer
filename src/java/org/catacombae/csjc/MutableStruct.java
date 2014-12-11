@@ -21,8 +21,7 @@ import org.catacombae.util.Util;
 import java.lang.reflect.Field;
 
 /**
- *
- * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class MutableStruct {
     private final boolean mutable;

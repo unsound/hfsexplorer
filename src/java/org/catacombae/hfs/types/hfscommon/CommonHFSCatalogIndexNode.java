@@ -22,8 +22,7 @@ import org.catacombae.hfs.types.hfsx.HFSXCatalogKey;
 import org.catacombae.hfs.types.hfs.CatKeyRec;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class CommonHFSCatalogIndexNode
         extends CommonBTKeyedNode<CommonBTIndexRecord<CommonHFSCatalogKey>>

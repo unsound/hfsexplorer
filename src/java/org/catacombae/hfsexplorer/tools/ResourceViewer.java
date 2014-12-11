@@ -41,8 +41,7 @@ import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 
 /**
- *
- * @author Erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class ResourceViewer extends javax.swing.JFrame {
     private final ResourceForkViewPanel resourceForkViewPanel;

@@ -20,8 +20,7 @@ package org.catacombae.hfs.types.hfscommon;
 import org.catacombae.csjc.PrintableStruct;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class CommonBTRecord implements PrintableStruct {
     public abstract int getSize();

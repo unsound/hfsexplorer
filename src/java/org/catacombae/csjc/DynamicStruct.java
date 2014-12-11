@@ -21,7 +21,7 @@ package org.catacombae.csjc;
  * Represents a dynamic struct, i.e. a struct with a size that varies between
  * instances.
  *
- * @author <a href="http://hem.bredband.net/catacombae">Erik Larsson</a>
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public interface DynamicStruct extends AbstractStruct {
     public int maxSize();

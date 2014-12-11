@@ -21,8 +21,7 @@ import java.io.PrintStream;
 import org.catacombae.util.Util;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class CommonBTIndexRecord <K extends CommonBTKey<K>>
         extends CommonBTKeyedRecord<K>

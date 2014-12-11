@@ -35,7 +35,7 @@ import org.catacombae.csjc.PrintableStruct;
  * need to convert from the native sector number to an actual byte offset/length.
  * </pre>
  *
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public interface Partition extends PrintableStruct {
     /** Returns the start offset in bytes. */

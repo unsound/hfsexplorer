@@ -49,8 +49,7 @@ import org.catacombae.hfs.Journal;
 import org.catacombae.util.Util;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class HFSOriginalVolume extends HFSVolume {
     private static final CommonHFSCatalogString EMPTY_STRING =

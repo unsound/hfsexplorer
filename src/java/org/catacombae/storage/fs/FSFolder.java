@@ -23,7 +23,7 @@ package org.catacombae.storage.fs;
  * holds subentries, like other files, folders or special files. A folder has no
  * associated data, other than the file system metadata such as attributes.
  *
- * @author <a href="mailto:catacombae@gmail.com">Erik Larsson</a>
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public interface FSFolder extends FSEntry {
     /**

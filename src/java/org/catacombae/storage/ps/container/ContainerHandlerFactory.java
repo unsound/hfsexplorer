@@ -20,8 +20,7 @@ package org.catacombae.storage.ps.container;
 import org.catacombae.storage.io.DataLocator;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class ContainerHandlerFactory {
     public abstract ContainerHandler createHandler(DataLocator containerData);

@@ -21,8 +21,7 @@ import org.catacombae.storage.fs.FileSystemMajorType;
 import org.catacombae.storage.ps.PartitionSystemType;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class ContainerHandler {
     /** Returns true if the container contains a file system. */

@@ -26,8 +26,7 @@ import javax.swing.SwingUtilities;
 import org.catacombae.util.Util;
 
 /**
- *
- * @author <a href="mailto:catacombae@gmail.com">Erik Larsson</a>
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class MemoryStatisticsPanel extends javax.swing.JPanel {
 

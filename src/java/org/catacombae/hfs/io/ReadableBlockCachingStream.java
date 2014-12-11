@@ -22,6 +22,9 @@ import org.catacombae.io.ReadableFilterStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.RuntimeIOException;
 
+/**
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ */
 public class ReadableBlockCachingStream extends ReadableFilterStream {
     /*
      * Keep track of the access count for every (?) block. The <itemCount> blocks with the highest

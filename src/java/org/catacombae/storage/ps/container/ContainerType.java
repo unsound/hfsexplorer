@@ -25,8 +25,7 @@ import java.util.List;
 import org.catacombae.storage.ps.container.hfs.HFSContainerHandlerFactory;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public enum ContainerType {
     NT_OS2_IFS,

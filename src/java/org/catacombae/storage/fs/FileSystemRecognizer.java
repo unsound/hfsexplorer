@@ -20,8 +20,7 @@ package org.catacombae.storage.fs;
 import org.catacombae.io.ReadableRandomAccessStream;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public interface FileSystemRecognizer {
 

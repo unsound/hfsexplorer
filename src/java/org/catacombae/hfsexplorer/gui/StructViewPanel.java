@@ -21,8 +21,7 @@ import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.csjc.structelements.Array;
 
 /**
- *
- * @author erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class StructViewPanel extends javax.swing.JPanel {
 

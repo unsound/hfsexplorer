@@ -31,8 +31,7 @@ import java.awt.Color;
 import java.text.DateFormat;
 
 /**
- *
- * @author  erik
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class FolderInfoPanel extends javax.swing.JPanel {
 

@@ -20,8 +20,7 @@ package org.catacombae.hfsexplorer.fs;
 import org.catacombae.hfs.ProgressMonitor;
 
 /**
- *
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class NullProgressMonitor implements ProgressMonitor {
 

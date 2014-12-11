@@ -30,7 +30,7 @@ import org.catacombae.io.ReadableRandomAccessStream;
 /**
  * Accessor class for the data inside a resource fork.
  *
- * @author Erik Larsson
+ * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class ResourceForkReader {
     /*
