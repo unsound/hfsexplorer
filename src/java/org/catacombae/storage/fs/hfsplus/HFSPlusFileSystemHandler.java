@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2008 Erik Larsson
+ * Copyright (C) 2008-2014 Erik Larsson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFolderRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogNodeID;
 import org.catacombae.storage.fs.FSEntry;
+import org.catacombae.storage.fs.FSFile;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFSFile;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFSFolder;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFSLink;
@@ -234,4 +235,16 @@ public class HFSPlusFileSystemHandler extends HFSCommonFileSystemHandler {
 
         return absPath;
    }
+
+    @Override
+    protected FSFile newFSFile(CommonHFSCatalogFileRecord fileRecord) {
+        return new HFSPlusFSFile(this, fileRecord);
+    }
+
+    @Override
+    protected FSFile newFSFile(CommonHFSCatalogFileRecord hardLinkRecord,
+            CommonHFSCatalogFileRecord fileRecord)
+    {
+        return new HFSPlusFSFile(this, hardLinkRecord, fileRecord);
+    }
 }

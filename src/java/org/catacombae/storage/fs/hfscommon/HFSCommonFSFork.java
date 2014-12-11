@@ -38,8 +38,9 @@ public class HFSCommonFSFork implements FSFork {
     private final FSForkType type;
     private final CommonHFSForkData forkData;
 
-    HFSCommonFSFork(HFSCommonFSFile iParent, FSForkType iType, CommonHFSForkData iForkData) {
-
+    protected HFSCommonFSFork(HFSCommonFSFile iParent, FSForkType iType,
+        CommonHFSForkData iForkData)
+    {
         // Input check
         if(iParent == null)
             throw new IllegalArgumentException("iParent must not be null!");

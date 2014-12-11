@@ -50,9 +50,9 @@ public abstract class HFSCommonFSEntry extends BasicFSEntry {
         this.catalogAttributes = catalogAttributes;
     }
 
-    private synchronized List<FSFork> getAttributeForks() {
+    protected synchronized void fillAttributeForks(List<FSFork> forkList) {
         if(attributeForkList == null) {
-            LinkedList<FSFork> forkList = new LinkedList<FSFork>();
+            LinkedList<FSFork> tmpAttributeForkList = new LinkedList<FSFork>();
 
             AttributesFile attributesFile =
                     fsHandler.getFSView().getAttributesFile();
@@ -95,17 +95,17 @@ public abstract class HFSCommonFSEntry extends BasicFSEntry {
                     LinkedList<CommonHFSAttributesLeafRecord> recordList =
                             p.getB();
 
-                    forkList.add(new HFSCommonAttributeFork(this,
+                    tmpAttributeForkList.add(new HFSCommonAttributeFork(this,
                             recordList.toArray(
                             new CommonHFSAttributesLeafRecord[recordList.
                             size()])));
                 }
             }
 
-            attributeForkList = forkList;
+            attributeForkList = tmpAttributeForkList;
         }
 
-        return attributeForkList;
+        forkList.addAll(attributeForkList);
     }
 
     HFSCommonFileSystemHandler getFileSystemHandler() {
@@ -116,6 +116,12 @@ public abstract class HFSCommonFSEntry extends BasicFSEntry {
     public FSFork[] getAllForks() {
         LinkedList<FSFork> forkList = new LinkedList<FSFork>();
 
+        fillForks(forkList);
+
+        return forkList.toArray(new FSFork[forkList.size()]);
+    }
+
+    protected void fillForks(List<FSFork> forkList) {
         FSFork fork = getFinderInfoFork();
         if(fork != null)
             forkList.add(fork);
@@ -125,9 +131,7 @@ public abstract class HFSCommonFSEntry extends BasicFSEntry {
             forkList.add(resourceFork);
         }
 
-        forkList.addAll(getAttributeForks());
-
-        return forkList.toArray(new FSFork[forkList.size()]);
+        fillAttributeForks(forkList);
     }
 
     /* @Override */

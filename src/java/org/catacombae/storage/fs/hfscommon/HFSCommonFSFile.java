@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2008-2009 Erik Larsson
+ * Copyright (C) 2008-2014 Erik Larsson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 
 package org.catacombae.storage.fs.hfscommon;
 
+import java.util.List;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFile;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFileRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogLeafRecord;
@@ -47,14 +48,19 @@ public class HFSCommonFSFile extends HFSCommonFSEntry implements FSFile {
     private final CommonHFSCatalogFileRecord fileRecord;
 
     private final HFSCommonFSAttributes attributes;
-    private final FSFork dataFork;
+    private final FSFork rawDataFork;
     private final FSFork resourceFork;
 
-    HFSCommonFSFile(HFSCommonFileSystemHandler iParent, CommonHFSCatalogFileRecord iFileRecord) {
+    protected HFSCommonFSFile(HFSCommonFileSystemHandler iParent,
+            CommonHFSCatalogFileRecord iFileRecord)
+    {
         this(iParent, null, iFileRecord);
     }
 
-    HFSCommonFSFile(HFSCommonFileSystemHandler iParent, CommonHFSCatalogLeafRecord iHardLinkRecord, CommonHFSCatalogFileRecord iFileRecord) {
+    protected HFSCommonFSFile(HFSCommonFileSystemHandler iParent,
+            CommonHFSCatalogLeafRecord iHardLinkRecord,
+            CommonHFSCatalogFileRecord iFileRecord)
+    {
         super(iParent, iFileRecord.getData());
 
         // Input check
@@ -70,7 +76,9 @@ public class HFSCommonFSFile extends HFSCommonFSEntry implements FSFile {
             this.keyRecord = iFileRecord;
         CommonHFSCatalogFile catalogFile = fileRecord.getData();
         this.attributes = new HFSCommonFSAttributes(this, catalogFile);
-        this.dataFork = new HFSCommonFSFork(this, FSForkType.DATA, catalogFile.getDataFork());
+        this.rawDataFork =
+                new HFSCommonFSFork(this, FSForkType.DATA,
+                        catalogFile.getDataFork());
         this.resourceFork = new HFSCommonFSFork(this, FSForkType.MACOS_RESOURCE, catalogFile.getResourceFork());
     }
 
@@ -97,26 +105,21 @@ public class HFSCommonFSFile extends HFSCommonFSEntry implements FSFile {
     }
 
     @Override
-    public FSFork[] getAllForks() {
-        FSFork[] superForks = super.getAllForks();
-        FSFork[] res = new FSFork[superForks.length + 1];
-
-        System.arraycopy(superForks, 0, res, 0, superForks.length);
-        res[superForks.length] = dataFork;
+    protected void fillForks(List<FSFork> forkList) {
+        forkList.add(getDataFork());
+        super.fillForks(forkList);
 
         /*
          * TODO: Remove duplicates, in case we are overriding a fork.
          * (...which we are not, so this is unneccessary at this point.)
          */
-
-        return res;
     }
 
     @Override
     public FSFork getForkByType(FSForkType type) {
         switch (type) {
             case DATA:
-                return dataFork;
+                return getDataFork();
             case MACOS_RESOURCE:
                 return resourceFork;
             default:
@@ -126,13 +129,17 @@ public class HFSCommonFSFile extends HFSCommonFSEntry implements FSFile {
 
     @Override
     public long getCombinedLength() {
-        return super.getCombinedLength() + dataFork.getLength() +
+        return super.getCombinedLength() + getDataFork().getLength() +
                 resourceFork.getLength();
     }
 
     /* @Override */
     protected CommonHFSCatalogNodeID getCatalogNodeID() {
         return fileRecord.getData().getFileID();
+    }
+
+    protected FSFork getDataFork() {
+        return rawDataFork;
     }
 
     /* @Override */

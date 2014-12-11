@@ -250,18 +250,29 @@ public abstract class HFSCommonFileSystemHandler extends FileSystemHandler {
         */
     }
 
-    protected FSEntry entryFromRecord(CommonHFSCatalogFileRecord fileRecord) {
+
+    protected FSFile newFSFile(CommonHFSCatalogFileRecord fileRecord) {
         return new HFSCommonFSFile(this, fileRecord);
     }
 
+    protected FSFile newFSFile(CommonHFSCatalogFileRecord hardLinkRecord,
+            CommonHFSCatalogFileRecord fileRecord)
+    {
+        return new HFSCommonFSFile(this, hardLinkRecord, fileRecord);
+    }
+
+    protected FSEntry entryFromRecord(CommonHFSCatalogFileRecord fileRecord) {
+        return newFSFile(fileRecord);
+    }
+
     protected FSFile createFSFile(CommonHFSCatalogFileRecord fileRecord) {
-        return new HFSCommonFSFile(this, fileRecord);
+        return newFSFile(fileRecord);
     }
 
     protected FSFile createFSFile(CommonHFSCatalogFileRecord hardLinkRecord,
             CommonHFSCatalogFileRecord fileRecord)
     {
-        return new HFSCommonFSFile(this, hardLinkRecord, fileRecord);
+        return newFSFile(hardLinkRecord, fileRecord);
     }
 
     protected FSFolder createFSFolder(CommonHFSCatalogFileRecord hardLinkRecord,
