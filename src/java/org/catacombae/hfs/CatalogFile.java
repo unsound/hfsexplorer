@@ -30,6 +30,7 @@ import org.catacombae.hfs.types.hfscommon.CommonBTKeyedNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor;
 import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor.NodeType;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFileThread;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFileThreadRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFolder;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFolderRecord;
@@ -240,12 +241,45 @@ public class CatalogFile
      * <code>leaf</code> as tail.
      */
     public LinkedList<CommonHFSCatalogLeafRecord> getPathTo(CommonHFSCatalogNodeID leafID) {
-	CommonHFSCatalogLeafRecord leafRec = getRecord(leafID, vol.getEmptyString());
-	if(leafRec != null)
-	    return getPathTo(leafRec);
-	else
-	    throw new RuntimeException("No folder thread found for leaf id " +
+        final CommonHFSCatalogLeafRecord leafThreadRec =
+                getRecord(leafID, vol.getEmptyString());
+
+        if(leafThreadRec != null) {
+            final CommonHFSCatalogNodeID parentID;
+            final CommonHFSCatalogString nodeName;
+
+            if(leafThreadRec instanceof CommonHFSCatalogFileThreadRecord) {
+                final CommonHFSCatalogFileThread fileThread =
+                        ((CommonHFSCatalogFileThreadRecord) leafThreadRec).
+                        getData();
+                parentID = fileThread.getParentID();
+                nodeName = fileThread.getNodeName();
+            }
+            else if(leafThreadRec instanceof CommonHFSCatalogFileThreadRecord) {
+                final CommonHFSCatalogFolderThread folderThread =
+                        ((CommonHFSCatalogFolderThreadRecord) leafThreadRec).
+                        getData();
+                parentID = folderThread.getParentID();
+                nodeName = folderThread.getNodeName();
+            }
+            else {
+                throw new RuntimeException("Expected a catalog thread record " +
+                        "for key " + leafID.toLong() + ":\"\", got " +
+                        leafThreadRec.getClass() + ".");
+            }
+
+            CommonHFSCatalogLeafRecord leaf = getRecord(parentID, nodeName);
+            if(leaf == null) {
+                throw new RuntimeException("No record found for leaf id " +
+                        leafID.toLong());
+            }
+
+            return getPathTo(leaf);
+        }
+        else {
+            throw new RuntimeException("No thread record found for leaf id " +
                     leafID.toLong() + "!");
+        }
     }
 
     /**
