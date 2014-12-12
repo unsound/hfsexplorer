@@ -713,6 +713,20 @@ public class UnHFS {
             if((cdata[i] >= 0 && cdata[i] <= 31) ||
                (cdata[i] == 127))
                 cdata[i] = '_';
+
+            if(cdata[i] == '/') {
+                /* This won't work on Windows, which doesn't allow ':' in
+                 * filenames.
+                 * TODO: Add special case for Windows? */
+                cdata[i] = ':';
+            }
+            else if(cdata[i] == ':') {
+                /* Just for the sake of identity. Filenames with this character
+                 * should not exist in HFS+ since ':' was always a reserved
+                 * character (the path separator char) in old Mac OS where HFS+
+                 * was originally introduced. */
+                cdata[i] = '/';
+            }
         }
         return new String(cdata);
     }
