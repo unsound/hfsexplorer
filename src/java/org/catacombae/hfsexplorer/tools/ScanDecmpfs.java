@@ -193,9 +193,28 @@ public class ScanDecmpfs {
                         {
                             /* Skip name of root directory. */
                             if(!firstComponent) {
-                                final String nodeName =
+                                final char[] nodeName =
                                         fsHandler.getFSView().decodeString(
-                                        pathComponent.getKey().getNodeName());
+                                        pathComponent.getKey().getNodeName()).
+                                        toCharArray();
+
+                                for(int i = 0; i < nodeName.length; ++i) {
+                                    /* '/' transformed into ':' and vice versa.
+                                     * This is part of the POSIX-translation of
+                                     * filenames in HFS+ (original Mac OS had
+                                     * ':' as a reserved character, while '/' is
+                                     * reserved in Mac OS X/POSIX). */
+                                    if(nodeName[i] == '/') {
+                                        nodeName[i] = ':';
+                                    }
+                                    else if(nodeName[i] == ':') {
+                                        /* Note: This should really be
+                                         *       considered an illegal HFS+
+                                         *       character. */
+                                        nodeName[i] = '/';
+                                    }
+                                }
+
                                 pathBuilder.append('/').append(nodeName);
                             }
                             else {
