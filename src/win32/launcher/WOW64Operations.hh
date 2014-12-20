@@ -86,7 +86,7 @@ public:
   static BOOL isWOW64Process(HANDLE hProcess, PBOOL pbIsWow64);
 
   /*
-   * Restores file system redirection for the calling thread.
+   * Disables file system redirection for the calling thread.
    *
    * Output parameters:
    *   oldValue - the current value of the state of WOW64 file system redirection.
