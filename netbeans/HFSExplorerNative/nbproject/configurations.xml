@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="62">
+  <logicalFolder name="root" displayName="root" projectFiles="true">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+      <logicalFolder name="launcher" displayName="launcher" projectFiles="true">
+        <itemPath>../../src/win32/launcher/StringBuilder.hh</itemPath>
+        <itemPath>../../src/win32/launcher/WOW64Operations.hh</itemPath>
+        <itemPath>../../src/win32/launcher/logging.hh</itemPath>
+        <itemPath>../../src/win32/launcher/resource.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="llio" displayName="llio" projectFiles="true">
+        <itemPath>../../src/win32/llio/llio_common.h</itemPath>
+        <itemPath>../../src/win32/llio/org_catacombae_storage_io_win32_ReadableWin32FileStream.h</itemPath>
+        <itemPath>../../src/win32/llio/org_catacombae_storage_io_win32_Win32FileStream.h</itemPath>
+      </logicalFolder>
+    </logicalFolder>
+    <logicalFolder name="ResourceFiles"
+                   displayName="Resource Files"
+                   projectFiles="true">
+      <logicalFolder name="launcher" displayName="launcher" projectFiles="true">
+        <itemPath>../../src/win32/launcher/launcher.rc</itemPath>
+      </logicalFolder>
+      <logicalFolder name="llio" displayName="llio" projectFiles="true">
+      </logicalFolder>
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <logicalFolder name="launcher" displayName="launcher" projectFiles="true">
+        <itemPath>../../src/win32/launcher/launcher.cpp</itemPath>
+      </logicalFolder>
+      <logicalFolder name="llio" displayName="llio" projectFiles="true">
+        <itemPath>../../src/win32/llio/llio_common.c</itemPath>
+        <itemPath>../../src/win32/llio/org_catacombae_storage_io_win32_ReadableWin32FileStream.c</itemPath>
+        <itemPath>../../src/win32/llio/org_catacombae_storage_io_win32_Win32FileStream.c</itemPath>
+      </logicalFolder>
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceRootList>
+    <Elem>../../src/win32/launcher</Elem>
+    <Elem>../../src/win32/llio</Elem>
+  </sourceRootList>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Debug" type="2">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <compilerSet>MinGW|MinGW</compilerSet>
+        <platform>3</platform>
+      </toolsSet>
+      <compileType>
+        <linkerTool>
+          <linkerLibItems>
+          </linkerLibItems>
+        </linkerTool>
+      </compileType>
+    </conf>
+    <conf name="Release" type="2">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <compilerSet>MinGW|MinGW</compilerSet>
+        <platform>3</platform>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <developmentMode>5</developmentMode>
+        </cTool>
+        <ccTool>
+          <developmentMode>5</developmentMode>
+        </ccTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <linkerTool>
+          <linkerLibItems>
+          </linkerLibItems>
+        </linkerTool>
+      </compileType>
+    </conf>
+  </confs>
+</configurationDescriptor>
