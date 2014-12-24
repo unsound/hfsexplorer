@@ -440,7 +440,7 @@ static int readJreKeyFromRegistry(const _TCHAR *leafName, _TCHAR *buf,
   BYTE version[MAX_PATH];
 
   LOG(debug, "  readJreKeyFromRegistry(__out _TCHAR *buf [ptr: 0x%X], %i)",
-    (int) buf, bufsize);
+    (size_t) buf, bufsize);
   if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, JRE_KEY, 0, KEY_READ, &key) != ERROR_SUCCESS) {
     LOG(debug, "  Could not open key HKLM\\%s. Aborting.", JRE_KEY);
     return -1;
@@ -1069,7 +1069,7 @@ static bool spawnElevatedProcess(_TCHAR *imageFile, _TCHAR *currentWorkingDirect
   execInfo.lpDirectory = currentWorkingDirectory;
   execInfo.nShow = SW_SHOW;
   execInfo.hInstApp = NULL;
-  LOG(debug, "&execInfo=%d", (int)&execInfo);
+  LOG(debug, "&execInfo=%d", (size_t) &execInfo);
   LOG(debug, "execInfo.lpVerb=\"%s\"", execInfo.lpVerb);
   LOG(debug, "execInfo.lpFile=\"%s\"", execInfo.lpFile);
   LOG(debug, "execInfo.lpParameters=\"%s\"", execInfo.lpParameters);
@@ -1361,7 +1361,7 @@ int main(int original_argc, char** original_argv) {
                          NULL,
                          NULL,
                          SW_SHOWNORMAL);
-          if((int) shellExecuteRet <= 32) {
+          if((size_t) shellExecuteRet <= 32) {
             MessageBox(NULL,
                        _T("Error while opening your web browser. Please browse "
                           "to http://www.java.com manually..."),
