@@ -66,8 +66,8 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_ICON1               ICON                    "..\\..\\doc\\dmg_iconsource\\finderdrive_folderback.ico"
-IDI_ICON2               ICON                    "..\\..\\doc\\dmg_iconsource\\dmg.ico"
+IDI_ICON1               ICON                    "..\\..\\..\\doc\\dmg_iconsource\\finderdrive_folderback.ico"
+IDI_ICON2               ICON                    "..\\..\\..\\doc\\dmg_iconsource\\dmg.ico"
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
