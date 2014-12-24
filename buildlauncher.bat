@@ -32,7 +32,7 @@ mkdir "%BUILD_DIR%"
 
 echo Compiling resources...
 pushd "%LAUNCHER_SRC%"
-windres .\launcher.rc ..\..\build.~\launcher_res.o
+windres .\launcher.rc "%BUILD_DIR%"\launcher_res.o
 set WINDRES_RES=%ERRORLEVEL%
 popd
 if not "%WINDRES_RES%"=="0" goto error
