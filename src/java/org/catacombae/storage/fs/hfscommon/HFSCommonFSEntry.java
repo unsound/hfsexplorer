@@ -37,6 +37,11 @@ import org.catacombae.util.Util.Pair;
  */
 public abstract class HFSCommonFSEntry extends BasicFSEntry {
 
+    private static final char[] SECURITY_ATTRIBUTE_NAME = {
+        'c', 'o', 'm', '.', 'a', 'p', 'p', 'l', 'e', '.', 's', 'y', 's', 't',
+        'e', 'm', '.', 'S', 'e', 'c', 'u', 'r', 'i', 't', 'y',
+    };
+
     protected final HFSCommonFileSystemHandler fsHandler;
     protected final CommonHFSCatalogAttributes catalogAttributes;
     private FSFork finderInfoFork = null;
@@ -68,6 +73,15 @@ public abstract class HFSCommonFSEntry extends BasicFSEntry {
                         attributesFile.listAttributeRecords(getCatalogNodeID()))
                 {
                     Pair<char[], LinkedList<CommonHFSAttributesLeafRecord>> p;
+
+                    if(Arrays.equals(attributeRecord.getKey().getAttrName(),
+                            SECURITY_ATTRIBUTE_NAME))
+                    {
+                        /* Skip the "com.apple.system.Security" attribute since
+                         * it contains access control lists and is supposed to
+                         * be hidden. */
+                        continue;
+                    }
 
                     if(!attributeBucketList.isEmpty() &&
                            (p = attributeBucketList.getLast()) != null)
