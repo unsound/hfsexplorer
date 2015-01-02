@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2008-2009 Erik Larsson
+ * Copyright (C) 2008-2014 Erik Larsson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 package org.catacombae.storage.fs.hfscommon;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.CharBuffer;
 import java.util.LinkedList;
 import org.catacombae.util.IOUtil;
 import org.catacombae.hfs.UnicodeNormalizationToolkit;
@@ -57,13 +58,16 @@ public abstract class HFSCommonFileSystemHandler extends FileSystemHandler {
             HFSCommonFileSystemHandler.class.getSimpleName() + ".debug");
 
     protected final HFSVolume view;
+    private boolean posixNames;
     private boolean doUnicodeFileNameComposition;
     protected boolean hideProtected;
 
     protected HFSCommonFileSystemHandler(HFSVolume iView,
+                    boolean posixNames,
                     boolean iDoUnicodeFileNameComposition,
                     boolean hideProtected) {
         this.view = iView;
+        this.posixNames = posixNames;
         this.doUnicodeFileNameComposition = iDoUnicodeFileNameComposition;
         this.hideProtected = hideProtected;
     }
@@ -162,7 +166,7 @@ public abstract class HFSCommonFileSystemHandler extends FileSystemHandler {
 
         // We iterate over all records except the last one, which is our target.
         for(int i = 0; i < path.length; ++i) {
-            String curPathComponent = path[i];
+            String curPathComponent = getOnDiskName(path[i]);
             //log(prefix + "  getRecord: Processing path element " + (i + 1) + "/" +
             //        path.length + ": \"" + curPathComponent + "\"");
 
@@ -305,17 +309,55 @@ public abstract class HFSCommonFileSystemHandler extends FileSystemHandler {
         return new FSForkType[] { FSForkType.DATA, FSForkType.MACOS_RESOURCE };
     }
 
-    protected String getProperNodeName(CommonHFSCatalogLeafRecord record) {
+    private static char[] posixWrap(final char[] nodeNameChars) {
+        for(int i = 0; i < nodeNameChars.length; ++i) {
+            if(nodeNameChars[i] == '/') {
+                nodeNameChars[i] = ':';
+            }
+            else if(nodeNameChars[i] == ':') {
+                nodeNameChars[i] = '/';
+            }
+        }
 
-        //if(doUnicodeFileNameComposition)
-        //    return record.getKey().getNodeName().decode(COMPOSED_UTF16_DECODER);
-        //else
-        //    return record.getKey().getNodeName().decode(DECOMPOSED_UTF16_DECODER);
-        String nodeNameRaw = view.decodeString(record.getKey().getNodeName());
-        if(doUnicodeFileNameComposition)
-            return UnicodeNormalizationToolkit.getDefaultInstance().compose(nodeNameRaw);
-        else
-            return nodeNameRaw;
+        return nodeNameChars;
+    }
+
+    private static String posixWrap(final String nodeName) {
+        return new String(posixWrap(nodeName.toCharArray()));
+    }
+
+    protected String getLogicalName(String onDiskName) {
+        String logicalName = onDiskName;
+
+        if(doUnicodeFileNameComposition) {
+            logicalName = UnicodeNormalizationToolkit.getDefaultInstance().
+                    compose(logicalName);
+        }
+
+        if(posixNames) {
+            logicalName = posixWrap(logicalName);
+        }
+
+        return logicalName;
+    }
+
+    protected String getOnDiskName(String logicalName) {
+        String onDiskName = logicalName;
+
+        if(doUnicodeFileNameComposition) {
+            onDiskName = UnicodeNormalizationToolkit.getDefaultInstance().
+                    decompose(CharBuffer.wrap(onDiskName));
+        }
+
+        if(posixNames) {
+            onDiskName = posixWrap(onDiskName);
+        }
+
+        return onDiskName;
+    }
+
+    protected String getProperNodeName(CommonHFSCatalogLeafRecord record) {
+        return getLogicalName(view.decodeString(record.getKey().getNodeName()));
     }
 
     /**
@@ -324,7 +366,7 @@ public abstract class HFSCommonFileSystemHandler extends FileSystemHandler {
      * @param path the bytes that make up the HFS+ POSIX UTF-8 pathname string.
      * @return the pathname components of the HFS+ POSIX UTF-8 pathname.
      */
-    public static String[] splitPOSIXUTF8Path(byte[] path) {
+    public String[] splitPOSIXUTF8Path(byte[] path) {
         return splitPOSIXUTF8Path(path, 0, path.length);
     }
 
@@ -336,16 +378,20 @@ public abstract class HFSCommonFileSystemHandler extends FileSystemHandler {
      * @param length length of string data in <code>path</code>.
      * @return the pathname components of the HFS+ POSIX UTF-8 pathname.
      */
-    public static String[] splitPOSIXUTF8Path(byte[] path, int offset, int length) {
+    public String[] splitPOSIXUTF8Path(byte[] path, int offset, int length) {
         try {
             String s = new String(path, offset, length, "UTF-8");
             String[] res = s.split("/");
 
-            /* As per the MacOS <-> POSIX translation semantics, all POSIX ':'
-             * characters are really '/' characters in the MacOS world. */
-            for(int i = 0; i < res.length; ++i) {
-                res[i] = res[i].replace(':', '/'); // Slightly inefficient.
+            if(!posixNames) {
+                /* As per the MacOS <-> POSIX translation semantics, all POSIX
+                 * ':' characters are really '/' characters in the MacOS
+                 * world. */
+                for(int i = 0; i < res.length; ++i) {
+                    res[i] = posixWrap(res[i]);
+                }
             }
+
             return res;
         } catch(UnsupportedEncodingException e) {
             throw new RuntimeException("REALLY UNEXPECTED: Could not decode UTF-8!", e);
@@ -474,12 +520,14 @@ public abstract class HFSCommonFileSystemHandler extends FileSystemHandler {
 
     @Override
     public String parsePosixPathnameComponent(String posixPathnameComponent) {
-        return posixPathnameComponent.replace(':', '/'); // Slightly inefficient.
+        return posixNames ? posixPathnameComponent :
+            posixWrap(posixPathnameComponent);
     }
 
     @Override
     public String generatePosixPathnameComponent(String fsPathnameComponent) {
-        return fsPathnameComponent.replace("/", ":");
+        return posixNames ? fsPathnameComponent :
+            posixWrap(fsPathnameComponent);
     }
 
     @Override

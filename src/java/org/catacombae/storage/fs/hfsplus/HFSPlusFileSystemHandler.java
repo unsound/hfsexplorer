@@ -47,16 +47,18 @@ public class HFSPlusFileSystemHandler extends HFSCommonFileSystemHandler {
     private static final String JOURNAL_FILE = ".journal";
 
     public HFSPlusFileSystemHandler(DataLocator fsLocator, boolean useCaching,
-            boolean doUnicodeFileNameComposition, boolean hideProtected) {
+            boolean posixNames, boolean doUnicodeFileNameComposition,
+            boolean hideProtected)
+    {
 
-        super(new HFSPlusVolume(fsLocator.createReadOnlyFile(),
-                    useCaching), doUnicodeFileNameComposition, hideProtected);
+        super(new HFSPlusVolume(fsLocator.createReadOnlyFile(), useCaching),
+                posixNames, doUnicodeFileNameComposition, hideProtected);
     }
 
-    protected HFSPlusFileSystemHandler(HFSVolume vol,
+    protected HFSPlusFileSystemHandler(HFSVolume vol, boolean posixNames,
             boolean doUnicodeFileNameComposition, boolean hideProtected)
     {
-        super(vol, doUnicodeFileNameComposition, hideProtected);
+        super(vol, posixNames, doUnicodeFileNameComposition, hideProtected);
     }
 
     protected boolean shouldHide(CommonHFSCatalogLeafRecord rec) {

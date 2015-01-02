@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2009 Erik Larsson
+ * Copyright (C) 2009-2014 Erik Larsson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,4 +23,15 @@ import org.catacombae.storage.fs.FileSystemHandlerFactory;
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class HFSCommonFileSystemHandlerFactory  extends FileSystemHandlerFactory {
+    protected static final CustomAttribute posixFilenamesAttribute =
+            createCustomAttribute(AttributeType.BOOLEAN, "POSIX_FILENAMES",
+                    "Controls whether filenames should be translated from " +
+                    "their on-disk format to POSIX format, swapping the ':' " +
+                    "and '/' characters.", false);
+
+    public CustomAttribute[] getSupportedCustomAttributes() {
+        return new CustomAttribute[] {
+            posixFilenamesAttribute,
+        };
+    }
 }

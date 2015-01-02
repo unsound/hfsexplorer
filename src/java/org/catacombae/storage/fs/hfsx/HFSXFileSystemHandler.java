@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2008 Erik Larsson
+ * Copyright (C) 2008-2014 Erik Larsson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,8 +32,10 @@ import org.catacombae.hfs.x.HFSXVolume;
 public class HFSXFileSystemHandler extends HFSPlusFileSystemHandler {
 
     public HFSXFileSystemHandler(DataLocator fsLocator, boolean useCaching,
-            boolean doUnicodeFileNameComposition, boolean hideProtected) {
+            boolean posixNames, boolean doUnicodeFileNameComposition,
+            boolean hideProtected)
+    {
         super(new HFSXVolume(fsLocator.createReadOnlyFile(), useCaching),
-                doUnicodeFileNameComposition, hideProtected);
+                posixNames, doUnicodeFileNameComposition, hideProtected);
     }
 }

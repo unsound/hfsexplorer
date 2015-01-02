@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2008 Erik Larsson
+ * Copyright (C) 2008-2014 Erik Larsson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,10 +29,10 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogLeafRecord;
 public class HFSFileSystemHandler extends HFSCommonFileSystemHandler {
 
     public HFSFileSystemHandler(DataLocator fsLocator, boolean useCaching,
-            String encodingName) {
-
-        super(new HFSOriginalVolume(fsLocator.createReadOnlyFile(),
-                useCaching, encodingName), false, false);
+            boolean posixNames, String encodingName)
+    {
+        super(new HFSOriginalVolume(fsLocator.createReadOnlyFile(), useCaching,
+                encodingName), posixNames, false, false);
     }
 
     protected boolean shouldHide(CommonHFSCatalogLeafRecord rec) {

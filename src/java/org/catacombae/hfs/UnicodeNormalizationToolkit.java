@@ -17,6 +17,7 @@
 
 package org.catacombae.hfs;
 
+import java.nio.CharBuffer;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -33,6 +34,11 @@ import org.catacombae.util.Util;
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class UnicodeNormalizationToolkit {
+    /**
+     * The maximum number of decomposed UTF-16 code units for each composed
+     * UTF-16 code unit.
+     */
+    private static final int MAX_DECOMPOSED_LENGTH = 4;
     private static final UnicodeNormalizationToolkit defaultInstance = new UnicodeNormalizationToolkit();
 
     private Map<Character, char[]> decompositionTable;
@@ -48,20 +54,27 @@ public class UnicodeNormalizationToolkit {
 	    NCount = VCount * TCount,   // 588
 	    SCount = LCount * NCount;   // 11172
 
-	public static String decomposeHangul(char s) {
-	    int SIndex = s - SBase;
+	public static String decomposeHangul(char c) {
+	    CharBuffer result = CharBuffer.allocate(3);
+            decomposeHangul(c, result);
+            return new String(result.array());
+        }
+
+        public static void decomposeHangul(char c, CharBuffer result) {
+	    int SIndex = c - SBase;
 	    if (SIndex < 0 || SIndex >= SCount) {
-		return String.valueOf(s);
+		result.put(c);
+                return;
 	    }
-	    StringBuffer result = new StringBuffer();
+
 	    int L = LBase + SIndex / NCount;
 	    int V = VBase + (SIndex % NCount) / TCount;
 	    int T = TBase + SIndex % TCount;
-	    result.append((char)L);
-	    result.append((char)V);
-	    if (T != TBase) result.append((char)T);
-	    return result.toString();
+	    result.put((char)L);
+	    result.put((char)V);
+	    if (T != TBase) result.put((char)T);
 	}
+
 	public static String composeHangul(String source) {
 	    int len = source.length();
 	    if (len == 0) return "";
@@ -160,24 +173,81 @@ public class UnicodeNormalizationToolkit {
     }
 
     /**
-     * Breaks down character <code>c</code> into one or more decomposed Unicode characters.
+     * Breaks down composed UTF-16 code unit <code>c</code> into one or more
+     * decomposed UTF-16 code units, putting the result in
+     * <code>decomposedBuffer</code>.
      */
-    public char[] decompose(char c) {
+    public void decompose(char c, CharBuffer decomposedBuffer) {
 	int codepoint = c & 0xFFFF;
 	if(codepoint >= 0xAC00 && codepoint <= 0xD7A3) {
 	    // We have a Hangul character
-	    //throw new RuntimeException("Hangul decomposition not yet implemented.");
-	    return HangulDecomposition.decomposeHangul(c).toCharArray();
+	    HangulDecomposition.decomposeHangul(c, decomposedBuffer);
 	}
 	else {
 	    char[] subst = decompositionTable.get(c);
-	    if(subst == null)
-		subst = new char[] { c };
-	    char[] res = new char[subst.length];
-	    for(int i = 0; i < subst.length; ++i)
-		res[i] = subst[i];
-	    return res;
+	    if(subst == null) {
+		decomposedBuffer.put(c);
+            }
+            else {
+                for(char sc : subst) {
+                    decomposedBuffer.put(sc);
+                }
+            }
 	}
+    }
+
+    /**
+     * Breaks down composed UTF-16 code unit <code>c</code> into one or more
+     * decomposed UTF-16 code units, returning the result as a
+     * {@link java.lang.String}.
+     */
+    public String decompose(char c) {
+        final CharBuffer decomposedBuffer =
+                CharBuffer.allocate(MAX_DECOMPOSED_LENGTH);
+
+        decompose(c, decomposedBuffer);
+
+        decomposedBuffer.limit(decomposedBuffer.position());
+        decomposedBuffer.rewind();
+        return decomposedBuffer.toString();
+    }
+
+    /**
+     * Breaks down each composed Unicode character in array
+     * <code>composedArray</code> into one or more decomposed characters,
+     * returning the result as a {@link java.lang.String}.
+     */
+    public String decompose(char[] composedArray) {
+        final CharBuffer decomposedBuffer =
+                CharBuffer.allocate(composedArray.length *
+                MAX_DECOMPOSED_LENGTH);
+
+        for(char c : composedArray) {
+            decompose(c, decomposedBuffer);
+        }
+
+        decomposedBuffer.limit(decomposedBuffer.position());
+        decomposedBuffer.rewind();
+        return decomposedBuffer.toString();
+    }
+
+    /**
+     * Breaks down each composed Unicode character in buffer
+     * <code>composedBuffer</code> into one or more decomposed characters,
+     * returning the result as a {@link java.lang.String}.
+     */
+    public String decompose(CharBuffer composedBuffer) {
+        final CharBuffer decomposedBuffer =
+                CharBuffer.allocate(composedBuffer.length() *
+                MAX_DECOMPOSED_LENGTH);
+
+        while(composedBuffer.hasRemaining()) {
+            decompose(composedBuffer.get(), decomposedBuffer);
+        }
+
+        decomposedBuffer.limit(decomposedBuffer.position());
+        decomposedBuffer.rewind();
+        return decomposedBuffer.toString();
     }
 
     public String compose(String decomposedString) {

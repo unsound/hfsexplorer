@@ -55,6 +55,7 @@ import org.catacombae.storage.fs.FSLink;
 import org.catacombae.storage.fs.FileSystemDetector;
 import org.catacombae.storage.fs.FileSystemHandler;
 import org.catacombae.storage.fs.FileSystemHandlerFactory;
+import org.catacombae.storage.fs.FileSystemHandlerFactory.CustomAttribute;
 import org.catacombae.storage.fs.FileSystemMajorType;
 import org.catacombae.storage.ps.Partition;
 import org.catacombae.storage.ps.PartitionSystemDetector;
@@ -473,6 +474,18 @@ public class UnHFS {
             System.exit(1);
         }
 
+        CustomAttribute posixFilenamesAttribute =
+                fact.getCustomAttribute("POSIX_FILENAMES");
+        if(posixFilenamesAttribute == null) {
+            System.err.println("Unexpected: HFS-ish file system handler does " +
+                    "not support POSIX_FILENAMES attribute.");
+            System.exit(1);
+            return;
+        }
+
+        fact.getCreateAttributes().setBooleanAttribute(posixFilenamesAttribute,
+                true);
+
         FileSystemHandler fsHandler = fact.createHandler(inputDataLocator);
 
         logDebug("Getting entry by posix path: \"" + fsRoot + "\"");
@@ -712,20 +725,8 @@ public class UnHFS {
         for(int i = 0; i < cdata.length; ++i) {
             if((cdata[i] >= 0 && cdata[i] <= 31) ||
                (cdata[i] == 127))
+            {
                 cdata[i] = '_';
-
-            if(cdata[i] == '/') {
-                /* This won't work on Windows, which doesn't allow ':' in
-                 * filenames.
-                 * TODO: Add special case for Windows? */
-                cdata[i] = ':';
-            }
-            else if(cdata[i] == ':') {
-                /* Just for the sake of identity. Filenames with this character
-                 * should not exist in HFS+ since ':' was always a reserved
-                 * character (the path separator char) in old Mac OS where HFS+
-                 * was originally introduced. */
-                cdata[i] = '/';
             }
         }
         return new String(cdata);

@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2008-2009 Erik Larsson
+ * Copyright (C) 2008-2014 Erik Larsson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ import org.catacombae.storage.fs.FileSystemHandlerFactory;
 import org.catacombae.storage.fs.FileSystemHandlerInfo;
 import org.catacombae.storage.fs.FileSystemRecognizer;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemHandlerFactory;
+import org.catacombae.util.Util;
 
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
@@ -50,15 +51,20 @@ public class HFSFileSystemHandlerFactory extends HFSCommonFileSystemHandlerFacto
     public FileSystemHandler createHandler(DataLocator data) {
         boolean useCaching =
                 createAttributes.getBooleanAttribute(StandardAttribute.CACHING_ENABLED);
+        boolean posixFilenames =
+                createAttributes.getBooleanAttribute(posixFilenamesAttribute);
         String encoding =
                 createAttributes.getStringAttribute(stringEncodingAttribute);
 
-        return createHandlerInternal(data, useCaching, encoding);
+        return createHandlerInternal(data, useCaching, posixFilenames,
+                encoding);
     }
 
     protected FileSystemHandler createHandlerInternal(DataLocator data,
-            boolean useCaching, String encoding) {
-        return new HFSFileSystemHandler(data, useCaching, encoding);
+            boolean useCaching, boolean posixFilenames, String encoding)
+    {
+        return new HFSFileSystemHandler(data, useCaching, posixFilenames,
+                encoding);
     }
 
     public FileSystemHandlerInfo getHandlerInfo() {
@@ -72,10 +78,17 @@ public class HFSFileSystemHandlerFactory extends HFSCommonFileSystemHandlerFacto
         return new StandardAttribute[] { StandardAttribute.CACHING_ENABLED };
     }
 
+    @Override
     public CustomAttribute[] getSupportedCustomAttributes() {
-        return new CustomAttribute[] {
-            stringEncodingAttribute
-        };
+        final CustomAttribute[] superAttributes =
+                super.getSupportedCustomAttributes();
+        final CustomAttribute[] result =
+                new CustomAttribute[superAttributes.length + 1];
+
+        Util.arrayCopy(superAttributes, result);
+        result[superAttributes.length + 0] = stringEncodingAttribute;
+
+        return result;
     }
 
     @Override

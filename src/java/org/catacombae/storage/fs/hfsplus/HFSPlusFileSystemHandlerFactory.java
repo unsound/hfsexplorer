@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2008-2009 Erik Larsson
+ * Copyright (C) 2008-2014 Erik Larsson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,6 +63,8 @@ public class HFSPlusFileSystemHandlerFactory extends HFSCommonFileSystemHandlerF
     public FileSystemHandler createHandler(DataLocator data) {
         boolean useCaching =
                 createAttributes.getBooleanAttribute(StandardAttribute.CACHING_ENABLED);
+        boolean posixFilenames =
+                createAttributes.getBooleanAttribute(posixFilenamesAttribute);
         boolean composeFilename =
                 createAttributes.getBooleanAttribute(compositionEnabledAttribute);
         boolean hideProtected =
@@ -91,14 +93,16 @@ public class HFSPlusFileSystemHandlerFactory extends HFSCommonFileSystemHandlerF
             recognizerStream.close();
         }
 
-        return createHandlerInternal(dataToLoad, useCaching, composeFilename,
-                hideProtected);
+        return createHandlerInternal(dataToLoad, useCaching, posixFilenames,
+                composeFilename, hideProtected);
     }
 
     protected FileSystemHandler createHandlerInternal(DataLocator data,
-            boolean useCaching, boolean composeFilename, boolean hideProtected) {
-        return new HFSPlusFileSystemHandler(data, useCaching, composeFilename,
-                hideProtected);
+            boolean useCaching, boolean posixFilenames, boolean composeFilename,
+            boolean hideProtected)
+    {
+        return new HFSPlusFileSystemHandler(data, useCaching, posixFilenames,
+                composeFilename, hideProtected);
     }
 
     @Override
@@ -116,10 +120,16 @@ public class HFSPlusFileSystemHandlerFactory extends HFSCommonFileSystemHandlerF
 
     @Override
     public CustomAttribute[] getSupportedCustomAttributes() {
-        return new CustomAttribute[] {
-            compositionEnabledAttribute,
-            hideProtectedAttribute,
-        };
+        final CustomAttribute[] superAttributes =
+                super.getSupportedCustomAttributes();
+        final CustomAttribute[] result =
+                new CustomAttribute[superAttributes.length + 2];
+
+        Util.arrayCopy(superAttributes, result);
+        result[superAttributes.length + 0] = compositionEnabledAttribute;
+        result[superAttributes.length + 1] = hideProtectedAttribute;
+
+        return result;
     }
 
     @Override

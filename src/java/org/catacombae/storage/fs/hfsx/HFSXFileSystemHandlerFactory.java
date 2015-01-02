@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2008 Erik Larsson
+ * Copyright (C) 2008-2014 Erik Larsson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,9 +43,11 @@ public class HFSXFileSystemHandlerFactory extends HFSPlusFileSystemHandlerFactor
 
     @Override
     protected FileSystemHandler createHandlerInternal(DataLocator data,
-            boolean useCaching, boolean composeFilename, boolean hideProtected) {
-        return new HFSXFileSystemHandler(data, useCaching, composeFilename,
-                hideProtected);
+            boolean useCaching, boolean posixFilenames, boolean composeFilename,
+            boolean hideProtected)
+    {
+        return new HFSXFileSystemHandler(data, useCaching, posixFilenames,
+                composeFilename, hideProtected);
     }
 
     @Override
