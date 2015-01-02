@@ -174,8 +174,6 @@ public abstract class HFSCommonFileSystemHandler extends FileSystemHandler {
 
             // Iterate through all links.
             while(currentRoot instanceof CommonHFSCatalogFileRecord) {
-                CommonHFSCatalogFileRecord fr =
-                        (CommonHFSCatalogFileRecord) currentRoot;
                 final String[] absPath;
 
                 absPath = getAbsoluteLinkPath(path, i,
