@@ -29,6 +29,7 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSFinderInfo;
 import org.catacombae.storage.fs.BasicFSEntry;
 import org.catacombae.storage.fs.FSFork;
 import org.catacombae.storage.fs.FSForkType;
+import org.catacombae.storage.fs.FSLink;
 import org.catacombae.util.Util.Pair;
 
 /**
@@ -159,6 +160,20 @@ public abstract class HFSCommonFSEntry extends BasicFSEntry {
         if(!finderInfoForkLoaded) {
             CommonHFSFinderInfo finderInfo = catalogAttributes.getFinderInfo();
             byte[] finderInfoBytes = finderInfo.getBytes();
+
+            /* Imitating the Mac OS X hfs kernel driver, we zero the fields
+             * 'document_id', 'date_added' and 'write_gen_counter' before
+             * checking if whole struct is zeroed. */
+            Arrays.fill(finderInfoBytes, 16, 20, (byte) 0);
+            Arrays.fill(finderInfoBytes, 20, 24, (byte) 0);
+            Arrays.fill(finderInfoBytes, 28, 32, (byte) 0);
+
+            /* Also, if this is a link then clear the type/creator fields in the
+             * FinderInfo before comparing. */
+            if(this instanceof FSLink) {
+                Arrays.fill(finderInfoBytes, 0, 4, (byte) 0);
+                Arrays.fill(finderInfoBytes, 4, 8, (byte) 0);
+            }
 
             if(!Util.zeroed(finderInfoBytes)) {
                 finderInfoFork = new HFSCommonFinderInfoFork(finderInfo);
