@@ -602,11 +602,13 @@ public class UnHFS {
             System.err.println("Failed to extract data " +
                     "fork to " + dataFile.getPath());
         }
-        else if(verbose) {
-            System.out.println(dataFile.getPath());
-        }
+        else {
+            if(verbose) {
+                System.out.println(dataFile.getPath());
+            }
 
-        setFileTimes(dataFile, file, "data file");
+            setFileTimes(dataFile, file, "data file");
+        }
 
         if(extractResourceForks) {
             FSFork resourceFork = file.getForkByType(FSForkType.MACOS_RESOURCE);
@@ -617,11 +619,14 @@ public class UnHFS {
                     System.err.println("Failed to extract resource " +
                             "fork to " + resFile.getPath());
                 }
-                else if(verbose) {
-                    System.out.println(resFile.getPath());
-                }
+                else {
+                    if(verbose) {
+                        System.out.println(resFile.getPath());
+                    }
 
-                setFileTimes(resFile, file, "resource fork AppleDouble file");
+                    setFileTimes(resFile, file,
+                            "resource fork AppleDouble file");
+                }
             }
         }
     }
