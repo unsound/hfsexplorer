@@ -184,7 +184,7 @@ public class ResourceForkViewPanel extends javax.swing.JPanel {
         });
     }
 
-    public void loadResourceFork(ResourceForkReader reader) {
+    public final void loadResourceFork(ResourceForkReader reader) {
         if(reader != null) {
             ListItem[] allItems = listAllItems(reader);
             resourceList.setEnabled(true);
