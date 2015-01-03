@@ -19,7 +19,7 @@ package org.catacombae.jparted.app;
 
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Vector;
+import java.util.Collection;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -130,7 +130,7 @@ public class MainPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    public void setPartitionSystemsBoxContents(Vector<String> contents) {
+    public void setPartitionSystemsBoxContents(Collection<String> contents) {
         partitionSystemsBox.removeAllItems();
         for(String currentItem : contents)
             partitionSystemsBox.addItem(currentItem);

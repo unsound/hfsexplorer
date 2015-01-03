@@ -19,7 +19,6 @@ package org.catacombae.hfsexplorer;
 
 import java.awt.Color;
 import java.util.Date;
-import java.util.Vector;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
@@ -94,7 +93,6 @@ public class FileSystemBrowser<A> {
     //private final JPopupMenu treeNodePopupMenu;
     //private final JPopupMenu tableNodePopupMenu;
 
-    private final Vector<String> colNames = new Vector<String>();
     private final DefaultTableModel tableModel;
 
     // Focus timestamps (for determining what to extract)
@@ -176,11 +174,13 @@ public class FileSystemBrowser<A> {
         //this.tableNodePopupMenu = controller.createTableNodePopupMenu();
 
         final Class objectClass = new Object().getClass();
-        colNames.add("Name");
-        colNames.add("Size");
-        colNames.add("Type");
-        colNames.add("Date Modified");
-        colNames.add("");
+        final Object[] colNames = {
+            "Name",
+            "Size",
+            "Type",
+            "Date Modified",
+            "",
+        };
 
         tableModel = new DefaultTableModel(colNames, 0) {
 
@@ -969,13 +969,13 @@ public class FileSystemBrowser<A> {
         DateFormat dti = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
         int i = 0;
 	for(Record<A> rec : contents) {
-	    Vector<Object> currentRow = new Vector<Object>(4);
-
-            currentRow.add(new RecordContainer(rec));
-            currentRow.add(new SizeEntry(rec.getSize()));
-            currentRow.add(new RecordTypeEntry(rec.getType()));
-            currentRow.add(new DateEntry(rec.getModifyDate(), dti));
-            currentRow.add(new IndexEntry(i++));
+            final Object[] currentRow = {
+                new RecordContainer(rec),
+                new SizeEntry(rec.getSize()),
+                new RecordTypeEntry(rec.getType()),
+                new DateEntry(rec.getModifyDate(), dti),
+                new IndexEntry(i++),
+            };
 
             tableModel.addRow(currentRow);
 	}

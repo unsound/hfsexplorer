@@ -21,7 +21,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.LinkedList;
-import java.util.Vector;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -65,7 +64,7 @@ public class MainController {
 
     public void showMainWindow() {
         // Initialize
-        mainPanel.setPartitionSystemsBoxContents(new Vector<String>());
+        mainPanel.setPartitionSystemsBoxContents(new LinkedList<String>());
         mainPanel.setPartitionSystemsBoxEnabled(false);
         mainPanel.setSynchronizeButtonEnabled(false);
 
@@ -79,9 +78,9 @@ public class MainController {
 
     private void loadPartitionSystem(DataLocator loc) {
 
-        Vector<PartitionSystemHandler> detectedPartitionSystems =
-                new Vector<PartitionSystemHandler>();
-        Vector<String> detectedPartitionSystemDescriptions = new Vector<String>();
+        LinkedList<PartitionSystemHandler> detectedPartitionSystems =
+                new LinkedList<PartitionSystemHandler>();
+        LinkedList<String> detectedPartitionSystemDescriptions = new LinkedList<String>();
         for (PartitionSystemType curType : PartitionSystemType.values()) {
             if (curType.isTopLevelCapable()) {
                 PartitionSystemHandlerFactory fac =
@@ -117,7 +116,8 @@ public class MainController {
 
         mainPanel.clearPartitionList();
         if (detectedPartitionSystems.size() > 0) {
-            PartitionSystemHandler handler = detectedPartitionSystems.get(0);
+            PartitionSystemHandler handler =
+                    detectedPartitionSystems.getFirst();
             Partition[] partitions = handler.getPartitions();
             int i = 0;
             for (Partition p : partitions) {
