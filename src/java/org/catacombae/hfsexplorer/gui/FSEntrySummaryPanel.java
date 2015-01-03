@@ -36,6 +36,13 @@ import org.catacombae.storage.fs.FSLink;
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPanel {
+    private static final boolean DEBUG = Util.booleanEnabledByProperties(false,
+            "org.catacombae.debug",
+            "org.catacombae.hfsexplorer.debug",
+            "org.catacombae.hfsexplorer.gui.debug",
+            "org.catacombae.hfsexplorer.gui." +
+            FSEntrySummaryPanel.class.getSimpleName() + ".debug");
+
     private volatile boolean cancelSignaled = false;
     private DecimalFormat sizeFormatter = new DecimalFormat("0.00");
 
@@ -346,13 +353,22 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
 
     private void calculateFolderSize(FSFolder folder, ObjectContainer<Long> result) {
         if(cancelSignaled) {
-            System.err.println("Calculate process stopping for folder \"" + folder.getName() + "\"");
+            if(DEBUG) {
+                System.err.println("Calculate process stopping for folder " +
+                        "\"" + folder.getName() + "\"");
+            }
+
             return;
         }
 
         for(FSEntry entry : folder.listEntries()) {
             if(cancelSignaled) {
-                System.err.println("Calculate process stopping for folder \"" + folder.getName() + "\", entry \"" + entry.getName() + "\"");
+                if(DEBUG) {
+                    System.err.println("Calculate process stopping for " +
+                            "folder \"" + folder.getName() + "\", entry " +
+                            "\"" + entry.getName() + "\"");
+                }
+
                 return;
             }
 
