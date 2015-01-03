@@ -41,7 +41,7 @@ import org.catacombae.hfsexplorer.gui.StructViewPanel;
 public class VolumeInfoWindow extends JFrame {
 
     public VolumeInfoWindow(HFSVolume fsView) {
-        super("File system info");
+        super("Volume information");
 
         final JTabbedPane tabs = new JTabbedPane();
 

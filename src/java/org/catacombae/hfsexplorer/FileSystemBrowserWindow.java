@@ -422,8 +422,8 @@ public class FileSystemBrowserWindow extends JFrame {
                     Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         }
 
-        JMenuItem fsInfoItem = new JMenuItem("File system info");
-        fsInfoItem.addActionListener(new ActionListener() {
+        JMenuItem volumeInfoItem = new JMenuItem("Volume information");
+        volumeInfoItem.addActionListener(new ActionListener() {
             /* @Override */
             public void actionPerformed(ActionEvent ae) {
                 if(ensureFileSystemLoaded()) {
@@ -452,7 +452,8 @@ public class FileSystemBrowserWindow extends JFrame {
                 }
             }
         });
-        fsInfoItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        volumeInfoItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
         toggleCachingItem = new JCheckBoxMenuItem("Use file system caching");
         toggleCachingItem.setState(true);
@@ -615,7 +616,7 @@ public class FileSystemBrowserWindow extends JFrame {
         if(exitProgramItem != null) {
             fileMenu.add(exitProgramItem);
         }
-        infoMenu.add(fsInfoItem);
+        infoMenu.add(volumeInfoItem);
         infoMenu.add(toggleCachingItem);
         infoMenu.add(createDiskImageItem);
         //infoMenu.add(setFileReadOffsetItem);
