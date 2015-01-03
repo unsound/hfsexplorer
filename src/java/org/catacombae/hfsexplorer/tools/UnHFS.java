@@ -408,8 +408,9 @@ public class UnHFS {
                         if(partitionNumber < psHandler.getPartitionCount()) {
                             partitionsToProbe = new Partition[] { psHandler.getPartition(partitionNumber) };
                         }
-                        else
-                            break outer;
+                        else {
+                            break;
+                        }
                     }
                     else if(partitionNumber == -1) {
                         partitionsToProbe = psHandler.getPartitions();
