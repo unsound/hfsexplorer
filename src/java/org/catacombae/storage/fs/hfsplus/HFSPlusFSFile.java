@@ -121,14 +121,15 @@ public class HFSPlusFSFile extends HFSCommonFSFile {
                     }
 
                     switch(header.getRawCompressionType()) {
-                        case 3:
-                        case 4:
+                        case DecmpfsHeader.COMPRESSION_TYPE_INLINE:
+                        case DecmpfsHeader.COMPRESSION_TYPE_RESOURCE:
                             break;
                         default:
                             /* No support for other compression types than type
-                             * 3 and 4 at this point. All other compression
-                             * types will lead to the attribute being exposed
-                             * as-is for recovery purposes. */
+                             * "inline" (3) and "resource" (4) at this point.
+                             * All other compression types will lead to the
+                             * attribute being exposed as-is for recovery
+                             * purposes. */
                             continue;
                     }
 

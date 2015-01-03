@@ -146,7 +146,7 @@ public class HFSPlusCompressedDataFork implements FSFork {
             final ReadableRandomAccessStream dataForkStream;
             final long compressionType = header.getCompressionType();
 
-            if(compressionType == 3) {
+            if(compressionType == DecmpfsHeader.COMPRESSION_TYPE_INLINE) {
                 /* Compressed file data is stored within the decmpfs fork
                  * itself. */
                 final long fileSize = header.getRawFileSize();
@@ -236,7 +236,8 @@ public class HFSPlusCompressedDataFork implements FSFork {
                     dataForkStream = new ReadableByteArrayStream(outBuffer);
                 }
             }
-            else if(compressionType == 4) {
+            else if(compressionType == DecmpfsHeader.COMPRESSION_TYPE_RESOURCE)
+            {
                 /* Compressed file data is stored in the resource fork. */
                 resourceForkStream =
                         resourceFork.getReadableRandomAccessStream();

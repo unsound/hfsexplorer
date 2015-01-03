@@ -22,6 +22,9 @@ public class DecmpfsHeader implements PrintableStruct {
     /** Proper value for 'magic' (this is "cmpf" in ASCII). */
     public static final long MAGIC = 0x636D7066L;
 
+    public static final int COMPRESSION_TYPE_INLINE = 3;
+    public static final int COMPRESSION_TYPE_RESOURCE = 4;
+
     public static final int STRUCTSIZE = 16;
 
     private int magic;
