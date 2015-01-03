@@ -31,7 +31,7 @@ import org.catacombae.storage.fs.FSForkType;
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
-public class HFSCommonFSFile extends HFSCommonFSEntry implements FSFile {
+public abstract class HFSCommonAbstractFile extends HFSCommonFSEntry {
     /**
      * The record from which this file was referenced. In the case of a
      * non-hardlinked file, this variable is equal to <code>fileRecord</code>.
@@ -51,13 +51,13 @@ public class HFSCommonFSFile extends HFSCommonFSEntry implements FSFile {
     private final FSFork rawDataFork;
     private final FSFork resourceFork;
 
-    protected HFSCommonFSFile(HFSCommonFileSystemHandler iParent,
+    protected HFSCommonAbstractFile(HFSCommonFileSystemHandler iParent,
             CommonHFSCatalogFileRecord iFileRecord)
     {
         this(iParent, null, iFileRecord);
     }
 
-    protected HFSCommonFSFile(HFSCommonFileSystemHandler iParent,
+    protected HFSCommonAbstractFile(HFSCommonFileSystemHandler iParent,
             CommonHFSCatalogLeafRecord iHardLinkRecord,
             CommonHFSCatalogFileRecord iFileRecord)
     {

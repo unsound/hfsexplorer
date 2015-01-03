@@ -34,11 +34,11 @@ import org.catacombae.storage.fs.FSForkType;
  */
 public class HFSCommonFSFork implements FSFork {
     private static final String RESOURCE_XATTR_NAME = "com.apple.ResourceFork";
-    private final HFSCommonFSFile parent;
+    private final HFSCommonAbstractFile parent;
     private final FSForkType type;
     private final CommonHFSForkData forkData;
 
-    protected HFSCommonFSFork(HFSCommonFSFile iParent, FSForkType iType,
+    protected HFSCommonFSFork(HFSCommonAbstractFile iParent, FSForkType iType,
         CommonHFSForkData iForkData)
     {
         // Input check
