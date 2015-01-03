@@ -22,7 +22,7 @@
  */
 
 package org.catacombae.hfsexplorer.gui;
-import javax.swing.*;
+import javax.swing.ImageIcon;
 
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>

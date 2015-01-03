@@ -17,7 +17,7 @@
 
 package org.catacombae.hfsexplorer;
 
-import java.io.*;
+import java.io.File;
 
 /**
  * Even simpler file filter as it only allows one extension.<br>

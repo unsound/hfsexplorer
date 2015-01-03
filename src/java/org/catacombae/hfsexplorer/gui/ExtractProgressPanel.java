@@ -23,9 +23,9 @@
 package org.catacombae.hfsexplorer.gui;
 
 import java.awt.event.ActionListener;
-import org.catacombae.hfsexplorer.*;
 import javax.swing.SwingUtilities;
 import java.text.DecimalFormat;
+import org.catacombae.util.SpeedUnitUtils;
 
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
