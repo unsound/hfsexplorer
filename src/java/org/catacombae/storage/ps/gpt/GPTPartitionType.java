@@ -18,7 +18,7 @@
 package org.catacombae.storage.ps.gpt;
 
 import java.nio.LongBuffer;
-import java.util.Hashtable;
+import java.util.HashMap;
 import org.catacombae.storage.ps.PartitionType;
 
 /**
@@ -115,7 +115,7 @@ public enum GPTPartitionType {
     PARTITION_TYPE_LINUX_SWAP(0x6DFD5706ABA4C443L, 0x84E50933C84B4F4FL, PartitionType.LINUX_SWAP),
     UNKNOWN_PARTITION_TYPE; // Returned when no known type can be matched
 
-    private static Hashtable<LongBuffer, GPTPartitionType> reverseLookupTable;
+    private static HashMap<LongBuffer, GPTPartitionType> reverseLookupTable;
 
     private final Long typeGUIDMsb;
     private final Long typeGUIDLsb;
@@ -136,7 +136,7 @@ public enum GPTPartitionType {
 
     private static void addReverseLookupReference(LongBuffer lb, GPTPartitionType t) {
         if(reverseLookupTable == null)
-            reverseLookupTable = new Hashtable<LongBuffer, GPTPartitionType>();
+            reverseLookupTable = new HashMap<LongBuffer, GPTPartitionType>();
         reverseLookupTable.put(lb, t);
     }
 

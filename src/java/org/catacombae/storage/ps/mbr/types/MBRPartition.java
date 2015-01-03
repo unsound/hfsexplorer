@@ -19,7 +19,6 @@ package org.catacombae.storage.ps.mbr.types;
 import org.catacombae.storage.ps.Partition;
 import org.catacombae.util.Util;
 import java.io.PrintStream;
-import java.util.Hashtable;
 import org.catacombae.storage.ps.PartitionType;
 import org.catacombae.storage.ps.mbr.MBRPartitionType;
 
@@ -28,7 +27,7 @@ public class MBRPartition implements Partition {
     protected static final byte PARTITION_BOOTABLE     = (byte)0x80;
 
     /** By some reason I couldn't put this variable inside MBRPartitionType. Initalizer error. */
-    private static final Hashtable<Byte,MBRPartitionType> byteMap = new Hashtable<Byte,MBRPartitionType>();
+    // private static final Hashtable<Byte,MBRPartitionType> byteMap = new Hashtable<Byte,MBRPartitionType>();
     //public static enum MBRPartitionType {
 	/* Partition type data from microsoft
          * (http://technet2.microsoft.com/WindowsServer/en/library/bdeda920-1f08-4683-9ffb-7b4b50df0b5a1033.mspx?mfr=true)

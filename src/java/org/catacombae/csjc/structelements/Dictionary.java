@@ -17,7 +17,7 @@
 
 package org.catacombae.csjc.structelements;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import org.catacombae.util.Util;
 
 /**
@@ -26,20 +26,24 @@ import org.catacombae.util.Util;
 public class Dictionary extends StructElement {
 
     private final String[] keys;
-    private final Hashtable<String,StructElement> mappings;
-    private final Hashtable<String,String> descriptions;
+    private final HashMap<String, StructElement> mappings;
+    private final HashMap<String, String> descriptions;
 
-    Dictionary(String typeName, String[] keys, Hashtable<String,StructElement> mappings,
-            Hashtable<String,String> descriptions) {
+    Dictionary(String typeName, String[] keys,
+            HashMap<String, StructElement> mappings,
+            HashMap<String, String> descriptions)
+    {
         this(typeName, null, keys, mappings, descriptions);
     }
     Dictionary(String typeName, String typeDescription, String[] keys,
-            Hashtable<String,StructElement> mappings, Hashtable<String,String> descriptions) {
+            HashMap<String, StructElement> mappings,
+            HashMap<String, String> descriptions)
+    {
         super(typeName, typeDescription);
         this.keys = new String[keys.length];
         System.arraycopy(keys, 0, this.keys, 0, keys.length);
-        this.mappings = new Hashtable<String,StructElement>();
-        this.descriptions = new Hashtable<String,String>();
+        this.mappings = new HashMap<String, StructElement>();
+        this.descriptions = new HashMap<String, String>();
         for(String key : keys) {
             this.mappings.put(key, mappings.get(key));
             String description = descriptions.get(key);

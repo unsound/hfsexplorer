@@ -18,7 +18,7 @@
 package org.catacombae.csjc.structelements;
 
 import java.lang.reflect.Field;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.LinkedList;
 import static org.catacombae.csjc.structelements.IntegerFieldBits.*;
 import static org.catacombae.csjc.structelements.Signedness.*;
@@ -33,8 +33,10 @@ public class DictionaryBuilder {
     private final String typeName;
     private final String typeDescription;
     private final LinkedList<String> keys = new LinkedList<String>();
-    private final Hashtable<String,StructElement> mappings = new Hashtable<String,StructElement>();
-    private final Hashtable<String,String> descriptions = new Hashtable<String,String>();
+    private final HashMap<String, StructElement> mappings =
+            new HashMap<String, StructElement>();
+    private final HashMap<String, String> descriptions =
+            new HashMap<String, String>();
 
     public DictionaryBuilder(String typeName) {
         this(typeName, null);

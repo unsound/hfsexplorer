@@ -20,7 +20,6 @@ package org.catacombae.hfs;
 import java.nio.CharBuffer;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Map;
 import org.catacombae.util.Util;
@@ -126,7 +125,8 @@ public class UnicodeNormalizationToolkit {
 
     private static long nextID = 0;
     private static class TrieNode {
-	private final Hashtable<Character, TrieNode> childNodes = new Hashtable<Character, TrieNode>();
+	private final HashMap<Character, TrieNode> childNodes =
+                new HashMap<Character, TrieNode>();
 	private char[] replacementSequence = null;
 	private char trig;
 	private long id;

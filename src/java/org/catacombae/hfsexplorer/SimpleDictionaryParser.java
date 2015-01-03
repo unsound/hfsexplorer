@@ -18,11 +18,12 @@
 package org.catacombae.hfsexplorer;
 
 import java.io.*;
-import java.util.Hashtable;
+import java.util.HashMap;
 
 public class SimpleDictionaryParser {
     private static final String SPD_HEADER = "!SimpleDictionary";
-    private Hashtable<String, String> dictionaryTable = new Hashtable<String, String>();
+    private HashMap<String, String> dictionaryTable =
+            new HashMap<String, String>();
 
     public SimpleDictionaryParser(InputStream is) {
 	try {
