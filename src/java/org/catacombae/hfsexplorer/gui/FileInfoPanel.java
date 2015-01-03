@@ -15,12 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * FileInfoPanel.java
- *
- * Created on den 16 mars 2007, 07:37
- */
-
 package org.catacombae.hfsexplorer.gui;
 
 import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogFile;

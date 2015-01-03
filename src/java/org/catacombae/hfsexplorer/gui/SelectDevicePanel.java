@@ -15,12 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * SelectWindowsDevicePanel.java
- *
- * Created on den 26 oktober 2006, 10:18
- */
-
 package org.catacombae.hfsexplorer.gui;
 
 /**

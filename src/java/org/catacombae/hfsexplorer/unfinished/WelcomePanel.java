@@ -15,12 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * WelcomePanel.java
- *
- * Created on 2009-nov-21, 07:23:06
- */
-
 package org.catacombae.hfsexplorer.unfinished;
 
 /**

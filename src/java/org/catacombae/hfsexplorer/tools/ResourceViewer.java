@@ -15,12 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * ResourceViewer.java
- *
- * Created on 2008-nov-28, 07:10:27
- */
-
 package org.catacombae.hfsexplorer.tools;
 
 import java.awt.Toolkit;

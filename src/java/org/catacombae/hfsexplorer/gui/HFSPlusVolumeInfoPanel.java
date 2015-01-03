@@ -15,12 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * HFSPlusVolumeInfoPanel.java
- *
- * Created on den 11 februari 2007, 14:42
- */
-
 package org.catacombae.hfsexplorer.gui;
 
 import org.catacombae.util.Util;

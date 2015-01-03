@@ -15,11 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * ExtractProgressPanel.java
- *
- * Created on den 3 april 2007, 09:02
- */
 package org.catacombae.hfsexplorer.gui;
 
 import java.awt.event.ActionListener;

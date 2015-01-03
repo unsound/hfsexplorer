@@ -15,12 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * PartitionSystemInfoPanel.java
- *
- * Created on den 16 juni 2007, 14:33
- */
-
 package org.catacombae.hfsexplorer.gui;
 
 /**

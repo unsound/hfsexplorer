@@ -15,12 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * FilesystemBrowserPanel.java
- *
- * Created on den 24 oktober 2006, 15:31
- */
-
 package org.catacombae.hfsexplorer.gui;
 
 import javax.swing.ImageIcon;

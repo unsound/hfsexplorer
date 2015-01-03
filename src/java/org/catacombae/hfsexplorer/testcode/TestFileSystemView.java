@@ -15,12 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * TestFileSystemView.java
- *
- * Created on den 29 oktober 2006, 10:16
- */
-
 package org.catacombae.hfsexplorer.testcode;
 
 import javax.swing.filechooser.FileSystemView;

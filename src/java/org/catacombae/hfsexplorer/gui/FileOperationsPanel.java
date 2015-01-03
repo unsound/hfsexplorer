@@ -15,12 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * FileOperationsPanel.java
- *
- * Created on den 27 juni 2007, 08:56
- */
-
 package org.catacombae.hfsexplorer.gui;
 
 import javax.swing.JDialog;

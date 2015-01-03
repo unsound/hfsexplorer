@@ -15,12 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * JournalInfoBlockPanel.java
- *
- * Created on den 12 februari 2007, 07:31
- */
-
 package org.catacombae.hfsexplorer.gui;
 
 import org.catacombae.hfs.types.hfsplus.JournalInfoBlock;

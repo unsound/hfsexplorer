@@ -15,12 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * ResourceForkViewPanel.java
- *
- * Created on 2008-nov-27, 11:27:34
- */
-
 package org.catacombae.hfsexplorer.gui;
 
 import java.awt.event.ActionEvent;

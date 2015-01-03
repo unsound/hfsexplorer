@@ -15,11 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * BTreeInfoPanel.java
- *
- * Created on den 20 mars 2007, 19:28
- */
 package org.catacombae.hfsexplorer.gui;
 
 import java.awt.BorderLayout;
