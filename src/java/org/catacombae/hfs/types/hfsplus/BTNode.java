@@ -30,7 +30,6 @@ public abstract class BTNode implements PrintableStruct {
     public BTNodeDescriptor getNodeDescriptor() {
         return nodeDescriptor;
     }
-//     BTRecord[] records;
 
     public void printFields(PrintStream ps, String prefix) {
         ps.println(prefix + " nodeDescriptor:");

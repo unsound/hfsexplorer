@@ -20,9 +20,7 @@ package org.catacombae.storage.ps.mbr.types;
 import org.catacombae.util.Util;
 
 public class MutableMasterBootRecord extends MasterBootRecord {
-//     private MutableMBRPartitionTable() {
-// 	throw new RuntimeException("Default boot code not yet written.");
-//     }
+
     public MutableMasterBootRecord(MasterBootRecord mbr) {
 	super(mbr);
     }

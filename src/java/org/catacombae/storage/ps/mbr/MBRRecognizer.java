@@ -26,35 +26,9 @@ import org.catacombae.storage.ps.mbr.types.MBRPartitionTable;
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class MBRRecognizer implements PartitionSystemRecognizer {
-    /*
-    private DataLocator data;
-
-    public MBRRecognizer(DataLocator pData) {
-        this.data = pData;
-    }
-
-    @Override
-    public boolean existsPartitionSystem() {
-        try {
-            ReadableRandomAccessStream llf = data.createReadOnlyFile();
-            byte[] firstBlock = new byte[512];
-            llf.read(firstBlock);
-
-            // Look for MBR
-            MBRPartitionTable mpt = new MBRPartitionTable(firstBlock, 0);
-            if(mpt.isValid()) {
-                return true;
-            }
-        } catch(Exception e) {
-        }
-
-        return false;
-    }
-    */
 
     public boolean detect(ReadableRandomAccessStream fsStream, long offset, long length) {
         try {
-            //ReadableRandomAccessStream llf = data.createReadOnlyFile();
             byte[] firstBlock = new byte[512];
             fsStream.read(firstBlock);
 

@@ -33,33 +33,6 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
     private static final ImageIcon BACK_ICON = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/back.png"));
     private static final ImageIcon UP_ICON = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/folderup.png"));
     private static final ImageIcon INFO_ICON = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/info.png"));
-    /*
-    private static final ImageIcon FORWARD_ICON;
-    private static final ImageIcon EXTRACT_ICON;
-    private static final ImageIcon BACK_ICON;
-    private static final ImageIcon UP_ICON;
-    private static final ImageIcon INFO_ICON;
-
-
-    static {
-        ImageIcon forwardIcon = null, extractIcon = null, backIcon = null, upIcon = null, infoIcon = null;
-        try {
-
-            forwardIcon = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/forward.png"));
-            extractIcon = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/extract.png"));
-            backIcon = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/back.png"));
-            upIcon = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/folderup.png"));
-            infoIcon = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/info.png"));
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-        FORWARD_ICON = forwardIcon;
-        EXTRACT_ICON = extractIcon;
-        BACK_ICON = backIcon;
-        UP_ICON = upIcon;
-        INFO_ICON = infoIcon;
-    }
-    */
 
     /** Creates new form FilesystemBrowserPanel */
     public FilesystemBrowserPanel() {

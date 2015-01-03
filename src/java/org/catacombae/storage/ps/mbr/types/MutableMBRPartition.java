@@ -20,9 +20,7 @@ package org.catacombae.storage.ps.mbr.types;
 import org.catacombae.util.Util;
 
 public class MutableMBRPartition extends MBRPartition {
-//     public MutableMBRPartition(int blockSize) {
-// 	super(blockSize);
-//     }
+
     public MutableMBRPartition(MBRPartition source) {
 	super(source);
     }

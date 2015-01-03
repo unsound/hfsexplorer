@@ -21,12 +21,10 @@ import java.io.PrintStream;
 import org.catacombae.util.Util;
 
 public abstract class BTIndexNode extends BTNode {
-    //protected final BTNodeDescriptor nodeDescriptor;
     protected final BTIndexRecord[] records;
     protected final short[] offsets;
 
     protected BTIndexNode(byte[] data, int offset, int nodeSize) {
-	//nodeDescriptor = new BTNodeDescriptor(data, offset);
 	super(data, offset, nodeSize);
 	this.offsets = new short[Util.unsign(nodeDescriptor.getNumRecords())+1]; //Last one is free space index
 	for(int i = 0; i < this.offsets.length; ++i) {
@@ -35,7 +33,6 @@ public abstract class BTIndexNode extends BTNode {
 	this.records = new BTIndexRecord[this.offsets.length-1];
     }
 
-    //public BTNodeDescriptor getNodeDescriptor() { return nodeDescriptor; }
     public BTIndexRecord getIndexRecord(int index) {
         return this.records[index];
     }

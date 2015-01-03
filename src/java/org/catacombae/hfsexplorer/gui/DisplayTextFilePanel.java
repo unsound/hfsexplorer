@@ -33,7 +33,6 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.catacombae.io.InputStreamReadable;
 import org.catacombae.io.Readable;
-//import net.iharder.dnd.FileDrop;
 
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>

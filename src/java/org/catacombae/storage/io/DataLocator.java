@@ -17,7 +17,6 @@
 
 package org.catacombae.storage.io;
 
-//import java.io.InputStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.RandomAccessStream;
 
