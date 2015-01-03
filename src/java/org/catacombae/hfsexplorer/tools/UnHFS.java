@@ -63,7 +63,6 @@ import org.catacombae.storage.ps.PartitionSystemHandler;
 import org.catacombae.storage.ps.PartitionSystemHandlerFactory;
 import org.catacombae.storage.ps.PartitionSystemType;
 import org.catacombae.storage.ps.PartitionType;
-import org.catacombae.util.Util;
 
 /**
  * Command line program which extracts all or part of the contents of a

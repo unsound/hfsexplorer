@@ -19,7 +19,6 @@ package org.catacombae.hfs.types.hfsplus;
 
 import java.io.PrintStream;
 import org.catacombae.csjc.PrintableStruct;
-import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.Array;
 import org.catacombae.csjc.structelements.ArrayBuilder;
 

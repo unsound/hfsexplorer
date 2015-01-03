@@ -17,7 +17,6 @@
 
 package org.catacombae.storage.ps.mbr.types;
 
-import org.catacombae.storage.ps.Partition;
 import java.io.PrintStream;
 import java.util.LinkedList;
 import org.catacombae.util.Util;

@@ -24,7 +24,6 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogNodeID;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.storage.fs.FSAttributes;
-import org.catacombae.storage.fs.FSFile;
 import org.catacombae.storage.fs.FSFork;
 import org.catacombae.storage.fs.FSForkType;
 

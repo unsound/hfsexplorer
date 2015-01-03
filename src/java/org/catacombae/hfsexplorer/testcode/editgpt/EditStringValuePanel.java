@@ -17,7 +17,6 @@
 
 package org.catacombae.hfsexplorer.testcode.editgpt;
 
-import org.catacombae.csjc.structelements.Field;
 import org.catacombae.csjc.structelements.StringRepresentableField;
 
 /**

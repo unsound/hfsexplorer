@@ -21,8 +21,6 @@ import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.catacombae.hfs.AttributesFile;
-import org.catacombae.hfs.BTreeFile;
-import org.catacombae.hfs.HFSVolume;
 import org.catacombae.hfs.types.hfscommon.CommonBTIndexRecord;
 import org.catacombae.hfs.types.hfscommon.CommonBTNode;
 import org.catacombae.hfs.types.hfscommon.CommonHFSAttributesIndexNode;

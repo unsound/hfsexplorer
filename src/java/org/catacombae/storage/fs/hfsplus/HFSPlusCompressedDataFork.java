@@ -30,7 +30,6 @@ import org.catacombae.hfsexplorer.types.resff.ResourceType;
 import org.catacombae.io.BasicReadableRandomAccessStream;
 import org.catacombae.io.RandomAccessStream;
 import org.catacombae.io.ReadableByteArrayStream;
-import org.catacombae.io.ReadableConcatenatedStream;
 import org.catacombae.io.ReadableRandomAccessInputStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.RuntimeIOException;

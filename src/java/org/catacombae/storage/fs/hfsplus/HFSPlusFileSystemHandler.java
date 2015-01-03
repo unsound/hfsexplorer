@@ -27,8 +27,6 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogNodeID;
 import org.catacombae.storage.fs.FSEntry;
 import org.catacombae.storage.fs.FSFile;
-import org.catacombae.storage.fs.hfscommon.HFSCommonFSFile;
-import org.catacombae.storage.fs.hfscommon.HFSCommonFSFolder;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFSLink;
 import org.catacombae.util.IOUtil;
 import org.catacombae.util.Util;

@@ -21,7 +21,6 @@ import java.util.Date;
 import org.catacombae.util.Util;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogAttributes;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFileRecord;
-import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFolderRecord;
 import org.catacombae.hfs.types.hfsplus.HFSPlusBSDInfo;
 import org.catacombae.storage.fs.FSAttributes;
 import org.catacombae.storage.fs.WindowsFileAttributes;

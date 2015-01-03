@@ -17,7 +17,6 @@
 
 package org.catacombae.csjc;
 
-import java.lang.reflect.Field;
 import org.catacombae.csjc.structelements.Signedness;
 import org.catacombae.csjc.structelements.Endianness;
 import org.catacombae.csjc.structelements.IntegerFieldBits;

@@ -25,8 +25,6 @@ import org.catacombae.storage.ps.gpt.types.GUIDPartitionTable;
 import org.catacombae.storage.ps.gpt.types.MutableGUIDPartitionTable;
 import org.catacombae.storage.io.win32.ReadableWin32FileStream;
 import org.catacombae.storage.io.win32.Win32FileStream;
-import org.catacombae.io.FileStream;
-import org.catacombae.io.RandomAccessStream;
 import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 

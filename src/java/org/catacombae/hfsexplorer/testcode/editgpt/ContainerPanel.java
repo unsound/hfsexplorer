@@ -26,7 +26,6 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import org.catacombae.csjc.structelements.Array;
 import org.catacombae.csjc.structelements.Dictionary;
-import org.catacombae.csjc.structelements.Field;
 import org.catacombae.csjc.structelements.StringRepresentableField;
 import org.catacombae.csjc.structelements.StructElement;
 
