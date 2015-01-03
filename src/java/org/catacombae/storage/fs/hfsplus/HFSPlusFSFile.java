@@ -20,8 +20,10 @@ package org.catacombae.storage.fs.hfsplus;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import org.catacombae.hfs.types.decmpfs.DecmpfsHeader;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFileRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogLeafRecord;
+import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.storage.fs.FSFork;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFSFile;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemHandler;
@@ -38,6 +40,8 @@ public class HFSPlusFSFile extends HFSCommonFSFile {
             "org.catacombae.storage.fs.hfsplus.debug",
             "org.catacombae.storage.fs.hfsplus." +
             HFSPlusFSFile.class.getSimpleName() + ".debug");
+
+    private FSFork dataFork = null;
 
     HFSPlusFSFile(HFSCommonFileSystemHandler parentHandler,
             CommonHFSCatalogFileRecord fileRecord)
@@ -57,10 +61,13 @@ public class HFSPlusFSFile extends HFSCommonFSFile {
         LinkedList<FSFork> attributeForkList = new LinkedList<FSFork>();
         super.fillAttributeForks(attributeForkList);
 
+        final boolean isCompressed =
+                getDataFork() instanceof HFSPlusCompressedDataFork;
+
         Iterator<FSFork> it = attributeForkList.iterator();
         while(it.hasNext()) {
             FSFork curFork = it.next();
-            if(curFork.hasXattrName() &&
+            if(isCompressed && curFork.hasXattrName() &&
                     curFork.getXattrName().equals("com.apple.decmpfs"))
             {
                 it.remove();
@@ -76,27 +83,69 @@ public class HFSPlusFSFile extends HFSCommonFSFile {
             System.err.println("getDataFork(): Entering...");
         }
 
-        LinkedList<FSFork> attributeForkList = new LinkedList<FSFork>();
+        if(dataFork == null) {
+            LinkedList<FSFork> attributeForkList = new LinkedList<FSFork>();
 
-        /* Note: Need to call super's implementation because this class
-         *       overrides fillAttributeForks to filter out the
-         *       "com.apple.decmpfs" attribute fork. */
-        super.fillAttributeForks(attributeForkList);
+            /* Note: Need to call super's implementation because this class
+             *       overrides fillAttributeForks to call back into
+             *       getDataFork() in order to determine if we should filter out
+             *       the "com.apple.decmpfs" attribute fork. */
+            super.fillAttributeForks(attributeForkList);
 
-        for(FSFork f : attributeForkList) {
-            if(DEBUG) {
-                System.err.println("getDataFork: Checking out attribute fork " +
-                        f + (f.hasXattrName() ? " with xattr name \"" +
-                                f.getXattrName() + "\"" : "") +
-                        ".");
+            for(FSFork f : attributeForkList) {
+                if(DEBUG) {
+                    System.err.println("getDataFork: Checking out attribute " +
+                            "fork " + f + (f.hasXattrName() ? " with xattr " +
+                            "name \"" + f.getXattrName() + "\"" : "") + ".");
+                }
+
+                if(f.hasXattrName() &&
+                        f.getXattrName().equals("com.apple.decmpfs"))
+                {
+                    byte[] headerData = new byte[DecmpfsHeader.STRUCTSIZE];
+
+                    ReadableRandomAccessStream forkStream =
+                            f.getReadableRandomAccessStream();
+                    try {
+                        forkStream.readFully(headerData);
+                    } finally {
+                        forkStream.close();
+                    }
+
+                    DecmpfsHeader header = new DecmpfsHeader(headerData, 0);
+                    if(header.getMagic() != DecmpfsHeader.MAGIC) {
+                        /* If magic doesn't match, the decmpfs fork is broken
+                         * and we treat this attribute fork as a normal extended
+                         * attribute for data recovery purposes. */
+                        continue;
+                    }
+
+                    switch(header.getRawCompressionType()) {
+                        case 3:
+                        case 4:
+                            break;
+                        default:
+                            /* No support for other compression types than type
+                             * 3 and 4 at this point. All other compression
+                             * types will lead to the attribute being exposed
+                             * as-is for recovery purposes. */
+                            continue;
+                    }
+
+                    dataFork =
+                            new HFSPlusCompressedDataFork(f, getResourceFork());
+                    break;
+                }
             }
 
-            if(f.hasXattrName() && f.getXattrName().equals("com.apple.decmpfs"))
-            {
-                return new HFSPlusCompressedDataFork(f, getResourceFork());
+            if(dataFork == null) {
+                /* We haven't created any compressed data fork when going
+                 * through the attributes, so this is a regular data fork. Just
+                 * call super. */
+                dataFork = super.getDataFork();
             }
         }
 
-        return super.getDataFork();
+        return dataFork;
     }
 }
