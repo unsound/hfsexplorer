@@ -16,6 +16,7 @@
  */
 
 package org.catacombae.hfsexplorer.tools;
+
 import java.io.FileOutputStream;
 import org.catacombae.storage.ps.mbr.types.MBRPartitionTable;
 import org.catacombae.storage.io.win32.ReadableWin32FileStream;

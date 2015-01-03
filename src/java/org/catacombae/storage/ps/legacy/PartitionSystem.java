@@ -16,6 +16,7 @@
  */
 
 package org.catacombae.storage.ps.legacy;
+
 import java.io.PrintStream;
 import org.catacombae.storage.ps.Partition;
 

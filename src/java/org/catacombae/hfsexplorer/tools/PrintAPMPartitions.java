@@ -16,6 +16,7 @@
  */
 
 package org.catacombae.hfsexplorer.tools;
+
 import java.io.FileOutputStream;
 import org.catacombae.storage.ps.apm.types.ApplePartitionMap;
 import org.catacombae.storage.ps.apm.types.DriverDescriptorRecord;

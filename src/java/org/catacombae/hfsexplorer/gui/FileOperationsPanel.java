@@ -22,6 +22,7 @@
  */
 
 package org.catacombae.hfsexplorer.gui;
+
 import javax.swing.JDialog;
 import java.awt.event.ActionListener;
 

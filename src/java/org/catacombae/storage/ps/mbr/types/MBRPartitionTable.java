@@ -16,6 +16,7 @@
  */
 
 package org.catacombae.storage.ps.mbr.types;
+
 import org.catacombae.storage.ps.legacy.PartitionSystem;
 import org.catacombae.storage.ps.Partition;
 import org.catacombae.storage.ps.ebr.types.DOSExtendedPartitionSystem;

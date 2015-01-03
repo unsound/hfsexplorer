@@ -16,6 +16,7 @@
  */
 
 package org.catacombae.storage.ps.gpt.types;
+
 import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.util.Util;
 import java.io.PrintStream;

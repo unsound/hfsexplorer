@@ -16,6 +16,7 @@
  */
 
 package org.catacombae.hfsexplorer;
+
 import java.awt.BorderLayout;
 import java.io.OutputStream;
 import java.io.PrintStream;

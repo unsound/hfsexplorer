@@ -16,6 +16,7 @@
  */
 
 package org.catacombae.storage.io.win32;
+
 import org.catacombae.io.RandomAccessStream;
 import org.catacombae.util.Util;
 

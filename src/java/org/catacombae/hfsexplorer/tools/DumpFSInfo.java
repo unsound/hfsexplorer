@@ -16,6 +16,7 @@
  */
 
 package org.catacombae.hfsexplorer.tools;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.LinkedList;

@@ -16,6 +16,7 @@
  */
 
 package org.catacombae.hfsexplorer.tools;
+
 import java.io.FileOutputStream;
 import org.catacombae.util.Util;
 import org.catacombae.storage.ps.gpt.types.GUIDPartitionTable;

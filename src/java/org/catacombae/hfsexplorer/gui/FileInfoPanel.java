@@ -22,6 +22,7 @@
  */
 
 package org.catacombae.hfsexplorer.gui;
+
 import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogFile;
 import org.catacombae.hfs.types.hfsplus.HFSPlusForkData;
 import org.catacombae.hfs.types.hfsplus.HFSPlusBSDInfo;
