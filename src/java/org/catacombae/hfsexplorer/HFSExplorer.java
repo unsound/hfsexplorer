@@ -51,6 +51,7 @@ import org.catacombae.storage.fs.FileSystemHandlerFactory;
 import org.catacombae.storage.fs.FileSystemMajorType;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemHandler;
 import org.catacombae.hfs.HFSVolume;
+import org.catacombae.util.Util.Pair;
 
 @SuppressWarnings("deprecation") // TODO: Fix HFSExplorer so it doesn't use deprecated methods...
 public class HFSExplorer {
@@ -789,7 +790,8 @@ public class HFSExplorer {
 
 	println("Most fragmented files: ");
 	for(Pair<CommonHFSCatalogLeafRecord, Integer> phi : mostFragmentedList) {
-	    println(phi.b + " - \"" + phi.a.getKey().getNodeName() + "\"");
+            println(phi.getB() + " - \"" + phi.getA().getKey().getNodeName() +
+                    "\"");
 	}
     }
 
@@ -812,7 +814,7 @@ public class HFSExplorer {
 		    Pair<CommonHFSCatalogLeafRecord, Integer> lower = mostFragmentedList.get(i);
 		    Pair<CommonHFSCatalogLeafRecord, Integer> higher = mostFragmentedList.get(i-1);
 
-		    if(lower.b.intValue() > higher.b.intValue()) {
+                    if(lower.getB().intValue() > higher.getB().intValue()) {
 			// Switch places.
 			mostFragmentedList.set(i-1, lower);
 			mostFragmentedList.set(i, higher);

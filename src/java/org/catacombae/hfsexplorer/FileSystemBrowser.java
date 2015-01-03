@@ -69,6 +69,7 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import org.catacombae.hfsexplorer.gui.FilesystemBrowserPanel;
+import org.catacombae.util.Util.Pair;
 
 /**
  * A generalization of the file system browser into a very autonomous component with very few
@@ -931,8 +932,8 @@ public class FileSystemBrowser<A> {
             int[] updatedIndices = new int[nodesToUpdate.size()];
             int index = 0;
             for(Pair<FolderTreeNode, Record<A>> p : nodesToUpdate) {
-                p.a.setUserObject(new RecordContainer(p.b));
-                updatedIndices[index] = nodeToPopulate.getIndex(p.a);
+                p.getA().setUserObject(new RecordContainer(p.getB()));
+                updatedIndices[index] = nodeToPopulate.getIndex(p.getA());
                 if(updatedIndices[index] < 0) {
                     throw new RuntimeException("INTERNAL ERROR: Can't find node in nodeToPopulate!");
                 }
