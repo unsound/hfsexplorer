@@ -65,7 +65,7 @@ public class HFSPlusCompressedDataFork implements FSFork {
         this.resourceFork = resourceFork;
     }
 
-    private synchronized DecmpfsHeader getDecmpfsHeader() {
+    synchronized DecmpfsHeader getDecmpfsHeader() {
         if(decmpfsHeader == null) {
             ReadableRandomAccessStream stream =
                     decmpfsFork.getReadableRandomAccessStream();
@@ -322,6 +322,11 @@ public class HFSPlusCompressedDataFork implements FSFork {
             throws UnsupportedOperationException
     {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    boolean isUsingResourceFork() {
+        return getDecmpfsHeader().getCompressionType() ==
+                DecmpfsHeader.COMPRESSION_TYPE_RESOURCE;
     }
 
     private static class CompressedResourceStream

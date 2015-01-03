@@ -133,8 +133,12 @@ public class HFSPlusFSFile extends HFSCommonFSFile {
                             continue;
                     }
 
-                    dataFork =
-                            new HFSPlusCompressedDataFork(f, getResourceFork());
+                    /* We override getResourceFork() in this class in order to
+                     * hide it if the file is compressed, so call super's
+                     * implementation to get it unconditionally (and without
+                     * infinite recursion for that matter). */
+                    dataFork = new HFSPlusCompressedDataFork(f,
+                            super.getResourceFork());
                     break;
                 }
             }
@@ -148,5 +152,27 @@ public class HFSPlusFSFile extends HFSCommonFSFile {
         }
 
         return dataFork;
+    }
+
+    @Override
+    protected FSFork getResourceFork() {
+        final FSFork f = getDataFork();
+
+        if(f instanceof HFSPlusCompressedDataFork) {
+            final HFSPlusCompressedDataFork compressedFork =
+                    (HFSPlusCompressedDataFork) f;
+
+            if(compressedFork.isUsingResourceFork()) {
+                /* Hide compressed data in resource fork. If there are other
+                 * resources they will be hidden too.
+                 *
+                 * TODO: Virtualize the resource fork data if there are other
+                 *       resources, so that the caller gets a virtual resource
+                 *       fork back with the 'cmpf' resource removed. */
+                return null;
+            }
+        }
+
+        return super.getResourceFork();
     }
 }

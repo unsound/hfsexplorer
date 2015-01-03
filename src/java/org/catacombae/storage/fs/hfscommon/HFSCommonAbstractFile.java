@@ -126,7 +126,7 @@ public abstract class HFSCommonAbstractFile extends HFSCommonFSEntry {
             case DATA:
                 return getDataFork();
             case MACOS_RESOURCE:
-                return resourceFork;
+                return getResourceFork();
             default:
                 return super.getForkByType(type);
         }
@@ -134,8 +134,10 @@ public abstract class HFSCommonAbstractFile extends HFSCommonFSEntry {
 
     @Override
     public long getCombinedLength() {
+        final FSFork resFork = getResourceFork();
+
         return super.getCombinedLength() + getDataFork().getLength() +
-                resourceFork.getLength();
+                (resFork != null ? resFork.getLength() : 0);
     }
 
     /* @Override */
