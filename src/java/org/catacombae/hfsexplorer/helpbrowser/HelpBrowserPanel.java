@@ -78,7 +78,7 @@ public class HelpBrowserPanel extends javax.swing.JPanel {
         goHome();
     }
 
-    protected void goHome() {
+    private void goHome() {
         goToPage(homePage);
     }
 
