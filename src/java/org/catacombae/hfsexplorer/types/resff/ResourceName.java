@@ -46,7 +46,7 @@ public class ResourceName implements DynamicStruct, PrintableStruct {
         stream.readFullyFrom(offset, nameLengthArray);
         nameLength = nameLengthArray[0];
 
-        name = new byte[getNameLength()];
+        name = new byte[Util.unsign(nameLength)];
         stream.readFullyFrom(offset+1, name);
     }
 
