@@ -51,6 +51,10 @@ public class HFSCommonFinderInfoFork implements FSFork {
         return false;
     }
 
+    public boolean isCompressed() {
+        return false;
+    }
+
     public String getForkIdentifier() {
         return "FinderInfo";
     }

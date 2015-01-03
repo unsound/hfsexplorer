@@ -111,6 +111,10 @@ public class HFSPlusCompressedDataFork implements FSFork {
         return false;
     }
 
+    public boolean isCompressed() {
+        return true;
+    }
+
     public String getForkIdentifier() {
         return "Data fork";
     }

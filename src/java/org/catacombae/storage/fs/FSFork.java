@@ -66,6 +66,17 @@ public interface FSFork {
     public abstract boolean isTruncatable();
 
     /**
+     * Returns whether or not the fork is compressed on disk.
+     *
+     * This does not affect the way that this fork can be used, so this is
+     * purely advisory information that upper layers can use to indicate whether
+     * compression is applied.
+     *
+     * @return whether or not the fork is compressed on disk.
+     */
+    public abstract boolean isCompressed();
+
+    /**
      * Returns an identifier which distinguishes this fork from the other
      * available forks. It's up to the implementor to decide what strings to
      * return. In a NTFS file system, forks (called Alternate Data Streams) have

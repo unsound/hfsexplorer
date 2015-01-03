@@ -110,6 +110,11 @@ public class HFSCommonFSFolder extends HFSCommonFSEntry implements FSFolder {
      * */
 
     /* @Override */
+    public boolean isCompressed() {
+        return false;
+    }
+
+    /* @Override */
     protected CommonHFSCatalogNodeID getCatalogNodeID() {
         return folderRecord.getData().getFolderID();
     }

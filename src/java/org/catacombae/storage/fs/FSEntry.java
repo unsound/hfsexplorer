@@ -42,6 +42,21 @@ public interface FSEntry {
     //public abstract FSFolder getParent();
 
     /**
+     * Returns whether or not the entry as a whole is compressed on disk.
+     *
+     * The meaning of this flag is implementation dependent. Implementations
+     * supporting multiple forks may choose to set this flag when the main fork
+     * is compressed, or due to some other condition.
+     *
+     * The information is purely advisory. Upper layers can use this to indicate
+     * whether or not compression is applied but must never make any assumptions
+     * based on the setting of this flag.
+     *
+     * @return whether or not the entry as a whole is compressed on disk.
+     */
+    public abstract boolean isCompressed();
+
+    /**
      * Returns all available forks for this file.
      *
      * @return all available forks for this file.

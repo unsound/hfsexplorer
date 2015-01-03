@@ -72,6 +72,11 @@ public class HFSCommonFSFork implements FSFork {
     }
 
     /* @Override */
+    public boolean isCompressed() {
+        return false;
+    }
+
+    /* @Override */
     public String getForkIdentifier() {
         switch(type) {
             case DATA:

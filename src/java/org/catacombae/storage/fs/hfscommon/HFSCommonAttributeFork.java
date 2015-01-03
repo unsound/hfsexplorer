@@ -87,6 +87,10 @@ public class HFSCommonAttributeFork implements FSFork {
         return false;
     }
 
+    public boolean isCompressed() {
+        return false;
+    }
+
     public String getForkIdentifier() {
         return "Attribute: " + new String(recordList[0].getKey().getAttrName());
     }

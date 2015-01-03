@@ -100,6 +100,11 @@ public class HFSCommonFSFile extends HFSCommonFSEntry implements FSFile {
      * */
 
     /* @Override */
+    public boolean isCompressed() {
+        return getDataFork().isCompressed();
+    }
+
+    /* @Override */
     public FSFork getMainFork() {
         return getForkByType(FSForkType.DATA);
     }

@@ -1148,6 +1148,7 @@ public class FileSystemBrowserWindow extends JFrame {
                 rootFolder.getName(),
                 0,
                 rootFolder.getAttributes().getModifyDate(),
+                false,
                 rootFolder);
         fsb.setRoot(rootRecord);
     }
@@ -2950,7 +2951,9 @@ public class FileSystemBrowserWindow extends JFrame {
     private static class FSEntryRecord extends Record<FSEntry> {
         public FSEntryRecord(FSEntry entry, String[] parentDirPath) {
             super(entryTypeToRecordType(entry, parentDirPath), entry.getName(),
-                    getEntrySize(entry, parentDirPath), entry.getAttributes().getModifyDate(), entry);
+                    getEntrySize(entry, parentDirPath),
+                    entry.getAttributes().getModifyDate(), entry.isCompressed(),
+                    entry);
         }
 
         public static RecordType entryTypeToRecordType(FSEntry entry, String[] parentDirPath) {

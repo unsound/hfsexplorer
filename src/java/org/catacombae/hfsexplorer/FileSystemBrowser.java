@@ -17,6 +17,7 @@
 
 package org.catacombae.hfsexplorer;
 
+import java.awt.Color;
 import java.util.Date;
 import java.util.Vector;
 import java.awt.Component;
@@ -362,6 +363,9 @@ public class FileSystemBrowser<A> {
                     }
 
                     jl.setVisible(true);
+
+                    final boolean compressed = rec.isCompressed();
+
                     Component c = new Component() {
                         {
                             jl.setSize(jl.getPreferredSize());
@@ -376,7 +380,39 @@ public class FileSystemBrowser<A> {
                             jl.paint(g);
                             int translatex = jl.getWidth();
                             g.translate(translatex, 0);
+
+                            final Color objectComponentOriginalForeground;
+                            if(compressed) {
+                                final Color curForeground =
+                                        objectComponent.getForeground();
+
+                                /* We only change the foreground colour to blue
+                                 * when the original foreground colour is black.
+                                 * This is due to painting issues when restoring
+                                 * the original background colour in (at least)
+                                 * the Mac OS X Swing implementation / L&F.
+                                 *
+                                 * TODO: Figure out how to do this properly. */
+                                if(curForeground.equals(Color.BLACK)) {
+                                    objectComponent.setForeground(Color.BLUE);
+                                    objectComponentOriginalForeground =
+                                            curForeground;
+                                }
+                                else {
+                                    objectComponentOriginalForeground = null;
+                                }
+                            }
+                            else {
+                                objectComponentOriginalForeground = null;
+                            }
+
                             objectComponent.paint(g);
+
+                            if(objectComponentOriginalForeground != null) {
+                                objectComponent.setForeground(
+                                        objectComponentOriginalForeground);
+                            }
+
                             g.translate(-translatex, 0);
                         }
                     };
@@ -1321,14 +1357,17 @@ public class FileSystemBrowser<A> {
         private String name;
         private long size;
         private Date modifyDate;
+        private boolean compressed;
         private A userObject;
 
         public Record(RecordType iType, String iName, long iSize,
-                Date iModifyDate, A iUserObject) {
+                Date iModifyDate, boolean compressed, A iUserObject)
+        {
             this.type = iType;
             this.name = iName;
             this.size = iSize;
             this.modifyDate = iModifyDate;
+            this.compressed = compressed;
             this.userObject = iUserObject;
         }
 
@@ -1346,6 +1385,10 @@ public class FileSystemBrowser<A> {
 
         public Date getModifyDate() {
             return modifyDate;
+        }
+
+        public boolean isCompressed() {
+            return compressed;
         }
 
         public A getUserObject() {
