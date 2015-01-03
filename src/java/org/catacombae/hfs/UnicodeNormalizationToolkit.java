@@ -77,7 +77,7 @@ public class UnicodeNormalizationToolkit {
 	public static String composeHangul(String source) {
 	    int len = source.length();
 	    if (len == 0) return "";
-	    StringBuffer result = new StringBuffer();
+	    StringBuilder result = new StringBuilder();
 	    char last = source.charAt(0);            // copy first char
 	    result.append(last);
 
