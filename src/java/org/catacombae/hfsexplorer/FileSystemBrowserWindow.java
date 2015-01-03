@@ -2128,8 +2128,13 @@ public class FileSystemBrowserWindow extends JFrame {
             //System.out.println("file: \"" + filename + "\" range: " + fractionLowLimit + "-" + fractionHighLimit);
             final FSFork theFork = rec.getForkByType(forkType);
 
-            if(theFork == null)
+            if(theFork == null) {
+                if(forkType == FSForkType.MACOS_RESOURCE) {
+                    return;
+                }
+
                 throw new RuntimeException("Could not find a fork of type: " + forkType);
+            }
             else if(forkType == FSForkType.MACOS_RESOURCE && theFork.getLength() == 0)
                 return; // Extracting empty resource forks is really pointless.
 
