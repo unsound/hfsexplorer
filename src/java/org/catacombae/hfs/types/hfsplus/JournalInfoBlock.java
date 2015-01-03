@@ -18,7 +18,6 @@
 package org.catacombae.hfs.types.hfsplus;
 
 import org.catacombae.util.Util;
-
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
