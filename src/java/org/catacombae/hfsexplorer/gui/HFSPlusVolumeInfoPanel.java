@@ -50,7 +50,7 @@ public class HFSPlusVolumeInfoPanel extends javax.swing.JPanel {
      * <code>vh</code>.
      * @param vh the structure containing the values to set.
      */
-    public void setFields(HFSPlusVolumeHeader vh) {
+    public final void setFields(HFSPlusVolumeHeader vh) {
 	signatureField.setText("" + Util.toASCIIString(vh.getSignature()));
 	versionField.setText("" + vh.getVersion());
 
