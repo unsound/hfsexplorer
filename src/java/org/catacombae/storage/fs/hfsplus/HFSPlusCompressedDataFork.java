@@ -515,7 +515,7 @@ public class HFSPlusCompressedDataFork implements FSFork {
                     }
                     else {
                         /* Variable block size => we must look up the offset of
-                         * the next block in nextBlockOffsets.*/
+                         * the next block in nextBlockOffsets. */
                         nextBlockOffset = nextBlockOffsets[curBlock];
                     }
 

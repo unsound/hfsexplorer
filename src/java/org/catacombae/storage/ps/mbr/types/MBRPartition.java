@@ -72,7 +72,7 @@ public class MBRPartition implements Partition {
 
     public byte getStatus() { return Util.readByteLE(status); }
     /** The result is returned in CHS form. This representation is deprecated and cannot handle
-	today's storage sizes. Preferrably use the getLBA-methods.*/
+        today's storage sizes. Preferrably use the getLBA-methods. */
     public byte[] getFirstSector() { return Util.createCopy(firstSector); }
     public byte getPartitionType() { return Util.readByteLE(partitionType); }
     /** The result is returned in CHS form. This representation is deprecated and cannot handle

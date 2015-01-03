@@ -45,7 +45,7 @@ public class UnicodeNormalizationToolkit {
 
     /** This class encapsulates code copied from http://unicode.org/reports/tr15/#Hangul in order
 	to deal with Hangul decomposition algorithmically. No indication of any copyright issues.
-	The same algorithm is presented in section 3.11 of the Unicode standard 3.0.*/
+        The same algorithm is presented in section 3.11 of the Unicode standard 3.0. */
     private static class HangulDecomposition {
 	static final int
 	    SBase = 0xAC00, LBase = 0x1100, VBase = 0x1161, TBase = 0x11A7,
