@@ -78,6 +78,12 @@ import org.catacombae.util.Util.Pair;
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class FileSystemBrowser<A> {
+    private static final boolean DEBUG = Util.booleanEnabledByProperties(false,
+            "org.catacombae.debug",
+            "org.catacombae.hfsexplorer.debug",
+            "org.catacombae.hfsexplorer." +
+            FileSystemBrowser.class.getSimpleName() + ".debug");
+
     private final FileSystemProvider<A> controller;
     private final FilesystemBrowserPanel viewComponent;
 
@@ -1279,9 +1285,14 @@ public class FileSystemBrowser<A> {
      * -
      */
     private void setCurrentDirectory(String[] pathnameComponents) {
-        System.err.println("setCurrentDirectory(): printing pathnameComponents");
-        for(int i = 0; i < pathnameComponents.length; ++i)
-            System.err.println("  [" + i + "]: " + pathnameComponents[i]);
+        if(DEBUG) {
+            System.err.println("setCurrentDirectory(): printing " +
+                    "pathnameComponents");
+            for(int i = 0; i < pathnameComponents.length; ++i) {
+                System.err.println("  [" + i + "]: " + pathnameComponents[i]);
+            }
+        }
+
         Object rootObj = treeModel.getRoot();
         FolderTreeNode curNode;
         if(rootObj instanceof FolderTreeNode) {
@@ -1333,10 +1344,14 @@ public class FileSystemBrowser<A> {
         }
 
         //TreePath tp = new TreePath(nodeStack.toArray(new FolderTreeNode[nodeStack.size()]));
-        System.err.println("setCurrentDirectory(): selecting the following path in tree:");
-        for(Object o : treePath.getPath())
-            System.err.print(" \"" + o.toString() + "\"");
-        System.err.println();
+        if(DEBUG) {
+            System.err.println("setCurrentDirectory(): selecting the " +
+                    "following path in tree:");
+            for(Object o : treePath.getPath()) {
+                System.err.print(" \"" + o.toString() + "\"");
+            }
+            System.err.println();
+        }
 
         selectInTree(treePath);
     }
