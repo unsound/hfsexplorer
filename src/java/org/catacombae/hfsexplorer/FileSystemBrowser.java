@@ -368,12 +368,28 @@ public class FileSystemBrowser<A> {
                     final boolean compressed = rec.isCompressed();
 
                     Component c = new Component() {
+                        final Color tableForeground;
+
                         {
                             jl.setSize(jl.getPreferredSize());
                             jl.setLocation(0, 0);
                             objectComponent.setSize(objectComponent.getPreferredSize());
                             objectComponent.setLocation(jl.getWidth(), 0);
                             setSize(jl.getWidth() + objectComponent.getWidth(), Math.max(jl.getHeight(), objectComponent.getHeight()));
+
+                            javax.swing.UIDefaults uidefs =
+                                javax.swing.UIManager.getLookAndFeelDefaults();
+                            final Color lfTableForeground =
+                                uidefs.getColor("Table.foreground");
+                            if(lfTableForeground != null) {
+                                tableForeground = lfTableForeground;
+                            }
+                            else {
+                                /* Fall back on the colour black, which is at
+                                 * least more often than not the foreground
+                                 * colour. */
+                                tableForeground = Color.BLACK;
+                            }
                         }
 
                         @Override
@@ -388,13 +404,12 @@ public class FileSystemBrowser<A> {
                                         objectComponent.getForeground();
 
                                 /* We only change the foreground colour to blue
-                                 * when the original foreground colour is black.
+                                 * when the original foreground colour is equal
+                                 * to the L&F's Table foreground colour.
                                  * This is due to painting issues when restoring
                                  * the original background colour in (at least)
-                                 * the Mac OS X Swing implementation / L&F.
-                                 *
-                                 * TODO: Figure out how to do this properly. */
-                                if(curForeground.equals(Color.BLACK)) {
+                                 * the Mac OS X Swing implementation / L&F. */
+                                if(curForeground.equals(tableForeground)) {
                                     objectComponent.setForeground(Color.BLUE);
                                     objectComponentOriginalForeground =
                                             curForeground;
