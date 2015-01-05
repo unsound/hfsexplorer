@@ -1,0 +1,7 @@
+struct AttributeEntry {
+    ube32 offset;
+    ube32 length;
+    be16 flags;
+    u8 nameLength;
+    char name[1];
+};

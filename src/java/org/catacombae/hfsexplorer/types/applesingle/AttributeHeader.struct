@@ -1,0 +1,10 @@
+struct AttributeHeader {
+    be32 magic;
+    be32 debugTag;
+    ube32 totalEnd;
+    ube32 dataStart;
+    ube32 dataLength;
+    char reserved[12];
+    be16 flags;
+    ube16 numAttrs;
+};
