@@ -57,6 +57,11 @@ public class HFSCommonFSFork implements FSFork {
     }
 
     /* @Override */
+    public FSForkType getType() {
+        return type;
+    }
+
+    /* @Override */
     public long getLength() {
         return forkData.getLogicalSize();
     }

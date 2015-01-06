@@ -35,6 +35,52 @@ public class EntryDescriptor {
      */
 
     public static final int STRUCTSIZE = 12;
+
+    /** Entry ID for the data fork. */
+    public static final int ENTRY_ID_DATA = 1;
+
+    /** Entry ID for the resource fork. */
+    public static final int ENTRY_ID_RESOURCE = 2;
+
+    /** Entry ID for the file's name on home file system. */
+    public static final int ENTRY_ID_REALNAME = 3;
+
+    /** Entry ID for the standard Mac comment. */
+    public static final int ENTRY_ID_COMMENT = 4;
+
+    /** Entry ID for the Mac black & white icon. */
+    public static final int ENTRY_ID_ICONBW = 5;
+
+    /** Entry ID for the Mac color icon. */
+    public static final int ENTRY_ID_ICONCOLOR = 6;
+
+    /** Unused Entry ID. */
+    public static final int ENTRY_ID_UNUSED = 7;
+
+    /** Entry ID for the file dates (create, modify, etc.). */
+    public static final int ENTRY_ID_FILEDATES= 8;
+
+    /** Entry ID for the Mac Finder info & extended info. */
+    public static final int ENTRY_ID_FINDERINFO = 9;
+
+    /** Entry ID for the Mac file info, attributes, etc. */
+    public static final int ENTRY_ID_MACINFO = 10;
+
+    /** Entry ID for the Pro-DOS file info, attrib., etc. */
+    public static final int ENTRY_ID_PRODOSINFO = 11;
+
+    /** Entry ID for the MS-DOS file info, attributes, etc. */
+    public static final int ENTRY_ID_MSDOSINFO = 12;
+
+    /** Entry ID for the short name on AFP server. */
+    public static final int ENTRY_ID_AFPNAME = 13;
+
+    /** Entry ID for the AFP file info, attributes, etc. */
+    public static final int ENTRY_ID_AFPINFO = 14;
+
+    /** Entry ID for the AFP directory ID. */
+    public static final int ENTRY_ID_AFPDIRID = 15;
+
     private static final long MAX_UINT = 0xFFFFFFFFL;
 
     private final byte[] entryId = new byte[4];

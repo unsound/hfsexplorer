@@ -19,6 +19,7 @@ package org.catacombae.hfsexplorer.types.applesingle;
 
 import java.io.PrintStream;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.csjc.StaticStruct;
 import org.catacombae.csjc.structelements.Dictionary;
@@ -46,6 +47,9 @@ public class AttributeHeader implements StaticStruct, PrintableStruct {
 
     public static final int STRUCTSIZE = 36;
 
+    /** The appropriate value for the 'magic' field ("ATTR" in ASCII). */
+    public static final int MAGIC = 0x41545452;
+
     private int magic;
     private int debugTag;
     private int totalEnd;
@@ -64,6 +68,19 @@ public class AttributeHeader implements StaticStruct, PrintableStruct {
         System.arraycopy(data, offset + 20, this.reserved, 0, 1 * 12);
         this.flags = Util.readShortBE(data, offset + 32);
         this.numAttrs = Util.readShortBE(data, offset + 34);
+    }
+
+    public AttributeHeader(int debugTag, int totalEnd, int dataStart,
+            int dataLength, short flags, short numAttrs)
+    {
+        this.magic = MAGIC;
+        this.debugTag = debugTag;
+        this.totalEnd = totalEnd;
+        this.dataStart = dataStart;
+        this.dataLength = dataLength;
+        Arrays.fill(reserved, (byte) 0);
+        this.flags = flags;
+        this.numAttrs = numAttrs;
     }
 
     public static int length() { return STRUCTSIZE; }

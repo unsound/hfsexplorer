@@ -111,6 +111,7 @@ import org.catacombae.storage.ps.PartitionSystemHandlerFactory;
 import org.catacombae.storage.ps.PartitionSystemType;
 import org.catacombae.storage.ps.PartitionType;
 import org.catacombae.util.ObjectContainer;
+import org.catacombae.util.Util.Pair;
 
 /**
  * The main window for the graphical part of HFSExplorer. This class contains a lot of
@@ -1108,26 +1109,59 @@ public class FileSystemBrowserWindow extends JFrame {
         return originalLength - bytesToRead;
     }
 
-    private long extractResourceForkToAppleDoubleStream(FSFork resourceFork, OutputStream os, ProgressMonitor pm) throws IOException {
+    private long extractAdditionalForksToAppleDoubleStream(FSEntry entry,
+            OutputStream os, ProgressMonitor pm) throws IOException
+    {
         ByteArrayOutputStream baos = null;
         ReadableRandomAccessStream in = null;
         try {
-            AppleSingleBuilder builder = new AppleSingleBuilder(FileType.APPLEDOUBLE,
-                    AppleSingleVersion.VERSION_2_0, FileSystem.MACOS_X);
+            final LinkedList<Pair<String, byte[]>> attributeList =
+                    new LinkedList<Pair<String, byte[]>>();
+            byte[] finderInfoData = null;
+            byte[] resourceForkData = null;
 
-            baos = new ByteArrayOutputStream();
-            in = resourceFork.getReadableRandomAccessStream();
-            long extractedBytes = IOUtil.streamCopy(in, baos, 128*1024);
-            if(extractedBytes != resourceFork.getLength()) {
-                System.err.println("WARNING: Did not extract intended number of bytes to resource " +
-                        "fork! Intended: " + resourceFork.getLength() +
-                        " Extracted: " + extractedBytes);
+            final AppleSingleBuilder builder =
+                    new AppleSingleBuilder(FileType.APPLEDOUBLE,
+                    AppleSingleVersion.VERSION_2_0, FileSystem.MACOS_X);
+            long extractedBytes = 0;
+
+            for(FSFork f : entry.getAllForks()) {
+                FSForkType forkType = f.getType();
+                if(forkType == FSForkType.MACOS_RESOURCE) {
+                    resourceForkData =
+                            IOUtil.readFully(f.getReadableRandomAccessStream());
+                    extractedBytes += resourceForkData.length;
+                }
+                else if(forkType == FSForkType.MACOS_FINDERINFO) {
+                    finderInfoData =
+                            IOUtil.readFully(f.getReadableRandomAccessStream());
+                    extractedBytes += finderInfoData.length;
+                }
+                else if(f.hasXattrName()) {
+                    final byte[] attributeData =
+                            IOUtil.readFully(f.getReadableRandomAccessStream());
+                    attributeList.add(new Pair<String, byte[]>(f.getXattrName(),
+                            attributeData));
+                    extractedBytes += attributeData.length;
+                }
             }
 
-            builder.addResourceFork(baos.toByteArray());
+            if(finderInfoData != null || attributeList.size() > 0) {
+                builder.addFinderInfo(finderInfoData, attributeList);
+            }
 
-            os.write(builder.getResult());
-            pm.addDataProgress(extractedBytes);
+            if(resourceForkData != null) {
+                builder.addResourceFork(resourceForkData);
+            }
+            else {
+                builder.addEmptyResourceFork();
+            }
+
+            if(extractedBytes > 0) {
+                os.write(builder.getResult());
+                pm.addDataProgress(extractedBytes);
+            }
+
             return extractedBytes;
         } finally {
             if(in != null) {
@@ -1402,8 +1436,9 @@ public class FileSystemBrowserWindow extends JFrame {
     }
 
     private void actionExtractToDir(final String[] parentPath, final List<FSEntry> selection,
-            final boolean dataFork, final boolean resourceFork) {
-        if(!dataFork && !resourceFork) {
+            final boolean dataFork, final boolean additionalForks)
+    {
+        if(!dataFork && !additionalForks) {
             throw new IllegalArgumentException("Can't choose to extract nothing!");
         }
         try {
@@ -1422,14 +1457,6 @@ public class FileSystemBrowserWindow extends JFrame {
                             //fsView.retainCatalogFile(); // Cache the catalog file to speed up operations
                             //fsView.enableFileSystemCache();
                             try {
-                                LinkedList<FSForkType> forkTypes = new LinkedList<FSForkType>();
-                                if(dataFork) {
-                                    forkTypes.add(FSForkType.DATA);
-                                }
-                                if(resourceFork) {
-                                    forkTypes.add(FSForkType.MACOS_RESOURCE);
-                                }
-
                                 LinkedList<String> dirStack = new LinkedList<String>();
                                 if(parentPath != null) {
                                     //System.err.println("parentPath: " + Util.concatenateStrings(parentPath, "/"));
@@ -1463,7 +1490,8 @@ public class FileSystemBrowserWindow extends JFrame {
                                 */
 
                                 long dataSize = calculateForkSizeRecursive(parentPath, selection,
-                                        progress, forkTypes, followSymlinks);
+                                        progress, dataFork, additionalForks,
+                                        followSymlinks);
                                 if(false) {
                                     if(progress.cancelSignaled())
                                         System.err.println("Size calculation aborted. Calculated size: " + dataSize + " bytes");
@@ -1481,7 +1509,8 @@ public class FileSystemBrowserWindow extends JFrame {
 
                                     LinkedList<String> errorMessages = new LinkedList<String>();
                                     extract(parentPath, selection, outDir, progress, errorMessages,
-                                            followSymlinks, forkTypes);
+                                            followSymlinks, dataFork,
+                                            additionalForks);
                                     if(progress.cancelSignaled())
                                         errorMessages.addLast("User aborted extraction.");
 
@@ -1553,21 +1582,21 @@ public class FileSystemBrowserWindow extends JFrame {
      * @param selection the source entries for the calculation.
      * @param progress the progress monitor that recieves updates about our current state and
      * decides whether or not to abort.
-     * @param forkTypes the fork types to include in the calculation.
+     * @param calculateDataForkSize
+     *      whether the size of the data forks should be included.
+     * @param calculateAdditionalForksSize
+     *      whether the size of the non-data data forks should be included.
      * @param followSymlinks whether or not symbolic links should be followed in the tree traversal.
      * @return the combined size of the forks of types <code>forkTypes</code> for the selection,
      * including for all files in subdirectories, recursively.
      */
     private long calculateForkSizeRecursive(String[] parentPath, List<FSEntry> selection,
-            ExtractProgressMonitor progress, LinkedList<FSForkType> forkTypes, boolean followSymlinks) {
-        // "If forkTypes is empty, all forks are included in the calculation."
-        if(forkTypes.size() == 0) {
-            for(FSForkType forkType : fsHandler.getSupportedForkTypes())
-                forkTypes.add(forkType);
-        }
-
+            ExtractProgressMonitor progress, boolean calculateDataForkSize,
+            boolean calculateAdditionalForksSize, boolean followSymlinks)
+    {
         CalculateTreeSizeVisitor sizeVisitor =
-                new CalculateTreeSizeVisitor(progress, forkTypes);
+                new CalculateTreeSizeVisitor(progress, calculateDataForkSize,
+                calculateAdditionalForksSize);
         traverseTree(parentPath, selection, sizeVisitor, followSymlinks);
         return sizeVisitor.getSize();
     }
@@ -1743,7 +1772,7 @@ public class FileSystemBrowserWindow extends JFrame {
             ExtractProgressMonitor progressDialog, LinkedList<String> errorMessages,
             boolean followSymbolicLinks) {
         extract(parentPath, Arrays.asList(rec), outDir, progressDialog, errorMessages,
-                followSymbolicLinks, FSForkType.DATA);
+                followSymbolicLinks, true, false);
     }
 
     /** <code>progressDialog</code> may NOT be null. */
@@ -1784,14 +1813,6 @@ public class FileSystemBrowserWindow extends JFrame {
     }
     */
 
-    /** <code>progressDialog</code> may NOT be null. */
-    protected void extract(String[] parentPath, List<FSEntry> recs, File outDir,
-            ExtractProgressMonitor progressDialog, LinkedList<String> errorMessages,
-            boolean followSymbolicLinks, List<FSForkType> forkTypes) {
-        extract(parentPath, recs, outDir, progressDialog, errorMessages, followSymbolicLinks,
-                forkTypes.toArray(new FSForkType[forkTypes.size()]));
-    }
-
     /**
      * Utility method that checks for the existence of a file. This method tries
      * to overcome some limitations of Java. For instance, the File.exists()
@@ -1814,8 +1835,8 @@ public class FileSystemBrowserWindow extends JFrame {
     protected void extract(String[] parentPath, List<FSEntry> recs, File outDir,
             ExtractProgressMonitor progressDialog,
             LinkedList<String> errorMessages, boolean followSymbolicLinks,
-            FSForkType... forkTypes) {
-
+            boolean extractMainFork, boolean extractAdditionalForks)
+    {
         if(!deepExists(outDir)) {
             String[] options = new String[]{"Create directory", "Cancel"};
             int reply = JOptionPane.showOptionDialog(this, "Warning! Target " +
@@ -1855,7 +1876,7 @@ public class FileSystemBrowserWindow extends JFrame {
         }
 
         ExtractVisitor ev = new ExtractVisitor(progressDialog, errorMessages,
-                outDir, forkTypes);
+                outDir, extractMainFork, extractAdditionalForks);
         traverseTree(parentPath, recs, ev, followSymbolicLinks);
     }
 
@@ -2102,16 +2123,18 @@ public class FileSystemBrowserWindow extends JFrame {
 
     private void extractFile(final FSFile rec, final File outDir, final ExtractProgressMonitor progressDialog,
             final LinkedList<String> errorMessages, final ExtractProperties extractProperties,
-            final ObjectContainer<Boolean> skipDirectory, final FSForkType forkType) {
+            final ObjectContainer<Boolean> skipDirectory,
+            final boolean extractAdditionalForks)
+    {
         //int errorCount = 0;
         final String originalFileName;
 
-        if(forkType == FSForkType.DATA)
+        if(!extractAdditionalForks) {
             originalFileName = rec.getName();
-        else if(forkType == FSForkType.MACOS_RESOURCE)
+        }
+        else {
             originalFileName = "._" + rec.getName(); // Special syntax for resource forks in foreign file systems
-        else
-            throw new RuntimeException("Unexpected fork type: " + forkType);
+        }
 
         CreateFileFailedAction defaultCreateFileFailedAction =
                 extractProperties.getCreateFileFailedAction();
@@ -2127,19 +2150,28 @@ public class FileSystemBrowserWindow extends JFrame {
             fileName = null;
 
             //System.out.println("file: \"" + filename + "\" range: " + fractionLowLimit + "-" + fractionHighLimit);
-            final FSFork theFork = rec.getForkByType(forkType);
+            long totalForkSize;
+            if(extractAdditionalForks) {
+                totalForkSize = 0;
 
-            if(theFork == null) {
-                if(forkType == FSForkType.MACOS_RESOURCE) {
-                    return;
+                for(FSFork f : rec.getAllForks()) {
+                    if(f.getType() == FSForkType.DATA) {
+                        continue;
+                    }
+
+                    totalForkSize += f.getLength();
                 }
 
-                throw new RuntimeException("Could not find a fork of type: " + forkType);
+                if(totalForkSize == 0) {
+                    /* Don't create empty AppleDouble files. */
+                    return;
+                }
             }
-            else if(forkType == FSForkType.MACOS_RESOURCE && theFork.getLength() == 0)
-                return; // Extracting empty resource forks is really pointless.
+            else {
+                totalForkSize = rec.getMainFork().getLength();
+            }
 
-            progressDialog.updateCurrentFile(curFileName, theFork.getLength());
+            progressDialog.updateCurrentFile(curFileName, totalForkSize);
 
             final File outFile = new File(outDir, curFileName);
             //progressDialog.updateTotalProgress(fractionLowLimit);
@@ -2220,10 +2252,13 @@ public class FileSystemBrowserWindow extends JFrame {
                     throw new FileNotFoundException();
                 }
                 fos = new FileOutputStream(outFile);
-                if(forkType == FSForkType.MACOS_RESOURCE)
-                    extractResourceForkToAppleDoubleStream(theFork, fos, progressDialog);
-                else
-                    extractForkToStream(theFork, fos, progressDialog);
+                if(extractAdditionalForks) {
+                    extractAdditionalForksToAppleDoubleStream(rec, fos,
+                            progressDialog);
+                }
+                else {
+                    extractForkToStream(rec.getMainFork(), fos, progressDialog);
+                }
                 fos.close();
 
                 if(curFileName != (Object) originalFileName && !curFileName.equals(originalFileName))
@@ -2475,26 +2510,26 @@ public class FileSystemBrowserWindow extends JFrame {
 
     public class CalculateTreeSizeVisitor extends NullTreeVisitor {
         private final ExtractProgressMonitor pm;
+        private final boolean includeMainFork;
+        private final boolean includeAdditionalForks;
+
         private final StringBuilder sb = new StringBuilder();
-        private final FSForkType[] forkTypes;
         private long size = 0;
         //private LinkedList<String> errorMessages = new LinkedList<String>();
 
-        public CalculateTreeSizeVisitor(ExtractProgressMonitor pm, List<FSForkType> forkTypes) {
-            this(pm, forkTypes.toArray(new FSForkType[forkTypes.size()]));
-        }
-
-        public CalculateTreeSizeVisitor(ExtractProgressMonitor pm, FSForkType... forkTypes) {
+        public CalculateTreeSizeVisitor(ExtractProgressMonitor pm,
+                boolean includeMainFork, boolean includeAdditionalForks)
+        {
             this.pm = pm;
-            this.forkTypes = forkTypes;
+            this.includeMainFork = includeMainFork;
+            this.includeAdditionalForks = includeAdditionalForks;
 
             if(this.pm == null)
                 throw new IllegalArgumentException("pm == null");
-            if(this.forkTypes == null)
-                throw new IllegalArgumentException("forkTypes == null");
 
-            if(forkTypes.length == 0)
+            if(!includeMainFork && !includeAdditionalForks) {
                 throw new IllegalArgumentException("No fork types to extract.");
+            }
         }
 
         public long getSize() {
@@ -2513,10 +2548,13 @@ public class FileSystemBrowserWindow extends JFrame {
 
         @Override
         public void file(FSFile file) {
-            for(FSForkType forkType : forkTypes) {
-                FSFork fork = file.getForkByType(forkType);
-                if(fork != null)
+            for(FSFork fork : file.getAllForks()) {
+                final boolean isMainFork = fork.getType() == FSForkType.DATA;
+                if((isMainFork && includeMainFork) ||
+                        (!isMainFork && includeAdditionalForks))
+                {
                     size += fork.getLength();
+                }
             }
         }
 
@@ -2531,19 +2569,18 @@ public class FileSystemBrowserWindow extends JFrame {
         //private final ObjectContainer<Boolean> overwriteAll = new ObjectContainer<Boolean>(false);
         private final ObjectContainer<Boolean> skipDirectory = new ObjectContainer<Boolean>(false);
         private final ExtractProperties extractProperties;
-        private final FSForkType[] forkTypes;
+        private final boolean extractMainFork;
+        private final boolean extractAdditionalForks;
         private final LinkedList<File> outDirStack = new LinkedList<File>();
 
         public ExtractVisitor(ExtractProgressMonitor pm, LinkedList<String> errorMessages, File outDir,
-                List<FSForkType> forkTypes) {
-            this(pm, errorMessages, outDir, forkTypes.toArray(new FSForkType[forkTypes.size()]));
-        }
-        public ExtractVisitor(ExtractProgressMonitor pm, LinkedList<String> errorMessages, File outDir,
-                FSForkType... forkTypes) {
+                boolean extractMainFork, boolean extractAdditionalForks)
+        {
             this.pm = pm;
             this.errorMessages = errorMessages;
             this.outRootDir = outDir;
-            this.forkTypes = forkTypes;
+            this.extractMainFork = extractMainFork;
+            this.extractAdditionalForks = extractAdditionalForks;
             this.extractProperties = this.pm.getExtractProperties();
 
             if(this.pm == null)
@@ -2552,11 +2589,10 @@ public class FileSystemBrowserWindow extends JFrame {
                 throw new IllegalArgumentException("errorMessages == null");
             if(this.outRootDir == null)
                 throw new IllegalArgumentException("outDir == null");
-            if(this.forkTypes == null)
-                throw new IllegalArgumentException("forkTypes == null");
 
-            if(forkTypes.length == 0)
+            if(!extractMainFork && !extractAdditionalForks) {
                 throw new IllegalArgumentException("No fork types to extract.");
+            }
 
             outDirStack.addLast(outDir);
         }
@@ -2714,8 +2750,16 @@ public class FileSystemBrowserWindow extends JFrame {
                 return;
 
             File outDir = outDirStack.getLast();
-            for(FSForkType forkType : forkTypes)
-                extractFile(fsf, outDir, pm, errorMessages, extractProperties, skipDirectory, forkType);
+
+            if(extractMainFork) {
+                extractFile(fsf, outDir, pm, errorMessages, extractProperties,
+                        skipDirectory, false);
+            }
+
+            if(extractAdditionalForks) {
+                extractFile(fsf, outDir, pm, errorMessages, extractProperties,
+                        skipDirectory, true);
+            }
         }
 
         @Override
@@ -2823,16 +2867,18 @@ public class FileSystemBrowserWindow extends JFrame {
             });
             jpm.add(dataExtractItem);
 
-            JMenuItem resExtractItem = new JMenuItem("Extract resource fork(s)");
-            resExtractItem.addActionListener(new ActionListener() {
+            JMenuItem xattrExtractItem =
+                    new JMenuItem("Extract extended attributes");
+            xattrExtractItem.addActionListener(new ActionListener() {
                 /* @Override */
                 public void actionPerformed(ActionEvent e) {
                     FileSystemBrowserWindow.this.actionExtractToDir(parentPath, userObjectList, false, true);
                 }
             });
-            jpm.add(resExtractItem);
+            jpm.add(xattrExtractItem);
 
-            JMenuItem bothExtractItem = new JMenuItem("Extract data and resource fork(s)");
+            JMenuItem bothExtractItem = new
+                    JMenuItem("Extract data and extended attributes");
             bothExtractItem.addActionListener(new ActionListener() {
                 /* @Override */
                 public void actionPerformed(ActionEvent e) {

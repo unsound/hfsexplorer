@@ -43,6 +43,9 @@ public class AttributeEntry implements DynamicStruct, PrintableStruct {
 
     public static final int STATIC_STRUCTSIZE = 11;
 
+    private static final long MAX_U32 = 0xFFFFFFFFL;
+    private static final int MAX_U8 = 0xFF;
+
     private int offset;
     private int length;
     private short flags;
@@ -57,6 +60,32 @@ public class AttributeEntry implements DynamicStruct, PrintableStruct {
 
         this.name = new byte[getNameLength()];
         System.arraycopy(data, offset + 11, this.name, 0, this.name.length);
+    }
+
+    public AttributeEntry(long offset, long length, short flags, byte[] name,
+            int nameOffset, short nameLength)
+    {
+        if(offset < 0 || offset > MAX_U32) {
+            throw new IllegalArgumentException("Illegal value for offset " +
+                    "(" + offset + ").");
+        }
+
+        if(length < 0 || length > MAX_U32) {
+            throw new IllegalArgumentException("Illegal value for length " +
+                    "(" + length + ").");
+        }
+
+        if(nameLength < 0 || nameLength > MAX_U8) {
+            throw new IllegalArgumentException("Illegal value for nameLength " +
+                    "(" + length + ").");
+        }
+
+        this.offset = (int) offset;
+        this.length = (int) length;
+        this.flags = flags;
+        this.nameLength = (byte) nameLength;
+        this.name = new byte[nameLength];
+        System.arraycopy(name, nameOffset, this.name, 0, nameLength);
     }
 
     public int occupiedSize() {

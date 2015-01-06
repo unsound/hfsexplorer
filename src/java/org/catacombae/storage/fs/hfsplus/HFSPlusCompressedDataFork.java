@@ -37,6 +37,7 @@ import org.catacombae.io.SynchronizedReadableRandomAccessStream;
 import org.catacombae.io.TruncatableRandomAccessStream;
 import org.catacombae.io.WritableRandomAccessStream;
 import org.catacombae.storage.fs.FSFork;
+import org.catacombae.storage.fs.FSForkType;
 import org.catacombae.util.Util;
 
 /**
@@ -62,6 +63,10 @@ public class HFSPlusCompressedDataFork implements FSFork {
     HFSPlusCompressedDataFork(FSFork decmpfsFork, FSFork resourceFork) {
         this.decmpfsFork = decmpfsFork;
         this.resourceFork = resourceFork;
+    }
+
+    public FSForkType getType() {
+        return FSForkType.DATA;
     }
 
     synchronized DecmpfsHeader getDecmpfsHeader() {

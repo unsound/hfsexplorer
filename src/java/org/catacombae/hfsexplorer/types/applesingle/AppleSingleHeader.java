@@ -82,7 +82,8 @@ public class AppleSingleHeader {
     public short getNumEntries() { return Util.readShortBE(numEntries); }
 
     public void printFields(PrintStream ps, String prefix) {
-	ps.println(prefix + " magicNumber: " + getMagicNumber());
+	ps.println(prefix + " magicNumber: " +
+                "0x" + Util.toHexStringBE(getMagicNumber()));
 	ps.println(prefix + " versionNumber: 0x" + Util.toHexStringBE(getVersionNumber()));
 	ps.println(prefix + " homeFileSystem: \"" + Util.readString(getHomeFileSystem(), "MacRoman") + "\"");
 	ps.println(prefix + " numEntries: " + getNumEntries());

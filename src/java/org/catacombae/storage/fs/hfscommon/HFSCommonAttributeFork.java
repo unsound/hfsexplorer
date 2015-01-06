@@ -37,6 +37,7 @@ import org.catacombae.io.SynchronizedReadableRandomAccessStream;
 import org.catacombae.io.TruncatableRandomAccessStream;
 import org.catacombae.io.WritableRandomAccessStream;
 import org.catacombae.storage.fs.FSFork;
+import org.catacombae.storage.fs.FSForkType;
 
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
@@ -54,6 +55,10 @@ public class HFSCommonAttributeFork implements FSFork {
 
         this.parent = parent;
         this.recordList = recordList;
+    }
+
+    public FSForkType getType() {
+        return null;
     }
 
     public long getLength() {

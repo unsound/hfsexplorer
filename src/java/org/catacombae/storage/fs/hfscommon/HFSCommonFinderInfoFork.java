@@ -28,6 +28,7 @@ import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.TruncatableRandomAccessStream;
 import org.catacombae.io.WritableRandomAccessStream;
 import org.catacombae.storage.fs.FSFork;
+import org.catacombae.storage.fs.FSForkType;
 
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
@@ -37,6 +38,10 @@ public class HFSCommonFinderInfoFork implements FSFork {
 
     public HFSCommonFinderInfoFork(CommonHFSFinderInfo finderInfo) {
         this.finderInfo = finderInfo;
+    }
+
+    public FSForkType getType() {
+        return FSForkType.MACOS_FINDERINFO;
     }
 
     public long getLength() {

@@ -29,6 +29,12 @@ import org.catacombae.io.WritableRandomAccessStream;
  */
 public interface FSFork {
 
+    /* Returns the type of this fork (if any).
+     *
+     * @return the type of this fork (if any).
+     */
+    public abstract FSForkType getType();
+
     /**
      * Returns the length (in bytes) of this fork.
      *
