@@ -60,9 +60,11 @@ public class FileInfoPanel extends javax.swing.JPanel {
 	HFSPlusBSDInfo bi = cf.getPermissions();
 	permissionsOwnerIDField.setText("" + bi.getOwnerID());
 	permissionsGroupIDField.setText("" + bi.getGroupID());
+        permissionsAdminFlagsField.setText("0x" + Util.toHexStringBE(bi.getAdminFlags()));
 	permissionsAdminFlagsArchivedBox.setSelected(bi.getAdminArchivedFlag());
 	permissionsAdminFlagsImmutableBox.setSelected(bi.getAdminImmutableFlag());
 	permissionsAdminFlagsAppendBox.setSelected(bi.getAdminAppendFlag());
+        permissionsOwnerFlagsField.setText("0x" + Util.toHexStringBE(bi.getOwnerFlags()));
 	permissionsOwnerFlagsNodumpBox.setSelected(bi.getOwnerNodumpFlag());
 	permissionsOwnerFlagsImmutableBox.setSelected(bi.getOwnerImmutableFlag());
 	permissionsOwnerFlagsAppendBox.setSelected(bi.getOwnerAppendFlag());
@@ -181,6 +183,7 @@ public class FileInfoPanel extends javax.swing.JPanel {
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
+        permissionsAdminFlagsField = new javax.swing.JTextField();
         permissionsAdminFlagsArchivedBox = new javax.swing.JCheckBox();
         permissionsAdminFlagsImmutableBox = new javax.swing.JCheckBox();
         permissionsAdminFlagsAppendBox = new javax.swing.JCheckBox();
@@ -188,6 +191,7 @@ public class FileInfoPanel extends javax.swing.JPanel {
         jLabel15 = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
         jLabel17 = new javax.swing.JLabel();
+        permissionsOwnerFlagsField = new javax.swing.JTextField();
         permissionsOwnerFlagsNodumpBox = new javax.swing.JCheckBox();
         permissionsOwnerFlagsImmutableBox = new javax.swing.JCheckBox();
         permissionsOwnerFlagsAppendBox = new javax.swing.JCheckBox();
@@ -323,6 +327,11 @@ public class FileInfoPanel extends javax.swing.JPanel {
 
         jLabel13.setText("Admin flags:");
 
+        permissionsAdminFlagsField.setEditable(false);
+        permissionsAdminFlagsField.setText("0x0000");
+        permissionsAdminFlagsField.setBorder(null);
+        permissionsAdminFlagsField.setOpaque(false);
+
         permissionsAdminFlagsArchivedBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         permissionsAdminFlagsArchivedBox.setEnabled(false);
         permissionsAdminFlagsArchivedBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
@@ -342,6 +351,11 @@ public class FileInfoPanel extends javax.swing.JPanel {
         jLabel16.setText("Writes to file may only append");
 
         jLabel17.setText("Owner flags:");
+
+        permissionsOwnerFlagsField.setEditable(false);
+        permissionsOwnerFlagsField.setText("0x0000");
+        permissionsOwnerFlagsField.setBorder(null);
+        permissionsOwnerFlagsField.setOpaque(false);
 
         permissionsOwnerFlagsNodumpBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         permissionsOwnerFlagsNodumpBox.setEnabled(false);
@@ -716,7 +730,10 @@ public class FileInfoPanel extends javax.swing.JPanel {
                     .add(layout.createSequentialGroup()
                         .add(24, 24, 24)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jLabel13)
+                            .add(layout.createSequentialGroup()
+                                .add(jLabel13)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(permissionsAdminFlagsField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE))
                             .add(layout.createSequentialGroup()
                                 .add(21, 21, 21)
                                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -732,7 +749,10 @@ public class FileInfoPanel extends javax.swing.JPanel {
                                         .add(permissionsAdminFlagsAppendBox)
                                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                         .add(jLabel16))))
-                            .add(jLabel17)
+                            .add(layout.createSequentialGroup()
+                                .add(jLabel17)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(permissionsOwnerFlagsField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE))
                             .add(layout.createSequentialGroup()
                                 .add(21, 21, 21)
                                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -998,7 +1018,9 @@ public class FileInfoPanel extends javax.swing.JPanel {
                     .add(jLabel12)
                     .add(permissionsGroupIDField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jLabel13)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel13)
+                    .add(permissionsAdminFlagsField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(permissionsAdminFlagsArchivedBox)
@@ -1012,7 +1034,9 @@ public class FileInfoPanel extends javax.swing.JPanel {
                     .add(permissionsAdminFlagsAppendBox)
                     .add(jLabel16))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jLabel17)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel17)
+                    .add(permissionsOwnerFlagsField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(permissionsOwnerFlagsNodumpBox)
@@ -1269,6 +1293,7 @@ public class FileInfoPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JCheckBox permissionsAdminFlagsAppendBox;
     private javax.swing.JCheckBox permissionsAdminFlagsArchivedBox;
+    private javax.swing.JTextField permissionsAdminFlagsField;
     private javax.swing.JCheckBox permissionsAdminFlagsImmutableBox;
     private javax.swing.JTextField permissionsFileModeField;
     private javax.swing.JCheckBox permissionsFileModeSGIDBox;
@@ -1276,6 +1301,7 @@ public class FileInfoPanel extends javax.swing.JPanel {
     private javax.swing.JCheckBox permissionsFileModeSUIDBox;
     private javax.swing.JTextField permissionsGroupIDField;
     private javax.swing.JCheckBox permissionsOwnerFlagsAppendBox;
+    private javax.swing.JTextField permissionsOwnerFlagsField;
     private javax.swing.JCheckBox permissionsOwnerFlagsImmutableBox;
     private javax.swing.JCheckBox permissionsOwnerFlagsNodumpBox;
     private javax.swing.JCheckBox permissionsOwnerFlagsOpaqueBox;

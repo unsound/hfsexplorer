@@ -45,7 +45,11 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="24" pref="24" max="24" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jLabel13" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="jLabel13" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="permissionsAdminFlagsField" pref="278" max="32767" attributes="0"/>
+                          </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace min="21" pref="21" max="21" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
@@ -66,7 +70,11 @@
                                   </Group>
                               </Group>
                           </Group>
-                          <Component id="jLabel17" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="jLabel17" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="permissionsOwnerFlagsField" pref="279" max="32767" attributes="0"/>
+                          </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace min="21" pref="21" max="21" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
@@ -358,7 +366,10 @@
                   <Component id="permissionsGroupIDField" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jLabel13" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jLabel13" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="permissionsAdminFlagsField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="permissionsAdminFlagsArchivedBox" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -375,7 +386,10 @@
                   <Component id="jLabel16" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jLabel17" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jLabel17" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="permissionsOwnerFlagsField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="permissionsOwnerFlagsNodumpBox" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -615,6 +629,16 @@
         <Property name="text" type="java.lang.String" value="Admin flags:"/>
       </Properties>
     </Component>
+    <Component class="javax.swing.JTextField" name="permissionsAdminFlagsField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="text" type="java.lang.String" value="0x0000"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+        <Property name="opaque" type="boolean" value="false"/>
+      </Properties>
+    </Component>
     <Component class="javax.swing.JCheckBox" name="permissionsAdminFlagsArchivedBox">
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
@@ -672,6 +696,16 @@
     <Component class="javax.swing.JLabel" name="jLabel17">
       <Properties>
         <Property name="text" type="java.lang.String" value="Owner flags:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="permissionsOwnerFlagsField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="text" type="java.lang.String" value="0x0000"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+        <Property name="opaque" type="boolean" value="false"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JCheckBox" name="permissionsOwnerFlagsNodumpBox">
