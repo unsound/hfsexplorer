@@ -44,7 +44,7 @@ public abstract class HFSCommonAbstractFile extends HFSCommonFSEntry {
      * be called the 'inode' although it's not really proper in regard to the
      * structure of HFS.
      */
-    private final CommonHFSCatalogFileRecord fileRecord;
+    protected final CommonHFSCatalogFileRecord fileRecord;
 
     private final HFSCommonFSAttributes attributes;
     private final FSFork rawDataFork;

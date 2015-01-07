@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import org.catacombae.hfs.types.decmpfs.DecmpfsHeader;
+import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFile;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFileRecord;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.io.ReadableRandomAccessStream;
@@ -84,70 +85,81 @@ public class HFSPlusFSFile extends HFSCommonFSFile {
         }
 
         if(dataFork == null) {
-            LinkedList<FSFork> attributeForkList = new LinkedList<FSFork>();
+            final CommonHFSCatalogFile catalogFile = fileRecord.getData();
+            if(!catalogFile.getPermissions().getOwnerCompressedFlag()) {
+                /* Definitely not compressed since the compressed flag is not
+                 * set. */
+                dataFork = super.getDataFork();
+            }
+            else {
+                LinkedList<FSFork> attributeForkList = new LinkedList<FSFork>();
 
-            /* Note: Need to call super's implementation because this class
-             *       overrides fillAttributeForks to call back into
-             *       getDataFork() in order to determine if we should filter out
-             *       the "com.apple.decmpfs" attribute fork. */
-            super.fillAttributeForks(attributeForkList);
+                /* Note: Need to call super's implementation because this class
+                 *       overrides fillAttributeForks to call back into
+                 *       getDataFork() in order to determine if we should filter
+                 *       out the "com.apple.decmpfs" attribute fork. */
+                super.fillAttributeForks(attributeForkList);
 
-            for(FSFork f : attributeForkList) {
-                if(DEBUG) {
-                    System.err.println("getDataFork: Checking out attribute " +
-                            "fork " + f + (f.hasXattrName() ? " with xattr " +
-                            "name \"" + f.getXattrName() + "\"" : "") + ".");
-                }
-
-                if(f.hasXattrName() &&
-                        f.getXattrName().equals("com.apple.decmpfs"))
-                {
-                    byte[] headerData = new byte[DecmpfsHeader.STRUCTSIZE];
-
-                    ReadableRandomAccessStream forkStream =
-                            f.getReadableRandomAccessStream();
-                    try {
-                        forkStream.readFully(headerData);
-                    } finally {
-                        forkStream.close();
+                for(FSFork f : attributeForkList) {
+                    if(DEBUG) {
+                        System.err.println("getDataFork: Checking out " +
+                                "attribute fork " + f + (f.hasXattrName() ?
+                                " with xattr name \"" + f.getXattrName() +
+                                "\"" : "") + ".");
                     }
 
-                    DecmpfsHeader header = new DecmpfsHeader(headerData, 0);
-                    if(header.getMagic() != DecmpfsHeader.MAGIC) {
-                        /* If magic doesn't match, the decmpfs fork is broken
-                         * and we treat this attribute fork as a normal extended
-                         * attribute for data recovery purposes. */
-                        continue;
-                    }
+                    if(f.hasXattrName() &&
+                            f.getXattrName().equals("com.apple.decmpfs"))
+                    {
+                        byte[] headerData = new byte[DecmpfsHeader.STRUCTSIZE];
 
-                    switch(header.getRawCompressionType()) {
-                        case DecmpfsHeader.COMPRESSION_TYPE_INLINE:
-                        case DecmpfsHeader.COMPRESSION_TYPE_RESOURCE:
-                            break;
-                        default:
-                            /* No support for other compression types than type
-                             * "inline" (3) and "resource" (4) at this point.
-                             * All other compression types will lead to the
-                             * attribute being exposed as-is for recovery
+                        ReadableRandomAccessStream forkStream =
+                                f.getReadableRandomAccessStream();
+                        try {
+                            forkStream.readFully(headerData);
+                        } finally {
+                            forkStream.close();
+                        }
+
+                        DecmpfsHeader header = new DecmpfsHeader(headerData, 0);
+                        if(header.getMagic() != DecmpfsHeader.MAGIC) {
+                            /* If magic doesn't match, the decmpfs fork is
+                             * broken and we treat this attribute fork as a
+                             * normal extended attribute for data recovery
                              * purposes. */
                             continue;
+                        }
+
+                        switch(header.getRawCompressionType()) {
+                            case DecmpfsHeader.COMPRESSION_TYPE_INLINE:
+                            case DecmpfsHeader.COMPRESSION_TYPE_RESOURCE:
+                                break;
+                            default:
+                                /* No support for other compression types than
+                                 * type "inline" (3) and "resource" (4) at this
+                                 * point.
+                                 * All other compression types will lead to the
+                                 * attribute being exposed as-is for recovery
+                                 * purposes. */
+                                continue;
+                        }
+
+                        /* We override getResourceFork() in this class in order
+                         * to hide it if the file is compressed, so call super's
+                         * implementation to get it unconditionally (and without
+                         * infinite recursion for that matter). */
+                        dataFork = new HFSPlusCompressedDataFork(f,
+                                super.getResourceFork());
+                        break;
                     }
-
-                    /* We override getResourceFork() in this class in order to
-                     * hide it if the file is compressed, so call super's
-                     * implementation to get it unconditionally (and without
-                     * infinite recursion for that matter). */
-                    dataFork = new HFSPlusCompressedDataFork(f,
-                            super.getResourceFork());
-                    break;
                 }
-            }
 
-            if(dataFork == null) {
-                /* We haven't created any compressed data fork when going
-                 * through the attributes, so this is a regular data fork. Just
-                 * call super. */
-                dataFork = super.getDataFork();
+                if(dataFork == null) {
+                    /* We haven't created any compressed data fork when going
+                     * through the attributes, so this is a regular data fork.
+                     * Just call super. */
+                    dataFork = super.getDataFork();
+                }
             }
         }
 
