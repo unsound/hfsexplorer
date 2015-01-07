@@ -62,6 +62,8 @@ public class FolderInfoPanel extends javax.swing.JPanel {
         permissionsOwnerFlagsImmutableBox.setSelected(bi.getOwnerImmutableFlag());
         permissionsOwnerFlagsAppendBox.setSelected(bi.getOwnerAppendFlag());
         permissionsOwnerFlagsOpaqueBox.setSelected(bi.getOwnerOpaqueFlag());
+        permissionsOwnerFlagsCompressedBox.setSelected(
+                bi.getOwnerCompressedFlag());
         permissionsFileModeField.setText(bi.getFileModeString());
         permissionsFileModeSUIDBox.setSelected(bi.getFileModeSetUserID());
         permissionsFileModeSGIDBox.setSelected(bi.getFileModeSetGroupID());
@@ -142,6 +144,8 @@ public class FolderInfoPanel extends javax.swing.JPanel {
         permissionsOwnerFlagsImmutableBox = new javax.swing.JCheckBox();
         permissionsOwnerFlagsAppendBox = new javax.swing.JCheckBox();
         permissionsOwnerFlagsOpaqueBox = new javax.swing.JCheckBox();
+        permissionsOwnerFlagsCompressedLabel = new javax.swing.JLabel();
+        permissionsOwnerFlagsCompressedBox = new javax.swing.JCheckBox();
         jLabel18 = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
         jLabel20 = new javax.swing.JLabel();
@@ -291,6 +295,12 @@ public class FolderInfoPanel extends javax.swing.JPanel {
         permissionsOwnerFlagsOpaqueBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         permissionsOwnerFlagsOpaqueBox.setEnabled(false);
         permissionsOwnerFlagsOpaqueBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
+
+        permissionsOwnerFlagsCompressedLabel.setText("Folder is compressed");
+
+        permissionsOwnerFlagsCompressedBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        permissionsOwnerFlagsCompressedBox.setEnabled(false);
+        permissionsOwnerFlagsCompressedBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
         jLabel18.setText("Do not dump (back up or archive) this file");
 
@@ -624,7 +634,11 @@ public class FolderInfoPanel extends javax.swing.JPanel {
                                     .add(layout.createSequentialGroup()
                                         .add(permissionsOwnerFlagsOpaqueBox)
                                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(jLabel21))))
+                                        .add(jLabel21))
+                                    .add(layout.createSequentialGroup()
+                                        .add(permissionsOwnerFlagsCompressedBox)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(permissionsOwnerFlagsCompressedLabel))))
                             .add(layout.createSequentialGroup()
                                 .add(jLabel22)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -867,6 +881,10 @@ public class FolderInfoPanel extends javax.swing.JPanel {
                     .add(jLabel21))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(permissionsOwnerFlagsCompressedBox)
+                    .add(permissionsOwnerFlagsCompressedLabel))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel22)
                     .add(permissionsFileModeField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -1066,6 +1084,8 @@ public class FolderInfoPanel extends javax.swing.JPanel {
     private javax.swing.JCheckBox permissionsFileModeSUIDBox;
     private javax.swing.JTextField permissionsGroupIDField;
     private javax.swing.JCheckBox permissionsOwnerFlagsAppendBox;
+    private javax.swing.JCheckBox permissionsOwnerFlagsCompressedBox;
+    private javax.swing.JLabel permissionsOwnerFlagsCompressedLabel;
     private javax.swing.JTextField permissionsOwnerFlagsField;
     private javax.swing.JCheckBox permissionsOwnerFlagsImmutableBox;
     private javax.swing.JCheckBox permissionsOwnerFlagsNodumpBox;

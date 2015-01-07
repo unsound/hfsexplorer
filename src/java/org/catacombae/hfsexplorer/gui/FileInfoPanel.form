@@ -103,6 +103,11 @@
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="jLabel21" min="-2" max="-2" attributes="0"/>
                                   </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="permissionsOwnerFlagsCompressedBox" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="permissionsOwnerFlagsCompressedLabel" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
@@ -465,6 +470,11 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="permissionsOwnerFlagsOpaqueBox" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel21" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="permissionsOwnerFlagsCompressedBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="permissionsOwnerFlagsCompressedLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -878,6 +888,24 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JCheckBox" name="permissionsOwnerFlagsOpaqueBox">
+      <Properties>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
+            <EmptyBorder bottom="0" left="0" right="0" top="0"/>
+          </Border>
+        </Property>
+        <Property name="enabled" type="boolean" value="false"/>
+        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+          <Insets value="[0, 0, 0, 0]"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="permissionsOwnerFlagsCompressedLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="File is compressed"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="permissionsOwnerFlagsCompressedBox">
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">

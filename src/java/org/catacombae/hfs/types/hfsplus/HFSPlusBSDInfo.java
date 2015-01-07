@@ -47,6 +47,7 @@ public class HFSPlusBSDInfo implements PrintableStruct, StructElements {
     public static final byte MASK_OWNER_IMMUTABLE = 0x2;
     public static final byte MASK_OWNER_APPEND = 0x4;
     public static final byte MASK_OWNER_OPAQUE = 0x8;
+    public static final byte MASK_OWNER_COMPRESSED = 0x20;
     public static final byte FILETYPE_UNDEFINED = 00;
     public static final byte FILETYPE_FIFO = 01;
     public static final byte FILETYPE_CHARACTER_SPECIAL = 02;
@@ -91,6 +92,9 @@ public class HFSPlusBSDInfo implements PrintableStruct, StructElements {
     public boolean getOwnerImmutableFlag() { return (getOwnerFlags() & MASK_OWNER_IMMUTABLE) != 0; }
     public boolean getOwnerAppendFlag()    { return (getOwnerFlags() & MASK_OWNER_APPEND)    != 0; }
     public boolean getOwnerOpaqueFlag()    { return (getOwnerFlags() & MASK_OWNER_OPAQUE)    != 0; }
+    public boolean getOwnerCompressedFlag() {
+        return (getOwnerFlags() & MASK_OWNER_COMPRESSED) != 0;
+    }
 
     public byte getFileModeFileType() {
 	int type = (getFileMode() >> 12) & 017;
