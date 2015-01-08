@@ -1845,7 +1845,7 @@ public class FileSystemBrowserWindow extends JFrame {
     {
         if(!deepExists(outDir)) {
             String[] options = new String[]{"Create directory", "Cancel"};
-            int reply = JOptionPane.showOptionDialog(this, "Warning! Target " +
+            int reply = JOptionPane.showOptionDialog(this, "Target " +
                     "directory:\n    \"" + outDir.getAbsolutePath() + "\"\n" +
                     "does not exist. Do you want to create this directory?",
                     "Warning", JOptionPane.YES_NO_CANCEL_OPTION,

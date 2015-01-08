@@ -245,8 +245,8 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
         };
 
         int reply = JOptionPane.showOptionDialog(parentComponent,
-                "Warning! Directory:\n    \"" + directory.getAbsolutePath() +
-                "\"\n" + "already exists.", "Warning",
+                "Directory:\n    \"" + directory.getAbsolutePath() + "\"\n" +
+                "already exists.", "Warning",
                 JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,
                 null, options, options[0]);
 
@@ -289,8 +289,8 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
         };
 
         int reply = JOptionPane.showOptionDialog(parentComponent,
-                "Warning! File:\n    \"" + file.getAbsolutePath() + "\"\n" +
-                "already exists.", "Warning", JOptionPane.YES_NO_CANCEL_OPTION,
+                "File:\n    \"" + file.getAbsolutePath() + "\"\nalready " +
+                "exists.", "Warning", JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 
         switch(reply) {
