@@ -441,7 +441,7 @@ public class Java7Util {
         Method fileSystemGetPathMethod =
                 fileSystemClass.getMethod("getPath", String.class,
                 String[].class);
-        Method fileSystemsCreateSymbolicLinkMethod =
+        Method filesCreateSymbolicLinkMethod =
                 filesClass.getMethod("createSymbolicLink", pathClass,
                 pathClass, emptyFileAttributeArray.getClass());
 
@@ -464,7 +464,7 @@ public class Java7Util {
 
         /* java.nio.file.Files.createSymbolicLink(linkPath, targetPath); */
         try {
-            fileSystemsCreateSymbolicLinkMethod.invoke(null, linkPathObject,
+            filesCreateSymbolicLinkMethod.invoke(null, linkPathObject,
                     targetPathObject, emptyFileAttributeArray);
         } catch(InvocationTargetException e) {
             final Throwable cause = e.getCause();
