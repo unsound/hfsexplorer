@@ -2127,7 +2127,8 @@ public class FileSystemBrowserWindow extends JFrame {
         }
     }
 
-    private void extractFile(final FSFile rec, final File outDir, final ExtractProgressMonitor progressDialog,
+    private void extractEntry(final FSEntry rec, final File outDir,
+            final ExtractProgressMonitor progressDialog,
             final LinkedList<String> errorMessages, final ExtractProperties extractProperties,
             final ObjectContainer<Boolean> skipDirectory,
             final boolean extractAdditionalForks)
@@ -2173,8 +2174,15 @@ public class FileSystemBrowserWindow extends JFrame {
                     return;
                 }
             }
+            else if(rec instanceof FSFile) {
+                totalForkSize = ((FSFile) rec).getMainFork().getLength();
+            }
+            else if(rec instanceof FSLink) {
+                totalForkSize = 0;
+            }
             else {
-                totalForkSize = rec.getMainFork().getLength();
+                /* Nothing to extract. */
+                return;
             }
 
             progressDialog.updateCurrentFile(curFileName, totalForkSize);
@@ -2194,8 +2202,15 @@ public class FileSystemBrowserWindow extends JFrame {
                 }
 
                 if(a == FileExistsAction.OVERWRITE) {
+                    if(!outFile.delete()) {
+                        continue;
+                    }
                 }
                 else if(a == FileExistsAction.OVERWRITE_ALL) {
+                    if(!outFile.delete()) {
+                        continue;
+                    }
+
                     extractProperties.setFileExistsAction(FileExistsAction.OVERWRITE);
                     defaultFileExistsAction = FileExistsAction.OVERWRITE;
                 }
@@ -2234,6 +2249,7 @@ public class FileSystemBrowserWindow extends JFrame {
             }
 
             FileOutputStream fos = null;
+            boolean extracted = false;
             try {
 // 		    try {
 // 			PrintStream p = System.out;
@@ -2257,15 +2273,37 @@ public class FileSystemBrowserWindow extends JFrame {
                 if(!outFile.getParentFile().equals(outDir) || !outFile.getName().equals(curFileName)) {
                     throw new FileNotFoundException();
                 }
-                fos = new FileOutputStream(outFile);
+
                 if(extractAdditionalForks) {
+                    fos = new FileOutputStream(outFile);
                     extractAdditionalForksToAppleDoubleStream(rec, fos,
                             progressDialog);
                 }
-                else {
-                    extractForkToStream(rec.getMainFork(), fos, progressDialog);
+                else if(rec instanceof FSFile) {
+                    fos = new FileOutputStream(outFile);
+                    extractForkToStream(((FSFile) rec).getMainFork(), fos,
+                            progressDialog);
                 }
-                fos.close();
+                else if(rec instanceof FSLink) {
+                    if(Java7Util.isJava7OrHigher()) {
+                        Java7Util.createSymbolicLink(outFile.getPath(),
+                                ((FSLink) rec).getLinkTargetString());
+                    }
+                    else {
+                        /* Create the link in OS-specific way? Need native code
+                         * for that... unless we create a new 'ln -s' process,
+                         * but it will be slow... UNLESS we thread it out, and
+                         * don't wait for it to finish. OK, flooding the OS with
+                         * ln processes isn't good either... */
+                    }
+                }
+
+                extracted = true;
+
+                if(fos != null) {
+                    fos.close();
+                    fos = null;
+                }
 
                 if(curFileName != (Object) originalFileName && !curFileName.equals(originalFileName))
                     errorMessages.addLast("File \"" + originalFileName +
@@ -2389,8 +2427,16 @@ public class FileSystemBrowserWindow extends JFrame {
             }
             finally {
                 if(fos != null) {
-                    /* If "fos" is non-null, then the file should exist. It
-                     * should have been created when "fos" was initialized. */
+                    try {
+                        fos.close();
+                    } catch(IOException ex) {
+                        ex.printStackTrace();
+                    }
+
+                    fos = null;
+                }
+
+                if(extracted) {
                     setExtractedEntryAttributes(outFile, rec, errorMessages);
                 }
             }
@@ -2399,69 +2445,6 @@ public class FileSystemBrowserWindow extends JFrame {
         }
 
         //return errorCount;
-    }
-
-    private void extractLink(final FSLink fsl, final File outDir,
-            final ExtractProgressMonitor pm,
-            final LinkedList<String> errorMessages,
-            final ExtractProperties extractProperties)
-    {
-        final File linkFile = new File(outDir, fsl.getName());
-
-        final UnhandledExceptionAction defaultUnhandledExceptionAction =
-                extractProperties.getUnhandledExceptionAction();
-
-        try {
-            if(Java7Util.isJava7OrHigher()) {
-                    Java7Util.createSymbolicLink(linkFile.getPath(),
-                            fsl.getLinkTargetString());
-            }
-            else {
-                /* Create the link in OS-specific way? Need native code for
-                 * that... unless we create a new 'ln -s' process, but it will
-                 * be slow... UNLESS we thread it out, and don't wait for it to
-                 * finish. OK, flooding the OS with ln processes isn't good
-                 * either... */
-            }
-
-            setExtractedEntryAttributes(linkFile, fsl, errorMessages);
-        } catch(Exception e) {
-            final String message =
-                    "Exception while attempting to create symbolic link " +
-                    "\"" + linkFile.getPath() + "\" with target " +
-                    "\"" + fsl.getLinkTargetString() + "\"";
-
-            System.err.println(message + ":");
-            e.printStackTrace();
-
-            errorMessages.add(message + ". See debug console for more info.");
-
-            UnhandledExceptionAction a;
-            if(defaultUnhandledExceptionAction ==
-                    UnhandledExceptionAction.PROMPT_USER)
-            {
-                a = pm.unhandledException(fsl.getName(), e);
-            }
-            else {
-                a = defaultUnhandledExceptionAction;
-            }
-
-            if(a == UnhandledExceptionAction.ABORT) {
-                pm.signalCancel();
-            }
-            else if(a == UnhandledExceptionAction.CONTINUE ||
-                    a == UnhandledExceptionAction.ALWAYS_CONTINUE)
-            {
-                if(a == UnhandledExceptionAction.ALWAYS_CONTINUE) {
-                    extractProperties.setUnhandledExceptionAction(
-                            UnhandledExceptionAction.CONTINUE);
-                }
-            }
-            else {
-                throw new RuntimeException("Internal error! Did not expect a " +
-                        a + " here.");
-            }
-        }
     }
 
     /**
@@ -2745,6 +2728,13 @@ public class FileSystemBrowserWindow extends JFrame {
         public void endDirectory(String[] parentPath, FSFolder folder) {
             File outDir = outDirStack.removeLast();
 
+            /* Extract any extended attributes into an AppleDouble file in
+             * outDir's parent. */
+            if(extractAdditionalForks) {
+                extractEntry(folder, outDirStack.getLast(), pm, errorMessages,
+                        extractProperties, skipDirectory, true);
+            }
+
             /* Finally reset the attributes of the directory to the attributes
              * of the FSFolder to make sure that times, mode, ownership, etc.
              * matches what we have in the file system (provided that there is
@@ -2762,12 +2752,12 @@ public class FileSystemBrowserWindow extends JFrame {
             File outDir = outDirStack.getLast();
 
             if(extractMainFork) {
-                extractFile(fsf, outDir, pm, errorMessages, extractProperties,
+                extractEntry(fsf, outDir, pm, errorMessages, extractProperties,
                         skipDirectory, false);
             }
 
             if(extractAdditionalForks) {
-                extractFile(fsf, outDir, pm, errorMessages, extractProperties,
+                extractEntry(fsf, outDir, pm, errorMessages, extractProperties,
                         skipDirectory, true);
             }
         }
@@ -2776,7 +2766,14 @@ public class FileSystemBrowserWindow extends JFrame {
         public void link(FSLink fsl) {
             File outDir = outDirStack.getLast();
 
-            extractLink(fsl, outDir, pm, errorMessages, extractProperties);
+            extractEntry(fsl, outDir, pm, errorMessages, extractProperties,
+                    skipDirectory, false);
+
+            /* Extract any extended attributes belonging to the link itself. */
+            if(extractAdditionalForks) {
+                extractEntry(fsl, outDir, pm, errorMessages, extractProperties,
+                        skipDirectory, true);
+            }
         }
 
         @Override
