@@ -1824,6 +1824,12 @@ public class FileSystemBrowserWindow extends JFrame {
             return false; // We trust that Java never returns false negatives.
 
         File parentDir = f.getParentFile();
+        if(parentDir == null) {
+            /* There is no parent, so this must be one of the file system
+             * roots (which definitely exists). */
+            return true;
+        }
+
         for(File child : parentDir.listFiles()) {
             if(child.getName().equals(f.getName()))
                 return true;
