@@ -158,9 +158,37 @@ public class Java7Util {
         Method basicFileAttributeViewSetTimesMethod =
                 basicFileAttributeViewClass.getMethod("setTimes", fileTimeClass,
                 fileTimeClass, fileTimeClass);
-        basicFileAttributeViewSetTimesMethod.invoke(attrViewObject,
-                lastModifiedFileTimeObject, lastAccessFileTimeObject,
-                creationFileTimeObject);
+        try {
+            basicFileAttributeViewSetTimesMethod.invoke(attrViewObject,
+                    lastModifiedFileTimeObject, lastAccessFileTimeObject,
+                    creationFileTimeObject);
+        } catch(InvocationTargetException ex) {
+            final Throwable cause = ex.getCause();
+            if(cause instanceof ClassNotFoundException) {
+                throw (ClassNotFoundException) cause;
+            }
+            else if(cause instanceof NoSuchMethodException) {
+                throw (NoSuchMethodException) cause;
+            }
+            else if(cause instanceof IllegalAccessException) {
+                throw (IllegalAccessException) cause;
+            }
+            else if(cause instanceof IllegalArgumentException) {
+                throw (IllegalArgumentException) cause;
+            }
+            else if(cause instanceof InvocationTargetException) {
+                throw (InvocationTargetException) cause;
+            }
+            else if(cause instanceof NoSuchFieldException) {
+                throw (NoSuchFieldException) cause;
+            }
+            else if(cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            else {
+                throw ex;
+            }
+        }
     }
 
     public static void setPosixPermissions(String path,
@@ -280,8 +308,36 @@ public class Java7Util {
         Method posixFileAttributeViewSetPermissionMethod =
                 posixFileAttributeViewClass.getMethod("setPermissions",
                 Set.class);
-        posixFileAttributeViewSetPermissionMethod.invoke(attrViewObject,
-                perms);
+        try {
+            posixFileAttributeViewSetPermissionMethod.invoke(attrViewObject,
+                    perms);
+        } catch(InvocationTargetException ex) {
+            final Throwable cause = ex.getCause();
+            if(cause instanceof ClassNotFoundException) {
+                throw (ClassNotFoundException) cause;
+            }
+            else if(cause instanceof NoSuchMethodException) {
+                throw (NoSuchMethodException) cause;
+            }
+            else if(cause instanceof IllegalAccessException) {
+                throw (IllegalAccessException) cause;
+            }
+            else if(cause instanceof IllegalArgumentException) {
+                throw (IllegalArgumentException) cause;
+            }
+            else if(cause instanceof InvocationTargetException) {
+                throw (InvocationTargetException) cause;
+            }
+            else if(cause instanceof NoSuchFieldException) {
+                throw (NoSuchFieldException) cause;
+            }
+            else if(cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            else {
+                throw ex;
+            }
+        }
     }
 
     public static void setPosixOwners(String path, int ownerId, int groupId)
@@ -333,8 +389,30 @@ public class Java7Util {
             filesSetAttributeMethod.invoke(null, pObject, "unix:gid",
                     Integer.valueOf(groupId), linkOptionsArray);
         } catch(InvocationTargetException ex) {
-            if(ex.getCause() instanceof UnsupportedOperationException) {
+            final Throwable cause = ex.getCause();
+            if(cause instanceof UnsupportedOperationException) {
                 /* Do nothing. This is expected on non-UNIX platforms. */
+            }
+            else if(cause instanceof ClassNotFoundException) {
+                throw (ClassNotFoundException) cause;
+            }
+            else if(cause instanceof NoSuchMethodException) {
+                throw (NoSuchMethodException) cause;
+            }
+            else if(cause instanceof IllegalAccessException) {
+                throw (IllegalAccessException) cause;
+            }
+            else if(cause instanceof IllegalArgumentException) {
+                throw (IllegalArgumentException) cause;
+            }
+            else if(cause instanceof InvocationTargetException) {
+                throw (InvocationTargetException) cause;
+            }
+            else if(cause instanceof NoSuchFieldException) {
+                throw (NoSuchFieldException) cause;
+            }
+            else if(cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
             }
             else {
                 throw ex;
@@ -385,7 +463,35 @@ public class Java7Util {
                 targetPathString, new String[0]);
 
         /* java.nio.file.Files.createSymbolicLink(linkPath, targetPath); */
-        fileSystemsCreateSymbolicLinkMethod.invoke(null, linkPathObject,
-                targetPathObject, emptyFileAttributeArray);
+        try {
+            fileSystemsCreateSymbolicLinkMethod.invoke(null, linkPathObject,
+                    targetPathObject, emptyFileAttributeArray);
+        } catch(InvocationTargetException e) {
+            final Throwable cause = e.getCause();
+            if(cause instanceof ClassNotFoundException) {
+                throw (ClassNotFoundException) cause;
+            }
+            else if(cause instanceof NoSuchMethodException) {
+                throw (NoSuchMethodException) cause;
+            }
+            else if(cause instanceof IllegalAccessException) {
+                throw (IllegalAccessException) cause;
+            }
+            else if(cause instanceof IllegalArgumentException) {
+                throw (IllegalArgumentException) cause;
+            }
+            else if(cause instanceof InvocationTargetException) {
+                throw (InvocationTargetException) cause;
+            }
+            else if(cause instanceof NoSuchFieldException) {
+                throw (NoSuchFieldException) cause;
+            }
+            else if(cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            else {
+                throw e;
+            }
+        }
     }
 }

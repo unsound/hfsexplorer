@@ -167,7 +167,13 @@ public class Java6Util extends org.catacombae.util.Java6Util {
         } catch (IllegalArgumentException ex) {
             throw new RuntimeException(ex);
         } catch (InvocationTargetException ex) {
-            throw new RuntimeException(ex);
+            final Throwable cause = ex.getCause();
+            if(cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            else {
+                throw new RuntimeException(ex);
+            }
         }
     }
 
@@ -226,7 +232,13 @@ public class Java6Util extends org.catacombae.util.Java6Util {
         } catch (IllegalArgumentException ex) {
             throw new RuntimeException(ex);
         } catch (InvocationTargetException ex) {
-            throw new RuntimeException(ex);
+            final Throwable cause = ex.getCause();
+            if(cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            else {
+                throw new RuntimeException(ex);
+            }
         }
     }
 }
