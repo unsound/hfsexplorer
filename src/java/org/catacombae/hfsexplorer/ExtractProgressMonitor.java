@@ -119,7 +119,17 @@ public interface ExtractProgressMonitor extends ProgressMonitor {
 
     public static enum CreateDirectoryFailedAction { PROMPT_USER, SKIP_DIRECTORY, RENAME, AUTO_RENAME, CANCEL }
     public static enum CreateFileFailedAction { PROMPT_USER, SKIP_FILE, SKIP_DIRECTORY, RENAME, AUTO_RENAME, CANCEL }
-    public static enum DirectoryExistsAction { PROMPT_USER, CONTINUE, SKIP_DIRECTORY, RENAME, AUTO_RENAME, CANCEL }
+
+    public static enum DirectoryExistsAction {
+        PROMPT_USER,
+        CONTINUE,
+        ALWAYS_CONTINUE,
+        SKIP_DIRECTORY,
+        RENAME,
+        AUTO_RENAME,
+        CANCEL,
+    }
+
     public static enum FileExistsAction { PROMPT_USER, SKIP_FILE, SKIP_DIRECTORY, OVERWRITE, OVERWRITE_ALL, RENAME, AUTO_RENAME, CANCEL }
     public static enum UnhandledExceptionAction {
         PROMPT_USER,

@@ -2638,6 +2638,10 @@ public class FileSystemBrowserWindow extends JFrame {
                     switch(a) {
                         case CONTINUE:
                             break;
+                        case ALWAYS_CONTINUE:
+                            extractProperties.setDirectoryExistsAction(
+                                    DirectoryExistsAction.CONTINUE);
+                            break;
                         case RENAME:
                             dirName = pm.displayRenamePrompt(curDirName, outDir);
                             if(dirName == null)

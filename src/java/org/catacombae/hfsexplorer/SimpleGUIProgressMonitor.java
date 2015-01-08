@@ -20,6 +20,7 @@ package org.catacombae.hfsexplorer;
 import java.awt.Component;
 import java.io.File;
 import javax.swing.JOptionPane;
+import org.catacombae.hfsexplorer.ExtractProgressMonitor.DirectoryExistsAction;
 import org.catacombae.hfsexplorer.ExtractProgressMonitor.ExtractProperties;
 
 /**
@@ -225,12 +226,22 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
      * @param parentComponent the parent component of the user prompt dialog
      * box.
      * @param directory the directory for which this prompt was triggered.
-     * @return one of CONTINUE, SKIP_DIRECTORY, RENAME, AUTO_RENAME or CANCEL.
+     * @return one of {@link DirectoryExistsAction#CONTINUE CONTINUE},
+     *     {@link DirectoryExistsAction#ALWAYS_CONTINUE ALWAYS_CONTINUE},
+     *     {@link DirectoryExistsAction#SKIP_DIRECTORY SKIP_DIRECTORY},
+     *     {@link DirectoryExistsAction#RENAME RENAME},
+     *     {@link DirectoryExistsAction#AUTO_RENAME AUTO_RENAME} or
+     *     {@link DirectoryExistsAction#CANCEL CANCEL}.
      */
     public static DirectoryExistsAction directoryExists(
             Component parentComponent, File directory) {
         String[] options = new String[] {
-            "Continue", "Rename", "Skip directory", "Auto-rename", "Cancel"
+            "Continue",
+            "Always continue",
+            "Rename",
+            "Skip directory",
+            "Auto-rename",
+            "Cancel"
         };
 
         int reply = JOptionPane.showOptionDialog(parentComponent,
@@ -243,10 +254,12 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
             case 0:
                 return DirectoryExistsAction.CONTINUE;
             case 1:
-                return DirectoryExistsAction.RENAME;
+                return DirectoryExistsAction.ALWAYS_CONTINUE;
             case 2:
-                return DirectoryExistsAction.SKIP_DIRECTORY;
+                return DirectoryExistsAction.RENAME;
             case 3:
+                return DirectoryExistsAction.SKIP_DIRECTORY;
+            case 4:
                 return DirectoryExistsAction.AUTO_RENAME;
             default:
                 return DirectoryExistsAction.CANCEL;
