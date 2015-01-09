@@ -63,13 +63,22 @@ public class HFSOriginalVolume extends HFSVolume {
 
         super(hfsFile, cachingEnabled);
 
+        final MasterDirectoryBlock mdb = getHFSMasterDirectoryBlock();
+        if(mdb.getDrSigWord() != MasterDirectoryBlock.SIGNATURE_HFS) {
+            throw new RuntimeException("Invalid volume header signature " +
+                    "(expected: 0x" +
+                    Util.toHexStringBE(MasterDirectoryBlock.SIGNATURE_HFS) +
+                    " actual: 0x" + Util.toHexStringBE(mdb.getDrSigWord()) +
+                    ").");
+        }
+
         this.stringCodec = new MutableStringCodec<CharsetStringCodec>(
                 new CharsetStringCodec(encodingName));
 
         this.allocationFile = createAllocationFile();
     }
 
-    public MasterDirectoryBlock getHFSMasterDirectoryBlock() {
+    public final MasterDirectoryBlock getHFSMasterDirectoryBlock() {
         byte[] currentBlock = new byte[512];
         hfsFile.readFrom(1024, currentBlock);
         return new MasterDirectoryBlock(currentBlock, 0);

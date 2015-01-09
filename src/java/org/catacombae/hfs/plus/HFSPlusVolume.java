@@ -65,13 +65,26 @@ public class HFSPlusVolume extends HFSVolume {
 
     public HFSPlusVolume(ReadableRandomAccessStream hfsFile,
             boolean cachingEnabled) {
+        this(hfsFile, cachingEnabled, HFSPlusVolumeHeader.SIGNATURE_HFS_PLUS);
+    }
 
+    protected HFSPlusVolume(ReadableRandomAccessStream hfsFile,
+            boolean cachingEnabled, short volumeHeaderSignature)
+    {
         super(hfsFile, cachingEnabled);
+
+        final HFSPlusVolumeHeader volumeHeader = getHFSPlusVolumeHeader();
+        if(volumeHeader.getSignature() != volumeHeaderSignature) {
+            throw new RuntimeException("Invalid volume header signature " +
+                    "(expected: 0x" +
+                    Util.toHexStringBE(volumeHeaderSignature) + " actual: 0x" +
+                    Util.toHexStringBE(volumeHeader.getSignature()) + ").");
+        }
 
         this.allocationFile = createAllocationFile();
         this.journal = new HFSPlusJournal(this);
 
-        if(getHFSPlusVolumeHeader().getAttributesFile().getExtents().
+        if(volumeHeader.getAttributesFile().getExtents().
                 getExtentDescriptors()[0].getBlockCount() == 0)
         {
             /* TODO: Is this even valid? */
@@ -86,7 +99,7 @@ public class HFSPlusVolume extends HFSVolume {
         return hfsFile;
     }
 
-    public HFSPlusVolumeHeader getHFSPlusVolumeHeader() {
+    public final HFSPlusVolumeHeader getHFSPlusVolumeHeader() {
         //System.err.println("getHFSPlusVolumeHeader()");
 	byte[] currentBlock = new byte[512];
         //System.err.println("  hfsFile.seek(" + (fsOffset + 1024) + ")");

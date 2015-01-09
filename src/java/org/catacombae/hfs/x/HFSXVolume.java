@@ -30,6 +30,7 @@ import org.catacombae.hfs.types.hfsplus.HFSUniStr255;
 import org.catacombae.hfs.types.hfsx.HFSXCatalogKey;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfs.plus.HFSPlusVolume;
+import org.catacombae.hfs.types.hfsplus.HFSPlusVolumeHeader;
 
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
@@ -40,7 +41,7 @@ public class HFSXVolume extends HFSPlusVolume {
     public HFSXVolume(ReadableRandomAccessStream hfsFile,
             boolean cachingEnabled) {
 
-        super(hfsFile, cachingEnabled);
+        super(hfsFile, cachingEnabled, HFSPlusVolumeHeader.SIGNATURE_HFSX);
 
         CommonBTHeaderRecord.CompareType keyCompareTypeEnum =
                 getCatalogFile().getCatalogHeaderNode().getHeaderRecord().
