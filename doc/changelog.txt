@@ -2,6 +2,35 @@ HFSExplorer Changelog
 ---------------------
 
 
+0.23
+----
+- Feature: Support for files compressed with HFS+ compression methods 3 and 4
+  (introduced starting with Mac OS X 10.6). Compressed files are indicated with
+  blue colour in HFSExplorer.
+
+- Feature: Support in HFSExplorer for extracting extended attributes to
+  AppleDouble files.
+
+- Feature: Support for Mac OS X sparse image (.sparseimage) files.
+
+- Enhancement: Add support for UDIF images larger than 2 GiB.
+
+- Bugfix: Fix regressions in the UDIF XML and zlib-compression code which broke
+  UDIF image support.
+
+- Bugfix: Fix broken parsing of non-ASCII XML data in UDIF file.
+
+- Bugfix: Fix incorrect data being extracted for multiple-extent files.
+
+- Bugfix: Windows installer now installs HFSExplorer shortcuts in 'All users'
+  instead of the user-specific start menu directory.
+
+- Bugfix: Windows uninstaller didn't clean up files in newly added directories.
+
+- Many other small fixes. See the git log for more info:
+  https://github.com/unsound/hfsexplorer/releases/tag/hfsexplorer-0.23
+
+
 0.22.1
 ------
 - Feature: The "Load file system from device" dialog is enabled for non-Windows

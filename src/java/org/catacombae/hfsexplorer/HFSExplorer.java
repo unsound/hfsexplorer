@@ -55,9 +55,9 @@ import org.catacombae.util.Util.Pair;
 
 @SuppressWarnings("deprecation") // TODO: Fix HFSExplorer so it doesn't use deprecated methods...
 public class HFSExplorer {
-    public static final String VERSION = "0.22.1";
+    public static final String VERSION = "0.23";
     public static final String COPYRIGHT =
-            "Copyright \u00A9 Erik Larsson 2006-2014";
+            "Copyright \u00A9 Erik Larsson 2006-2015";
     public static final String[] NOTICES = {
         "This program is distributed under the GNU General Public License version 3.",
         "See <http://www.gnu.org/copyleft/gpl.html> for the details.",
