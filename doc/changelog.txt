@@ -193,7 +193,8 @@ HFSExplorer Changelog
   previously due to incorrect assumptions about input data.
 
 - Bugfix: Caching layer was suffering from a logic error, mostly encountered
-  when reading very small filesystems (such as disk images), which then could not be loaded.
+  when reading very small filesystems (such as disk images), which then could
+  not be loaded.
 
 - Bugfix: Autodetect failed for some MBR partitioned drives.
 
