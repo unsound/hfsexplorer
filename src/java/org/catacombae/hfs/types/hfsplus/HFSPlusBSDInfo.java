@@ -268,6 +268,8 @@ public class HFSPlusBSDInfo implements PrintableStruct, StructElements {
         final Dictionary ownerFlagsDict;
         {
             DictionaryBuilder dbOwnerFlags = new DictionaryBuilder("UInt8");
+            dbOwnerFlags.addFlag("compressed", ownerFlags, 5,
+                    "File is compressed");
             dbOwnerFlags.addFlag("opaque", ownerFlags, 3, "Directory is opaque");
             dbOwnerFlags.addFlag("append", ownerFlags, 2, "Writes to file may only append");
             dbOwnerFlags.addFlag("immutable", ownerFlags, 1, "File may not be changed");
