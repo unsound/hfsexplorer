@@ -43,6 +43,15 @@ public interface FSFork {
     public abstract long getLength();
 
     /**
+     * Returns the number of bytes that this fork occupies on disk. This may be
+     * larger or smaller than the length of the fork, depending on the
+     * allocation strategy and whether compression is applied.
+     *
+     * @return the number of bytes that this fork occupies on disk.
+     */
+    public abstract long getOccupiedSize();
+
+    /**
      * Returns whether or not the underlying implementation allows writing to
      * this fork. If this method returns true, you can use the methods:
      * <ul>

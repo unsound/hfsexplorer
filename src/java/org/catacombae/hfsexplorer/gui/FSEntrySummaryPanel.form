@@ -26,9 +26,11 @@
                           <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="occupiedSizeLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="occupiedSizeField" alignment="0" pref="305" max="32767" attributes="0"/>
                           <Component id="sizeField" alignment="0" pref="305" max="32767" attributes="0"/>
                           <Component id="typeField" alignment="0" pref="305" max="32767" attributes="0"/>
                           <Component id="nameField" alignment="0" pref="305" max="32767" attributes="0"/>
@@ -56,6 +58,11 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="sizeField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="occupiedSizeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="occupiedSizeField" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jSeparator1" min="-2" max="-2" attributes="0"/>
@@ -103,6 +110,21 @@
       <Properties>
         <Property name="editable" type="boolean" value="false"/>
         <Property name="text" type="java.lang.String" value="jTextField3"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+        <Property name="opaque" type="boolean" value="false"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="occupiedSizeLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Size on disk:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="occupiedSizeField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="text" type="java.lang.String" value="occupiedSizeField"/>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="null"/>
         </Property>

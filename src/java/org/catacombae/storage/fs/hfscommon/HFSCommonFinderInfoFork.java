@@ -48,6 +48,10 @@ public class HFSCommonFinderInfoFork implements FSFork {
         return 32;
     }
 
+    public long getOccupiedSize() {
+        return 32;
+    }
+
     public boolean isWritable() {
         return false;
     }

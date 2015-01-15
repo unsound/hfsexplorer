@@ -23,11 +23,16 @@ import org.catacombae.hfs.types.hfsplus.HFSPlusExtentDescriptor;
 import org.catacombae.hfs.types.hfsplus.HFSPlusForkData;
 import org.catacombae.hfs.types.hfs.ExtDataRec;
 import org.catacombae.hfs.types.hfs.ExtDescriptor;
+import org.catacombae.util.Util;
 
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class CommonHFSForkData implements PrintableStruct {
+    public abstract boolean hasTotalBlocks();
+
+    public abstract long getTotalBlocks();
+
     public abstract long getLogicalSize();
 
     public abstract CommonHFSExtentDescriptor[] getBasicExtents();
@@ -47,6 +52,15 @@ public abstract class CommonHFSForkData implements PrintableStruct {
         public HFSImplementation(ExtDataRec edr, long logicalSize) {
             this.edr = edr;
             this.logicalSize = logicalSize;
+        }
+
+        public final boolean hasTotalBlocks() {
+            return false;
+        }
+
+        public final long getTotalBlocks() {
+            throw new UnsupportedOperationException("Information about the " +
+                    "total number of blocks in a fork does not exist in HFS.");
         }
 
         public long getLogicalSize() {
@@ -78,6 +92,14 @@ public abstract class CommonHFSForkData implements PrintableStruct {
 
         public HFSPlusImplementation(HFSPlusForkData hper) {
             this.hper = hper;
+        }
+
+        public final boolean hasTotalBlocks() {
+            return true;
+        }
+
+        public final long getTotalBlocks() {
+            return Util.unsign(hper.getTotalBlocks());
         }
 
         public long getLogicalSize() {

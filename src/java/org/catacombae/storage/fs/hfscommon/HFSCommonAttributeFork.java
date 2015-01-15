@@ -84,6 +84,31 @@ public class HFSCommonAttributeFork implements FSFork {
         return length;
     }
 
+    public long getOccupiedSize() {
+        final HFSPlusAttributesLeafRecordData firstRecordData =
+                recordList[0].getRecordData();
+        final long occupiedSize;
+
+        if(firstRecordData instanceof HFSPlusAttributesData) {
+            HFSPlusAttributesData attributesData =
+                    (HFSPlusAttributesData) firstRecordData;
+            occupiedSize = attributesData.getAttrSize();
+        }
+        else if(firstRecordData instanceof HFSPlusAttributesForkData) {
+            HFSPlusAttributesForkData attributesForkData =
+                    (HFSPlusAttributesForkData) firstRecordData;
+            occupiedSize = attributesForkData.getTheFork().getTotalBlocks() *
+                    parent.fsHandler.getFSView().getVolumeHeader().
+                    getAllocationBlockSize();
+        }
+        else {
+            throw new RuntimeException("Unexpected record type of first " +
+                    "record: " + firstRecordData.getClass());
+        }
+
+        return occupiedSize;
+    }
+
     public boolean isWritable() {
         return false;
     }

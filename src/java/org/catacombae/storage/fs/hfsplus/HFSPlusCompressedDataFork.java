@@ -60,6 +60,9 @@ public class HFSPlusCompressedDataFork implements FSFork {
     private boolean lengthValid = false;
     private long length = 0;
 
+    private boolean occupiedSizeValid = false;
+    private long occupiedSize = 0;
+
     HFSPlusCompressedDataFork(FSFork decmpfsFork, FSFork resourceFork) {
         this.decmpfsFork = decmpfsFork;
         this.resourceFork = resourceFork;
@@ -105,6 +108,71 @@ public class HFSPlusCompressedDataFork implements FSFork {
         }
 
         return length;
+    }
+
+    public synchronized long getOccupiedSize() {
+        if(!occupiedSizeValid) {
+            final DecmpfsHeader header = getDecmpfsHeader();
+            final long tmpOccupiedSize;
+
+            switch(header.getRawCompressionType()) {
+                case DecmpfsHeader.COMPRESSION_TYPE_INLINE:
+                    tmpOccupiedSize =
+                            decmpfsFork.getLength() - DecmpfsHeader.STRUCTSIZE;
+                    break;
+                case DecmpfsHeader.COMPRESSION_TYPE_RESOURCE:
+                    ReadableRandomAccessStream resourceForkStream = null;
+                    ResourceForkReader r = null;
+                    try {
+                        resourceForkStream =
+                            resourceFork.getReadableRandomAccessStream();
+                        r = new ResourceForkReader(resourceForkStream);
+
+                        final ResourceMap m = r.getResourceMap();
+                        Long resourceDataLength = null;
+
+                        for(ResourceType t : m.getResourceTypeList()) {
+                            if(!Util.toASCIIString(t.getType()).equals("cmpf"))
+                            {
+                                continue;
+                            }
+
+                            final ReferenceListEntry[] entries =
+                                    m.getReferencesByType(t);
+                            if(entries.length != 1) {
+                                throw new RuntimeException("More than one " +
+                                        "instance (" + entries.length + ") " +
+                                        "of resource type 'cmpf'.");
+                            }
+
+                            resourceDataLength = r.getDataLength(entries[0]);
+                        }
+
+                        if(resourceDataLength == null) {
+                            throw new RuntimeException("No 'cmpf' resource " +
+                                    "found in resource fork.");
+                        }
+
+                        tmpOccupiedSize = resourceDataLength;
+                    } finally {
+                        if(r != null) {
+                            r.close();
+                        }
+                        else if(resourceForkStream != null) {
+                            resourceForkStream.close();
+                        }
+                    }
+                    break;
+                default:
+                    throw new RuntimeException("Unsupported compression type " +
+                            header.getCompressionType());
+            }
+
+            occupiedSize = tmpOccupiedSize;
+            occupiedSizeValid = true;
+        }
+
+        return occupiedSize;
     }
 
     public boolean isWritable() {

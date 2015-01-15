@@ -66,6 +66,22 @@ public class HFSCommonFSFork implements FSFork {
         return forkData.getLogicalSize();
     }
 
+    public long getOccupiedSize() {
+        final long blockSize =
+                parent.fsHandler.getFSView().getVolumeHeader().
+                getAllocationBlockSize();
+        final long forkBlocks;
+        if(forkData.hasTotalBlocks()) {
+            forkBlocks = forkData.getTotalBlocks();
+        }
+        else {
+            forkBlocks = (forkData.getLogicalSize() + blockSize - 1) /
+                    blockSize;
+        }
+
+        return forkBlocks * blockSize;
+    }
+
     /* @Override */
     public boolean isWritable() {
         return false; // Will be implemented in the future

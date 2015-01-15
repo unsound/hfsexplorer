@@ -59,7 +59,7 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
      * - Type (Folder, Link or File)
      * - Size can be derived from all FSEntries (through recursive search or by looking up a file
      *   entry) and should be considered a must-have field.
-     * - (Size on disk)
+     * - Size on disk.
      *
      * An FSEntry may optionally have:
      * - Various date variables.
@@ -132,15 +132,19 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
         nameField.setText(entry.getName());
         final String typeString;
         final String sizeString;
+        final String occupiedSizeString;
         if(entry instanceof FSFile) {
             FSFile file = (FSFile) entry;
             typeString= "File";
             sizeString = getSizeString(file.getMainFork().getLength());
+            occupiedSizeString =
+                    getSizeString(file.getMainFork().getOccupiedSize());
         }
         else if(entry instanceof FSFolder) {
             FSFolder folder = (FSFolder) entry;
             typeString = "Folder";
             sizeString = "Calculating...";
+            occupiedSizeString = "Calculating...";
             startFolderSizeCalculation(folder);
         }
         else if(entry instanceof FSLink) {
@@ -149,30 +153,37 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
             if(linkTarget == null) {
                 typeString = "Symbolic link (broken)";
                 sizeString = "- (broken link)";
+                occupiedSizeString = "- (broken link)";
             }
             else if(linkTarget instanceof FSFile) {
                 FSFile file = (FSFile) linkTarget;
                 typeString = "Symbolic link (file)";
                 sizeString = getSizeString(file.getMainFork().getLength());
+                occupiedSizeString =
+                        getSizeString(file.getMainFork().getOccupiedSize());
             }
             else if(linkTarget instanceof FSFolder) {
                 FSFolder folder = (FSFolder) linkTarget;
                 typeString = "Symbolic link (folder)";
                 sizeString = "Calculating...";
+                occupiedSizeString = "Calculating...";
                 startFolderSizeCalculation(folder);
             }
             else {
                 typeString = "Symbolic link (unknown [" +
                         linkTarget.getClass() + "])";
                 sizeString = "- (unknown type)";
+                occupiedSizeString = "- (unknown type)";
             }
         }
         else {
             typeString = "Unknown [" + entry.getClass() + "]";
             sizeString = "- (unknown type)";
+            occupiedSizeString = "- (unknown type)";
         }
         typeField.setText(typeString);
         sizeField.setText(sizeString);
+        occupiedSizeField.setText(occupiedSizeString);
 
 
         FSAttributes attrs = entry.getAttributes();
@@ -218,6 +229,8 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
         typeField = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         sizeField = new javax.swing.JTextField();
+        occupiedSizeLabel = new javax.swing.JLabel();
+        occupiedSizeField = new javax.swing.JTextField();
         jSeparator1 = new javax.swing.JSeparator();
         extendedInfoStackPanel = new javax.swing.JPanel();
 
@@ -241,6 +254,13 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
         sizeField.setBorder(null);
         sizeField.setOpaque(false);
 
+        occupiedSizeLabel.setText("Size on disk:");
+
+        occupiedSizeField.setEditable(false);
+        occupiedSizeField.setText("occupiedSizeField");
+        occupiedSizeField.setBorder(null);
+        occupiedSizeField.setOpaque(false);
+
         extendedInfoStackPanel.setLayout(new javax.swing.BoxLayout(extendedInfoStackPanel, javax.swing.BoxLayout.PAGE_AXIS));
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
@@ -256,9 +276,11 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(jLabel1)
                             .add(jLabel2)
-                            .add(jLabel3))
+                            .add(jLabel3)
+                            .add(occupiedSizeLabel))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(occupiedSizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE)
                             .add(sizeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE)
                             .add(typeField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE)
                             .add(nameField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE))))
@@ -280,6 +302,10 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
                     .add(jLabel3)
                     .add(sizeField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(occupiedSizeLabel)
+                    .add(occupiedSizeField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(extendedInfoStackPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)
@@ -295,6 +321,8 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
     private javax.swing.JLabel jLabel3;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTextField nameField;
+    private javax.swing.JTextField occupiedSizeField;
+    private javax.swing.JLabel occupiedSizeLabel;
     private javax.swing.JTextField sizeField;
     private javax.swing.JTextField typeField;
     // End of variables declaration//GEN-END:variables
@@ -320,28 +348,45 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
 
             /* @Override */
             public void run() {
-                String resultString;
+                String sizeResultString;
+                String occupiedSizeResultString;
                 try {
-                    ObjectContainer<Long> result =
+                    ObjectContainer<Long> sizeResult =
                             new ObjectContainer<Long>((long)0);
-                    calculateFolderSize(folder, result);
-                    resultString = getSizeString(result.o);
+                    ObjectContainer<Long> occupiedSizeResult =
+                            new ObjectContainer<Long>((long)0);
+                    calculateFolderSize(folder, sizeResult, occupiedSizeResult);
+                    sizeResultString = getSizeString(sizeResult.o);
+                    occupiedSizeResultString =
+                            getSizeString(occupiedSizeResult.o);
                 } catch(Exception e) {
                     e.printStackTrace();
-                    resultString = "Exception while calculating! See debug console for info...";
+                    sizeResultString =
+                            "Exception while calculating! See debug console " +
+                            "for info...";
+                    occupiedSizeResultString =
+                            "Exception while calculating! See debug console " +
+                            "for info...";
                 }
 
-                final String finalResultString;
-                if(!cancelSignaled)
-                    finalResultString = resultString;
-                else
-                    finalResultString = "Canceled";
+                final String finalSizeResultString;
+                final String finalOccupiedSizeResultString;
+                if(!cancelSignaled) {
+                    finalSizeResultString = sizeResultString;
+                    finalOccupiedSizeResultString = occupiedSizeResultString;
+                }
+                else {
+                    finalSizeResultString = "Canceled";
+                    finalOccupiedSizeResultString = "Canceled";
+                }
 
                 SwingUtilities.invokeLater(new Runnable() {
 
                     /* @Override */
                     public void run() {
-                        sizeField.setText(finalResultString);
+                        sizeField.setText(finalSizeResultString);
+                        occupiedSizeField.setText(
+                                finalOccupiedSizeResultString);
                     }
                 });
             }
@@ -351,7 +396,10 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
         new Thread(r).start();
     }
 
-    private void calculateFolderSize(FSFolder folder, ObjectContainer<Long> result) {
+    private void calculateFolderSize(FSFolder folder,
+            ObjectContainer<Long> sizeResult,
+            ObjectContainer<Long> occupiedSizeResult)
+    {
         if(cancelSignaled) {
             if(DEBUG) {
                 System.err.println("Calculate process stopping for folder " +
@@ -373,10 +421,14 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
             }
 
             if(entry instanceof FSFile) {
-                result.o = result.o + ((FSFile) entry).getMainFork().getLength();
+                sizeResult.o = sizeResult.o +
+                        ((FSFile) entry).getMainFork().getLength();
+                occupiedSizeResult.o = occupiedSizeResult.o +
+                        ((FSFile) entry).getMainFork().getOccupiedSize();
             }
             else if(entry instanceof FSFolder) {
-                calculateFolderSize((FSFolder) entry, result);
+                calculateFolderSize((FSFolder) entry, sizeResult,
+                        occupiedSizeResult);
             }
             else if(entry instanceof FSLink) {
                 /* Do nothing. Symbolic link targets aren't part of the folder. */
