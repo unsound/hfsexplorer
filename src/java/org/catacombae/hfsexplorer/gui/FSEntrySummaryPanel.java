@@ -135,7 +135,7 @@ public class FSEntrySummaryPanel extends javax.swing.JPanel implements ChainedPa
         final String occupiedSizeString;
         if(entry instanceof FSFile) {
             FSFile file = (FSFile) entry;
-            typeString= "File";
+            typeString = "File";
             sizeString = getSizeString(file.getMainFork().getLength());
             occupiedSizeString =
                     getSizeString(file.getMainFork().getOccupiedSize());
