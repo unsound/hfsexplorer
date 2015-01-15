@@ -43,6 +43,13 @@ public class FileInfoWindow extends JFrame {
     public FileInfoWindow(FSEntry fsEntry, String[] parentPath) {
         super("Info - " + fsEntry.getName());
 
+        if(Java6Util.isJava6OrHigher()) {
+            Java6Util.setIconImages(FileSystemBrowserWindow.WINDOW_ICONS, this);
+        }
+        else {
+            setIconImage(FileSystemBrowserWindow.WINDOW_ICONS[0].getImage());
+        }
+
         JScrollPane summaryPanelScroller = null;
         JScrollPane infoPanelScroller = null;
 

@@ -121,7 +121,7 @@ import org.catacombae.util.Util.Pair;
  */
 public class FileSystemBrowserWindow extends JFrame {
     private static final String TITLE_STRING = "HFSExplorer " + HFSExplorer.VERSION;
-    private static final ImageIcon[] WINDOW_ICONS = {
+    public static final ImageIcon[] WINDOW_ICONS = {
         new ImageIcon(ClassLoader.getSystemResource("res/finderdrive_folderback_16.png")),
         new ImageIcon(ClassLoader.getSystemResource("res/finderdrive_folderback_32.png")),
         new ImageIcon(ClassLoader.getSystemResource("res/finderdrive_folderback_48.png"))

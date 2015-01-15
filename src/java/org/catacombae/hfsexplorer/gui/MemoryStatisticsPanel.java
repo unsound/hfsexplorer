@@ -23,6 +23,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+import org.catacombae.hfsexplorer.FileSystemBrowserWindow;
+import org.catacombae.hfsexplorer.Java6Util;
 import org.catacombae.util.Util;
 
 /**
@@ -109,6 +111,15 @@ public class MemoryStatisticsPanel extends javax.swing.JPanel {
      */
     public static JFrame createMemoryStatisticsWindow() {
         final JFrame memoryStatisticsWindow = new JFrame("Memory statistics");
+
+        if(Java6Util.isJava6OrHigher()) {
+            Java6Util.setIconImages(FileSystemBrowserWindow.WINDOW_ICONS,
+                    memoryStatisticsWindow);
+        }
+        else {
+            memoryStatisticsWindow.setIconImage(
+                    FileSystemBrowserWindow.WINDOW_ICONS[0].getImage());
+        }
 
         final MemoryStatisticsPanel msp = new MemoryStatisticsPanel();
         memoryStatisticsWindow.add(msp);

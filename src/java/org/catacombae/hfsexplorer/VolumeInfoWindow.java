@@ -43,6 +43,13 @@ public class VolumeInfoWindow extends JFrame {
     public VolumeInfoWindow(HFSVolume fsView) {
         super("Volume information");
 
+        if(Java6Util.isJava6OrHigher()) {
+            Java6Util.setIconImages(FileSystemBrowserWindow.WINDOW_ICONS, this);
+        }
+        else {
+            setIconImage(FileSystemBrowserWindow.WINDOW_ICONS[0].getImage());
+        }
+
         final JTabbedPane tabs = new JTabbedPane();
 
 

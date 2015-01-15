@@ -29,6 +29,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import org.catacombae.hfsexplorer.FileSystemBrowserWindow;
+import org.catacombae.hfsexplorer.Java6Util;
 
 /**
  * A simple implemetation of a HTML help browser through Java's standard API.
@@ -131,6 +133,14 @@ public class HelpBrowserPanel extends javax.swing.JPanel {
 
     public static void showHelpBrowserWindow(String iTitle, URL iHomePage) {
         JFrame f = new JFrame(iTitle);
+
+        if(Java6Util.isJava6OrHigher()) {
+            Java6Util.setIconImages(FileSystemBrowserWindow.WINDOW_ICONS, f);
+        }
+        else {
+            f.setIconImage(FileSystemBrowserWindow.WINDOW_ICONS[0].getImage());
+        }
+
         f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         JPanel helpBrowserPanel = new HelpBrowserPanel(iHomePage);
         //helpBrowserPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
