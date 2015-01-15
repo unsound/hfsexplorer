@@ -515,7 +515,7 @@ public class FileSystemBrowserWindow extends JFrame {
         startHelpBrowserItem.addActionListener(new ActionListener() {
             /* @Override */
             public void actionPerformed(ActionEvent ae) {
-                File f = new File("doc/html/index.html");
+                File f = new File("../doc/html/index.html");
                 if(f.exists()) {
                     try {
                         HelpBrowserPanel.showHelpBrowserWindow("HFSExplorer help browser", f.toURI().toURL());
