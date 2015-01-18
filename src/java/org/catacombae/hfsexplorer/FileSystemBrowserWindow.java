@@ -3074,14 +3074,36 @@ public class FileSystemBrowserWindow extends JFrame {
         if(System.getProperty("os.name").toLowerCase().startsWith("mac os x"))
             System.setProperty("apple.laf.useScreenMenuBar", "true");
 
-        try {
-            javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
         /*
          * Description of look&feels:
          *   http://java.sun.com/docs/books/tutorial/uiswing/misc/plaf.html
          */
-        } catch(Exception e) {
-            //It's ok. Non-critical.
+        String lookAndFeelClassName =
+                javax.swing.UIManager.getSystemLookAndFeelClassName();
+        System.out.println("System L&F class name: " + lookAndFeelClassName);
+        if(lookAndFeelClassName.equals(
+                "javax.swing.plaf.metal.MetalLookAndFeel") ||
+                lookAndFeelClassName.equals(
+                "com.sun.java.swing.plaf.motif.MotifLookAndFeel"))
+        {
+            /* Metal and Motif are really quite terrible L&Fs. Try the GTK+ L&F
+             * instead. */
+            try {
+                System.err.println("Attempting to force GTK+ L&F...");
+                javax.swing.UIManager.setLookAndFeel(
+                        "com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+                lookAndFeelClassName = null;
+            } catch(Exception e) {
+                /* Non-critical. */
+            }
+        }
+
+        if(lookAndFeelClassName != null) {
+            try {
+                javax.swing.UIManager.setLookAndFeel(lookAndFeelClassName);
+            } catch(Exception e) {
+                /* Non-critical. */
+            }
         }
 
         int parsedArgs = 0;
