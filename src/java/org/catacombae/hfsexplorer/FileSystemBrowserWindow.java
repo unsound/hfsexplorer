@@ -515,14 +515,16 @@ public class FileSystemBrowserWindow extends JFrame {
         startHelpBrowserItem.addActionListener(new ActionListener() {
             /* @Override */
             public void actionPerformed(ActionEvent ae) {
-                File f = new File("../doc/html/index.html");
-                if(f.exists()) {
-                    try {
-                        HelpBrowserPanel.showHelpBrowserWindow("HFSExplorer help browser", f.toURI().toURL());
-                    } catch(MalformedURLException ex) {
-                        ex.printStackTrace();
-                        Logger.getLogger(FileSystemBrowserWindow.class.getName()).log(Level.WARNING, null, ex);
-                    }
+                try {
+                    URL url = new URL(FileSystemBrowserWindow.class.
+                            getProtectionDomain().getCodeSource().getLocation(),
+                            "../doc/html/index.html");
+                    HelpBrowserPanel.showHelpBrowserWindow("HFSExplorer help " +
+                            "browser", url);
+                } catch(MalformedURLException ex) {
+                    ex.printStackTrace();
+                    Logger.getLogger(FileSystemBrowserWindow.class.getName()).
+                            log(Level.WARNING, null, ex);
                 }
             }
         });
