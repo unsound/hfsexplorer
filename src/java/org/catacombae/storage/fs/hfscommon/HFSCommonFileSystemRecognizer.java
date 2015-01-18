@@ -56,7 +56,11 @@ public class HFSCommonFileSystemRecognizer {
         try {
             bitstream.seek(offset);
             byte[] signatureData = new byte[4096];
-            bitstream.readFully(signatureData);
+            int bytesRead = bitstream.read(signatureData);
+            if(bytesRead < 4096) {
+                return FileSystemType.UNKNOWN;
+            }
+
             short signature = Util.readShortBE(signatureData, 1024);
             switch(signature) {
                 case SIGNATURE_MFS:
