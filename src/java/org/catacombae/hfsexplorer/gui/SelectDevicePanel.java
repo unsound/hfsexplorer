@@ -127,8 +127,7 @@ public class SelectDevicePanel extends javax.swing.JPanel {
                     .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                     .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                         .add(loadButton)
-                        .add(cancelButton))
-                    .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .add(cancelButton)))
             );
         }// </editor-fold>//GEN-END:initComponents
 
