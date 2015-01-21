@@ -21,6 +21,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import org.catacombae.csjc.PrintableStruct;
+import org.catacombae.io.RuntimeIOException;
 import org.catacombae.util.Util;
 import org.catacombae.io.SynchronizedReadableRandomAccess;
 import org.catacombae.util.Util.Pair;
@@ -59,7 +60,15 @@ public class ResourceMap implements PrintableStruct {
 
     public ResourceMap(SynchronizedReadableRandomAccess stream, final long offset) {
         byte[] data = new byte[30];
-        stream.readFullyFrom(offset, data);
+
+        final int bytesRead = stream.readFrom(offset, data);
+        if(bytesRead != data.length) {
+            throw new RuntimeIOException("Error while reading the resource " +
+                    "map header from offset " + offset + " (" +
+                    (bytesRead == -1 ? "End of file" :
+                    (bytesRead + " / " + data.length + " bytes read")) + ").");
+        }
+
         System.arraycopy(data, 0, reserved1, 0, 1 * 16);
         System.arraycopy(data, 16, reserved2, 0, 4);
         System.arraycopy(data, 20, reserved3, 0, 2);
