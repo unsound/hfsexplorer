@@ -30,6 +30,7 @@ import org.catacombae.hfsexplorer.gui.ResourceForkViewPanel;
 import org.catacombae.hfsexplorer.gui.StructViewPanel;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFile;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFolder;
+import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.storage.fs.FSEntry;
 import org.catacombae.storage.fs.FSFile;
 import org.catacombae.storage.fs.FSFork;
@@ -114,9 +115,22 @@ public class FileInfoWindow extends JFrame {
                 FSFile fsFile = (FSFile) fsEntry;
                 FSFork resourceFork = fsFile.getForkByType(FSForkType.MACOS_RESOURCE);
                 if(resourceFork != null && resourceFork.getLength() > 0) {
-                    ResourceForkReader resffReader = new ResourceForkReader(resourceFork.getReadableRandomAccessStream());
-                    ResourceForkViewPanel resffPanel = new ResourceForkViewPanel(resffReader);
-                    tabs.addTab("Resource fork", resffPanel);
+                    ReadableRandomAccessStream s =
+                            resourceFork.getReadableRandomAccessStream();
+                    ResourceForkReader resffReader = null;
+                    try {
+                        resffReader = new ResourceForkReader(s);
+                        ResourceForkViewPanel resffPanel =
+                                new ResourceForkViewPanel(resffReader);
+                        tabs.addTab("Resource fork", resffPanel);
+                    } finally {
+                        if(resffReader != null) {
+                            resffReader.close();
+                        }
+                        else if(s != null) {
+                            s.close();
+                        }
+                    }
                 }
             }
         } catch(Exception e) {
