@@ -41,8 +41,6 @@ public class FileInfoPanel extends javax.swing.JPanel {
     }
 
     public void setFields(HFSPlusCatalogFile cf) {
-        int i;
-
 	recordTypeField.setText("0x" + Util.toHexStringBE(cf.getRecordType()));
 
         //flagsDebugField.setText("0x" + Util.toHexStringBE(cf.getFlags()));
@@ -118,16 +116,31 @@ public class FileInfoPanel extends javax.swing.JPanel {
 	textEncodingField.setText("" + cf.getTextEncoding());
 	reserved2Field.setText("0x" + Util.toHexStringBE(cf.getReserved2()));
 
-	HFSPlusForkData df = cf.getDataFork();
-	dataForkLogicalSizeField.setText("" + df.getLogicalSize() + " bytes");
-	dataForkClumpSizeField.setText("" + df.getClumpSize() + " bytes");
-	dataForkTotalBlocksField.setText("" + df.getTotalBlocks());
+        setForkFields(cf.getDataFork(), dataForkLogicalSizeField,
+                dataForkClumpSizeField, dataForkTotalBlocksField,
+                dataForkExtentsPanel);
 
-        dataForkExtentsPanel.setLayout(new javax.swing.BoxLayout(
-                dataForkExtentsPanel,
+        setForkFields(cf.getResourceFork(), resForkLogicalSizeField,
+                resForkClumpSizeField, resForkTotalBlocksField,
+                resourceForkExtentsPanel);
+    }
+
+    private static void setForkFields(HFSPlusForkData forkData,
+            javax.swing.JTextField forkLogicalSizeField,
+            javax.swing.JTextField forkClumpSizeField,
+            javax.swing.JTextField forkTotalBlocksField,
+            javax.swing.JPanel forkExtentsPanel)
+    {
+        forkLogicalSizeField.setText("" + forkData.getLogicalSize() + " bytes");
+        forkClumpSizeField.setText("" + forkData.getClumpSize() + " bytes");
+        forkTotalBlocksField.setText("" + forkData.getTotalBlocks());
+
+        forkExtentsPanel.setLayout(new javax.swing.BoxLayout(
+                forkExtentsPanel,
                 javax.swing.BoxLayout.Y_AXIS));
-        i = 0;
-        for(HFSPlusExtentDescriptor d : df.getExtents().getExtentDescriptors())
+        int i = 0;
+        for(HFSPlusExtentDescriptor d : forkData.getExtents().
+                getExtentDescriptors())
         {
             if(d.getBlockCount() == 0) {
                 break;
@@ -136,29 +149,7 @@ public class FileInfoPanel extends javax.swing.JPanel {
             StructViewPanel p =
                     new StructViewPanel("Extent " + (i++ + 1),
                     d.getStructElements());
-            dataForkExtentsPanel.add(p);
-        }
-
-	HFSPlusForkData rf = cf.getResourceFork();
-	resForkLogicalSizeField.setText("" + rf.getLogicalSize() + " bytes");
-	resForkClumpSizeField.setText("" + rf.getClumpSize() + " bytes");
-	resForkTotalBlocksField.setText("" + rf.getTotalBlocks());
-
-        resourceForkExtentsPanel.setLayout(new javax.swing.BoxLayout(
-                resourceForkExtentsPanel,
-                javax.swing.BoxLayout.Y_AXIS));
-
-        i = 0;
-        for(HFSPlusExtentDescriptor d : rf.getExtents().getExtentDescriptors())
-        {
-            if(d.getBlockCount() == 0) {
-                break;
-            }
-
-            StructViewPanel p =
-                    new StructViewPanel("Extent " + (i++ + 1),
-                    d.getStructElements());
-            resourceForkExtentsPanel.add(p);
+            forkExtentsPanel.add(p);
         }
     }
 
