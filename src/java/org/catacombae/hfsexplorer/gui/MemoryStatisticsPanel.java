@@ -231,8 +231,7 @@ public class MemoryStatisticsPanel extends javax.swing.JPanel {
                     .add(jLabel4)
                     .add(maxMemoryField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(runGcButton)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .add(runGcButton))
         );
     }// </editor-fold>//GEN-END:initComponents
 
