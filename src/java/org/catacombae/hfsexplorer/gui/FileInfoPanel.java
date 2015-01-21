@@ -25,6 +25,7 @@ import org.catacombae.hfs.types.finder.FileInfo;
 import org.catacombae.util.Util;
 import java.awt.Color;
 import java.text.DateFormat;
+import java.util.LinkedList;
 import org.catacombae.hfs.types.hfsplus.HFSPlusExtentDescriptor;
 
 /**
@@ -125,7 +126,7 @@ public class FileInfoPanel extends javax.swing.JPanel {
                 resourceForkExtentsPanel);
     }
 
-    private static void setForkFields(HFSPlusForkData forkData,
+    private void setForkFields(HFSPlusForkData forkData,
             javax.swing.JTextField forkLogicalSizeField,
             javax.swing.JTextField forkClumpSizeField,
             javax.swing.JTextField forkTotalBlocksField,
@@ -135,10 +136,9 @@ public class FileInfoPanel extends javax.swing.JPanel {
         forkClumpSizeField.setText("" + forkData.getClumpSize() + " bytes");
         forkTotalBlocksField.setText("" + forkData.getTotalBlocks());
 
-        forkExtentsPanel.setLayout(new javax.swing.BoxLayout(
-                forkExtentsPanel,
-                javax.swing.BoxLayout.Y_AXIS));
         int i = 0;
+        LinkedList<InternalStructViewPanel> structViewPanels =
+                new LinkedList<InternalStructViewPanel>();
         for(HFSPlusExtentDescriptor d : forkData.getExtents().
                 getExtentDescriptors())
         {
@@ -146,11 +146,46 @@ public class FileInfoPanel extends javax.swing.JPanel {
                 break;
             }
 
-            StructViewPanel p =
-                    new StructViewPanel("Extent " + (i++ + 1),
+            InternalStructViewPanel p =
+                    new InternalStructViewPanel("Extent " + (i++ + 1) + ":",
                     d.getStructElements());
-            forkExtentsPanel.add(p);
+            structViewPanels.add(p);
         }
+
+        org.jdesktop.layout.GroupLayout forkExtentsPanelLayout =
+                new org.jdesktop.layout.GroupLayout(forkExtentsPanel);
+        forkExtentsPanel.setLayout(forkExtentsPanelLayout);
+
+        org.jdesktop.layout.GroupLayout.ParallelGroup horizontalGroup =
+                forkExtentsPanelLayout.createParallelGroup(
+                org.jdesktop.layout.GroupLayout.LEADING);
+        for(InternalStructViewPanel p : structViewPanels) {
+            horizontalGroup = horizontalGroup.add(p);
+        }
+        horizontalGroup.add(0, 389, Short.MAX_VALUE);
+        forkExtentsPanelLayout.setHorizontalGroup(horizontalGroup);
+
+        org.jdesktop.layout.GroupLayout.SequentialGroup verticalGroup =
+                forkExtentsPanelLayout.createSequentialGroup();
+        if(structViewPanels.size() > 0) {
+            final int preferredGap =
+                    org.jdesktop.layout.LayoutStyle.getSharedInstance().
+                    getPreferredGap(forkTotalBlocksField, forkExtentsPanel,
+                    org.jdesktop.layout.LayoutStyle.RELATED,
+                    javax.swing.SwingConstants.SOUTH, this);
+            verticalGroup = verticalGroup.add(preferredGap);
+        }
+        for(InternalStructViewPanel p : structViewPanels) {
+            verticalGroup = verticalGroup.addPreferredGap(
+                    org.jdesktop.layout.LayoutStyle.RELATED);
+            verticalGroup = verticalGroup.add(p);
+        }
+        forkExtentsPanelLayout.setVerticalGroup(
+            forkExtentsPanelLayout.createParallelGroup(
+            org.jdesktop.layout.GroupLayout.LEADING)
+            .add(verticalGroup)
+            .add(0, 0, Short.MAX_VALUE)
+        );
     }
 
     /** This method is called from within the constructor to
@@ -674,27 +709,9 @@ public class FileInfoPanel extends javax.swing.JPanel {
         reserved1Field.setBorder(null);
         reserved1Field.setOpaque(false);
 
-        org.jdesktop.layout.GroupLayout dataForkExtentsPanelLayout = new org.jdesktop.layout.GroupLayout(dataForkExtentsPanel);
-        dataForkExtentsPanel.setLayout(dataForkExtentsPanelLayout);
-        dataForkExtentsPanelLayout.setHorizontalGroup(
-            dataForkExtentsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 389, Short.MAX_VALUE)
-        );
-        dataForkExtentsPanelLayout.setVerticalGroup(
-            dataForkExtentsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 0, Short.MAX_VALUE)
-        );
+        dataForkExtentsPanel.setLayout(null);
 
-        org.jdesktop.layout.GroupLayout resourceForkExtentsPanelLayout = new org.jdesktop.layout.GroupLayout(resourceForkExtentsPanel);
-        resourceForkExtentsPanel.setLayout(resourceForkExtentsPanelLayout);
-        resourceForkExtentsPanelLayout.setHorizontalGroup(
-            resourceForkExtentsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 389, Short.MAX_VALUE)
-        );
-        resourceForkExtentsPanelLayout.setVerticalGroup(
-            resourceForkExtentsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 0, Short.MAX_VALUE)
-        );
+        resourceForkExtentsPanel.setLayout(null);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -1196,9 +1213,9 @@ public class FileInfoPanel extends javax.swing.JPanel {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel57)
                     .add(dataForkTotalBlocksField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(0, 0, 0)
                 .add(dataForkExtentsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jLabel58)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
@@ -1212,7 +1229,7 @@ public class FileInfoPanel extends javax.swing.JPanel {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel61)
                     .add(resForkTotalBlocksField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(0, 0, 0)
                 .add(resourceForkExtentsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
