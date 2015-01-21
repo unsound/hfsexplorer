@@ -54,13 +54,18 @@ public class ResourceHeader implements StaticStruct, PrintableStruct {
     public static int length() { return STRUCTSIZE; }
 
     /** // Offset from the beginning of the resource fork to the beginning of the resource data. */
-    public int getDataOffset() { return Util.readIntBE(dataOffset); }
+    public long getDataOffset() { return Util.unsign(getRawDataOffset()); }
     /** // Offset from the beginning of the resource fork to the beginning of the resource map. */
-    public int getMapOffset() { return Util.readIntBE(mapOffset); }
+    public long getMapOffset() { return Util.unsign(getRawMapOffset()); }
     /** // Length of resource data. */
-    public int getDataLength() { return Util.readIntBE(dataLength); }
+    public long getDataLength() { return Util.unsign(getRawDataLength()); }
     /** // Length of resource map. */
-    public int getMapLength() { return Util.readIntBE(mapLength); }
+    public long getMapLength() { return Util.unsign(getRawMapLength()); }
+
+    public int getRawDataOffset() { return Util.readIntBE(dataOffset); }
+    public int getRawMapOffset() { return Util.readIntBE(mapOffset); }
+    public int getRawDataLength() { return Util.readIntBE(dataLength); }
+    public int getRawMapLength() { return Util.readIntBE(mapLength); }
 
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " dataOffset: " + getDataOffset());

@@ -70,7 +70,6 @@ public class ReferenceListEntry implements StaticStruct, PrintableStruct {
         System.arraycopy(resourceDataOffset, 0, temp, 1, resourceDataOffset.length);
         return Util.readIntBE(temp);
     }
-
     /** // Reserved for handle to resource. */
     public int getReserved1() { return Util.readIntBE(reserved1); }
 

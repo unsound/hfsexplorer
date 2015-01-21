@@ -74,8 +74,8 @@ public class ResourceMap implements PrintableStruct {
         System.err.println("ResourceMap(): typeCount = " + getTypeCount());
         */
 
-        final long resourceTypeListOffset = Util.unsign(getTypeListOffset());
-        final long resourceNameListOffset = Util.unsign(getNameListOffset());
+        final int resourceTypeListOffset = getTypeListOffset();
+        final int resourceNameListOffset = getNameListOffset();
 
         {
             long curOffset = offset + resourceTypeListOffset + 2; // +2 for typeCount, which is included in the offset
@@ -157,12 +157,22 @@ public class ResourceMap implements PrintableStruct {
     /** // Resource fork attributes */
     public short getResourceForkAttributes() { return Util.readShortBE(resourceForkAttributes); }
     /** // Offset from beginning of map to resource type list. */
-    public short getTypeListOffset() { return Util.readShortBE(typeListOffset); }
+    public int getTypeListOffset() {
+        return Util.unsign(getRawTypeListOffset());
+    }
     /** // Offset from beginning of map to resource name list. */
-    public short getNameListOffset() { return Util.readShortBE(nameListOffset); }
+    public int getNameListOffset() {
+        return Util.unsign(getRawNameListOffset());
+    }
     /** // Number of types in the map minus 1. */
     public short getTypeCount() { return Util.readShortBE(typeCount); }
 
+    public short getRawTypeListOffset() {
+        return Util.readShortBE(typeListOffset);
+    }
+    public short getRawNameListOffset() {
+        return Util.readShortBE(nameListOffset);
+    }
     /** Resource type list. */
     public ResourceType[] getResourceTypeList() {
         return Util.arrayCopy(resourceTypeList, new ResourceType[resourceTypeList.length]);

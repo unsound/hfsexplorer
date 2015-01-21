@@ -53,9 +53,18 @@ public class ResourceType implements StaticStruct, PrintableStruct {
     /** // Resource type. */
     public byte[] getType() { return Util.readByteArrayBE(type); }
     /** // Number of resources of this type in map minus 1. */
-    public short getInstanceCount() { return Util.readShortBE(instanceCount); }
+    public int getInstanceCount() { return Util.unsign(getRawInstanceCount()); }
     /** // Offset from beginning of resource type list to reference list for this type. */
-    public short getReferenceListOffset() { return Util.readShortBE(referenceListOffset); }
+    public int getReferenceListOffset() {
+        return Util.unsign(getRawReferenceListOffset());
+    }
+
+    public short getRawInstanceCount() {
+        return Util.readShortBE(instanceCount);
+    }
+    public short getRawReferenceListOffset() {
+        return Util.readShortBE(referenceListOffset);
+    }
 
     public void printFields(PrintStream ps, String prefix) {
 	ps.println(prefix + " type: " + Util.toASCIIString(getType()));

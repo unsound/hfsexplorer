@@ -80,7 +80,7 @@ public class ResourceForkReader {
 
     public ResourceMap getResourceMap() {
         ResourceHeader header = getHeader();
-        return new ResourceMap(forkStream, Util.unsign(header.getMapOffset()));
+        return new ResourceMap(forkStream, header.getMapOffset());
     }
 
     public long getDataLength(ReferenceListEntry entry) {
@@ -90,7 +90,7 @@ public class ResourceForkReader {
 
     private long getDataPos(ReferenceListEntry entry) {
         ResourceHeader header = getHeader();
-        return Util.unsign(header.getDataOffset()) + entry.getResourceDataOffset();
+        return header.getDataOffset() + entry.getResourceDataOffset();
     }
 
     private long getDataLength(long dataPos) {

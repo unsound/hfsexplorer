@@ -51,9 +51,11 @@ public class ResourceName implements DynamicStruct, PrintableStruct {
     }
 
     /**  */
-    public short getNameLength() { return Util.unsign(nameLength); }
+    public short getNameLength() { return Util.unsign(getRawNameLength()); }
     /**  */
     public byte[] getName() { return Util.readByteArrayBE(name); }
+
+    public byte getRawNameLength() { return nameLength; }
 
     public void printFields(PrintStream ps, String prefix) {
         ps.println(prefix + " nameLength: " + getNameLength());
