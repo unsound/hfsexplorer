@@ -40,7 +40,7 @@ public class ResourceMap implements PrintableStruct {
      * 22  2     UInt16                     resourceForkAttributes  // Resource fork attributes
      * 24  2     UInt16                     typeListOffset          // Offset from beginning of map to resource type list.
      * 26  2     UInt16                     nameListOffset          // Offset from beginning of map to resource name list.
-     * 28  2     UInt16                     typeCount               // Number of types in the map minus 1.
+     * 28  2     SInt16                     typeCount               // Number of types in the map minus 1.
      * 30  8*?   ResourceType[typeCount+1]  resourceTypeList        // Resource type list.
      */
 

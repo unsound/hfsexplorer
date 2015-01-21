@@ -5,7 +5,7 @@ struct ResourceMap {
     UInt16          resourceForkAttributes; // Resource fork attributes
     UInt16          typeListOffset;         // Offset from beginning of map to resource type list.
     UInt16          nameListOffset;         // Offset from beginning of map to resource name list.
-    UInt16          typeCount;              // Number of types in the map minus 1.
+    SInt16          typeCount;              // Number of types in the map minus 1.
     ResourceType    resourceTypeList[2];    // Resource type list.
 
 };
