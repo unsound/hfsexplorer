@@ -144,12 +144,12 @@ public class FileInfoPanel extends javax.swing.JPanel {
 	resForkClumpSizeField.setText("" + rf.getClumpSize() + " bytes");
 	resForkTotalBlocksField.setText("" + rf.getTotalBlocks());
 
-        dataForkExtentsPanel.setLayout(new javax.swing.BoxLayout(
-                dataForkExtentsPanel,
+        resourceForkExtentsPanel.setLayout(new javax.swing.BoxLayout(
+                resourceForkExtentsPanel,
                 javax.swing.BoxLayout.Y_AXIS));
 
         i = 0;
-        for(HFSPlusExtentDescriptor d : df.getExtents().getExtentDescriptors())
+        for(HFSPlusExtentDescriptor d : rf.getExtents().getExtentDescriptors())
         {
             if(d.getBlockCount() == 0) {
                 break;
