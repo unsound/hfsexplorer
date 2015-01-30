@@ -42,12 +42,26 @@ public class ResourceName implements DynamicStruct, PrintableStruct {
 
     public ResourceName(SynchronizedReadableRandomAccess stream, final long offset) {
 
-        byte[] nameLengthArray = new byte[1];
-        stream.readFullyFrom(offset, nameLengthArray);
-        nameLength = nameLengthArray[0];
+        final int nameLengthInt = stream.readFrom(offset);
+        if(nameLengthInt == -1) {
+            throw new RuntimeException("Reached end of file while reading " +
+                    "name length (1 byte) from offset " + offset + ".");
+        }
+        else if(nameLengthInt < 0 || nameLengthInt > 0xFF) {
+            throw new RuntimeException("Unexpected return value from " +
+                    "readFrom: " + nameLengthInt);
+        }
+
+        nameLength = (byte) nameLengthInt;
 
         name = new byte[Util.unsign(nameLength)];
-        stream.readFullyFrom(offset+1, name);
+        final int bytesRead = stream.readFrom(offset + 1, name);
+        if(bytesRead != name.length) {
+            throw new RuntimeException(
+                    (bytesRead > 0 ? "Partial read" : "Could not read") + " " +
+                    "from offset " + (offset + 1) + " while reading name " +
+                    "data: " + bytesRead + " / " + name.length + " bytes read");
+        }
     }
 
     /**  */
