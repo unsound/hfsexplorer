@@ -74,11 +74,14 @@ public class ReferenceListEntry implements StaticStruct, PrintableStruct {
     public int getReserved1() { return Util.readIntBE(reserved1); }
 
     public void printFields(PrintStream ps, String prefix) {
-	ps.println(prefix + " resourceID: " + getResourceID());
+	ps.println(prefix + " resourceID: " +
+                "0x" + Util.toHexStringBE(getResourceID()));
 	ps.println(prefix + " resourceNameOffset: " + getResourceNameOffset());
-	ps.println(prefix + " resourceAttributes: " + getResourceAttributes());
+	ps.println(prefix + " resourceAttributes: " +
+                "0x" + Util.toHexStringBE(getResourceAttributes()));
 	ps.println(prefix + " resourceDataOffset: " + getResourceDataOffset());
-	ps.println(prefix + " reserved1: " + getReserved1());
+	ps.println(prefix + " reserved1: " +
+                "0x" + Util.toHexStringBE(getReserved1()));
     }
 
     public void print(PrintStream ps, String prefix) {
