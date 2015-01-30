@@ -32,7 +32,7 @@ public class ReferenceListEntry implements StaticStruct, PrintableStruct {
      * BP  Size  Type      Identifier          Description
      * ------------------------------------------------------------------------------------------------------------
      * 0   2     UInt16    resourceID          // Resource ID
-     * 2   2     UInt16    resourceNameOffset  // Offset from beginning of resource name list to resource name
+     * 2   2     SInt16    resourceNameOffset  // Offset from beginning of resource name list to resource name
      * 4   1     UInt8     resourceAttributes  // Resource attributes
      * 5   1*3   UInt8[3]  resourceDataOffset  // Offset from beginning of resource data to data for this resource.
      * 8   4     UInt32    reserved1           // Reserved for handle to resource.
