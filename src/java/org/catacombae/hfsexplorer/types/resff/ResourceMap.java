@@ -45,6 +45,14 @@ public class ResourceMap implements PrintableStruct {
      * 30  8*?   ResourceType[typeCount+1]  resourceTypeList        // Resource type list.
      */
 
+    private static final boolean DEBUG = Util.booleanEnabledByProperties(true,
+            "org.catacombae.debug",
+            "org.catacombae.hfsexplorer.debug",
+            "org.catacombae.hfsexplorer.types.debug",
+            "org.catacombae.hfsexplorer.types.resff.debug",
+            "org.catacombae.hfsexplorer.types.resff." +
+            ResourceMap.class.getSimpleName() + ".debug");
+
     public static final int STRUCTSIZE = 46;
 
     private final byte[] reserved1 = new byte[1*16];
@@ -77,11 +85,14 @@ public class ResourceMap implements PrintableStruct {
         System.arraycopy(data, 26, nameListOffset, 0, 2);
         System.arraycopy(data, 28, typeCount, 0, 2);
 
-        /*
-        System.err.println("ResourceMap(): typeListOffset = " + getTypeListOffset());
-        System.err.println("ResourceMap(): nameListOffset = " + getNameListOffset());
-        System.err.println("ResourceMap(): typeCount = " + getTypeCount());
-        */
+        if(DEBUG) {
+            System.err.println("ResourceMap(): typeListOffset = " +
+                    getTypeListOffset());
+            System.err.println("ResourceMap(): nameListOffset = " +
+                    getNameListOffset());
+            System.err.println("ResourceMap(): typeCount = " +
+                    getTypeCount());
+        }
 
         final int resourceTypeListOffset = getTypeListOffset();
         final int resourceNameListOffset = getNameListOffset();
@@ -95,8 +106,10 @@ public class ResourceMap implements PrintableStruct {
                 resourceTypeList[i] = new ResourceType(curResTypeData, 0);
                 curOffset += curResTypeData.length;
 
-                //System.err.println("Read type:");
-                //resourceTypeList[i].print(System.err, "  ");
+                if(DEBUG) {
+                    System.err.println("Read type:");
+                    resourceTypeList[i].print(System.err, "  ");
+                }
             }
         }
 
@@ -106,8 +119,11 @@ public class ResourceMap implements PrintableStruct {
             referenceList = new ArrayList<Pair<ResourceType, ReferenceListEntry[]>>(resourceTypeList.length);
             for(int i = 0; i < resourceTypeList.length; ++i) {
                 ResourceType curType = resourceTypeList[i];
-                //System.err.println("Processing instances of type:");
-                //curType.print(System.err, "  ");
+                if(DEBUG) {
+                    System.err.println("Processing instances of type:");
+                    curType.print(System.err, "  ");
+                }
+
                 ReferenceListEntry[] curList = new ReferenceListEntry[curType.getInstanceCount() + 1];
 
                 long curOffset = offset + resourceTypeListOffset + Util.unsign(curType.getReferenceListOffset());
@@ -116,8 +132,10 @@ public class ResourceMap implements PrintableStruct {
                     curList[j] = new ReferenceListEntry(curListEntryData, 0);
                     curOffset += curListEntryData.length;
 
-                    //System.err.println("Read ReferenceListEntry:");
-                    //curList[j].print(System.err, "  ");
+                    if(DEBUG) {
+                        System.err.println("Read ReferenceListEntry:");
+                        curList[j].print(System.err, "  ");
+                    }
                 }
 
                 numberOfRefListEntries += curList.length;
@@ -136,8 +154,10 @@ public class ResourceMap implements PrintableStruct {
                         ResourceName resName = new ResourceName(stream, nameOffset);
                         resourceNameList.add(new Pair<ReferenceListEntry, ResourceName>(e, resName));
 
-                        //System.err.println("Read ResourceName:");
-                        //resName.print(System.err, "  ");
+                        if(DEBUG) {
+                            System.err.println("Read ResourceName:");
+                            resName.print(System.err, "  ");
+                        }
                     }
                 }
             }
