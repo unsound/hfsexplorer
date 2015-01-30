@@ -73,7 +73,11 @@ public class FileInfoWindow extends JFrame {
                     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
             tabs.addTab("Summary", summaryPanelScroller);
-        } catch(Exception e) { e.printStackTrace(); }
+        } catch(Exception e) {
+            GUIUtil.displayExceptionDialog(e, 20, this, "Exception while " +
+                    "creating FSEntrySummaryPanel.");
+            e.printStackTrace();
+        }
 
         // Details panel
         try {
