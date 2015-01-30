@@ -18,10 +18,16 @@
 package org.catacombae.hfsexplorer;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
 import org.catacombae.hfsexplorer.fs.ResourceForkReader;
 import org.catacombae.hfsexplorer.gui.FileInfoPanel;
 import org.catacombae.hfsexplorer.gui.FSEntrySummaryPanel;
@@ -30,6 +36,9 @@ import org.catacombae.hfsexplorer.gui.ResourceForkViewPanel;
 import org.catacombae.hfsexplorer.gui.StructViewPanel;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFile;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFolder;
+import org.catacombae.hfsexplorer.fs.ResourceForkReader.
+        MalformedResourceForkException;
+import org.catacombae.io.FileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.storage.fs.FSEntry;
 import org.catacombae.storage.fs.FSFile;
@@ -41,7 +50,7 @@ import org.catacombae.storage.fs.hfscommon.HFSCommonFSLink;
 
 public class FileInfoWindow extends JFrame {
 
-    public FileInfoWindow(FSEntry fsEntry, String[] parentPath) {
+    public FileInfoWindow(final FSEntry fsEntry, String[] parentPath) {
         super("Info - " + fsEntry.getName());
 
         if(Java6Util.isJava6OrHigher()) {
@@ -110,6 +119,7 @@ public class FileInfoWindow extends JFrame {
         } catch(Exception e) { e.printStackTrace(); }
 
         // Resource fork panel
+        JPanel resffPanel = null;
         try {
             if(fsEntry instanceof FSFile) {
                 FSFile fsFile = (FSFile) fsEntry;
@@ -120,9 +130,7 @@ public class FileInfoWindow extends JFrame {
                     ResourceForkReader resffReader = null;
                     try {
                         resffReader = new ResourceForkReader(s);
-                        ResourceForkViewPanel resffPanel =
-                                new ResourceForkViewPanel(resffReader);
-                        tabs.addTab("Resource fork", resffPanel);
+                        resffPanel = new ResourceForkViewPanel(resffReader);
                     } finally {
                         if(resffReader != null) {
                             resffReader.close();
@@ -133,9 +141,52 @@ public class FileInfoWindow extends JFrame {
                     }
                 }
             }
+        } catch(MalformedResourceForkException e) {
+            System.err.println("Malformed resource fork:");
+            e.printStackTrace(System.err);
+
+            resffPanel = new JPanel();
+            resffPanel.setLayout(new BorderLayout());
+
+            resffPanel.add(new JLabel("Invalid resource fork data",
+                    SwingConstants.CENTER), BorderLayout.CENTER);
+
+            JButton saveDataButton = new JButton("Save data...");
+            saveDataButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        final JFileChooser fc = new JFileChooser();
+                        if(fc.showSaveDialog(fc) == JFileChooser.APPROVE_OPTION)
+                        {
+                            final ReadableRandomAccessStream rs =
+                                    ((FSFile) fsEntry).
+                                    getForkByType(FSForkType.MACOS_RESOURCE).
+                                    getReadableRandomAccessStream();
+                            final FileStream fs =
+                                    new FileStream(fc.getSelectedFile());
+
+                            IOUtil.streamCopy(rs, fs, 1024*1024);
+                        }
+                    } catch(Throwable t) {
+                        System.err.println("Exception while extracting " +
+                                "resource fork to file:");
+                        t.printStackTrace(System.err);
+
+                        GUIUtil.displayExceptionDialog(t, 20,
+                                FileInfoWindow.this,
+                                "Exception while extracting resource fork to " +
+                                "file:");
+                    }
+                }
+            });
+            resffPanel.add(saveDataButton, BorderLayout.SOUTH);
         } catch(Exception e) {
             e.printStackTrace();
             GUIUtil.displayExceptionDialog(e, 20, this, "Exception while creating ResourceForkViewPanel.");
+        }
+
+        if(resffPanel != null) {
+            tabs.addTab("Resource fork", resffPanel);
         }
 
         add(tabs, BorderLayout.CENTER);
