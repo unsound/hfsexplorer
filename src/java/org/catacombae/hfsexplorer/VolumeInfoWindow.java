@@ -29,6 +29,7 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.hfsexplorer.gui.AttributesInfoPanel;
 import org.catacombae.hfsexplorer.gui.CatalogInfoPanel;
 import org.catacombae.hfsexplorer.gui.ExtentsInfoPanel;
+import org.catacombae.hfsexplorer.gui.HFSExplorerJFrame;
 import org.catacombae.hfsexplorer.gui.JournalInfoPanel;
 import org.catacombae.hfsexplorer.gui.StructViewPanel;
 
@@ -38,17 +39,10 @@ import org.catacombae.hfsexplorer.gui.StructViewPanel;
  *
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
-public class VolumeInfoWindow extends JFrame {
+public class VolumeInfoWindow extends HFSExplorerJFrame {
 
     public VolumeInfoWindow(HFSVolume fsView) {
         super("Volume information");
-
-        if(Java6Util.isJava6OrHigher()) {
-            Java6Util.setIconImages(FileSystemBrowserWindow.WINDOW_ICONS, this);
-        }
-        else {
-            setIconImage(FileSystemBrowserWindow.WINDOW_ICONS[0].getImage());
-        }
 
         final JTabbedPane tabs = new JTabbedPane();
 

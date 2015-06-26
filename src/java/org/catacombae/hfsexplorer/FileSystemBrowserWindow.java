@@ -44,11 +44,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -81,6 +79,7 @@ import org.catacombae.hfsexplorer.fs.AppleSingleBuilder.FileSystem;
 import org.catacombae.hfsexplorer.fs.AppleSingleBuilder.FileType;
 import org.catacombae.hfsexplorer.gui.ErrorSummaryPanel;
 import org.catacombae.hfsexplorer.gui.FileOperationsPanel;
+import org.catacombae.hfsexplorer.gui.HFSExplorerJFrame;
 import org.catacombae.hfsexplorer.gui.MemoryStatisticsPanel;
 import org.catacombae.hfsexplorer.helpbrowser.HelpBrowserPanel;
 import org.catacombae.io.ReadableConcatenatedStream;
@@ -119,13 +118,8 @@ import org.catacombae.util.Util.Pair;
  *
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
-public class FileSystemBrowserWindow extends JFrame {
+public class FileSystemBrowserWindow extends HFSExplorerJFrame {
     private static final String TITLE_STRING = "HFSExplorer " + HFSExplorer.VERSION;
-    public static final ImageIcon[] WINDOW_ICONS = {
-        new ImageIcon(ClassLoader.getSystemResource("res/finderdrive_folderback_16.png")),
-        new ImageIcon(ClassLoader.getSystemResource("res/finderdrive_folderback_32.png")),
-        new ImageIcon(ClassLoader.getSystemResource("res/finderdrive_folderback_48.png"))
-    };
     private static final String[] VERSION_INFO_DICTIONARY = {
         "http://www.catacombae.org/hfsexplorer/version.sdic.txt",
         "http://catacombae.sourceforge.net/hfsexplorer/version.sdic.txt",
@@ -155,12 +149,6 @@ public class FileSystemBrowserWindow extends JFrame {
         super(TITLE_STRING);
         this.dcw = dcw;
 
-        if(Java6Util.isJava6OrHigher()) {
-            Java6Util.setIconImages(WINDOW_ICONS, this);
-        }
-        else {
-            setIconImage(WINDOW_ICONS[0].getImage());
-        }
         fsb = new FileSystemBrowser<FSEntry>(new FileSystemProvider());
 
         //final Class objectClass = new Object().getClass();

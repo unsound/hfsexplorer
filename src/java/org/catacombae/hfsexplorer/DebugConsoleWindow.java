@@ -20,12 +20,12 @@ package org.catacombae.hfsexplorer;
 import java.awt.BorderLayout;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import org.catacombae.hfsexplorer.gui.HFSExplorerJFrame;
 import org.catacombae.hfsexplorer.io.JTextAreaOutputStream;
 
-public class DebugConsoleWindow extends JFrame {
+public class DebugConsoleWindow extends HFSExplorerJFrame {
     private static final int WINDOW_NUMBER_OF_COLUMNS = 80;
     private static final int WINDOW_NUMBER_OF_LINES = 25;
 
@@ -37,13 +37,6 @@ public class DebugConsoleWindow extends JFrame {
 
     public DebugConsoleWindow(PrintStream stdErr) {
         super("Debug Console");
-
-        if(Java6Util.isJava6OrHigher()) {
-            Java6Util.setIconImages(FileSystemBrowserWindow.WINDOW_ICONS, this);
-        }
-        else {
-            setIconImage(FileSystemBrowserWindow.WINDOW_ICONS[0].getImage());
-        }
 
         setLayout(new BorderLayout());
         this.debugArea = new JTextArea(WINDOW_NUMBER_OF_LINES, WINDOW_NUMBER_OF_COLUMNS);

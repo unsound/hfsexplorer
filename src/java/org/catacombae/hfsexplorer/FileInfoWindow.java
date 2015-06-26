@@ -22,7 +22,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -38,6 +37,7 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFile;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFolder;
 import org.catacombae.hfsexplorer.fs.ResourceForkReader.
         MalformedResourceForkException;
+import org.catacombae.hfsexplorer.gui.HFSExplorerJFrame;
 import org.catacombae.io.FileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.storage.fs.FSEntry;
@@ -48,17 +48,10 @@ import org.catacombae.storage.fs.hfscommon.HFSCommonFSFile;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFSFolder;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFSLink;
 
-public class FileInfoWindow extends JFrame {
+public class FileInfoWindow extends HFSExplorerJFrame {
 
     public FileInfoWindow(final FSEntry fsEntry, String[] parentPath) {
         super("Info - " + fsEntry.getName());
-
-        if(Java6Util.isJava6OrHigher()) {
-            Java6Util.setIconImages(FileSystemBrowserWindow.WINDOW_ICONS, this);
-        }
-        else {
-            setIconImage(FileSystemBrowserWindow.WINDOW_ICONS[0].getImage());
-        }
 
         JScrollPane summaryPanelScroller = null;
         JScrollPane infoPanelScroller = null;
