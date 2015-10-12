@@ -1,9 +1,9 @@
 !SimpleDictionary: 1.0
 AppName: HFSExplorer
-Version: 0.23
-Build: 230000
-Date: 2015-01-09
-Installer: http://downloads.sourceforge.net/catacombae/hfsexplorer-0.23-setup.exe?use_mirror=
-Binary: http://downloads.sourceforge.net/catacombae/hfsexplorer-0.23-bin.zip?use_mirror=
-Source: http://downloads.sourceforge.net/catacombae/hfsexplorer-0.23-src.zip?use_mirror=
+Version: 0.23.1
+Build: 230100
+Date: 2015-10-12
+Installer: http://downloads.sourceforge.net/catacombae/hfsexplorer-0.23.1-setup.exe?use_mirror=
+Binary: http://downloads.sourceforge.net/catacombae/hfsexplorer-0.23.1-bin.zip?use_mirror=
+Source: http://downloads.sourceforge.net/catacombae/hfsexplorer-0.23.1-src.zip?use_mirror=
 Changelog: http://www.catacombae.org/hfsexplorer/changelog.txt

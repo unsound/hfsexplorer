@@ -2,6 +2,24 @@ HFSExplorer Changelog
 ---------------------
 
 
+0.23.1
+------
+- Bugfix: Fix support for encrypted images with the version 2 header and
+  multiple key entries.
+
+- Bugfix: Help content could not be located due to a recent location change.
+
+- Enhancement: Use the same custom icon for all HFSExplorer windows, making them
+  easier to find.
+
+- Enhancement: Attempt to force the GTK+ Look & Feel if the default one provided
+  by the system is Metal or Motif. This makes HFSExplorer more usable in
+  superuser mode on many Linux distributions.
+
+- Many other small fixes. See the git log for more info:
+  https://github.com/unsound/hfsexplorer/releases/tag/hfsexplorer-0.23.1
+
+
 0.23
 ----
 - Feature: Support for files compressed with HFS+ compression methods 3 and 4
