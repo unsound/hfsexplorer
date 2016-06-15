@@ -29,14 +29,6 @@ public enum GPTPartitionType {
      * GUID Partition types
      * --------------------
      *
-     * Microsoft info (first three fields byteswapped):
-     *   Unused entry                                 {00000000-0000-0000-0000-000000000000}
-     *   EFI System partition                         {28732AC1-1FF8-D211-BA4B-00A0C93EC93B}
-     *   Microsoft Reserved partition                 {16E3C9E3-5C0B-B84D-817D-F92DF00215AE}
-     *   Primary partition on a basic disk            {A2A0D0EB-E5B9-3344-87C0-68B6B72699C7}
-     *   LDM Metadata partition on a dynamic disk     {AAC80858-8F7E-E042-85D2-E1E90434CFB3}
-     *   LDM Data partition on a dynamic disk         {A0609BAF-3114-624F-BC68-3311714A69AD}
-     *
      * Wikipedia info (as always, it can be wrong... especially as people seem to write
      * GUIDS with different endianness):
      *   EFI Specification:
