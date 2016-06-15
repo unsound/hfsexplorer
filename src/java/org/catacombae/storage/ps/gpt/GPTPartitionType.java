@@ -104,16 +104,62 @@ public enum GPTPartitionType {
      *   The enum fields in this implementation should be accurate.
      */
 
+    /**
+     * Unused GPT partition entry type:
+     *     <code>00000000-0000-0000-0000-000000000000</code>
+     */
     PARTITION_TYPE_UNUSED_ENTRY((long) 0x0000000000000000L, (long) 0x0000000000000000L, PartitionType.EMPTY),
+
+    /**
+     * EFI system partition type:
+     *     <code>C12A7328-F81F-11D2-BA4B-00A0C93EC93B</code>
+     */
     PARTITION_TYPE_EFI_SYSTEM((long) 0x28732AC11FF8D211L, (long) 0xBA4B00A0C93EC93BL, PartitionType.EFI_SYSTEM),
+
+    /**
+     * Microsoft reserved partition:
+     *     <code>E3C9E316-0B5C-4DB8-817D-F92DF00215AE</code>
+     */
     PARTITION_TYPE_MICROSOFT_RESERVED((long) 0x16E3C9E35C0BB84DL, (long) 0x817DF92DF00215AEL, PartitionType.SPECIAL),
+
+    /**
+     * Microsoft basic data partition (also used for Linux native filesystems):
+     *     <code>EBD0A0A2-B9E5-4433-87C0-68B6B72699C7</code>
+     */
     PARTITION_TYPE_PRIMARY_PARTITION((long) 0xA2A0D0EBE5B93344L, (long) 0x87C068B6B72699C7L, PartitionType.NT_OS2_IFS),
+
+    /**
+     * Microsoft Logical Disk Manager metadata partition type:
+     *     <code>5808C8AA-7E8F-42E0-85D2-E1E90434CFB3</code>
+     */
     PARTITION_TYPE_LDM_METADATA((long) 0xAAC808588F7EE042L, (long) 0x85D2E1E90434CFB3L, PartitionType.SPECIAL),
+
+    /**
+     * Microsoft Logical Disk Manager data partition type:
+     *     <code>AF9B60A0-1431-4F62-BC68-3311714A69AD</code>
+     */
     PARTITION_TYPE_LDM_DATA((long) 0xA0609BAF3114624FL, (long) 0xBC683311714A69ADL, PartitionType.SPECIAL),
+
+    /**
+     * Apple HFS(+/X) partition type:
+     *     <code>48465300-0000-11AA-AA11-00306543ECAC</code>
+     */
     PARTITION_TYPE_APPLE_HFS((long) 0x005346480000AA11L, (long) 0xAA1100306543ECACL, PartitionType.APPLE_HFS_CONTAINER),
+
+    /**
+     * Apple Boot partition type:
+     *     <code>426F6F74-0000-11AA-AA11-00306543ECAC</code>
+     */
     PARTITION_TYPE_APPLE_BOOT(0x746F6F420000AA11L, 0xAA1100306543ECACL, PartitionType.SPECIAL),
+
+    /**
+     * Linux Swap partition type:
+     *     <code>0657FD6D-A4AB-43C4-84E5-0933C84B4F4F</code>
+     */
     PARTITION_TYPE_LINUX_SWAP(0x6DFD5706ABA4C443L, 0x84E50933C84B4F4FL, PartitionType.LINUX_SWAP),
-    UNKNOWN_PARTITION_TYPE; // Returned when no known type can be matched
+
+    /** Returned when no known type can be matched. */
+    UNKNOWN_PARTITION_TYPE;
 
     private static HashMap<LongBuffer, GPTPartitionType> reverseLookupTable;
 
