@@ -19,9 +19,9 @@ package org.catacombae.hfs;
  *
  *     IF              RESULT
  * --------------------------
- * str1 < str2     =>  -1
- * str1 = str2     =>   0
- * str1 > str2     =>  +1
+ * str1 &lt; str2     =&gt;  -1
+ * str1 = str2     =&gt;   0
+ * str1 &gt; str2     =&gt;  +1
  *
  * The lower case table starts with 256 entries (one for each of the upper bytes
  * of the original Unicode char).  If that entry is zero, then all characters with
@@ -68,7 +68,7 @@ package org.catacombae.hfs;
  *
  *     // When we get here, c1 != c2.  So, we just need to determine which one is
  *     // less.
- *     if (c1 < c2)
+ *     if (c1 &lt; c2)
  *         return -1;
  *     else
  *         return 1;

@@ -36,7 +36,7 @@ public interface PartitionSystem {
 
     /**
      * Fetches the partition entry at index <code>index</code>.
-     * <code>index<code> must be larger than or equal to 0 and less than
+     * <code>index</code> must be larger than or equal to 0 and less than
      * <code>getPartitionCount()</code>.
      * @param index the requested index.
      * @return the requested Partition.

@@ -36,7 +36,7 @@ public interface FileSystemHandlerInfo {
     /**
      * Returns a unique identifier for this file system handler. This identifier
      * should be in reverse-DNS form, just like the naming of java packages.
-     * An example could be: "com.yourcompany.our_filesystem_handler". <br/>
+     * An example could be: "com.yourcompany.our_filesystem_handler".<br>
      * The identifier should be chosen wisely and retained through the entire
      * lifecycle of the handler.
      *
@@ -52,7 +52,7 @@ public interface FileSystemHandlerInfo {
 
     /**
      * Returns the revision number of this release of the handler (striclty
-     * increasing).<br/>
+     * increasing).<br>
      * The revision number should be increased for every release of the file
      * system handler. One should be able to tell a newer version from an older
      * version by comparing revision numbers.

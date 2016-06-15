@@ -147,7 +147,7 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
 
     /**
      * Default Swing implementation of a "Failed to create directory" user
-     * prompt.<br/>
+     * prompt.<br>
      * This method will never return <code>null</code>.
      *
      * @param parentComponent the parent component of the user prompt dialog
@@ -184,7 +184,7 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
 
     /**
      * Default Swing implementation of a "Failed to create file" user prompt.
-     * <br/>This method will never return <code>null</code>.
+     * <br>This method will never return <code>null</code>.
      *
      * @param parentComponent the parent component of the user prompt dialog
      * box.
@@ -312,7 +312,7 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
     }
 
     /**
-     * Default Swing implementation of an unhandled execption prompt.<br/>
+     * Default Swing implementation of an unhandled execption prompt.<br>
      * This method will never return null.
      *
      * @param parentComponent the parent component of the user prompt dialog
@@ -365,7 +365,7 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
     }
 
     /**
-     * Default Swing implementation of a rename file prompt.<br/>
+     * Default Swing implementation of a rename file prompt.<br>
      * If the user aborted the prompt, this method will return
      * <code>null</code>. Otherwise, it will return the string that the user
      * typed.

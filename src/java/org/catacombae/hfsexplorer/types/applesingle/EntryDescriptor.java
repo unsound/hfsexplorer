@@ -48,7 +48,7 @@ public class EntryDescriptor {
     /** Entry ID for the standard Mac comment. */
     public static final int ENTRY_ID_COMMENT = 4;
 
-    /** Entry ID for the Mac black & white icon. */
+    /** Entry ID for the Mac black &amp; white icon. */
     public static final int ENTRY_ID_ICONBW = 5;
 
     /** Entry ID for the Mac color icon. */
@@ -60,7 +60,7 @@ public class EntryDescriptor {
     /** Entry ID for the file dates (create, modify, etc.). */
     public static final int ENTRY_ID_FILEDATES= 8;
 
-    /** Entry ID for the Mac Finder info & extended info. */
+    /** Entry ID for the Mac Finder info &amp; extended info. */
     public static final int ENTRY_ID_FINDERINFO = 9;
 
     /** Entry ID for the Mac file info, attributes, etc. */
