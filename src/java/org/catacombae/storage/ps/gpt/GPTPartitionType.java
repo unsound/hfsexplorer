@@ -153,6 +153,13 @@ public enum GPTPartitionType {
     PARTITION_TYPE_APPLE_BOOT(0x746F6F420000AA11L, 0xAA1100306543ECACL, PartitionType.SPECIAL),
 
     /**
+     * Apple APFS partition type:
+     *     <code>7C3457EF-0000-11AA-AA11-00306543ECAC</code>
+     */
+    PARTITION_TYPE_APPLE_APFS(0xEF57347C0000AA11L, 0xAA1100306543ECACL,
+        PartitionType.SPECIAL),
+
+    /**
      * Linux Swap partition type:
      *     <code>0657FD6D-A4AB-43C4-84E5-0933C84B4F4F</code>
      */
