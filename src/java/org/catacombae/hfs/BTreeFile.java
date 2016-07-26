@@ -39,6 +39,7 @@ import org.catacombae.io.RuntimeIOException;
  */
 public abstract class BTreeFile<K extends CommonBTKey<K>,
         L extends CommonBTLeafRecord<K>>
+        implements Limits
 {
     final HFSVolume vol;
 
@@ -271,7 +272,7 @@ public abstract class BTreeFile<K extends CommonBTKey<K>,
                 // seek does not exist. Return null.
                 return null;
             }
-            else if(rootNode < 0 || rootNode > Integer.MAX_VALUE * 2L) {
+            else if(rootNode < 0 || rootNode > UINT32_MAX) {
                 throw new RuntimeException("Internal error - rootNode out of " +
                         "range: " + rootNode);
             }

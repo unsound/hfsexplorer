@@ -17,6 +17,7 @@
 
 package org.catacombae.hfs.original;
 
+import org.catacombae.hfs.Limits;
 import org.catacombae.hfs.types.hfs.ExtDescriptor;
 import org.catacombae.hfs.types.hfscommon.CommonHFSExtentDescriptor;
 import org.catacombae.io.ReadableRandomAccessStream;
@@ -25,7 +26,8 @@ import org.catacombae.hfs.AllocationFile;
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
-public class HFSOriginalAllocationFile extends AllocationFile {
+public class HFSOriginalAllocationFile extends AllocationFile implements Limits
+{
     private final HFSOriginalVolume hfsParentView;
     private final ReadableRandomAccessStream volumeBitmap;
 
@@ -42,9 +44,10 @@ public class HFSOriginalAllocationFile extends AllocationFile {
      */
     @Override
     public boolean isAllocationBlockUsed(long blockNumber) throws IllegalArgumentException {
-        if(blockNumber < 0 || blockNumber > ((long)Short.MAX_VALUE)*2)
+        if(blockNumber < 0 || blockNumber > UINT16_MAX) {
             throw new IllegalArgumentException("Block number (" + blockNumber +
                     ") out of range for UInt16!");
+        }
 
         return super.isAllocationBlockUsed(blockNumber);
     }
@@ -54,12 +57,14 @@ public class HFSOriginalAllocationFile extends AllocationFile {
      */
     @Override
     public CommonHFSExtentDescriptor createExtentDescriptor(long startBlock, long blockCount) {
-        if(startBlock < 0 || startBlock > ((long)Short.MAX_VALUE)*2)
+        if(startBlock < 0 || startBlock > UINT16_MAX) {
             throw new IllegalArgumentException("startBlock(" + startBlock +
                     ") out of range for UInt16!");
-        if(blockCount < 0 || blockCount > ((long)Short.MAX_VALUE)*2)
+        }
+        else if(blockCount < 0 || blockCount > UINT16_MAX) {
             throw new IllegalArgumentException("blockCount(" + blockCount +
                     ") out of range for UInt16!");
+        }
 
         ExtDescriptor ed = new ExtDescriptor((short)startBlock, (short)blockCount);
         return CommonHFSExtentDescriptor.create(ed);

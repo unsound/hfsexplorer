@@ -21,11 +21,12 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSExtentDescriptor;
 import org.catacombae.hfs.types.hfsplus.HFSPlusExtentDescriptor;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfs.AllocationFile;
+import org.catacombae.hfs.Limits;
 
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
-public class HFSPlusAllocationFile extends AllocationFile {
+public class HFSPlusAllocationFile extends AllocationFile implements Limits {
     private HFSPlusVolume hfsPlusParentView;
     private ReadableRandomAccessStream allocationFile;
 
@@ -42,9 +43,10 @@ public class HFSPlusAllocationFile extends AllocationFile {
      */
     @Override
     public boolean isAllocationBlockUsed(long blockNumber) throws IllegalArgumentException {
-        if(blockNumber < 0 || blockNumber > ((long)Integer.MAX_VALUE)*2)
+        if(blockNumber < 0 || blockNumber > UINT32_MAX) {
             throw new IllegalArgumentException("Block number (" + blockNumber +
                     ") out of range for UInt32!");
+        }
 
         return super.isAllocationBlockUsed(blockNumber);
     }
@@ -54,12 +56,14 @@ public class HFSPlusAllocationFile extends AllocationFile {
      */
     @Override
     public CommonHFSExtentDescriptor createExtentDescriptor(long startBlock, long blockCount) {
-        if(startBlock < 0 || startBlock > ((long)Integer.MAX_VALUE)*2)
+        if(startBlock < 0 || startBlock > UINT32_MAX) {
             throw new IllegalArgumentException("startBlock(" + startBlock +
                     ") out of range for UInt32!");
-        if(blockCount < 0 || blockCount > ((long)Integer.MAX_VALUE)*2)
+        }
+        else if(blockCount < 0 || blockCount > UINT32_MAX) {
             throw new IllegalArgumentException("blockCount(" + blockCount +
                     ") out of range for UInt32!");
+        }
 
         HFSPlusExtentDescriptor hped =
                 new HFSPlusExtentDescriptor((int)startBlock, (int)blockCount);
