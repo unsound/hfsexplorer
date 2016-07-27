@@ -1454,7 +1454,16 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
                                         dirStack.addLast(pathComponent);
                                 }
 
-                                int res = JOptionPane.showConfirmDialog(progress,
+                                boolean couldHaveSymlinks = false;
+                                for(FSEntry e : selection) {
+                                    if(!(e instanceof FSFile)) {
+                                        couldHaveSymlinks = true;
+                                    }
+                                }
+
+                                int res =
+                                        !couldHaveSymlinks ? JOptionPane.NO_OPTION :
+                                        JOptionPane.showConfirmDialog(progress,
                                         "Do you want to follow symbolic links while extracting?\n" +
                                         "Following symbolic links means that the extracted tree will " +
                                         "more closely match the percieved file system tree, but it\n" +
