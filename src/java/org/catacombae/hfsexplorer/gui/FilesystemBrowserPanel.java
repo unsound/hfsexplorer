@@ -18,16 +18,22 @@
 package org.catacombae.hfsexplorer.gui;
 
 import javax.swing.ImageIcon;
+import org.catacombae.hfsexplorer.Resources;
 
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class FilesystemBrowserPanel extends javax.swing.JPanel {
-    private static final ImageIcon FORWARD_ICON = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/forward.png"));
-    private static final ImageIcon EXTRACT_ICON = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/extract.png"));
-    private static final ImageIcon BACK_ICON = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/back.png"));
-    private static final ImageIcon UP_ICON = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/folderup.png"));
-    private static final ImageIcon INFO_ICON = new javax.swing.ImageIcon(ClassLoader.getSystemResource("res/info.png"));
+    private static final ImageIcon FORWARD_ICON =
+            new ImageIcon(Resources.FORWARD_ICON);
+    private static final ImageIcon EXTRACT_ICON =
+            new ImageIcon(Resources.EXTRACT_ICON);
+    private static final ImageIcon BACK_ICON =
+            new ImageIcon(Resources.BACK_ICON);
+    private static final ImageIcon UP_ICON =
+            new ImageIcon(Resources.UP_ICON);
+    private static final ImageIcon INFO_ICON =
+            new ImageIcon(Resources.INFO_ICON);
 
     /** Creates new form FilesystemBrowserPanel */
     public FilesystemBrowserPanel() {

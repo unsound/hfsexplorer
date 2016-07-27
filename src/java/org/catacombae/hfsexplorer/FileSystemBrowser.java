@@ -77,7 +77,7 @@ import org.catacombae.util.Util.Pair;
  *
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
-public class FileSystemBrowser<A> {
+public class FileSystemBrowser<A> implements Resources {
     private static final boolean DEBUG = Util.booleanEnabledByProperties(false,
             "org.catacombae.debug",
             "org.catacombae.hfsexplorer.debug",
@@ -342,9 +342,9 @@ public class FileSystemBrowser<A> {
 
             private JLabel theOne = new JLabel();
             private JLabel theTwo = new JLabel("", SwingConstants.RIGHT);
-            private ImageIcon documentIcon = new ImageIcon(ClassLoader.getSystemResource("res/emptydocument.png"));
-            private ImageIcon folderIcon = new ImageIcon(ClassLoader.getSystemResource("res/folder.png"));
-            private ImageIcon emptyIcon = new ImageIcon(ClassLoader.getSystemResource("res/nothing.png"));
+            private ImageIcon documentIcon = new ImageIcon(EMPTY_DOCUMENT_ICON);
+            private ImageIcon folderIcon = new ImageIcon(FOLDER_ICON);
+            private ImageIcon emptyIcon = new ImageIcon(EMPTY_ICON);
 
             /* @Override */
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, final int row, final int column) {

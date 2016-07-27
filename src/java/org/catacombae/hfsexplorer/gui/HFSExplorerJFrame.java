@@ -20,6 +20,7 @@ package org.catacombae.hfsexplorer.gui;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import org.catacombae.hfsexplorer.Java6Util;
+import org.catacombae.hfsexplorer.Resources;
 
 /**
  * Base class for all HFSExplorer windows, setting up common properties such as
@@ -27,14 +28,11 @@ import org.catacombae.hfsexplorer.Java6Util;
  *
  * @author Erik Larsson
  */
-public class HFSExplorerJFrame extends JFrame {
+public class HFSExplorerJFrame extends JFrame implements Resources {
     private static final ImageIcon[] WINDOW_ICONS = {
-        new ImageIcon(ClassLoader.getSystemResource(
-                "res/finderdrive_folderback_16.png")),
-        new ImageIcon(ClassLoader.getSystemResource(
-                "res/finderdrive_folderback_32.png")),
-        new ImageIcon(ClassLoader.getSystemResource(
-                "res/finderdrive_folderback_48.png"))
+        new ImageIcon(APPLICATION_ICON_16),
+        new ImageIcon(APPLICATION_ICON_32),
+        new ImageIcon(APPLICATION_ICON_48),
     };
 
     public HFSExplorerJFrame(String title) {
