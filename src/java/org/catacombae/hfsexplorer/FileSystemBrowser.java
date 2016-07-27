@@ -63,6 +63,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.TreeNode;
@@ -569,6 +570,32 @@ public class FileSystemBrowser<A> implements Resources {
 	    });
 
         setRoot(null);
+
+        /* If the Look & Feel doesn't provide any icon for nodes in a JTree,
+         * then we use our custom folder icon for all nodes. This is a known
+         * issue with the GTK+ Look & Feel (not sure if it's a bug or by design
+         * but it looks pretty awful). */
+        final DefaultTreeCellRenderer customCellRenderer =
+                new DefaultTreeCellRenderer();
+        boolean useCustomCellRenderer = false;
+
+        if(customCellRenderer.getClosedIcon() == null) {
+            customCellRenderer.setClosedIcon(new ImageIcon(FOLDER_ICON));
+            useCustomCellRenderer = true;
+        }
+        if(customCellRenderer.getOpenIcon() == null) {
+            customCellRenderer.setOpenIcon(new ImageIcon(FOLDER_ICON));
+            useCustomCellRenderer = true;
+        }
+        if(customCellRenderer.getLeafIcon() == null) {
+            customCellRenderer.setLeafIcon(new ImageIcon(FOLDER_ICON));
+            useCustomCellRenderer = true;
+        }
+
+        if(useCustomCellRenderer) {
+            dirTree.setCellRenderer(customCellRenderer);
+        }
+
        	dirTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
 	dirTree.addTreeSelectionListener(new TreeSelectionListener() {
