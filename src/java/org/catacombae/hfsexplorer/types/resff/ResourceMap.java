@@ -45,7 +45,7 @@ public class ResourceMap implements PrintableStruct {
      * 30  8*?   ResourceType[typeCount+1]  resourceTypeList        // Resource type list.
      */
 
-    private static final boolean DEBUG = Util.booleanEnabledByProperties(true,
+    private static final boolean DEBUG = Util.booleanEnabledByProperties(false,
             "org.catacombae.debug",
             "org.catacombae.hfsexplorer.debug",
             "org.catacombae.hfsexplorer.types.debug",
