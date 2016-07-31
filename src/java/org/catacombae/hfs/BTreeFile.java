@@ -252,7 +252,7 @@ public abstract class BTreeFile<K extends CommonBTKey<K>,
         return vol;
     }
 
-    protected abstract BTreeFileSession openSession();
+    abstract BTreeFileSession openSession();
 
     /**
      * Returns the root node of the B-tree file. If it does not exist

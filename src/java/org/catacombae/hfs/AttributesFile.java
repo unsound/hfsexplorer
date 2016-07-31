@@ -82,7 +82,7 @@ public class AttributesFile
                 header.getAllocationBlockStart() * view.getPhysicalBlockSize());
     }
 
-    protected BTreeFileSession openSession() {
+    BTreeFileSession openSession() {
         return new Session();
     }
 

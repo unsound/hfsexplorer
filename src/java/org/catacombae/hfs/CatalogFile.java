@@ -81,7 +81,7 @@ public class CatalogFile
      * Opens the catalog file for reading and reads the value of some important
      * variables (the "session").
      */
-    protected BTreeFileSession openSession() {
+    BTreeFileSession openSession() {
         return new CatalogFileSession();
     }
 

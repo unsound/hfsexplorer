@@ -67,7 +67,7 @@ public class ExtentsOverflowFile
         }
     }
 
-    protected BTreeFileSession openSession() {
+    BTreeFileSession openSession() {
         return new ExtentsOverflowFileSession();
     }
 
