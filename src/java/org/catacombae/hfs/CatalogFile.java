@@ -196,18 +196,27 @@ public class CatalogFile
      * @return the requested node if it exists and has type index node or leaf node, null otherwise
      */
     public CommonBTNode getCatalogNode(long nodeNumber) {
-        BTreeFileSession ses = openSession();
 
-        long currentNodeNumber;
-        if(nodeNumber < 0) { // Means that we should get the root node
-            currentNodeNumber = ses.bthr.getRootNodeNumber();
-            if(currentNodeNumber == 0) // There is no index node, or other content. So the node we
-                return null;           // seek does not exist. Return null.
+        final BTreeFileSession ses = openSession();
+        try {
+            long currentNodeNumber;
+            if(nodeNumber < 0) {
+                // Means that we should get the root node
+                currentNodeNumber = ses.bthr.getRootNodeNumber();
+                if(currentNodeNumber == 0) {
+                    // There is no index node, or other content. So the node we
+                    // seek does not exist. Return null.
+                    return null;
+                }
+            }
+            else {
+                currentNodeNumber = nodeNumber;
+            }
+
+            return getNode(currentNodeNumber, ses);
+        } finally {
+            ses.close();
         }
-        else
-            currentNodeNumber = nodeNumber;
-
-        return getNode(currentNodeNumber);
     }
 
     /**
