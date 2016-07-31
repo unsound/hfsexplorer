@@ -277,7 +277,7 @@ public abstract class BTreeFile<K extends CommonBTKey<K>,
                         "range: " + rootNode);
             }
             else {
-                return getNode(rootNode);
+                return getNode(rootNode, ses);
             }
         } finally {
             ses.close();
@@ -295,6 +295,47 @@ public abstract class BTreeFile<K extends CommonBTKey<K>,
         }
     }
 
+    CommonBTNode getNode(long nodeNumber, BTreeFileSession ses) {
+        final String METHOD = "getNode";
+        final int nodeSize = ses.bthr.getNodeSize();
+
+        CommonBTNode node;
+        byte[] nodeData = new byte[nodeSize];
+        try {
+            ses.btreeStream.seek(nodeNumber * nodeSize);
+            ses.btreeStream.readFully(nodeData);
+        } catch(RuntimeException e) {
+            System.err.println("RuntimeException in " + METHOD + ". Printing " +
+                    "additional information:");
+            System.err.println("  nodeNumber=" + nodeNumber);
+            System.err.println("  nodeSize=" + nodeSize);
+            System.err.println("  init.btreeStream.length()=" +
+                    ses.btreeStream.length());
+            System.err.println("  (currentNodeNumber * nodeSize)=" +
+                    (nodeNumber * nodeSize));
+            throw e;
+        }
+
+        CommonBTNodeDescriptor nodeDescriptor =
+                createCommonBTNodeDescriptor(nodeData, 0);
+        switch(nodeDescriptor.getNodeType()) {
+            case HEADER:
+                node = createCommonBTHeaderNode(nodeData, 0, nodeSize);
+                break;
+            case INDEX:
+                node = createIndexNode(nodeData, 0, nodeSize);
+                break;
+            case LEAF:
+                node = createLeafNode(nodeData, 0, nodeSize);
+                break;
+            default:
+                node = null;
+                break;
+        }
+
+        return node;
+    }
+
     /**
      * Returns the requested node in the B-tree file. If the requested node is
      * not a header, index or leaf node, <code>null</code> is returned because
@@ -306,38 +347,8 @@ public abstract class BTreeFile<K extends CommonBTKey<K>,
      */
     public CommonBTNode getNode(long nodeNumber) {
         BTreeFileSession ses = openSession();
-
         try {
-            final String METHOD = "getNode";
-            final int nodeSize = ses.bthr.getNodeSize();
-
-            byte[] nodeData = new byte[nodeSize];
-            try {
-                ses.btreeStream.seek(nodeNumber * nodeSize);
-                ses.btreeStream.readFully(nodeData);
-            } catch(RuntimeException e) {
-                System.err.println("RuntimeException in " + METHOD + ". " +
-                        "Printing additional information:");
-                System.err.println("  nodeNumber=" + nodeNumber);
-                System.err.println("  nodeSize=" + nodeSize);
-                System.err.println("  init.btreeStream.length()=" +
-                        ses.btreeStream.length());
-                System.err.println("  (currentNodeNumber * nodeSize)=" +
-                        (nodeNumber * nodeSize));
-                throw e;
-            }
-
-            CommonBTNodeDescriptor nodeDescriptor =
-                    createCommonBTNodeDescriptor(nodeData, 0);
-
-            if(nodeDescriptor.getNodeType() == NodeType.HEADER)
-                return createCommonBTHeaderNode(nodeData, 0, nodeSize);
-            else if(nodeDescriptor.getNodeType() == NodeType.INDEX)
-                return createIndexNode(nodeData, 0, nodeSize);
-            else if(nodeDescriptor.getNodeType() == NodeType.LEAF)
-                return createLeafNode(nodeData, 0, nodeSize);
-            else
-                return null;
+            return getNode(nodeNumber, ses);
         } finally {
             ses.close();
         }
