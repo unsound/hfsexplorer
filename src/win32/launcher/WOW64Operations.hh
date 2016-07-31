@@ -101,7 +101,7 @@ public:
    * Restores file system redirection for the calling thread.
    *
    * Input parameters:
-   *   oldValue - the value previously aquired through a call to
+   *   oldValue - the value previously acquired through a call to
    *              disableWOW64FileSystemRedirection.
    *
    * Return value:
