@@ -45,9 +45,14 @@ import org.catacombae.storage.io.win32.ReadableWin32FileStream;
 import org.catacombae.hfsexplorer.gui.SelectDevicePanel;
 import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.RuntimeIOException;
+import org.catacombae.storage.fs.FileSystemDetector;
+import org.catacombae.storage.fs.FileSystemHandler;
+import org.catacombae.storage.fs.FileSystemHandlerFactory;
+import org.catacombae.storage.fs.FileSystemMajorType;
 import org.catacombae.storage.ps.Partition;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer.FileSystemType;
+import org.catacombae.storage.io.DataLocator;
 import org.catacombae.storage.io.ReadableStreamDataLocator;
 import org.catacombae.storage.ps.PartitionSystemDetector;
 import org.catacombae.storage.ps.PartitionSystemHandler;
@@ -222,6 +227,91 @@ public abstract class SelectDeviceDialog extends JDialog {
         return dialog;
     }
 
+    private String getFilesystemInfo(ReadableRandomAccessStream deviceStream,
+            String deviceDescription)
+    {
+        String fsInfo = null;
+        DataLocator inputDataLocator = null;
+
+        try {
+            inputDataLocator =
+                    new ReadableStreamDataLocator(deviceStream);
+            FileSystemMajorType[] fsTypes =
+                    FileSystemDetector.detectFileSystem(inputDataLocator);
+            FileSystemHandlerFactory fsFactory = null;
+
+            for(FileSystemMajorType type : fsTypes) {
+                FileSystemHandler fsHandler = null;
+                try {
+                    switch(type) {
+                        case APPLE_HFS:
+                        case APPLE_HFS_PLUS:
+                        case APPLE_HFSX:
+                            fsFactory = type.createDefaultHandlerFactory();
+                            break;
+                        default:
+                            break;
+                    }
+
+                    if(fsFactory != null) {
+                        fsHandler = fsFactory.createHandler(inputDataLocator);
+                        fsInfo = "\"" + fsHandler.getRoot().getName() + "\" " +
+                                "(" + deviceDescription + ")";
+                        break;
+                    }
+                } catch(Exception e) {
+                    System.err.println("Exception while getting file system " +
+                            "label for filesystem major type " + type + ":");
+                    e.printStackTrace();
+                } finally {
+                    if(fsHandler != null) {
+                        fsHandler.close();
+                    }
+                }
+            }
+        } catch(Exception e) {
+            System.err.println("Exception while getting file system label:");
+            e.printStackTrace();
+        } finally {
+            if(inputDataLocator != null) {
+                inputDataLocator.close();
+            }
+        }
+
+        if(fsInfo == null) {
+            fsInfo = deviceDescription;
+        }
+
+        return fsInfo;
+    }
+
+    private String getFilesystemInfoString(String deviceName) {
+        ReadableRandomAccessStream fsStream = null;
+        try {
+            fsStream = createStream(getDevicePrefix() + deviceName);
+            return getFilesystemInfo(fsStream, deviceName);
+        } finally {
+            if(fsStream != null) {
+                fsStream.close();
+            }
+        }
+    }
+
+    private String getFilesystemInfoString(EmbeddedPartitionEntry pe) {
+        ReadableRandomAccessStream fsStream = null;
+        try {
+            fsStream =
+                    new ReadableConcatenatedStream(
+                    createStream(getDevicePrefix() + pe.deviceName),
+                    pe.partition.getStartOffset(), pe.partition.getLength());
+            return getFilesystemInfo(fsStream, pe.toString());
+        } finally {
+            if(fsStream != null) {
+                fsStream.close();
+            }
+        }
+    }
+
     protected void autodetectFilesystems() {
         LinkedList<String> plainFileSystems = new LinkedList<String>();
         LinkedList<EmbeddedPartitionEntry> embeddedFileSystems = new LinkedList<EmbeddedPartitionEntry>();
@@ -332,13 +422,18 @@ public abstract class SelectDeviceDialog extends JDialog {
         }
 
         if(plainFileSystems.size() >= 1 || embeddedFileSystems.size() >= 1) {
-            String[] plainStrings = plainFileSystems.toArray(
-                    new String[plainFileSystems.size()]);
+            int i;
+
+            String[] plainStrings = new String[plainFileSystems.size()];
+            i = 0;
+            for(String cur : plainFileSystems) {
+                plainStrings[i++] = getFilesystemInfoString(cur);
+            }
 
             String[] embeddedStrings = new String[embeddedFileSystems.size()];
-            int i = 0;
+            i = 0;
             for(EmbeddedPartitionEntry cur : embeddedFileSystems) {
-                embeddedStrings[i++] = cur.toString();
+                embeddedStrings[i++] = getFilesystemInfoString(cur);
             }
 
             String[] allOptions =
@@ -387,7 +482,7 @@ public abstract class SelectDeviceDialog extends JDialog {
 
                                 Partition p = embeddedInfo.partition;
                                 resultCreatePath = getDevicePrefix() +
-                                        selectedValue.toString();
+                                        embeddedInfo.toString();
                                 result = new ReadableConcatenatedStream(llf,
                                         p.getStartOffset(), p.getLength());
                                 setVisible(false);
@@ -399,8 +494,13 @@ public abstract class SelectDeviceDialog extends JDialog {
                         }
                     }
                     else {
-                        resultCreatePath = getDevicePrefix() +
-                                selectedValue.toString();
+                        final String plainInfo =
+                                plainFileSystems.get(selectedIndex);
+                        if(plainInfo == null) {
+                            throw new RuntimeException("plainInfo == null");
+                        }
+
+                        resultCreatePath = getDevicePrefix() + plainInfo;
                         result = createStream(resultCreatePath);
                         setVisible(false);
                     }
