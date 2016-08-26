@@ -281,7 +281,7 @@ public class ForkFilter implements ReadableRandomAccessStream {
         int extIndex;
         long currentExtentLength;
 
-        if(extentDescriptors.size() < 1 || logicalPosition > forkLength) {
+        if(extentDescriptors.size() < 1 || logicalPosition >= forkLength) {
             return -1; // EOF
         }
 
