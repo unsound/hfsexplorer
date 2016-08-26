@@ -29,10 +29,10 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogLeafRecord;
 public class HFSFileSystemHandler extends HFSCommonFileSystemHandler {
 
     public HFSFileSystemHandler(DataLocator fsLocator, boolean useCaching,
-            boolean posixNames, String encodingName)
+            boolean posixNames, boolean sfmSubstitutions, String encodingName)
     {
         super(new HFSOriginalVolume(fsLocator.createReadOnlyFile(), useCaching,
-                encodingName), posixNames, false, false);
+                encodingName), posixNames, sfmSubstitutions, false, false);
     }
 
     protected boolean shouldHide(CommonHFSCatalogLeafRecord rec) {

@@ -32,10 +32,11 @@ import org.catacombae.hfs.x.HFSXVolume;
 public class HFSXFileSystemHandler extends HFSPlusFileSystemHandler {
 
     public HFSXFileSystemHandler(DataLocator fsLocator, boolean useCaching,
-            boolean posixNames, boolean doUnicodeFileNameComposition,
-            boolean hideProtected)
+            boolean posixNames, boolean sfmSubstitutions,
+            boolean doUnicodeFileNameComposition, boolean hideProtected)
     {
         super(new HFSXVolume(fsLocator.createReadOnlyFile(), useCaching),
-                posixNames, doUnicodeFileNameComposition, hideProtected);
+                posixNames, sfmSubstitutions, doUnicodeFileNameComposition,
+                hideProtected);
     }
 }

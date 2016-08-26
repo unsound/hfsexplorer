@@ -53,18 +53,21 @@ public class HFSFileSystemHandlerFactory extends HFSCommonFileSystemHandlerFacto
                 createAttributes.getBooleanAttribute(StandardAttribute.CACHING_ENABLED);
         boolean posixFilenames =
                 createAttributes.getBooleanAttribute(posixFilenamesAttribute);
+        boolean sfmSubstitutions =
+                createAttributes.getBooleanAttribute(sfmSubstitutionsAttribute);
         String encoding =
                 createAttributes.getStringAttribute(stringEncodingAttribute);
 
         return createHandlerInternal(data, useCaching, posixFilenames,
-                encoding);
+                sfmSubstitutions, encoding);
     }
 
     protected FileSystemHandler createHandlerInternal(DataLocator data,
-            boolean useCaching, boolean posixFilenames, String encoding)
+            boolean useCaching, boolean posixFilenames,
+            boolean sfmSubstitutions, String encoding)
     {
         return new HFSFileSystemHandler(data, useCaching, posixFilenames,
-                encoding);
+                sfmSubstitutions, encoding);
     }
 
     public FileSystemHandlerInfo getHandlerInfo() {

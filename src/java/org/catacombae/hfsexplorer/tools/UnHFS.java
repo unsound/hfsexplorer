@@ -121,6 +121,10 @@ public class UnHFS {
         ps.println("    -password <password>");
         ps.println("      Specifies the password for an encrypted image. The special marker \"-\" ");
         ps.println("      causes the password to be read from stdin.");
+        ps.println("    -sfm-substitutions");
+        ps.println("      Translates the filenames to a format that is more compatible with Windows");
+        ps.println("      filesystems, using the translation scheme that was used by the now defunct");
+        ps.println("      Services for Mac component in Windows Server.");
         ps.println("    -v");
         ps.println("      Verbose mode. Prints the POSIX path of every extracted file to stdout.");
         ps.println("    --");
@@ -141,6 +145,7 @@ public class UnHFS {
         boolean extractFolderDirectly = true;
         boolean extractResourceForks = false;
         boolean verbose = false;
+        boolean sfmSubstitutions = false;
         int partitionNumber = -1; // -1 means search for first supported partition
         char[] password = null;
 
@@ -265,6 +270,9 @@ public class UnHFS {
                     System.exit(1);
                 }
             }
+            else if(curArg.equals("-sfm-substitutions")) {
+                sfmSubstitutions = true;
+            }
             else if(curArg.equals("-v")) {
                 verbose = true;
             }
@@ -309,7 +317,8 @@ public class UnHFS {
 
         try {
             unhfs(System.out, inputStream, outputDir, fsRoot, password,
-                    extractFolderDirectly, extractResourceForks, partitionNumber, verbose);
+                    extractFolderDirectly, extractResourceForks,
+                    partitionNumber, verbose, sfmSubstitutions);
             System.exit(0);
         } catch(RuntimeIOException e) {
             System.err.println("Exception while executing main routine:");
@@ -338,7 +347,8 @@ public class UnHFS {
     public static void unhfs(PrintStream outputStream,
             ReadableRandomAccessStream inFileStream, File outputDir,
             String fsRoot, char[] password, boolean extractFolderDirectly,
-            boolean extractResourceForks, int partitionNumber, boolean verbose)
+            boolean extractResourceForks, int partitionNumber, boolean verbose,
+            boolean sfmSubstitutions)
             throws RuntimeIOException {
 
         // First detect any outer layers of UDIF and/or encryption.
@@ -485,6 +495,18 @@ public class UnHFS {
 
         fact.getCreateAttributes().setBooleanAttribute(posixFilenamesAttribute,
                 true);
+
+        CustomAttribute sfmSubstitutionsAttribute =
+                fact.getCustomAttribute("SFM_SUBSTITUTIONS");
+        if(sfmSubstitutionsAttribute == null) {
+            System.err.println("Unexpected: HFS-ish file system handler does " +
+                    "not support SFM_SUBSTITUTIONS attribute.");
+            System.exit(1);
+            return;
+        }
+
+        fact.getCreateAttributes().setBooleanAttribute(
+                sfmSubstitutionsAttribute, sfmSubstitutions);
 
         FileSystemHandler fsHandler = fact.createHandler(inputDataLocator);
 

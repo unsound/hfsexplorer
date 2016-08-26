@@ -65,6 +65,8 @@ public class HFSPlusFileSystemHandlerFactory extends HFSCommonFileSystemHandlerF
                 createAttributes.getBooleanAttribute(StandardAttribute.CACHING_ENABLED);
         boolean posixFilenames =
                 createAttributes.getBooleanAttribute(posixFilenamesAttribute);
+        boolean sfmSubstitutions =
+                createAttributes.getBooleanAttribute(sfmSubstitutionsAttribute);
         boolean composeFilename =
                 createAttributes.getBooleanAttribute(compositionEnabledAttribute);
         boolean hideProtected =
@@ -94,15 +96,16 @@ public class HFSPlusFileSystemHandlerFactory extends HFSCommonFileSystemHandlerF
         }
 
         return createHandlerInternal(dataToLoad, useCaching, posixFilenames,
-                composeFilename, hideProtected);
+                sfmSubstitutions, composeFilename, hideProtected);
     }
 
     protected FileSystemHandler createHandlerInternal(DataLocator data,
-            boolean useCaching, boolean posixFilenames, boolean composeFilename,
+            boolean useCaching, boolean posixFilenames,
+            boolean sfmSubstitutions, boolean composeFilename,
             boolean hideProtected)
     {
         return new HFSPlusFileSystemHandler(data, useCaching, posixFilenames,
-                composeFilename, hideProtected);
+                sfmSubstitutions, composeFilename, hideProtected);
     }
 
     @Override
