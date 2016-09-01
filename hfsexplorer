@@ -7,4 +7,4 @@ if [ $? -ne 0 ]; then
     BASEDIR="."
 fi
 
-"${BASEDIR}/dist/bin/hfsexplorer.sh" "$@"
+"${BASEDIR}/dist/bin/hfsexplorer" "$@"

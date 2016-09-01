@@ -117,8 +117,8 @@ recursiveRmdir "^\.DS_Store$" "$TEMPDIR"
 echo "Removing .cvsignore files..."
 recursiveRmdir "^\.cvsignore$" "$TEMPDIR"
 echo "Removing dist build scripts..."
-rm -v "${TEMPDIR}/makebindist.sh"
-rm -v "${TEMPDIR}/makesrcdist.sh"
+rm -v "${TEMPDIR}/makebindist"
+rm -v "${TEMPDIR}/makesrcdist"
 
 echo "Building zip file..."
 cd $TEMPDIR
