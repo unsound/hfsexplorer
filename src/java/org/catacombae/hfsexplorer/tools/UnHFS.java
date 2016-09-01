@@ -635,7 +635,7 @@ public class UnHFS {
         if(extractResourceForks) {
             FSFork resourceFork = file.getForkByType(FSForkType.MACOS_RESOURCE);
 
-            if(resourceFork.getLength() > 0) {
+            if(resourceFork != null) {
                 File resFile = new File(targetDir, "._" + scrub(file.getName()));
                 if(!extractResourceForkToAppleDoubleFile(resourceFork, resFile)) {
                     System.err.println("Failed to extract resource " +
