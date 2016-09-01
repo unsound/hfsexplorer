@@ -100,9 +100,6 @@ mkdir $TEMPDIR
 echo "Copying files..."
 cp -r dist/* $TEMPDIR 
 
-echo "Setting execute permissions for shell scripts..."
-chmod a+x $TEMPDIR/*.sh
-
 echo "Removing CVS directories..."
 recursiveRmdir "^CVS$" "$TEMPDIR"
 
