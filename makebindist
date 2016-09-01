@@ -1,5 +1,16 @@
 #!/bin/sh
 
+if [ $# -eq 1 ]; then
+    SNAPSHOT_DATE=""
+    VERSION="$1"
+elif ( [ $# -eq 3 ] && [ "$1" == "-s" ] ); then
+    SNAPSHOT_DATE="$2"
+    VERSION="$3"
+else
+    echo "usage: makebindist [-s <snapshot date>] <version>" 1>&2
+    exit 1
+fi
+
 BASEDIR="`dirname "$0"`"
 if [ $? -ne 0 ]; then
     echo "WARNING: No dirname utility found!"
@@ -38,7 +49,8 @@ if [ ! -f "dist/lib/hfsx.jar" ]; then
     exit 1
 fi
 
-ZIPFILE=hfsexplorer-current-bin.zip
+RELEASE_DIR="releases/${VERSION}${SNAPSHOT_DATE:+-snapshot_${SNAPSHOT_DATE}}"
+ZIPFILE="hfsexplorer-${VERSION}${SNAPSHOT_DATE:+-snapshot_${SNAPSHOT_DATE}}-bin.zip"
 
 match () {
     local SUBFILE="$1"
@@ -105,11 +117,11 @@ recursiveRmdir "^CVS$" "$TEMPDIR"
 
 echo "Building zip file..."
 cd $TEMPDIR
-if [ ! -d "../releases" ]; then
-    mkdir "../releases"
+if [ ! -d "../${RELEASE_DIR}" ]; then
+    mkdir -p "../${RELEASE_DIR}"
 fi
-rm "../releases/${ZIPFILE}"
-zip -9 -r "../releases/${ZIPFILE}" *
+rm -fv "../${RELEASE_DIR}/${ZIPFILE}"
+zip -9 -r "../${RELEASE_DIR}/${ZIPFILE}" *
 cd ..
 
-echo "Done! Zip file generated at releases/${ZIPFILE}"
+echo "Done! Zip file generated at: ${RELEASE_DIR}/${ZIPFILE}"
