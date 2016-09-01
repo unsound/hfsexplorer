@@ -102,10 +102,7 @@ Section "HFSExplorer" SEC01
 
   SetOutPath "$INSTDIR\bin"
   SetOverwrite ifnewer
-  File "..\dist\bin\*.exe"
-  File "..\dist\bin\*.bat"
-  File "..\dist\bin\*.sh"
-  File "..\dist\bin\*.vbs"
+  File "..\dist\bin\*"
   
   SetOutPath "$INSTDIR\lib"
   SetOverwrite ifnewer
