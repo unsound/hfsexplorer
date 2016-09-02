@@ -340,8 +340,10 @@ public class CatalogFile
     }
 
     /**
-     * More typesafe than <code>listRecords(HFSCatalogNodeID)</code> since it
-     * checks that folderRecord is of appropriate type first.
+     * List all records belonging to a folder.
+     *
+     * More typesafe than {@link #listRecords(CommonHFSCatalogNodeID)} since it
+     * checks that <code>folderRecord</code> has an appropriate type first.
      */
     public CommonHFSCatalogLeafRecord[] listRecords(CommonHFSCatalogLeafRecord folderRecord) {
 	if(folderRecord instanceof CommonHFSCatalogFolderRecord) {
@@ -353,9 +355,12 @@ public class CatalogFile
     }
 
     /**
-     * You should use the method above to access folder listings. However, the
-     * folderID is really all that's needed, but make sure it's a folder ID and
-     * not a file ID, or something bad will happen.
+     * List all records belonging to a folder.
+     *
+     * You should use {@link #listRecords(CommonHFSCatalogLeafRecord)} to access
+     * folder listings. However, the folder ID is really all that's needed, but
+     * make sure it's a folder ID and not a file ID, or something bad will
+     * happen.
      */
     public CommonHFSCatalogLeafRecord[] listRecords(CommonHFSCatalogNodeID folderID) {
         BTreeFileSession init = openSession();
