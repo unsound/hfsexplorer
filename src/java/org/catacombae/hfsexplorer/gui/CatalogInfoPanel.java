@@ -24,6 +24,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.catacombae.hfs.CatalogFile;
 import org.catacombae.hfs.HFSVolume;
 import org.catacombae.hfs.types.hfscommon.CommonBTIndexRecord;
+import org.catacombae.hfs.types.hfscommon.CommonBTLeafRecord;
 import org.catacombae.hfs.types.hfscommon.CommonBTNode;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFile;
 import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogFileRecord;
@@ -111,12 +112,18 @@ public class CatalogInfoPanel
 
             for(int i = 0; i < recs.length; ++i) {
                 final CommonHFSCatalogLeafRecord rec = recs[i];
-                dmtn.add(new DefaultMutableTreeNode(new BTLeafStorage(i,
-                        recordOffsets[i],
-                        recordOffsets[i + 1] - recordOffsets[i], rec,
-                        rec.getKey().getParentID().toLong() + ":" +
-                        catalogFile.getVolume().decodeString(rec.getKey().
-                        getNodeName()))));
+                if(rec != null) {
+                    dmtn.add(new DefaultMutableTreeNode(new BTLeafStorage(i,
+                            recordOffsets[i],
+                            recordOffsets[i + 1] - recordOffsets[i], rec,
+                            rec.getKey().getParentID().toLong() + ":" +
+                            catalogFile.getVolume().decodeString(rec.getKey().
+                            getNodeName()))));
+                }
+                else {
+                    dmtn.add(new DefaultMutableTreeNode("<Invalid record " +
+                            (i + 1) + ">", false));
+                }
             }
         }
         else
@@ -124,7 +131,7 @@ public class CatalogInfoPanel
     }
 
     public boolean handleLeafRecord(BTLeafStorage leafStorage) {
-        CommonHFSCatalogLeafRecord rec = leafStorage.getRecord();
+        CommonBTLeafRecord rec = leafStorage.getRecord();
         //HFSPlusCatalogLeafRecordData data = rec.getData();
         if(rec instanceof CommonHFSCatalogFileRecord.HFSPlusImplementation) {
             CommonHFSCatalogFile fil =

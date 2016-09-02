@@ -158,7 +158,9 @@ public class CatalogFile
                     newCatalogLeafNode(currentNodeData, 0, nodeSize);
             CommonHFSCatalogLeafRecord[] recs = leaf.getLeafRecords();
             for(CommonHFSCatalogLeafRecord rec : recs) {
-                if(rec.getKey().getParentID().toLong() == parentID.toLong()) {
+                if(rec != null && rec.getKey().getParentID().toLong() ==
+                        parentID.toLong())
+                {
                     if(rec instanceof CommonHFSCatalogFolderRecord)
                         return (CommonHFSCatalogFolderRecord)rec;
                     else
@@ -426,14 +428,19 @@ public class CatalogFile
 
     private static CommonHFSCatalogLeafRecord[] getChildrenTo(CommonHFSCatalogLeafNode leafNode,
             CommonHFSCatalogNodeID nodeID) {
-	LinkedList<CommonHFSCatalogLeafRecord> children = new LinkedList<CommonHFSCatalogLeafRecord>();
-	CommonHFSCatalogLeafRecord[] records = leafNode.getLeafRecords();
-	for(int i = 0; i < records.length; ++i) {
-	    CommonHFSCatalogLeafRecord curRec = records[i];
-	    if(curRec.getKey().getParentID().toLong() == nodeID.toLong())
-		children.addLast(curRec);
-	}
-	return children.toArray(new CommonHFSCatalogLeafRecord[children.size()]);
+        LinkedList<CommonHFSCatalogLeafRecord> children =
+                new LinkedList<CommonHFSCatalogLeafRecord>();
+        CommonHFSCatalogLeafRecord[] records = leafNode.getLeafRecords();
+        for(int i = 0; i < records.length; ++i) {
+            CommonHFSCatalogLeafRecord curRec = records[i];
+            if(curRec != null &&
+                    curRec.getKey().getParentID().toLong() == nodeID.toLong())
+            {
+                children.addLast(curRec);
+            }
+        }
+        return children.toArray(
+                new CommonHFSCatalogLeafRecord[children.size()]);
     }
 
     /*

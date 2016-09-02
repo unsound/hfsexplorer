@@ -39,6 +39,7 @@ import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.hfs.BTreeFile;
+import org.catacombae.hfs.types.hfscommon.CommonBTLeafRecord;
 import org.catacombae.hfsexplorer.FileSystemBrowser.NoLeafMutableTreeNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTNode;
 import org.catacombae.hfs.types.hfscommon.CommonBTNodeDescriptor;
@@ -48,7 +49,8 @@ import org.catacombae.util.Util.Pair;
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
-public abstract class BTreeInfoPanel<R, B extends BTreeFile>
+public abstract class BTreeInfoPanel
+        <R extends CommonBTLeafRecord, B extends BTreeFile>
         extends javax.swing.JPanel
 {
     private static final int UNIT_INCREMENT = 10;
@@ -56,9 +58,13 @@ public abstract class BTreeInfoPanel<R, B extends BTreeFile>
     protected final String INDEX_NAME = "index";
     protected final String LEAF_NAME = "leaf";
     protected final String PRINT_FIELDS_AREA_NAME = "printfieldsarea";
+    protected final String ERROR_STRING_NAME = "error_string";
     protected final String OTHER_NAME = "other";
     protected final String STRUCT_VIEW_PANEL_NAME = "structview";
 
+    private final JLabel errorStringLabel =
+            new JLabel("Error while processing leaf record.",
+            SwingConstants.CENTER);
     protected final JPanel leafPanel;
     protected final CardLayout clLeaf;
 
@@ -125,6 +131,7 @@ public abstract class BTreeInfoPanel<R, B extends BTreeFile>
         clLeaf = new CardLayout();
         leafPanel.setLayout(clLeaf);
 
+        leafPanel.add(errorStringLabel, ERROR_STRING_NAME);
         leafPanel.add(new JLabel("INTERNAL ERROR!", SwingConstants.CENTER), OTHER_NAME);
 
         final JScrollPane structViewPanelScroller = new JScrollPane();
@@ -199,9 +206,9 @@ public abstract class BTreeInfoPanel<R, B extends BTreeFile>
 
                         clRoot.show(infoPanel, INDEX_NAME);
                     }
-                    else {
+                    else if(o2 instanceof BTLeafStorage) {
                         final BTLeafStorage leafStorage = (BTLeafStorage) o2;
-                        final R rec = leafStorage.getRecord();
+                        final CommonBTLeafRecord rec = leafStorage.getRecord();
 
                         if(handleLeafRecord(leafStorage));
                         else if(rec instanceof StructElements) {
@@ -252,6 +259,18 @@ public abstract class BTreeInfoPanel<R, B extends BTreeFile>
                         clRoot.show(infoPanel, LEAF_NAME);
 
                     }
+                    else if(o2 instanceof String) {
+                        errorStringLabel.setText((String) o2);
+                        clLeaf.show(leafPanel, ERROR_STRING_NAME);
+                        clRoot.show(infoPanel, LEAF_NAME);
+                    }
+                    else {
+                        System.err.println("BTreeInfoPanel: Unexpected user " +
+                                "object type " + o2.getClass() + " for " +
+                                "selected tree node.");
+                        clLeaf.show(leafPanel, OTHER_NAME);
+                        clRoot.show(infoPanel, LEAF_NAME);
+                    }
                 }
                 else
                     System.err.println("WARNING: Unknown node type in " +
@@ -298,16 +317,16 @@ public abstract class BTreeInfoPanel<R, B extends BTreeFile>
         }
     }
 
-    protected class BTLeafStorage {
+    protected static class BTLeafStorage {
 
         private final int recordNumber;
         private final int recordOffset;
         private final int recordSize;
-        private R rec;
+        private CommonBTLeafRecord rec;
         private String text;
 
         public BTLeafStorage(int recordNumber, int recordOffset, int recordSize,
-                R rec, String text)
+                CommonBTLeafRecord rec, String text)
         {
             this.recordNumber = recordNumber;
             this.recordOffset = recordOffset;
@@ -328,7 +347,7 @@ public abstract class BTreeInfoPanel<R, B extends BTreeFile>
             return recordSize;
         }
 
-        public R getRecord() {
+        public CommonBTLeafRecord getRecord() {
             return rec;
         }
 
