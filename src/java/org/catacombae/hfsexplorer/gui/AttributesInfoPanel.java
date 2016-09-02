@@ -42,20 +42,20 @@ public class AttributesInfoPanel
         super(attributesFile);
     }
 
-    public String getRootNodeName() {
+    protected String getRootNodeName() {
         return "Attributes root";
     }
 
-    public String getHeaderText() {
+    protected String getHeaderText() {
         return "View of the attributes file's B*-tree:";
     }
 
-    public void createCustomPanels(List<Pair<JPanel, String>> customPanelsList)
+    protected void createCustomPanels(List<Pair<JPanel, String>> panelsList)
     {
         /* No custom panels are implemented for the attributes file. */
     }
 
-    public void expandNode(DefaultMutableTreeNode dmtn, CommonBTNode node,
+    protected void expandNode(DefaultMutableTreeNode dmtn, CommonBTNode node,
             AttributesFile attributesFile)
     {
         if(node instanceof CommonHFSAttributesIndexNode) {
@@ -93,7 +93,7 @@ public class AttributesInfoPanel
             throw new RuntimeException("Invalid node type in tree: " + node);
     }
 
-    public boolean handleLeafRecord(BTLeafStorage leafStorage) {
+    protected boolean handleLeafRecord(BTLeafStorage leafStorage) {
         /* No custom panels are implemented for the attributes file, so no
          * special handling is needed for leaf records. */
         return false;

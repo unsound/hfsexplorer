@@ -57,15 +57,15 @@ public class CatalogInfoPanel
         super(vol.getCatalogFile());
     }
 
-    public String getRootNodeName() {
+    protected String getRootNodeName() {
         return "Catalog root";
     }
 
-    public String getHeaderText() {
+    protected String getHeaderText() {
         return "View of the catalog file's B*-tree:";
     }
 
-    public void createCustomPanels(List<Pair<JPanel, String>> panelsList) {
+    protected void createCustomPanels(List<Pair<JPanel, String>> panelsList) {
         fileInfoPanelHeader = new LeafInfoPanel();
         fileInfoPanel = new FileInfoPanel();
         final JPanel fileInfoPanelContainer =
@@ -86,7 +86,7 @@ public class CatalogInfoPanel
                 FOLDER_NAME));
     }
 
-    public void expandNode(DefaultMutableTreeNode dmtn, CommonBTNode node,
+    protected void expandNode(DefaultMutableTreeNode dmtn, CommonBTNode node,
             CatalogFile catalogFile)
     {
         if(node instanceof CommonHFSCatalogIndexNode) {
@@ -130,7 +130,7 @@ public class CatalogInfoPanel
             throw new RuntimeException("Invalid node type in tree.");
     }
 
-    public boolean handleLeafRecord(BTLeafStorage leafStorage) {
+    protected boolean handleLeafRecord(BTLeafStorage leafStorage) {
         CommonBTLeafRecord rec = leafStorage.getRecord();
         //HFSPlusCatalogLeafRecordData data = rec.getData();
         if(rec instanceof CommonHFSCatalogFileRecord.HFSPlusImplementation) {

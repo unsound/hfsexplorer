@@ -279,17 +279,17 @@ public abstract class BTreeInfoPanel
         });
     }
 
-    public abstract String getRootNodeName();
+    protected abstract String getRootNodeName();
 
-    public abstract String getHeaderText();
+    protected abstract String getHeaderText();
 
-    public abstract void createCustomPanels(
+    protected abstract void createCustomPanels(
             List<Pair<JPanel, String>> customPanelsList);
 
-    public abstract void expandNode(DefaultMutableTreeNode dmtn,
+    protected abstract void expandNode(DefaultMutableTreeNode dmtn,
             CommonBTNode node, B bTree);
 
-    public abstract boolean handleLeafRecord(BTLeafStorage leafStorage);
+    protected abstract boolean handleLeafRecord(BTLeafStorage leafStorage);
 
     protected static class BTNodeStorage {
 
