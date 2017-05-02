@@ -362,7 +362,7 @@ public abstract class HFSCommonFileSystemHandler extends FileSystemHandler {
             onDiskName = posixWrap(onDiskName);
 
             if(sfmSubstitutions) {
-                logicalName = ServicesForMac.remap(logicalName, true);
+                onDiskName = ServicesForMac.remap(onDiskName, true);
             }
         }
 
