@@ -353,17 +353,17 @@ public abstract class HFSCommonFileSystemHandler extends FileSystemHandler {
     protected String getOnDiskName(String logicalName) {
         String onDiskName = logicalName;
 
-        if(doUnicodeFileNameComposition) {
-            onDiskName = UnicodeNormalizationToolkit.getDefaultInstance().
-                    decompose(CharBuffer.wrap(onDiskName));
-        }
-
         if(posixNames) {
-            onDiskName = posixWrap(onDiskName);
-
             if(sfmSubstitutions) {
                 onDiskName = ServicesForMac.remap(onDiskName, true);
             }
+
+            onDiskName = posixWrap(onDiskName);
+        }
+
+        if(doUnicodeFileNameComposition) {
+            onDiskName = UnicodeNormalizationToolkit.getDefaultInstance().
+                    decompose(CharBuffer.wrap(onDiskName));
         }
 
         return onDiskName;
