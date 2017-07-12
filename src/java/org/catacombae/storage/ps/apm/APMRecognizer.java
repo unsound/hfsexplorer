@@ -45,6 +45,15 @@ public class APMRecognizer implements PartitionSystemRecognizer {
                 if(apm.getUsedPartitionCount() > 0) {
                     return true;
                 }
+                else if(blockSize != 512) {
+                    /* We may have an APM configured with 512 byte block size
+                     * even though the DDR says otherwise. */
+                    final ApplePartitionMap backupApm =
+                        new ApplePartitionMap(fsStream, 512, 512);
+                    if(backupApm.getUsedPartitionCount() > 0) {
+                        return true;
+                    }
+                }
             }
         } catch (Exception e) {
         }

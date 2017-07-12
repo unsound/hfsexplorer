@@ -77,14 +77,49 @@ public class APMHandler extends PartitionSystemHandler {
             DriverDescriptorRecord ddr = readDriverDescriptorRecord();
             if(ddr.isValid()) {
                 int blockSize = ddr.getSbBlkSize();
-                //long numberOfBlocksOnDevice = Util.unsign(ddr.getSbBlkCount());
+                long numberOfBlocksOnDevice = ddr.getSbBlkCount();
                 //bitStream.seek(blockSize*1); // second block, first partition in list
                 ApplePartitionMap apm = new ApplePartitionMap(llf,
                         blockSize * 1, blockSize);
-                if(apm.getPartitionCount() > 0)
-                    return apm;
-                else
-                    return null;
+
+                if(apm.getPartitionCount() == 0) {
+                    apm = null;
+                }
+
+                if(apm == null || blockSize > 512) {
+                    long lastPartitionBlock = 0;
+
+                    if(apm != null) {
+                        for(int i = 0; i < apm.getPartitionCount(); ++i) {
+                            final long curLastPartitionBlock =
+                                    (apm.getPartitionEntry(i).getStartOffset() +
+                                    apm.getPartitionEntry(i).getLength() +
+                                    blockSize - 1) / blockSize;
+                            if(curLastPartitionBlock > lastPartitionBlock) {
+                                lastPartitionBlock = curLastPartitionBlock;
+                            }
+                        }
+                    }
+
+                    if(apm == null ||
+                            lastPartitionBlock > numberOfBlocksOnDevice)
+                    {
+                        /* Last partition extends beyond the end of the device
+                         * as specified in the DDR. Chances are that the
+                         * partition layout refers to a 512-byte sector size. */
+                        try {
+                            final ApplePartitionMap fallbackApm =
+                                    new ApplePartitionMap(llf, 512, 512);
+                            if(fallbackApm.getPartitionCount() > 0) {
+                                apm = fallbackApm;
+                            }
+                        } catch(Exception e) {
+                            /* Ignore errors. */
+                        }
+                    }
+                }
+
+                return apm;
             }
             else
                 return null;
