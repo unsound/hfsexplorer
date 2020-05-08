@@ -54,7 +54,7 @@ void throwByName(JNIEnv *env, const char *name, const char *fmt, ...) {
     allocated_msg_capacity *= 2;
 
     allocated_msg_length =
-      vsnprintf(allocated_msg, allocated_msg_capacity, fmt, ap);
+      _vsnprintf(allocated_msg, allocated_msg_capacity, fmt, ap);
 
     /* Always ensure that a NULL terminator exists. */
     allocated_msg[allocated_msg_capacity - 1] = '\0';

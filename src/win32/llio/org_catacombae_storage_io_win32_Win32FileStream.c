@@ -19,7 +19,8 @@
 #define _UNICODE
 #define _CRT_SECURE_NO_WARNINGS
 
-#define _WIN32_WINNT 0x0500 // Minimum windows 2000 required, beacuse of GetFileSizeEx.
+/* Minimum Windows 2000 SDK required. */
+#define _WIN32_WINNT 0x0500
 #include <windows.h>
 #include <winioctl.h>
 #include <tchar.h>
@@ -46,7 +47,6 @@ JNIEXPORT jbyteArray JNICALL Java_org_catacombae_catacombae_storage_io_win32_Win
 JNIEXPORT void JNICALL Java_org_catacombae_catacombae_storage_io_win32_Win32FileStream_write(JNIEnv *env, jclass cls, jbyteArray data, jint offset, jint length, jbyteArray handleData) {
   // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
-  LARGE_INTEGER distance;
   LARGE_INTEGER position;
   BYTE *buffer;
   DWORD bytesWritten = 0;
@@ -56,8 +56,19 @@ JNIEXPORT void JNICALL Java_org_catacombae_catacombae_storage_io_win32_Win32File
 
   hnd = getHandle(env, handleData);
 
-  distance.QuadPart = 0;
-  if(!SetFilePointerEx(hnd, distance, &position, FILE_CURRENT)) {
+  position.QuadPart = 0;
+  position.LowPart = SetFilePointer(
+    /* HANDLE hFile */
+    hnd,
+    /* LONG lDistanceToMove */
+    position.LowPart,
+    /* PLONG lpDistanceToMoveHigh */
+    &position.HighPart,
+    /* DWORD dwMoveMethod */
+    FILE_CURRENT);
+  if(position.LowPart == INVALID_SET_FILE_POINTER &&
+    GetLastError() != NO_ERROR)
+  {
     position.QuadPart = 0x7FFFFFFFFFFFFFFFLL;
   }
 

@@ -19,7 +19,8 @@
 #define _UNICODE
 #define _CRT_SECURE_NO_WARNINGS
 
-#define _WIN32_WINNT 0x0500 // Minimum windows 2000 required, because of GetFileSizeEx.
+/* Minimum Windows 2000 SDK required. */
+#define _WIN32_WINNT 0x0500
 #include <windows.h>
 #include <winioctl.h>
 #include <tchar.h>
@@ -46,15 +47,18 @@ JNIEXPORT jbyteArray JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32F
 JNIEXPORT void JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStream_seek(JNIEnv *env, jclass cls, jlong pos, jbyteArray handleData) {
   // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
-  LARGE_INTEGER oldFP, newFP;
+  LARGE_INTEGER newFP;
 
   if(DEBUG) printf("Java_WindowsLowLevelIO_seek called\n");
   hnd = getHandle(env, handleData);
-  oldFP.QuadPart = pos;
-  if(SetFilePointerEx(hnd, oldFP, &newFP, FILE_BEGIN) == FALSE)
+  newFP.QuadPart = pos;
+  if(SetFilePointer(hnd, newFP.LowPart, &newFP.HighPart, FILE_BEGIN) ==
+    INVALID_SET_FILE_POINTER && GetLastError() != NO_ERROR)
+  {
     throwByName(env, "java/lang/RuntimeException",
                 "Error 0x%08X while attempting to set file pointer to %lld.",
                 GetLastError(), (long long) pos);
+  }
 }
 
 /*
@@ -66,7 +70,6 @@ JNIEXPORT jint JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStr
 						   jint offset, jint length, jbyteArray handleData) {
   // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
-  LARGE_INTEGER distance;
   LARGE_INTEGER position;
   BYTE *buffer;
   DWORD bytesRead = 0;
@@ -75,8 +78,19 @@ JNIEXPORT jint JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStr
   if(DEBUG) printf("Java_WindowsLowLevelIO_read called\n");
   hnd = getHandle(env, handleData);
 
-  distance.QuadPart = 0;
-  if(!SetFilePointerEx(hnd, distance, &position, FILE_CURRENT)) {
+  position.QuadPart = 0;
+  position.LowPart = SetFilePointer(
+    /* HANDLE hFile */
+    hnd,
+    /* LONG lDistanceToMove */
+    position.LowPart,
+    /* PLONG lpDistanceToMoveHigh */
+    &position.HighPart,
+    /* DWORD dwMoveMethod */
+    FILE_CURRENT);
+  if(position.LowPart == INVALID_SET_FILE_POINTER &&
+    GetLastError() != NO_ERROR)
+  {
     position.QuadPart = 0x7FFFFFFFFFFFFFFFLL;
   }
 
@@ -165,26 +179,89 @@ JNIEXPORT void JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStr
 JNIEXPORT jlong JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStream_length(JNIEnv *env, jclass cls, jbyteArray handleData) {
   // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
-  LARGE_INTEGER length;
+  BY_HANDLE_FILE_INFORMATION fi;
 
   hnd = getHandle(env, handleData);
-  if(GetFileSizeEx(hnd, &length) == FALSE) {
+
+  if(GetFileInformationByHandle(
+    /* HANDLE hFile */
+    hnd,
+    /* LPBY_HANDLE_FILE_INFORMATION lpFileInformation */
+    &fi) == FALSE)
+  {
     GET_LENGTH_INFORMATION info;
+    PARTITION_INFORMATION partition_info;
     DWORD bytesReturned;
-    if(DeviceIoControl(hnd, IOCTL_DISK_GET_LENGTH_INFO, NULL, 0, &info, sizeof(GET_LENGTH_INFORMATION), &bytesReturned, NULL) == FALSE) {
+    if(DeviceIoControl(
+      /* __in        HANDLE hDevice */
+      hnd,
+      /* __in        DWORD dwIoControlCode */
+      IOCTL_DISK_GET_LENGTH_INFO,
+      /* __in_bcount_opt(nInBufferSize) LPVOID lpInBuffer */
+      NULL,
+      /* __in        DWORD nInBufferSize */
+      0,
+      /* __out_bcount_part_opt(nOutBufferSize, *lpBytesReturned)
+       * LPVOID lpOutBuffer */
+      &info,
+      /* __in        DWORD nOutBufferSize */
+      sizeof(GET_LENGTH_INFORMATION),
+      /* __out_opt   LPDWORD lpBytesReturned */
+      &bytesReturned,
+      /* __inout_opt LPOVERLAPPED lpOverlapped */
+      NULL) != FALSE)
+    {
+      if(bytesReturned != sizeof(GET_LENGTH_INFORMATION)) {
+        fprintf(stderr, "WARNING: Expected %u bytes in return from "
+            "DeviceIoControl, got %u.\n",
+            sizeof(GET_LENGTH_INFORMATION), (int) bytesReturned);
+      }
+
+      fprintf(stderr, "Got partition sector count with "
+          "IOCTL_DISK_GET_LENGTH_INFO: %lld\n",
+          info.Length.QuadPart);
+      return (jlong) (info.Length.QuadPart);
+    }
+    else if(DeviceIoControl(
+      /* __in        HANDLE hDevice */
+      hnd,
+      /* __in        DWORD dwIoControlCode */
+      IOCTL_DISK_GET_PARTITION_INFO,
+      /* __in_bcount_opt(nInBufferSize) LPVOID lpInBuffer */
+      NULL,
+      /* __in        DWORD nInBufferSize */
+      0,
+      /* __out_bcount_part_opt(nOutBufferSize, *lpBytesReturned)
+       * LPVOID lpOutBuffer */
+      &partition_info,
+      /* __in        DWORD nOutBufferSize */
+      sizeof(PARTITION_INFORMATION),
+      /* __out_opt   LPDWORD lpBytesReturned */
+      &bytesReturned,
+      /* __inout_opt LPOVERLAPPED lpOverlapped */
+      NULL) != FALSE)
+    {
+      if(bytesReturned != sizeof(PARTITION_INFORMATION)) {
+        fprintf(stderr, "WARNING: Expected %u bytes in return from "
+            "DeviceIoControl, got %u.\n",
+            sizeof(PARTITION_INFORMATION), (int) bytesReturned);
+      }
+
+      fprintf(stderr, "Got partition sector count with "
+          "IOCTL_DISK_GET_PARTITION_INFO: %lld\n",
+          partition_info.PartitionLength.QuadPart);
+      return (jlong) (partition_info.PartitionLength.QuadPart);
+    }
+    else {
       throwByName(env, "java/lang/RuntimeException",
                   "Error 0x%08X while attempting to get file size.",
                   GetLastError());
       return -1;
     }
-    else {
-      if(bytesReturned != sizeof(GET_LENGTH_INFORMATION))
-	fprintf(stderr, "WARNING: Expected %u bytes in return from DeviceIoControl, got %u.\n", sizeof(GET_LENGTH_INFORMATION), (int)bytesReturned);
-      return (jlong)(info.Length.QuadPart);
-    }
   }
-  else
-    return (jlong)(length.QuadPart);
+  else {
+    return (jlong)((((jlong) fi.nFileSizeHigh) << 32) | fi.nFileSizeLow);
+  }
 }
 
 /*
@@ -195,19 +272,31 @@ JNIEXPORT jlong JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileSt
 JNIEXPORT jlong JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStream_getFilePointer(JNIEnv *env, jclass cls, jbyteArray handleData) {
   // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
-  LARGE_INTEGER distance, fp;
+  LARGE_INTEGER fp;
 
-  distance.QuadPart = 0;
+  fp.QuadPart = 0;
   hnd = getHandle(env, handleData);
 
-  if(SetFilePointerEx(hnd, distance, &fp, FILE_CURRENT) == FALSE) {
+  fp.LowPart = SetFilePointer(
+    /* HANDLE hFile */
+    hnd,
+    /* LONG lDistanceToMove */
+    fp.LowPart,
+    /* PLONG lpDistanceToMoveHigh */
+    &fp.HighPart,
+    /* DWORD dwMoveMethod */
+    FILE_CURRENT);
+  if(fp.LowPart == INVALID_SET_FILE_POINTER &&
+    GetLastError() != NO_ERROR)
+  {
     throwByName(env, "java/lang/RuntimeException",
                 "Error 0x%08X while attempting to get file pointer!",
                 GetLastError());
     return -1;
   }
-  else
+  else {
     return (jlong)(fp.QuadPart);
+  }
 }
 
 /*
@@ -219,11 +308,59 @@ JNIEXPORT jint JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStr
   // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
   DISK_GEOMETRY_EX geom;
+  DISK_GEOMETRY geom_legacy;
   DWORD bytesReturned;
 
   hnd = getHandle(env, handleData);
-  if(DeviceIoControl(hnd, IOCTL_DISK_GET_DRIVE_GEOMETRY_EX, NULL, 0, &geom, sizeof(DISK_GEOMETRY_EX), &bytesReturned, NULL) == FALSE)
-    return -1;
-  else
+  if(DeviceIoControl(
+    /* __in        HANDLE hDevice */
+    hnd,
+    /* __in        DWORD dwIoControlCode */
+    IOCTL_DISK_GET_DRIVE_GEOMETRY_EX,
+    /* __in_bcount_opt(nInBufferSize) LPVOID lpInBuffer */
+    NULL,
+    /* __in        DWORD nInBufferSize */
+    0,
+    /* __out_bcount_part_opt(nOutBufferSize, *lpBytesReturned)
+     * LPVOID lpOutBuffer */
+    &geom,
+    /* __in        DWORD nOutBufferSize */
+    sizeof(DISK_GEOMETRY_EX),
+    /* __out_opt   LPDWORD lpBytesReturned */
+    &bytesReturned,
+    /* __inout_opt LPOVERLAPPED lpOverlapped */
+    NULL) != FALSE)
+  {
+    fprintf(stderr, "Got bytes per sector with "
+        "IOCTL_DISK_GET_DRIVE_GEOMETRY_EX: %lu\n",
+        geom.Geometry.BytesPerSector);
     return geom.Geometry.BytesPerSector;
+  }
+  else if(DeviceIoControl(
+    /* __in        HANDLE hDevice */
+    hnd,
+    /* __in        DWORD dwIoControlCode */
+    IOCTL_DISK_GET_DRIVE_GEOMETRY,
+    /* __in_bcount_opt(nInBufferSize) LPVOID lpInBuffer */
+    NULL,
+    /* __in        DWORD nInBufferSize */
+    0,
+    /* __out_bcount_part_opt(nOutBufferSize, *lpBytesReturned)
+     * LPVOID lpOutBuffer */
+    &geom_legacy,
+    /* __in        DWORD nOutBufferSize */
+    sizeof(DISK_GEOMETRY),
+    /* __out_opt   LPDWORD lpBytesReturned */
+    &bytesReturned,
+    /* __inout_opt LPOVERLAPPED lpOverlapped */
+    NULL) != FALSE)
+  {
+    fprintf(stderr, "Got bytes per sector with IOCTL_DISK_GET_DRIVE_GEOMETRY: "
+        "%lu\n", geom_legacy.BytesPerSector);
+    return geom_legacy.BytesPerSector;
+  }
+  else {
+    fprintf(stderr, "Failed to get bytes per sector: 0x%X\n", GetLastError());
+    return -1;
+  }
 }
