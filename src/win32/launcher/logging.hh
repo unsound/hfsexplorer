@@ -8,6 +8,13 @@
 #define LOGGING_ENABLED TRUE
 #endif /* LOGGING_ENABLED */
 
+/** Format placeholder to use for _TCHAR strings in log messages. */
+#ifdef _UNICODE
+#define FMTts "S"
+#else
+#define FMTts "s"
+#endif
+
 /* <Logging macros and inline helper functions> */
 enum loglevel {
   error = 0x0000010,

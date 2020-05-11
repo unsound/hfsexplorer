@@ -266,7 +266,7 @@ static inline void printError(const _TCHAR *const prefix, const DWORD errorVal) 
     message[cutPosition-1] = _T('\0');
   }
 
-  LOG(error, "%s%i: \"%s\"", prefix, errorVal, message);
+  LOG(error, "%" FMTts "%i: \"%" FMTts "\"", prefix, errorVal, message);
 
   delete[] message;
   if(fmtMsgMessage != NULL)
@@ -370,13 +370,14 @@ static bool appendToEnvironmentVariable(const _TCHAR *const varName,
         GetEnvironmentVariable(varName, oldValue, oldValueAllocatedLength);
 
     if(oldValueLength != oldValueAllocatedLength - 1) {
-        LOG(error, "Could not get environment variable %s. oldValueLength=%d, "
-            "oldValueAllocatedLength=%d.",
+        LOG(error, "Could not get environment variable %" FMTts ". "
+            "oldValueLength=%d, oldValueAllocatedLength=%d.",
             varName, oldValueLength, oldValueAllocatedLength);
         printError(_T("Error: "), GetLastError());
     }
     else {
-        LOG(debug, "Read old %s variable: \"%s\"", varName, oldValue);
+        LOG(debug, "Read old %" FMTts " variable: \"%" FMTts "\"",
+            varName, oldValue);
 
         const DWORD newValueAllocatedLength =
             oldValueLength + appendedValueLength + 1;
@@ -392,10 +393,11 @@ static bool appendToEnvironmentVariable(const _TCHAR *const varName,
 
         newValue[ptr++] = _T('\0');
 
-        LOG(debug, "Setting new %s variable: \"%s\"", varName, newValue);
+        LOG(debug, "Setting new %" FMTts " variable: \"%" FMTts "\"",
+            varName, newValue);
 
         if(SetEnvironmentVariable(varName, newValue) == TRUE) {
-            LOG(debug, "Successfully set %s variable!", varName);
+            LOG(debug, "Successfully set %" FMTts " variable!", varName);
             result = true;
         }
         else {
@@ -416,7 +418,8 @@ static bool appendToEnvironmentVariable(const _TCHAR *const varName,
 /* Begin: Code from Sun's forums. http://forum.java.sun.com/thread.jspa?threadID=5124559&messageID=9441051 */
 
 static int readStringFromRegistry(HKEY key, const _TCHAR *name, LPBYTE buf, DWORD bufsize) {
-  LOG(trace, "int readStringFromRegistry(%d, \"%s\", (_TCHAR*) 0x%X, %d)", key, name, buf, bufsize);
+  LOG(trace, "int readStringFromRegistry(%d, \"%" FMTts "\", (_TCHAR*) 0x%X, "
+    "%d)", key, name, buf, bufsize);
 
   DWORD type, size;
 
@@ -442,23 +445,25 @@ static int readJreKeyFromRegistry(const _TCHAR *leafName, _TCHAR *buf,
   LOG(debug, "  readJreKeyFromRegistry(__out _TCHAR *buf [ptr: 0x%X], %i)",
     (size_t) buf, bufsize);
   if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, JRE_KEY, 0, KEY_READ, &key) != ERROR_SUCCESS) {
-    LOG(debug, "  Could not open key HKLM\\%s. Aborting.", JRE_KEY);
+    LOG(debug, "  Could not open key HKLM\\%" FMTts ". Aborting.", JRE_KEY);
     return -1;
   }
   if(readStringFromRegistry(key, CURVER_STR, version, sizeof(version)) != 0) {
-    LOG(debug, "  Could not read %s string (CURVER) from Java registry location. Aborting...", CURVER_STR);
+    LOG(debug, "  Could not read %" FMTts " string (CURVER) from Java registry "
+      "location. Aborting...", CURVER_STR);
     RegCloseKey(key);
     return -2;
   }
   // If we call the unicode version of the function, we will get unicode data back, so we can cast to _TCHAR
   if(RegOpenKeyEx(key, (_TCHAR*)version, 0, KEY_READ, &subkey) != ERROR_SUCCESS) {
-    LOG(debug, "  Could not open subkey %s. Aborting...", (_TCHAR*)version);
+    LOG(debug, "  Could not open subkey %" FMTts ". Aborting...",
+      (_TCHAR*)version);
     RegCloseKey(key);
     return -3;
   }
   if(readStringFromRegistry(subkey, leafName, (LPBYTE)buf, bufsize) != 0) {
-    LOG(debug, "  Could not read %s string from Java registry location. "
-      "Aborting...", leafName);
+    LOG(debug, "  Could not read %" FMTts " string from Java registry "
+      "location. Aborting...", leafName);
     RegCloseKey(subkey);
     RegCloseKey(key);
     return -4;
@@ -520,7 +525,7 @@ static bool loadJVMLibrary(const _TCHAR *const libraryPath,
             else if(!appendToEnvironmentVariable(_T("PATH"), javaHomePath,
                 _tcslen(javaHomePath)))
             {
-                LOG(debug, "Error while appending \"%s\" to PATH.\n",
+                LOG(debug, "Error while appending \"%" FMTts "\" to PATH.\n",
                     javaHomePath);
             }
             else if(!appendToEnvironmentVariable(_T("PATH"), _T("\\bin"),
@@ -535,7 +540,7 @@ static bool loadJVMLibrary(const _TCHAR *const libraryPath,
     }
 
     if(pathModificationSuccessful) {
-        LOG(debug, "LoadLibrary(%s);", libraryPath);
+        LOG(debug, "LoadLibrary(%" FMTts ");", libraryPath);
         HINSTANCE jvmLib = LoadLibrary(libraryPath);
         if(jvmLib == NULL) {
             printError(_T("LoadLibrary failed with error "), GetLastError());
@@ -709,7 +714,8 @@ static bool createJavaVM(JavaVM **jvmOut, HINSTANCE *jvmLibOut) {
     strncpy(classpathOptionString+optionPrefixLength, classpathString, classpathStringLength);
     classpathOptionString[optionPrefixLength+classpathStringLength-1] = '\0';
     _TCHAR *tClasspathOptionString = A2T(classpathOptionString);
-    LOG(debug, "Classpath option string: \"%s\"", tClasspathOptionString);
+    LOG(debug, "Classpath option string: \"%" FMTts "\"",
+        tClasspathOptionString);
 
     JavaVMInitArgs vm_args;
     const int nOptions = 2;
@@ -776,7 +782,7 @@ static bool startJavaVM(JavaVM *jvmInstance, const int javaArgsLength, const _TC
 
   _TCHAR currentWorkingDirectory[MAX_PATH];
   GetCurrentDirectory(MAX_PATH, currentWorkingDirectory);
-  LOG(debug, "Current working dir: \"%s\"", currentWorkingDirectory);
+  LOG(debug, "Current working dir: \"%" FMTts "\"", currentWorkingDirectory);
   /* Proceed... */
   JNIEnv *env;
   jvmInstance->AttachCurrentThread((void **)&env, NULL);
@@ -829,7 +835,8 @@ static bool startJavaVM(JavaVM *jvmInstance, const int javaArgsLength, const _TC
 #endif
 
 	  if(wcCur != NULL && wcCurLength != -1) {
-            LOG(debug, "Converting \"%.*s\" to UTF-8...", wcCurLength, wcCur);
+            LOG(debug, "Converting \"%.*" FMTts "\" to UTF-8...",
+                wcCurLength, wcCur);
 	    char* utf8String;
 	    int utf8StringLength = WideCharToMultiByte(CP_UTF8, 0, wcCur, wcCurLength, NULL, 0, NULL, NULL);
 	    LOG(debug, "utf8StringLength=%d", utf8StringLength);
@@ -908,7 +915,7 @@ static bool createExternalJavaProcess(const _TCHAR *imageFile, int javaArgsLengt
     }
     _TCHAR *commandLine = argsStringBuilder.toWideCharString(new _TCHAR[argsStringBuilder.length()+1]);
 
-    LOG(debug, "commandLine=\"%s\"", commandLine);
+    LOG(debug, "commandLine=\"%" FMTts "\"", commandLine);
     //LOG(debug, "printing characters in commandLine detailed:");
     //for(int i = 0; commandLine[i] != _T('\0'); ++i)
     //  LOG(debug, "  commandLine[%d]: '%c' (0x%X)", i, commandLine[i], commandLine[i]);
@@ -1011,8 +1018,8 @@ static void resolveClasspath(const _TCHAR *const prefix) {
     _tcscat(classpathString, classpathComponents[i]);
     _tcscat(classpathString, _T("\""));
   }
-  LOG(debug, "resolveClasspath(_TCHAR*) 0x%X) setting global variable classpathString to \"%s\"",
-      prefix, classpathString);
+  LOG(debug, "resolveClasspath(_TCHAR*) 0x%X) setting global variable "
+    "classpathString to \"%" FMTts "\"", prefix, classpathString);
   LOG(trace, "returning from void resolveClasspath((_TCHAR*) 0x%X)", prefix);
 }
 
@@ -1070,10 +1077,10 @@ static bool spawnElevatedProcess(_TCHAR *imageFile, _TCHAR *currentWorkingDirect
   execInfo.nShow = SW_SHOW;
   execInfo.hInstApp = NULL;
   LOG(debug, "&execInfo=%d", (size_t) &execInfo);
-  LOG(debug, "execInfo.lpVerb=\"%s\"", execInfo.lpVerb);
-  LOG(debug, "execInfo.lpFile=\"%s\"", execInfo.lpFile);
-  LOG(debug, "execInfo.lpParameters=\"%s\"", execInfo.lpParameters);
-  LOG(debug, "execInfo.lpDirectory=\"%s\"", execInfo.lpDirectory);
+  LOG(debug, "execInfo.lpVerb=\"%" FMTts "\"", execInfo.lpVerb);
+  LOG(debug, "execInfo.lpFile=\"%" FMTts "\"", execInfo.lpFile);
+  LOG(debug, "execInfo.lpParameters=\"%" FMTts "\"", execInfo.lpParameters);
+  LOG(debug, "execInfo.lpDirectory=\"%" FMTts "\"", execInfo.lpDirectory);
   LOG(debug, "executing ShellExecuteEx...");
   if(ShellExecuteEx(&execInfo) == TRUE) {
     LOG(debug, "ShellExecuteEx success!");
@@ -1162,7 +1169,7 @@ int main(int original_argc, char** original_argv) {
       break;
     }
   }
-  LOG(debug, "Got fully qualified path: \"%s\"", processFilename);
+  LOG(debug, "Got fully qualified path: \"%" FMTts "\"", processFilename);
   /* </Get the fully qualified path of this executable> */
 
 
@@ -1177,7 +1184,8 @@ int main(int original_argc, char** original_argv) {
   _TCHAR *processParentDir = new _TCHAR[processParentDirLength];
   memcpy(processParentDir, processFilename, sizeof(_TCHAR)*(processParentDirLength-1));
   processParentDir[psIndex] = _T('\0');
-  LOG(debug, "Got fully qualified parent dir: \"%s\"", processParentDir);
+  LOG(debug, "Got fully qualified parent dir: \"%" FMTts "\"",
+    processParentDir);
   /* <//Extract the parent directory from the fully qualified path> */
 
 
@@ -1197,7 +1205,7 @@ int main(int original_argc, char** original_argv) {
     returnValue = RETVAL_COULD_NOT_GET_CWD;
   }
   else {
-    LOG(debug, "CWD: \"%s\"", currentWorkingDirectory);
+    LOG(debug, "CWD: \"%" FMTts "\"", currentWorkingDirectory);
 
     if(argc > 1 && _tcscmp(argv[1], _T("-invokeuac")) == 0) {
       LOG(debug, "\"-invokeuac\" specified. Forking off elevated process...");
@@ -1239,7 +1247,7 @@ int main(int original_argc, char** original_argv) {
 	    printError(_T("Could not convert args[1] into pathname. Last error: "), GetLastError());
 	  }
 	  else {
-	    LOG(debug, "full pathname: \"%s\"", fullPathName);
+            LOG(debug, "full pathname: \"%" FMTts "\"", fullPathName);
 	    argv[1] = fullPathName;
 	  }
 	}
@@ -1262,7 +1270,7 @@ int main(int original_argc, char** original_argv) {
         if(!appendToEnvironmentVariable(_T("PATH"), processParentDir,
           _tcslen(processParentDir)))
         {
-          LOG(debug, "Error while appending \"%s\" to PATH.\n",
+          LOG(debug, "Error while appending \"%" FMTts "\" to PATH.\n",
               processParentDir);
           return 0;
         }
@@ -1270,8 +1278,7 @@ int main(int original_argc, char** original_argv) {
         if(!appendToEnvironmentVariable(_T("PATH"), _T("\\") _T(DLL_HOME),
            _tcslen(_T("\\") _T(DLL_HOME))))
         {
-          LOG(debug, "Error while appending \"" _T("\\") _T(DLL_HOME) "\" to "
-              "PATH.\n");
+          LOG(debug, "Error while appending \"\\" DLL_HOME "\" to PATH.\n");
           return 0;
         }
 
@@ -1295,7 +1302,7 @@ int main(int original_argc, char** original_argv) {
 
 	LOG(debug, "Current environment:");
 	while(*lpszVariable) {
-	  LOG(debug, "  %s", lpszVariable);
+          LOG(debug, "  %" FMTts, lpszVariable);
 	  lpszVariable += lstrlen(lpszVariable) + 1;
 	}
 	FreeEnvironmentStrings(lpvEnv);
