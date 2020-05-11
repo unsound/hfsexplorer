@@ -52,12 +52,54 @@ public:
   }
 
   void append(const char *cstr, int pos, int len, UINT codePage, DWORD dwFlags) {
-    int wstrLength = MultiByteToWideChar(codePage, dwFlags, cstr+pos, len, NULL, 0);
+    int wstrLength =
+      (codePage == CODEPAGE_ASCII) ? len :
+      MultiByteToWideChar(
+        /* UINT CodePage */
+        codePage,
+        /* DWORD dwFlags */
+        dwFlags,
+        /* LPCCH lpMultiByteStr */
+        &cstr[pos],
+        /* int cbMultiByte */
+        len,
+        /* LPWSTR lpWideCharStr */
+        NULL,
+        /* int cchWideChar */
+        0);
     wchar_t *wstr = new wchar_t[wstrLength];
-    int writtenChars = MultiByteToWideChar(codePage, dwFlags, cstr+pos, len, wstr, wstrLength);
-    if(writtenChars != wstrLength) {
-      LOG(error, "FATAL ERROR: writtenChars(%d) != wstrLength(%d)", writtenChars, wstrLength);
-      throw "MultiByteToWideChar failed...";
+
+    if(codePage == CODEPAGE_ASCII) {
+      int i;
+
+      for(i = 0; i < len; ++i) {
+        if(cstr[i] < 0x80) {
+          wstr[i] = (wchar_t) cstr[i];
+        }
+        else {
+          wstr[i] = L'?';
+        }
+      }
+    }
+    else {
+      int writtenChars = MultiByteToWideChar(
+        /* UINT CodePage */
+        codePage,
+        /* DWORD dwFlags */
+        dwFlags,
+        /* LPCCH lpMultiByteStr */
+        &cstr[pos],
+        /* int cbMultiByte */
+        len,
+        /* LPWSTR lpWideCharStr */
+        wstr,
+        /* int cchWideChar */
+        wstrLength);
+      if(writtenChars != wstrLength) {
+        LOG(error, "FATAL ERROR: writtenChars(%d) != wstrLength(%d)",
+          writtenChars, wstrLength);
+        throw "MultiByteToWideChar failed...";
+      }
     }
     append(wstr, 0, wstrLength);
     delete[] wstr;
@@ -133,28 +175,88 @@ public:
   }
 
   /**
-   * Stores the built string in <code>cstr</code>, which is assumed to be at least length()+1
-   * char elements long to accommodate the string and the null terminator.<br>
-   * It the caller's responsibility to make sure that the allocated memory area is large enough.<br>
-   * BUG/WARNING: If specifying a code page which converts one wide character to one or more chars,
-   * instead of just one 8-bit char, memory usage will be unpredictable, as the length()+1 assumption
-   * will not hold. If you calculate conservatively, the limit (length()+1)*16 will probably be enough
-   * for all thinkable encodings, as no currently known character encoding uses more than 16 bytes per
-   * character in the worst case (16 is a ridiculous number too, 4 is more realistic).
+   * Stores the built string in <code>cstr</code>, which is assumed to be at
+   * least length()+1 char elements long to accommodate the string and the null
+   * terminator.<br>
+   * It the caller's responsibility to make sure that the allocated memory area
+   * is large enough.<br>
+   * BUG/WARNING: If specifying a code page which converts one wide character to
+   * one or more chars,
+   * instead of just one 8-bit char, memory usage will be unpredictable, as the
+   * length()+1 assumption will not hold. If you calculate conservatively, the
+   * limit (length()+1)*16 will probably be enough for all thinkable encodings,
+   * as no currently known character encoding uses more than 16 bytes per
+   * character in the worst case (16 is a ridiculous number too, 4 is more
+   * realistic).
    *
-   * @param cstr the target memory area where the string is to be stored.
-   * @param codePage the Windows code page for the target string. See http://msdn.microsoft.com/en-us/library/ms776446(VS.85).aspx
-   * @param dwFlags see http://msdn.microsoft.com/en-us/library/ms776420.aspx
-   * @param lpDefaultChar see http://msdn.microsoft.com/en-us/library/ms776420.aspx
-   * @param lpDefaultChar see http://msdn.microsoft.com/en-us/library/ms776420.aspx
+   * @param cstr
+   *     the target memory area where the string is to be stored.
+   * @param codePage
+   *     the Windows code page for the target string. See
+   *     http://msdn.microsoft.com/en-us/library/ms776446(VS.85).aspx
+   * @param dwFlags
+   *     see http://msdn.microsoft.com/en-us/library/ms776420.aspx
+   * @param lpDefaultChar
+   *     see http://msdn.microsoft.com/en-us/library/ms776420.aspx
+   * @param lpUsedDefaultChar
+   *     see http://msdn.microsoft.com/en-us/library/ms776420.aspx
+   *
    * @return <code>cstr</code> (for chaining purposes)
    */
-  char* toCString(char* cstr, UINT codePage, DWORD dwFlags, LPCSTR lpDefaultChar, LPBOOL lpUsedDefaultChar) {
-    int cstrLength = WideCharToMultiByte(codePage, dwFlags, backBuffer, -1, cstr, backBufferLength+1, lpDefaultChar, lpUsedDefaultChar);
-    if(cstrLength != backBufferLength+1) {
-      LOG(error, "FATAL ERROR: cstrLength(%d) != backBufferLength+1(%d)", cstrLength, (backBufferLength+1));
-      throw "WideCharToMultiByte failed...";
+  char* toCString(char* cstr, UINT codePage, DWORD dwFlags,
+    LPCSTR lpDefaultChar, LPBOOL lpUsedDefaultChar)
+  {
+    LOG(trace, "toCString(cstr=%p, codePage=%u, dwFlags=0x%X, "
+      "lpDefaultChar=%p, lpUsedDefaultChar=%p)",
+      cstr, codePage, dwFlags, lpDefaultChar, lpUsedDefaultChar);
+
+    if(codePage == CODEPAGE_ASCII) {
+      int i;
+
+      if(lpUsedDefaultChar) {
+        *lpUsedDefaultChar = FALSE;
+      }
+
+      for(i = 0; i < backBufferLength; ++i) {
+        if(backBuffer[i] < 0x80) {
+          cstr[i] = (char) backBuffer[i];
+        }
+        else {
+          cstr[i] = lpDefaultChar ? *lpDefaultChar : '?';
+          if(lpUsedDefaultChar) {
+            *lpUsedDefaultChar = TRUE;
+          }
+        }
+      }
+
+      cstr[i] = '\0';
     }
+    else {
+      int cstrLength = WideCharToMultiByte(
+        /* UINT CodePage */
+        codePage,
+        /* DWORD dwFlags */
+        dwFlags,
+        /* LPCWCH lpWideCharStr */
+        backBuffer,
+        /* int cchWideChar */
+        backBufferLength,
+        /* LPSTR lpMultiByteStr */
+        cstr,
+        /* int cbMultiByte */
+        backBufferLength + 1,
+        /* LPCCH lpDefaultChar */
+        lpDefaultChar,
+        /* LPBOOL lpUsedDefaultChar */
+        lpUsedDefaultChar);
+      if(cstrLength != backBufferLength+1) {
+        LOG(error, "FATAL ERROR: cstrLength(%d) != backBufferLength+1(%d) "
+          "for cstr \"%s\" (length: %lu)",
+          cstrLength, (backBufferLength+1), cstr, strlen(cstr));
+        throw "WideCharToMultiByte failed...";
+      }
+    }
+
     return cstr;
   }
 };
