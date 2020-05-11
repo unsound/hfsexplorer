@@ -87,8 +87,12 @@ public abstract class SelectDeviceDialog extends JDialog {
                 String title);
     }
 
+    private static final WindowsNT4Factory windowsNt4Factory =
+        new WindowsNT4Factory();
+
     private static final SelectDeviceDialogFactory factories[] = {
         new WindowsFactory(),
+        windowsNt4Factory, /* Must come immediately after WindowsFactory. */
         new LinuxFactory(),
         new MacOSXFactory(),
         new FreeBSDFactory(),
@@ -220,6 +224,21 @@ public abstract class SelectDeviceDialog extends JDialog {
         for(SelectDeviceDialogFactory factory : factories) {
             if(factory.isSystemSupported()) {
                 dialog = factory.createDeviceDialog(owner, modal, title);
+                if(dialog instanceof SelectDeviceDialog.Windows &&
+                    dialog.detectedDeviceNames.length == 0)
+                {
+                    SelectDeviceDialog nt4dialog =
+                        windowsNt4Factory.createDeviceDialog(
+                            /* Frame owner */
+                            owner,
+                            /* boolean modal */
+                            modal,
+                            /* String title */
+                            title);
+                    if(nt4dialog.detectedDeviceNames.length != 0) {
+                        dialog = nt4dialog;
+                    }
+                }
                 break;
             }
         }
@@ -634,6 +653,83 @@ public abstract class SelectDeviceDialog extends JDialog {
                     activeDeviceNames.addLast(currentDevice);
                 }
                 catch(Exception e) {}
+            }
+
+            return activeDeviceNames.toArray(
+                    new String[activeDeviceNames.size()]);
+        }
+    }
+
+    private static class WindowsNT4Factory implements SelectDeviceDialogFactory
+    {
+        public boolean isSystemSupported() {
+            return System.getProperty("os.name").toLowerCase().
+                    startsWith("windows");
+        }
+
+        public SelectDeviceDialog createDeviceDialog(final Frame owner,
+                final boolean modal, final String title)
+        {
+            return new SelectDeviceDialog.WindowsNT4(owner, modal, title);
+        }
+    }
+
+    private static class WindowsNT4 extends SelectDeviceDialog {
+        public WindowsNT4(final Frame owner, final boolean modal,
+                final String title)
+        {
+            super(owner, modal, title);
+        }
+
+        @Override
+        protected ReadableRandomAccessStream createStream(final String path) {
+            return new ReadableWin32FileStream(path);
+        }
+
+        protected String getDevicePrefix() {
+            return "\\\\.\\";
+        }
+
+        protected String getExampleDeviceName() {
+            return "\\\\.\\E:";
+        }
+
+        protected boolean isPartition(final String deviceName) {
+            /* Technically this is true, however this is used only to determine
+             * if we should ignore it in favour of the internal partition
+             * system parser, and we can't use it if we don't have access to
+             * the whole devices. So return false (maybe this method should be
+             * renamed). */
+            return false;
+        }
+
+        /**
+         * This method is only tested with Windows NT 4.0. (SP6a, x86). Also,
+         * it won't work with devices that are not mounted using the Windows NT
+         * standard names.
+         * @return a list of the names of the detected devices
+         */
+        protected String[] detectDevices() {
+            LinkedList<String> activeDeviceNames = new LinkedList<String>();
+
+            /*
+             * Since I've been too lazy to figure out how to implement a native
+             * method for reading the contents of the device tree I'll just
+             * iterate over all possible drive letters.
+             */
+
+            /* If all else fails, use drive letters. */
+            if(activeDeviceNames.size() == 0) {
+                for(char c = 'A'; c <= 'Z'; ++c) {
+                    try {
+                        String currentDevice = c + ":";
+                        ReadableRandomAccessStream curFile =
+                                createStream(getDevicePrefix() + currentDevice);
+                        curFile.close();
+                        activeDeviceNames.addLast(currentDevice);
+                    } catch(Exception e) {
+                    }
+                }
             }
 
             return activeDeviceNames.toArray(
