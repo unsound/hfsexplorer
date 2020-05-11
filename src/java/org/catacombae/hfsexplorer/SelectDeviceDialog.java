@@ -310,9 +310,6 @@ public abstract class SelectDeviceDialog extends JDialog {
             fsStream = createStream(getDevicePrefix() + deviceName);
             return getFilesystemInfo(fsStream, deviceName);
         } finally {
-            if(fsStream != null) {
-                fsStream.close();
-            }
         }
     }
 
@@ -325,9 +322,6 @@ public abstract class SelectDeviceDialog extends JDialog {
                     pe.partition.getStartOffset(), pe.partition.getLength());
             return getFilesystemInfo(fsStream, pe.toString());
         } finally {
-            if(fsStream != null) {
-                fsStream.close();
-            }
         }
     }
 
