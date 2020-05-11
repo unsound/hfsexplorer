@@ -40,9 +40,20 @@ static inline const _TCHAR* loglevelToString(loglevel ll) {
 
 /* Main logging macro. */
 #if LOGGING_ENABLED
-#define LOG(loglevel, format, ...) do { if(loglevelEnabled(loglevel)) { _ftprintf(stderr, _T("%s: ") _T(format) _T("\n"), loglevelToString(loglevel), ##__VA_ARGS__); fflush(stderr); } } while(0)
+static inline void LOG(enum loglevel loglevel, const char *format, ...)
+{
+  if(loglevelEnabled(loglevel)) {
+    va_list ap;
+    va_start(ap, format);
+    _ftprintf(stderr, _T("%s: "), loglevelToString(loglevel));
+    vfprintf(stderr, format, ap);
+    _ftprintf(stderr, _T("\n"));
+    fflush(stderr);
+    va_end(ap);
+  }
+}
 #else
-#define LOG(loglevel, format, ...)
+static inline void LOG(enum loglevel loglevel, const char *format, ...) {}
 #endif
 /* </Logging macros and inline helper functions> */
 

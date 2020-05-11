@@ -15,7 +15,7 @@
  */
 class StringBuilder {
 private:
-  static const int CODEPAGE_ASCII = 20127;
+  static const int CODEPAGE_ASCII;
   wchar_t *backBuffer;
   char *asciiBackBuffer;
   int backBufferLength;
@@ -70,10 +70,13 @@ public:
   void append(const wchar_t *wstr, int pos, int len) {
     int newBackBufferLength = backBufferLength+len;
     wchar_t *newBackBuffer = new wchar_t[newBackBufferLength+1];
-    for(int i = 0; i < backBufferLength; ++i)
+    int i;
+    for(i = 0; i < backBufferLength; ++i) {
       newBackBuffer[i] = backBuffer[i];
-    for(int i = 0; i < len; ++i)
+    }
+    for(i = 0; i < len; ++i) {
       newBackBuffer[backBufferLength+i] = wstr[pos+i];
+    }
     newBackBuffer[newBackBufferLength] = L'\0';
 
     wchar_t *oldBackBuffer = backBuffer;
@@ -155,5 +158,7 @@ public:
     return cstr;
   }
 };
+
+const int StringBuilder::CODEPAGE_ASCII = 20127;
 
 #endif

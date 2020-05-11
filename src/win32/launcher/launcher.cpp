@@ -678,11 +678,12 @@ static bool createJavaVM(JavaVM **jvmOut, HINSTANCE *jvmLibOut) {
     JNIEnv *env;
     JavaVM *jvm;
     jint res;
+    int i;
 
     /* <Build classpath string> */
     int classpathStringLength = 0;
     int pathSeparatorLength = strlen(PATH_SEPARATOR);
-    for(int i = 0; i < classpathComponentsLength; ++i) {
+    for(i = 0; i < classpathComponentsLength; ++i) {
       if(i > 0)
 	classpathStringLength += pathSeparatorLength; // PATH_SEPARATOR
       classpathStringLength += strlen(T2A(classpathComponents[i]));
@@ -691,7 +692,7 @@ static bool createJavaVM(JavaVM **jvmOut, HINSTANCE *jvmLibOut) {
 
     char* classpathString = new char[classpathStringLength];
     int pos = 0;
-    for(int i = 0; i < classpathComponentsLength; ++i) {
+    for(i = 0; i < classpathComponentsLength; ++i) {
       if(i > 0) {
 	strncpy(classpathString+pos, PATH_SEPARATOR, pathSeparatorLength); pos += pathSeparatorLength;
       }
@@ -888,6 +889,7 @@ static bool createExternalJavaProcess(const _TCHAR *imageFile, int javaArgsLengt
   if(!DISABLE_JAVA_PROCESS_CREATION) {
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
+    int i;
     //LOG(debug, "  zeroing memory..."));
     ZeroMemory( &si, sizeof(si) );
     si.cb = sizeof(si);
@@ -897,18 +899,18 @@ static bool createExternalJavaProcess(const _TCHAR *imageFile, int javaArgsLengt
     argsStringBuilder.append(imageFile);
     argsStringBuilder.append(" ");
     argsStringBuilder.append("-classpath ");
-    for(int i = 0; i < classpathComponentsLength; ++i) {
+    for(i = 0; i < classpathComponentsLength; ++i) {
       if(i > 0)
 	argsStringBuilder.append(PATH_SEPARATOR);
       argsStringBuilder.append(classpathComponents[i]);
     }
     argsStringBuilder.append(" ");
-    for(int i = 0; i < startClassComponentsLength; ++i) {
+    for(i = 0; i < startClassComponentsLength; ++i) {
       if(i > 0)
 	argsStringBuilder.append(".");
       argsStringBuilder.append(startClassComponents[i]);
     }
-    for(int i = 0; i < javaArgsLength; ++i) {
+    for(i = 0; i < javaArgsLength; ++i) {
       argsStringBuilder.append(" \"");
       argsStringBuilder.append(javaArgs[i]);
       argsStringBuilder.append("\"");
@@ -1314,11 +1316,12 @@ int main(int original_argc, char** original_argv) {
       const int javaArgsLength = (argc - 1) + prefixArgsLength;
       const _TCHAR **javaArgs = new const _TCHAR*[javaArgsLength];
 
+      int i;
       int curArg = 0;
-      for(int i = 0; i < prefixArgsLength; ++i) {
+      for(i = 0; i < prefixArgsLength; ++i) {
 	javaArgs[curArg++] = prefixArgs[i];
       }
-      for(int i = 1; i < argc; ++i) {
+      for(i = 1; i < argc; ++i) {
 	javaArgs[curArg++] = argv[i];
       }
 
@@ -1352,11 +1355,11 @@ int main(int original_argc, char** original_argv) {
       else {
         int messageBoxRet =
           MessageBox(NULL,
-                     _T("No Java runtime environment found. HFSExplorer cannot "
-                        "function without Java.\n"
-                        "Press \"OK\" to open up http://www.java.com where you "
-                        "can download a Java runtime environment for your "
-			"system."),
+                     _T("No Java runtime environment found. HFSExplorer ")
+                     _T("cannot function without Java.\n")
+                     _T("Press \"OK\" to open up http://www.java.com where ")
+                     _T("you can download a Java runtime environment for ")
+                     _T("your system."),
                      _T("HFSExplorer: Launch error"),
                      MB_OKCANCEL | MB_ICONEXCLAMATION);
 
@@ -1370,8 +1373,8 @@ int main(int original_argc, char** original_argv) {
                          SW_SHOWNORMAL);
           if((size_t) shellExecuteRet <= 32) {
             MessageBox(NULL,
-                       _T("Error while opening your web browser. Please browse "
-                          "to http://www.java.com manually..."),
+                       _T("Error while opening your web browser. Please ")
+                       _T("browse to http://www.java.com manually..."),
                        _T("HFSExplorer: Error opening URL"),
                        MB_OK | MB_ICONERROR);
           }
