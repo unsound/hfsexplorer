@@ -279,6 +279,10 @@ public class ReadableWin32FileStream implements ReadableRandomAccessStream {
             throw new RuntimeException("File closed!");
     }
 
+    public int getSectorSize() {
+        return sectorSize;
+    }
+
     public void ejectMedia() {
         if(fileHandle != null)
             ejectMedia(fileHandle);

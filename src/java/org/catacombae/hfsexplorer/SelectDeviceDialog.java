@@ -59,6 +59,7 @@ import org.catacombae.storage.ps.PartitionSystemHandler;
 import org.catacombae.storage.ps.PartitionSystemHandlerFactory;
 import org.catacombae.storage.ps.PartitionSystemType;
 import org.catacombae.storage.ps.PartitionType;
+import org.catacombae.storage.ps.gpt.GPTRecognizer;
 import org.catacombae.util.ObjectContainer;
 
 public abstract class SelectDeviceDialog extends JDialog {
@@ -186,7 +187,34 @@ public abstract class SelectDeviceDialog extends JDialog {
         setResizable(false);
     }
 
-    public ReadableRandomAccessStream getPartitionStream() { return result; }
+    public ReadableRandomAccessStream getPartitionStream() {
+        if(this instanceof WindowsNT4 &&
+                result instanceof ReadableWin32FileStream)
+        {
+            /* Check if we need to offset the stream to handle a GPT layout
+             * inside a protective MBR partition. */
+            final int sectorSize =
+                    ((ReadableWin32FileStream) result).getSectorSize();
+            final ReadableRandomAccessStream gptStream;
+
+            /* Try detecting GPT partitions inside MBR protective
+             * partition by creating a sector-sized hole preceding the
+             * device for the MBR. */
+            gptStream = new ReadableConcatenatedStream(
+                    /* ReadableRandomAccessStream firstPart */
+                    result,
+                    /* long startOffset */
+                    -sectorSize,
+                    /* long length */
+                    result.length() + sectorSize);
+
+            GPTRecognizer gptRecognizer = new GPTRecognizer();
+            if(gptRecognizer.detect(gptStream, 0, gptStream.length())) {
+                return gptStream;
+            }
+        }
+        return result;
+    }
 
     /** Could include an identifier of a partitioning scheme. This should only be used to display a descriptive locator. */
     public String getPathName() { return resultCreatePath; }
@@ -319,7 +347,8 @@ public abstract class SelectDeviceDialog extends JDialog {
             fsStream =
                     new ReadableConcatenatedStream(
                     createStream(getDevicePrefix() + pe.deviceName),
-                    pe.partition.getStartOffset(), pe.partition.getLength());
+                    pe.psOffset + pe.partition.getStartOffset(),
+                    pe.partition.getLength());
             return getFilesystemInfo(fsStream, pe.toString());
         } finally {
         }
@@ -350,6 +379,7 @@ public abstract class SelectDeviceDialog extends JDialog {
             //    skipPrefix = null;
 
             ReadableRandomAccessStream llf = null;
+            int psOffset = 0;
             PartitionSystemHandler partSys = null;
             try {
                 llf = createStream(getDevicePrefix() + deviceName);
@@ -357,6 +387,34 @@ public abstract class SelectDeviceDialog extends JDialog {
                 PartitionSystemType[] detectedTypes =
                         PartitionSystemDetector.detectPartitionSystem(llf,
                         false);
+
+                if(detectedTypes.length == 0 && this instanceof WindowsNT4 &&
+                        llf instanceof ReadableWin32FileStream)
+                {
+                    final int sectorSize =
+                            ((ReadableWin32FileStream) llf).getSectorSize();
+                    final ReadableRandomAccessStream gptStream;
+
+                    /* Try detecting GPT partitions inside MBR protective
+                     * partition by creating a sector-sized hole preceding the
+                     * device for the MBR. */
+                    psOffset = -sectorSize;
+                    gptStream = new ReadableConcatenatedStream(
+                            /* ReadableRandomAccessStream firstPart */
+                            llf,
+                            /* long startOffset */
+                            -sectorSize,
+                            /* long length */
+                            llf.length() + sectorSize);
+
+                    GPTRecognizer a = new GPTRecognizer();
+                    if(a.detect(gptStream, 0, gptStream.length())) {
+                        detectedTypes = new PartitionSystemType[] {
+                            PartitionSystemType.GPT,
+                        };
+                        llf = gptStream;
+                    }
+                }
 
                 PartitionSystemType pst;
                 if(detectedTypes.length == 1)
@@ -397,7 +455,7 @@ public abstract class SelectDeviceDialog extends JDialog {
                                 fileSystemFound = true;
                                 embeddedFileSystems.add(
                                         new EmbeddedPartitionEntry(deviceName,
-                                        j, pst, part));
+                                        j, pst, part, psOffset));
                             }
                         }
                     }
@@ -497,6 +555,7 @@ public abstract class SelectDeviceDialog extends JDialog {
                                 resultCreatePath = getDevicePrefix() +
                                         embeddedInfo.toString();
                                 result = new ReadableConcatenatedStream(llf,
+                                        embeddedInfo.psOffset +
                                         p.getStartOffset(), p.getLength());
                                 setVisible(false);
                                 break;
@@ -1229,13 +1288,16 @@ public abstract class SelectDeviceDialog extends JDialog {
         public final long partitionNumber;
         public final PartitionSystemType psType;
         public final Partition partition;
+        public final int psOffset;
 
         public EmbeddedPartitionEntry(String deviceName, long partitionNumber,
-                PartitionSystemType psType, Partition partition) {
+                PartitionSystemType psType, Partition partition, int psOffset)
+        {
             this.deviceName = deviceName;
             this.partitionNumber = partitionNumber;
             this.psType = psType;
             this.partition = partition;
+            this.psOffset = psOffset;
         }
 
         private String getPartitionSystemString() {
