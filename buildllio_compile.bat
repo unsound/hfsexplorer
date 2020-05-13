@@ -13,6 +13,7 @@ set SOURCE_FILES="%SOURCE_DIR%\llio_common.c" "%SOURCE_DIR%\org_catacombae_stora
 
 if "%1"=="gcc" goto build_gcc
 if "%1"=="vc" goto build_vc
+if "%1"=="wdk" goto build_wdk
 
 goto printusage
 
@@ -20,6 +21,8 @@ goto printusage
 echo usage: %0 gcc
 echo OR
 echo usage: %0 vc [x86^|x64^|ia64]
+echo OR
+echo usage: %0 wdk [x86^|x64^|ia64]
 goto end
 
 :build_gcc
@@ -60,6 +63,41 @@ popd
 set TARGET_DLL=%TARGET_PREFIX%_%IA64_ARCHID%.dll
 goto compile_vc
 
+:build_wdk
+set WDK_PATH=C:\WinDDK\7600.16385.1
+if not exist "%WDK_PATH%\" echo Can not find WDK 7.1.0 at %WDK_PATH%! & goto error
+
+set COMPILE_FLAGS="/I%WDK_PATH%\inc\crt"
+
+if "%2"=="x86" goto setvars_wdk_x86
+if "%2"=="x64" goto setvars_wdk_x64
+if "%2"=="ia64" goto setvars_wdk_ia64
+goto printusage
+
+:setvars_wdk_x86
+pushd "%WDK_PATH%"
+call bin\setenv.bat %WDK_PATH% fre x86 WXP no_oacr
+popd
+set TARGET_DLL=%TARGET_PREFIX%_%I386_ARCHID%.dll
+set LINK_FLAGS=/libpath:%SDK_LIB_DEST%\i386\ /libpath:%WDK_PATH%\lib\crt\i386\
+goto compile_vc
+
+:setvars_wdk_x64
+pushd "%WDK_PATH%"
+call bin\setenv.bat %WDK_PATH% fre x64 WNET no_oacr
+popd
+set TARGET_DLL=%TARGET_PREFIX%_%AMD64_ARCHID%.dll
+set LINK_FLAGS=/libpath:%SDK_LIB_DEST%\amd64\ /libpath:%WDK_PATH%\lib\crt\amd64\
+goto compile_vc
+
+:setvars_wdk_ia64
+pushd "%WDK_PATH%"
+call bin\setenv.bat %WDK_PATH% fre ia64 WNET no_oacr
+popd
+set TARGET_DLL=%TARGET_PREFIX%_%IA64_ARCHID%.dll
+set LINK_FLAGS=/libpath:%SDK_LIB_DEST%\ia64\ /libpath:%WDK_PATH%\lib\crt\ia64\
+goto compile_vc
+
 :compile_vc
 
 if "%JAVA_HOME%"=="" echo JAVA_HOME environment variable not defined! & goto error
@@ -73,13 +111,13 @@ mkdir "%BUILD_DIR%"
 if not "%ERRORLEVEL%"=="0" goto error
 
 echo Compiling with Visual C++...
-cl -c "/Fo%BUILD_DIR%\\" /W3 "/I%JDK_PATH%\include" "/I%JDK_PATH%\include\win32" "%SOURCE_DIR%\*.c"
+cl -c "/Fo%BUILD_DIR%\\" /W3 "/I%JDK_PATH%\include" "/I%JDK_PATH%\include\win32" %COMPILE_FLAGS% "%SOURCE_DIR%\*.c"
 set EXIT_CODE=%ERRORLEVEL%
 if not "%EXIT_CODE%"=="0" goto error
 
 echo Linking...
 REM "/libpath:%JDK_PATH%\lib" 
-link /dll "/out:%TARGET_DLL%" "/implib:%BUILD_DIR%\llio.lib" "/pdb:%BUILD_DIR%\llio.pdb" "%BUILD_DIR%\*.obj"
+link /dll "/out:%TARGET_DLL%" "/implib:%BUILD_DIR%\llio.lib" "/pdb:%BUILD_DIR%\llio.pdb" %LINK_FLAGS% "%BUILD_DIR%\*.obj"
 set EXIT_CODE=%ERRORLEVEL%
 if not "%EXIT_CODE%"=="0" goto error
 goto completed
