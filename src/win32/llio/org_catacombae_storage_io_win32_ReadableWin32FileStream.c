@@ -45,7 +45,6 @@ JNIEXPORT jbyteArray JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32F
  * Signature: (J[B)V
  */
 JNIEXPORT void JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStream_seek(JNIEnv *env, jclass cls, jlong pos, jbyteArray handleData) {
-  // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
   LARGE_INTEGER newFP;
 
@@ -68,7 +67,6 @@ JNIEXPORT void JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStr
  */
 JNIEXPORT jint JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStream_read(JNIEnv *env, jclass cls, jbyteArray data,
 						   jint offset, jint length, jbyteArray handleData) {
-  // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
   LARGE_INTEGER position;
   BYTE *buffer;
@@ -126,7 +124,6 @@ JNIEXPORT jint JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStr
  * Signature: ([B)V
  */
 JNIEXPORT void JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStream_close(JNIEnv *env, jclass cls, jbyteArray handleData) {
-  // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
 
   hnd = getHandle(env, handleData);
@@ -143,7 +140,6 @@ JNIEXPORT void JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStr
  * Signature: ([B)V
  */
 JNIEXPORT void JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStream_ejectMedia(JNIEnv *env, jclass cls, jbyteArray handleData) {
-  // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
   DWORD bytesReturned;
 
@@ -160,7 +156,6 @@ JNIEXPORT void JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStr
  * Signature: ([B)V
  */
 JNIEXPORT void JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStream_loadMedia(JNIEnv *env, jclass cls, jbyteArray handleData) {
-  // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
   DWORD bytesReturned;
 
@@ -172,12 +167,11 @@ JNIEXPORT void JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStr
 }
 
 /*
- * Class:     WindowsLowLevelIO
+ * Class:     org_catacombae_storage_io_win32_ReadableWin32FileStream
  * Method:    length
  * Signature: ([B)J
  */
 JNIEXPORT jlong JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStream_length(JNIEnv *env, jclass cls, jbyteArray handleData) {
-  // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
   BY_HANDLE_FILE_INFORMATION fi;
 
@@ -265,12 +259,11 @@ JNIEXPORT jlong JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileSt
 }
 
 /*
- * Class:     WindowsLowLevelIO
+ * Class:     org_catacombae_storage_io_win32_ReadableWin32FileStream
  * Method:    getFilePointer
  * Signature: ([B)J
  */
 JNIEXPORT jlong JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStream_getFilePointer(JNIEnv *env, jclass cls, jbyteArray handleData) {
-  // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
   LARGE_INTEGER fp;
 
@@ -300,12 +293,11 @@ JNIEXPORT jlong JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileSt
 }
 
 /*
- * Class:     WindowsLowLevelIO
+ * Class:     org_catacombae_storage_io_win32_ReadableWin32FileStream
  * Method:    getSectorSize
  * Signature: ([B)I
  */
 JNIEXPORT jint JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileStream_getSectorSize(JNIEnv *env, jclass cls, jbyteArray handleData) {
-  // Microsoft's old-school C compiler forces me to go C90 strict. Hopefully MinGW GCC will be 64-bit soon.
   HANDLE hnd;
   DISK_GEOMETRY_EX geom;
   DISK_GEOMETRY geom_legacy;

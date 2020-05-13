@@ -51,7 +51,6 @@ JNIEXPORT void JNICALL Java_org_catacombae_catacombae_storage_io_win32_Win32File
   BYTE *buffer;
   DWORD bytesWritten = 0;
 
-  //_tprintf(_T("Java_WindowsLowLevelIO_read called\n"));
   if(DEBUG) printf("Java_WritableWin32File_write called\n");
 
   hnd = getHandle(env, handleData);
