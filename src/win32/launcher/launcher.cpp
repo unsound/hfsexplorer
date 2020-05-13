@@ -349,8 +349,8 @@ static void uninitializeCOM() {
  * Inline utility function for getting the correct string for a bool value
  * (i.e. not 1 or 0, but "true" or "false").
  */
-static inline const _TCHAR* bool2str(bool b) {
-  return b?_T("true"):_T("false");
+static inline const char* bool2str(bool b) {
+  return b ? "true" : "false";
 }
 
 /**
