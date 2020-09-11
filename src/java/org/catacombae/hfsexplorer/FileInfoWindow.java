@@ -215,9 +215,7 @@ public class FileInfoWindow extends HFSExplorerJFrame {
                 /* We know that this window won't be reused. It's recreated
                  * every time, so under that assumption we can close the
                  * ResourceForkReader passed to the ResourceForkViewerPanel. */
-                System.err.println("FileInfoWindow closed");
                 if(resffReaderFinal != null) {
-                    System.err.println("Closing reader");
                     resffReaderFinal.close();
                 }
             }
