@@ -15,7 +15,7 @@
  */
 class StringBuilder {
 private:
-  static const int CODEPAGE_ASCII;
+  static const UINT CODEPAGE_ASCII;
   wchar_t *backBuffer;
   char *asciiBackBuffer;
   int backBufferLength;
@@ -261,6 +261,6 @@ public:
   }
 };
 
-const int StringBuilder::CODEPAGE_ASCII = 20127;
+const UINT StringBuilder::CODEPAGE_ASCII = 20127;
 
 #endif
