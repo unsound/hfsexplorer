@@ -33,7 +33,7 @@ public interface PartitionSystemRecognizer {
      * @param offset the offset in fsStream to the start of the file system.
      * @param length this parameter may be set to -1 if the length isn't
      * currently known.
-     * @return <code>true</code> if a file system can be detected at the
+     * @return <code>true</code> if a partition system can be detected at the
      * specified offset in fsStream, and <code>false</code> otherwise.
      */
     public boolean detect(ReadableRandomAccessStream fsStream, long offset, long length);
