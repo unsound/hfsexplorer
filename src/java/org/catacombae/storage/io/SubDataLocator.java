@@ -54,7 +54,7 @@ public class SubDataLocator extends DataLocator {
     }
 
     @Override
-    public void releaseResources() {
+    protected void releaseResources() {
         source.removeReference(this);
     }
 }

@@ -54,7 +54,7 @@ public class ReadableStreamDataLocator extends DataLocator {
     }
 
     @Override
-    public synchronized void releaseResources() {
+    protected synchronized void releaseResources() {
         if(closed) {
             throw new RuntimeException("Stream is already closed.");
         }
