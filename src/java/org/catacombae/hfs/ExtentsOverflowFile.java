@@ -102,6 +102,16 @@ public class ExtentsOverflowFile
         BTreeFileSession init = openSession();
         //System.err.println("  ExtentsInitProcedure done!");
 
+        try {
+            return getOverflowExtent(init, key);
+        } finally {
+            init.close();
+        }
+    }
+
+    private CommonHFSExtentLeafRecord getOverflowExtent(BTreeFileSession init,
+            CommonHFSExtentKey key)
+    {
 	final int nodeSize = init.bthr.getNodeSize();
 
 	long currentNodeOffset = init.bthr.getRootNodeNumber()*nodeSize;
