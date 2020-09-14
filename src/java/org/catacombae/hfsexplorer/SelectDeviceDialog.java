@@ -54,11 +54,13 @@ import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer.FileSystemType;
 import org.catacombae.storage.io.DataLocator;
 import org.catacombae.storage.io.ReadableStreamDataLocator;
+import org.catacombae.storage.io.SubDataLocator;
 import org.catacombae.storage.ps.PartitionSystemDetector;
 import org.catacombae.storage.ps.PartitionSystemHandler;
 import org.catacombae.storage.ps.PartitionSystemHandlerFactory;
 import org.catacombae.storage.ps.PartitionSystemType;
 import org.catacombae.storage.ps.PartitionType;
+import org.catacombae.storage.ps.PartitionType.ContentType;
 import org.catacombae.storage.ps.gpt.GPTRecognizer;
 import org.catacombae.util.ObjectContainer;
 
@@ -380,6 +382,7 @@ public abstract class SelectDeviceDialog extends JDialog {
 
             ReadableRandomAccessStream llf = null;
             int psOffset = 0;
+            ReadableStreamDataLocator llfLocator = null;
             PartitionSystemHandler partSys = null;
             try {
                 llf = createStream(getDevicePrefix() + deviceName);
@@ -436,14 +439,60 @@ public abstract class SelectDeviceDialog extends JDialog {
                     PartitionSystemHandlerFactory fact =
                             pst.createDefaultHandlerFactory();
 
-                    partSys = fact.createHandler(
-                            new ReadableStreamDataLocator(llf));
+                    llfLocator = new ReadableStreamDataLocator(llf);
+                    partSys = fact.createHandler(llfLocator);
 
-                    Partition[] parts = partSys.getPartitions();
-                    for(int j = 0; j < parts.length; ++j) {
-                        Partition part = parts[j];
+                    ArrayList<Partition> parts =
+                            new ArrayList<Partition>(Arrays.asList(partSys.
+                            getPartitions()));
+                    for(int j = 0; j < parts.size(); ++j) {
+                        Partition part = parts.get(j);
                         PartitionType pt = part.getType();
-                        if(pt == PartitionType.APPLE_HFS_CONTAINER ||
+
+                        if(pt.getContentType() == ContentType.PARTITION_SYSTEM)
+                        {
+                            PartitionSystemType epst =
+                                    pt.getAssociatedPartitionSystemType();
+                            PartitionSystemHandler ph =
+                                    epst.createDefaultHandlerFactory().
+                                    createHandler(
+                                    new SubDataLocator(llfLocator,
+                                    part.getStartOffset(),
+                                    part.getLength()));
+                            EmbeddedPartitionEntry outerPartitionEntry =
+                                    new EmbeddedPartitionEntry(deviceName, j,
+                                    pst, part, psOffset);
+                            Partition[] embeddedPartitions = ph.getPartitions();
+                            for(int k = 0; k < embeddedPartitions.length; ++k) {
+                                Partition embeddedPart = embeddedPartitions[k];
+
+                                PartitionType ept = embeddedPart.getType();
+                                if(ept != PartitionType.APPLE_HFS_CONTAINER &&
+                                    ept != PartitionType.APPLE_HFSX)
+                                {
+                                    continue;
+                                }
+
+                                FileSystemType fsType =
+                                        HFSCommonFileSystemRecognizer.
+                                            detectFileSystem(llf,
+                                                part.getStartOffset() +
+                                                embeddedPart.getStartOffset());
+
+                                if(HFSCommonFileSystemRecognizer.
+                                        isTypeSupported(fsType))
+                                {
+                                    fileSystemFound = true;
+                                    embeddedFileSystems.add(
+                                            new EmbeddedPartitionEntry(
+                                            outerPartitionEntry, k, epst,
+                                            embeddedPart, psOffset));
+                                }
+                            }
+
+                            ph.close();
+                        }
+                        else if(pt == PartitionType.APPLE_HFS_CONTAINER ||
                                 pt == PartitionType.APPLE_HFSX) {
                             FileSystemType fsType =
                                     HFSCommonFileSystemRecognizer.
@@ -487,7 +536,13 @@ public abstract class SelectDeviceDialog extends JDialog {
                 }
             } finally {
                 if(partSys != null) {
-                    partSys.close(); /* Will also close llf. */
+                    partSys.close(); /* Will also close llfLocator, llf. */
+                }
+                else if(llfLocator != null) {
+                    llfLocator.close(); /* Will also close llf. */
+                }
+                else if(llf != null) {
+                    llf.close();
                 }
             }
         }
@@ -547,6 +602,7 @@ public abstract class SelectDeviceDialog extends JDialog {
                             case APM:
                             case GPT:
                             case MBR:
+                            case DOS_EXTENDED:
                                 ReadableRandomAccessStream llf =
                                         createStream(getDevicePrefix() +
                                         embeddedInfo.deviceName);
@@ -1285,19 +1341,35 @@ public abstract class SelectDeviceDialog extends JDialog {
 
     private static final class EmbeddedPartitionEntry {
         public final String deviceName;
+        public final EmbeddedPartitionEntry outerPartitionEntry;
         public final long partitionNumber;
         public final PartitionSystemType psType;
         public final Partition partition;
-        public final int psOffset;
+        public final long psOffset;
 
         public EmbeddedPartitionEntry(String deviceName, long partitionNumber,
                 PartitionSystemType psType, Partition partition, int psOffset)
         {
             this.deviceName = deviceName;
+            this.outerPartitionEntry = null;
             this.partitionNumber = partitionNumber;
             this.psType = psType;
             this.partition = partition;
             this.psOffset = psOffset;
+        }
+
+        public EmbeddedPartitionEntry(
+                EmbeddedPartitionEntry outerPartitionEntry,
+                long partitionNumber, PartitionSystemType psType,
+                Partition partition, int psOffset)
+        {
+            this.deviceName = outerPartitionEntry.deviceName;
+            this.outerPartitionEntry = outerPartitionEntry;
+            this.partitionNumber = partitionNumber;
+            this.psType = psType;
+            this.partition = partition;
+            this.psOffset =
+                    psOffset + outerPartitionEntry.partition.getStartOffset();
         }
 
         private String getPartitionSystemString() {
@@ -1315,10 +1387,16 @@ public abstract class SelectDeviceDialog extends JDialog {
             }
         }
 
+        private String getPartitionString() {
+            return ((outerPartitionEntry != null) ?
+                outerPartitionEntry.getPartitionString() : "") +
+                "[" + getPartitionSystemString() + ":Partition" +
+                partitionNumber + "]";
+        }
+
         @Override
         public String toString() {
-            return deviceName + "[" + getPartitionSystemString() + ":Partition" +
-                    partitionNumber + "]";
+            return deviceName + getPartitionString();
         }
     }
 }
