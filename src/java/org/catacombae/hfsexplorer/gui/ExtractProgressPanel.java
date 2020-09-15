@@ -23,7 +23,7 @@ import java.text.DecimalFormat;
 import org.catacombae.util.SpeedUnitUtils;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class ExtractProgressPanel extends javax.swing.JPanel {
 

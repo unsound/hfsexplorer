@@ -33,7 +33,7 @@ import org.catacombae.hfs.plus.HFSPlusVolume;
 import org.catacombae.hfs.types.hfsplus.HFSPlusVolumeHeader;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class HFSXVolume extends HFSPlusVolume {
     private final byte keyCompareType;

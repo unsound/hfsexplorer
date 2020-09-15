@@ -24,7 +24,7 @@ package org.catacombae.storage.fs;
  * system entries that point to the same location (there is no "source file" for the link, but
  * instead an inode).
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public interface FSLink extends FSEntry {
 

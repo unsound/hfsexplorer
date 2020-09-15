@@ -23,7 +23,7 @@ import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.RuntimeIOException;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class ReadableBlockCachingStream extends ReadableFilterStream {
     /*

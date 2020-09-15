@@ -20,6 +20,9 @@ package org.catacombae.hfs.types.hfsplus;
 import java.io.PrintStream;
 import org.catacombae.util.Util;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public abstract class BTIndexNode extends BTNode {
     protected final BTIndexRecord[] records;
     protected final short[] offsets;

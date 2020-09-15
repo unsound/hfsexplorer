@@ -19,6 +19,9 @@ package org.catacombae.hfs.types.hfsplus;
 
 import org.catacombae.csjc.PrintableStruct;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public abstract class BTKey implements Comparable<BTKey>, PrintableStruct {
     public abstract short getKeyLength();
     public abstract int length();

@@ -24,7 +24,7 @@ package org.catacombae.hfs;
  * only when encountering inconsistencies in structs read from disk that prevent
  * us from proceeding with the requested operation.
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class HFSException extends RuntimeException {
     public HFSException(String message) {

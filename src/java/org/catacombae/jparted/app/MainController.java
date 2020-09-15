@@ -35,7 +35,7 @@ import org.catacombae.storage.ps.PartitionSystemHandlerFactory;
 import org.catacombae.storage.ps.apm.types.APMPartition;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class MainController {
     private MainWindow mainWindow;

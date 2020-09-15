@@ -25,6 +25,9 @@ import javax.swing.JTextArea;
 import org.catacombae.hfsexplorer.gui.HFSExplorerJFrame;
 import org.catacombae.hfsexplorer.io.JTextAreaOutputStream;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class DebugConsoleWindow extends HFSExplorerJFrame {
     private static final int WINDOW_NUMBER_OF_COLUMNS = 80;
     private static final int WINDOW_NUMBER_OF_LINES = 25;

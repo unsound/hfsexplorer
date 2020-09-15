@@ -22,7 +22,7 @@ import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.storage.ps.mbr.types.MBRPartitionTable;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class MBRRecognizer implements PartitionSystemRecognizer {
 

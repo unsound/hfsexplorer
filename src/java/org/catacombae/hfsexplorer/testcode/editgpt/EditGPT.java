@@ -29,7 +29,7 @@ import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class EditGPT extends javax.swing.JPanel {
     private GUIDPartitionTable originalGPT = null;

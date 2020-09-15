@@ -24,6 +24,9 @@ import org.catacombae.storage.io.win32.ReadableWin32FileStream;
 import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class PrintAPMPartitions {
 
     public static void main(String[] args) throws Exception {

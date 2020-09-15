@@ -20,7 +20,7 @@ package org.catacombae.hfsexplorer.testcode.editgpt;
 import org.catacombae.csjc.structelements.StringRepresentableField;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class EditStringValuePanel extends javax.swing.JPanel {
     private StringRepresentableField userData;

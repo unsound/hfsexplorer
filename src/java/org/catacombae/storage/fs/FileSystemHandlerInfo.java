@@ -21,7 +21,7 @@ package org.catacombae.storage.fs;
  * Contains information about a specific implementation of a file system
  * handler.
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public interface FileSystemHandlerInfo {
     /**

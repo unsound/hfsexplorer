@@ -24,6 +24,9 @@ import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.csjc.structelements.IntegerFieldRepresentation;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class BTHeaderRec implements PrintableStruct, StructElements {
     /*
      * struct BTHeaderRec

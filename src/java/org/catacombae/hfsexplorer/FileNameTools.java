@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.HashSet;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class FileNameTools {
     private static final HashSet<String> reservedWindowsFilenames =

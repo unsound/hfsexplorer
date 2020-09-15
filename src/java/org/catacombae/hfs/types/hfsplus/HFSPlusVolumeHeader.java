@@ -30,6 +30,9 @@ import org.catacombae.csjc.structelements.Dictionary;
 import org.catacombae.csjc.structelements.IntegerFieldRepresentation;
 import org.catacombae.hfs.types.hfs.HFSVolumeFinderInfo;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class HFSPlusVolumeHeader extends MutableStruct implements
         PrintableStruct, StructElements
 {

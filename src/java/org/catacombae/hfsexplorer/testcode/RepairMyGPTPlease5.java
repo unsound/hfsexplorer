@@ -33,8 +33,9 @@ import org.catacombae.storage.ps.gpt.GPTPartitionType;
 
 /**
  * 17 August 2008: Changing partition type of partition 2 to microsoft reserved.
+ *
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
-
 public class RepairMyGPTPlease5 {
     private static BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
     public static void main(String[] args) throws Exception {

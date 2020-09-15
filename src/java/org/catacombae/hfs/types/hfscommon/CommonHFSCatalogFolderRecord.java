@@ -25,7 +25,7 @@ import org.catacombae.hfs.types.hfs.CatKeyRec;
 import org.catacombae.hfs.types.hfs.CdrDirRec;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public abstract class CommonHFSCatalogFolderRecord extends CommonHFSCatalogLeafRecord {
     protected final CommonHFSCatalogKey key;

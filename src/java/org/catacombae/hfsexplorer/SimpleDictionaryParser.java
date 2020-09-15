@@ -23,6 +23,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class SimpleDictionaryParser {
     private static final String SPD_HEADER = "!SimpleDictionary";
     private HashMap<String, String> dictionaryTable =

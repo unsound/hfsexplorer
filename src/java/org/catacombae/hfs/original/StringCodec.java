@@ -20,7 +20,7 @@ package org.catacombae.hfs.original;
 /**
  * Transforms data between Java strings and their respective encoded byte[] forms.
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public interface StringCodec {
     /**

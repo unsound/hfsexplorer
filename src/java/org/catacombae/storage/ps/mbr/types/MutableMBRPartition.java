@@ -19,6 +19,9 @@ package org.catacombae.storage.ps.mbr.types;
 
 import org.catacombae.util.Util;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class MutableMBRPartition extends MBRPartition {
 
     public MutableMBRPartition(MBRPartition source) {

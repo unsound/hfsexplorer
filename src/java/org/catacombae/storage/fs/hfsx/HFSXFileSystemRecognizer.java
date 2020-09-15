@@ -22,7 +22,7 @@ import org.catacombae.storage.fs.FileSystemRecognizer;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class HFSXFileSystemRecognizer implements FileSystemRecognizer {
 

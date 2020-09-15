@@ -31,7 +31,7 @@ import org.catacombae.storage.ps.ebr.EBRHandlerFactory;
  * Defines the partition system types that the library knows of, and provides a
  * way of retrieving their handlers, if any implementations exist.
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public enum PartitionSystemType {
     /** The PC legacy Master Boot Record partition system. */

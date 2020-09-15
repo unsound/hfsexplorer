@@ -66,8 +66,9 @@ import org.catacombae.util.Util;
  * (test.bat just says java -cp lib\hfsx.jar org.catacombae.hfsexplorer.%1 %2 %3 etc.)
  *
  * </pre>
+ *
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
-
 public class RepairMyGPTPlease4 {
     private static BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
     public static void main(String[] args) throws Exception {

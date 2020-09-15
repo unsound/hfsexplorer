@@ -25,6 +25,9 @@ import java.util.Arrays;
 import org.catacombae.storage.ps.Partition;
 import org.catacombae.storage.ps.PartitionType;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class APMPartition implements Partition {
     public static final short APM_PARTITION_SIGNATURE = 0x504D;
     public static final short APM_PARTITION_OLD_SIGNATURE = 0x5453;

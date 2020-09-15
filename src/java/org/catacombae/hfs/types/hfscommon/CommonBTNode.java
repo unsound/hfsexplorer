@@ -30,7 +30,7 @@ import org.catacombae.hfs.types.hfs.NodeDescriptor;
  * Generalization of a B-tree node which suits both HFS and HFS+/HFSX
  * implementations.
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public abstract class CommonBTNode <R extends CommonBTRecord>
         implements PrintableStruct

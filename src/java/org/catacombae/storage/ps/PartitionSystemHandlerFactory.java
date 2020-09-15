@@ -23,7 +23,7 @@ import org.catacombae.storage.io.DataLocator;
  * A subclass of PartitionSystemHandlerFactory must always have a empty
  * constructor in order to be used as such.
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public abstract class PartitionSystemHandlerFactory {
     public abstract PartitionSystemRecognizer getRecognizer();

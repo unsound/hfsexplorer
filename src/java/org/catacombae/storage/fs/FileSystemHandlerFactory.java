@@ -25,7 +25,7 @@ import org.catacombae.storage.io.DataLocator;
  * A factory for creating FileSystemHandlers. By setting attributes in the
  * factory, you affect how new FileSystemHandlers are created.
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public abstract class FileSystemHandlerFactory {
 

@@ -31,7 +31,7 @@ import org.catacombae.storage.fs.FSFork;
 import org.catacombae.storage.fs.FSForkType;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class HFSCommonFinderInfoFork implements FSFork {
     private final CommonHFSFinderInfo finderInfo;

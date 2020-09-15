@@ -36,6 +36,8 @@ import org.catacombae.util.Util;
  * This application reads the primary GPT header from the specified disk and writes a
  * corresponding backup header at the end of the disk. Useful for when a disk image
  * does not contain the entire length of the drive, due to read errors and such.
+ *
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 
 public class RepairMyBackupGPT {

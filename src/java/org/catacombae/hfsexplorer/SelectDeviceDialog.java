@@ -64,6 +64,9 @@ import org.catacombae.storage.ps.PartitionType.ContentType;
 import org.catacombae.storage.ps.gpt.GPTRecognizer;
 import org.catacombae.util.ObjectContainer;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public abstract class SelectDeviceDialog extends JDialog {
 
     private SelectDevicePanel guiPanel;

@@ -22,7 +22,7 @@ import java.util.Date;
 /**
  * Generalization of the common attributes of HFSPlusCatalogFolder and HFSPlusCatalogFile.
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public interface HFSPlusCatalogAttributes {
     public static short kHFSFileLockedBit = 0x0000;

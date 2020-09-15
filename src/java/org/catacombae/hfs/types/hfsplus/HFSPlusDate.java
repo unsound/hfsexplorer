@@ -21,7 +21,11 @@ import org.catacombae.hfs.types.hfs.HFSDate;
 import java.util.Date;
 import java.util.TimeZone;
 
-/** In the future, this could wrap a 32 bit HFS+ date. */
+/**
+ * In the future, this could wrap a 32 bit HFS+ date.
+ *
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class HFSPlusDate extends HFSDate {
 
     /**

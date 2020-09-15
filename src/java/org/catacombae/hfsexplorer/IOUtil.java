@@ -29,7 +29,7 @@ import org.catacombae.io.Writable;
 /**
  * IO-specific utility class.
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class IOUtil extends org.catacombae.util.IOUtil {
     public static long streamCopy(InputStream is, OutputStream os, int bufferSize) throws IOException {

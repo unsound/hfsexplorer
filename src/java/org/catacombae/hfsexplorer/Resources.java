@@ -22,7 +22,7 @@ import java.net.URL;
 /**
  * Interface defining common constants for accessing HFSExplorer's resources.
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public interface Resources {
     public static final URL FOLDER_ICON =

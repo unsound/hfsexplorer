@@ -24,7 +24,7 @@ import org.catacombae.hfs.AllocationFile;
 import org.catacombae.hfs.Limits;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class HFSPlusAllocationFile extends AllocationFile implements Limits {
     private HFSPlusVolume hfsPlusParentView;

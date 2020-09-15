@@ -30,7 +30,7 @@ import org.catacombae.util.Util;
  * Created from http://developer.apple.com/technotes/tn/tn1150table.html and verified against it.
  * Also including a Hangul decomposition algorithm from the Unicode Book.
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class UnicodeNormalizationToolkit {
     /**

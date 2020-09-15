@@ -20,6 +20,9 @@ package org.catacombae.storage.ps.gpt.types;
 import org.catacombae.util.Util;
 import java.io.PrintStream;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class MutableGPTHeader extends GPTHeader {
     public MutableGPTHeader(int blockSize) {
 	super(blockSize);

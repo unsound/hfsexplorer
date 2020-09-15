@@ -20,7 +20,7 @@ package org.catacombae.hfs.types.hfscommon;
 import org.catacombae.hfs.types.hfsplus.HFSPlusAttributesKey;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public abstract class CommonHFSAttributesIndexNode
         extends CommonBTKeyedNode<CommonBTIndexRecord<CommonHFSAttributesKey>>

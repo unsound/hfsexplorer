@@ -20,6 +20,9 @@ package org.catacombae.hfs.types.hfsplus;
 import java.io.PrintStream;
 import org.catacombae.csjc.PrintableStruct;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public abstract class BTNode implements PrintableStruct {
     protected final BTNodeDescriptor nodeDescriptor;
 

@@ -24,6 +24,8 @@ import java.util.TimeZone;
 
 /**
  * Reference to how the field HFSPlusDate.DIFF_TO_JAVA_DATE_IN_MILLIS is calculated.
+ *
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class DateCalc {
     public static void main(String[] args) {

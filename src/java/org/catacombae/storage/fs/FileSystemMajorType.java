@@ -31,7 +31,7 @@ import org.catacombae.storage.fs.hfs.HFSFileSystemHandlerFactory;
  * with, and defines all file system handler implementations for these file
  * systems that are available in the build.
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public enum FileSystemMajorType {
     APPLE_MFS,

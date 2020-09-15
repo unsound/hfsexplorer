@@ -27,6 +27,9 @@ import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.ByteArrayField;
 import org.catacombae.csjc.structelements.IntegerField;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class GPTHeader implements DynamicStruct, PrintableStruct, StructElements
 {
     // Header is 92 bytes long. The rest of the sector is reserved.

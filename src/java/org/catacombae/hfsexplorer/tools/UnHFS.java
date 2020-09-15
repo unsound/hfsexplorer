@@ -68,7 +68,7 @@ import org.catacombae.storage.ps.PartitionType;
  * Command line program which extracts all or part of the contents of a
  * HFS/HFS+/HFSX file system to a specified path.
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class UnHFS {
     private static boolean debug = false;

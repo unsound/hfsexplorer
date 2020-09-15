@@ -37,8 +37,9 @@ import org.catacombae.io.RandomAccessStream;
  * Slightly altered version of RepairMyGPTPlease. This time I wanted to sync the MBR values for the table to
  * match the GPT values, as Windows altered this data during reformatting. (I might have done it myself)
  * </pre>
+ *
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
-
 public class RepairMyGPTPleaseTheSequel {
     private static BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
     public static void main(String[] args) throws Exception {

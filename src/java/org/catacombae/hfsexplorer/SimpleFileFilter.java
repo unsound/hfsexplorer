@@ -22,6 +22,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import javax.swing.filechooser.FileFilter;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class SimpleFileFilter extends FileFilter {
     private final LinkedList<String> extensions;
     private String description;

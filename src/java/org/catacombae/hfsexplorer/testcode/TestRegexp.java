@@ -19,6 +19,9 @@ package org.catacombae.hfsexplorer.testcode;
 
 import java.util.regex.Pattern;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class TestRegexp {
     public static void main(String[] args) {
         String regexp = args[0];

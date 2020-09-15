@@ -28,7 +28,7 @@ import org.catacombae.hfs.types.hfsplus.HFSPlusBSDInfo;
  * content modify and attribute modify dates, and does not at all store access
  * date. This interface should be updated in a clever way some time later.
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public interface CommonHFSCatalogAttributes {
     /**

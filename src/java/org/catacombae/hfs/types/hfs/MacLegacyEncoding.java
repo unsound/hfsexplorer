@@ -20,7 +20,7 @@ package org.catacombae.hfs.types.hfs;
 /**
  * Very sketchy and unfinished.
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public enum MacLegacyEncoding {
     ROMAN, ARABIC;

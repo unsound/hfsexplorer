@@ -28,7 +28,7 @@ import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.storage.ps.PartitionType;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class EBRPartitionSystem implements PartitionSystem {
     private final ExtendedBootRecord[] bootRecords;

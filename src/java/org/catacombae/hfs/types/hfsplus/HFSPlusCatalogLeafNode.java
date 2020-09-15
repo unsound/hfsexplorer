@@ -22,6 +22,9 @@ import org.catacombae.hfs.HFSException;
 import org.catacombae.hfs.types.hfsx.HFSXCatalogLeafRecord;
 import org.catacombae.util.Util;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class HFSPlusCatalogLeafNode extends BTLeafNode {
     protected HFSPlusCatalogLeafRecord[] leafRecords;
 

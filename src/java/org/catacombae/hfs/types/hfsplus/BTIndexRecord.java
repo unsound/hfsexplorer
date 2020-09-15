@@ -21,6 +21,9 @@ import java.io.PrintStream;
 import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.util.Util;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class BTIndexRecord implements PrintableStruct {
     private final BTKey key;
     private final byte[] index = new byte[4];

@@ -18,7 +18,7 @@
 package org.catacombae.hfsexplorer.unfinished;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class WelcomePanel extends javax.swing.JPanel {
 

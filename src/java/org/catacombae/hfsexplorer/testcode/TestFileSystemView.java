@@ -21,7 +21,7 @@ import javax.swing.filechooser.FileSystemView;
 import java.io.File;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class TestFileSystemView extends javax.swing.JFrame {
     private class FakeFile extends File {

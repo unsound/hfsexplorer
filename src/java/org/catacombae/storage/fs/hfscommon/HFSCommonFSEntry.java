@@ -33,7 +33,7 @@ import org.catacombae.storage.fs.FSLink;
 import org.catacombae.util.Util.Pair;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public abstract class HFSCommonFSEntry extends BasicFSEntry {
 

@@ -116,7 +116,7 @@ import org.catacombae.util.Util.Pair;
  * The main window for the graphical part of HFSExplorer. This class contains a lot of
  * non-presentation code and is very large. Should be restructured in the future.
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class FileSystemBrowserWindow extends HFSExplorerJFrame {
     private static final String TITLE_STRING = "HFSExplorer " + HFSExplorer.VERSION;

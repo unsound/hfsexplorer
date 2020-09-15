@@ -44,7 +44,7 @@ import org.catacombae.storage.fs.FileSystemCapability;
  * HFS+ implementation of a FileSystemHandler. This implementation can be used
  * to access HFS+ file systems.
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public abstract class HFSCommonFileSystemHandler extends FileSystemHandler {
 

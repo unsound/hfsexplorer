@@ -76,7 +76,7 @@ import org.catacombae.util.Util.Pair;
  * A generalization of the file system browser into a very autonomous component with very few
  * dependencies, so that it can be easily reused in the future.
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class FileSystemBrowser<A> implements Resources {
     private static final boolean DEBUG = Util.booleanEnabledByProperties(false,

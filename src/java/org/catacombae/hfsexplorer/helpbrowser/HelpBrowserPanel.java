@@ -34,7 +34,7 @@ import org.catacombae.hfsexplorer.gui.HFSExplorerJFrame;
 /**
  * A simple implemetation of a HTML help browser through Java's standard API.
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class HelpBrowserPanel extends javax.swing.JPanel {
     private static final String TEST_HOME =

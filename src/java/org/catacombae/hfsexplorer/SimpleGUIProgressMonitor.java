@@ -24,7 +24,7 @@ import org.catacombae.hfsexplorer.ExtractProgressMonitor.DirectoryExistsAction;
 import org.catacombae.hfsexplorer.ExtractProgressMonitor.ExtractProperties;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
     private final Component parentComponent;

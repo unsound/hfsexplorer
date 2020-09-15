@@ -28,7 +28,7 @@ import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemHandlerFactory;
 import org.catacombae.util.Util;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class HFSFileSystemHandlerFactory extends HFSCommonFileSystemHandlerFactory {
     private static final FileSystemRecognizer recognizer = new HFSFileSystemRecognizer();

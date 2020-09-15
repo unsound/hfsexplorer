@@ -24,7 +24,7 @@ import org.catacombae.hfs.types.hfsplus.BTNodeDescriptor;
 import org.catacombae.hfs.types.hfs.NodeDescriptor;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public abstract class CommonBTNodeDescriptor implements PrintableStruct {
 

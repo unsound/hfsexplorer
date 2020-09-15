@@ -23,7 +23,7 @@ import org.catacombae.util.Util;
 /**
  * Record with unspecified data.
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class CommonBTGenericDataRecord extends CommonBTRecord {
     private final byte[] data;

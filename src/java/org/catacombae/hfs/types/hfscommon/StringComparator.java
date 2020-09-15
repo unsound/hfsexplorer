@@ -18,7 +18,7 @@
 package org.catacombae.hfs.types.hfscommon;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public interface StringComparator {
     public int compare(byte[] a, int aoff, int alen, byte[] b, int boff, int blen);

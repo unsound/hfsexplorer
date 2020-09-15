@@ -25,7 +25,7 @@ import java.util.LinkedList;
 import org.catacombae.io.ReadableRandomAccessStream;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class DOSExtendedPartitionSystem implements PartitionSystem {
     private final ExtendedBootRecord[] extendedBootRecords;

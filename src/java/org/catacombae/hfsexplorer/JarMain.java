@@ -20,6 +20,8 @@ package org.catacombae.hfsexplorer;
 /**
  * Containins the main method for when the application is started
  * through a JAR manifest.
+ *
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class JarMain {
     private static final String CONSOLE_ARG = "-dbgconsole";

@@ -24,8 +24,9 @@ package org.catacombae.hfsexplorer.testcode;
  * I'm thinking of creating a better sync program (that works) in this class, but right now, it's just
  * a code copy from the sequel.
  * </pre>
+ *
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
-
 public class GPTToMBRSync {
     /*
     private static BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));

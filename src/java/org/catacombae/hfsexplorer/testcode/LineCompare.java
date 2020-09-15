@@ -25,6 +25,8 @@ import java.io.InputStreamReader;
 /**
  * Application that compares two text files for equality, after removing empty empty lines, and ignoring
  * different line endings.
+ *
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class LineCompare {
     public static void main(String[] args) throws IOException {

@@ -22,6 +22,9 @@ import org.catacombae.util.Util;
 import java.io.PrintStream;
 import org.catacombae.csjc.PrintableStruct;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class HFSPlusCatalogLeafRecord implements PrintableStruct {
     public static final int HFS_PLUS_FOLDER_RECORD = 0x0001;
     public static final int HFS_PLUS_FILE_RECORD = 0x0002;

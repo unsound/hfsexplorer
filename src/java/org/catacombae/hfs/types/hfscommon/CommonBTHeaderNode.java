@@ -22,7 +22,7 @@ import org.catacombae.hfs.types.hfs.BTHdrRec;
 
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public abstract class CommonBTHeaderNode extends CommonBTNode<CommonBTRecord> {
     protected CommonBTHeaderNode(byte[] data, int offset, int nodeSize, FSType type) {

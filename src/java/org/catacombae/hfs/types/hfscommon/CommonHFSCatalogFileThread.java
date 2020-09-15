@@ -25,7 +25,7 @@ import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogThread;
 import org.catacombae.hfs.types.hfs.CdrFThdRec;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public abstract class CommonHFSCatalogFileThread extends CommonHFSCatalogThread
         implements PrintableStruct, StructElements

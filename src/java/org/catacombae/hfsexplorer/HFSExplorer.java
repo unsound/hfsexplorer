@@ -53,6 +53,9 @@ import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemHandler;
 import org.catacombae.hfs.HFSVolume;
 import org.catacombae.util.Util.Pair;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 @SuppressWarnings("deprecation") // TODO: Fix HFSExplorer so it doesn't use deprecated methods...
 public class HFSExplorer {
     public static final String VERSION = "0.23.1";

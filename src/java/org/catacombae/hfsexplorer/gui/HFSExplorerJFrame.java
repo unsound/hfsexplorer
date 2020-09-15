@@ -26,7 +26,7 @@ import org.catacombae.hfsexplorer.Resources;
  * Base class for all HFSExplorer windows, setting up common properties such as
  * the window icon.
  *
- * @author Erik Larsson
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class HFSExplorerJFrame extends JFrame implements Resources {
     private static final ImageIcon[] WINDOW_ICONS = {

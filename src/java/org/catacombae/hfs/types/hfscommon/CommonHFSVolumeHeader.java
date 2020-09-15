@@ -30,7 +30,7 @@ import org.catacombae.hfs.types.hfs.MasterDirectoryBlock;
  * This class acts as a generalization of the common data properties of the
  * volume headers of all versions of HFS.
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public abstract class CommonHFSVolumeHeader
         implements PrintableStruct, StructElements

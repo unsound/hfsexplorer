@@ -23,7 +23,7 @@ import org.catacombae.io.RandomAccessStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class ReadableStreamDataLocator extends DataLocator {
     private SynchronizedReadableRandomAccessStream backingStream;

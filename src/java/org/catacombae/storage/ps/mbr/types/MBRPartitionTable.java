@@ -32,7 +32,7 @@ import org.catacombae.storage.ps.mbr.MBRPartitionType;
  * common "Extended Boot Record" scheme (parsing of extended boot
  * records can be turned off, if desired).
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class MBRPartitionTable implements PartitionSystem, PrintableStruct {
     /* Until I figure out a way to detect sector size, it will be 512... */

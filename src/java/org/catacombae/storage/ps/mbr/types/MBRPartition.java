@@ -23,6 +23,9 @@ import java.io.PrintStream;
 import org.catacombae.storage.ps.PartitionType;
 import org.catacombae.storage.ps.mbr.MBRPartitionType;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class MBRPartition implements Partition {
     protected static final byte PARTITION_NOT_BOOTABLE = (byte)0x00;
     protected static final byte PARTITION_BOOTABLE     = (byte)0x80;

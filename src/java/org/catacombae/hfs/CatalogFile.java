@@ -48,7 +48,7 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.io.ReadableRandomAccessStream;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class CatalogFile
     extends BTreeFile<CommonHFSCatalogKey, CommonHFSCatalogLeafRecord>

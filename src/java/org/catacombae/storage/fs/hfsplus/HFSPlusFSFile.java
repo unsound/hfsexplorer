@@ -31,7 +31,7 @@ import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemHandler;
 import org.catacombae.util.Util;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class HFSPlusFSFile extends HFSCommonFSFile {
     private static final boolean DEBUG = Util.booleanEnabledByProperties(false,

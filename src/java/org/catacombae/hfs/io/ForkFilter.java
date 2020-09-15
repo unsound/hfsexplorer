@@ -44,7 +44,7 @@ import org.catacombae.io.RuntimeIOException;
  *     - seek to last fp
  * </pre>
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class ForkFilter implements ReadableRandomAccessStream {
 

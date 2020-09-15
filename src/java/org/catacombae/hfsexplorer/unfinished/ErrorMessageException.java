@@ -20,7 +20,7 @@ package org.catacombae.hfsexplorer.unfinished;
 /**
  * A HFSExplorer exception that should result in a pretty error message.
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class ErrorMessageException extends RuntimeException {
     public ErrorMessageException(String errorMessage) {

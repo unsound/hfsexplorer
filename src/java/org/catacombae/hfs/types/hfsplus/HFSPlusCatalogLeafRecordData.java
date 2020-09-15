@@ -21,6 +21,9 @@ import org.catacombae.util.Util;
 import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.csjc.StructElements;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public abstract class HFSPlusCatalogLeafRecordData implements PrintableStruct, StructElements {
     public static final int RECORD_TYPE_FOLDER = 0x0001;
     public static final int RECORD_TYPE_FILE = 0x0002;

@@ -26,7 +26,7 @@ import org.catacombae.hfs.types.hfsplus.BTHeaderRec;
 import org.catacombae.hfs.types.hfs.BTHdrRec;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public abstract class CommonBTHeaderRecord extends CommonBTRecord
         implements PrintableStruct, StructElements

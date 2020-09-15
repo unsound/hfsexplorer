@@ -24,7 +24,7 @@ import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.hfs.AllocationFile;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class HFSOriginalAllocationFile extends AllocationFile implements Limits
 {

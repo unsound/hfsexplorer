@@ -22,7 +22,7 @@ package org.catacombae.hfs.original;
  * be changed over time. This allows you to maintain one StringCodec instance across your app, while
  * still enabling you to alter the method used for coding.
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class MutableStringCodec <A extends StringCodec> implements StringCodec {
     private A underlying;

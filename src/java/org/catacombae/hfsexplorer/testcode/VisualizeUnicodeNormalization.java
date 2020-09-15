@@ -30,6 +30,9 @@ import javax.swing.ScrollPaneConstants;
 import org.catacombae.hfs.UnicodeNormalizationToolkit;
 import org.catacombae.util.Util;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class VisualizeUnicodeNormalization extends JFrame {
 
     public VisualizeUnicodeNormalization() {

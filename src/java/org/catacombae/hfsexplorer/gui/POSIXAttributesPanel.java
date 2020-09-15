@@ -21,7 +21,7 @@ import java.awt.Component;
 import org.catacombae.storage.fs.FSAttributes.POSIXFileAttributes;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class POSIXAttributesPanel extends javax.swing.JPanel implements ChainedPanel {
 

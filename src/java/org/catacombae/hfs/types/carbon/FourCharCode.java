@@ -23,6 +23,9 @@ import java.io.PrintStream;
 import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.csjc.StructElements;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class FourCharCode implements PrintableStruct, StructElements {
     /*
      * struct FourCharCode

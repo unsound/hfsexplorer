@@ -21,6 +21,9 @@ import java.io.File;
 import java.io.RandomAccessFile;
 import org.catacombae.storage.ps.gpt.types.GPTEntry;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class PrintGPTEntry {
     public static void main(String[] args) throws Exception {
 	long offset = 0;

@@ -21,7 +21,7 @@ import java.io.File;
 import javax.swing.filechooser.FileFilter;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class PrefixFileFilter extends FileFilter {
     private final String description;

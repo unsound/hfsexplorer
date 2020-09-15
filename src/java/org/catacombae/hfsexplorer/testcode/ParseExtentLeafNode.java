@@ -20,6 +20,9 @@ package org.catacombae.hfsexplorer.testcode;
 import java.io.RandomAccessFile;
 import org.catacombae.hfs.types.hfsplus.HFSPlusExtentLeafNode;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class ParseExtentLeafNode {
 
     public static void main(String[] args) throws Exception {

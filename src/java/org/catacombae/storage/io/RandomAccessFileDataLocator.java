@@ -26,7 +26,7 @@ import org.catacombae.io.RandomAccessStream;
 import org.catacombae.io.FileStream;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class RandomAccessFileDataLocator extends DataLocator {
     private final File file;

@@ -22,7 +22,7 @@ import java.util.Collection;
 import javax.swing.table.DefaultTableModel;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class MainPanel extends javax.swing.JPanel {
     private class PartitionTableRow {

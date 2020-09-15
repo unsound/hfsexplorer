@@ -17,5 +17,8 @@
 
 package org.catacombae.hfsexplorer;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class Util extends org.catacombae.util.Util {
 }

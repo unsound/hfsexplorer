@@ -19,6 +19,9 @@ package org.catacombae.storage.ps.ebr;
 
 import org.catacombae.storage.ps.mbr.types.MBRPartition;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class EBRPartition extends MBRPartition {
 
     private final long baseOffset;

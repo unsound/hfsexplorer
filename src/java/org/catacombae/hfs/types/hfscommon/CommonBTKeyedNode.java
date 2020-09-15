@@ -20,7 +20,7 @@ package org.catacombae.hfs.types.hfscommon;
 import java.util.List;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public abstract class CommonBTKeyedNode <R extends CommonBTKeyedRecord>
         extends CommonBTNode<R>

@@ -25,7 +25,7 @@ import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogFile;
 import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogFolder;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public abstract class CommonHFSFinderInfo implements PrintableStruct {
 

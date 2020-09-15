@@ -22,7 +22,7 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogLeafRecord;
 import org.catacombae.storage.fs.FSFile;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class HFSCommonFSFile extends HFSCommonAbstractFile implements FSFile {
     protected HFSCommonFSFile(HFSCommonFileSystemHandler parent,

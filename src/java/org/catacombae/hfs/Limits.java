@@ -22,7 +22,7 @@ import java.math.BigInteger;
 /**
  * Convenient interface containing some essential limits of generic types.
  *
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public interface Limits {
     public static final int UINT8_MAX = 0xFF;

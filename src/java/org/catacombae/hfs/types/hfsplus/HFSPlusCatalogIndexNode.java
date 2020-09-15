@@ -20,6 +20,9 @@ package org.catacombae.hfs.types.hfsplus;
 import org.catacombae.hfs.types.hfsx.HFSXCatalogKey;
 import org.catacombae.util.Util;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class HFSPlusCatalogIndexNode extends BTIndexNode {
     public HFSPlusCatalogIndexNode(byte[] data, int offset, int nodeSize) {
 	this(data, offset, nodeSize, null);

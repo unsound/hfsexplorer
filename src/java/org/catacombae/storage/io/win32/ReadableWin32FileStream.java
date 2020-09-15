@@ -23,6 +23,9 @@ import org.catacombae.io.AbstractFileStream;
 import org.catacombae.util.Util;
 import org.catacombae.io.ReadableRandomAccessStream;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class ReadableWin32FileStream implements ReadableRandomAccessStream,
         AbstractFileStream
 {

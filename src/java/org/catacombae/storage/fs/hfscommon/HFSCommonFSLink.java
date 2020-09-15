@@ -26,7 +26,7 @@ import org.catacombae.storage.fs.FSEntry;
 import org.catacombae.storage.fs.FSLink;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class HFSCommonFSLink extends HFSCommonAbstractFile implements FSLink {
     private static final boolean DEBUG = Util.booleanEnabledByProperties(false,

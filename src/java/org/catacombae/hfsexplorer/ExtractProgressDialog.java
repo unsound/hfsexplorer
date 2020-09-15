@@ -31,6 +31,9 @@ import javax.swing.JPanel;
 import org.catacombae.hfsexplorer.gui.ExtractProgressPanel;
 import org.catacombae.hfsexplorer.gui.ExtractSettingsPanel;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class ExtractProgressDialog extends JDialog implements ExtractProgressMonitor {
 
     private final ExtractProgressPanel progressPanel;

@@ -19,6 +19,9 @@ package org.catacombae.hfsexplorer;
 
 import org.catacombae.hfsexplorer.fs.NullProgressMonitor;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public abstract class BasicExtractProgressMonitor extends NullProgressMonitor implements ExtractProgressMonitor {
 
     protected BasicExtractProgressMonitor() {}

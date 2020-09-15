@@ -23,6 +23,9 @@ import org.catacombae.util.Util;
 /** BUG: Writing at the end of a file will always expand it to fit the sector size! Not very good. Fixit.
     Note: Is this fixed? TODO ?! */
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class Win32FileStream extends ReadableWin32FileStream implements RandomAccessStream {
     private byte[] sectorBuffer;
     public Win32FileStream(String filename) {

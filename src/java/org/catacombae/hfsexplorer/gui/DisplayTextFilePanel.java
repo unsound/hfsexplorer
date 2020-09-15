@@ -35,7 +35,7 @@ import org.catacombae.io.InputStreamReadable;
 import org.catacombae.io.Readable;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class DisplayTextFilePanel extends javax.swing.JPanel {
     private static final String[] sortingPrefixes =

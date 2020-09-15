@@ -20,6 +20,9 @@ package org.catacombae.hfs.types.hfsplus;
 import org.catacombae.util.Util;
 import java.io.PrintStream;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class HFSPlusExtentLeafNode extends BTLeafNode {
     protected HFSPlusExtentLeafRecord[] leafRecords;
     protected short[] leafRecordOffsets;

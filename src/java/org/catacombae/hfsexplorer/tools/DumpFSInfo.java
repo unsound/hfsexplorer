@@ -41,6 +41,9 @@ import org.catacombae.storage.ps.apm.types.DriverDescriptorRecord;
 import org.catacombae.storage.ps.gpt.GPTHandler;
 import org.catacombae.storage.ps.mbr.MBRHandler;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class DumpFSInfo {
 
     public static void main(String[] args) throws Throwable {

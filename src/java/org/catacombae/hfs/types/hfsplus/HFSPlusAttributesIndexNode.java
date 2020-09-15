@@ -19,6 +19,9 @@ package org.catacombae.hfs.types.hfsplus;
 
 import org.catacombae.util.Util;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class HFSPlusAttributesIndexNode extends BTIndexNode {
     public HFSPlusAttributesIndexNode(byte[] data, int offset, int nodeSize) {
         super(data, offset, nodeSize);

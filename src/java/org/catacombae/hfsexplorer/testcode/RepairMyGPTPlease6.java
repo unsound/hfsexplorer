@@ -33,8 +33,9 @@ import org.catacombae.util.Util;
 
 /**
  * This time I needed to change partition 3 partition type from Basic Data to HFS+.
+ *
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
-
 public class RepairMyGPTPlease6 {
     private static BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
     public static void main(String[] args) throws Exception {

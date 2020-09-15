@@ -19,6 +19,9 @@ package org.catacombae.hfs.types.hfsplus;
 
 import org.catacombae.csjc.PrintableStruct;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public abstract class BTLeafNode extends BTNode implements PrintableStruct {
     // This one is open for future generalization
     public BTLeafNode(byte[] data, int offset, int nodeSize) {

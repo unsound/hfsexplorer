@@ -34,7 +34,7 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSCatalogNodeID;
 import org.catacombae.hfs.types.hfsplus.HFSPlusAttributesKey;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class AttributesFile
     extends BTreeFile<CommonHFSAttributesKey, CommonHFSAttributesLeafRecord>

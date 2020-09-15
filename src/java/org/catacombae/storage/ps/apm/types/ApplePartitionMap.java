@@ -25,6 +25,9 @@ import org.catacombae.storage.ps.Partition;
 import org.catacombae.storage.ps.legacy.PartitionSystem;
 import org.catacombae.util.Util;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class ApplePartitionMap implements PartitionSystem {
     private final APMPartition[] partitions;
 

@@ -50,6 +50,9 @@ import org.catacombae.storage.fs.hfscommon.HFSCommonFSFile;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFSFolder;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFSLink;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class FileInfoWindow extends HFSExplorerJFrame {
 
     public FileInfoWindow(final FSEntry fsEntry, String[] parentPath) {

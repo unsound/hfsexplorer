@@ -25,7 +25,7 @@ import org.catacombae.io.TruncatableRandomAccessStream;
 import org.catacombae.io.WritableRandomAccessStream;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public interface FSFork {
 

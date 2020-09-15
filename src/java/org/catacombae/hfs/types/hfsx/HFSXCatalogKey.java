@@ -25,6 +25,9 @@ import org.catacombae.hfs.types.hfsplus.HFSCatalogNodeID;
 import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogKey;
 import org.catacombae.hfs.types.hfsplus.HFSUniStr255;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class HFSXCatalogKey extends HFSPlusCatalogKey {
     private final byte keyCompareType;
 

@@ -20,6 +20,9 @@ package org.catacombae.hfs.types.hfsx;
 import org.catacombae.hfs.types.hfsplus.BTHeaderRec;
 import org.catacombae.hfs.types.hfsplus.HFSPlusCatalogLeafNode;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class HFSXCatalogLeafNode extends HFSPlusCatalogLeafNode {
     public HFSXCatalogLeafNode(byte[] data, int offset, int nodeSize, BTHeaderRec catalogHeaderRec) {
         super(data, offset, nodeSize, catalogHeaderRec);

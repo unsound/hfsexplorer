@@ -21,7 +21,7 @@ import org.catacombae.util.Util;
 import org.catacombae.hfs.types.hfsplus.HFSCatalogNodeID;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public abstract class CommonHFSCatalogNodeID {
     public enum ReservedID {

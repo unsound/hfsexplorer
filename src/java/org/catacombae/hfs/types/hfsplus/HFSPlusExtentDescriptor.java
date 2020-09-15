@@ -23,6 +23,9 @@ import org.catacombae.csjc.PrintableStruct;
 import org.catacombae.csjc.StructElements;
 import org.catacombae.csjc.structelements.Dictionary;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class HFSPlusExtentDescriptor implements StructElements,
         PrintableStruct {
     /*

@@ -21,7 +21,7 @@ import javax.swing.ImageIcon;
 import org.catacombae.hfsexplorer.Resources;
 
 /**
- * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
 public class FilesystemBrowserPanel extends javax.swing.JPanel {
     private static final ImageIcon FORWARD_ICON =

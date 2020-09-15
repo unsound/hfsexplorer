@@ -17,6 +17,9 @@
 
 package org.catacombae.storage.ps.gpt.types;
 
+/**
+ * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
+ */
 public class MutableGUIDPartitionTable extends GUIDPartitionTable {
     protected MutableGPTHeader mutableHeader;
     protected MutableGPTEntry[] mutableEntries;
