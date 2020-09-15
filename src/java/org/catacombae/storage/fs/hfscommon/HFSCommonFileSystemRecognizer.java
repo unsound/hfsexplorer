@@ -68,14 +68,12 @@ public class HFSCommonFileSystemRecognizer {
                 case SIGNATURE_MFS:
                     return FileSystemType.MFS;
                 case SIGNATURE_HFS:
-                    try {
-                        short embeddedSignature =
-                                Util.readShortBE(signatureData, 1024 + 124);
-                        if(embeddedSignature == SIGNATURE_HFS_PLUS)
-                            return FileSystemType.HFS_WRAPPED_HFS_PLUS;
-                        else
-                            return FileSystemType.HFS;
-                    } catch(Exception e) {
+                    short embeddedSignature =
+                            Util.readShortBE(signatureData, 1024 + 124);
+                    if(embeddedSignature == SIGNATURE_HFS_PLUS) {
+                        return FileSystemType.HFS_WRAPPED_HFS_PLUS;
+                    }
+                    else {
                         return FileSystemType.HFS;
                     }
                 case SIGNATURE_HFS_PLUS:
