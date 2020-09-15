@@ -46,6 +46,9 @@
 
   
   <target name="all">
+    <!-- Ruler (messages start at column 12 because of the leading "     [echo] "        -->
+    <!--        10        20        30        40        50        60        70        80 -->
+    <!--         |         |         |         |         |         |         |         | -->
     <echo message="Current well defined targets:"/>
     <echo message="  build-all     - Compiles all files in all packages and puts the"/>
     <echo message="                  result in dist/lib/hfsx.jar."/>
@@ -57,6 +60,10 @@
     <echo message="                  hfs-jfuse."/>
     <echo message="  build-mkapm   - Builds mkapm, a utility for creating Apple"/>
     <echo message="                  Partition Map layouts."/>
+    <echo message="  build-csframework -"/>
+    <echo message="                  Builds csframework.jar from external/"/>
+    <echo message="                  catacombaeframework and copies the result to dist/"/>
+    <echo message="                  lib/csframework.jar."/>
     <echo message="  javadoc       - Creates the javadoc documentation for the"/>
     <echo message="                  project."/>
   </target>
@@ -182,7 +189,15 @@
   <target name="jar-mkapm" depends="compile-mkapm">
     <jar destfile="${target.mkapm.outjar}" basedir="${builddir}" manifest="${target.mkapm.jarmanifest}"/>
   </target>
-  
+
+  <target name="build-csframework">
+    <ant antfile="build.xml"
+         dir="external/catacombaeframework"
+         inheritAll="false"/>
+    <copy file="external/catacombaeframework/targets/base/csframework.jar"
+          todir="${java.runtime.library.dir}"/>
+  </target>
+
   <target name="javadoc">
     <javadoc destdir="javadoc.~"
 	     packagenames="org.catacombae.*"

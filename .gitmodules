@@ -1,0 +1,3 @@
+[submodule "external/catacombaeframework"]
+	path = external/catacombaeframework
+	url = ../catacombaeframework.git
