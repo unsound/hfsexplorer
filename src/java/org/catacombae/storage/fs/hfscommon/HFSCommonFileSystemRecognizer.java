@@ -17,7 +17,9 @@
 
 package org.catacombae.storage.fs.hfscommon;
 
+import org.catacombae.io.AbstractFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
+import org.catacombae.io.RuntimeIOException;
 import org.catacombae.util.Util;
 
 /**
@@ -83,8 +85,23 @@ public class HFSCommonFileSystemRecognizer {
                 default:
                     return FileSystemType.UNKNOWN;
             }
+        } catch(RuntimeIOException e) {
+            final String streamString =
+                    !(bitstream instanceof AbstractFileStream) ? "" :
+                    (" at " + ((AbstractFileStream) bitstream).getOpenPath());
+            System.err.println("Error while detecting file system" +
+                    streamString + ": " + e.getIOCause().getMessage());
+            if(!(bitstream instanceof AbstractFileStream)) {
+                e.printStackTrace();
+            }
+
+            return FileSystemType.UNKNOWN;
         } catch(Exception e) {
-            System.err.println("Exception while detecting file system:");
+            final String streamString =
+                    !(bitstream instanceof AbstractFileStream) ? "" :
+                    (" at " + ((AbstractFileStream) bitstream).getOpenPath());
+            System.err.println("Exception while detecting file system" +
+                    streamString + ": " + e);
             e.printStackTrace();
             return FileSystemType.UNKNOWN;
         }

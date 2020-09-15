@@ -19,12 +19,16 @@ package org.catacombae.storage.io.win32;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import org.catacombae.io.AbstractFileStream;
 import org.catacombae.util.Util;
 import org.catacombae.io.ReadableRandomAccessStream;
 
-public class ReadableWin32FileStream implements ReadableRandomAccessStream {
+public class ReadableWin32FileStream implements ReadableRandomAccessStream,
+        AbstractFileStream
+{
     protected byte[] fileHandle;
     protected final int sectorSize; //Detect this later..
+    private String openPath;
     protected long filePointer = 0;
     private static final Object loadLibSync = new Object();
     private static boolean libraryLoaded = false;
@@ -132,6 +136,7 @@ public class ReadableWin32FileStream implements ReadableRandomAccessStream {
                 System.out.println("Could not determine sector size.");
             sectorSize = 512; // The only reasonable standard value
         }
+        openPath = filename;
     }
 
     /* @Override */
@@ -300,6 +305,10 @@ public class ReadableWin32FileStream implements ReadableRandomAccessStream {
     protected byte[] open(String filename) {
         //System.out.println("Java: WindowsLowLevelIO.open(" + filename + ");");
         return openNative(filename);
+    }
+
+    public String getOpenPath() {
+        return openPath;
     }
 
     protected static native byte[] openNative(String filename);
