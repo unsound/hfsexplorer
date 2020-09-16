@@ -23,6 +23,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -85,7 +87,9 @@ public abstract class SelectDeviceDialog extends JDialog {
 
     private ReadableRandomAccessStream result = null;
     private String resultCreatePath = null;
-    private String[] detectedDeviceNames;
+    private String[] detectedDeviceNames = null;
+
+    private long lastRefreshTimestamp = 0;
 
     private interface SelectDeviceDialogFactory {
         public boolean isSystemSupported();
@@ -124,17 +128,7 @@ public abstract class SelectDeviceDialog extends JDialog {
         selectSpecifyGroup.add(selectDeviceButton);
         selectSpecifyGroup.add(specifyDeviceNameButton);
 
-        detectedDevicesCombo.removeAllItems();
-
-        detectedDeviceNames = detectDevices();
-        for(String name : detectedDeviceNames)
-            detectedDevicesCombo.addItem(name);
-
-        if(detectedDeviceNames.length > 0) {
-            detectedDevicesCombo.setSelectedIndex(0);
-            specifyDeviceNameField.setText(getDevicePrefix() +
-                    detectedDevicesCombo.getSelectedItem().toString());
-        }
+        refreshDevices();
 
         autodetectButton.addActionListener(new ActionListener() {
                 /* @Override */
@@ -180,6 +174,12 @@ public abstract class SelectDeviceDialog extends JDialog {
                     setVisible(false);
                 }
             });
+        addWindowFocusListener(new WindowAdapter() {
+                @Override
+                public void windowGainedFocus(WindowEvent we) {
+                    refreshDevices();
+                }
+            });
 
 // 	JPanel container = new JPanel();
 // 	container.setLayout(new BorderLayout());
@@ -190,6 +190,61 @@ public abstract class SelectDeviceDialog extends JDialog {
         pack();
         setLocationRelativeTo(null);
         setResizable(false);
+    }
+
+    private void refreshDevices() {
+        long refreshTimestamp = System.currentTimeMillis();
+        if(refreshTimestamp - lastRefreshTimestamp < 100) {
+            /* Prevent a flood of requests. */
+            return;
+        }
+        lastRefreshTimestamp = refreshTimestamp;
+
+        int selectedIndex = detectedDevicesCombo.getSelectedIndex();
+        detectedDevicesCombo.removeAllItems();
+
+        String newDeviceNames[] = detectDevices();
+        for(String name : newDeviceNames) {
+            detectedDevicesCombo.addItem(name);
+        }
+
+        if(newDeviceNames.length > 0) {
+            /* Calculate new selected index. */
+            final int i_limit =
+                    (detectedDeviceNames == null) ? 0 :
+                    detectedDeviceNames.length;
+            final int j_limit = newDeviceNames.length;
+
+            int i, j;
+            for(i = 0, j = 0; i < i_limit && j < j_limit;) {
+                if(detectedDeviceNames[i].equals(newDeviceNames[j])) {
+                    if(i == selectedIndex) {
+                        break;
+                    }
+
+                    ++i;
+                    ++j;
+                }
+                else if(j <= i) {
+                    ++i;
+                }
+            }
+
+            if(j >= j_limit) {
+                j = j_limit - 1;
+            }
+
+            detectedDevicesCombo.setSelectedIndex(j);
+
+            specifyDeviceNameField.setText(getDevicePrefix() +
+                    detectedDevicesCombo.getSelectedItem().toString());
+        }
+        else {
+            detectedDevicesCombo.setSelectedIndex(-1);
+            specifyDeviceNameField.setText("");
+        }
+
+        detectedDeviceNames = newDeviceNames;
     }
 
     public ReadableRandomAccessStream getPartitionStream() {
@@ -363,6 +418,8 @@ public abstract class SelectDeviceDialog extends JDialog {
         LinkedList<String> plainFileSystems = new LinkedList<String>();
         LinkedList<EmbeddedPartitionEntry> embeddedFileSystems = new LinkedList<EmbeddedPartitionEntry>();
         //String skipPrefix = null;
+
+        refreshDevices();
 
         // Look for file systems that sit inside partition systems unsupported by Windows.
         for(int i = 0; i < detectedDeviceNames.length; ++i) {
