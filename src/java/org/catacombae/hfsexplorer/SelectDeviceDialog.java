@@ -165,13 +165,13 @@ public abstract class SelectDeviceDialog extends JDialog {
                 public void actionPerformed(ActionEvent ae) {
                     resultCreatePath = specifyDeviceNameField.getText();
                     result = createStream(resultCreatePath);
-                    setVisible(false);
+                    dispose();
                 }
             });
         cancelButton.addActionListener(new ActionListener() {
                 /* @Override */
                 public void actionPerformed(ActionEvent ae) {
-                    setVisible(false);
+                    dispose();
                 }
             });
         addWindowFocusListener(new WindowAdapter() {
@@ -673,7 +673,7 @@ public abstract class SelectDeviceDialog extends JDialog {
                                 result = new ReadableConcatenatedStream(llf,
                                         embeddedInfo.psOffset +
                                         p.getStartOffset(), p.getLength());
-                                setVisible(false);
+                                dispose();
                                 break;
                             default:
                                 throw new RuntimeException("Unexpected " +
@@ -690,7 +690,7 @@ public abstract class SelectDeviceDialog extends JDialog {
 
                         resultCreatePath = getDevicePrefix() + plainInfo;
                         result = createStream(resultCreatePath);
-                        setVisible(false);
+                        dispose();
                     }
                 }
             }
@@ -705,7 +705,7 @@ public abstract class SelectDeviceDialog extends JDialog {
 // 						    JOptionPane.QUESTION_MESSAGE);
 // 	    if(res == JOptionPane.YES_OPTION) {
 // 		result = DEVICE_PREFIX + plainFileSystems.getFirst();
-// 		setVisible(false);
+// 	        dispose();
 // 	    }
 // 	}
         else
