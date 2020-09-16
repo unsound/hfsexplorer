@@ -2,6 +2,47 @@ HFSExplorer Changelog
 ---------------------
 
 
+2020.9.16
+---------
+- Change version scheme to be based on release date.
+
+- Bugfix: Fix broken resource fork access.
+  See: https://github.com/unsound/hfsexplorer/issues/10
+
+- Bugfix: Fix broken unhfs option '-resforks APPLEDOUBLE'.
+
+- Enhancement: The tree traversal process is now less sensitive to metadata
+  corruption in leaf nodes, i.e. more data can now be extracted from corrupted
+  volumes.
+
+- Enhancement: Improve compatibility with certain seemingly incorrect Apple
+  Partition Map layouts with mismatching sector size.
+
+- Enhancement: Select device dialog updates devices when acquiring focus and
+  when autodetect button is pressed. Previously any device attached to the
+  system after opening the dialog was not seen until the dialog was closed and
+  then reopened.
+
+- Enhancement: Volume autodetection now shows the volume name in addition to the
+  device name, making it easier to find the right volume.
+
+- Enhancement: Volume autodetection can now detect volumes in MBR extended boot
+  records (DOS extended partitions).
+
+- Enhancement: Add new option '-sfm_subsitutions' to unhfs, translating Windows-
+  incompatible filenames to a Windows-friendly form.
+
+- Enhancement: Fix missing folder icons in UI when the look & feel does not
+  provide a default one (fall back to our own custom folder icon).
+
+- Enhancement: Add support for running HFSExplorer in Windows NT 4.0 (JRE
+  1.5.0_06 tested). (MBR partition support is limited for USB removable drives
+  due to OS limitations.)
+
+- Many other fixes. See the git log for more info:
+  https://github.com/unsound/hfsexplorer/releases/tag/hfsexplorer-2020.9.16
+
+
 0.23.1
 ------
 - Bugfix: Fix support for encrypted images with the version 2 header and
