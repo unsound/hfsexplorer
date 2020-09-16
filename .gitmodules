@@ -1,3 +1,6 @@
 [submodule "external/catacombaeframework"]
 	path = external/catacombaeframework
 	url = ../catacombaeframework.git
+[submodule "external/dmgextractor"]
+	path = external/dmgextractor
+	url = ../dmgextractor.git

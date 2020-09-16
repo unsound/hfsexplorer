@@ -64,6 +64,10 @@
     <echo message="                  Builds csframework.jar from external/"/>
     <echo message="                  catacombaeframework and copies the result to dist/"/>
     <echo message="                  lib/csframework.jar."/>
+    <echo message="  build-hfsx_dmglib -"/>
+    <echo message="                  Builds hfsx_dmglib.jar from external/"/>
+    <echo message="                  dmgextractor and copies the result to dist/"/>
+    <echo message="                  lib/hfsx_dmglib.jar."/>
     <echo message="  javadoc       - Creates the javadoc documentation for the"/>
     <echo message="                  project."/>
   </target>
@@ -195,6 +199,19 @@
          dir="external/catacombaeframework"
          inheritAll="false"/>
     <copy file="external/catacombaeframework/targets/base/csframework.jar"
+          todir="${java.runtime.library.dir}"/>
+  </target>
+
+  <target name="build-hfsx_dmglib">
+    <copy file="${java.runtime.library.dir}/csframework.jar"
+          todir="external/dmgextractor/targets/application/lib"
+          overwrite="true"/>
+    <ant antfile="build.xml"
+         dir="external/dmgextractor"
+         inheritAll="false">
+      <target name="build-hfsxlib"/>
+    </ant>
+    <copy file="external/dmgextractor/targets/hfsxlib/hfsx_dmglib.jar"
           todir="${java.runtime.library.dir}"/>
   </target>
 
