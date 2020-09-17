@@ -58,7 +58,7 @@ import org.catacombae.util.Util.Pair;
  */
 @SuppressWarnings("deprecation") // TODO: Fix HFSExplorer so it doesn't use deprecated methods...
 public class HFSExplorer {
-    public static final String VERSION = "2020.9.16";
+    public static final String VERSION = "2020.9.17";
     public static final String COPYRIGHT =
             "Copyright \u00A9 Erik Larsson 2006-2020";
     public static final String[] NOTICES = {

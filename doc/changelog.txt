@@ -2,6 +2,12 @@ HFSExplorer Changelog
 ---------------------
 
 
+2020.9.17
+---------
+- Fix outdated library leading to issues when loading UDIF/encrypted/sparse
+  images.
+
+
 2020.9.16
 ---------
 - Change version scheme to be based on release date.
