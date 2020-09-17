@@ -77,6 +77,8 @@ public class HFSExplorer {
         "        under the Apache License, Version 2.0.",
         "        See <http://www.apache.org/licenses/LICENSE-2.0> for the details.",
     };
+    public static final String WEB_SITE_URL =
+            "https://catacombae.org/hfsexplorer";
 
     public static BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
     private static class Options {

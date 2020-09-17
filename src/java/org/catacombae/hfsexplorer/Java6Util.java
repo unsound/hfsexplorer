@@ -25,6 +25,7 @@ import java.awt.Image;
 import java.awt.Window;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.util.Comparator;
 import java.util.List;
 import javax.swing.ImageIcon;
@@ -139,6 +140,107 @@ public class Java6Util extends org.catacombae.util.Java6Util {
         Method desktopOpenFileMethod =
                 desktopClass.getMethod("open", File.class);
         desktopOpenFileMethod.invoke(desktopObject, f);
+    }
+
+    /**
+     * Checks whether browse can be invoked for this platform. (Internally,
+     * checks whether the Java 6 operation java.awt.Desktop.browse(..) is
+     * supported for the currently running platform.<br>
+     * <b>Invoking this method on a non-Java 6 JRE will cause a class loading
+     * exception.</b>
+     *
+     * @return whether browse can be invoked for this platform.
+     */
+    public static boolean canBrowse() {
+        try {
+            return canBrowseInternal();
+        } catch(Exception e) {
+            if(e instanceof InvocationTargetException) {
+                Throwable cause = e.getCause();
+
+                if(cause instanceof RuntimeException) {
+                    throw (RuntimeException) cause;
+                }
+            }
+
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static boolean canBrowseInternal()
+            throws ClassNotFoundException, NoSuchMethodException,
+            InvocationTargetException, IllegalAccessException,
+            NoSuchFieldException
+    {
+        Class<?> desktopClass = Class.forName("java.awt.Desktop");
+        Class<?> desktopActionClass = Class.forName("java.awt.Desktop$Action");
+
+        /* Desktop desktop = Desktop.getDesktop(); */
+        Method desktopGetDesktopMethod = desktopClass.getMethod("getDesktop");
+        Object desktopObject = desktopGetDesktopMethod.invoke(null);
+
+        /* Desktop.Action browseAction = Desktop.Action.BROWSE); */
+        Field desktopActionOpenField = desktopActionClass.getField("BROWSE");
+        Object browseActionObject = desktopActionOpenField.get(null);
+
+        /* return desktop.isSupported(browseAction); */
+        Method desktopIsSupportedMethod =
+                desktopClass.getMethod("isSupported", desktopActionClass);
+        Object returnObject =
+                desktopIsSupportedMethod.invoke(desktopObject,
+                browseActionObject);
+        if(!(returnObject instanceof Boolean)) {
+            throw new RuntimeException("Unexpected type returned from " +
+                    "java.awt.Desktop.isSupported(java.awt.Desktop.Action): " +
+                    returnObject.getClass());
+        }
+
+        return ((Boolean) returnObject).booleanValue();
+    }
+
+    /**
+     * Sends an OS signal via Java 6's java.awt.Desktop.browse() method to open
+     * the specified URL with the default web browser.<br>
+     * <b>Invoking this method on a non-Java 6 JRE will cause a class loading
+     * exception.</b>
+     *
+     * @param u the URI to browse.
+     * @throws java.io.IOException if the URL could not be browsed.
+     */
+    public static void browse(URI uri) throws IOException {
+        try {
+            browseInternal(uri);
+        } catch(Exception e) {
+            if(e instanceof InvocationTargetException) {
+                Throwable cause = e.getCause();
+
+                if(cause instanceof RuntimeException) {
+                    throw (RuntimeException) cause;
+                }
+                else if(cause instanceof IOException) {
+                    throw (IOException) cause;
+                }
+            }
+
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void browseInternal(URI uri)
+            throws ClassNotFoundException, NoSuchMethodException,
+            InvocationTargetException, IllegalAccessException,
+            NoSuchFieldException
+    {
+        Class<?> desktopClass = Class.forName("java.awt.Desktop");
+
+        /* Desktop desktop = Desktop.getDesktop(); */
+        Method desktopGetDesktopMethod = desktopClass.getMethod("getDesktop");
+        Object desktopObject = desktopGetDesktopMethod.invoke(null);
+
+        /* desktop.browse(uri); */
+        Method desktopOpenFileMethod =
+                desktopClass.getMethod("browse", URI.class);
+        desktopOpenFileMethod.invoke(desktopObject, uri);
     }
 
     /**

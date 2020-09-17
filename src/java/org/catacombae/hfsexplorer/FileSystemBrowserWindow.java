@@ -33,6 +33,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.text.DecimalFormat;
@@ -558,11 +559,50 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
                         }
 
                         if(dictVersionIsHigher) {
-                            JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
+                            final String message =
                                     "There are updates available!\n" +
                                     "Latest version is: " + dictVersion +
-                                    " (build number #" + dictBuildNumber + ")",
-                                    "Information", JOptionPane.INFORMATION_MESSAGE);
+                                    (dictVersion.equals(HFSExplorer.VERSION) ?
+                                    " (build number #" + dictBuildNumber + ")" :
+                                    "");
+                            if(Java6Util.isJava6OrHigher() &&
+                                Java6Util.canBrowse())
+                            {
+                                final String[] options =
+                                        new String[] { "Download...", "Close" };
+                                int selection = JOptionPane.showOptionDialog(
+                                        /* Component parentComponent */
+                                        FileSystemBrowserWindow.this,
+                                        /* Object message */
+                                        message,
+                                        /* String title */
+                                        "Information",
+                                        /* int optionType */
+                                        JOptionPane.OK_CANCEL_OPTION,
+                                        /* int messageType */
+                                        JOptionPane.INFORMATION_MESSAGE,
+                                        /* Icon icon */
+                                        null,
+                                        /* Object[] options */
+                                        options,
+                                        /* Object initialValue */
+                                        options[0]);
+                                if(selection == 0) {
+                                    Java6Util.browse(
+                                            new URI(HFSExplorer.WEB_SITE_URL));
+                                }
+                            }
+                            else {
+                                JOptionPane.showMessageDialog(
+                                        /* Component parentComponent */
+                                        FileSystemBrowserWindow.this,
+                                        /* Object message */
+                                        message,
+                                        /* String title */
+                                        "Information",
+                                        /* int messageType */
+                                        JOptionPane.INFORMATION_MESSAGE);
+                            }
                         }
                         else {
                             JOptionPane.showMessageDialog(FileSystemBrowserWindow.this,
