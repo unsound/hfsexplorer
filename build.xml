@@ -199,7 +199,8 @@
          dir="external/catacombaeframework"
          inheritAll="false"/>
     <copy file="external/catacombaeframework/targets/base/csframework.jar"
-          todir="${java.runtime.library.dir}"/>
+          todir="${java.runtime.library.dir}"
+          overwrite="true"/>
   </target>
 
   <target name="build-hfsx_dmglib">
@@ -212,7 +213,8 @@
       <target name="build-hfsxlib"/>
     </ant>
     <copy file="external/dmgextractor/targets/hfsxlib/hfsx_dmglib.jar"
-          todir="${java.runtime.library.dir}"/>
+          todir="${java.runtime.library.dir}"
+          overwrite="true"/>
   </target>
 
   <target name="javadoc">
