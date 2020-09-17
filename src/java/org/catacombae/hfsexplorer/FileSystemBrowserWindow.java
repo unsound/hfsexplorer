@@ -1731,7 +1731,7 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
 
     private void actionShowAboutDialog() {
         String message = "";
-        message += "HFSExplorer " + HFSExplorer.VERSION + " Build #" + BuildNumber.BUILD_NUMBER + "\n";
+        message += "HFSExplorer " + HFSExplorer.VERSION + "\n";
         message += HFSExplorer.COPYRIGHT + "\n";
         for(String notice : HFSExplorer.NOTICES) {
             message += notice + "\n";

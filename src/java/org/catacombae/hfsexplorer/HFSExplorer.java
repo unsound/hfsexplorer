@@ -1003,7 +1003,7 @@ public class HFSExplorer {
 	// For measurement of the standard terminal width in fixed width environments:
 	// 80:  <-------------------------------------------------------------------------------->
 	println("hfsx - HFSExplorer Command Line Interface");
-        println("Version " + VERSION + " Build #" + BuildNumber.BUILD_NUMBER);
+        println("Version " + VERSION);
         println(COPYRIGHT.replaceAll("\u00A9", "(C)"));
         println();
 	println("Utility to explore various aspects of an HFS/HFS+/HFSX filesystem.");
