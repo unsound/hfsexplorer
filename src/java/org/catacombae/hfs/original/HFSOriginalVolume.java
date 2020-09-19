@@ -204,6 +204,12 @@ public class HFSOriginalVolume extends HFSVolume {
         return CommonHFSCatalogString.createHFS(bytes);
     }
 
+    @Override
+    public void close() {
+        allocationFile.close();
+        super.close();
+    }
+
     /* @Override */
     public CommonBTHeaderNode createCommonBTHeaderNode(byte[] currentNodeData,
             int offset, int nodeSize)
