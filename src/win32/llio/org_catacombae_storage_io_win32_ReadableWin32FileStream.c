@@ -208,7 +208,7 @@ JNIEXPORT jlong JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileSt
       if(bytesReturned != sizeof(GET_LENGTH_INFORMATION)) {
         fprintf(stderr, "WARNING: Expected %u bytes in return from "
             "DeviceIoControl, got %u.\n",
-            sizeof(GET_LENGTH_INFORMATION), (int) bytesReturned);
+            (int) sizeof(GET_LENGTH_INFORMATION), (int) bytesReturned);
       }
 
       fprintf(stderr, "Got partition sector count with "
@@ -238,7 +238,7 @@ JNIEXPORT jlong JNICALL Java_org_catacombae_storage_io_win32_ReadableWin32FileSt
       if(bytesReturned != sizeof(PARTITION_INFORMATION)) {
         fprintf(stderr, "WARNING: Expected %u bytes in return from "
             "DeviceIoControl, got %u.\n",
-            sizeof(PARTITION_INFORMATION), (int) bytesReturned);
+            (int) sizeof(PARTITION_INFORMATION), (int) bytesReturned);
       }
 
       fprintf(stderr, "Got partition sector count with "
