@@ -48,6 +48,7 @@ public class ReadableWin32FileStream implements ReadableRandomAccessStream,
         POWERPC("ppc32"), POWERPC64("ppc64"),
         SPARC("sparc32"), SPARC64("sparc64"),
         MIPS("mips32"), MIPS64("mips64"), ALPHA("alpha"),
+        ARM("arm"), ARM64("arm64"),
         UNKNOWN;
 
         private final String idString;
@@ -82,6 +83,14 @@ public class ReadableWin32FileStream implements ReadableRandomAccessStream,
         else if(osArch.equalsIgnoreCase("ia64") ||
                 osArch.equalsIgnoreCase("ia64n"))
             return ArchitectureIdentifier.IA64;
+        else if(osArch.equalsIgnoreCase("arm")) {
+            return ArchitectureIdentifier.ARM;
+        }
+        else if(osArch.equalsIgnoreCase("arm64") ||
+                osArch.equalsIgnoreCase("aarch64"))
+        {
+            return ArchitectureIdentifier.ARM64;
+        }
         else
             return ArchitectureIdentifier.UNKNOWN;
     }

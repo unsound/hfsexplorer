@@ -6,8 +6,11 @@ set TARGET_PREFIX=%~dp0dist\lib\llio
 set I386_ARCHID=i386
 set AMD64_ARCHID=amd64
 set IA64_ARCHID=ia64
+set ARM_ARCHID=arm
+set ARM64_ARCHID=arm64
 set SOURCE_DIR=%~dp0src\win32\llio
 set SOURCE_FILES="%SOURCE_DIR%\llio_common.c" "%SOURCE_DIR%\org_catacombae_storage_io_win32_ReadableWin32FileStream.c" "%SOURCE_DIR%\org_catacombae_storage_io_win32_Win32FileStream.c"
+set "VS2019_BUILD_PATH=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build"
 
 :start
 
@@ -20,7 +23,7 @@ goto printusage
 :printusage
 echo usage: %0 gcc
 echo OR
-echo usage: %0 vc [x86^|x64^|ia64]
+echo usage: %0 vc [x86^|x64^|ia64^|arm^|arm64]
 echo OR
 echo usage: %0 wdk [x86^|x64^|ia64]
 goto end
@@ -37,6 +40,8 @@ goto completed
 if "%2"=="x86" goto setvars_x86
 if "%2"=="x64" goto setvars_x64
 if "%2"=="ia64" goto setvars_ia64
+if "%2"=="arm" goto setvars_arm
+if "%2"=="arm64" goto setvars_arm64
 goto printusage
 
 :setvars_x86
@@ -61,6 +66,22 @@ pushd "%VS90COMNTOOLS%\..\..\VC"
 call vcvarsall.bat x86_ia64
 popd
 set TARGET_DLL=%TARGET_PREFIX%_%IA64_ARCHID%.dll
+goto compile_vc
+
+:setvars_arm
+if not exist "%VS2019_BUILD_PATH%" echo Can not find Visual Studio 2019! & goto error
+pushd "%VS2019_BUILD_PATH%"
+call vcvarsall.bat x86_arm
+popd
+set TARGET_DLL=%TARGET_PREFIX%_%ARM_ARCHID%.dll
+goto compile_vc
+
+:setvars_arm64
+if not exist "%VS2019_BUILD_PATH%" echo Can not find Visual Studio 2019! & goto error
+pushd "%VS2019_BUILD_PATH%"
+call vcvarsall.bat x86_arm64
+popd
+set TARGET_DLL=%TARGET_PREFIX%_%ARM64_ARCHID%.dll
 goto compile_vc
 
 :build_wdk

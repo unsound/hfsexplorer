@@ -11,7 +11,7 @@ set LLIO_SOURCEDIR=%~dp0\src\win32\llio
 if "%COMPILER%" == "gcc" goto check_gcc_arch
 if "%COMPILER%" == "vc" goto check_vc_arch
 if "%COMPILER%" == "wdk" goto check_wdk_arch
-echo You must specify which compiler to use ("gcc" or "vc")...
+echo You must specify which compiler to use ("gcc", "vc" or "wdk")...
 goto end
 
 :check_gcc_arch
@@ -24,10 +24,12 @@ goto end
 if "%ARCHITECTURE%" == "x86" goto build
 if "%ARCHITECTURE%" == "x64" goto build
 if "%ARCHITECTURE%" == "ia64" goto build
+if "%ARCHITECTURE%" == "arm" goto build
+if "%ARCHITECTURE%" == "arm64" goto build
 if "%ARCHITECTURE%" == "" (
-    echo You must specify which architecture to build ("x86", "x64" or "ia64"^).
+    echo You must specify which architecture to build ("x86", "x64", "ia64"^, "arm"^ or "arm64"^).
 ) else (
-    echo Invalid architecture "%ARCHITECTURE%" for vc build ("x86", "x64" and "ia64" are valid^).
+    echo Invalid architecture "%ARCHITECTURE%" for vc build ("x86", "x64", "ia64"^, "arm"^ and "arm64"^ are valid^).
 )
 goto end
 
