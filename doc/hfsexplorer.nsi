@@ -4,7 +4,7 @@
 !define PRODUCT_NAME "HFSExplorer"
 !define PRODUCT_VERSION "2020.9.17"
 !define PRODUCT_PUBLISHER "Catacombae Software"
-!define PRODUCT_WEB_SITE "http://www.catacombae.org/"
+!define PRODUCT_WEB_SITE "https://www.catacombae.org/"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 !define PRODUCT_STARTMENU_REGVAL "NSIS:StartMenuDir"
