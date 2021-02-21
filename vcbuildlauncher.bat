@@ -63,7 +63,7 @@ if exist "%BUILD_DIR%" echo Could not clean build dir! & goto error
 mkdir "%BUILD_DIR%"
 
 echo Compiling resources...
-rc /fo "%RES_TARGET%" "%SOURCE_DIR%\launcher.rc"
+rc /i "%~dp0doc\dmg_iconsource" /fo "%RES_TARGET%" "%SOURCE_DIR%\launcher.rc"
 if not "%ERRORLEVEL%"=="0" goto error
 
 echo Compiling source code...

@@ -31,11 +31,8 @@ if exist "%BUILD_DIR%" echo Could not clean build dir!
 mkdir "%BUILD_DIR%"
 
 echo Compiling resources...
-pushd "%LAUNCHER_SRC%"
-windres .\launcher.rc "%BUILD_DIR%"\launcher_res.o
-set WINDRES_RES=%ERRORLEVEL%
-popd
-if not "%WINDRES_RES%"=="0" goto error
+windres -I "%~dp0doc\dmg_iconsource" "%LAUNCHER_SRC%\launcher.rc" "%BUILD_DIR%"\launcher_res.o
+if not "%ERRORLEVEL%"=="0" goto error
 
 echo Compiling launcher.cpp...
 g++ -g -Wall -D_JNI_IMPLEMENTATION_ -c "%LAUNCHER_SRC%\launcher.cpp" -o "%BUILD_DIR%\launcher.o"
