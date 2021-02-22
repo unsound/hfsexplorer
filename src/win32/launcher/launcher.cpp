@@ -613,10 +613,12 @@ static bool locateJVMThroughJavaHome(JNI_CreateJavaVM_t **JNI_CreateJavaVM_f, HI
 
   _TCHAR *envString = new _TCHAR[32767];
 
-  const int endingsLength = 2;
+  const int endingsLength = 4;
   const _TCHAR *endings[endingsLength] = {
+    _T("\\bin\\client\\jvm.dll"),
+    _T("\\bin\\server\\jvm.dll"),
     _T("\\jre\\bin\\client\\jvm.dll"),
-    _T("\\jre\\bin\\server\\jvm.dll")
+    _T("\\jre\\bin\\server\\jvm.dll"),
   };
 
   for(int i = 0; i < endingsLength; ++i) {
