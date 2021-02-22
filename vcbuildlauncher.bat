@@ -11,6 +11,11 @@ set TARGET_EXE_PREFIX=%~dp0dist\bin
 set RES_TARGET=%BUILD_DIR%\launcher.res
 set OBJ_TARGET=%BUILD_DIR%\launcher.obj
 
+if "%JAVA_HOME%"=="" (
+    echo Please set the JAVA_HOME environment variable to point at a Windows JDK before executing this script.
+    goto error
+)
+
 if "%1"=="console" goto console
 if "%1"=="windows" goto windows
 
@@ -68,7 +73,7 @@ if not "%ERRORLEVEL%"=="0" goto error
 
 echo Compiling source code...
 REM "/Fe%TARGET_EXE%" 
-cl /c "/Fo%OBJ_TARGET%" "/IC:\Program Files\Java\jdk\include" "/IC:\Program Files\Java\jdk\include\win32" "%SOURCE_DIR%\launcher.cpp"
+cl /c "/Fo%OBJ_TARGET%" "/I%JAVA_HOME%\include" "/I%JAVA_HOME%\include\win32" "%SOURCE_DIR%\launcher.cpp"
 if not "%ERRORLEVEL%"=="0" goto error
 
 echo Linking...
