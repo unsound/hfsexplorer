@@ -7,7 +7,7 @@ setlocal
 
 set BUILD_DIR=%~dp0build.~
 set SOURCE_DIR=%~dp0src\win32\launcher
-set TARGET_EXE_PREFIX=%~dp0dist\bin
+set TARGET_EXE_PREFIX=%~dp0dist\bin\hfsexplorer
 set RES_TARGET=%BUILD_DIR%\launcher.res
 set OBJ_TARGET=%BUILD_DIR%\launcher.obj
 
