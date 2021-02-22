@@ -5,7 +5,7 @@ set OUTDIR=%~dp0dist\bin
 set OUTFILE=hfsexplorer.exe
 set BUILD_DIR=%~dp0build.~
 
-if "%JAVA_HOME%"=="" echo Please set the JAVA_HOME environment variable before executing this script. & goto error
+if "%JAVA_HOME%"=="" echo Please set the JAVA_HOME environment variable to point at a Windows JDK before executing this script. & goto error
 
 if not "%CPATH%"=="" set "CPATH=%CPATH%;"
 set CPATH=%CPATH%%JAVA_HOME%\include;%JAVA_HOME%\include\win32
