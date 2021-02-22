@@ -1207,22 +1207,75 @@ int main(int original_argc, char** original_argv) {
     returnValue = RETVAL_COULD_NOT_GET_CWD;
   }
   else {
+    /*
+     * The behaviour when no arguments are supplied varies depending on the
+     * Windows version, so query the version with the GetVersion API.
+     * - If the Windows version is Vista or later, invoke UAC to launch an
+     *   elevated process which can access devices etc.
+     * - If the Windows version is earlier than Vista then UAC is not available
+     *   so just carry on launching the application.
+     */
+    const DWORD windowsVersion = GetVersion();
+    const DWORD windowsMajorVersion = (DWORD)(LOBYTE(LOWORD(windowsVersion)));
+
     LOG(debug, "CWD: \"%" FMTts "\"", currentWorkingDirectory);
 
-    if(argc > 1 && _tcscmp(argv[1], _T("-invokeuac")) == 0) {
+    if((argc == 1 && windowsMajorVersion >= 6) ||
+       (argc > 1 && _tcscmp(argv[1], _T("-invokeuac")) == 0))
+    {
+      int elevatedProcessArgc;
+      _TCHAR **elevatedProcessArgv;
+      int i;
+
       LOG(debug, "\"-invokeuac\" specified. Forking off elevated process...");
 
-      if(spawnElevatedProcess(argv[0], currentWorkingDirectory, argc-2, argv+2))
+      elevatedProcessArgc = (argc < 2) ? 1 : (argc - 1);
+      elevatedProcessArgv =
+        (_TCHAR**) malloc(sizeof(_TCHAR*) * (elevatedProcessArgc + 1));
+      if(!elevatedProcessArgv) {
+        LOG(error, "Failed to allocate subprocess argv.");
+        return RETVAL_UNKNOWN_ERROR;
+      }
+
+      elevatedProcessArgv[0] = _T("-invokeduac");
+      for(i = 1; i < argc - 1; ++i) {
+	elevatedProcessArgv[i] = argv[i + 1];
+      }
+      elevatedProcessArgv[i] = NULL;
+
+      if(spawnElevatedProcess(
+          /* _TCHAR *imageFile */
+          argv[0],
+          /*_TCHAR *currentWorkingDirectory */
+          currentWorkingDirectory,
+          /* int argc */
+          elevatedProcessArgc,
+          /* _TCHAR **argv */
+          elevatedProcessArgv))
+      {
 	returnValue = RETVAL_OK;
+      }
       else {
 	returnValue = RETVAL_INVOKEUAC_FAILED;
 	LOG(error, "Failed to create elevated (UAC) process!");
 	MessageBox(NULL, _T("Failed to create elevated (UAC) process!"), _T("HFSExplorer launch error"), MB_OK);
       }
+
+      free(elevatedProcessArgv);
     }
     else { // No -invokeuac switch supplied
       // <Ugly hack which converts argv[1] into an absolute path name>
       _TCHAR *fullPathName = NULL;
+
+      if(argc > 1 && _tcscmp(argv[1], _T("-invokeduac")) == 0) {
+        /*
+         * Swallow argument simply used to indicate that we are running elevated
+         * so we don't need to do it again.
+         */
+        argv = &argv[1];
+        --argc;
+      }
+
       if(argc > 1) {
 	const int fullPathNameLength =
 	  SearchPath(currentWorkingDirectory,

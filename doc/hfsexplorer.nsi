@@ -126,7 +126,6 @@ Section "HFSExplorer" SEC01
   CreateDirectory "$SMPROGRAMS\$ICONS_GROUP"
   SetOutPath $INSTDIR
   CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\HFSExplorer.lnk" "$INSTDIR\bin\hfsexplorer.exe"
-  CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Run HFSExplorer in Administrator mode.lnk" "$INSTDIR\bin\hfsexplorer.exe" "-invokeuac"
   CreateDirectory "$SMPROGRAMS\$ICONS_GROUP\Tools"
   CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Tools\Resource Viewer.lnk" "javaw.exe" "-cp lib\hfsx.jar org.catacombae.hfsexplorer.tools.ResourceViewer" "" "" "" "" "An application for displaying the contents of resource forks."
   SetOutPath -
@@ -331,7 +330,6 @@ Section Uninstall
   Delete "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\Developer Web Site.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\HFSExplorer.lnk"
-  Delete "$SMPROGRAMS\$ICONS_GROUP\Run HFSExplorer in Administrator mode.lnk"
   RMDir /r "$SMPROGRAMS\$ICONS_GROUP"
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
