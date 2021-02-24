@@ -2,6 +2,20 @@ HFSExplorer Changelog
 ---------------------
 
 
+2021.2.22
+---------
+- Add support for ARM-native JDKs on Windows (adding ARM versions of llio dll).
+
+- Simplify start menu options to remove the 'administrator mode' item and
+  instead always launch the application elevated when there are no arguments
+  while if there are arguments, i.e. when opening a file, then UAC is not
+  invoked.
+
+- Add web site link to "update available" dialog.
+
+- Fix memory leak in HFS code.
+
+
 2020.9.17
 ---------
 - Fix outdated library leading to issues when loading UDIF/encrypted/sparse
