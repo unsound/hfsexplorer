@@ -1,0 +1,23 @@
+struct AliasHeader {
+    char        userType[4];
+    be16        aliasSize;
+    be16        version;
+    be16        flags;
+    u8          volumeNameLength;
+    char        volumeName[27];
+    be32        volumeCreateTimestamp;
+    char        volumeFsType[2]; // 'H+' for HFS+, 'BD' (Big Disk) for HFS and also later for any other filesystems, 'RW' for MFS.
+    be16        driveType; // 0 = HD (fixed), 1 = Network, 2 = 400k FD, 3 = 800k FD, 4 = 1.44M FD, 5 = Other ejectable media
+    be32        parentID; // Parent directory ID of target item.
+    u8          fileNameLength;
+    char        fileName[63];
+    be32        fileID;
+    be32        fileCreateTimestamp;
+    char        fileType[4];
+    char        fileCreator[4];
+    be16        nextLevelUpFromAlias;
+    be16        nextLevelDownToTarget;
+    be32        volumeAttributes;
+    be16        fileSystemID;
+    u8          reserved[10];
+};

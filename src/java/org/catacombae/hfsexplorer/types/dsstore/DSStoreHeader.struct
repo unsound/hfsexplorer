@@ -1,0 +1,8 @@
+struct DSStoreHeader {
+    be32        alignment;
+    u8          signature[4]; // Must be 'Bud1' in ASCII.
+    be32        rootBlockOffset1; // Must be equal to rootBlockOffset2.
+    be32        rootBlockSize;
+    be32        rootBlockOffset2; // Must be equal to rootBlockOffset1.
+    u8          unknown[16];
+};

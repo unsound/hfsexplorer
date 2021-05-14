@@ -1,0 +1,5 @@
+struct DSStoreTableOfContentsEntry {
+    u8          tocNameLength;
+    char        tocName[255];
+    be32        tocValue;
+};

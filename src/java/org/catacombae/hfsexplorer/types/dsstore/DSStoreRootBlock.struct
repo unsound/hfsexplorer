@@ -1,0 +1,6 @@
+struct DSStoreRootBlock {
+    be32        unknown;
+    be32        numOffsets;
+    be32        unknown2; // Zeroed in all known cases.
+    be32        offsetList[1];
+};

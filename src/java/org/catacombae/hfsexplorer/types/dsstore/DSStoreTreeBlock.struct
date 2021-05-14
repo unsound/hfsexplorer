@@ -1,0 +1,7 @@
+struct DSStoreTreeBlock {
+    be32        firstDataBlockID;
+    be32        recordsInTree;
+    be32        levelsOfInternalBlocks;
+    be32        totalTreeBlocks;
+    be32        unknownAlways0x1000;
+};

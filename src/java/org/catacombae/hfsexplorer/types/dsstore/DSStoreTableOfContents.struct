@@ -1,0 +1,4 @@
+struct DSStoreTableOfContents {
+    be32        tocCount;
+    DSStoreTableOfContentsEntry tocEntries[1];
+};
