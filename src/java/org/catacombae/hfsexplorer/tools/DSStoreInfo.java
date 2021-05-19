@@ -260,7 +260,7 @@ public class DSStoreInfo {
                         offset + j));
                 System.out.println(insetString + "        Name: " +
                         Util.readString(data,
-                        offset + j + 2, entrySize, "UTF-16BE"));
+                        offset + j + 2, entrySize - 2, "UTF-16BE"));
                 break;
             case EntryTypeUNIXRelativePath:
                 System.out.println(insetString + "        Path: " +
