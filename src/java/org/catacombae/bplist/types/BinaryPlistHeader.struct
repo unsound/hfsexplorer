@@ -1,0 +1,4 @@
+struct BinaryPlistHeader {
+    char signature[6];
+    char version[2];
+};

@@ -1,0 +1,9 @@
+struct BinaryPlistFooter {
+    u8 reserved[5];
+    u8 sortVersion;
+    u8 offsetTableOffsetSize;
+    u8 objectRefSize;
+    be64 numObjects;
+    be64 topObjectOffset;
+    be64 offsetTableStart;
+};

@@ -1,15 +1,31 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/*-
+ * Copyright (C) 2021 Erik Larsson
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.catacombae.hfsexplorer.tools;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Date;
+import java.util.LinkedList;
 import org.catacombae.hfsexplorer.types.alias.AliasHeader;
+import org.catacombae.bplist.BinaryPlist;
 import org.catacombae.hfsexplorer.types.dsstore.DSStoreFreeList;
 import org.catacombae.hfsexplorer.types.dsstore.DSStoreHeader;
 import org.catacombae.hfsexplorer.types.dsstore.DSStoreRootBlock;
@@ -19,8 +35,10 @@ import org.catacombae.hfsexplorer.types.dsstore.DSStoreTreeBlock;
 import org.catacombae.util.Util;
 
 /**
+ * Utility which prints the contents of a .DS_Store file, including the content
+ * inside some supported blobs.
  *
- * @author erik
+ * @author Erik Larsson
  */
 public class DSStoreInfo {
     private static void hexDump(byte[] data, int dataOffset, int dataSize,
@@ -269,6 +287,308 @@ public class DSStoreInfo {
         }
     }
 
+    private static void printBinaryPlistValue(byte[] dsStoreData,
+            BinaryPlist plist, int curOffset, int virtualOffset,
+            String insetString)
+    {
+        int physicalOffset =
+                plist.getOffsetMapping(virtualOffset);
+
+        byte marker = dsStoreData[curOffset + physicalOffset];
+
+        /*
+        System.out.println(insetString + "Reading element at " +
+                virtualOffset + " -> " + physicalOffset);
+        System.out.println(insetString + "  (marker: " +
+                "0x" + Util.toHexStringBE(marker) + ")");
+        */
+
+        switch(marker & 0xF0) {
+        case 0x00:
+            if(marker == 0x00) {
+                System.out.println(insetString + "NULL");
+            }
+            else if(marker == 0x08) {
+                System.out.println(insetString + "Boolean: false");
+            }
+            else if(marker == 0x09) {
+                System.out.println(insetString + "Boolean: true");
+            }
+            else if(marker == 0x0F) {
+                /* TODO: Find out what this marker is supposed to mean. */
+                System.out.println(insetString + "fill?");
+            }
+            else {
+                System.out.println(insetString + "<unknown: 0x" +
+                        Util.toHexStringBE(marker) + ">");
+            }
+
+            break;
+        case 0x10: {
+            /* Integer */
+            int size = 1 << (marker & 0x0F);
+            BigInteger value =
+                    new BigInteger(Util.arrayCopy(dsStoreData,
+                    curOffset + physicalOffset + 1,
+                    new byte[size], 0, size));
+
+            System.out.println(insetString + "Integer " +
+                    "(" + (size * 8) + "-bit): " + value + " " +
+                    "(0x" + Util.byteArrayToHexString(dsStoreData,
+                    curOffset + physicalOffset + 1, size) + ")");
+            break;
+        }
+        case 0x20: {
+            /* Real number */
+            int size = 1 << (marker & 0x0F);
+            BigDecimal value = null;
+            if(size == 4) {
+                /*
+                 * "float" format: Big endian with 1-bit sign, 8-bit
+                 * exponent, 23-bit significand.
+                 */
+
+                int rawValue =
+                        Util.readIntBE(dsStoreData,
+                        curOffset + physicalOffset + 1);
+                int unscaledValue =
+                        (rawValue & 0x807FFFFF);
+                int scale =
+                        (rawValue & 0x7F800000) >>> 23;
+
+                value = BigDecimal.valueOf(unscaledValue, scale);
+            }
+            else if(size == 8) {
+                /*
+                 * "double" format: Big endian with 1-bit sign, 11-bit
+                 * exponent, 52-bit significand.
+                 */
+
+                long rawValue =
+                        Util.readLongBE(dsStoreData,
+                        curOffset + physicalOffset + 1);
+                long unscaledValue =
+                        (rawValue & 0x800FFFFFFFFFFFFFL);
+                int scale =
+                        (int) ((rawValue & 0x7FF0000000000000L) >>> 52);
+
+                value = BigDecimal.valueOf(unscaledValue, scale);
+            }
+
+            System.out.println(insetString + "Real number " +
+                    "(" + (size * 8) + "-bit): " +
+                    (value != null ? value : "<unsupported format>"));
+            break;
+        }
+        case 0x30: {
+            /* Date */
+            int size = 1 << (marker & 0x0F);
+            Date d = null;
+            if(size == 8) {
+                /*
+                 * "double" format: Big endian with 1-bit sign, 11-bit
+                 * exponent, 52-bit significand.
+                 */
+
+                long rawValue =
+                        Util.readLongBE(dsStoreData,
+                        curOffset + physicalOffset + 1);
+
+                BigDecimal value =
+                        new BigDecimal(Double.longBitsToDouble(
+                        rawValue));
+
+                long unixTimestamp =
+                        978307200 +
+                        value.multiply(BigDecimal.
+                        valueOf(1000)).longValue();
+
+                d = new Date(unixTimestamp);
+            }
+
+            System.out.println(insetString + "Date: " +
+                    ((d != null) ? d : "<unsupported format>"));
+            break;
+        }
+        case 0x40:
+            /* Data */
+        case 0x50:
+            /* ASCII string */
+        case 0x60:
+            /* Unicode string */
+        case 0xA0:
+            /* Array */
+        case 0xC0:
+            /* Set */
+        case 0xD0:
+            /* Dictionary */
+        {
+            /*
+             * All of these types have in common that they have a variable
+             * sized count field describing the length of the data.
+             */
+            int size = marker & 0x0F;
+            int dataOffset = 1;
+
+            if(size == 0x0F) {
+                /*
+                 * All bits set in the lower nibble means the size is
+                 * encoded as a variable-sized integer.
+                 * First comes one byte containing the size of the size
+                 * field in its low nibble (the high nibble should always be
+                 * 0x1 as a marker). The size of the size field is encoded
+                 * as the power of two of the size.
+                 * I.e. a value of 3 means the integer is 2^3 = 8 bytes.
+                 *
+                 * After that comes the size field itself, encoded as a
+                 * big-endian integer.
+                 */
+                byte sizeSizeByte =
+                        dsStoreData[curOffset + physicalOffset +
+                        1];
+                if((sizeSizeByte & 0xF0) == 0x10) {
+                    int sizeSize = 1 << (sizeSizeByte & 0x0F);
+                    BigInteger sizeBigInt =
+                            new BigInteger(Util.arrayCopy(dsStoreData,
+                            curOffset + physicalOffset + 2,
+                            new byte[sizeSize], 0, sizeSize));
+                    if(sizeBigInt.bitCount() > 31) {
+                        System.err.println("Unexpected number of bits (" +
+                                sizeBigInt.bitCount() + ") in size bits " +
+                                "nibble! Byte: 0x" +
+                                Util.toHexStringBE(sizeSizeByte));
+                        dataOffset = 0;
+                    }
+                    else {
+                        size = sizeBigInt.intValue();
+                        dataOffset += 1 + sizeSize;
+                    }
+                }
+                else {
+                    System.err.println("Unexpected marker in size bits " +
+                            "nibble! Byte: 0x" +
+                            Util.toHexStringBE(sizeSizeByte));
+                    dataOffset = 0;
+                }
+            }
+
+            if(dataOffset != 0) {
+                switch(marker & 0xF0) {
+                case 0x40:
+                    /* Data */
+                    System.out.println(insetString + "Data " +
+                            "(" + size + " bytes):");
+                    hexDump(dsStoreData,
+                            curOffset + physicalOffset + dataOffset, size,
+                            insetString + "  ");
+                    break;
+                case 0x50:
+                    /* ASCII string */
+                    System.out.println(insetString + "ASCII string " +
+                            "(" + size + " characters):");
+                    System.out.println(insetString + "  " +
+                            Util.readString(dsStoreData,
+                            curOffset + physicalOffset + dataOffset, size,
+                            "MacRoman"));
+                    break;
+                case 0x60:
+                    /* Unicode string */
+                    System.out.println(insetString + "Unicode " +
+                            "string (" + size + " characters):");
+                    System.out.println(insetString + "  " +
+                            Util.readString(dsStoreData,
+                            curOffset + physicalOffset + dataOffset,
+                            size * 2, "UTF-16BE"));
+                    break;
+                case 0xA0:
+                    /* Array */
+                case 0xC0: {
+                    /* Set */
+                    /* Here the size field means the number of value
+                     * refs. */
+                    System.out.println(insetString +
+                            ((marker & 0xF0) == 0xC0 ? "Set" : "Array") +
+                            "(" + size + " elements):");
+
+                    short refSize =
+                            plist.getFooter().getObjectRefSize();
+                    for(int i = 0; i < size; ++i) {
+                        BigInteger valueRef = new BigInteger(Util.arrayCopy(
+                                dsStoreData,
+                                curOffset + physicalOffset + dataOffset +
+                                i * refSize,
+                                new byte[refSize], 0, refSize));
+
+                        System.out.println(insetString + "  Value:");
+                        printBinaryPlistValue(dsStoreData, plist, curOffset,
+                                valueRef.intValue(), insetString + "    ");
+                    }
+
+                    break;
+                }
+                case 0xD0: {
+                    /* Dictionary */
+                    /* Here the size field means the number of key ref -
+                     * value ref pairs. */
+                    System.out.println(insetString + "Dictionary (" + size +
+                            " entries):");
+
+                    short refSize =
+                            plist.getFooter().getObjectRefSize();
+                    for(int i = 0; i < size; ++i) {
+                        BigInteger keyRef = new BigInteger(Util.arrayCopy(
+                                dsStoreData,
+                                curOffset + physicalOffset + dataOffset +
+                                i * refSize,
+                                new byte[refSize], 0, refSize));
+
+                        BigInteger valueRef = new BigInteger(Util.arrayCopy(
+                                dsStoreData,
+                                curOffset + physicalOffset + dataOffset +
+                                (size + i) * refSize,
+                                new byte[refSize], 0, refSize));
+
+                        System.out.println(insetString + "  Key:");
+                        printBinaryPlistValue(dsStoreData, plist, curOffset,
+                                keyRef.intValue(), insetString + "    ");
+
+                        System.out.println(insetString + "  Value:");
+                        printBinaryPlistValue(dsStoreData, plist, curOffset,
+                                valueRef.intValue(), insetString + "    ");
+                    }
+
+                    break;
+                }
+                default:
+                    throw new RuntimeException("Should not get here.");
+                }
+            }
+            else {
+                System.out.println(insetString + "<unsupported format>");
+            }
+            break;
+        }
+        case 0x80:
+            /* uid (?) */
+        default:
+            System.out.println(insetString + "<unknown: 0x" +
+                    Util.toHexStringBE(marker) + ">");
+            break;
+        }
+    }
+
+    private static void printBinaryPlist(byte[] dsStoreData, int curOffset,
+            int blobSize, String insetString)
+    {
+        BinaryPlist plist =
+                new BinaryPlist(dsStoreData, curOffset, blobSize);
+
+        plist.getFooter().printFields(System.out, insetString);
+
+        /* Start iterating at virtual offset 0, which is the root element. */
+        printBinaryPlistValue(dsStoreData, plist, curOffset, 0, insetString);
+    }
+
     private static void printTreeBlockRecursive(byte[] dsStoreData,
             DSStoreRootBlock rootBlock, int inset, int blockID)
     {
@@ -370,6 +690,92 @@ public class DSStoreInfo {
                     /* This data is in Mac OS alias format, pointing at the
                      * location of the background image. */
                     printAlias(dsStoreData, curOffset, blobSize, insetString);
+                }
+                else if(Util.toASCIIString(structID).equals("BKGD") &&
+                        blobSize == 12) {
+                    /*
+                     * Background of the Finder window. Starts with a FourCC
+                     * which then defines the rest of the fields.
+                     */
+
+                    System.out.println(insetString + "      Finder " +
+                            "background:");
+
+                    int backgroundType = Util.readIntBE(dsStoreData, curOffset);
+                    System.out.print(insetString + "        Type: '" +
+                            Util.toASCIIString(backgroundType) + "' ");
+
+                    if(Util.toASCIIString(backgroundType).equals("DefB")) {
+                        System.out.println("(Default background)");
+                        System.out.println(insetString + "        Reserved: " +
+                                "0x" + Util.byteArrayToHexString(dsStoreData,
+                                curOffset + 4, 8));
+                    }
+                    else if(Util.toASCIIString(backgroundType).equals("ClrB")) {
+                        System.out.println("(Solid color)");
+
+                        short red =
+                                Util.readShortBE(dsStoreData, curOffset + 4);
+                        short green =
+                                Util.readShortBE(dsStoreData, curOffset + 6);
+                        short blue =
+                                Util.readShortBE(dsStoreData, curOffset + 8);
+                        short unknown =
+                                Util.readShortBE(dsStoreData, curOffset + 10);
+                        System.out.println(insetString + "        Red: " + red);
+                        System.out.println(insetString + "        Green: " +
+                                green);
+                        System.out.println(insetString + "        Blue: " +
+                                blue);
+                        System.out.println(insetString + "        Reserved / " +
+                                "unknown: 0x" + Util.toHexStringBE(unknown));
+                    }
+                    else if(Util.toASCIIString(backgroundType).equals("PctB")) {
+                        System.out.println("(Picture background)");
+                        int pictBlobSize =
+                                Util.readIntBE(dsStoreData, curOffset + 4);
+                        int unknown =
+                                Util.readIntBE(dsStoreData, curOffset + 8);
+                        System.out.println(insetString + "        Blob size: " +
+                                pictBlobSize);
+                        System.out.println(insetString + "        Reserved / " +
+                                "unknown: 0x" + Util.toHexStringBE(unknown));
+                    }
+                    else {
+                        System.out.println(insetString + "        Type: " +
+                                "Unknown ('" +
+                                Util.toASCIIString(backgroundType) + "')");
+                        System.out.println(insetString + "        Unknown / " +
+                                "Reserved: 0x" + Util.byteArrayToHexString(
+                                dsStoreData, curOffset + 4, 8));
+                    }
+                }
+                else if(Util.toASCIIString(structID).equals("Iloc") &&
+                        blobSize == 16)
+                {
+                    /*
+                     * Location of file's icon within the Finder window.
+                     */
+
+                    System.out.println(insetString + "      Finder " +
+                            "icon location:");
+
+                    int x = Util.readIntBE(dsStoreData, curOffset);
+                    int y = Util.readIntBE(dsStoreData, curOffset + 4);
+                    System.out.println(insetString + "        Horizontal " +
+                            "(X): " + x);
+                    System.out.println(insetString + "        Vertical " +
+                            "(Y): " + y);
+                    System.out.println(insetString + "        Unknown / " +
+                            "Reserved: 0x" + Util.byteArrayToHexString(
+                            dsStoreData, curOffset + 8, 8));
+                }
+                else if(Util.toASCIIString(structID).equals("bwsp")) {
+                    System.out.println(insetString + "      Finder " +
+                            "window properties:");
+
+                    printBinaryPlist(dsStoreData, curOffset, blobSize,
+                            insetString + "        ");
                 }
 
                 curOffset += blobSize;
