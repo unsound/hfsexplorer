@@ -600,6 +600,119 @@ public class DSStoreInfo {
                     printBinaryPlist(dsStoreData, curOffset, blobSize,
                             insetString + "        ");
                 }
+                else if(Util.toASCIIString(structID).equals("fwi0")) {
+                    System.out.println(insetString + "      Finder " +
+                            "window information:");
+
+                    short top = Util.readShortBE(dsStoreData, curOffset);
+                    short left = Util.readShortBE(dsStoreData, curOffset + 2);
+                    short bottom = Util.readShortBE(dsStoreData, curOffset + 4);
+                    short right = Util.readShortBE(dsStoreData, curOffset + 6);
+
+                    System.out.println(insetString + "        Top: " + top);
+                    System.out.println(insetString + "        Left: " + left);
+                    System.out.println(insetString + "        Bottom: " +
+                            bottom);
+                    System.out.println(insetString + "        Right: " + right);
+
+                    int view = Util.readIntBE(dsStoreData, curOffset + 8);
+                    final String viewLabel;
+                    if(Util.toASCIIString(view).equals("icnv")) {
+                        viewLabel = "Icon view";
+                    }
+                    else if(Util.toASCIIString(view).equals("Nlsv")) {
+                        viewLabel = "List view";
+                    }
+                    else if(Util.toASCIIString(view).equals("clmv")) {
+                        viewLabel = "Column view";
+                    }
+                    else if(Util.toASCIIString(view).equals("Flwv")) {
+                        viewLabel = "Cover flow";
+                    }
+                    else {
+                        viewLabel = "Unknown";
+                    }
+
+                    System.out.println(insetString + "        View: " +
+                            viewLabel + " (" + Util.toASCIIString(view) + " " +
+                            "/ 0x" + Util.toHexStringBE(view) + ")");
+
+                    System.out.println(insetString + "        Unknown / " +
+                            "Reserved: 0x" + Util.byteArrayToHexString(
+                            dsStoreData, curOffset + 12, 4));
+                }
+                else if(Util.toASCIIString(structID).equals("icvo")) {
+                    System.out.println(insetString + "      Finder " +
+                            "icon view options:");
+
+                    int magic = Util.readIntBE(dsStoreData, curOffset);
+
+                    Long unknown = null;
+                    Short iconViewSize = null;
+                    Integer keepArrangedBy = null;
+                    Integer iconLabelPosition = null;
+                    byte[] flags = null;
+
+                    if(Util.toASCIIString(magic).equals("icvo")) {
+                        /* 18-byte format */
+                        unknown = Util.readLongBE(dsStoreData, curOffset + 4);
+                        iconViewSize =
+                                Util.readShortBE(dsStoreData, curOffset + 12);
+                        keepArrangedBy =
+                                Util.readIntBE(dsStoreData, curOffset + 14);
+                    }
+                    else if(Util.toASCIIString(magic).equals("icv4")) {
+                        /* 26-byte format */
+                        iconViewSize =
+                                Util.readShortBE(dsStoreData, curOffset + 4);
+                        keepArrangedBy =
+                                Util.readIntBE(dsStoreData, curOffset + 6);
+                        iconLabelPosition =
+                                Util.readIntBE(dsStoreData, curOffset + 10);
+                        flags =
+                                Util.readByteArrayBE(dsStoreData,
+                                curOffset + 14, 12);
+                    }
+                    else {
+                        System.out.println(insetString + "        " +
+                                "<Unrecognized magic for type: " +
+                                "'" + Util.toASCIIString(magic) + "' " +
+                                "(0x" + Util.toHexStringBE(magic) + ")>");
+                    }
+
+                    if(unknown != null) {
+                        System.out.println(insetString + "        Unknown: " +
+                                "0x" + Util.toHexStringBE(unknown));
+                    }
+                    if(iconViewSize != null) {
+                        System.out.println(insetString + "        Icon view " +
+                                "size: " + iconViewSize);
+                    }
+                    if(keepArrangedBy != null) {
+                        System.out.println(insetString + "        Keep " +
+                                "arranged by: '" +
+                                Util.toASCIIString(keepArrangedBy) + "' (0x" +
+                                Util.toHexStringBE(keepArrangedBy) + ")");
+                    }
+                    if(iconLabelPosition != null) {
+                        System.out.println(insetString + "        Icon label " +
+                                "position: '" +
+                                Util.toASCIIString(iconLabelPosition) + "' (0x" +
+                                Util.toHexStringBE(iconLabelPosition) + ")");
+                    }
+                    if(flags != null) {
+                        System.out.println(insetString + "        Flags: 0x" +
+                                Util.byteArrayToHexString(flags));
+                        if((flags[1] & 0x1) != 0) {
+                            System.out.println(insetString + "          " +
+                                    "Show item info");
+                        }
+                        if((flags[11] & 0x1) != 0) {
+                            System.out.println(insetString + "          " +
+                                    "Show icon preview");
+                        }
+                    }
+                }
 
                 curOffset += blobSize;
             }
