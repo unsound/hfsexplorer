@@ -87,6 +87,10 @@ public class DSStoreInfo {
         }
     }
 
+    private static void hexDump(byte[] data, String insetString) {
+        hexDump(data, 0, data.length, insetString);
+    }
+
     private static enum EntryType {
         EntryTypeInvalid(null),
         EntryTypeExtendedInfoEnd(-1),
@@ -287,293 +291,110 @@ public class DSStoreInfo {
         }
     }
 
-    private static void printBinaryPlistValue(byte[] dsStoreData,
-            BinaryPlist plist, int curOffset, int virtualOffset,
+    private static void printBinaryPlistValue(BinaryPlist.Entry entry,
             String insetString)
     {
-        int physicalOffset =
-                plist.getOffsetMapping(virtualOffset);
+        byte marker = entry.getMarker();
 
-        byte marker = dsStoreData[curOffset + physicalOffset];
-
-        /*
-        System.out.println(insetString + "Reading element at " +
-                virtualOffset + " -> " + physicalOffset);
-        System.out.println(insetString + "  (marker: " +
-                "0x" + Util.toHexStringBE(marker) + ")");
-        */
-
-        switch(marker & 0xF0) {
-        case 0x00:
-            if(marker == 0x00) {
-                System.out.println(insetString + "NULL");
-            }
-            else if(marker == 0x08) {
-                System.out.println(insetString + "Boolean: false");
-            }
-            else if(marker == 0x09) {
-                System.out.println(insetString + "Boolean: true");
-            }
-            else if(marker == 0x0F) {
-                /* TODO: Find out what this marker is supposed to mean. */
-                System.out.println(insetString + "fill?");
-            }
-            else {
-                System.out.println(insetString + "<unknown: 0x" +
-                        Util.toHexStringBE(marker) + ">");
-            }
-
-            break;
-        case 0x10: {
-            /* Integer */
-            int size = 1 << (marker & 0x0F);
-            BigInteger value =
-                    new BigInteger(Util.arrayCopy(dsStoreData,
-                    curOffset + physicalOffset + 1,
-                    new byte[size], 0, size));
-
+        if(entry == null) {
+            System.out.println(insetString + "<unsupported format>");
+        }
+        else if(entry instanceof BinaryPlist.NullEntry) {
+            System.out.println(insetString + "NULL");
+        }
+        else if(entry instanceof BinaryPlist.BooleanEntry) {
+            BinaryPlist.BooleanEntry e = (BinaryPlist.BooleanEntry) entry;
+            System.out.println(insetString + "Boolean: " +
+                    (e.getValue() ? "true" : "false"));
+        }
+        else if(entry instanceof BinaryPlist.FillEntry) {
+            System.out.println(insetString + "Fill");
+        }
+        else if(entry instanceof BinaryPlist.IntegerEntry) {
+            BinaryPlist.IntegerEntry e = (BinaryPlist.IntegerEntry) entry;
+            byte[] valueData = e.getValueData();
+            BigInteger value = e.getValue();
             System.out.println(insetString + "Integer " +
-                    "(" + (size * 8) + "-bit): " + value + " " +
-                    "(0x" + Util.byteArrayToHexString(dsStoreData,
-                    curOffset + physicalOffset + 1, size) + ")");
-            break;
+                    "(" + (valueData.length * 8) + "-bit): " + value + " " +
+                    "(0x" + Util.byteArrayToHexString(valueData) + ")");
         }
-        case 0x20: {
-            /* Real number */
-            int size = 1 << (marker & 0x0F);
-            BigDecimal value = null;
-            if(size == 4) {
-                /*
-                 * "float" format: Big endian with 1-bit sign, 8-bit
-                 * exponent, 23-bit significand.
-                 */
-
-                int rawValue =
-                        Util.readIntBE(dsStoreData,
-                        curOffset + physicalOffset + 1);
-                int unscaledValue =
-                        (rawValue & 0x807FFFFF);
-                int scale =
-                        (rawValue & 0x7F800000) >>> 23;
-
-                value = BigDecimal.valueOf(unscaledValue, scale);
-            }
-            else if(size == 8) {
-                /*
-                 * "double" format: Big endian with 1-bit sign, 11-bit
-                 * exponent, 52-bit significand.
-                 */
-
-                long rawValue =
-                        Util.readLongBE(dsStoreData,
-                        curOffset + physicalOffset + 1);
-                long unscaledValue =
-                        (rawValue & 0x800FFFFFFFFFFFFFL);
-                int scale =
-                        (int) ((rawValue & 0x7FF0000000000000L) >>> 52);
-
-                value = BigDecimal.valueOf(unscaledValue, scale);
-            }
-
+        else if(entry instanceof BinaryPlist.DecimalEntry) {
+            BinaryPlist.DecimalEntry e = (BinaryPlist.DecimalEntry) entry;
+            byte[] valueData = e.getValueData();
+            BigDecimal value = e.getValue();
             System.out.println(insetString + "Real number " +
-                    "(" + (size * 8) + "-bit): " +
+                    "(" + (valueData.length * 8) + "-bit): " +
                     (value != null ? value : "<unsupported format>"));
-            break;
         }
-        case 0x30: {
-            /* Date */
-            int size = 1 << (marker & 0x0F);
-            Date d = null;
-            if(size == 8) {
-                /*
-                 * "double" format: Big endian with 1-bit sign, 11-bit
-                 * exponent, 52-bit significand.
-                 */
-
-                long rawValue =
-                        Util.readLongBE(dsStoreData,
-                        curOffset + physicalOffset + 1);
-
-                BigDecimal value =
-                        new BigDecimal(Double.longBitsToDouble(
-                        rawValue));
-
-                long unixTimestamp =
-                        978307200 +
-                        value.multiply(BigDecimal.
-                        valueOf(1000)).longValue();
-
-                d = new Date(unixTimestamp);
-            }
-
-            System.out.println(insetString + "Date: " +
+        else if(entry instanceof BinaryPlist.DateEntry) {
+            BinaryPlist.DateEntry e = (BinaryPlist.DateEntry) entry;
+            byte[] valueData = e.getValueData();
+            Date d = e.getValue();
+            System.out.println(insetString + "Date " +
+                    "(" + (valueData.length * 8) + "-bit): " +
                     ((d != null) ? d : "<unsupported format>"));
-            break;
         }
-        case 0x40:
-            /* Data */
-        case 0x50:
-            /* ASCII string */
-        case 0x60:
-            /* Unicode string */
-        case 0xA0:
-            /* Array */
-        case 0xC0:
-            /* Set */
-        case 0xD0:
-            /* Dictionary */
+        else if(entry instanceof BinaryPlist.DataEntry) {
+            BinaryPlist.DataEntry e = (BinaryPlist.DataEntry) entry;
+            byte[] valueData = e.getValueData();
+            System.out.println(insetString + "Data " +
+                    "(" + valueData.length + " bytes):");
+            hexDump(valueData, insetString + "  ");
+        }
+        else if(entry instanceof BinaryPlist.ASCIIStringEntry) {
+            BinaryPlist.ASCIIStringEntry e =
+                    (BinaryPlist.ASCIIStringEntry) entry;
+            byte[] valueData = e.getValueData();
+            System.out.println(insetString + "ASCII string " +
+                    "(" + valueData.length + " characters):");
+            System.out.println(insetString + "  " + e.getValue());
+        }
+        else if(entry instanceof BinaryPlist.UnicodeStringEntry) {
+            BinaryPlist.UnicodeStringEntry e =
+                    (BinaryPlist.UnicodeStringEntry) entry;
+            byte[] valueData = e.getValueData();
+            System.out.println(insetString + "Unicode " +
+                    "string (" + (valueData.length / 2) + " characters):");
+            System.out.println(insetString + "  " + e.getValue());
+        }
+        else if(entry instanceof BinaryPlist.ArrayEntry ||
+                entry instanceof BinaryPlist.SetEntry)
         {
-            /*
-             * All of these types have in common that they have a variable
-             * sized count field describing the length of the data.
-             */
-            int size = marker & 0x0F;
-            int dataOffset = 1;
+            BinaryPlist.ArrayEntry e = (BinaryPlist.ArrayEntry) entry;
+            LinkedList<BinaryPlist.Entry> entries = e.getEntries();
 
-            if(size == 0x0F) {
-                /*
-                 * All bits set in the lower nibble means the size is
-                 * encoded as a variable-sized integer.
-                 * First comes one byte containing the size of the size
-                 * field in its low nibble (the high nibble should always be
-                 * 0x1 as a marker). The size of the size field is encoded
-                 * as the power of two of the size.
-                 * I.e. a value of 3 means the integer is 2^3 = 8 bytes.
-                 *
-                 * After that comes the size field itself, encoded as a
-                 * big-endian integer.
-                 */
-                byte sizeSizeByte =
-                        dsStoreData[curOffset + physicalOffset +
-                        1];
-                if((sizeSizeByte & 0xF0) == 0x10) {
-                    int sizeSize = 1 << (sizeSizeByte & 0x0F);
-                    BigInteger sizeBigInt =
-                            new BigInteger(Util.arrayCopy(dsStoreData,
-                            curOffset + physicalOffset + 2,
-                            new byte[sizeSize], 0, sizeSize));
-                    if(sizeBigInt.bitCount() > 31) {
-                        System.err.println("Unexpected number of bits (" +
-                                sizeBigInt.bitCount() + ") in size bits " +
-                                "nibble! Byte: 0x" +
-                                Util.toHexStringBE(sizeSizeByte));
-                        dataOffset = 0;
-                    }
-                    else {
-                        size = sizeBigInt.intValue();
-                        dataOffset += 1 + sizeSize;
-                    }
-                }
-                else {
-                    System.err.println("Unexpected marker in size bits " +
-                            "nibble! Byte: 0x" +
-                            Util.toHexStringBE(sizeSizeByte));
-                    dataOffset = 0;
-                }
+            System.out.println(insetString +
+                    ((marker & 0xF0) == 0xC0 ? "Set" : "Array") +
+                    " (" + entries.size() + " elements):");
+
+            for(BinaryPlist.Entry value : entries) {
+                System.out.println(insetString + "  Value:");
+                printBinaryPlistValue(value, insetString + "    ");
             }
-
-            if(dataOffset != 0) {
-                switch(marker & 0xF0) {
-                case 0x40:
-                    /* Data */
-                    System.out.println(insetString + "Data " +
-                            "(" + size + " bytes):");
-                    hexDump(dsStoreData,
-                            curOffset + physicalOffset + dataOffset, size,
-                            insetString + "  ");
-                    break;
-                case 0x50:
-                    /* ASCII string */
-                    System.out.println(insetString + "ASCII string " +
-                            "(" + size + " characters):");
-                    System.out.println(insetString + "  " +
-                            Util.readString(dsStoreData,
-                            curOffset + physicalOffset + dataOffset, size,
-                            "MacRoman"));
-                    break;
-                case 0x60:
-                    /* Unicode string */
-                    System.out.println(insetString + "Unicode " +
-                            "string (" + size + " characters):");
-                    System.out.println(insetString + "  " +
-                            Util.readString(dsStoreData,
-                            curOffset + physicalOffset + dataOffset,
-                            size * 2, "UTF-16BE"));
-                    break;
-                case 0xA0:
-                    /* Array */
-                case 0xC0: {
-                    /* Set */
-                    /* Here the size field means the number of value
-                     * refs. */
-                    System.out.println(insetString +
-                            ((marker & 0xF0) == 0xC0 ? "Set" : "Array") +
-                            "(" + size + " elements):");
-
-                    short refSize =
-                            plist.getFooter().getObjectRefSize();
-                    for(int i = 0; i < size; ++i) {
-                        BigInteger valueRef = new BigInteger(Util.arrayCopy(
-                                dsStoreData,
-                                curOffset + physicalOffset + dataOffset +
-                                i * refSize,
-                                new byte[refSize], 0, refSize));
-
-                        System.out.println(insetString + "  Value:");
-                        printBinaryPlistValue(dsStoreData, plist, curOffset,
-                                valueRef.intValue(), insetString + "    ");
-                    }
-
-                    break;
-                }
-                case 0xD0: {
-                    /* Dictionary */
-                    /* Here the size field means the number of key ref -
-                     * value ref pairs. */
-                    System.out.println(insetString + "Dictionary (" + size +
-                            " entries):");
-
-                    short refSize =
-                            plist.getFooter().getObjectRefSize();
-                    for(int i = 0; i < size; ++i) {
-                        BigInteger keyRef = new BigInteger(Util.arrayCopy(
-                                dsStoreData,
-                                curOffset + physicalOffset + dataOffset +
-                                i * refSize,
-                                new byte[refSize], 0, refSize));
-
-                        BigInteger valueRef = new BigInteger(Util.arrayCopy(
-                                dsStoreData,
-                                curOffset + physicalOffset + dataOffset +
-                                (size + i) * refSize,
-                                new byte[refSize], 0, refSize));
-
-                        System.out.println(insetString + "  Key:");
-                        printBinaryPlistValue(dsStoreData, plist, curOffset,
-                                keyRef.intValue(), insetString + "    ");
-
-                        System.out.println(insetString + "  Value:");
-                        printBinaryPlistValue(dsStoreData, plist, curOffset,
-                                valueRef.intValue(), insetString + "    ");
-                    }
-
-                    break;
-                }
-                default:
-                    throw new RuntimeException("Should not get here.");
-                }
-            }
-            else {
-                System.out.println(insetString + "<unsupported format>");
-            }
-            break;
         }
-        case 0x80:
-            /* uid (?) */
-        default:
+        else if(entry instanceof BinaryPlist.DictionaryEntry) {
+            BinaryPlist.DictionaryEntry e = (BinaryPlist.DictionaryEntry) entry;
+            LinkedList<BinaryPlist.Entry> keys = e.getKeys();
+
+            System.out.println(insetString + "Dictionary (" + keys.size() +
+                    " entries):");
+
+            int i = 0;
+            for(BinaryPlist.Entry key : keys) {
+                System.out.println(insetString + "  Key:");
+                printBinaryPlistValue(key, insetString + "    ");
+
+                System.out.println(insetString + "  Value:");
+                printBinaryPlistValue(e.getValue(i++), insetString + "    ");
+            }
+        }
+        else if(entry instanceof BinaryPlist.UidEntry) {
+            System.out.println(insetString + "<uid: 0x" +
+                        Util.toHexStringBE(entry.getMarker()) + ">");
+        }
+        else {
             System.out.println(insetString + "<unknown: 0x" +
-                    Util.toHexStringBE(marker) + ">");
-            break;
+                        Util.toHexStringBE(entry.getMarker()) + ">");
         }
     }
 
@@ -586,7 +407,7 @@ public class DSStoreInfo {
         plist.getFooter().printFields(System.out, insetString);
 
         /* Start iterating at virtual offset 0, which is the root element. */
-        printBinaryPlistValue(dsStoreData, plist, curOffset, 0, insetString);
+        printBinaryPlistValue(plist.getRootEntry(), insetString);
     }
 
     private static void printTreeBlockRecursive(byte[] dsStoreData,
