@@ -18,7 +18,6 @@
 package org.catacombae.hfsexplorer.types.dsstore;
 
 import java.io.PrintStream;
-import java.util.Arrays;
 import org.catacombae.csjc.DynamicStruct;
 import org.catacombae.util.Util;
 
