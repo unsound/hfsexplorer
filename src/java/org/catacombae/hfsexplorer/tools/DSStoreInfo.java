@@ -404,7 +404,9 @@ public class DSStoreInfo {
         BinaryPlist plist =
                 new BinaryPlist(dsStoreData, curOffset, blobSize);
 
+        /*
         plist.getFooter().printFields(System.out, insetString);
+        */
 
         /* Start iterating at virtual offset 0, which is the root element. */
         printBinaryPlistValue(plist.getRootEntry(), insetString);
