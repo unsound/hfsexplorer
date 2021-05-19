@@ -347,44 +347,44 @@ public class AliasHeader {
     }
 
     public void printFields(PrintStream ps, String prefix) {
-        ps.println(prefix + " userType: " +
+        ps.println(prefix + " User type: " +
                 "0x" + Util.byteArrayToHexString(getUserType()) + " " +
                 "('" + Util.toASCIIString(getUserType()) + "')");
-        ps.println(prefix + " aliasSize: " + getAliasSize());
-        ps.println(prefix + " version: " + getVersion());
-        ps.println(prefix + " flags: " + getFlags());
-        ps.println(prefix + " volumeNameLength: " + getVolumeNameLength());
-        ps.println(prefix + " volumeName: " +
+        ps.println(prefix + " Alias size: " + getAliasSize());
+        ps.println(prefix + " Version: " + getVersion());
+        ps.println(prefix + " Flags: " + getFlags());
+        ps.println(prefix + " Volume name length: " + getVolumeNameLength());
+        ps.println(prefix + " Volume name: " +
                 Util.readString(getVolumeName(), 0, getVolumeNameLength(),
                 "MacRoman"));
-        ps.println(prefix + " volumeCreateTimestamp: " +
+        ps.println(prefix + " Volume create timestamp: " +
                 HFSPlusDate.gmtTimestampToDate(getRawVolumeCreateTimestamp()) +
                 " (" + getVolumeCreateTimestamp() + ")");
-        ps.println(prefix + " volumeFsType: " +
+        ps.println(prefix + " Volume filesystem type: " +
                 Util.readString(getVolumeFsType(), "MacRoman"));
         String driveTypeString = driveTypeToString(getRawDriveType());
-        ps.println(prefix + " driveType: " + getDriveType() +
+        ps.println(prefix + " Drive type: " + getDriveType() +
                 (driveTypeString != null ? " (" + driveTypeString + ")" : ""));
-        ps.println(prefix + " parentID: " + getParentID());
-        ps.println(prefix + " fileNameLength: " + getFileNameLength());
-        ps.println(prefix + " fileName: " +
+        ps.println(prefix + " Parent ID: " + getParentID());
+        ps.println(prefix + " File name length: " + getFileNameLength());
+        ps.println(prefix + " File name: " +
                 Util.readString(getFileName(), 0, getFileNameLength(),
                 "MacRoman"));
-        ps.println(prefix + " fileID: " + getFileID());
-        ps.println(prefix + " fileCreateTimestamp: " +
+        ps.println(prefix + " File ID: " + getFileID());
+        ps.println(prefix + " File create timestamp: " +
                 HFSPlusDate.gmtTimestampToDate(getRawVolumeCreateTimestamp()) +
                 " (" + getFileCreateTimestamp() + ")");
-        ps.println(prefix + " fileType: " + Util.toASCIIString(getFileType()));
-        ps.println(prefix + " fileCreator: " +
+        ps.println(prefix + " File type: " + Util.toASCIIString(getFileType()));
+        ps.println(prefix + " File creator: " +
                 Util.toASCIIString(getFileCreator()));
-        ps.println(prefix + " nextLevelUpFromAlias: " +
+        ps.println(prefix + " Next level up from alias: " +
                 getNextLevelUpFromAlias());
-        ps.println(prefix + " nextLevelDownToTarget: " +
+        ps.println(prefix + " Next level down to target: " +
                 getNextLevelDownToTarget());
-        ps.println(prefix + " volumeAttributes: " +
+        ps.println(prefix + " Volume attributes: " +
                 "0x" + Util.toHexStringBE(getVolumeAttributes()));
-        ps.println(prefix + " fileSystemID: " + getFileSystemID());
-        ps.println(prefix + " reserved: " +
+        ps.println(prefix + " Filesystem ID: " + getFileSystemID());
+        ps.println(prefix + " Reserved: " +
                 "0x" + Util.byteArrayToHexString(getRawReserved()));
     }
 
