@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2008 Erik Larsson
+ * Copyright (C) 2008-2021 Erik Larsson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -96,6 +96,7 @@ public class CharsetStringCodec implements StringCodec {
      * Returns the charset name as it was passed to the constructor.
      * @return the charset name as it was passed to the constructor.
      */
+    /* @Override */
     public String getCharsetName() {
         return charsetName;
     }

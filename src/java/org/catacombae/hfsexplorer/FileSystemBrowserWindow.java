@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2006-2014 Erik Larsson
+ * Copyright (C) 2006-2021 Erik Larsson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -96,8 +96,10 @@ import org.catacombae.storage.fs.FSFork;
 import org.catacombae.storage.fs.FSForkType;
 import org.catacombae.storage.fs.FSLink;
 import org.catacombae.storage.fs.FileSystemHandlerFactory;
+import org.catacombae.storage.fs.FileSystemHandlerFactory.CustomAttribute;
 import org.catacombae.storage.fs.FileSystemHandlerFactory.StandardAttribute;
 import org.catacombae.storage.fs.FileSystemMajorType;
+import org.catacombae.storage.fs.hfs.HFSFileSystemHandler;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemHandler;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer.FileSystemType;
@@ -176,6 +178,20 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
             @Override
             public void windowClosing(WindowEvent we) {
                 exitApplication();
+            }
+        });
+
+        fsb.registerHFSEncodingChangedListener(new ActionListener() {
+            /* @Override */
+            public void actionPerformed(ActionEvent ae) {
+                if(!(fsHandler instanceof HFSFileSystemHandler)) {
+                    return;
+                }
+
+                String newEncoding = fsb.getSelectedHFSEncoding();
+                System.err.println("Setting encoding: " + newEncoding);
+                ((HFSFileSystemHandler) fsHandler).setEncoding(newEncoding);
+                populateFilesystemGUI(fsHandler.getRoot());
             }
         });
 
@@ -1070,6 +1086,14 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
                             toggleCachingItem.getState());
                 }
 
+                CustomAttribute hfsStringEncodingAttribute =
+                        factory.getCustomAttribute("HFS_STRING_ENCODING");
+                if(hfsStringEncodingAttribute != null) {
+                    factory.getCreateAttributes().setStringAttribute(
+                            hfsStringEncodingAttribute,
+                            fsb.getSelectedHFSEncoding());
+                }
+
                 //System.err.println("loadFS(): fsFile=" + fsFile);
                 //System.err.println("loadFS(): Creating ReadableConcatenatedStream...");
 
@@ -1094,6 +1118,14 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
                 FSFolder rootRecord = fsHandler.getRoot();
                 //FSEntry[] rootContents = rootRecord.list();
                 populateFilesystemGUI(rootRecord);
+
+                if(hfsStringEncodingAttribute != null) {
+                    fsb.setHFSFieldsVisible(true);
+                }
+                else {
+                    fsb.setHFSFieldsVisible(false);
+                }
+
                 setTitle(TITLE_STRING + " - [" + displayName + "]");
                 //adjustTableWidth();
                 break;

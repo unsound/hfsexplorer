@@ -20,12 +20,12 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="pathLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="addressField" pref="631" max="32767" attributes="0"/>
+              <Component id="addressField" pref="650" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="goButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="boxPanel" alignment="0" pref="732" max="32767" attributes="0"/>
+          <Component id="boxPanel" alignment="0" pref="812" max="32767" attributes="0"/>
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="upButton" min="-2" max="-2" attributes="0"/>
@@ -33,7 +33,11 @@
               <Component id="extractButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="infoButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="545" max="32767" attributes="0"/>
+              <EmptySpace pref="295" max="32767" attributes="0"/>
+              <Component id="encodingLabel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="encodingComboBox" min="-2" pref="166" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -45,6 +49,8 @@
                   <Component id="upButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="extractButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="infoButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="encodingComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="encodingLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -248,5 +254,20 @@
         </Container>
       </SubComponents>
     </Container>
+    <Component class="javax.swing.JLabel" name="encodingLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Encoding:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="encodingComboBox">
+      <Properties>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="2">
+            <StringItem index="0" value="MacRoman"/>
+            <StringItem index="1" value="MacJapanese"/>
+          </StringArray>
+        </Property>
+      </Properties>
+    </Component>
   </SubComponents>
 </Form>

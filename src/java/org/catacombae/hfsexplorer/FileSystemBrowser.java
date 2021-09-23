@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2007-2014 Erik Larsson
+ * Copyright (C) 2007-2021 Erik Larsson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1041,6 +1041,18 @@ public class FileSystemBrowser<A> implements Resources {
      */
     public JComponent getViewComponent() {
         return viewComponent;
+    }
+
+    public String getSelectedHFSEncoding() {
+        return viewComponent.getSelectedHFSEncoding();
+    }
+
+    public void setHFSFieldsVisible(boolean b) {
+        viewComponent.setHFSFieldsVisible(b);
+    }
+
+    public void registerHFSEncodingChangedListener(ActionListener al) {
+        viewComponent.registerHFSEncodingChangedListener(al);
     }
 
     /**

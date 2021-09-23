@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2006-2009 Erik Larsson
+ * Copyright (C) 2006-2021 Erik Larsson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,12 @@
 
 package org.catacombae.hfs.original;
 
-import org.catacombae.io.ReadableRandomAccessSubstream;
+import org.catacombae.hfs.AllocationFile;
+import org.catacombae.hfs.AttributesFile;
+import org.catacombae.hfs.HFSVolume;
+import org.catacombae.hfs.HotFilesFile;
+import org.catacombae.hfs.Journal;
+import org.catacombae.hfs.original.macjapanese.MacJapaneseStringCodec;
 import org.catacombae.hfs.types.hfs.BTHdrRec;
 import org.catacombae.hfs.types.hfs.CatKeyRec;
 import org.catacombae.hfs.types.hfs.ExtKeyRec;
@@ -41,11 +46,7 @@ import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.io.Readable;
 import org.catacombae.io.ReadableConcatenatedStream;
 import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.hfs.AllocationFile;
-import org.catacombae.hfs.AttributesFile;
-import org.catacombae.hfs.HFSVolume;
-import org.catacombae.hfs.HotFilesFile;
-import org.catacombae.hfs.Journal;
+import org.catacombae.io.ReadableRandomAccessSubstream;
 import org.catacombae.util.Util;
 
 /**
@@ -56,7 +57,7 @@ public class HFSOriginalVolume extends HFSVolume {
             CommonHFSCatalogString.createHFS(new byte[0]);
 
     private final HFSOriginalAllocationFile allocationFile;
-    private final MutableStringCodec<CharsetStringCodec> stringCodec;
+    private MutableStringCodec<StringCodec> stringCodec;
 
     public HFSOriginalVolume(ReadableRandomAccessStream hfsFile,
             boolean cachingEnabled, String encodingName) {
@@ -72,8 +73,7 @@ public class HFSOriginalVolume extends HFSVolume {
                     ").");
         }
 
-        this.stringCodec = new MutableStringCodec<CharsetStringCodec>(
-                new CharsetStringCodec(encodingName));
+        setStringEncoding(encodingName);
 
         this.allocationFile = createAllocationFile();
     }
@@ -177,7 +177,20 @@ public class HFSOriginalVolume extends HFSVolume {
      * @param encodingName the charset to use
      */
     public void setStringEncoding(String encodingName) {
-        this.stringCodec.setDecoder(new CharsetStringCodec(encodingName));
+        StringCodec codec;
+        if(encodingName.equals("MacJapanese")) {
+            codec = new MacJapaneseStringCodec();
+        }
+        else {
+            codec = new CharsetStringCodec(encodingName);
+        }
+
+        if(this.stringCodec == null) {
+            this.stringCodec = new MutableStringCodec<StringCodec>(codec);
+        }
+        else {
+            this.stringCodec.setDecoder(codec);
+        }
     }
 
     /**

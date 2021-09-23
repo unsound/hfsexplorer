@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2008-2014 Erik Larsson
+ * Copyright (C) 2008-2021 Erik Larsson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,5 +50,9 @@ public class HFSFileSystemHandler extends HFSCommonFileSystemHandler {
     {
         // HFS does not support links.
         return null;
+    }
+
+    public void setEncoding(String encodingName) {
+        ((HFSOriginalVolume) view).setStringEncoding(encodingName);
     }
 }

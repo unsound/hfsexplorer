@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2008 Erik Larsson
+ * Copyright (C) 2008-2021 Erik Larsson
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,4 +58,11 @@ public interface StringCodec {
      * @return encoded data.
      */
     public byte[] encode(String str, int off, int len);
+
+    /**
+     * Returns the charset name as a string.
+     *
+     * @return the charset name as a string.
+     */
+    public String getCharsetName();
 }
