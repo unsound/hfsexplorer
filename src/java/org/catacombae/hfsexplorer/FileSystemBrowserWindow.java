@@ -112,6 +112,7 @@ import org.catacombae.storage.ps.PartitionSystemHandler;
 import org.catacombae.storage.ps.PartitionSystemHandlerFactory;
 import org.catacombae.storage.ps.PartitionSystemType;
 import org.catacombae.storage.ps.PartitionType;
+import org.catacombae.util.Log;
 import org.catacombae.util.ObjectContainer;
 import org.catacombae.util.Util.Pair;
 
@@ -132,6 +133,10 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
      * stderr to a special debug console.
      */
     private static final String DEBUG_CONSOLE_ARG = "-dbgconsole";
+
+    private static final Log log =
+            Log.getInstance(FileSystemBrowserWindow.class);
+
     private FileSystemBrowser<FSEntry> fsb;
     // Fast accessors for the corresponding variables in org.catacombae.hfsexplorer.gui.FilesystemBrowserPanel
     private JCheckBoxMenuItem toggleCachingItem;
@@ -189,7 +194,7 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
                 }
 
                 String newEncoding = fsb.getSelectedHFSEncoding();
-                System.err.println("Setting encoding: " + newEncoding);
+                log.debug("Setting encoding: " + newEncoding);
                 ((HFSFileSystemHandler) fsHandler).setEncoding(newEncoding);
                 populateFilesystemGUI(fsHandler.getRoot());
             }
