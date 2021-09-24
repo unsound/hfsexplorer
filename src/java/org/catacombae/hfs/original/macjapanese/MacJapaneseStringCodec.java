@@ -21,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import org.catacombae.hfs.original.StringCodec;
+import org.catacombae.util.Log;
 import org.catacombae.util.Util;
 
 /**
@@ -33,6 +34,9 @@ public class MacJapaneseStringCodec implements StringCodec {
     private static final HashMap<Short, String> macJapaneseToUnicodeMap;
 
     private static final HashMap<String, Short> unicodeToMacJapaneseMap;
+
+    private static final Log log =
+            Log.getInstance(MacJapaneseStringCodec.class);
 
     /**
      * Creates a new @ref MacJapaneseStringCodec.
@@ -56,10 +60,13 @@ public class MacJapaneseStringCodec implements StringCodec {
         StringBuilder sb = new StringBuilder();
 
         for(int i = 0; i < len;) {
-            System.err.println("data[" + (off + i) + "]: " +
-                    "0x" + Util.toHexStringBE(data[off + i]));
-            short sequence = (short) (data[off + i++] & 0xFF);
+            short sequence;
             String replacement;
+
+            log.debug("data[" + (off + i) + "]: " +
+                    "0x" + Util.toHexStringBE(data[off + i]));
+
+            sequence = (short) (data[off + i++] & 0xFF);
             if(sequence < 0x20) {
                 replacement = new String(new char[] { (char) sequence });
             }
@@ -78,7 +85,7 @@ public class MacJapaneseStringCodec implements StringCodec {
                 sequence |= (short) (data[off + i] & 0xFF);
                 replacement = macJapaneseToUnicodeMap.get(sequence);
                 if(replacement != null) {
-                    System.err.println("data[" + (off + i) + "]: " +
+                    log.debug("data[" + (off + i) + "]: " +
                             "0x" + Util.toHexStringBE(data[off + i]));
                     ++i;
                 }
@@ -90,13 +97,17 @@ public class MacJapaneseStringCodec implements StringCodec {
                         "0x" + Util.toHexStringBE(sequence));
             }
 
-            System.err.print("Found replacement: " +
-                    "0x" + Util.toHexStringBE(sequence) + " ->");
-            for(int j = 0; j < replacement.length(); ++j) {
-                System.err.print(" " +
-                        "0x" + Util.toHexStringBE(replacement.charAt(j)));
+            if(log.debug) {
+                StringBuilder messageBuilder =
+                        new StringBuilder("Found replacement: " +
+                        "0x" + Util.toHexStringBE(sequence) + " ->");
+                for(int j = 0; j < replacement.length(); ++j) {
+                    messageBuilder.append(" " +
+                            "0x" + Util.toHexStringBE(replacement.charAt(j)));
+                }
+
+                log.debug(messageBuilder.toString());
             }
-            System.err.println();
 
             sb.append(replacement);
         }
