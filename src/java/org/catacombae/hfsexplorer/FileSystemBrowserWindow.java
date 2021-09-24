@@ -194,9 +194,19 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
                 }
 
                 String newEncoding = fsb.getSelectedHFSEncoding();
+                String oldEncoding;
                 log.debug("Setting encoding: " + newEncoding);
-                ((HFSFileSystemHandler) fsHandler).setEncoding(newEncoding);
-                populateFilesystemGUI(fsHandler.getRoot());
+                oldEncoding = ((HFSFileSystemHandler) fsHandler).getEncoding();
+                try {
+                    ((HFSFileSystemHandler) fsHandler).setEncoding(newEncoding);
+                    populateFilesystemGUI(fsHandler.getRoot());
+                } catch(Exception e) {
+                    GUIUtil.displayExceptionDialog(e, 20,
+                            FileSystemBrowserWindow.this,
+                            "Exception while changing HFS string encoding:");
+                    ((HFSFileSystemHandler) fsHandler).setEncoding(oldEncoding);
+                    populateFilesystemGUI(fsHandler.getRoot());
+                }
             }
         });
 
