@@ -18,8 +18,10 @@
 package org.catacombae.hfsexplorer.gui;
 
 import java.awt.event.ActionListener;
+import java.nio.charset.Charset;
 import javax.swing.ImageIcon;
 import org.catacombae.hfsexplorer.Resources;
+import org.catacombae.util.Log;
 
 /**
  * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
@@ -36,11 +38,70 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
     private static final ImageIcon INFO_ICON =
             new ImageIcon(Resources.INFO_ICON);
 
+    private static final String[] optionalEncodings = {
+        "MacChineseTrad",
+        "MacKorean",
+        "MacArabic",
+        "MacHebrew",
+        "MacGreek",
+        "MacCyrillic",
+        "MacDevanagari",
+        "MacGurmukhi",
+        "MacGujarati",
+        "MacOriya",
+        "MacBengali",
+        "MacTamil",
+        "MacTelugu",
+        "MacKannada",
+        "MacMalayalam",
+        "MacSinhalese",
+        "MacBurmese",
+        "MacKhmer",
+        "MacThai",
+        "MacLaotian",
+        "MacGeorgian",
+        "MacArmenian",
+        "MacChineseSimp",
+        "MacTibetan",
+        "MacMongolian",
+        "MacEthiopic",
+        "MacCentralEurRoman",
+        "MacVietnamese",
+        "MacExtArabic",
+        "MacSymbol",
+        "MacDingbats",
+        "MacTurkish",
+        "MacCroatian",
+        "MacIcelandic",
+        "MacRomanian",
+        "MacFarsi",
+        "MacUkrainian",
+    };
+
+    private static final Log log =
+            Log.getInstance(FilesystemBrowserPanel.class);
+
     /** Creates new form FilesystemBrowserPanel */
     public FilesystemBrowserPanel() {
         initComponents();
         fileTableScroller.getViewport().setBackground(fileTable.getBackground()); // To remove the grey area below the actual table
         setHFSFieldsVisible(false);
+
+        /*
+         * Add optional encodings to the encoding combo box based on
+         * availability.
+         */
+        for(String encoding : optionalEncodings) {
+            if(Charset.isSupported(encoding) ||
+                    Charset.isSupported("x-" + encoding))
+            {
+                log.debug("Charset is supported: " + encoding);
+                encodingComboBox.addItem(encoding);
+            }
+            else {
+                log.debug("Charset is not supported: " + encoding);
+            }
+        }
     }
 
     public void setHFSFieldsVisible(boolean b) {

@@ -52,6 +52,10 @@ public class HFSFileSystemHandler extends HFSCommonFileSystemHandler {
         return null;
     }
 
+    public String getEncoding() {
+        return ((HFSOriginalVolume) view).getStringEncoding();
+    }
+
     public void setEncoding(String encodingName) {
         ((HFSOriginalVolume) view).setStringEncoding(encodingName);
     }

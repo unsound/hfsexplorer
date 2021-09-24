@@ -17,6 +17,7 @@
 
 package org.catacombae.hfs.original;
 
+import java.nio.charset.Charset;
 import org.catacombae.hfs.AllocationFile;
 import org.catacombae.hfs.AttributesFile;
 import org.catacombae.hfs.HFSVolume;
@@ -181,8 +182,15 @@ public class HFSOriginalVolume extends HFSVolume {
         if(encodingName.equals("MacJapanese")) {
             codec = new MacJapaneseStringCodec();
         }
-        else {
+        else if(Charset.isSupported(encodingName)) {
             codec = new CharsetStringCodec(encodingName);
+        }
+        else if(Charset.isSupported("x-" + encodingName)) {
+            codec = new CharsetStringCodec("x-" + encodingName);
+        }
+        else {
+            throw new RuntimeException("Unsupported string encoding: " +
+                    encodingName);
         }
 
         if(this.stringCodec == null) {
