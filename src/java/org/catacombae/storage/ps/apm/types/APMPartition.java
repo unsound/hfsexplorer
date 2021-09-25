@@ -208,7 +208,27 @@ public class APMPartition implements Partition {
     // Defined in Partition
     public long getStartOffset() { return ( Util.unsign(getPmPyPartStart())+
 					    Util.unsign(getPmLgDataStart()) )*blockSize; }
-    public long getLength() { return Util.unsign(getPmDataCnt())*blockSize; }
+
+    public long getLength() {
+        final long dataStartSector = Util.unsign(getPmLgDataStart());
+        long dataSectors = Util.unsign(getPmDataCnt());
+
+        if(dataSectors == 0) {
+            /*
+             * In case 0 is recorded in 'pmDataCnt' we derive the data size from
+             * the size of the partition and the offset of the boot data.
+             */
+            final long partitionSectors = Util.unsign(getPmPartBlkCnt());
+            final long bootStartSector = Util.unsign(getPmLgBootStart());
+
+            dataSectors =
+                    ((bootStartSector > dataStartSector) ? bootStartSector :
+                    partitionSectors) - dataStartSector;
+        }
+
+        return dataSectors * blockSize;
+    }
+
     public PartitionType getType() { return convertPartitionType(getPmParType()); }
 
     /** partition signature */
