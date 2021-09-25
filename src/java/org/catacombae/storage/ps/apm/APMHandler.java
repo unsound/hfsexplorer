@@ -74,10 +74,31 @@ public class APMHandler extends PartitionSystemHandler {
             llf = partitionData.createReadOnlyFile();
 
             // Look for APM
-            DriverDescriptorRecord ddr = readDriverDescriptorRecord();
-            if(ddr.isValid()) {
-                int blockSize = ddr.getSbBlkSize();
-                long numberOfBlocksOnDevice = ddr.getSbBlkCount();
+            int blockSize = 0;
+            long numberOfBlocksOnDevice = 0;
+
+            try {
+                DriverDescriptorRecord ddr = readDriverDescriptorRecord();
+                if(ddr.isValid()) {
+                    blockSize = ddr.getSbBlkSize();
+                    numberOfBlocksOnDevice = ddr.getSbBlkCount();
+                }
+            } catch(Exception e) {
+            }
+
+            if(blockSize == 0) {
+                /* Check if the second block has a valid partition signature. */
+                byte[] secondBlock = new byte[512];
+                llf.seek(512);
+                llf.readFully(secondBlock);
+                if(secondBlock[0] == 'P' && secondBlock[1] == 'M') {
+                    blockSize = 512;
+                    numberOfBlocksOnDevice =
+                            (llf.length() + blockSize - 1) / blockSize;
+                }
+            }
+
+            if(blockSize > 0) {
                 //bitStream.seek(blockSize*1); // second block, first partition in list
                 ApplePartitionMap apm = new ApplePartitionMap(llf,
                         blockSize * 1, blockSize);
@@ -101,8 +122,8 @@ public class APMHandler extends PartitionSystemHandler {
                         }
                     }
 
-                    if(apm == null ||
-                            lastPartitionBlock > numberOfBlocksOnDevice)
+                    if(apm == null || (numberOfBlocksOnDevice > 0 &&
+                            lastPartitionBlock > numberOfBlocksOnDevice))
                     {
                         /* Last partition extends beyond the end of the device
                          * as specified in the DDR. Chances are that the
