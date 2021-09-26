@@ -92,7 +92,7 @@ public class MacJapaneseStringCodec implements StringCodec {
             }
 
             if(replacement == null) {
-                throw new RuntimeException("Unable to decode sequence at " +
+                throw new StringCodecException("Unable to decode sequence at " +
                         "byte " + (i - 1) + ": " +
                         "0x" + Util.toHexStringBE(sequence));
             }
@@ -154,8 +154,8 @@ public class MacJapaneseStringCodec implements StringCodec {
             }
 
             if(replacement == null) {
-                throw new RuntimeException("Unable to decode sequence at " +
-                        "byte " + i + ": " +
+                throw new StringCodecException("Unable to encode sequence at " +
+                        "character " + i + ": " +
                         "0x" + Util.toHexStringBE(str.charAt(i)));
             }
 

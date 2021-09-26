@@ -64,6 +64,7 @@ import org.catacombae.dmg.udif.UDIFDetector;
 import org.catacombae.dmg.udif.UDIFRandomAccessStream;
 import org.catacombae.dmgextractor.ui.PasswordDialog;
 import org.catacombae.hfs.ProgressMonitor;
+import org.catacombae.hfs.original.StringCodec.StringCodecException;
 import org.catacombae.hfs.types.hfscommon.CommonHFSVolumeHeader;
 import org.catacombae.hfs.types.hfsplus.HFSPlusVolumeHeader;
 import org.catacombae.hfsexplorer.ExtractProgressMonitor.CreateDirectoryFailedAction;
@@ -200,6 +201,7 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
                 try {
                     ((HFSFileSystemHandler) fsHandler).setEncoding(newEncoding);
                     populateFilesystemGUI(fsHandler.getRoot());
+                    fsb.saveSelectedHFSEncoding();
                 } catch(Exception e) {
                     GUIUtil.displayExceptionDialog(e, 20,
                             FileSystemBrowserWindow.this,
@@ -1107,6 +1109,10 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
                     factory.getCreateAttributes().setStringAttribute(
                             hfsStringEncodingAttribute,
                             fsb.getSelectedHFSEncoding());
+                    fsb.setHFSFieldsVisible(true);
+                }
+                else {
+                    fsb.setHFSFieldsVisible(false);
                 }
 
                 //System.err.println("loadFS(): fsFile=" + fsFile);
@@ -1130,18 +1136,23 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
 
                 fsHandler = (HFSCommonFileSystemHandler)
                         factory.createHandler(fsDataLocator);
-                FSFolder rootRecord = fsHandler.getRoot();
-                //FSEntry[] rootContents = rootRecord.list();
-                populateFilesystemGUI(rootRecord);
-
-                if(hfsStringEncodingAttribute != null) {
-                    fsb.setHFSFieldsVisible(true);
-                }
-                else {
-                    fsb.setHFSFieldsVisible(false);
-                }
 
                 setTitle(TITLE_STRING + " - [" + displayName + "]");
+
+                try {
+                    FSFolder rootRecord = fsHandler.getRoot();
+                    populateFilesystemGUI(rootRecord);
+                } catch(StringCodecException e) {
+                    JOptionPane.showMessageDialog(this,
+                            "Invalid string encoding for HFS volume: " +
+                            fsb.getSelectedHFSEncoding(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                } catch(Exception e) {
+                    GUIUtil.displayExceptionDialog(e, 1, this,
+                            "An error occurred while listing the root " +
+                            "directory:");
+                }
+
                 //adjustTableWidth();
                 break;
 

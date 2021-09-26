@@ -65,4 +65,18 @@ public interface StringCodec {
      * @return the charset name as a string.
      */
     public String getCharsetName();
+
+    /**
+     * Exception which should be thrown only when a conversion between binary
+     * data and Unicode fails.
+     */
+    public static class StringCodecException extends RuntimeException {
+        public StringCodecException(String message) {
+            super(message);
+        }
+
+        public StringCodecException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
 }

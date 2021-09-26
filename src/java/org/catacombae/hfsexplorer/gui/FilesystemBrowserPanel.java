@@ -113,6 +113,18 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
         return encodingComboBox.getSelectedItem().toString();
     }
 
+    public boolean setSelectedHFSEncoding(String encoding) {
+        for(int i = 0; i < encodingComboBox.getItemCount(); ++i) {
+            Object item = encodingComboBox.getItemAt(i);
+            if(item.toString().equals(encoding)) {
+                encodingComboBox.setSelectedIndex(i);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public void registerHFSEncodingChangedListener(ActionListener al) {
         encodingComboBox.addActionListener(al);
     }

@@ -68,7 +68,7 @@ public class CharsetStringCodec implements StringCodec {
         try {
             return decoder.decode(ByteBuffer.wrap(data, off, len)).toString();
         } catch(CharacterCodingException e) {
-            throw new RuntimeException("Could not decode data!", e);
+            throw new StringCodecException("Could not decode data!", e);
         }
     }
 
@@ -88,7 +88,7 @@ public class CharsetStringCodec implements StringCodec {
         try {
             return encoder.encode(CharBuffer.wrap(str.toCharArray(), off, len)).array();
         } catch(CharacterCodingException e) {
-            throw new RuntimeException("Could not encode data!", e);
+            throw new StringCodecException("Could not encode data!", e);
         }
     }
 

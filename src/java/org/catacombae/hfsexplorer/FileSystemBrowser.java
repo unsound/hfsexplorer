@@ -38,6 +38,8 @@ import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -649,6 +651,14 @@ public class FileSystemBrowser<A> implements Resources {
 		    adjustTableWidth();
 		}
  	    });
+
+        String savedHFSEncoding = getSavedHFSEncoding();
+        if(savedHFSEncoding != null) {
+            if(!viewComponent.setSelectedHFSEncoding(savedHFSEncoding)) {
+                System.err.println("Could not restore saved HFS encoding: " +
+                        savedHFSEncoding);
+            }
+        }
     }
 
     /**
@@ -1045,6 +1055,21 @@ public class FileSystemBrowser<A> implements Resources {
 
     public String getSelectedHFSEncoding() {
         return viewComponent.getSelectedHFSEncoding();
+    }
+
+    public void saveSelectedHFSEncoding() {
+        try {
+            Preferences p = Preferences.userNodeForPackage(HFSExplorer.class);
+            p.put("DefaultHFSEncoding", viewComponent.getSelectedHFSEncoding());
+            p.flush();
+        } catch(BackingStoreException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public final String getSavedHFSEncoding() {
+        Preferences p = Preferences.userNodeForPackage(HFSExplorer.class);
+        return p.get("DefaultHFSEncoding", null);
     }
 
     public void setHFSFieldsVisible(boolean b) {
