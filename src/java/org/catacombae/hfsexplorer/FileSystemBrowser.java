@@ -1053,11 +1053,19 @@ public class FileSystemBrowser<A> implements Resources {
         return viewComponent;
     }
 
-    public String getSelectedHFSEncoding() {
+    /**
+     * Get the selected HFS encoding value in the user interface.
+     *
+     * @return the selected HFS encoding value in the user interface.
+     */
+    String getSelectedHFSEncoding() {
         return viewComponent.getSelectedHFSEncoding();
     }
 
-    public void saveSelectedHFSEncoding() {
+    /**
+     * Persist the current HFS encoding value in the application's preferences.
+     */
+    void saveSelectedHFSEncoding() {
         try {
             Preferences p = Preferences.userNodeForPackage(HFSExplorer.class);
             p.put("DefaultHFSEncoding", viewComponent.getSelectedHFSEncoding());
@@ -1067,16 +1075,34 @@ public class FileSystemBrowser<A> implements Resources {
         }
     }
 
-    public final String getSavedHFSEncoding() {
+    /**
+     * Query the saved preferences for any saved HFS encoding value.
+     *
+     * @return
+     *      the saved preference value for HFS encoding, or null if there is no
+     *      saved value.
+     */
+    final String getSavedHFSEncoding() {
         Preferences p = Preferences.userNodeForPackage(HFSExplorer.class);
         return p.get("DefaultHFSEncoding", null);
     }
 
-    public void setHFSFieldsVisible(boolean b) {
+    /**
+     * Set the visibility of the HFS-specific graphical components.
+     *
+     * @param b true if the HFS fields should be showing, false otherwise.
+     */
+    void setHFSFieldsVisible(boolean b) {
         viewComponent.setHFSFieldsVisible(b);
     }
 
-    public void registerHFSEncodingChangedListener(ActionListener al) {
+    /**
+     * Register a listener for when the user changes the selection in the HFS
+     * encodings combo box.
+     *
+     * @param al An {@link ActionListener} that will be notified.
+     */
+    void registerHFSEncodingChangedListener(ActionListener al) {
         viewComponent.registerHFSEncodingChangedListener(al);
     }
 

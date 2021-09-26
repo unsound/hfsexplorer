@@ -109,10 +109,22 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
         encodingComboBox.setVisible(b);
     }
 
+    /**
+     * Get the selected encoding in the encodings combo box.
+     *
+     * @return the selected encoding in the encodings combo box.
+     */
     public String getSelectedHFSEncoding() {
         return encodingComboBox.getSelectedItem().toString();
     }
 
+    /**
+     * Set the selected encoding in the encodings combo box to the item matching
+     * the supplied string.
+     *
+     * @param encoding The encoding to select.
+     * @return true if the encoding existed in the combo box, false otherwise.
+     */
     public boolean setSelectedHFSEncoding(String encoding) {
         for(int i = 0; i < encodingComboBox.getItemCount(); ++i) {
             Object item = encodingComboBox.getItemAt(i);
@@ -125,6 +137,12 @@ public class FilesystemBrowserPanel extends javax.swing.JPanel {
         return false;
     }
 
+    /**
+     * Register a listener for when the user changes the selection in the
+     * encodings combo box.
+     *
+     * @param al An {@link ActionListener} that will be notified.
+     */
     public void registerHFSEncodingChangedListener(ActionListener al) {
         encodingComboBox.addActionListener(al);
     }
