@@ -10,8 +10,16 @@ fi
 LIB="${BASEDIR}/../lib"
 
 UNAME=`uname`
-if [ "${UNAME}" = "Darwin" ]; then
+case "${UNAME}" in
+Darwin*)
     DOCK_NAME="-Xdock:name=HFSExplorer"
     DOCK_ICON="-Xdock:icon=${BASEDIR}/../res/icon.png"
-fi
+    ;;
+mingw*|MINGW*|MSYS*)
+    # Our library dir must be in the PATH in Windows so that llio dlls can be
+    # located.
+    export PATH="${PATH}:${LIB}"
+    ;;
+esac
+
 java ${DOCK_NAME:+"${DOCK_NAME}"} ${DOCK_ICON:+"${DOCK_ICON}"} -cp "$LIB/hfsx.jar" org.catacombae.hfsexplorer.FileSystemBrowserWindow "$@"
