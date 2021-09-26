@@ -32,6 +32,7 @@ class MacJapaneseStringCodecData3 {
      * Due to code size restrictions the table is split into three class files.
      */
     static final char[][] mappingTable = {
+        { (char) 0xE6CB, (char) 0x8CE4 }, // <CJK>
         { (char) 0xE6CC, (char) 0x8CE3 }, // <CJK>
         { (char) 0xE6CD, (char) 0x8CDA }, // <CJK>
         { (char) 0xE6CE, (char) 0x8CFD }, // <CJK>

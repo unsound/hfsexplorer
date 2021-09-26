@@ -3327,7 +3327,6 @@ class MacJapaneseStringCodecData2 {
         { (char) 0xE6C8, (char) 0x8CB6 }, // <CJK>
         { (char) 0xE6C9, (char) 0x8CC8 }, // <CJK>
         { (char) 0xE6CA, (char) 0x8CC1 }, // <CJK>
-        { (char) 0xE6CB, (char) 0x8CE4 }, // <CJK>
         /* Continued in MacJapaneseStringCodecData3... */
     };
 }
