@@ -3,8 +3,24 @@
 <project basedir="." default="all" name="HFSExplorer">
   <property environment="env"/>
   <property name="debuglevel" value="source,lines,vars"/>
-  <property name="java.target.level" value="1.5"/>
-  <property name="java.source.level" value="1.5"/>
+  <condition property="java.target.level" value="1.5">
+    <or>
+      <equals arg1="${ant.java.version}" arg2="1.5"/>
+      <equals arg1="${ant.java.version}" arg2="1.6"/>
+      <equals arg1="${ant.java.version}" arg2="1.7"/>
+      <equals arg1="${ant.java.version}" arg2="1.8"/>
+    </or>
+  </condition>
+  <property name="java.target.level" value="${ant.java.version}"/>
+  <condition property="java.source.level" value="1.5">
+    <or>
+      <equals arg1="${ant.java.version}" arg2="1.5"/>
+      <equals arg1="${ant.java.version}" arg2="1.6"/>
+      <equals arg1="${ant.java.version}" arg2="1.7"/>
+      <equals arg1="${ant.java.version}" arg2="1.8"/>
+    </or>
+  </condition>
+  <property name="java.source.level" value="${ant.java.version}"/>
   <property name="java.source.dir" value="src/java"/>
   <property name="manifest.source.dir" value="src/META-INF"/>
   <!--<property name="builddir" value=".build~"/>-->
