@@ -86,6 +86,10 @@
     <echo message="                  lib/hfsx_dmglib.jar."/>
     <echo message="  javadoc       - Creates the javadoc documentation for the"/>
     <echo message="                  project."/>
+    <echo message="  javadoc-internal -"/>
+    <echo message="                  Creates the javadoc documentation for the project"/>
+    <echo message="                  including internal class members (private and"/>
+    <echo message="                  package-private)."/>
   </target>
   
   
@@ -235,19 +239,36 @@
 
   <target name="javadoc">
     <javadoc destdir="javadoc.~"
-	     packagenames="org.catacombae.*"
-	     sourcepath="${java.source.dir}"
-	     access="protected"
+             packagenames="org.catacombae.*"
+             sourcepath="${java.source.dir}"
+             access="protected"
              author="true"
              version="true"
              use="true"
-	     encoding="utf-8"
+             encoding="utf-8"
              windowtitle="HFSExplorer API">
-      
       <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
       <link href="../../catacombaeframework/javadoc.~/"/>
       <classpath>
-	<path refid="javadoc.classpath"/>
+        <path refid="javadoc.classpath"/>
+      </classpath>
+    </javadoc>
+  </target>
+
+  <target name="javadoc-internal">
+    <javadoc destdir="javadoc-internal.~"
+             packagenames="org.catacombae.*"
+             sourcepath="${java.source.dir}"
+             access="private"
+             author="true"
+             version="true"
+             use="true"
+             encoding="utf-8"
+             windowtitle="HFSExplorer Internal API">
+      <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+      <link href="../../catacombaeframework/javadoc.~/"/>
+      <classpath>
+        <path refid="javadoc.classpath"/>
       </classpath>
     </javadoc>
   </target>
