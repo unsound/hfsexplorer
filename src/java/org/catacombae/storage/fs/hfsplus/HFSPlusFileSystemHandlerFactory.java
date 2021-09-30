@@ -31,6 +31,7 @@ import org.catacombae.storage.fs.FileSystemRecognizer;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemHandlerFactory;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer;
 import org.catacombae.storage.fs.hfscommon.HFSCommonFileSystemRecognizer.FileSystemType;
+import org.catacombae.util.Log;
 import org.catacombae.util.Util;
 
 /**
@@ -54,6 +55,9 @@ public class HFSPlusFileSystemHandlerFactory extends HFSCommonFileSystemHandlerF
                     "Decides whether protected files like the inode " +
                     "directories and the journal files should show up in a " +
                     "directory listing.", true);
+
+    private static final Log log =
+            Log.getInstance(HFSPlusFileSystemHandlerFactory.class);
 
     public FileSystemCapability[] getCapabilities() {
         return HFSPlusFileSystemHandler.getStaticCapabilities();
@@ -154,18 +158,20 @@ public class HFSPlusFileSystemHandlerFactory extends HFSCommonFileSystemHandlerF
     private static DataLocator hfsUnwrap(DataLocator data) {
         ReadableRandomAccessStream fsStream = data.createReadOnlyFile();
 
-        //System.out.println("Found a wrapped HFS+ volume.");
+        log.debug("Found a wrapped HFS+ volume:");
         byte[] mdbData = new byte[HFSPlusWrapperMDB.STRUCTSIZE];
         fsStream.seek(1024);
         fsStream.read(mdbData);
         HFSPlusWrapperMDB mdb = new HFSPlusWrapperMDB(mdbData, 0);
         ExtDescriptor xd = mdb.getDrEmbedExtent();
         int hfsBlockSize = mdb.getDrAlBlkSiz();
-        //System.out.println("old fsOffset: " + fsOffset);
-        long fsOffset = Util.unsign(mdb.getDrAlBlSt()) * 512 +
-                Util.unsign(xd.getXdrStABN()) * hfsBlockSize; // Lovely method names...
-        long fsLength = Util.unsign(xd.getXdrNumABlks() * hfsBlockSize);
-        //System.out.println("new fsOffset: " + fsOffset);
+        long fsOffset =
+                ((long) Util.unsign(mdb.getDrAlBlSt())) * 512 +
+                ((long) Util.unsign(xd.getXdrStABN())) * hfsBlockSize;
+        long fsLength =
+                ((long) Util.unsign(xd.getXdrNumABlks())) * hfsBlockSize;
+        log.debug("  fsOffset: " + fsOffset);
+        log.debug("  fsLength: " + fsLength);
         // redetect with adjusted fsOffset
 
         return new SubDataLocator(data, fsOffset, fsLength);
