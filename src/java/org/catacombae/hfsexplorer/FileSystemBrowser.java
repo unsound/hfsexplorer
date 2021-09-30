@@ -1453,8 +1453,8 @@ public class FileSystemBrowser<A> implements Resources {
      * where to display it.<br>
      * The text will look something like "3 objects selected (11,39 KiB)".
      *
-     * @param selectedFilesCount  number of files currently selected.
-     * @param totalSize           the total size of the selection.
+     * @param selectedFilesCount The number of files currently selected.
+     * @param selectionSize The total size of the selection.
      */
     private void setSelectionStatus(long selectedFilesCount, long selectionSize) {
         String sizeString;

@@ -3069,10 +3069,12 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
         }
 
         /**
-         * Converts a FileSystemBrowser parent path into a FSFramework compatible raw string path.
+         * Converts a FileSystemBrowser parent path into a FSFramework
+         * compatible raw string path.
          *
-         * @param parentPathList
-         * @return
+         * @param fsbPathList A list of {@link Record records}.
+         * @return An array with all the pathname string elements of
+         *     <code>fsbPathList</code>.
          */
         private String[] getFSPath(List<Record<FSEntry>> fsbPathList) {
             if(fsbPathList == null)
