@@ -204,7 +204,7 @@ public class Java6Util extends org.catacombae.util.Java6Util {
      * <b>Invoking this method on a non-Java 6 JRE will cause a class loading
      * exception.</b>
      *
-     * @param u the URI to browse.
+     * @param uri the URI to browse.
      * @throws java.io.IOException if the URL could not be browsed.
      */
     public static void browse(URI uri) throws IOException {
