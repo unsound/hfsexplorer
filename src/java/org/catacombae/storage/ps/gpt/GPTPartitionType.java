@@ -20,6 +20,7 @@ package org.catacombae.storage.ps.gpt;
 import java.nio.LongBuffer;
 import java.util.HashMap;
 import org.catacombae.storage.ps.PartitionType;
+import org.catacombae.util.Util;
 
 /**
  * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
@@ -102,70 +103,80 @@ public enum GPTPartitionType {
      * Unused GPT partition entry type:
      *     <code>00000000-0000-0000-0000-000000000000</code>
      */
-    PARTITION_TYPE_UNUSED_ENTRY(0x0000000000000000L, 0x0000000000000000L,
+    PARTITION_TYPE_UNUSED_ENTRY("00000000-0000-0000-0000-000000000000",
+        0x0000000000000000L, 0x0000000000000000L,
         PartitionType.EMPTY),
 
     /**
      * EFI system partition type:
      *     <code>C12A7328-F81F-11D2-BA4B-00A0C93EC93B</code>
      */
-    PARTITION_TYPE_EFI_SYSTEM(0x28732AC11FF8D211L, 0xBA4B00A0C93EC93BL,
+    PARTITION_TYPE_EFI_SYSTEM("C12A7328-F81F-11D2-BA4B-00A0C93EC93B",
+        0x28732AC11FF8D211L, 0xBA4B00A0C93EC93BL,
         PartitionType.EFI_SYSTEM),
 
     /**
      * Microsoft reserved partition:
      *     <code>E3C9E316-0B5C-4DB8-817D-F92DF00215AE</code>
      */
-    PARTITION_TYPE_MICROSOFT_RESERVED(0x16E3C9E35C0BB84DL, 0x817DF92DF00215AEL,
+    PARTITION_TYPE_MICROSOFT_RESERVED("E3C9E316-0B5C-4DB8-817D-F92DF00215AE",
+        0x16E3C9E35C0BB84DL, 0x817DF92DF00215AEL,
         PartitionType.SPECIAL),
 
     /**
      * Microsoft basic data partition (also used for Linux native filesystems):
      *     <code>EBD0A0A2-B9E5-4433-87C0-68B6B72699C7</code>
      */
-    PARTITION_TYPE_PRIMARY_PARTITION(0xA2A0D0EBE5B93344L, 0x87C068B6B72699C7L,
+    PARTITION_TYPE_PRIMARY_PARTITION("EBD0A0A2-B9E5-4433-87C0-68B6B72699C7",
+        0xA2A0D0EBE5B93344L, 0x87C068B6B72699C7L,
         PartitionType.NT_OS2_IFS),
 
     /**
      * Microsoft Logical Disk Manager metadata partition type:
      *     <code>5808C8AA-7E8F-42E0-85D2-E1E90434CFB3</code>
      */
-    PARTITION_TYPE_LDM_METADATA(0xAAC808588F7EE042L, 0x85D2E1E90434CFB3L,
+    PARTITION_TYPE_LDM_METADATA("5808C8AA-7E8F-42E0-85D2-E1E90434CFB3",
+        0xAAC808588F7EE042L, 0x85D2E1E90434CFB3L,
         PartitionType.SPECIAL),
 
     /**
      * Microsoft Logical Disk Manager data partition type:
      *     <code>AF9B60A0-1431-4F62-BC68-3311714A69AD</code>
      */
-    PARTITION_TYPE_LDM_DATA(0xA0609BAF3114624FL, 0xBC683311714A69ADL,
+    PARTITION_TYPE_LDM_DATA("AF9B60A0-1431-4F62-BC68-3311714A69AD",
+        0xA0609BAF3114624FL, 0xBC683311714A69ADL,
         PartitionType.SPECIAL),
 
     /**
      * Apple HFS(+/X) partition type:
      *     <code>48465300-0000-11AA-AA11-00306543ECAC</code>
      */
-    PARTITION_TYPE_APPLE_HFS(0x005346480000AA11L, 0xAA1100306543ECACL,
+    PARTITION_TYPE_APPLE_HFS("48465300-0000-11AA-AA11-00306543ECAC",
+        0x005346480000AA11L, 0xAA1100306543ECACL,
         PartitionType.APPLE_HFS_CONTAINER),
 
     /**
      * Apple Boot partition type:
      *     <code>426F6F74-0000-11AA-AA11-00306543ECAC</code>
      */
-    PARTITION_TYPE_APPLE_BOOT(0x746F6F420000AA11L, 0xAA1100306543ECACL,
+    PARTITION_TYPE_APPLE_BOOT("426F6F74-0000-11AA-AA11-00306543ECAC",
+        0x746F6F420000AA11L, 0xAA1100306543ECACL,
         PartitionType.SPECIAL),
 
     /**
      * Apple APFS partition type:
      *     <code>7C3457EF-0000-11AA-AA11-00306543ECAC</code>
      */
-    PARTITION_TYPE_APPLE_APFS(0xEF57347C0000AA11L, 0xAA1100306543ECACL,
+    PARTITION_TYPE_APPLE_APFS("7C3457EF-0000-11AA-AA11-00306543ECAC",
+        0xEF57347C0000AA11L, 0xAA1100306543ECACL,
         PartitionType.SPECIAL),
 
     /**
      * Linux Swap partition type:
      *     <code>0657FD6D-A4AB-43C4-84E5-0933C84B4F4F</code>
      */
-    PARTITION_TYPE_LINUX_SWAP(0x6DFD5706ABA4C443L, 0x84E50933C84B4F4FL,
+    PARTITION_TYPE_LINUX_SWAP("0657FD6D-A4AB-43C4-84E5-0933C84B4F4F",
+        0x6DFD5706ABA4C443L, 0x84E50933C84B4F4FL,
         PartitionType.LINUX_SWAP),
 
     /** Returned when no known type can be matched. */
@@ -177,20 +188,119 @@ public enum GPTPartitionType {
     private final Long typeGUIDLsb;
     private final PartitionType enumType;
 
-    private GPTPartitionType(long typeGUIDMsb, long typeGUIDLsb,
-            PartitionType enumType)
+    private GPTPartitionType(String guidString, PartitionType enumType)
     {
-        this.typeGUIDMsb = typeGUIDMsb;
-        this.typeGUIDLsb = typeGUIDLsb;
+        this(guidString, null, null, enumType);
+    }
+
+    private GPTPartitionType(String guidString, Long typeGUIDMsb,
+            Long typeGUIDLsb, PartitionType enumType)
+    {
+        final char[] guidStringChars = guidString.toCharArray();
+
+        if(guidStringChars.length != 36) {
+            throw new RuntimeException("Invalid length " +
+                    "(" + guidStringChars.length + ") for GUID: " + guidString +
+                    " (expected 36 characters)");
+        }
+
+        for(int i = 0; i < guidStringChars.length; ++i) {
+            boolean invalid = true;
+
+            if(i == 8 || i == 13 || i == 18 || i == 23) {
+                if(guidStringChars[i] == '-') {
+                    invalid = false;
+                }
+            }
+            else {
+                if(guidStringChars[i] >= '0' && guidStringChars[i] <= '9') {
+                    invalid = false;
+                }
+                else if(guidStringChars[i] >= 'A' && guidStringChars[i] <= 'F')
+                {
+                    invalid = false;
+                }
+            }
+
+            if(invalid) {
+                throw new RuntimeException("Invalid GUID character " +
+                        "'" + guidStringChars[i] + "' at index " + i + " in " +
+                        "GUID: " + guidString + " (expected hexadecimal " +
+                        "nibble: 0-9, A-F)");
+            }
+        }
+
+        this.typeGUIDMsb =
+                (parseHexDataLE(guidStringChars, 0, 8) << 32) |
+                (parseHexDataLE(guidStringChars, 9, 4) << 16) |
+                parseHexDataLE(guidStringChars, 14, 4);
+        this.typeGUIDLsb =
+                (parseHexDataBE(guidStringChars, 19, 4) << 48) |
+                parseHexDataBE(guidStringChars, 24, 12);
         this.enumType = enumType;
-        addReverseLookupReference(
-                LongBuffer.wrap(new long[] { typeGUIDMsb, typeGUIDLsb }), this);
+
+        if((typeGUIDMsb != null &&
+                typeGUIDMsb.longValue() != this.typeGUIDMsb) ||
+                (typeGUIDLsb != null &&
+                typeGUIDLsb.longValue() != this.typeGUIDLsb))
+        {
+            throw new RuntimeException("GUID parsed value differs from " +
+                    "reference value. GUID: " + guidString + " parsed: " +
+                    "{ 0x" + Util.toHexStringBE(this.typeGUIDMsb) + ", 0x" +
+                    Util.toHexStringBE(this.typeGUIDLsb) + " } reference: " +
+                    "{ 0x" + Util.toHexStringBE(typeGUIDMsb) + ", 0x" +
+                    Util.toHexStringBE(typeGUIDLsb) + " }");
+        }
+
+        addReverseLookupReference(LongBuffer.wrap(
+                new long[] { this.typeGUIDMsb, this.typeGUIDLsb }), this);
     }
 
     private GPTPartitionType() {
         this.typeGUIDMsb = null;
         this.typeGUIDLsb = null;
         this.enumType = null;
+    }
+
+    private static long parseHexDataBE(char[] data, int index, int length) {
+        long result = 0;
+
+        for(int i = 0; i < length; ++i) {
+            final char cur = data[index + i];
+            byte value;
+
+            if(cur >= '0' && cur <= '9') {
+                value = (byte) (cur - '0');
+            }
+            else {
+                value = (byte) (0xA + (cur - 'A'));
+            }
+
+            result <<= 4;
+            result |= value;
+        }
+
+        return result;
+    }
+
+    private static long parseHexDataLE(char[] data, int index, int length) {
+        long result = 0;
+
+        for(int i = 0; i < length; ++i) {
+            final char cur = data[index + i];
+            byte value;
+
+            if(cur >= '0' && cur <= '9') {
+                value = (byte) (cur - '0');
+            }
+            else {
+                value = (byte) (0xA + (cur - 'A'));
+            }
+
+            result |= value << (i + (((i % 2) == 0) ? 1 : -1)) * 4;
+        }
+
+        return result;
     }
 
     private static void addReverseLookupReference(LongBuffer lb,
