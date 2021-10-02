@@ -107,7 +107,7 @@ public class RandomAccessFileDataLocator extends DataLocator {
      * @param pLen      the length of the data being addressed.
      */
     public RandomAccessFileDataLocator(File pFile, long pPos, long pLen) {
-        this(pFile, new Long(pPos), new Long(pLen), true);
+        this(pFile, Long.valueOf(pPos), Long.valueOf(pLen), true);
     }
 
     /**
@@ -121,7 +121,7 @@ public class RandomAccessFileDataLocator extends DataLocator {
      */
     public RandomAccessFileDataLocator(File pFile, long pPos, long pLen,
             boolean pWritable) {
-        this(pFile, new Long(pPos), new Long(pLen), pWritable);
+        this(pFile, Long.valueOf(pPos), Long.valueOf(pLen), pWritable);
     }
 
     private RandomAccessFileDataLocator(File pFile, Long pPos, Long pLen,
