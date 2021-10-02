@@ -241,7 +241,7 @@ public abstract class FSAttributes {
         }
 
         public DefaultPOSIXFileAttributes(long userID, long groupID, short fileMode, long inodeNumber) {
-            this(userID, groupID, fileMode, new Long(inodeNumber));
+            this(userID, groupID, fileMode, Long.valueOf(inodeNumber));
         }
 
         private DefaultPOSIXFileAttributes(long userID, long groupID, short fileMode, Long inodeNumber) {
