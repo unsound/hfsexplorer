@@ -164,11 +164,67 @@ public enum GPTPartitionType {
         PartitionType.SPECIAL),
 
     /**
+     * AppleRAID partition type:
+     *     <code>52414944-0000-11AA-AA11-00306543ECAC</code>
+     */
+    PARTITION_TYPE_APPLERAID("52414944-0000-11AA-AA11-00306543ECAC",
+        PartitionType.SPECIAL),
+
+    /**
+     * AppleRAID (offline) partition type:
+     *     <code>52414944-0000-11AA-AA11-00306543ECAC</code>
+     */
+    PARTITION_TYPE_APPLERAID_OFFLINE("52414944-5F4F-11AA-AA11-00306543ECAC",
+        PartitionType.SPECIAL),
+
+    /**
+     * Apple recovery partition type:
+     *     <code>426F6F74-0000-11AA-AA11-00306543ECAC</code>
+     */
+    PARTITION_TYPE_APPLE_RECOVERY("426F6F74-0000-11AA-AA11-00306543ECAC",
+        PartitionType.SPECIAL),
+
+    /**
+     * Apple label partition type:
+     *     <code>4C616265-6C00-11AA-AA11-00306543ECAC</code>
+     */
+    PARTITION_TYPE_APPLE_LABEL("4C616265-6C00-11AA-AA11-00306543ECAC",
+        PartitionType.SPECIAL),
+
+    /**
+     * AppleTV recovery partition type:
+     *     <code>5265636F-7665-11AA-AA11-00306543ECAC</code>
+     */
+    PARTITION_TYPE_APPLETV_RECOVERY("5265636F-7665-11AA-AA11-00306543ECAC",
+        PartitionType.SPECIAL),
+
+    /**
+     * Apple CoreStorage partition type:
+     *     <code>53746F72-6167-11AA-AA11-00306543ECAC</code>
+     */
+    PARTITION_TYPE_APPLE_CORESTORAGE("53746F72-6167-11AA-AA11-00306543ECAC",
+        PartitionType.SPECIAL),
+
+    /**
      * Apple APFS partition type:
      *     <code>7C3457EF-0000-11AA-AA11-00306543ECAC</code>
      */
     PARTITION_TYPE_APPLE_APFS("7C3457EF-0000-11AA-AA11-00306543ECAC",
         0xEF57347C0000AA11L, 0xAA1100306543ECACL,
+        PartitionType.SPECIAL),
+
+    /**
+     * Apple APFS preboot partition type:
+     *     <code>69646961-6700-11AA-AA11-00306543ECAC</code>
+     */
+    PARTITION_TYPE_APPLE_APFS_PREBOOT("69646961-6700-11AA-AA11-00306543ECAC",
+        PartitionType.SPECIAL),
+
+    /**
+     * Apple APFS recovery partition type:
+     *     <code>52637672-7900-11AA-AA11-00306543ECAC</code>
+     */
+    PARTITION_TYPE_APPLE_APFS_RECOVERY("52637672-7900-11AA-AA11-00306543ECAC",
         PartitionType.SPECIAL),
 
     /**
@@ -178,6 +234,55 @@ public enum GPTPartitionType {
     PARTITION_TYPE_LINUX_SWAP("0657FD6D-A4AB-43C4-84E5-0933C84B4F4F",
         0x6DFD5706ABA4C443L, 0x84E50933C84B4F4FL,
         PartitionType.LINUX_SWAP),
+
+    /**
+     * FreeBSD boot partition type:
+     *     <code>83BD6B9D-7F41-11DC-BE0B-001560B84F0F</code>
+     */
+    PARTITION_TYPE_FREEBSD_BOOT("83BD6B9D-7F41-11DC-BE0B-001560B84F0F",
+        PartitionType.SPECIAL),
+
+    /**
+     * FreeBSD disklabel partition type:
+     *     <code>516E7CB4-6ECF-11D6-8FF8-00022D09712B</code>
+     */
+    PARTITION_TYPE_FREEBSD_DISKLABEL("516E7CB4-6ECF-11D6-8FF8-00022D09712B",
+        PartitionType.SPECIAL),
+
+    /**
+     * FreeBSD swap partition type:
+     *     <code>516E7CB5-6ECF-11D6-8FF8-00022D09712B</code>
+     */
+    PARTITION_TYPE_FREEBSD_SWAP("516E7CB5-6ECF-11D6-8FF8-00022D09712B",
+        PartitionType.SPECIAL),
+
+    /**
+     * FreeBSD UFS partition type:
+     *     <code>516E7CB6-6ECF-11D6-8FF8-00022D09712B</code>
+     */
+    PARTITION_TYPE_FREEBSD_UFS("516E7CB6-6ECF-11D6-8FF8-00022D09712B",
+        PartitionType.SPECIAL),
+
+    /**
+     * FreeBSD Vinum partition type:
+     *     <code>516E7CB8-6ECF-11D6-8FF8-00022D09712B</code>
+     */
+    PARTITION_TYPE_FREEBSD_VINUM("516E7CB8-6ECF-11D6-8FF8-00022D09712B",
+        PartitionType.SPECIAL),
+
+    /**
+     * FreeBSD ZFS partition type:
+     *     <code>516E7CBA-6ECF-11D6-8FF8-00022D09712B</code>
+     */
+    PARTITION_TYPE_FREEBSD_ZFS("516E7CBA-6ECF-11D6-8FF8-00022D09712B",
+        PartitionType.SPECIAL),
+
+    /**
+     * FreeBSD nandfs partition type:
+     *     <code>74BA7DD9-A689-11E1-BD04-00E081286ACF</code>
+     */
+    PARTITION_TYPE_FREEBSD_NANDFS("74BA7DD9-A689-11E1-BD04-00E081286ACF",
+        PartitionType.SPECIAL),
 
     /** Returned when no known type can be matched. */
     UNKNOWN_PARTITION_TYPE;
