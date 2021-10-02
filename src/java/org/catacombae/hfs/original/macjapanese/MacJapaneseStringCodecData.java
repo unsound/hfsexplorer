@@ -18,7 +18,7 @@
 package org.catacombae.hfs.original.macjapanese;
 
 /**
- * Data for @ref MacJapaneseStringCodec (part 1).
+ * Data for {@link MacJapaneseStringCodec} (part 1).
  *
  * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */

@@ -39,7 +39,7 @@ public class MacJapaneseStringCodec implements StringCodec {
             Log.getInstance(MacJapaneseStringCodec.class);
 
     /**
-     * Creates a new @ref MacJapaneseStringCodec.
+     * Creates a new {@link MacJapaneseStringCodec}.
      */
     public MacJapaneseStringCodec() {
     }
