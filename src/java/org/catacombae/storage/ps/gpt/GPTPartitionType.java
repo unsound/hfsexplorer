@@ -228,6 +228,98 @@ public enum GPTPartitionType {
         PartitionType.LINUX_SWAP),
 
     /**
+     * Solaris boot partition
+     *     <code>6A82CB45-1DD2-11B2-99A6-080020736631</code>
+     */
+    PARTITION_TYPE_SOLARIS_BOOT("6A82CB45-1DD2-11B2-99A6-080020736631",
+        PartitionType.SPECIAL),
+
+    /**
+     * Solaris root partition
+     *     <code>6A85CF4D-1DD2-11B2-99A6-080020736631</code>
+     */
+    PARTITION_TYPE_SOLARIS_ROOT("6A85CF4D-1DD2-11B2-99A6-080020736631",
+        PartitionType.SPECIAL),
+
+    /**
+     * Solaris swap partition
+     *     <code>6A87C46F-1DD2-11B2-99A6-080020736631</code>
+     */
+    PARTITION_TYPE_SOLARIS_SWAP("6A87C46F-1DD2-11B2-99A6-080020736631",
+        PartitionType.SPECIAL),
+
+    /**
+     * Solaris Backup partition
+     *     <code>6A8B642B-1DD2-11B2-99A6-080020736631</code>
+     */
+    PARTITION_TYPE_SOLARIS_BACKUP("6A8B642B-1DD2-11B2-99A6-080020736631",
+        PartitionType.SPECIAL),
+
+    /**
+     * Solaris /usr partition[h]
+     *     <code>6A898CC3-1DD2-11B2-99A6-080020736631</code>
+     */
+    PARTITION_TYPE_SOLARIS_USR("6A898CC3-1DD2-11B2-99A6-080020736631",
+        PartitionType.SPECIAL),
+
+    /**
+     * Solaris /var partition
+     *     <code>6A8EF2E9-1DD2-11B2-99A6-080020736631</code>
+     */
+    PARTITION_TYPE_SOLARIS_VAR("6A8EF2E9-1DD2-11B2-99A6-080020736631",
+        PartitionType.SPECIAL),
+
+    /**
+     * Solaris /home partition
+     *     <code>6A90BA39-1DD2-11B2-99A6-080020736631</code>
+     */
+    PARTITION_TYPE_SOLARIS_HOME("6A90BA39-1DD2-11B2-99A6-080020736631",
+        PartitionType.SPECIAL),
+
+    /**
+     * Solaris alternate sector
+     *     <code>6A9283A5-1DD2-11B2-99A6-080020736631</code>
+     */
+    PARTITION_TYPE_SOLARIS_ALTERNATE_SECTOR(
+        "6A9283A5-1DD2-11B2-99A6-080020736631",
+        PartitionType.SPECIAL),
+
+    /**
+     * Solaris reserved partition
+     *     <code>6A945A3B-1DD2-11B2-99A6-080020736631</code>
+     */
+    PARTITION_TYPE_SOLARIS_RESERVED1("6A945A3B-1DD2-11B2-99A6-080020736631",
+        PartitionType.SPECIAL),
+
+    /**
+     * Solaris reserved partition
+     *     <code>6A9630D1-1DD2-11B2-99A6-080020736631</code>
+     */
+    PARTITION_TYPE_SOLARIS_RESERVED2("6A9630D1-1DD2-11B2-99A6-080020736631",
+        PartitionType.SPECIAL),
+
+    /**
+     * Solaris reserved partition
+     *     <code>6A980767-1DD2-11B2-99A6-080020736631</code>
+     */
+    PARTITION_TYPE_SOLARIS_RESERVED3("6A980767-1DD2-11B2-99A6-080020736631",
+        PartitionType.SPECIAL),
+
+    /**
+     * Solaris reserved partition
+     *     <code>6A96237F-1DD2-11B2-99A6-080020736631</code>
+     */
+    PARTITION_TYPE_SOLARIS_RESERVED4("6A96237F-1DD2-11B2-99A6-080020736631",
+        PartitionType.SPECIAL),
+
+    /**
+     * Solaris reserved partition
+     *     <code>6A8D2AC7-1DD2-11B2-99A6-080020736631</code>
+     */
+    PARTITION_TYPE_SOLARIS_RESERVED5("6A8D2AC7-1DD2-11B2-99A6-080020736631",
+        PartitionType.SPECIAL),
+
+    /**
      * FreeBSD boot partition type:
      *     <code>83BD6B9D-7F41-11DC-BE0B-001560B84F0F</code>
      */
