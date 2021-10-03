@@ -108,11 +108,46 @@ public enum GPTPartitionType {
         PartitionType.EMPTY),
 
     /**
+     * MBR partition scheme partition type:
+     *     <code>024DEE41-33E7-11D3-9D69-0008C781F39F</code>
+     */
+    PARTITION_TYPE_MBR("024DEE41-33E7-11D3-9D69-0008C781F39F",
+        PartitionType.EFI_SYSTEM),
+
+    /**
      * EFI system partition type:
      *     <code>C12A7328-F81F-11D2-BA4B-00A0C93EC93B</code>
      */
     PARTITION_TYPE_EFI_SYSTEM("C12A7328-F81F-11D2-BA4B-00A0C93EC93B",
         0x28732AC11FF8D211L, 0xBA4B00A0C93EC93BL,
+        PartitionType.EFI_SYSTEM),
+
+    /**
+     * BIOS boot partition type:
+     *     <code>21686148-6449-6E6F-744E-656564454649</code>
+     */
+    PARTITION_TYPE_BIOS_BOOT("21686148-6449-6E6F-744E-656564454649",
+        PartitionType.EFI_SYSTEM),
+
+    /**
+     * Intel Fast Flash (iFFS) partition type:
+     *     <code>D3BFE2DE-3DAF-11DF-BA40-E3A556D89593</code>
+     */
+    PARTITION_TYPE_INTEL_FAST_FLASH("D3BFE2DE-3DAF-11DF-BA40-E3A556D89593",
+        PartitionType.EFI_SYSTEM),
+
+    /**
+     * Sony boot partition type:
+     *     <code>F4019732-066E-4E12-8273-346C5641494F</code>
+     */
+    PARTITION_TYPE_SONY_BOOT("F4019732-066E-4E12-8273-346C5641494F",
+        PartitionType.EFI_SYSTEM),
+
+    /**
+     * Lenovo boot partition type:
+     *     <code>BFBFAFE7-A34F-448A-9A5B-6213EB736C22</code>
+     */
+    PARTITION_TYPE_LENOVO_BOOT("BFBFAFE7-A34F-448A-9A5B-6213EB736C22",
         PartitionType.EFI_SYSTEM),
 
     /**
@@ -145,6 +180,37 @@ public enum GPTPartitionType {
      */
     PARTITION_TYPE_LDM_DATA("AF9B60A0-1431-4F62-BC68-3311714A69AD",
         0xA0609BAF3114624FL, 0xBC683311714A69ADL,
+        PartitionType.SPECIAL),
+
+    /**
+     * Microsoft Windows Recovery Environment partition type:
+     *     <code>DE94BBA4-06D1-4D40-A16A-BFD50179D6AC</code>
+     */
+    PARTITION_TYPE_MICROSOFT_WINDOWS_RECOVERY_ENVIRONMENT(
+        "DE94BBA4-06D1-4D40-A16A-BFD50179D6AC",
+        PartitionType.SPECIAL),
+
+    /**
+     * IBM General Parallel File System (GPFS) partition type:
+     *     <code>37AFFC90-EF7D-4E96-91C3-2D7AE055B174</code>
+     */
+    PARTITION_TYPE_IBM_GPFS("37AFFC90-EF7D-4E96-91C3-2D7AE055B174",
+        PartitionType.SPECIAL),
+
+    /**
+     * Microsoft Windows Storage Spaces partition type:
+     *     <code>E75CAF8F-F680-4CEE-AFA3-B001E56EFC2D</code>
+     */
+    PARTITION_TYPE_MICROSOFT_WINDOWS_STORAGE_SPACES(
+        "E75CAF8F-F680-4CEE-AFA3-B001E56EFC2D",
+        PartitionType.SPECIAL),
+
+    /**
+     * Microsoft Windows Storage Replica partition type:
+     *     <code>558D43C5-A1AC-43C0-AAC8-D1472B2923D1</code>
+     */
+    PARTITION_TYPE_MICROSOFT_WINDOWS_STORAGE_REPLICA(
+        "558D43C5-A1AC-43C0-AAC8-D1472B2923D1",
         PartitionType.SPECIAL),
 
     /**
