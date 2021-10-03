@@ -539,6 +539,591 @@ public enum GPTPartitionType {
     PARTITION_TYPE_FREEBSD_NANDFS("74BA7DD9-A689-11E1-BD04-00E081286ACF",
         PartitionType.SPECIAL),
 
+    /**
+     * NetBSD Swap partition:
+     *     <code>49F48D32-B10E-11DC-B99B-0019D1879648</code>
+     */
+    PARTITION_TYPE_NETBSD_SWAP("49F48D32-B10E-11DC-B99B-0019D1879648",
+        PartitionType.SPECIAL),
+
+    /**
+     * NetBSD FFS partition:
+     *     <code>49F48D5A-B10E-11DC-B99B-0019D1879648</code>
+     */
+    PARTITION_TYPE_NETBSD_FFS("49F48D5A-B10E-11DC-B99B-0019D1879648",
+        PartitionType.SPECIAL),
+
+    /**
+     * NetBSD LFS partition:
+     *     <code>49F48D82-B10E-11DC-B99B-0019D1879648</code>
+     */
+    PARTITION_TYPE_NETBSD_LFS("49F48D82-B10E-11DC-B99B-0019D1879648",
+        PartitionType.SPECIAL),
+
+    /**
+     * NetBSD RAID partition:
+     *     <code>49F48DAA-B10E-11DC-B99B-0019D1879648</code>
+     */
+    PARTITION_TYPE_NETBSD_RAID("49F48DAA-B10E-11DC-B99B-0019D1879648",
+        PartitionType.SPECIAL),
+
+    /**
+     * NetBSD Concatenated partition:
+     *     <code>2DB519C4-B10F-11DC-B99B-0019D1879648</code>
+     */
+    PARTITION_TYPE_NETBSD_CONCATENATED("2DB519C4-B10F-11DC-B99B-0019D1879648",
+        PartitionType.SPECIAL),
+
+    /**
+     * NetBSD Encrypted partition:
+     *     <code>2DB519EC-B10F-11DC-B99B-0019D1879648</code>
+     */
+    PARTITION_TYPE_NETBSD_ENCRYPTED("2DB519EC-B10F-11DC-B99B-0019D1879648",
+        PartitionType.SPECIAL),
+
+    /**
+     * Chrome OS kernel:
+     *     <code>FE3A2A5D-4F32-41A7-B725-ACCC3285A309</code>
+     */
+    PARTITION_TYPE_CHROMEOS_KERNEL("FE3A2A5D-4F32-41A7-B725-ACCC3285A309",
+        PartitionType.SPECIAL),
+
+    /**
+     * Chrome OS rootfs:
+     *     <code>3CB8E202-3B7E-47DD-8A3C-7FF2A13CFCEC</code>
+     */
+    PARTITION_TYPE_CHROMEOS_ROOTFS("3CB8E202-3B7E-47DD-8A3C-7FF2A13CFCEC",
+        PartitionType.SPECIAL),
+
+    /**
+     * Chrome OS future use:
+     *     <code>2E0A753D-9E48-43B0-8337-B15192CB1B5E</code>
+     */
+    PARTITION_TYPE_CHROMEOS_FUTURE_USE("2E0A753D-9E48-43B0-8337-B15192CB1B5E",
+        PartitionType.SPECIAL),
+
+    /**
+     * Container Linux by CoreOS /usr partition (coreos-usr):
+     *     <code>5DFBF5F4-2848-4BAC-AA5E-0D9A20B745A6</code>
+     */
+    PARTITION_TYPE_COREOS_USR("5DFBF5F4-2848-4BAC-AA5E-0D9A20B745A6",
+        PartitionType.SPECIAL),
+
+    /**
+     * Container Linux by CoreOS Resizable rootfs (coreos-resize):
+     *     <code>3884DD41-8582-4404-B9A8-E9B84F2DF50E</code>
+     */
+    PARTITION_TYPE_COREOS_RESIZABLE_ROOTFS(
+        "3884DD41-8582-4404-B9A8-E9B84F2DF50E",
+        PartitionType.SPECIAL),
+
+    /**
+     * Container Linux by CoreOS OEM customizations (coreos-reserved):
+     *     <code>C95DC21A-DF0E-4340-8D7B-26CBFA9A03E0</code>
+     */
+    PARTITION_TYPE_COREOS_OEM("C95DC21A-DF0E-4340-8D7B-26CBFA9A03E0",
+        PartitionType.SPECIAL),
+
+    /**
+     * Container Linux by CoreOS Root filesystem on RAID (coreos-root-raid):
+     *     <code>BE9067B9-EA49-4F15-B4F6-F36F8C9E1818</code>
+     */
+    PARTITION_TYPE_COREOS_ROOT_ON_RAID("BE9067B9-EA49-4F15-B4F6-F36F8C9E1818",
+        PartitionType.SPECIAL),
+
+    /**
+     * Haiku BFS:
+     *     <code>42465331-3BA3-10F1-802A-4861696B7521</code>
+     */
+    PARTITION_TYPE_HAIKU_BFS("42465331-3BA3-10F1-802A-4861696B7521",
+        PartitionType.SPECIAL),
+
+    /**
+     * MidnightBSD boot partition:
+     *     <code>85D5E45E-237C-11E1-B4B3-E89A8F7FC3A7</code>
+     */
+    PARTITION_TYPE_MIDNIGHTBSD_BOOT("85D5E45E-237C-11E1-B4B3-E89A8F7FC3A7",
+        PartitionType.SPECIAL),
+
+    /**
+     * MidnightBSD data partition:
+     *     <code>85D5E45A-237C-11E1-B4B3-E89A8F7FC3A7</code>
+     */
+    PARTITION_TYPE_MIDNIGHTBSD_DATA("85D5E45A-237C-11E1-B4B3-E89A8F7FC3A7",
+        PartitionType.SPECIAL),
+
+    /**
+     * MidnightBSD swap partition:
+     *     <code>85D5E45B-237C-11E1-B4B3-E89A8F7FC3A7</code>
+     */
+    PARTITION_TYPE_MIDNIGHTBSD_SWAP("85D5E45B-237C-11E1-B4B3-E89A8F7FC3A7",
+        PartitionType.SPECIAL),
+
+    /**
+     * MidnightBSD Unix File System (UFS) partition:
+     *     <code>0394EF8B-237E-11E1-B4B3-E89A8F7FC3A7</code>
+     */
+    PARTITION_TYPE_MIDNIGHTBSD_UFS("0394EF8B-237E-11E1-B4B3-E89A8F7FC3A7",
+        PartitionType.SPECIAL),
+
+    /**
+     * MidnightBSD Vinum volume manager partition:
+     *     <code>85D5E45C-237C-11E1-B4B3-E89A8F7FC3A7</code>
+     */
+    PARTITION_TYPE_MIDNIGHTBSD_VINUM("85D5E45C-237C-11E1-B4B3-E89A8F7FC3A7",
+        PartitionType.SPECIAL),
+
+    /**
+     * MidnightBSD ZFS partition:
+     *     <code>85D5E45D-237C-11E1-B4B3-E89A8F7FC3A7</code>
+     */
+    PARTITION_TYPE_MIDNIGHTBSD_ZFS("85D5E45D-237C-11E1-B4B3-E89A8F7FC3A7",
+        PartitionType.SPECIAL),
+
+    /**
+     * Ceph journal:
+     *     <code>45B0969E-9B03-4F30-B4C6-B4B80CEFF106</code>
+     */
+    PARTITION_TYPE_CEPH_JOURNAL("45B0969E-9B03-4F30-B4C6-B4B80CEFF106",
+        PartitionType.SPECIAL),
+
+    /**
+     * Ceph dm-crypt journal:
+     *     <code>45B0969E-9B03-4F30-B4C6-5EC00CEFF106</code>
+     */
+    PARTITION_TYPE_CEPH_DM_CRYPT_JOURNAL("45B0969E-9B03-4F30-B4C6-5EC00CEFF106",
+        PartitionType.SPECIAL),
+
+    /**
+     * Ceph OSD:
+     *     <code>4FBD7E29-9D25-41B8-AFD0-062C0CEFF05D</code>
+     */
+    PARTITION_TYPE_CEPH_OSD("4FBD7E29-9D25-41B8-AFD0-062C0CEFF05D",
+        PartitionType.SPECIAL),
+
+    /**
+     * Ceph dm-crypt OSD:
+     *     <code>4FBD7E29-9D25-41B8-AFD0-5EC00CEFF05D</code>
+     */
+    PARTITION_TYPE_CEPH_DM_CRYPT_OSD("4FBD7E29-9D25-41B8-AFD0-5EC00CEFF05D",
+        PartitionType.SPECIAL),
+
+    /**
+     * Ceph Disk in creation:
+     *     <code>89C57F98-2FE5-4DC0-89C1-F3AD0CEFF2BE</code>
+     */
+    PARTITION_TYPE_CEPH_DISK_IN_CREATION("89C57F98-2FE5-4DC0-89C1-F3AD0CEFF2BE",
+        PartitionType.SPECIAL),
+
+    /**
+     * Ceph dm-crypt disk in creation:
+     *     <code>89C57F98-2FE5-4DC0-89C1-5EC00CEFF2BE</code>
+     */
+    PARTITION_TYPE_CEPH_DM_CRYPT_DISK_IN_CREATION(
+        "89C57F98-2FE5-4DC0-89C1-5EC00CEFF2BE",
+        PartitionType.SPECIAL),
+
+    /**
+     * Ceph Block:
+     *     <code>CAFECAFE-9B03-4F30-B4C6-B4B80CEFF106</code>
+     */
+    PARTITION_TYPE_CEPH_BLOCK("CAFECAFE-9B03-4F30-B4C6-B4B80CEFF106",
+        PartitionType.SPECIAL),
+
+    /**
+     * Ceph Block DB:
+     *     <code>30CD0809-C2B2-499C-8879-2D6B78529876</code>
+     */
+    PARTITION_TYPE_CEPH_BLOCK_DB(
+        "30CD0809-C2B2-499C-8879-2D6B78529876",
+        PartitionType.SPECIAL),
+
+    /**
+     * Ceph Block write-ahead log:
+     *     <code>5CE17FCE-4087-4169-B7FF-056CC58473F9</code>
+     */
+    PARTITION_TYPE_CEPH_WRITE_AHEAD_LOG(
+        "5CE17FCE-4087-4169-B7FF-056CC58473F9",
+        PartitionType.SPECIAL),
+
+    /**
+     * Ceph Lockbox for dm-crypt keys:
+     *     <code>FB3AABF9-D25F-47CC-BF5E-721D1816496B</code>
+     */
+    PARTITION_TYPE_CEPH_LOCKBOX_FOR_DM_CRYPT_KEYS(
+        "FB3AABF9-D25F-47CC-BF5E-721D1816496B",
+        PartitionType.SPECIAL),
+
+    /**
+     * Ceph Multipath OSD:
+     *     <code>4FBD7E29-8AE0-4982-BF9D-5A8D867AF560</code>
+     */
+    PARTITION_TYPE_CEPH_MULTIPATH_OSD("4FBD7E29-8AE0-4982-BF9D-5A8D867AF560",
+        PartitionType.SPECIAL),
+
+    /**
+     * Ceph Multipath journal:
+     *     <code>45B0969E-8AE0-4982-BF9D-5A8D867AF560</code>
+     */
+    PARTITION_TYPE_CEPH_MULTIPATH_JOURNAL(
+        "45B0969E-8AE0-4982-BF9D-5A8D867AF560",
+        PartitionType.SPECIAL),
+
+    /**
+     * Ceph Multipath block (1):
+     *     <code>CAFECAFE-8AE0-4982-BF9D-5A8D867AF560</code>
+     */
+    PARTITION_TYPE_CEPH_MULTIPATH_BLOCK1("CAFECAFE-8AE0-4982-BF9D-5A8D867AF560",
+        PartitionType.SPECIAL),
+
+    /**
+     * Ceph Multipath block (2):
+     *     <code>7F4A666A-16F3-47A2-8445-152EF4D03F6C</code>
+     */
+    PARTITION_TYPE_CEPH_MULTIPATH_BLOCK2("7F4A666A-16F3-47A2-8445-152EF4D03F6C",
+        PartitionType.SPECIAL),
+
+    /**
+     * Ceph Multipath block DB:
+     *     <code>EC6D6385-E346-45DC-BE91-DA2A7C8B3261</code>
+     */
+    PARTITION_TYPE_CEPH_MULTIPATH_BLOCK_DB(
+        "EC6D6385-E346-45DC-BE91-DA2A7C8B3261",
+        PartitionType.SPECIAL),
+
+    /**
+     * Ceph Multipath block write-ahead log:
+     *     <code>01B41E1B-002A-453C-9F17-88793989FF8F</code>
+     */
+    PARTITION_TYPE_CEPH_BLOCK_WRITE_AHEAD_LOG(
+        "01B41E1B-002A-453C-9F17-88793989FF8F",
+        PartitionType.SPECIAL),
+
+    /**
+     * Ceph dm-crypt block:
+     *     <code>CAFECAFE-9B03-4F30-B4C6-5EC00CEFF106</code>
+     */
+    PARTITION_TYPE_CEPH_DM_CRYPT_BLOCK("CAFECAFE-9B03-4F30-B4C6-5EC00CEFF106",
+        PartitionType.SPECIAL),
+
+    /**
+     * Ceph dm-crypt block DB:
+     *     <code>93B0052D-02D9-4D8A-A43B-33A3EE4DFBC3</code>
+     */
+    PARTITION_TYPE_CEPH_DM_CRYPT_BLOCK_DB(
+        "93B0052D-02D9-4D8A-A43B-33A3EE4DFBC3",
+        PartitionType.SPECIAL),
+
+    /**
+     * Ceph dm-crypt block write-ahead log:
+     *     <code>306E8683-4FE2-4330-B7C0-00A917C16966</code>
+     */
+    PARTITION_TYPE_CEPH_DMG_CRYPT_BLOCK_WRITE_AHEAD_LOG(
+        "306E8683-4FE2-4330-B7C0-00A917C16966",
+        PartitionType.SPECIAL),
+
+    /**
+     * Ceph dm-crypt LUKS journal:
+     *     <code>45B0969E-9B03-4F30-B4C6-35865CEFF106</code>
+     */
+    PARTITION_TYPE_CEPH_DMG_CRYPT_LUKS_JOURNAL(
+        "45B0969E-9B03-4F30-B4C6-35865CEFF106",
+        PartitionType.SPECIAL),
+
+    /**
+     * Ceph dm-crypt LUKS block:
+     *     <code>CAFECAFE-9B03-4F30-B4C6-35865CEFF106</code>
+     */
+    PARTITION_TYPE_CEPH_DM_CRYPT_LUKS_BLOCK(
+        "CAFECAFE-9B03-4F30-B4C6-35865CEFF106",
+        PartitionType.SPECIAL),
+
+    /**
+     * Ceph dm-crypt LUKS block DB:
+     *     <code>166418DA-C469-4022-ADF4-B30AFD37F176</code>
+     */
+    PARTITION_TYPE_CEPH_DMG_CRYPT_LUKS_BLOCK_DB(
+        "166418DA-C469-4022-ADF4-B30AFD37F176",
+        PartitionType.SPECIAL),
+
+    /**
+     * Ceph dm-crypt LUKS block write-ahead log:
+     *     <code>86A32090-3647-40B9-BBBD-38D8C573AA86</code>
+     */
+    PARTITION_TYPE_CEPH_DM_CRYPT_LUKS_BLOCK_WRITE_AHEAD_LOG(
+        "86A32090-3647-40B9-BBBD-38D8C573AA86",
+        PartitionType.SPECIAL),
+
+    /**
+     * Ceph dm-crypt LUKS OSD:
+     *     <code>4FBD7E29-9D25-41B8-AFD0-35865CEFF05D</code>
+     */
+    PARTITION_TYPE_CEPH_DM_CRYPT_LUKS_OSD(
+        "4FBD7E29-9D25-41B8-AFD0-35865CEFF05D",
+        PartitionType.SPECIAL),
+
+    /**
+     * OpenBSD data partition:
+     *     <code>824CC7A0-36A8-11E3-890A-952519AD3F61</code>
+     */
+    PARTITION_TYPE_OPENBSD_DATA("824CC7A0-36A8-11E3-890A-952519AD3F61",
+        PartitionType.SPECIAL),
+
+    /**
+     * QNX power-safe (QNX6) file system[51]:
+     *     <code>CEF5A9AD-73BC-4601-89F3-CDEEEEE321A1</code>
+     */
+    PARTITION_TYPE_QNX6("CEF5A9AD-73BC-4601-89F3-CDEEEEE321A1",
+        PartitionType.SPECIAL),
+
+    /**
+     * Plan 9 partition:
+     *     <code>C91818F9-8025-47AF-89D2-F030D7000C2C</code>
+     */
+    PARTITION_TYPE_PLAN9("C91818F9-8025-47AF-89D2-F030D7000C2C",
+        PartitionType.SPECIAL),
+
+    /**
+     * VMware ESX vmkcore (coredump partition):
+     *     <code>9D275380-40AD-11DB-BF97-000C2911D1B8</code>
+     */
+    PARTITION_TYPE_VMWARE_ESX_VMKCORE("9D275380-40AD-11DB-BF97-000C2911D1B8",
+        PartitionType.SPECIAL),
+
+    /**
+     * VMware ESX VMFS filesystem partition:
+     *     <code>AA31E02A-400F-11DB-9590-000C2911D1B8</code>
+     */
+    PARTITION_TYPE_VMWARE_ESX_VMFS("AA31E02A-400F-11DB-9590-000C2911D1B8",
+        PartitionType.SPECIAL),
+
+    /**
+     * VMware ESX Reserved:
+     *     <code>9198EFFC-31C0-11DB-8F78-000C2911D1B8</code>
+     */
+    PARTITION_TYPE_VMWARE_ESX_RESERVED("9198EFFC-31C0-11DB-8F78-000C2911D1B8",
+        PartitionType.SPECIAL),
+
+    /**
+     * Android-IA Bootloader:
+     *     <code>2568845D-2332-4675-BC39-8FA5A4748D15</code>
+     */
+    PARTITION_TYPE_ANDROID_IA_BOOTLOADER("2568845D-2332-4675-BC39-8FA5A4748D15",
+        PartitionType.SPECIAL),
+
+    /**
+     * Android-IA Bootloader2:
+     *     <code>114EAFFE-1552-4022-B26E-9B053604CF84</code>
+     */
+    PARTITION_TYPE_ANDROID_IA_BOOTLOADER2(
+        "114EAFFE-1552-4022-B26E-9B053604CF84",
+        PartitionType.SPECIAL),
+
+    /**
+     * Android-IA Boot:
+     *     <code>49A4D17F-93A3-45C1-A0DE-F50B2EBE2599</code>
+     */
+    PARTITION_TYPE_ANDROID_IA_BOOT("49A4D17F-93A3-45C1-A0DE-F50B2EBE2599",
+        PartitionType.SPECIAL),
+
+    /**
+     * Android-IA Recovery:
+     *     <code>4177C722-9E92-4AAB-8644-43502BFD5506</code>
+     */
+    PARTITION_TYPE_ANDROID_IA_RECOVERY("4177C722-9E92-4AAB-8644-43502BFD5506",
+        PartitionType.SPECIAL),
+
+    /**
+     * Android-IA Misc:
+     *     <code>EF32A33B-A409-486C-9141-9FFB711F6266</code>
+     */
+    PARTITION_TYPE_ANDROID_IA_MISC("EF32A33B-A409-486C-9141-9FFB711F6266",
+        PartitionType.SPECIAL),
+
+    /**
+     * Android-IA Metadata:
+     *     <code>20AC26BE-20B7-11E3-84C5-6CFDB94711E9</code>
+     */
+    PARTITION_TYPE_ANDROID_IA_METADATA("20AC26BE-20B7-11E3-84C5-6CFDB94711E9",
+        PartitionType.SPECIAL),
+
+    /**
+     * Android-IA System:
+     *     <code>38F428E6-D326-425D-9140-6E0EA133647C</code>
+     */
+    PARTITION_TYPE_ANDROID_IA_SYSTEM("38F428E6-D326-425D-9140-6E0EA133647C",
+        PartitionType.SPECIAL),
+
+    /**
+     * Android-IA Cache:
+     *     <code>A893EF21-E428-470A-9E55-0668FD91A2D9</code>
+     */
+    PARTITION_TYPE_ANDROID_IA_CACHE("A893EF21-E428-470A-9E55-0668FD91A2D9",
+        PartitionType.SPECIAL),
+
+    /**
+     * Android-IA Data:
+     *     <code>DC76DDA9-5AC1-491C-AF42-A82591580C0D</code>
+     */
+    PARTITION_TYPE_ANDROID_IA_DATA("DC76DDA9-5AC1-491C-AF42-A82591580C0D",
+        PartitionType.SPECIAL),
+
+    /**
+     * Android-IA Persistent:
+     *     <code>EBC597D0-2053-4B15-8B64-E0AAC75F4DB1</code>
+     */
+    PARTITION_TYPE_ANDROID_IA_PERSISTENT("EBC597D0-2053-4B15-8B64-E0AAC75F4DB1",
+        PartitionType.SPECIAL),
+
+    /**
+     * Android-IA Vendor:
+     *     <code>C5A0AEEC-13EA-11E5-A1B1-001E67CA0C3C</code>
+     */
+    PARTITION_TYPE_ANDROID_IA_VENDOR("C5A0AEEC-13EA-11E5-A1B1-001E67CA0C3C",
+        PartitionType.SPECIAL),
+
+    /**
+     * Android-IA Config:
+     *     <code>BD59408B-4514-490D-BF12-9878D963F378</code>
+     */
+    PARTITION_TYPE_ANDROID_IA_CONFIG("BD59408B-4514-490D-BF12-9878D963F378",
+        PartitionType.SPECIAL),
+
+    /**
+     * Android-IA Factory:
+     *     <code>8F68CC74-C5E5-48DA-BE91-A0C8C15E9C80</code>
+     */
+    PARTITION_TYPE_ANDROID_IA_FACTORY("8F68CC74-C5E5-48DA-BE91-A0C8C15E9C80",
+        PartitionType.SPECIAL),
+
+    /**
+     * Android-IA Factory (alt):
+     *     <code>9FDAA6EF-4B3F-40D2-BA8D-BFF16BFB887B</code>
+     */
+    PARTITION_TYPE_ANDROID_IA_FACTORY_ALT(
+        "9FDAA6EF-4B3F-40D2-BA8D-BFF16BFB887B",
+        PartitionType.SPECIAL),
+
+    /**
+     * Android-IA Fastboot / Tertiary:
+     *     <code>767941D0-2085-11E3-AD3B-6CFDB94711E9</code>
+     */
+    PARTITION_TYPE_ANDROID_IA_FASTBOOT_TERTIARY(
+        "767941D0-2085-11E3-AD3B-6CFDB94711E9",
+        PartitionType.SPECIAL),
+
+    /**
+     * Android-IA OEM:
+     *     <code>AC6D7924-EB71-4DF8-B48D-E267B27148FF</code>
+     */
+    PARTITION_TYPE_ANDROID_IA_OEM("AC6D7924-EB71-4DF8-B48D-E267B27148FF",
+        PartitionType.SPECIAL),
+
+    /**
+     * Android 6.0+ ARM Meta:
+     *     <code>19A710A2-B3CA-11E4-B026-10604B889DCF</code>
+     */
+    PARTITION_TYPE_ANDROID_ARM_META("19A710A2-B3CA-11E4-B026-10604B889DCF",
+        PartitionType.SPECIAL),
+
+    /**
+     * Android 6.0+ ARM EXT:
+     *     <code>193D1EA4-B3CA-11E4-B075-10604B889DCF</code>
+     */
+    PARTITION_TYPE_ANDROID_ARM_EXT("193D1EA4-B3CA-11E4-B075-10604B889DCF",
+        PartitionType.SPECIAL),
+
+    /**
+     * Open Network Install Environment (ONIE) Boot:
+     *     <code>7412F7D5-A156-4B13-81DC-867174929325</code>
+     */
+    PARTITION_TYPE_ONIE_BOOT("7412F7D5-A156-4B13-81DC-867174929325",
+        PartitionType.SPECIAL),
+
+    /**
+     * Open Network Install Environment (ONIE) Config:
+     *     <code>D4E6E2CD-4469-46F3-B5CB-1BFF57AFC149</code>
+     */
+    PARTITION_TYPE_ONIE_CONFIG("D4E6E2CD-4469-46F3-B5CB-1BFF57AFC149",
+        PartitionType.SPECIAL),
+
+    /**
+     * PowerPC PReP boot:
+     *     <code>9E1A2D38-C612-4316-AA26-8B49521E5A8B</code>
+     */
+    PARTITION_TYPE_POWERPC_PREP_BOOT("9E1A2D38-C612-4316-AA26-8B49521E5A8B",
+        PartitionType.SPECIAL),
+
+    /**
+     * Atari TOS basic data partition (GEM, BGM, F32):
+     *     <code>734E5AFE-F61A-11E6-BC64-92361F002671</code>
+     */
+    PARTITION_TYPE_ATARI_TOS_BASIC_DATA("734E5AFE-F61A-11E6-BC64-92361F002671",
+        PartitionType.SPECIAL),
+
+    /**
+     * VeraCrypt encrypted data partition:
+     *     <code>8C8F8EFF-AC95-4770-814A-21994F2DBC8F</code>
+     */
+    PARTITION_TYPE_VERACRYPT_DATA("8C8F8EFF-AC95-4770-814A-21994F2DBC8F",
+        PartitionType.SPECIAL),
+
+    /**
+     * OS/2 ArcaOS Type 1:
+     *     <code>90B6FF38-B98F-4358-A21F-48F35B4A8AD3</code>
+     */
+    PARTITION_TYPE_OS2_ARCAOS_TYPE_1("90B6FF38-B98F-4358-A21F-48F35B4A8AD3",
+        PartitionType.SPECIAL),
+
+    /**
+     * Storage Performance Development Kit (SPDK) block device:
+     *     <code>7C5222BD-8F5D-4087-9C00-BF9843C7B58C</code>
+     */
+    PARTITION_TYPE_SPDK_BLOCK_DEVICE("7C5222BD-8F5D-4087-9C00-BF9843C7B58C",
+        PartitionType.SPECIAL),
+
+    /**
+     * barebox bootloader barebox-state:
+     *     <code>4778ED65-BF42-45FA-9C5B-287A1DC4AAB1</code>
+     */
+    PARTITION_TYPE_BAREBOX_STATE("4778ED65-BF42-45FA-9C5B-287A1DC4AAB1",
+        PartitionType.SPECIAL),
+
+    /**
+     * U-Boot bootloader environment:
+     *     <code>3DE21764-95BD-54BD-A5C3-4ABE786F38A8</code>
+     */
+    PARTITION_TYPE_UBOOT_ENVIRONMENT("3DE21764-95BD-54BD-A5C3-4ABE786F38A8",
+        PartitionType.SPECIAL),
+
+    /**
+     * SoftRAID Status:
+     *     <code>B6FA30DA-92D2-4A9A-96F1-871EC6486200</code>
+     */
+    PARTITION_TYPE_SOFTRAID_STATUS("B6FA30DA-92D2-4A9A-96F1-871EC6486200",
+        PartitionType.SPECIAL),
+
+    /**
+     * SoftRAID Scratch:
+     *     <code>2E313465-19B9-463F-8126-8A7993773801</code>
+     */
+    PARTITION_TYPE_SOFTRAID_SCRATCH("2E313465-19B9-463F-8126-8A7993773801",
+        PartitionType.SPECIAL),
+
+    /**
+     * SoftRAID Volume:
+     *     <code>FA709C7E-65B1-4593-BFD5-E71D61DE9B02</code>
+     */
+    PARTITION_TYPE_SOFTRAID_VOLUME("FA709C7E-65B1-4593-BFD5-E71D61DE9B02",
+        PartitionType.SPECIAL),
+
+    /**
+     * SoftRAID Cache:
+     *     <code>BBBA6DF5-F46F-4A89-8F59-8765B2727503</code>
+     */
+    PARTITION_TYPE_SOFTRAID_CACHE("BBBA6DF5-F46F-4A89-8F59-8765B2727503",
+        PartitionType.SPECIAL),
+
     /** Returned when no known type can be matched. */
     UNKNOWN_PARTITION_TYPE;
 
