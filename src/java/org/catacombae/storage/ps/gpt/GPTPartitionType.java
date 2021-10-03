@@ -286,12 +286,117 @@ public enum GPTPartitionType {
         PartitionType.SPECIAL),
 
     /**
+     * HP-UX data partition type:
+     *     <code>75894C1E-3AEB-11D3-B7C1-7B03A0000000</code>
+     */
+    PARTITION_TYPE_HPUX_DATA("75894C1E-3AEB-11D3-B7C1-7B03A0000000",
+        PartitionType.SPECIAL),
+
+    /**
+     * HP-UX service partition type:
+     *     <code>E2A1E728-32E3-11D6-A682-7B03A0000000</code>
+     */
+    PARTITION_TYPE_HPUX_SERVICE("E2A1E728-32E3-11D6-A682-7B03A0000000",
+        PartitionType.SPECIAL),
+
+    /**
+     * Linux data partition type:
+     *     <code>0FC63DAF-8483-4772-8E79-3D69D8477DE4</code>
+     */
+    PARTITION_TYPE_LINUX_DATA("0FC63DAF-8483-4772-8E79-3D69D8477DE4",
+        PartitionType.LINUX_NATIVE),
+
+    /**
+     * Linux RAID partition type:
+     *     <code>A19D880F-05FC-4D3B-A006-743F0F84911E</code>
+     */
+    PARTITION_TYPE_LINUX_RAID("A19D880F-05FC-4D3B-A006-743F0F84911E",
+        PartitionType.SPECIAL),
+
+    /**
+     * Linux root (x86) partition type:
+     *     <code>44479540-F297-41B2-9AF7-D131D5F0458A</code>
+     */
+    PARTITION_TYPE_LINUX_ROOT_X86("44479540-F297-41B2-9AF7-D131D5F0458A",
+        PartitionType.SPECIAL),
+
+    /**
+     * Linux root (x86_64) partition type:
+     *     <code>4F68BCE3-E8CD-4DB1-96E7-FBCAF984B709</code>
+     */
+    PARTITION_TYPE_LINUX_ROOT_X86_64("4F68BCE3-E8CD-4DB1-96E7-FBCAF984B709",
+        PartitionType.SPECIAL),
+
+    /**
+     * Linux root (arm) partition type:
+     *     <code>69DAD710-2CE4-4E3C-B16C-21A1D49ABED3</code>
+     */
+    PARTITION_TYPE_LINUX_ROOT_ARM("69DAD710-2CE4-4E3C-B16C-21A1D49ABED3",
+        PartitionType.SPECIAL),
+
+    /**
+     * Linux root (aarch64) partition type:
+     *     <code>B921B045-1DF0-41C3-AF44-4C6F280D3FAE</code>
+     */
+    PARTITION_TYPE_LINUX_ROOT_AARCH64("B921B045-1DF0-41C3-AF44-4C6F280D3FAE",
+        PartitionType.SPECIAL),
+
+    /**
+     * Linux /boot partition type:
+     *     <code>BC13C2FF-59E6-4262-A352-B275FD6F7172</code>
+     */
+    PARTITION_TYPE_LINUX_BOOT("BC13C2FF-59E6-4262-A352-B275FD6F7172",
+        PartitionType.SPECIAL),
+
+    /**
      * Linux Swap partition type:
      *     <code>0657FD6D-A4AB-43C4-84E5-0933C84B4F4F</code>
      */
     PARTITION_TYPE_LINUX_SWAP("0657FD6D-A4AB-43C4-84E5-0933C84B4F4F",
         0x6DFD5706ABA4C443L, 0x84E50933C84B4F4FL,
         PartitionType.LINUX_SWAP),
+
+    /**
+     * Linux LVM partition type:
+     *     <code>E6D6D379-F507-44C2-A23C-238F2A3DF928</code>
+     */
+    PARTITION_TYPE_LINUX_LVM("E6D6D379-F507-44C2-A23C-238F2A3DF928",
+        PartitionType.LINUX_LVM),
+
+    /**
+     * Linux /home partition type:
+     *     <code>933AC7E1-2EB4-4F13-B844-0E14E2AEF915</code>
+     */
+    PARTITION_TYPE_LINUX_HOME("933AC7E1-2EB4-4F13-B844-0E14E2AEF915",
+        PartitionType.SPECIAL),
+
+    /**
+     * Linux /srv partition type:
+     *     <code>3B8F8425-20E0-4F3B-907F-1A25A76F98E8</code>
+     */
+    PARTITION_TYPE_LINUX_SRV("3B8F8425-20E0-4F3B-907F-1A25A76F98E8",
+        PartitionType.SPECIAL),
+
+    /**
+     * Linux plain dm-crypt partition type:
+     *     <code>7FFEC5C9-2D00-49B7-8941-3EA10A5586B7</code>
+     */
+    PARTITION_TYPE_LINUX_DM_CRYPT("7FFEC5C9-2D00-49B7-8941-3EA10A5586B7",
+        PartitionType.SPECIAL),
+
+    /**
+     * Linux LUKS partition type:
+     *     <code>CA7D7CCB-63ED-4C53-861C-1742536059CC</code>
+     */
+    PARTITION_TYPE_LINUX_LUKS("CA7D7CCB-63ED-4C53-861C-1742536059CC",
+        PartitionType.SPECIAL),
+
+    /**
+     * Linux reserved partition type:
+     *     <code>8DA63339-0007-60C0-C436-083AC8230908</code>
+     */
+    PARTITION_TYPE_LINUX_RESERVED("8DA63339-0007-60C0-C436-083AC8230908",
+        PartitionType.SPECIAL),
 
     /**
      * Solaris boot partition
