@@ -411,8 +411,14 @@ public enum GPTPartitionType {
     private static void addReverseLookupReference(LongBuffer lb,
             GPTPartitionType t)
     {
-        if(reverseLookupTable == null)
+        if(reverseLookupTable == null) {
             reverseLookupTable = new HashMap<LongBuffer, GPTPartitionType>();
+        }
+        else if(reverseLookupTable.get(lb) != null) {
+            throw new RuntimeException("Invalid duplicate partition type: " +
+                    t);
+        }
+
         reverseLookupTable.put(lb, t);
     }
 
