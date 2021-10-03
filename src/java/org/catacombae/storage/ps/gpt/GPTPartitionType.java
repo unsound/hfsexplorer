@@ -156,14 +156,6 @@ public enum GPTPartitionType {
         PartitionType.APPLE_HFS_CONTAINER),
 
     /**
-     * Apple Boot partition type:
-     *     <code>426F6F74-0000-11AA-AA11-00306543ECAC</code>
-     */
-    PARTITION_TYPE_APPLE_BOOT("426F6F74-0000-11AA-AA11-00306543ECAC",
-        0x746F6F420000AA11L, 0xAA1100306543ECACL,
-        PartitionType.SPECIAL),
-
-    /**
      * AppleRAID partition type:
      *     <code>52414944-0000-11AA-AA11-00306543ECAC</code>
      */
@@ -178,10 +170,10 @@ public enum GPTPartitionType {
         PartitionType.SPECIAL),
 
     /**
-     * Apple recovery partition type:
+     * Apple boot/recovery partition type:
      *     <code>426F6F74-0000-11AA-AA11-00306543ECAC</code>
      */
-    PARTITION_TYPE_APPLE_RECOVERY("426F6F74-0000-11AA-AA11-00306543ECAC",
+    PARTITION_TYPE_APPLE_BOOT_RECOVERY("426F6F74-0000-11AA-AA11-00306543ECAC",
         PartitionType.SPECIAL),
 
     /**
@@ -411,12 +403,13 @@ public enum GPTPartitionType {
     private static void addReverseLookupReference(LongBuffer lb,
             GPTPartitionType t)
     {
+        GPTPartitionType conflictingType;
         if(reverseLookupTable == null) {
             reverseLookupTable = new HashMap<LongBuffer, GPTPartitionType>();
         }
-        else if(reverseLookupTable.get(lb) != null) {
+        else if((conflictingType = reverseLookupTable.get(lb)) != null) {
             throw new RuntimeException("Invalid duplicate partition type: " +
-                    t);
+                    t + " (duplicates " + conflictingType + ")");
         }
 
         reverseLookupTable.put(lb, t);
