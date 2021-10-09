@@ -759,6 +759,16 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
             GUIUtil.displayExceptionDialog(t, 20, this, "Exception when exiting application");
         } finally {
             if(doExit) {
+                /*
+                 * The debug console can be created without its window being
+                 * displayed. Since it has never been displayed it's not in a
+                 * "disposed" state. So unless we dispose of it here the
+                 * application may not quit.
+                 */
+                if(dcw != null) {
+                    dcw.dispose();
+                }
+
                 dispose();
             }
         }
