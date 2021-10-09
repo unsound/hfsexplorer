@@ -3284,9 +3284,16 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
         }
 
         int parsedArgs = 0;
+
+        boolean debugConsole = false;
+        if(args.length > 0 && args[0].equals(DEBUG_CONSOLE_ARG)) {
+            debugConsole = true;
+            ++parsedArgs;
+        }
+
         final FileSystemBrowserWindow fsbWindow = openFileSystemBrowserWindow(
                 /* boolean debugConsole */
-                args.length > 0 && args[0].equals(DEBUG_CONSOLE_ARG));
+                debugConsole);
 
         /*
         System.err.println(FileSystemBrowserWindow.class.getName() + ".main invoked.");
