@@ -759,7 +759,7 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
             GUIUtil.displayExceptionDialog(t, 20, this, "Exception when exiting application");
         } finally {
             if(doExit) {
-                System.exit(0);
+                dispose();
             }
         }
     }
@@ -781,6 +781,29 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
             else {
                 fsFile = new ReadableFileStream(filename);
             }
+
+            String displayName;
+            try {
+                displayName = f.getCanonicalFile().getName();
+            } catch(Exception e) {
+                displayName = filename;
+            }
+
+            loadFSWithUDIFAutodetect(displayName, fsFile, pos);
+        } catch(Exception e) {
+            System.err.println("Could not open file! Exception thrown:");
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                    "Could not open file:\n" +
+                    "    \"" + filename + "\"",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void loadFSWithUDIFAutodetect(String displayName,
+            ReadableRandomAccessStream fsFile, long pos)
+    {
+        {
             try {
                 System.err.println("Trying to detect CEncryptedEncoding structure...");
                 if(ReadableCEncryptedEncodingStream.isCEncryptedEncoding(fsFile)) {
@@ -900,12 +923,6 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
             if(pos != 0) {
                 fsFile = new ReadableConcatenatedStream(fsFile, pos, fsFile.length() - pos);
             }
-            String displayName;
-            try {
-                displayName = new File(filename).getCanonicalFile().getName();
-            } catch(Exception e) {
-                displayName = filename;
-            }
 
             SynchronizedReadableRandomAccessStream syncStream =
                     new SynchronizedReadableRandomAccessStream(fsFile);
@@ -914,11 +931,6 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
             } finally {
                 syncStream.close();
             }
-        } catch(Exception e) {
-            System.err.println("Could not open file! Exception thrown:");
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Could not open file:\n    \"" + filename + "\"",
-                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -1668,6 +1680,40 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
     //System.err.println("curdir: " + fileChooser.getCurrentDirectory());
     //fileChooser.setSelectedFiles(new File[0]);
     //fileChooser.setCurrentDirectory(fileChooser.getCurrentDirectory());
+    }
+
+    private void actionOpenInHFSExplorer(final List<FSEntry> selection)
+    {
+        for(FSEntry e : selection) {
+            ReadableRandomAccessStream stream;
+            FileSystemBrowserWindow fsbWindow;
+
+            if(e instanceof FSFolder) {
+                stream = new ReadableSparseBundleStream(
+                        new FSEntryFileAccessor(e));
+            }
+            else {
+                FSFork dataFork = e.getForkByType(FSForkType.DATA);
+                if(dataFork == null || dataFork.getLength() <= 0) {
+                    log.debug("Ignoring file in selection without data.");
+                    continue;
+                }
+
+                stream = dataFork.getReadableRandomAccessStream();
+            }
+
+            fsbWindow = openFileSystemBrowserWindow(
+                    /* boolean debugConsole */
+                    dcw != null);
+
+            fsbWindow.loadFSWithUDIFAutodetect(
+                    /* String displayName */
+                    e.getName(),
+                    /* ReadableRandomAccessStream fsFile */
+                    stream,
+                    /* long pos */
+                    0);
+        }
     }
 
     /**
@@ -2991,6 +3037,18 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
             });
             jpm.add(bothExtractItem);
 
+            JMenuItem openInHFSExplorerItem = new
+                    JMenuItem("Open in HFSExplorer");
+            openInHFSExplorerItem.addActionListener(new ActionListener() {
+                /* @Override */
+                public void actionPerformed(ActionEvent e) {
+                    FileSystemBrowserWindow.this.actionOpenInHFSExplorer(
+                            /* List<FSEntry> selection */
+                            userObjectList);
+                }
+            });
+            jpm.add(openInHFSExplorerItem);
+
             return jpm;
         }
 
@@ -3169,6 +3227,26 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
         }
     }
 
+    private static FileSystemBrowserWindow openFileSystemBrowserWindow(
+            boolean debugConsole)
+    {
+        final FileSystemBrowserWindow fsbWindow;
+
+        if(debugConsole) {
+            DebugConsoleWindow dcw = new DebugConsoleWindow(System.err);
+            System.setOut(new PrintStream(dcw.getDebugStream()));
+            System.setErr(new PrintStream(dcw.getDebugStream()));
+            fsbWindow = new FileSystemBrowserWindow(dcw);
+        }
+        else {
+            fsbWindow = new FileSystemBrowserWindow();
+        }
+
+        fsbWindow.setVisible(true);
+
+        return fsbWindow;
+    }
+
     public static void main(String[] args) {
         if(System.getProperty("os.name").toLowerCase().startsWith("mac os x"))
             System.setProperty("apple.laf.useScreenMenuBar", "true");
@@ -3206,16 +3284,9 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
         }
 
         int parsedArgs = 0;
-        final FileSystemBrowserWindow fsbWindow;
-        if(args.length > 0 && args[0].equals(DEBUG_CONSOLE_ARG)) {
-            DebugConsoleWindow dcw = new DebugConsoleWindow(System.err);
-            System.setOut(new PrintStream(dcw.getDebugStream()));
-            System.setErr(new PrintStream(dcw.getDebugStream()));
-            fsbWindow = new FileSystemBrowserWindow(dcw);
-            ++parsedArgs;
-        }
-        else {
-            fsbWindow = new FileSystemBrowserWindow();
+        final FileSystemBrowserWindow fsbWindow = openFileSystemBrowserWindow(
+                /* boolean debugConsole */
+                args.length > 0 && args[0].equals(DEBUG_CONSOLE_ARG));
 
         /*
         System.err.println(FileSystemBrowserWindow.class.getName() + ".main invoked.");
@@ -3224,8 +3295,6 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
         System.err.println();
         System.err.println("java.library.path=\"" + System.getProperty("java.library.path") + "\"");
          */
-        }
-        fsbWindow.setVisible(true);
 
         if(args.length > parsedArgs) {
             String filename = args[parsedArgs];
