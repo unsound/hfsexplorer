@@ -3305,13 +3305,16 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
                 /* boolean debugConsole */
                 debugConsole);
 
-        /*
-        System.err.println(FileSystemBrowserWindow.class.getName() + ".main invoked.");
-        for(int i = 0; i < args.length; ++i)
-        System.err.println("  args[" + i + "]: \"" + args[i] + "\"");
-        System.err.println();
-        System.err.println("java.library.path=\"" + System.getProperty("java.library.path") + "\"");
-         */
+        if(false) {
+            System.err.println(FileSystemBrowserWindow.class.getName() +
+                    ".main invoked.");
+            for(int i = 0; i < args.length; ++i) {
+                System.err.println("  args[" + i + "]: \"" + args[i] + "\"");
+            }
+            System.err.println();
+            System.err.println("java.library.path=\"" +
+                    System.getProperty("java.library.path") + "\"");
+        }
 
         if(args.length > parsedArgs) {
             String filename = args[parsedArgs];
