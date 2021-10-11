@@ -2,7 +2,7 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "HFSExplorer"
-!define PRODUCT_VERSION "2021.2.22"
+!define PRODUCT_VERSION "2021.10.9"
 !define PRODUCT_PUBLISHER "Catacombae Software"
 !define PRODUCT_WEB_SITE "https://www.catacombae.org/"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"

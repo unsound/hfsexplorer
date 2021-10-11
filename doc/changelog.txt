@@ -2,6 +2,20 @@ HFSExplorer Changelog
 ---------------------
 
 
+2021.10.9
+---------
+- Add support for selecting the character encoding for decoding HFS filenames.
+
+- Add support for more APM partition layouts, including ones with unusual
+  inconsistencies.
+
+- Add support for opening embedded disk images directly in HFSExplorer instead
+  of having to extract them first.
+
+- Fix overflow in calculations when opening HFS-wrapped HFS+ volumes causing
+  errors when extracting files and potentially when opening volumes.
+
+
 2021.2.22
 ---------
 - Add support for ARM-native JDKs on Windows (adding ARM versions of llio dll).
