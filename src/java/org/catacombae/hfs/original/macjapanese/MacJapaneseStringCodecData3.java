@@ -32,6 +32,70 @@ class MacJapaneseStringCodecData3 {
      * Due to code size restrictions the table is split into three class files.
      */
     static final char[][] mappingTable = {
+        { (char) 0xE68B, (char) 0x8AE1 }, // <CJK>
+        { (char) 0xE68C, (char) 0x8B16 }, // <CJK>
+        { (char) 0xE68D, (char) 0x8B10 }, // <CJK>
+        { (char) 0xE68E, (char) 0x8B17 }, // <CJK>
+        { (char) 0xE68F, (char) 0x8B20 }, // <CJK>
+        { (char) 0xE690, (char) 0x8B33 }, // <CJK>
+        { (char) 0xE691, (char) 0x97AB }, // <CJK>
+        { (char) 0xE692, (char) 0x8B26 }, // <CJK>
+        { (char) 0xE693, (char) 0x8B2B }, // <CJK>
+        { (char) 0xE694, (char) 0x8B3E }, // <CJK>
+        { (char) 0xE695, (char) 0x8B28 }, // <CJK>
+        { (char) 0xE696, (char) 0x8B41 }, // <CJK>
+        { (char) 0xE697, (char) 0x8B4C }, // <CJK>
+        { (char) 0xE698, (char) 0x8B4F }, // <CJK>
+        { (char) 0xE699, (char) 0x8B4E }, // <CJK>
+        { (char) 0xE69A, (char) 0x8B49 }, // <CJK>
+        { (char) 0xE69B, (char) 0x8B56 }, // <CJK>
+        { (char) 0xE69C, (char) 0x8B5B }, // <CJK>
+        { (char) 0xE69D, (char) 0x8B5A }, // <CJK>
+        { (char) 0xE69E, (char) 0x8B6B }, // <CJK>
+        { (char) 0xE69F, (char) 0x8B5F }, // <CJK>
+        { (char) 0xE6A0, (char) 0x8B6C }, // <CJK>
+        { (char) 0xE6A1, (char) 0x8B6F }, // <CJK>
+        { (char) 0xE6A2, (char) 0x8B74 }, // <CJK>
+        { (char) 0xE6A3, (char) 0x8B7D }, // <CJK>
+        { (char) 0xE6A4, (char) 0x8B80 }, // <CJK>
+        { (char) 0xE6A5, (char) 0x8B8C }, // <CJK>
+        { (char) 0xE6A6, (char) 0x8B8E }, // <CJK>
+        { (char) 0xE6A7, (char) 0x8B92 }, // <CJK>
+        { (char) 0xE6A8, (char) 0x8B93 }, // <CJK>
+        { (char) 0xE6A9, (char) 0x8B96 }, // <CJK>
+        { (char) 0xE6AA, (char) 0x8B99 }, // <CJK>
+        { (char) 0xE6AB, (char) 0x8B9A }, // <CJK>
+        { (char) 0xE6AC, (char) 0x8C3A }, // <CJK>
+        { (char) 0xE6AD, (char) 0x8C41 }, // <CJK>
+        { (char) 0xE6AE, (char) 0x8C3F }, // <CJK>
+        { (char) 0xE6AF, (char) 0x8C48 }, // <CJK>
+        { (char) 0xE6B0, (char) 0x8C4C }, // <CJK>
+        { (char) 0xE6B1, (char) 0x8C4E }, // <CJK>
+        { (char) 0xE6B2, (char) 0x8C50 }, // <CJK>
+        { (char) 0xE6B3, (char) 0x8C55 }, // <CJK>
+        { (char) 0xE6B4, (char) 0x8C62 }, // <CJK>
+        { (char) 0xE6B5, (char) 0x8C6C }, // <CJK>
+        { (char) 0xE6B6, (char) 0x8C78 }, // <CJK>
+        { (char) 0xE6B7, (char) 0x8C7A }, // <CJK>
+        { (char) 0xE6B8, (char) 0x8C82 }, // <CJK>
+        { (char) 0xE6B9, (char) 0x8C89 }, // <CJK>
+        { (char) 0xE6BA, (char) 0x8C85 }, // <CJK>
+        { (char) 0xE6BB, (char) 0x8C8A }, // <CJK>
+        { (char) 0xE6BC, (char) 0x8C8D }, // <CJK>
+        { (char) 0xE6BD, (char) 0x8C8E }, // <CJK>
+        { (char) 0xE6BE, (char) 0x8C94 }, // <CJK>
+        { (char) 0xE6BF, (char) 0x8C7C }, // <CJK>
+        { (char) 0xE6C0, (char) 0x8C98 }, // <CJK>
+        { (char) 0xE6C1, (char) 0x621D }, // <CJK>
+        { (char) 0xE6C2, (char) 0x8CAD }, // <CJK>
+        { (char) 0xE6C3, (char) 0x8CAA }, // <CJK>
+        { (char) 0xE6C4, (char) 0x8CBD }, // <CJK>
+        { (char) 0xE6C5, (char) 0x8CB2 }, // <CJK>
+        { (char) 0xE6C6, (char) 0x8CB3 }, // <CJK>
+        { (char) 0xE6C7, (char) 0x8CAE }, // <CJK>
+        { (char) 0xE6C8, (char) 0x8CB6 }, // <CJK>
+        { (char) 0xE6C9, (char) 0x8CC8 }, // <CJK>
+        { (char) 0xE6CA, (char) 0x8CC1 }, // <CJK>
         { (char) 0xE6CB, (char) 0x8CE4 }, // <CJK>
         { (char) 0xE6CC, (char) 0x8CE3 }, // <CJK>
         { (char) 0xE6CD, (char) 0x8CDA }, // <CJK>

@@ -32,6 +32,38 @@ class MacJapaneseStringCodecData {
      * Due to code size restrictions the table is split into three class files.
      */
     static final char[][] mappingTable = {
+        { (char) 0x00, (char) 0x0000 }, // NULL
+        { (char) 0x01, (char) 0x0001 }, // START OF HEADING
+        { (char) 0x02, (char) 0x0002 }, // START OF TEXT
+        { (char) 0x03, (char) 0x0003 }, // END OF TEXT
+        { (char) 0x04, (char) 0x0004 }, // END OF TRANSMISSION
+        { (char) 0x05, (char) 0x0005 }, // ENQUIRY
+        { (char) 0x06, (char) 0x0006 }, // ACKNOWLEDGE
+        { (char) 0x07, (char) 0x0007 }, // BELL
+        { (char) 0x08, (char) 0x0008 }, // BACKSPACE
+        { (char) 0x09, (char) 0x0009 }, // HORIZONTAL TABULATION
+        { (char) 0x0A, (char) 0x000A }, // LINE FEED
+        { (char) 0x0B, (char) 0x000B }, // VERTICAL TABULATION
+        { (char) 0x0C, (char) 0x000C }, // FORM FEED
+        { (char) 0x0D, (char) 0x000D }, // CARRIAGE RETURN
+        { (char) 0x0E, (char) 0x000E }, // SHIFT OUT
+        { (char) 0x0F, (char) 0x000F }, // SHIFT IN
+        { (char) 0x10, (char) 0x0010 }, // DATA LINK ESCAPE
+        { (char) 0x11, (char) 0x0011 }, // DEVICE CONTROL ONE
+        { (char) 0x12, (char) 0x0012 }, // DEVICE CONTROL TWO
+        { (char) 0x13, (char) 0x0013 }, // DEVICE CONTROL THREE
+        { (char) 0x14, (char) 0x0014 }, // DEVICE CONTROL FOUR
+        { (char) 0x15, (char) 0x0015 }, // NEGATIVE ACKNOWLEDGE
+        { (char) 0x16, (char) 0x0016 }, // SYNCHRONOUS IDLE
+        { (char) 0x17, (char) 0x0017 }, // END OF TRANSMISSION BLOCK
+        { (char) 0x18, (char) 0x0018 }, // CANCEL
+        { (char) 0x19, (char) 0x0019 }, // END OF MEDIUM
+        { (char) 0x1A, (char) 0x001A }, // SUBSTITUTE
+        { (char) 0x1B, (char) 0x001B }, // ESCAPE
+        { (char) 0x1C, (char) 0x001C }, // FILE SEPARATOR
+        { (char) 0x1D, (char) 0x001D }, // GROUP SEPARATOR
+        { (char) 0x1E, (char) 0x001E }, // RECORD SEPARATOR
+        { (char) 0x1F, (char) 0x001F }, // UNIT SEPARATOR
         { (char) 0x20, (char) 0x0020 }, // SPACE
         { (char) 0x21, (char) 0x0021 }, // EXCLAMATION MARK
         { (char) 0x22, (char) 0x0022 }, // QUOTATION MARK
@@ -127,7 +159,39 @@ class MacJapaneseStringCodecData {
         { (char) 0x7C, (char) 0x007C }, // VERTICAL LINE
         { (char) 0x7D, (char) 0x007D }, // RIGHT CURLY BRACKET
         { (char) 0x7E, (char) 0x007E }, // TILDE # Apple change from standard Shift-JIS
+        { (char) 0x7F, (char) 0x007F }, // DELETE
         { (char) 0x80, (char) 0x005C }, // REVERSE SOLIDUS # Apple addition; changes mapping of 0x815F
+        { (char) 0x81, (char) 0x0081 }, // <control>
+        { (char) 0x82, (char) 0x0082 }, // <control>
+        { (char) 0x83, (char) 0x0083 }, // <control>
+        { (char) 0x84, (char) 0x0084 }, // <control>
+        { (char) 0x85, (char) 0x0085 }, // <control>
+        { (char) 0x86, (char) 0x0086 }, // <control>
+        { (char) 0x87, (char) 0x0087 }, // <control>
+        { (char) 0x88, (char) 0x0088 }, // <control>
+        { (char) 0x89, (char) 0x0089 }, // <control>
+        { (char) 0x8A, (char) 0x008A }, // <control>
+        { (char) 0x8B, (char) 0x008B }, // <control>
+        { (char) 0x8C, (char) 0x008C }, // <control>
+        { (char) 0x8D, (char) 0x008D }, // <control>
+        { (char) 0x8E, (char) 0x008E }, // <control>
+        { (char) 0x8F, (char) 0x008F }, // <control>
+        { (char) 0x90, (char) 0x0090 }, // <control>
+        { (char) 0x91, (char) 0x0091 }, // <control>
+        { (char) 0x92, (char) 0x0092 }, // <control>
+        { (char) 0x93, (char) 0x0093 }, // <control>
+        { (char) 0x94, (char) 0x0094 }, // <control>
+        { (char) 0x95, (char) 0x0095 }, // <control>
+        { (char) 0x96, (char) 0x0096 }, // <control>
+        { (char) 0x97, (char) 0x0097 }, // <control>
+        { (char) 0x98, (char) 0x0098 }, // <control>
+        { (char) 0x99, (char) 0x0099 }, // <control>
+        { (char) 0x9A, (char) 0x009A }, // <control>
+        { (char) 0x9B, (char) 0x009B }, // <control>
+        { (char) 0x9C, (char) 0x009C }, // <control>
+        { (char) 0x9D, (char) 0x009D }, // <control>
+        { (char) 0x9E, (char) 0x009E }, // <control>
+        { (char) 0x9F, (char) 0x009F }, // <control>
         { (char) 0xA0, (char) 0x00A0 }, // NO-BREAK SPACE # Apple addition
         { (char) 0xA1, (char) 0xFF61 }, // HALFWIDTH IDEOGRAPHIC FULL STOP
         { (char) 0xA2, (char) 0xFF62 }, // HALFWIDTH LEFT CORNER BRACKET
@@ -3265,70 +3329,6 @@ class MacJapaneseStringCodecData {
         { (char) 0x94B6, (char) 0x567A }, // <CJK>
         { (char) 0x94B7, (char) 0x5859 }, // <CJK>
         { (char) 0x94B8, (char) 0x86E4 }, // <CJK>
-        { (char) 0x94B9, (char) 0x96BC }, // <CJK>
-        { (char) 0x94BA, (char) 0x4F34 }, // <CJK>
-        { (char) 0x94BB, (char) 0x5224 }, // <CJK>
-        { (char) 0x94BC, (char) 0x534A }, // <CJK>
-        { (char) 0x94BD, (char) 0x53CD }, // <CJK>
-        { (char) 0x94BE, (char) 0x53DB }, // <CJK>
-        { (char) 0x94BF, (char) 0x5E06 }, // <CJK>
-        { (char) 0x94C0, (char) 0x642C }, // <CJK>
-        { (char) 0x94C1, (char) 0x6591 }, // <CJK>
-        { (char) 0x94C2, (char) 0x677F }, // <CJK>
-        { (char) 0x94C3, (char) 0x6C3E }, // <CJK>
-        { (char) 0x94C4, (char) 0x6C4E }, // <CJK>
-        { (char) 0x94C5, (char) 0x7248 }, // <CJK>
-        { (char) 0x94C6, (char) 0x72AF }, // <CJK>
-        { (char) 0x94C7, (char) 0x73ED }, // <CJK>
-        { (char) 0x94C8, (char) 0x7554 }, // <CJK>
-        { (char) 0x94C9, (char) 0x7E41 }, // <CJK>
-        { (char) 0x94CA, (char) 0x822C }, // <CJK>
-        { (char) 0x94CB, (char) 0x85E9 }, // <CJK>
-        { (char) 0x94CC, (char) 0x8CA9 }, // <CJK>
-        { (char) 0x94CD, (char) 0x7BC4 }, // <CJK>
-        { (char) 0x94CE, (char) 0x91C6 }, // <CJK>
-        { (char) 0x94CF, (char) 0x7169 }, // <CJK>
-        { (char) 0x94D0, (char) 0x9812 }, // <CJK>
-        { (char) 0x94D1, (char) 0x98EF }, // <CJK>
-        { (char) 0x94D2, (char) 0x633D }, // <CJK>
-        { (char) 0x94D3, (char) 0x6669 }, // <CJK>
-        { (char) 0x94D4, (char) 0x756A }, // <CJK>
-        { (char) 0x94D5, (char) 0x76E4 }, // <CJK>
-        { (char) 0x94D6, (char) 0x78D0 }, // <CJK>
-        { (char) 0x94D7, (char) 0x8543 }, // <CJK>
-        { (char) 0x94D8, (char) 0x86EE }, // <CJK>
-        { (char) 0x94D9, (char) 0x532A }, // <CJK>
-        { (char) 0x94DA, (char) 0x5351 }, // <CJK>
-        { (char) 0x94DB, (char) 0x5426 }, // <CJK>
-        { (char) 0x94DC, (char) 0x5983 }, // <CJK>
-        { (char) 0x94DD, (char) 0x5E87 }, // <CJK>
-        { (char) 0x94DE, (char) 0x5F7C }, // <CJK>
-        { (char) 0x94DF, (char) 0x60B2 }, // <CJK>
-        { (char) 0x94E0, (char) 0x6249 }, // <CJK>
-        { (char) 0x94E1, (char) 0x6279 }, // <CJK>
-        { (char) 0x94E2, (char) 0x62AB }, // <CJK>
-        { (char) 0x94E3, (char) 0x6590 }, // <CJK>
-        { (char) 0x94E4, (char) 0x6BD4 }, // <CJK>
-        { (char) 0x94E5, (char) 0x6CCC }, // <CJK>
-        { (char) 0x94E6, (char) 0x75B2 }, // <CJK>
-        { (char) 0x94E7, (char) 0x76AE }, // <CJK>
-        { (char) 0x94E8, (char) 0x7891 }, // <CJK>
-        { (char) 0x94E9, (char) 0x79D8 }, // <CJK>
-        { (char) 0x94EA, (char) 0x7DCB }, // <CJK>
-        { (char) 0x94EB, (char) 0x7F77 }, // <CJK>
-        { (char) 0x94EC, (char) 0x80A5 }, // <CJK>
-        { (char) 0x94ED, (char) 0x88AB }, // <CJK>
-        { (char) 0x94EE, (char) 0x8AB9 }, // <CJK>
-        { (char) 0x94EF, (char) 0x8CBB }, // <CJK>
-        { (char) 0x94F0, (char) 0x907F }, // <CJK>
-        { (char) 0x94F1, (char) 0x975E }, // <CJK>
-        { (char) 0x94F2, (char) 0x98DB }, // <CJK>
-        { (char) 0x94F3, (char) 0x6A0B }, // <CJK>
-        { (char) 0x94F4, (char) 0x7C38 }, // <CJK>
-        { (char) 0x94F5, (char) 0x5099 }, // <CJK>
-        { (char) 0x94F6, (char) 0x5C3E }, // <CJK>
-        { (char) 0x94F7, (char) 0x5FAE }, // <CJK>
-        { (char) 0x94F8, (char) 0x6787 }, // <CJK>
         /* Continued in MacJapaneseStringCodecData2... */
     };
 }
