@@ -24,6 +24,7 @@ import org.catacombae.hfs.HFSVolume;
 import org.catacombae.hfs.HotFilesFile;
 import org.catacombae.hfs.Journal;
 import org.catacombae.hfs.original.macjapanese.MacJapaneseStringCodec;
+import org.catacombae.hfs.original.macroman.MacRomanStringCodec;
 import org.catacombae.hfs.types.hfs.BTHdrRec;
 import org.catacombae.hfs.types.hfs.CatKeyRec;
 import org.catacombae.hfs.types.hfs.ExtKeyRec;
@@ -177,10 +178,16 @@ public class HFSOriginalVolume extends HFSVolume {
      *
      * @param encodingName the charset to use
      */
-    public void setStringEncoding(String encodingName) {
+    public final void setStringEncoding(String encodingName) {
         StringCodec codec;
-        if(encodingName.equals("MacJapanese")) {
-            codec = new MacJapaneseStringCodec();
+
+        if(encodingName.equals("MacRoman")) {
+            codec = MacRomanStringCodec.getInstance();
+        }
+        else if(encodingName.equals("MacJapanese")) {
+            codec = new MacJapaneseStringCodec(
+                    /* SingleByteCodepageStringCodec fallbackCodec */
+                    MacRomanStringCodec.getInstance());
         }
         else if(Charset.isSupported(encodingName)) {
             codec = new CharsetStringCodec(encodingName);

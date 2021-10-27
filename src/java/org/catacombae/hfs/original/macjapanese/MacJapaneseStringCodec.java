@@ -20,6 +20,7 @@ package org.catacombae.hfs.original.macjapanese;
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import org.catacombae.hfs.original.SingleByteCodepageStringCodec;
 import org.catacombae.hfs.original.StringCodec;
 import org.catacombae.util.Log;
 import org.catacombae.util.Util;
@@ -38,10 +39,26 @@ public class MacJapaneseStringCodec implements StringCodec {
     private static final Log log =
             Log.getInstance(MacJapaneseStringCodec.class);
 
+    private final SingleByteCodepageStringCodec fallbackCodec;
+
     /**
      * Creates a new {@link MacJapaneseStringCodec}.
+     *
+     * @param fallbackCodec
+     *      (optional) The fully mapped 8-bit charset codec to use for byte
+     *      sequences that don't exist in the MacJapanese encoding. This can be
+     *      <code>null</code> in which case an exception is thrown when
+     *      encountering such sequences.
+     */
+    public MacJapaneseStringCodec(SingleByteCodepageStringCodec fallbackCodec) {
+        this.fallbackCodec = fallbackCodec;
+    }
+
+    /**
+     * Creates a new {@link MacJapaneseStringCodec} without a fallback codec.
      */
     public MacJapaneseStringCodec() {
+        this(null);
     }
 
     /**
@@ -168,6 +185,17 @@ public class MacJapaneseStringCodec implements StringCodec {
                         }
                     }
                 }
+            }
+
+            if(replacement == null && fallbackCodec != null) {
+                byte[] data = fallbackCodec.encode(str.substring(off + i, 1));
+                if(data == null || data.length != 1) {
+                    throw new StringCodecException("Unexpected data length " +
+                            "from fallback codec: " +
+                            (data != null ? data.length : 0));
+                }
+
+                replacement = (short) (data[0] & 0xFF);
             }
 
             if(replacement == null) {
