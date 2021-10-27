@@ -60,41 +60,58 @@ public class MacJapaneseStringCodec implements StringCodec {
         StringBuilder sb = new StringBuilder();
 
         for(int i = 0; i < len;) {
-            short sequence;
-            String replacement;
+            short sequence = 0;
+            String replacement = null;
 
             log.debug("data[" + (off + i) + "]: " +
                     "0x" + Util.toHexStringBE(data[off + i]));
 
-            sequence = (short) (data[off + i++] & 0xFF);
-            if(sequence < 0x20) {
-                replacement = new String(new char[] { (char) sequence });
-            }
-            else {
-                replacement = macJapaneseToUnicodeMap.get(sequence);
-            }
-
-            if(replacement == null && i < len) {
+            if(i + 1 < len) {
                 /*
-                 * There is no replacement for the single-byte sequence, so
-                 * check if there is one for the two-byte one.
-                 * (Note: Big endian)
+                 * First check if there's a match for the 2-byte sequence
+                 * (greedy matching).
+                 * Note: Big endian
                  */
 
-                sequence <<= 8;
-                sequence |= (short) (data[off + i] & 0xFF);
+                sequence =
+                        (short) (((data[off + i] & 0xFF) << 8) |
+                        (data[off + i + 1] & 0xFF));
                 replacement = macJapaneseToUnicodeMap.get(sequence);
                 if(replacement != null) {
                     log.debug("data[" + (off + i) + "]: " +
                             "0x" + Util.toHexStringBE(data[off + i]));
+                    i += 2;
+                }
+            }
+
+            if(replacement == null) {
+                sequence = (short) (data[off + i] & 0xFF);
+                if(sequence < 0x20) {
+                    replacement = new String(new char[] { (char) sequence });
+                }
+                else {
+                    replacement = macJapaneseToUnicodeMap.get(sequence);
+                }
+
+                if(replacement != null) {
+                    ++i;
+                }
+            }
+
+            if(replacement == null && fallbackCodec != null) {
+                sequence = (short) (data[off + i] & 0xFF);
+                log.debug("Querying fallback codec for missing replacement " +
+                        "for 0x" + Util.toHexStringBE((byte) sequence) + "...");
+                replacement = fallbackCodec.decode(data, off + i - 1, 1);
+
+                if(replacement != null) {
                     ++i;
                 }
             }
 
             if(replacement == null) {
                 throw new StringCodecException("Unable to decode sequence at " +
-                        "byte " + (i - 1) + ": " +
-                        "0x" + Util.toHexStringBE(sequence));
+                        "byte " + i + ": 0x" + Util.toHexStringBE(sequence));
             }
 
             if(log.debug) {
