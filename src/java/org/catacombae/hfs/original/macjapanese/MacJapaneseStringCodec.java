@@ -132,13 +132,15 @@ public class MacJapaneseStringCodec implements StringCodec {
             }
 
             if(log.debug) {
-                StringBuilder messageBuilder =
-                        new StringBuilder("Found replacement: " +
-                        "0x" + Util.toHexStringBE(sequence) + " ->");
+                StringBuilder messageBuilder = new StringBuilder();
+
+                messageBuilder.append("Found replacement: 0x").
+                        append(Util.toHexStringBE(sequence)).append(" ->");
                 for(int j = 0; j < replacement.length(); ++j) {
-                    messageBuilder.append(" " +
-                            "0x" + Util.toHexStringBE(replacement.charAt(j)));
+                    messageBuilder.append(" 0x").append(
+                            Util.toHexStringBE(replacement.charAt(j)));
                 }
+                messageBuilder.append(" (\"").append(replacement).append("\")");
 
                 log.debug(messageBuilder.toString());
             }
