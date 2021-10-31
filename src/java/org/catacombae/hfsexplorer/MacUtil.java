@@ -70,7 +70,15 @@ public class MacUtil {
             final MacApplicationHandler qh)
     {
         try {
-            registerMacApplicationHandlerInternal(qh);
+            try {
+                registerMacApplicationHandlerInternal(qh);
+            } catch(ClassNotFoundException e) {
+                /* Newer Java versions have removed the com.apple.eawt APIs and
+                 * replaced them with java.awt.Desktop equivalents. So if
+                 * com.apple.eawt.Application registration fails due to missing
+                 * class files we try the java.awt.Desktop method. */
+                registerJavaAwtDesktopHandlersInternal(qh);
+            }
         } catch(Exception e) {
             if(e instanceof InvocationTargetException) {
                 Throwable cause = e.getCause();
@@ -153,5 +161,99 @@ public class MacUtil {
 
         applicationAddApplicationListenerMethod.invoke(applicationObject,
                 applicationAdapterObject);
+    }
+
+    private static void registerJavaAwtDesktopHandlersInternal(
+            final MacApplicationHandler qh)
+            throws ClassNotFoundException, NoSuchMethodException,
+            InvocationTargetException, IllegalAccessException
+    {
+        Class<?> desktopClass = Class.forName("java.awt.Desktop");
+        Class<?> quitHandlerClass =
+                Class.forName("java.awt.desktop.QuitHandler");
+        Class<?> quitResponseClass =
+                Class.forName("java.awt.desktop.QuitResponse");
+        Class<?> aboutHandlerClass =
+                Class.forName("java.awt.desktop.AboutHandler");
+
+        Method desktopGetDesktopMethod =
+                desktopClass.getMethod("getDesktop");
+        Object desktopObject =
+                desktopGetDesktopMethod.invoke(null);
+
+        final Method quitResponsePerformQuitMethod =
+                quitResponseClass.getMethod("performQuit");
+        final Method quitResponseCancelQuitMethod =
+                quitResponseClass.getMethod("cancelQuit");
+
+        InvocationHandler quitInvocationHandler = new InvocationHandler() {
+            public Object invoke(Object proxy, Method method, Object[] args)
+                    throws Throwable
+            {
+                if(method.getName().equals("handleQuitRequestWith")) {
+                    /* void handleQuitRequestWith(AppEvent.QuitEvent e,
+                     *     QuitResponse response) */
+                    Object e = args[0];
+                    Object response = args[1];
+
+                    if(qh.acceptQuit()) {
+                        quitResponsePerformQuitMethod.invoke(response);
+                    }
+                    else {
+                        quitResponseCancelQuitMethod.invoke(response);
+                    }
+
+                    return null;
+
+                }
+
+                throw new NoSuchMethodException("No " +
+                        "\"" + method.getName() + "\" defined.");
+            }
+        };
+
+        Object quitHandlerObject =
+                Proxy.newProxyInstance(
+                quitHandlerClass.getClassLoader(),
+                new Class[] { quitHandlerClass },
+                quitInvocationHandler);
+
+        Method desktopSetQuitHandlerMethod =
+                desktopClass.getMethod("setQuitHandler",
+                quitHandlerClass);
+
+        desktopSetQuitHandlerMethod.invoke(desktopObject,
+                quitHandlerObject);
+
+        InvocationHandler aboutInvocationHandler = new InvocationHandler() {
+            public Object invoke(Object proxy, Method method, Object[] args)
+                    throws Throwable
+            {
+                if(method.getName().equals("handleAbout")) {
+                    /* void handleAbout(AppEvent.AboutEvent e) */
+                    Object e = args[0];
+
+                    qh.showAboutDialog();
+
+                    return null;
+                }
+
+                throw new NoSuchMethodException("No " +
+                        "\"" + method.getName() + "\" defined.");
+            }
+        };
+
+        Object aboutHandlerObject =
+                Proxy.newProxyInstance(
+                aboutHandlerClass.getClassLoader(),
+                new Class[] { aboutHandlerClass },
+                aboutInvocationHandler);
+
+        Method desktopSetAboutHandlerMethod =
+                desktopClass.getMethod("setAboutHandler",
+                aboutHandlerClass);
+
+        desktopSetAboutHandlerMethod.invoke(desktopObject,
+                aboutHandlerObject);
     }
 }
