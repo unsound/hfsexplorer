@@ -206,7 +206,7 @@ public class MacJapaneseStringCodec implements StringCodec {
                         "0x" + Util.toHexStringBE(str.charAt(i)));
             }
 
-            if(replacement > 0xFF) {
+            if((replacement & 0xFFFF) > 0xFF) {
                 os.write((replacement >>> 8) & 0xFF);
             }
 
