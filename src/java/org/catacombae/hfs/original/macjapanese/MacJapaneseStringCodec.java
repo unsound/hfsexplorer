@@ -77,13 +77,35 @@ public class MacJapaneseStringCodec implements StringCodec {
         StringBuilder sb = new StringBuilder();
 
         for(int i = 0; i < len;) {
+            final byte firstByte = data[off + i];
+            final Byte secondByte = (i + 1 < len) ? data[off + i + 1] : null;
             short sequence = 0;
             String replacement = null;
 
             log.debug("data[" + (off + i) + "]: " +
-                    "0x" + Util.toHexStringBE(data[off + i]));
+                    "0x" + Util.toHexStringBE(firstByte));
 
-            if(i + 1 < len) {
+            if(secondByte != null && (firstByte & 0xFF) >= 0xF0 &&
+                    (firstByte & 0xFF) <= 0xFC && (secondByte & 0xFF) >= 0x40 &&
+                    (secondByte & 0xFF) <= 0xFC && (secondByte & 0xFF) != 0x7F)
+            {
+                /* Shift-JIS user-defined range.
+                 *
+                 * This is mapped a bit weirdly as the mapping starts at offset
+                 * 0xF040 and goes on for 0x3F (63) entries, skips over entry
+                 * 0x40 (64), continues for 0x3D (61) entries, then skips over
+                 * 0x43 (67) entries and resumes mapping at 0xF140, repeating
+                 * this pattern until the end of the range at 0xFCFC. */
+                final char replacementChar =
+                        (char) (0xE000 + ((firstByte & 0xFF) - 0xF0) * 0xBC +
+                        ((secondByte & 0xFF) -
+                        ((secondByte & 0xFF) >= 0x80 ? 0x41 : 0x40)));
+
+                replacement = Character.valueOf(replacementChar).toString();
+                i += 2;
+            }
+
+            if(replacement == null && secondByte != null) {
                 /*
                  * First check if there's a match for the 2-byte sequence
                  * (greedy matching).
@@ -91,18 +113,18 @@ public class MacJapaneseStringCodec implements StringCodec {
                  */
 
                 sequence =
-                        (short) (((data[off + i] & 0xFF) << 8) |
-                        (data[off + i + 1] & 0xFF));
+                        (short) (((firstByte & 0xFF) << 8) |
+                        (secondByte & 0xFF));
                 replacement = macJapaneseToUnicodeMap.get(sequence);
                 if(replacement != null) {
                     log.debug("data[" + (off + i) + "]: " +
-                            "0x" + Util.toHexStringBE(data[off + i]));
+                            "0x" + Util.toHexStringBE(firstByte));
                     i += 2;
                 }
             }
 
             if(replacement == null) {
-                sequence = (short) (data[off + i] & 0xFF);
+                sequence = (short) (firstByte & 0xFF);
                 if(sequence < 0x20) {
                     replacement = new String(new char[] { (char) sequence });
                 }
@@ -116,7 +138,7 @@ public class MacJapaneseStringCodec implements StringCodec {
             }
 
             if(replacement == null && fallbackCodec != null) {
-                sequence = (short) (data[off + i] & 0xFF);
+                sequence = (short) (firstByte & 0xFF);
                 log.debug("Querying fallback codec for missing replacement " +
                         "for 0x" + Util.toHexStringBE((byte) sequence) + "...");
                 replacement = fallbackCodec.decode(data, off + i - 1, 1);
@@ -128,7 +150,9 @@ public class MacJapaneseStringCodec implements StringCodec {
 
             if(replacement == null) {
                 throw new StringCodecException("Unable to decode sequence at " +
-                        "byte " + i + ": 0x" + Util.toHexStringBE(sequence));
+                        "byte " + i + ": 0x" + Util.toHexStringBE(firstByte) + 
+                        ((secondByte != null) ? Util.toHexStringBE(secondByte) :
+                        ""));
             }
 
             if(log.debug) {
@@ -176,6 +200,32 @@ public class MacJapaneseStringCodec implements StringCodec {
                 replacement = (short) firstChar;
                 ++i;
             }
+            else if(firstChar >= 0xE000 && firstChar <= 0xE98B) {
+                /* Shift-JIS user-defined range.
+                 *
+                 * This is mapped a bit weirdly as the mapping starts at offset
+                 * 0xF040 and goes on for 0x3F (63) entries, skips over entry
+                 * 0x40 (64), continues for 0x3D (61) entries, then skips over
+                 * 0x43 (67) entries and resumes mapping at 0xF140, repeating
+                 * this pattern until the end of the range at 0xFCFC. */
+                final int rangeIndex = firstChar - 0xE000;
+
+                /* Which 'chunk' of the repeating pattern are we at? For every
+                 * chunk we must add 0x44 to compensate for the gap between the
+                 * chunks (0x43 bytes) and the 1-byte gap between 0x7E and 0x80
+                 * (avoiding the 0x7F / DEL control character). */
+                final int rangeChunk = rangeIndex / 0xBC;
+                final int indexInChunk = rangeIndex % 0xBC;
+
+                log.trace("rangeIndex: " + rangeIndex);
+                log.trace("rangeChunk: " + rangeChunk);
+                log.trace("indexInChunk: " + indexInChunk);
+                replacement =
+                        (short) ((0xF040 + rangeChunk * 0x44 +
+                        (indexInChunk > 0x3E ? 1 : 0) + rangeIndex) & 0xFFFF);
+                log.trace("replacement: 0x" + Util.toHexStringBE(replacement));
+                ++i;
+            }
             else {
                 for(int j = 5; j > 0; --j) {
                     if(remaining >= j) {
@@ -204,7 +254,7 @@ public class MacJapaneseStringCodec implements StringCodec {
             if(replacement == null) {
                 throw new StringCodecException("Unable to encode sequence at " +
                         "character " + i + ": " +
-                        "0x" + Util.toHexStringBE(str.charAt(i)));
+                        "0x" + Util.toHexStringBE(firstChar));
             }
 
             if((replacement & 0xFFFF) > 0xFF) {
@@ -263,4 +313,107 @@ public class MacJapaneseStringCodec implements StringCodec {
             unicodeToMacJapaneseMap.put(entry.getValue(), entry.getKey());
         }
     }
+
+    static boolean testShiftJisReservedRange()
+    {
+        final int rangeFirst = 0xE000;
+        final int rangeEnd = 0xE98B + 1;
+        int contiguous = 0;
+        byte[] prevEncoded = null;
+
+        MacJapaneseStringCodec c = new MacJapaneseStringCodec();
+        for(int i = rangeFirst; i <= rangeEnd; ++i) {
+            final String original;
+            final byte[] encoded;
+
+            if(i != rangeEnd) {
+                original = Character.valueOf((char) i).toString();
+                encoded = c.encode(original);
+                log.debug("original: " + original);
+            }
+            else {
+                original = null;
+                encoded = null;
+            }
+
+            if(prevEncoded != null && (encoded == null ||
+                    encoded.length != prevEncoded.length ||
+                    encoded[encoded.length - 1] !=
+                    prevEncoded[encoded.length - 1] + contiguous))
+            {
+                System.err.printf("0x");
+                if(contiguous > 1) {
+                    for(int j = 0; j < prevEncoded.length - 1; ++j) {
+                        System.err.printf("%02X", prevEncoded[j] & 0xFF);
+                    }
+                    System.err.printf("%02X-0x",
+                            prevEncoded[prevEncoded.length - 1] & 0xFF);
+                }
+                for(int j = 0; j < prevEncoded.length - 1; ++j) {
+                    System.err.printf("%02X", prevEncoded[j] & 0xFF);
+                }
+                System.err.printf("%02X -> ",
+                        (prevEncoded[prevEncoded.length - 1] & 0xFF) +
+                        (contiguous - 1));
+                if(contiguous > 1) {
+                    System.err.printf("0x%04X-", i - contiguous);
+                }
+                System.err.printf("0x%04X", i - 1);
+                System.err.println();
+
+                contiguous = 1;
+            }
+            else {
+                ++contiguous;
+            }
+
+            if(contiguous == 1) {
+                prevEncoded = encoded;
+            }
+
+            if(original == null || encoded == null) {
+                break;
+            }
+
+            final String decoded = c.decode(encoded);
+            if(!decoded.equals(original)) {
+                System.err.println("FAIL: Round-trip conversion does not " +
+                        "yield identical result!");
+                System.err.print("      Original: \"" + original + "\" (");
+                for(int j = 0; j < original.length(); ++j) {
+                    System.err.print((j != 0 ? " " : "") +
+                            Util.toHexStringBE(original.charAt(j)));
+                }
+                System.err.println(")");
+                System.err.print("      Round-trip: \"" + decoded  + "\" (");
+                for(int j = 0; j < decoded.length(); ++j) {
+                    System.err.print((j != 0 ? " " : "") +
+                            Util.toHexStringBE(decoded.charAt(j)));
+                }
+                System.err.println(")");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /*
+    public static void main(String[] args)
+    {
+        boolean b;
+
+        System.err.println("Testing Shift-JIS reserved range...");
+        try {
+            b = testShiftJisReservedRange();
+        } catch(Throwable t) {
+            t.printStackTrace(System.err);
+            b = false;
+        }
+        System.err.println("Testing Shift-JIS reserved range: " +
+                (b ? "PASS" : "FAIL"));
+
+        System.exit(b ? 1 : 0);
+    }
+    */
 }
