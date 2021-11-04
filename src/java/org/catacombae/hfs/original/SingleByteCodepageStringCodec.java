@@ -29,8 +29,8 @@ import org.catacombae.util.Util;
  */
 public abstract class SingleByteCodepageStringCodec implements StringCodec {
     private final char[] codepageData;
-    private final HashMap<String, Byte> unicodeToCodepageMap =
-            new HashMap<String, Byte>();
+    private final HashMap<Character, Byte> unicodeToCodepageMap =
+            new HashMap<Character, Byte>();
 
     protected SingleByteCodepageStringCodec(char[] codepageData) {
         if(codepageData.length != 256) {
@@ -41,8 +41,7 @@ public abstract class SingleByteCodepageStringCodec implements StringCodec {
         this.codepageData = codepageData;
 
         for(int i = 0; i < 256; ++i) {
-            this.unicodeToCodepageMap.put(
-                    Character.toString(codepageData[i]), (byte) i);
+            this.unicodeToCodepageMap.put(codepageData[i], (byte) i);
         }
     }
 
@@ -84,37 +83,17 @@ public abstract class SingleByteCodepageStringCodec implements StringCodec {
     public byte[] encode(String str, int off, int len) {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
 
-        for(int i = 0; i < len;) {
-            final int remaining = len - i;
-            char firstChar;
-            Byte replacement = null;
+        for(int i = 0; i < len; ++i) {
+            char curChar;
+            Byte replacement;
 
-            firstChar = str.charAt(off + i);
-            if(firstChar < 0x20) {
-                replacement = (byte) firstChar;
-            }
-            else {
-                for(int j = 5; j > 0; --j) {
-                    if(remaining >= j) {
-                        /* Check if the j-character substring has a match. */
-                        replacement = unicodeToCodepageMap.get(str.substring(
-                                off + i, j));
-                        if(replacement != null) {
-                            i += j;
-                            break;
-                        }
-                    }
-                }
-            }
+            curChar = str.charAt(off + i);
 
+            replacement = unicodeToCodepageMap.get(curChar);
             if(replacement == null) {
                 throw new StringCodecException("Unable to encode sequence at " +
                         "character " + i + ": " +
-                        "0x" + Util.toHexStringBE(str.charAt(i)));
-            }
-
-            if(replacement > 0xFF) {
-                os.write((replacement >>> 8) & 0xFF);
+                        "0x" + Util.toHexStringBE(curChar));
             }
 
             os.write(replacement & 0xFF);
