@@ -174,6 +174,7 @@ public class MacJapaneseStringCodec implements StringCodec {
             firstChar = str.charAt(off + i);
             if(firstChar < 0x20) {
                 replacement = (short) firstChar;
+                ++i;
             }
             else {
                 for(int j = 5; j > 0; --j) {
