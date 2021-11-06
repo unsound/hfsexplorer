@@ -56,6 +56,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import net.iharder.dnd.FileDrop;
 import org.catacombae.dmg.encrypted.ReadableCEncryptedEncodingStream;
 import org.catacombae.dmg.sparsebundle.ReadableSparseBundleStream;
 import org.catacombae.dmg.sparseimage.ReadableSparseImageStream;
@@ -184,6 +185,16 @@ public class FileSystemBrowserWindow extends HFSExplorerJFrame {
             @Override
             public void windowClosing(WindowEvent we) {
                 exitApplication();
+            }
+        });
+
+        // Register handler for file drag&drop events
+        new FileDrop(this, new FileDrop.Listener() {
+
+            public void filesDropped(java.io.File[] files) {
+                if(files.length > 0) {
+                    loadFSWithUDIFAutodetect(files[0].getAbsolutePath());
+                }
             }
         });
 

@@ -161,6 +161,7 @@ static const _TCHAR *classpathComponents[classpathComponentsLength] =
     _T("..\\lib\\swing-layout-1.0.4.jar"),
     _T("..\\lib\\hfsx_dmglib.jar"),
     _T("..\\lib\\apache-ant-1.7.0-bzip2.jar"),
+    _T("..\\lib\\filedrop.jar")
     _T("..\\lib\\iharder-base64.jar")
   };
 

@@ -70,7 +70,7 @@ public class HFSExplorer {
         "        Copyright \u00A9 2005-2006 Sun Microsystems, Inc. Licensed under",
         "        the Lesser General Public License.",
         "        See <http://www.gnu.org/licenses/lgpl.html> for the details.",
-        "    iHarder Base64 encoder/decoder <http://iharder.sourceforge.net>",
+        "    iHarder Base64 and FileDrop projects <http://iharder.sourceforge.net>",
         "        Public domain software.",
         "    Apache Ant bzip2 library <http://ant.apache.org/>",
         "        Copyright \u00A9 the Apache Software Foundation (ASF). Licensed",
