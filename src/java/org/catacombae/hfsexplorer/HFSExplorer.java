@@ -72,7 +72,7 @@ public class HFSExplorer {
         "        See <http://www.gnu.org/licenses/lgpl.html> for the details.",
         "    iHarder Base64 and FileDrop projects <http://iharder.sourceforge.net>",
         "        Public domain software.",
-        "    Apache Ant bzip2 library <http://ant.apache.org/>",
+        "    Apache Ant bzip2 library <https://ant.apache.org/>",
         "        Copyright \u00A9 the Apache Software Foundation (ASF). Licensed",
         "        under the Apache License, Version 2.0.",
         "        See <http://www.apache.org/licenses/LICENSE-2.0> for the details.",
