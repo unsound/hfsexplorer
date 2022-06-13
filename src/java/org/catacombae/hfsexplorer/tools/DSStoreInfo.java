@@ -41,6 +41,8 @@ import org.catacombae.util.Util;
  * @author Erik Larsson
  */
 public class DSStoreInfo {
+    private static boolean verbose = false;
+
     private static void hexDump(byte[] data, int dataOffset, int dataSize,
             String insetString)
     {
@@ -412,6 +414,10 @@ public class DSStoreInfo {
         printBinaryPlistValue(plist.getRootEntry(), insetString);
     }
 
+    private static String getOffsetString(long offset) {
+        return verbose ? " @ " + offset : "";
+    }
+
     private static void printTreeBlockRecursive(byte[] dsStoreData,
             DSStoreRootBlock rootBlock, int inset, int blockID)
     {
@@ -442,37 +448,41 @@ public class DSStoreInfo {
         /* Read the records. */
         int curOffset = 4 + (int) dataBlockOffset + 8;
         for(int i = 0; i < recordCount; ++i) {
-            System.out.println(insetString + "    Record " + (i + 1) + ":");
             int childNodeBlockID = 0;
+            System.out.println(insetString + "    Record " + (i + 1) +
+                    getOffsetString(curOffset) + ":");
             if(blockMode != 0x0) {
                 /* "index nodes" have the child node block id prepended to
                  * the record so that we can descend further into the
                  * tree. */
                 childNodeBlockID = Util.readIntBE(dsStoreData, curOffset);
-                System.out.println(insetString + "      Child node block ID: " +
-                        childNodeBlockID);
+                System.out.println(insetString + "      Child node block ID" +
+                        getOffsetString(curOffset) + ": " + childNodeBlockID);
                 curOffset += 4;
             }
 
             int filenameLength = Util.readIntBE(dsStoreData, curOffset);
-            System.out.println(insetString + "      Filename length: " +
-                    filenameLength);
+            System.out.println(insetString + "      Filename length" +
+                    getOffsetString(curOffset) + ": " + filenameLength);
             curOffset += 4;
 
             String filename =
                     Util.readString(dsStoreData, curOffset, filenameLength * 2,
                     "UTF-16BE");
-            System.out.println(insetString + "      Filename: " + filename);
+            System.out.println(insetString + "      Filename" +
+                    getOffsetString(curOffset) + ": " + filename);
             curOffset += filenameLength * 2;
 
             int structID = Util.readIntBE(dsStoreData, curOffset);
-            System.out.println(insetString + "      Structure ID: " +
+            System.out.println(insetString + "      Structure ID" +
+                    getOffsetString(curOffset) + ": " +
                     Util.toASCIIString(structID) + " " +
                     "(0x" + Util.toHexStringBE(structID) + ")");
             curOffset += 4;
 
             int structType = Util.readIntBE(dsStoreData, curOffset);
-            System.out.println(insetString + "      Structure type: " +
+            System.out.println(insetString + "      Structure type" +
+                    getOffsetString(curOffset) + ": " +
                     Util.toASCIIString(structType) + " " +
                     "(0x" + Util.toHexStringBE(structType) + ")");
             curOffset += 4;
@@ -480,32 +490,37 @@ public class DSStoreInfo {
             if(Util.toASCIIString(structType).equals("long")) {
                 /* A long is a 4 byte (32-bit) big-endian integer. */
                 int value = Util.readIntBE(dsStoreData, curOffset);
-                System.out.println(insetString + "      Value: " + value + " " +
-                        "/ 0x" + Util.toHexStringBE(value));
+                System.out.println(insetString + "      Value" +
+                        getOffsetString(curOffset) + ": " + value + " " + "/ " +
+                        "0x" + Util.toHexStringBE(value));
                 curOffset += 4;
             }
             else if(Util.toASCIIString(structType).equals("shor")) {
                 /* A long is a 2 byte (16-bit) big-endian integer, padded to 4
                  * bytes. */
                 short padding = Util.readShortBE(dsStoreData, curOffset);
-                System.out.println(insetString + "      Padding: " + padding +
-                        " / 0x" + Util.toHexStringBE(padding));
+                System.out.println(insetString + "      Padding" +
+                        getOffsetString(curOffset) + ": " + padding + " / " +
+                        "0x" + Util.toHexStringBE(padding));
                 curOffset += 2;
 
                 short value = Util.readShortBE(dsStoreData, curOffset);
-                System.out.println(insetString + "      Value: " + value + " " +
-                        "/ 0x" + Util.toHexStringBE(value));
+                System.out.println(insetString + "      Value" +
+                        getOffsetString(curOffset) + ": " + value + " / " +
+                        "0x" + Util.toHexStringBE(value));
                 curOffset += 2;
             }
             else if(Util.toASCIIString(structType).equals("blob")) {
                 /* A blob has a size (32 bits) followed by variable-size binary
                  * data. */
                 int blobSize = Util.readIntBE(dsStoreData, curOffset);
-                System.out.println(insetString + "      Blob size: " +
+                System.out.println(insetString + "      Blob size" +
+                        getOffsetString(curOffset) + ": " +
                         blobSize);
                 curOffset += 4;
 
-                System.out.println(insetString + "      Blob data:");
+                System.out.println(insetString + "      Blob data" +
+                        getOffsetString(curOffset) + ":");
                 hexDump(dsStoreData, curOffset, blobSize,
                         insetString + "        ");
 
@@ -697,8 +712,9 @@ public class DSStoreInfo {
                     if(iconLabelPosition != null) {
                         System.out.println(insetString + "        Icon label " +
                                 "position: '" +
-                                Util.toASCIIString(iconLabelPosition) + "' (0x" +
-                                Util.toHexStringBE(iconLabelPosition) + ")");
+                                Util.toASCIIString(iconLabelPosition) + "' " +
+                                "(0x" + Util.toHexStringBE(iconLabelPosition) +
+                                ")");
                     }
                     if(flags != null) {
                         System.out.println(insetString + "        Flags: 0x" +
@@ -719,28 +735,32 @@ public class DSStoreInfo {
             else if(Util.toASCIIString(structType).equals("type")) {
                 /* A long is a 4 byte (32-bit) big-endian integer. */
                 int value = Util.readIntBE(dsStoreData, curOffset);
-                System.out.println(insetString + "      Value: '" +
+                System.out.println(insetString + "      Value" +
+                        getOffsetString(curOffset) + ": '" +
                         Util.toASCIIString(value) + "'");
                 curOffset += 4;
             }
             else if(Util.toASCIIString(structType).equals("ustr")) {
                 /* A long is a 4 byte (32-bit) big-endian integer. */
                 int length = Util.readIntBE(dsStoreData, curOffset);
-                System.out.println(insetString + "      String length: " +
-                        length + " / 0x" + Util.toHexStringBE(length));
+                System.out.println(insetString + "      String length" +
+                        getOffsetString(curOffset) + ": " + length + " / " +
+                        "0x" + Util.toHexStringBE(length));
                 curOffset += 4;
 
                 String string =
                         Util.readString(dsStoreData, curOffset, length * 2,
                         "UTF-16BE");
-                System.out.println(insetString + "      String: " + string);
+                System.out.println(insetString + "      String" +
+                        getOffsetString(curOffset) + ": " + string);
                 curOffset += length * 2;
             }
             else if(Util.toASCIIString(structType).equals("comp")) {
                 /* A comp is an 8 byte (64-bit) big-endian integer. */
                 long value = Util.readLongBE(dsStoreData, curOffset);
-                System.out.println(insetString + "      Value: " + value + " " +
-                        "/ 0x" + Util.toHexStringBE(value));
+                System.out.println(insetString + "      Value" +
+                        getOffsetString(curOffset) + ": " + value + " " + "/ " +
+                        "0x" + Util.toHexStringBE(value));
                 curOffset += 8;
             }
             else if(Util.toASCIIString(structType).equals("dutc")) {
@@ -748,15 +768,17 @@ public class DSStoreInfo {
                  * second intervals since 1904 (start of the pre-UNIX Mac OS
                  * epoch). */
                 long value = Util.readLongBE(dsStoreData, curOffset);
-                System.out.println(insetString + "      Timestamp: " + value +
+                System.out.println(insetString + "      Timestamp" +
+                        getOffsetString(curOffset) + ": " + value +
                         " / 0x" + Util.toHexStringBE(value));
                 curOffset += 8;
             }
             else if(Util.toASCIIString(structType).equals("bool")) {
                 /* A bool is a one-byte boolean value expected to be 0 or 1. */
                 byte value = dsStoreData[curOffset];
-                System.out.println(insetString + "      Value: " + value +
-                        " / 0x" + Util.toHexStringBE((byte) value));
+                System.out.println(insetString + "      Value" +
+                        getOffsetString(curOffset) + ": " + value + " / " +
+                        "0x" + Util.toHexStringBE((byte) value));
                 curOffset += 1;
             }
             else {
@@ -779,15 +801,23 @@ public class DSStoreInfo {
     public static void main(String[] args) {
         final RandomAccessFile dsStoreFile;
         final byte[] dsStoreData;
+        final String filename;
 
-        if(args.length < 1) {
+        if(args.length == 2 && args[0].equals("-v")) {
+            verbose = true;
+            filename = args[1];
+        }
+        else if(args.length == 1) {
+            filename = args[0];
+        }
+        else {
             System.err.println("usage: DSStoreInfo <file>");
             System.exit(1);
             return;
         }
 
         try {
-            dsStoreFile = new RandomAccessFile(args[0], "r");
+            dsStoreFile = new RandomAccessFile(filename, "r");
         } catch(IOException e) {
             System.err.println("Error while opening .DS_Store file: " +
                     e.getMessage());
