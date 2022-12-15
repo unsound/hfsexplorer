@@ -120,7 +120,9 @@ public class EntryDescriptor {
     public int getEntryLength() { return Util.readIntBE(entryLength); }
 
     public void printFields(PrintStream ps, String prefix) {
-	ps.println(prefix + " entryId: " + getEntryId());
+        String entryIdString = entryIdToString(getEntryId());
+        ps.println(prefix + " entryId: " + getEntryId() +
+                (entryIdString != null ? " (" + entryIdString + ")" : ""));
 	ps.println(prefix + " entryOffset: " + getEntryOffset());
 	ps.println(prefix + " entryLength: " + getEntryLength());
     }
@@ -137,5 +139,27 @@ public class EntryDescriptor {
 	System.arraycopy(entryOffset, 0, result, offset, entryOffset.length); offset += entryOffset.length;
 	System.arraycopy(entryLength, 0, result, offset, entryLength.length); offset += entryLength.length;
 	return result;
+    }
+
+    private static String entryIdToString(int entryId)
+    {
+        switch(entryId) {
+        case ENTRY_ID_DATA: return "ENTRY_ID_DATA";
+        case ENTRY_ID_RESOURCE: return "ENTRY_ID_RESOURCE";
+        case ENTRY_ID_REALNAME: return "ENTRY_ID_REALNAME";
+        case ENTRY_ID_COMMENT: return "ENTRY_ID_COMMENT";
+        case ENTRY_ID_ICONBW: return "ENTRY_ID_ICONBW";
+        case ENTRY_ID_ICONCOLOR: return "ENTRY_ID_ICONCOLOR";
+        case ENTRY_ID_UNUSED: return "ENTRY_ID_UNUSED";
+        case ENTRY_ID_FILEDATES: return "ENTRY_ID_FILEDATES";
+        case ENTRY_ID_FINDERINFO: return "ENTRY_ID_FINDERINFO";
+        case ENTRY_ID_MACINFO: return "ENTRY_ID_MACINFO";
+        case ENTRY_ID_PRODOSINFO: return "ENTRY_ID_PRODOSINFO";
+        case ENTRY_ID_MSDOSINFO: return "ENTRY_ID_MSDOSINFO";
+        case ENTRY_ID_AFPNAME: return "ENTRY_ID_AFPNAME";
+        case ENTRY_ID_AFPINFO: return "ENTRY_ID_AFPINFO";
+        case ENTRY_ID_AFPDIRID: return "ENTRY_ID_AFPDIRID";
+        default: return null;
+        }
     }
 }
