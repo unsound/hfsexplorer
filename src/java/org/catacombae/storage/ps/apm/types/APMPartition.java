@@ -76,7 +76,7 @@ public class APMPartition implements Partition {
     private final byte[] pmBootEntry2 = new byte[4];
     private final byte[] pmBootCksum = new byte[4];
     private final byte[] pmProcessor = new byte[16];
-    private final byte[] pmPad = new byte[2*188];
+    private final byte[] pmPad;
 
     private final int blockSize;
 
@@ -99,7 +99,8 @@ public class APMPartition implements Partition {
         System.arraycopy(data, offset + 112, pmBootEntry2, 0, 4);
         System.arraycopy(data, offset + 116, pmBootCksum, 0, 4);
         System.arraycopy(data, offset + 120, pmProcessor, 0, 16);
-        System.arraycopy(data, offset + 136, pmPad, 0, 2 * 188);
+        pmPad = new byte[blockSize - 136];
+        System.arraycopy(data, offset + 136, pmPad, 0, blockSize - 136);
 
         this.blockSize = blockSize;
     }
@@ -199,12 +200,14 @@ public class APMPartition implements Partition {
         Util.arrayPutBE(pmBootEntry2, 0, (int) 0);
         Util.arrayPutBE(pmBootCksum, 0, (int) 0);
         Arrays.fill(pmProcessor, (byte) 0);
+        pmPad = new byte[blockSize - 136];
         Arrays.fill(pmPad, (byte) 0);
 
         this.blockSize = blockSize;
     }
 
-    public static int structSize() { return 512; }
+    public int size() { return blockSize; }
+
     // Defined in Partition
     public long getStartOffset() {
         return (getPmPyPartStart() + getPmLgDataStart()) * blockSize;
@@ -424,8 +427,9 @@ public class APMPartition implements Partition {
     }
 
     public byte[] getData() {
-        byte[] result = new byte[structSize()];
+        byte[] result = new byte[size()];
         int offset = 0;
+
         System.arraycopy(pmSig, 0, result, offset, pmSig.length); offset += pmSig.length;
         System.arraycopy(pmSigPad, 0, result, offset, pmSigPad.length); offset += pmSigPad.length;
         System.arraycopy(pmMapBlkCnt, 0, result, offset, pmMapBlkCnt.length); offset += pmMapBlkCnt.length;
@@ -445,7 +449,7 @@ public class APMPartition implements Partition {
         System.arraycopy(pmBootCksum, 0, result, offset, pmBootCksum.length); offset += pmBootCksum.length;
         System.arraycopy(pmProcessor, 0, result, offset, pmProcessor.length); offset += pmProcessor.length;
         System.arraycopy(pmPad, 0, result, offset, pmPad.length); offset += pmPad.length;
-	       //System.arraycopy(, 0, result, offset, .length); offset += .length;
+
         if(offset != result.length)
             throw new RuntimeException("Internal miscalculation...");
         else

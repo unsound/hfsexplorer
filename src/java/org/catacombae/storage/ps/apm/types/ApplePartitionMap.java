@@ -128,7 +128,9 @@ public class ApplePartitionMap implements PartitionSystem {
     }
 
     public byte[] getData() {
-        byte[] result = new byte[partitions.length * APMPartition.structSize()];
+        byte[] result =
+                new byte[(partitions != null && partitions.length != 0) ?
+                partitions.length * partitions[0].size() : 0];
         int offset = 0;
         for(APMPartition ap : partitions) {
             byte[] tmp = ap.getData();
