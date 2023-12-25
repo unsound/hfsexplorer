@@ -103,7 +103,7 @@ public class AppleSingleBuilder {
         MACOS_X("Mac OS X"),
         PRODOS("ProDOS"),
         MS_DOS("MS-DOS"),
-        UNIS("Unix"),
+        UNIX("Unix"),
         VMS("VAX VMS");
 
         private final String identifier;
