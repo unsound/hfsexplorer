@@ -55,7 +55,7 @@ public class ApplePartitionMap implements PartitionSystem {
             if(p.isValid()) {
                 short curPmSig = p.getPmSig();
                 short curPmSigPad = p.getPmSigPad();
-                long curPmMapBlkCnt = Util.unsign(p.getPmMapBlkCnt());
+                long curPmMapBlkCnt = p.getPmMapBlkCnt();
 
                 if(pmMapBlkCnt != null && pmSigPad != null && pmSig != null) {
                     if(curPmSig != pmSig || curPmSigPad != pmSigPad || curPmMapBlkCnt != pmMapBlkCnt)
