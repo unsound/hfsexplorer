@@ -17,6 +17,8 @@
 
 package org.catacombae.hfsexplorer.testcode;
 
+import org.catacombae.hfs.types.finder.ExtendedFileInfo;
+import org.catacombae.hfs.types.finder.FileInfo;
 import org.catacombae.hfsexplorer.fs.AppleSingleHandler;
 import org.catacombae.hfsexplorer.types.applesingle.AttributeEntry;
 import org.catacombae.hfsexplorer.types.applesingle.AttributeHeader;
@@ -44,6 +46,23 @@ public class AppleSingleDebug {
                 ed.print(System.out, "  ");
 
                 if(ed.getEntryId() == EntryDescriptor.ENTRY_ID_FINDERINFO &&
+                        ed.getEntryLength() >= 32)
+                {
+                    final byte[] finderInfoData = new byte[32];
+                    final int entryOffset = ed.getEntryOffset();
+
+                    is.seek(entryOffset);
+                    is.readFully(finderInfoData);
+
+                    FileInfo fi = new FileInfo(finderInfoData, 0);
+                    ExtendedFileInfo ei =
+                            new ExtendedFileInfo(finderInfoData, 16);
+                    System.out.println("    Finder info:");
+                    fi.print(System.out, "     ");
+                    ei.print(System.out, "     ");
+                }
+
+                if(ed.getEntryId() == EntryDescriptor.ENTRY_ID_FINDERINFO &&
                         ed.getEntryLength() >
                         (32 + 2 + AttributeHeader.STRUCTSIZE))
                 {
@@ -66,7 +85,7 @@ public class AppleSingleDebug {
                                     curOffset);
 
                             System.out.println("    Attribute entry " +
-                                    (i + 1) + ":");
+                                    (i + 1) + " @ " + (entryOffset + curOffset) + ":");
                             ae.print(System.out, "     ");
 
                             int nextOffset = curOffset + ae.occupiedSize();
