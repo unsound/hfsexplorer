@@ -42,7 +42,8 @@ public class AppleSingleDebug {
 
             int i = 0;
             for(EntryDescriptor ed : handler.getEntryDescriptors()) {
-                System.out.println("EntryDescriptor[" + i++ +"]:");
+                System.out.println("EntryDescriptor[" + i++ +"] @ " +
+                        ed.getEntryOffset() + ":");
                 ed.print(System.out, "  ");
 
                 if(ed.getEntryId() == EntryDescriptor.ENTRY_ID_FINDERINFO &&
@@ -75,7 +76,9 @@ public class AppleSingleDebug {
                     final AttributeHeader header =
                             new AttributeHeader(finderInfoData, 32 + 2);
                     if(header.getMagic() == AttributeHeader.MAGIC) {
-                        header.print(System.out, "    ");
+                        System.out.println("    Attribute header @ " +
+                                (entryOffset + 32 + 2) + ":");
+                        header.printFields(System.out, "     ");
 
                         final int numAttrs = header.getNumAttrs();
                         int curOffset = 32 + 2 + AttributeHeader.STRUCTSIZE;
