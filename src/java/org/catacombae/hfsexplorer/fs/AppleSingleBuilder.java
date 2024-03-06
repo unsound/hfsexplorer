@@ -472,11 +472,12 @@ public class AppleSingleBuilder {
                     if(remainder != 0) {
                         if(data != null) {
                             Arrays.fill(data, offset + finderInfoDataSize,
-                                    offset + finderInfoDataSize + remainder,
+                                    offset + finderInfoDataSize +
+                                            (4 - remainder),
                                     (byte) 0);
                         }
 
-                        finderInfoDataSize += remainder;
+                        finderInfoDataSize += 4 - remainder;
                     }
 
                     if(data != null) {
