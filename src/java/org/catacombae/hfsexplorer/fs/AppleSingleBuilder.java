@@ -566,11 +566,6 @@ public class AppleSingleBuilder {
                     }
 
                     finderInfoDataSize += content.length;
-                    if(((fileOffset + finderInfoDataSize) % 4) != 0) {
-                        /* Align end of attribute data. */
-                        finderInfoDataSize +=
-                                4 - ((fileOffset + finderInfoDataSize) % 4);
-                    }
                 }
             }
 
