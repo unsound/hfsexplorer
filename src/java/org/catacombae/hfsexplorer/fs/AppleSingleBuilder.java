@@ -498,9 +498,14 @@ public class AppleSingleBuilder {
                             (fileOffset + finderInfoDataSize) + ").");
                 }
 
+                if(((fileOffset + finderInfoDataSize) & 0x3) != 0) {
+                    /* Align end of attribute entry list. */
+                    finderInfoDataSize +=
+                            4 - ((fileOffset + finderInfoDataSize) & 0x3);
+                }
+
                 final int extendedAttributesDataStart =
                         (int) (fileOffset + finderInfoDataSize);
-                int curDataOffset = finderInfoDataSize;
 
                 /* Write out attribute header. */
                 if(data != null) {
@@ -524,8 +529,18 @@ public class AppleSingleBuilder {
                         final byte[] name = attributeData.getA();
 
                         final AttributeEntry entry = new AttributeEntry(
-                                curDataOffset, content.length, (short) 0, name,
-                                0, (short) name.length);
+                                /* long offset */
+                                fileOffset + finderInfoDataSize,
+                                /* long length */
+                                content.length,
+                                /* short flags */
+                                (short) 0,
+                                /* byte[] name */
+                                name,
+                                /* int nameOffset */
+                                0,
+                                /* short nameLength */
+                                (short) name.length);
                         final byte[] entryData = entry.getBytes();
 
                         /* Write out entry header. */
@@ -538,6 +553,11 @@ public class AppleSingleBuilder {
                     }
 
                     finderInfoDataSize += content.length;
+                    if(((fileOffset + finderInfoDataSize) % 4) != 0) {
+                        /* Align end of attribute data. */
+                        finderInfoDataSize +=
+                                4 - ((fileOffset + finderInfoDataSize) % 4);
+                    }
                 }
             }
 
