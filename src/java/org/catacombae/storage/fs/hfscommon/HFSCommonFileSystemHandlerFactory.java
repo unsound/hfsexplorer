@@ -22,7 +22,7 @@ import org.catacombae.storage.fs.FileSystemHandlerFactory;
 /**
  * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
-public abstract class HFSCommonFileSystemHandlerFactory  extends FileSystemHandlerFactory {
+public abstract class HFSCommonFileSystemHandlerFactory extends FileSystemHandlerFactory {
     protected static final CustomAttribute posixFilenamesAttribute =
             createCustomAttribute(AttributeType.BOOLEAN, "POSIX_FILENAMES",
                     "Controls whether filenames should be translated from " +
