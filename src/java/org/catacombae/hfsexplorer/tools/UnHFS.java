@@ -17,7 +17,6 @@
 
 package org.catacombae.hfsexplorer.tools;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -190,8 +189,8 @@ public class UnHFS {
                     try {
                         partitionNumber = Integer.parseInt(args[++i]);
                     } catch(NumberFormatException nfe) {
-                        System.err.println("Error: Invalid partition number \"" +
-                                args[i] + "\"!");
+                        System.err.println("Error: Invalid partition number " +
+                                "\"" + args[i] + "\"!");
                         printUsage(System.err);
                         System.exit(1);
                     }
@@ -286,14 +285,16 @@ public class UnHFS {
         if(!inputFile.isDirectory() &&
                 !(inputFile.exists() && inputFile.canRead()))
         {
-            System.err.println("Error: Input file \"" + inputFilename + "\" can not be read!");
+            System.err.println("Error: Input file \"" + inputFilename + "\" " +
+                    "can not be read!");
             printUsage(System.err);
             System.exit(1);
         }
 
         File outputDir = new File(outputDirname);
         if(!(outputDir.exists() && outputDir.isDirectory())) {
-            System.err.println("Error: Invalid output directory \"" + outputDirname + "\"!");
+            System.err.println("Error: Invalid output directory \"" +
+                    outputDirname + "\"!");
             printUsage(System.err);
             System.exit(1);
         }
