@@ -19,6 +19,7 @@ package org.catacombae.hfsexplorer;
 
 import java.awt.Component;
 import java.io.File;
+import java.io.IOException;
 import javax.swing.JOptionPane;
 import org.catacombae.hfsexplorer.ExtractProgressMonitor.DirectoryExistsAction;
 import org.catacombae.hfsexplorer.ExtractProgressMonitor.ExtractProperties;
@@ -37,6 +38,13 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
     /* @Override */
     public ExtractProperties getExtractProperties() {
         return extractProperties;
+    }
+
+    /**
+     * @see #confirmCreateDirectory(java.awt.Component, java.io.File)
+     */
+    public boolean confirmCreateDirectory(File dir) {
+        return confirmCreateDirectory(parentComponent, dir);
     }
 
     /*
@@ -130,10 +138,21 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
      * java.lang.Throwable)
      */
     /* @Override */
-    public UnhandledExceptionAction unhandledException(String filename,
-            Throwable t)
+    public UnhandledExceptionAction unhandledException(
+            final String filename,
+            final Throwable t,
+            final String actionDescription)
     {
-        return unhandledException(parentComponent, filename, t);
+        return unhandledException(parentComponent, filename, t,
+                actionDescription);
+    }
+
+    /**
+     * @see #errorMessage(java.awt.Component, java.lang.String)
+     */
+    /* @Override */
+    public void errorMessage(String message) {
+        errorMessage(parentComponent, message);
     }
 
     /**
@@ -143,6 +162,43 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
     /* @Override */
     public String displayRenamePrompt(String currentName, File outDir) {
         return displayRenamePrompt(parentComponent, currentName, outDir);
+    }
+
+    /**
+     * @see #displayIoErrorPrompt(java.awt.Component, java.lang.String,
+     * java.io.File, java.io.IOException)
+     */
+    /* @Override */
+    public boolean displayIoErrorPrompt(String fileName, File outDir,
+            IOException ioe)
+    {
+        return displayIoErrorPrompt(parentComponent, fileName, outDir, ioe);
+    }
+
+    /**
+     * Default Swing implementation of a "Do you want to create this directory?"
+     * user prompt.<br>
+     * Returns <code>true</code> if the directory should be created, and
+     * <code>false</code> if not.
+     *
+     * @param parentComponent the parent component of the user prompt dialog
+     * box.
+     * @param dir
+     *      the currently non-existent directory that we are asking to create.
+     * @return <code>true</code> if we should create this directory and
+     * <code>false</code> if not.
+     */
+    public static boolean confirmCreateDirectory(Component parentComponent,
+            File dir)
+    {
+        final String[] options = new String[] { "Create directory", "Cancel" };
+        int reply = JOptionPane.showOptionDialog(parentComponent,
+                "Target directory:\n" +
+                "    \"" + dir.getAbsolutePath() + "\"\n" +
+                "does not exist. Do you want to create this directory?",
+                "Warning", JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+        return (reply == 0);
     }
 
     /**
@@ -319,10 +375,15 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
      * box.
      * @param filename the name of the file that is currently being extracted.
      * @param t the unhandled exception.
+     * @param actionDescription
+     *      a description of the ongoing action, e.g. "extracting file".
      * @return one of CONTINUE, ALWAYS_CONTINUE or ABORT.
      */
     public static UnhandledExceptionAction unhandledException(
-            Component parentComponent, String filename, Throwable t)
+            final Component parentComponent,
+            final String filename,
+            final Throwable t,
+            final String actionDescription)
     {
         String[] options = new String[] {
             "Continue",
@@ -330,8 +391,8 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
             "Abort",
         };
 
-        String message = "An exception occurred while extracting " +
-                "\"" + filename + "\"!";
+        String message =
+                "An exception occurred while " + actionDescription + "!";
         message += "\n  " + t.toString();
         for(StackTraceElement ste : t.getStackTrace()) {
             message += "\n    " + ste.toString();
@@ -365,6 +426,19 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
     }
 
     /**
+     * Default Swing implementation of an error message dialog.
+     *
+     * @param parentComponent the parent component of the user prompt dialog
+     * box.
+     * @param message the error message.
+     */
+    public static void errorMessage(Component parentComponent, String message) {
+        JOptionPane.showMessageDialog(parentComponent, message, "Error",
+                JOptionPane.ERROR_MESSAGE);
+
+    }
+
+    /**
      * Default Swing implementation of a rename file prompt.<br>
      * If the user aborted the prompt, this method will return
      * <code>null</code>. Otherwise, it will return the string that the user
@@ -387,5 +461,35 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
             return selection.toString();
         else
             return null;
+    }
+
+    /**
+     * Default Swing implementation of a confirmation prompt on I/O error.<br>
+     * Returns <code>true</code> if extraction should continue and
+     * <code>false</code> if it should be aborted.
+     *
+     * @param parentComponent the parent component of the user prompt dialog
+     * box.
+     * @param fileName the name of the file that was being extracted.
+     * @param outDir the directory where the file was being written.
+     * @param ioe the I/O exception that occurred.
+     * @return a new file name, or <code>null</code> if the user canceled the
+     * dialog.
+     */
+    public static boolean displayIoErrorPrompt(Component parentComponent,
+            String fileName, File outDir, IOException ioe)
+    {
+        String exceptionMessage = ioe.getMessage();
+        int reply = JOptionPane.showConfirmDialog(parentComponent,
+                "Encountered an I/O exception while attempting to write to " +
+                "file \"" + fileName + "\" in folder:\n" +
+                "  " + outDir.getAbsolutePath() + "\n" +
+                (exceptionMessage != null ? "System message: " +
+                "\"" + exceptionMessage + "\"\n" : "") +
+                "Do you want to continue?",
+                "I/O Error",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.ERROR_MESSAGE);
+        return (reply != JOptionPane.NO_OPTION);
     }
 }

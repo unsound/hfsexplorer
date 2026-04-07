@@ -18,6 +18,7 @@
 package org.catacombae.hfsexplorer;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import org.catacombae.hfs.ProgressMonitor;
 
@@ -31,15 +32,21 @@ public interface ExtractProgressMonitor extends ProgressMonitor {
     public void updateCurrentDir(String dirname);
     public void updateCurrentFile(String filename, long fileSize);
     public void setDataSize(long totalSize);
+    public boolean confirmCreateDirectory(File dir);
     //public boolean confirmOverwriteDirectory(File dir);
     //public boolean confirmSkipDirectory(String... messageLines);
     public CreateDirectoryFailedAction createDirectoryFailed(String dirname, File parentDirectory);
     public CreateFileFailedAction createFileFailed(String filename, File parentDirectory);
     public DirectoryExistsAction directoryExists(File directory);
     public FileExistsAction fileExists(File file);
-    public UnhandledExceptionAction unhandledException(String filename,
-            Throwable t);
+    public UnhandledExceptionAction unhandledException(
+            String filename,
+            Throwable t,
+            String actionDescription);
+    public void errorMessage(String message);
     public String displayRenamePrompt(String currentName, File outDir);
+    public boolean displayIoErrorPrompt(String fileName, File outDir,
+            IOException ioe);
     public ExtractProperties getExtractProperties();
 
     public static interface ExtractPropertiesListener {
@@ -133,6 +140,7 @@ public interface ExtractProgressMonitor extends ProgressMonitor {
     public static enum FileExistsAction { PROMPT_USER, SKIP_FILE, SKIP_DIRECTORY, OVERWRITE, OVERWRITE_ALL, RENAME, AUTO_RENAME, CANCEL }
     public static enum UnhandledExceptionAction {
         PROMPT_USER,
+        HANDLED,
         CONTINUE,
         ALWAYS_CONTINUE,
         ABORT,

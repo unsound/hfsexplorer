@@ -23,6 +23,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -143,6 +144,12 @@ public class ExtractProgressDialog extends JDialog implements ExtractProgressMon
     }
 
     /* @Override */
+    public boolean confirmCreateDirectory(File dir)
+    {
+        return SimpleGUIProgressMonitor.confirmCreateDirectory(this, dir);
+    }
+
+    /* @Override */
     public void setDataSize(long totalSize) {
         this.totalSize = totalSize;
         addDataProgress(0);
@@ -189,15 +196,31 @@ public class ExtractProgressDialog extends JDialog implements ExtractProgressMon
     }
 
     /* @Override */
-    public UnhandledExceptionAction unhandledException(String filename,
-            Throwable t)
+    public UnhandledExceptionAction unhandledException(
+            final String filename,
+            final Throwable t,
+            final String actionDescription)
     {
-        return SimpleGUIProgressMonitor.unhandledException(this, filename, t);
+        return SimpleGUIProgressMonitor.unhandledException(this, filename, t,
+                actionDescription);
+    }
+
+    /* @Override */
+    public void errorMessage(String message) {
+        SimpleGUIProgressMonitor.errorMessage(this, message);
     }
 
     /* @Override */
     public String displayRenamePrompt(String currentName, File outDir) {
         return SimpleGUIProgressMonitor.displayRenamePrompt(this, currentName, outDir);
+    }
+
+    /* @Override */
+    public boolean displayIoErrorPrompt(String fileName, File outDir,
+            IOException ioe)
+    {
+        return SimpleGUIProgressMonitor.displayIoErrorPrompt(this, fileName,
+                outDir, ioe);
     }
 
     /* @Override */
