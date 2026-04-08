@@ -73,6 +73,9 @@ public class UnHFS {
      * @param ps the PrintStream to print usage instruction to.
      */
     private static void printUsage(PrintStream ps) {
+        final char SHORT_ARG_PREFIX = '-';
+        final String LONG_ARG_PREFIX = "-";
+
         //     80 <-------------------------------------------------------------------------------->
         ps.println("unhfs " + HFSExplorer.VERSION);
         ps.println(HFSExplorer.COPYRIGHT.replaceAll("\u00A9", "(C)"));
@@ -83,40 +86,46 @@ public class UnHFS {
         ps.println("usage: unhfs [options...] <input file>");
         ps.println("  Input file can be in raw, UDIF (.dmg) and/or encrypted format.");
         ps.println("  Options:");
-        ps.println("    -o <output dir>");
+        ps.println("    " + SHORT_ARG_PREFIX + "o <output dir>");
         ps.println("      The target directory in the local file system where all extracted files");
         ps.println("      should go.");
         ps.println("      When this option is omitted, all files go to the currect working");
         ps.println("      directory.");
-        ps.println("    -fsroot <path to extract>");
+        ps.println("    " + LONG_ARG_PREFIX + "fsroot <path to extract>");
         ps.println("      A POSIX path in the HFS file system that should be extracted.");
         ps.println("      Example which extracts all the contents of joe's user dir from a backup");
         ps.println("      disk image to the current directory:");
         ps.println("        unhfs -o . -fsroot /Users/joe FullBackup.dmg");
         ps.println("      When this option is omitted, all the contents of the file system is");
         ps.println("      extracted.");
-        ps.println("    -create");
+        ps.println("    " + LONG_ARG_PREFIX + "create");
         ps.println("      If the -fsroot path refers to a folder, create that folder inside");
         ps.println("      the output directory, rather than extracting into the output directory");
         ps.println("      itself.");
-        ps.println("    -resforks NONE|APPLEDOUBLE");
+        ps.println("    " + LONG_ARG_PREFIX + "resforks NONE|APPLEDOUBLE");
         ps.println("      Determines whether resource forks should be extracted, and in what");
         ps.println("      format. Currently only the APPLEDOUBLE format, which puts each resource");
         ps.println("      fork in its own file with the '._' prefix, is supported.");
         ps.println("      When this option is omitted, no resource forks are extracted.");
-        ps.println("    -partition <partition number>");
+        ps.println("    " + LONG_ARG_PREFIX + "partition <partition number>");
         ps.println("      If the input file is partitioned, extracts files from the specified HFS");
         ps.println("      partition. Partitions are numbered from 0 and up.");
         ps.println("      When this options is omitted, the application chooses the first");
         ps.println("      available HFS partition.");
-        ps.println("    -password <password>");
+        ps.println("    " + LONG_ARG_PREFIX + "password <password>");
         ps.println("      Specifies the password for an encrypted image. The special marker \"-\" ");
         ps.println("      causes the password to be read from stdin.");
-        ps.println("    -sfm-substitutions");
+        ps.println("    " + LONG_ARG_PREFIX + "sfm-substitutions");
         ps.println("      Translates the filenames to a format that is more compatible with Windows");
-        ps.println("      filesystems, using the translation scheme that was used by the now defunct");
-        ps.println("      Services for Mac component in Windows Server.");
-        ps.println("    -v");
+        ps.println("      filesystems, using the translation scheme that was used by the now");
+        ps.println("      defunct Services for Mac component in Windows Server.");
+        ps.println("    " + LONG_ARG_PREFIX + "auto-rename");
+        ps.println("      Auto-rename files with names that cannot be represented in the target");
+        ps.println("      filesystem.");
+        ps.println("      Combine this with '-sfm-substitutions' when extracting to a Windows");
+        ps.println("      filesystem (e.g. FAT, exFAT, NTFS, ReFS, ...) to preserve as much filename");
+        ps.println("      information as possible while extracting as many files as possible.");
+        ps.println("    " + SHORT_ARG_PREFIX + "v");
         ps.println("      Verbose mode. Prints the POSIX path of every extracted file to stdout.");
         ps.println("    --");
         ps.println("      Signals that there are no more option arguments. Useful for accessing");
@@ -126,7 +135,10 @@ public class UnHFS {
     /**
      * UnHFS entry point. The main method's only responsibility is to parse and
      * validate program arguments. It then passes them on to the static method
-     * unhfs(...), which contains the actual program logic.
+     * {@link #unhfs(java.io.PrintStream,
+     * org.catacombae.io.ReadableRandomAccessStream, java.io.File,
+     * java.lang.String, char[], boolean, boolean, int, boolean, boolean,
+     * boolean)}, which contains the actual program logic.
      *
      * @param args program arguments.
      */
@@ -137,14 +149,48 @@ public class UnHFS {
         boolean extractResourceForks = false;
         boolean verbose = false;
         boolean sfmSubstitutions = false;
+        boolean autoRename = false;
         int partitionNumber = -1; // -1 means search for first supported partition
         char[] password = null;
 
         int i;
         for(i = 0; i < args.length; ++i) {
             String curArg = args[i];
+            char firstChar = curArg.length() > 0 ? curArg.charAt(0) : '\0';
+            char secondChar = curArg.length() > 1 ? curArg.charAt(1) : '\0';
+            String argString;
 
-            if(curArg.equals("-o")) {
+            if(curArg.equals("--")) {
+                ++i;
+                break;
+            }
+
+            if((firstChar == '-' || firstChar == '/') && curArg.length() > 1 &&
+                    secondChar != '-')
+            {
+                argString = curArg.substring(1);
+            }
+            else if(curArg.length() > 3 && secondChar == '-') {
+                argString = curArg.substring(2);
+            }
+            else {
+                /* Not an option argument. Supported ways of specifying options
+                 * are:
+                 * - The Java way, prefixed with a single '-' regardless of
+                 *   whether it's long or short.
+                 * - The Windows way, prefixed with a '/' regardless of whether
+                 *   it's long or short.
+                 * - The Unix way, with short (single character) arguments
+                 *   prefixed by '-' and long (more than one character)
+                 *   arguments prefixed by '--'.
+                 *
+                 * The special token '--' ends argument parsing and allows
+                 * opening a file that has the same name or format as an option
+                 * argument. E.g. to open a file named '--', specify '-- --'. */
+                break;
+            }
+
+            if(argString.equals("o")) {
                 if(i+1 < args.length)
                     outputDirname = args[++i];
                 else {
@@ -152,7 +198,7 @@ public class UnHFS {
                     System.exit(1);
                 }
             }
-            else if(curArg.equals("-fsroot")) {
+            else if(argString.equals("fsroot")) {
                 if(i+1 < args.length)
                     fsRoot = args[++i];
                 else {
@@ -160,10 +206,10 @@ public class UnHFS {
                     System.exit(1);
                 }
             }
-            else if(curArg.equals("-create")) {
+            else if(argString.equals("create")) {
                 extractFolderDirectly = false;
             }
-            else if(curArg.equals("-resforks")) {
+            else if(argString.equals("resforks")) {
                 if(i+1 < args.length) {
                     String value = args[++i];
                     if(value.equalsIgnoreCase("NONE")) {
@@ -184,7 +230,7 @@ public class UnHFS {
                     System.exit(1);
                 }
             }
-            else if(curArg.equals("-partition")) {
+            else if(argString.equals("partition")) {
                 if(i+1 < args.length) {
                     try {
                         partitionNumber = Integer.parseInt(args[++i]);
@@ -200,7 +246,7 @@ public class UnHFS {
                     System.exit(1);
                 }
             }
-            else if(curArg.equals("-password")) {
+            else if(argString.equals("password")) {
                 if(i+1 < args.length) {
                     password = args[++i].toCharArray();
 
@@ -261,15 +307,14 @@ public class UnHFS {
                     System.exit(1);
                 }
             }
-            else if(curArg.equals("-sfm-substitutions")) {
+            else if(argString.equals("sfm-substitutions")) {
                 sfmSubstitutions = true;
             }
-            else if(curArg.equals("-v")) {
-                verbose = true;
+            else if(argString.equals("auto-rename")) {
+                autoRename = true;
             }
-            else if(curArg.equals("--")) {
-                ++i;
-                break;
+            else if(argString.equals("v")) {
+                verbose = true;
             }
             else
                 break;
@@ -309,9 +354,29 @@ public class UnHFS {
             inputStream = new ReadableFileStream(inputFilename);
 
         try {
-            unhfs(System.out, inputStream, outputDir, fsRoot, password,
-                    extractFolderDirectly, extractResourceForks,
-                    partitionNumber, verbose, sfmSubstitutions);
+            unhfs(
+                    /* PrintStream outputStream */
+                    System.out,
+                    /* ReadableRandomAccessStream inFileStream */
+                    inputStream,
+                    /* File outputDir */
+                    outputDir,
+                    /* String fsRoot */
+                    fsRoot,
+                    /* char[] password */
+                    password,
+                    /* boolean extractFolderDirectly */
+                    extractFolderDirectly,
+                    /* boolean extractResourceForks */
+                    extractResourceForks,
+                    /* int partitionNumber */
+                    partitionNumber,
+                    /* boolean verbose */
+                    verbose,
+                    /* boolean sfmSubstitutions */
+                    sfmSubstitutions,
+                    /* boolean autoRename */
+                    autoRename);
             System.exit(0);
         } catch(RuntimeIOException e) {
             System.err.println("Exception while executing main routine:");
@@ -325,12 +390,16 @@ public class UnHFS {
                 new ExtractProperties();
         private final File targetDir;
         private final boolean verbose;
+        private final boolean autoRename;
 
         private String currentDir = null;
 
-        public ProgressMonitor(File targetDir, boolean verbose) {
+        public ProgressMonitor(File targetDir, boolean verbose,
+                boolean autoRename)
+        {
             this.targetDir = targetDir;
             this.verbose = verbose;
+            this.autoRename = autoRename;
         }
 
         public void updateCalculateDir(
@@ -382,7 +451,8 @@ public class UnHFS {
         {
             System.err.println("Failed to create directory " +
                     parentDirectory.getPath() + "/" + dirname + ".");
-            return CreateDirectoryFailedAction.SKIP_DIRECTORY;
+            return autoRename ? CreateDirectoryFailedAction.AUTO_RENAME :
+                CreateDirectoryFailedAction.SKIP_DIRECTORY;
         }
 
         public CreateFileFailedAction createFileFailed(
@@ -391,7 +461,8 @@ public class UnHFS {
         {
             System.err.println("Failed to create directory " +
                     parentDirectory.getPath() + "/" + filename + ".");
-            return CreateFileFailedAction.SKIP_FILE;
+            return autoRename ? CreateFileFailedAction.AUTO_RENAME :
+                CreateFileFailedAction.SKIP_FILE;
         }
 
         public DirectoryExistsAction directoryExists(
@@ -399,7 +470,8 @@ public class UnHFS {
         {
             logDebug("Directory \"" + directory.getPath() + "\" " +
                     "already exists. Continuing anyway...");
-            return DirectoryExistsAction.CONTINUE;
+            return autoRename ? DirectoryExistsAction.AUTO_RENAME :
+                DirectoryExistsAction.CONTINUE;
         }
 
         public FileExistsAction fileExists(
@@ -407,7 +479,8 @@ public class UnHFS {
         {
             logDebug("File \"" + file.getPath() + "\" already " +
                     "exists. Overwriting...");
-            return FileExistsAction.OVERWRITE;
+            return autoRename ? FileExistsAction.AUTO_RENAME :
+                FileExistsAction.OVERWRITE;
         }
 
         public UnhandledExceptionAction unhandledException(
@@ -477,33 +550,64 @@ public class UnHFS {
      * parsing is complete. The routine expects all arguments to be fully parsed
      * and valid.
      *
-     * @param outputStream the PrintStream where all the messages will go
-     * (should normally be System.out).
-     * @param inFileStream the stream containing the file system data.
+     * @param outputStream
+     *      the PrintStream where all the messages will go (should normally be
+     *      {@link System#out}).
+     * @param inFileStream
+     *      the random access stream that the file system data will be read
+     *      from.
      * @param outputDir
+     *      the directory where the specified files and directories will be
+     *      extracted to.
      * @param fsRoot
-     * @param password the password used to unlock an encrypted image.
-     * @param extractFolderDirectly if fsRoot is a folder, extract directly into outputDir?
+     *      the file or directory tree to extract, specified as a POSIX path.
+     * @param password
+     *      the password used to unlock an encrypted image, if any (may be
+     *      <code>NULL</code>).
+     * @param extractFolderDirectly
+     *      if fsRoot is a folder, don't create the folder but extract its
+     *      contents to <code>outputDir</code>.
      * @param extractResourceForks
+     *      extract resource forks and other extended attributes to the target
+     *      filesystem.
      * @param partitionNumber
+     *      the number of the partition to load from <code>inFileStream</code>
+     *      (0 means use the whole device).
      * @param verbose
+     *      print the name of every extracted file and directory.
+     * @param sfmSubstitutions
+     *      map characters incompatible with Windows filesystems to the Unicode
+     *      private range used by Services for Mac.
+     * @param autoRename
+     *      automatically rename files and directories that cannot be created on
+     *      the target filesystem.
      * @throws org.catacombae.io.RuntimeIOException
      */
-    public static void unhfs(PrintStream outputStream,
-            ReadableRandomAccessStream inFileStream, File outputDir,
-            String fsRoot, char[] password, boolean extractFolderDirectly,
-            boolean extractResourceForks, int partitionNumber, boolean verbose,
-            boolean sfmSubstitutions)
-            throws RuntimeIOException
+    public static void unhfs(
+            final PrintStream outputStream,
+            final ReadableRandomAccessStream inFileStream,
+            final File outputDir,
+            final String fsRoot,
+            final char[] password,
+            final boolean extractFolderDirectly,
+            final boolean extractResourceForks,
+            final int partitionNumber,
+            final boolean verbose,
+            final boolean sfmSubstitutions,
+            final boolean autoRename) throws RuntimeIOException
     {
+        ReadableRandomAccessStream stream = inFileStream;
+
         // First detect any outer layers of UDIF and/or encryption.
         logDebug("Trying to detect encrypted structure...");
-        if(ReadableCEncryptedEncodingStream.isCEncryptedEncoding(inFileStream)) {
+        if(ReadableCEncryptedEncodingStream.isCEncryptedEncoding(stream)) {
             if(password != null) {
                 try {
-                    ReadableCEncryptedEncodingStream stream =
-                            new ReadableCEncryptedEncodingStream(inFileStream, password);
-                    inFileStream = stream;
+                    stream = new ReadableCEncryptedEncodingStream(
+                            /* ReadableRandomAccessStream backingStream */
+                            stream,
+                            /* char[] password */
+                            password);
                 } catch(Exception e) {
                     // TODO: Differentiate between exceptions...
                     System.err.println("Incorrect password for encrypted image.");
@@ -517,11 +621,11 @@ public class UnHFS {
         }
 
         logDebug("Trying to detect sparseimage structure...");
-        if(SparseImageRecognizer.isSparseImage(inFileStream)) {
+        if(SparseImageRecognizer.isSparseImage(stream)) {
             try {
-                ReadableSparseImageStream stream =
-                        new ReadableSparseImageStream(inFileStream);
-                inFileStream = stream;
+                stream = new ReadableSparseImageStream(
+                        /* ReadableRandomAccessStream backingStream */
+                        stream);
             } catch(Exception e) {
                 System.err.println("Exception while creating readable " +
                         "sparseimage stream:");
@@ -531,11 +635,11 @@ public class UnHFS {
         }
 
         logDebug("Trying to detect UDIF structure...");
-        if(UDIFDetector.isUDIFEncoded(inFileStream)) {
-            UDIFRandomAccessStream stream = null;
+        if(UDIFDetector.isUDIFEncoded(stream)) {
             try {
-                stream = new UDIFRandomAccessStream(inFileStream);
-                inFileStream = stream;
+                stream = new UDIFRandomAccessStream(
+                        /* ReadableRandomAccessStream stream */
+                        stream);
             } catch(Exception e) {
                 e.printStackTrace();
                 System.err.println("Unhandled exception while trying to load UDIF wrapper.");
@@ -543,7 +647,7 @@ public class UnHFS {
             }
         }
 
-        DataLocator inputDataLocator = new ReadableStreamDataLocator(inFileStream);
+        DataLocator inputDataLocator = new ReadableStreamDataLocator(stream);
 
         PartitionSystemType[] psTypes =
                 PartitionSystemDetector.detectPartitionSystem(inputDataLocator,
@@ -679,7 +783,7 @@ public class UnHFS {
                 /* File outDir */
                 outputDir,
                 /* ExtractProgressMonitor progressMonitor */
-                new ProgressMonitor(outputDir, verbose),
+                new ProgressMonitor(outputDir, verbose, autoRename),
                 /* LinkedList<String> errorMessages */
                 new LinkedList<String>(),
                 /* boolean followSymbolicLinks */
