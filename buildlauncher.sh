@@ -16,6 +16,18 @@ if test -z "$JAVA_HOME"; then
     error
 fi
 
+${TOOLCHAIN_PREFIX}windres -V >/dev/null 2>/dev/null
+if [ $? -eq 0 ]; then
+    WINDRES=${TOOLCHAIN_PREFIX}windres
+else
+    windres -V >/dev/null 2>/dev/null
+    if [ $? -eq 0 ]; then
+	WINDRES=windres
+    else
+	echo "No 'windres' utility found."
+    fi
+fi
+
 if test "$1" = "console"; then
     BUILDTYPE=console
 elif test "$1" = "windows"; then
@@ -36,7 +48,7 @@ fi
 mkdir "${BUILD_DIR}"
 
 echo "Compiling resources..."
-${TOOLCHAIN_PREFIX}windres -I doc/dmg_iconsource "${LAUNCHER_SRC}"/launcher.rc "${BUILD_DIR}"/launcher_res.o
+${WINDRES} -I doc/dmg_iconsource "${LAUNCHER_SRC}"/launcher.rc "${BUILD_DIR}"/launcher_res.o
 if test $? -ne 0; then error; fi
 
 echo "Compiling launcher.cpp..."
