@@ -2,6 +2,26 @@ HFSExplorer Changelog
 ---------------------
 
 
+2026.4.9
+--------
+- Add support for auto-renaming files in the 'unhfs' command line tool.
+
+- Add drag-and-drop support for opening disk images in HFSExplorer.
+
+- Improve handling of the MacJapanese character set on HFS volumes.
+
+- Fix negative offset warning when opening raw devices on macOS/Linux/BSD/...
+
+- Fix overflow when parsing the HFS 'DInfo' struct.
+
+- Fix incorrectly generated AppleDouble ("._") files with extended attributes.
+
+- Fix issues with Apple Partition Map handling on non-512 byte block sizes.
+
+- Fix crash when attempting to register an application handler on macOS using
+  newer Java versions.
+
+
 2021.10.9
 ---------
 - Add support for selecting the character encoding for decoding HFS filenames.
