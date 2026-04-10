@@ -37,6 +37,7 @@ import org.catacombae.io.Readable;
 /**
  * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
+@SuppressWarnings("unchecked")
 public class DisplayTextFilePanel extends javax.swing.JPanel {
     private static final String[] sortingPrefixes =
             new String[] { "US-ASCII", "UTF-8", "ISO-8859", "UTF", "IBM4", "IBM8", "IBM" };

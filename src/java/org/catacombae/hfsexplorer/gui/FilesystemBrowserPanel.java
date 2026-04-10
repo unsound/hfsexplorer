@@ -26,6 +26,7 @@ import org.catacombae.util.Log;
 /**
  * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
+@SuppressWarnings("unchecked")
 public class FilesystemBrowserPanel extends javax.swing.JPanel {
     private static final ImageIcon FORWARD_ICON =
             new ImageIcon(Resources.FORWARD_ICON);

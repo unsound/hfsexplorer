@@ -24,6 +24,7 @@ import javax.swing.table.DefaultTableModel;
 /**
  * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
+@SuppressWarnings("unchecked")
 public class MainPanel extends javax.swing.JPanel {
     private class PartitionTableRow {
         public String number;

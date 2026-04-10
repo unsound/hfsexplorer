@@ -20,6 +20,7 @@ package org.catacombae.hfsexplorer.gui;
 /**
  * @author <a href="https://catacombae.org" target="_top">Erik Larsson</a>
  */
+@SuppressWarnings("unchecked")
 public class SelectDevicePanel extends javax.swing.JPanel {
 
     /** Creates new form SelectWindowsDevicePanel */

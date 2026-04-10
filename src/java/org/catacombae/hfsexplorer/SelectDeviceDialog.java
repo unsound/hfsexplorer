@@ -192,6 +192,7 @@ public abstract class SelectDeviceDialog extends JDialog {
         setResizable(false);
     }
 
+    @SuppressWarnings("unchecked")
     private void refreshDevices() {
         long refreshTimestamp = System.currentTimeMillis();
         if(refreshTimestamp - lastRefreshTimestamp < 100) {
