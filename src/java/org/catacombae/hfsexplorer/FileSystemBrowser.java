@@ -962,8 +962,10 @@ public class FileSystemBrowser<A> implements Resources {
         }
         //System.err.println("nodesWereInserted: " + insertedRecordIndicesArray.length);
         if(insertedRecordIndicesArray.length > 0) {
-            treeModel.nodesWereInserted(nodeToPopulate, insertedRecordIndicesArray);        // 1. Remove those nodes that should be removed
+            treeModel.nodesWereInserted(nodeToPopulate, insertedRecordIndicesArray);
         }
+
+        // 1. Remove those nodes that should be removed
         {
             FolderTreeNode[] removedChildren = new FolderTreeNode[nodesToRemove.size()];
             int[] removedIndices = new int[removedChildren.length];
