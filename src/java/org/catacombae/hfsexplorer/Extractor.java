@@ -1743,7 +1743,7 @@ public class Extractor {
                         false);
             }
 
-            if(extractAdditionalForks) {
+            if(extractAdditionalForks && !pm.cancelSignaled()) {
                 extractEntry(
                         /* FSEntry rec */
                         fsf,
