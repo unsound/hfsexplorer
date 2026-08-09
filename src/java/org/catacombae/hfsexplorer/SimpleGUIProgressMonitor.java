@@ -20,6 +20,7 @@ package org.catacombae.hfsexplorer;
 import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import javax.swing.JOptionPane;
 import org.catacombae.hfsexplorer.ExtractProgressMonitor.DirectoryExistsAction;
 import org.catacombae.hfsexplorer.ExtractProgressMonitor.ExtractProperties;
@@ -368,7 +369,7 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
     }
 
     /**
-     * Default Swing implementation of an unhandled execption prompt.<br>
+     * Default Swing implementation of an unhandled exception prompt.<br>
      * This method will never return null.
      *
      * @param parentComponent the parent component of the user prompt dialog
@@ -393,10 +394,18 @@ public class SimpleGUIProgressMonitor extends BasicExtractProgressMonitor {
 
         String message =
                 "An exception occurred while " + actionDescription + "!";
-        message += "\n  " + t.toString();
-        for(StackTraceElement ste : t.getStackTrace()) {
+
+        /* When printing just one exception backtrace, make sure that it's not
+         * the InvocationTargetException of a method invoked through reflection.
+         * The real underlying exception cause is more useful. */
+        final Throwable tPrintable =
+                (t instanceof InvocationTargetException) ?
+                ((InvocationTargetException) t).getCause() : t;
+        message += "\n  " + tPrintable.toString();
+        for(StackTraceElement ste : tPrintable.getStackTrace()) {
             message += "\n    " + ste.toString();
         }
+
         message += "\n\nThe file has not been completely extracted.";
         message += "\nDo you want to continue with the extraction?";
 
