@@ -246,21 +246,29 @@ public class Extractor {
 
                 try {
                     if(visitor.startDirectory(pathStackArray, curFolder)) {
-                        traverseTreeRecursive(
-                                /* FileSystemHandler fsHandler */
-                                fsHandler,
-                                /* FSEntry[] selection */
-                                curFolder.listEntries(),
-                                /* LinkedList<String> pathStack */
-                                pathStack,
-                                /* LinkedList<String[]> absPathsStack */
-                                absPathsStack,
-                                /* TreeVisitor visitor */
-                                visitor,
-                                /* boolean followSymbolicLinks */
-                                followSymbolicLinks);
-
-                        visitor.endDirectory(pathStackArray, curFolder);
+                        try {
+                            traverseTreeRecursive(
+                                    /* FileSystemHandler fsHandler */
+                                    fsHandler,
+                                    /* FSEntry[] selection */
+                                    curFolder.listEntries(),
+                                    /* LinkedList<String> pathStack */
+                                    pathStack,
+                                    /* LinkedList<String[]> absPathsStack */
+                                    absPathsStack,
+                                    /* TreeVisitor visitor */
+                                    visitor,
+                                    /* boolean followSymbolicLinks */
+                                    followSymbolicLinks);
+                        } finally {
+                            if(!visitor.cancelTraversal()) {
+                                visitor.endDirectory(
+                                        /* String[] parentPath */
+                                        pathStackArray,
+                                        /* FSFolder folder */
+                                        curFolder);
+                            }
+                        }
                     }
                 } finally {
                     absPathsStack.removeLast();
@@ -628,7 +636,12 @@ public class Extractor {
         if(defaultUnhandledExceptionAction ==
                 UnhandledExceptionAction.PROMPT_USER)
         {
-            a = progressMonitor.unhandledException(curFileName, e,
+            a = progressMonitor.unhandledException(
+                    /* String filename */
+                    curFileName,
+                    /* Throwable t */
+                    e,
+                    /* String actionDescription */
                     actionDescription);
         }
         else {
@@ -662,7 +675,7 @@ public class Extractor {
         }
     }
 
-    private static void setExtractedEntryAttributes(
+    private static void setExtractedEntryPermissions(
             final File outNode,
             final FSEntry entry,
             final ExtractProgressMonitor progressMonitor,
@@ -703,7 +716,8 @@ public class Extractor {
                         extractProperties);
             }
 
-            try {
+            if(progressMonitor.cancelSignaled());
+            else try {
                 Java7Util.setPosixOwners(outNode.getPath(),
                         (int) attrs.getUserID(),
                         (int) attrs.getGroupID());
@@ -725,7 +739,15 @@ public class Extractor {
                         extractProperties);
             }
         }
+    }
 
+    private static void setExtractedEntryFileTimes(
+            final File outNode,
+            final FSEntry entry,
+            final ExtractProgressMonitor progressMonitor,
+            final LinkedList<String> errorMessages,
+            final ExtractProperties extractProperties)
+    {
         Long createTime = null;
         Long lastAccessTime = null;
         Long lastModifiedTime = null;
@@ -796,6 +818,40 @@ public class Extractor {
                         new Date(lastModifiedTime) + " (raw: " +
                         lastModifiedTime + ").");
             }
+        }
+    }
+
+    private static void setExtractedEntryAttributes(
+            final File outNode,
+            final FSEntry entry,
+            final ExtractProgressMonitor progressMonitor,
+            final LinkedList<String> errorMessages,
+            final ExtractProperties extractProperties)
+    {
+        setExtractedEntryFileTimes(
+                /* File outNode */
+                outNode,
+                /* FSEntry entry */
+                entry,
+                /* ExtractProgressMonitor progressMonitor */
+                progressMonitor,
+                /* LinkedList<String> errorMessages */
+                errorMessages,
+                /* ExtractProperties extractProperties */
+                extractProperties);
+
+        if(!progressMonitor.cancelSignaled()) {
+            setExtractedEntryPermissions(
+                    /* File outNode */
+                    outNode,
+                    /* FSEntry entry */
+                    entry,
+                    /* ExtractProgressMonitor progressMonitor */
+                    progressMonitor,
+                    /* LinkedList<String> errorMessages */
+                    errorMessages,
+                    /* ExtractProperties extractProperties */
+                    extractProperties);
         }
     }
 
@@ -1541,23 +1597,6 @@ public class Extractor {
                                 "parent folder \"" + outDir.getAbsolutePath() +
                                 "\".");
                     }
-
-                    /* Set attributes for directory right after creation, even
-                     * though the directory is likely to have its attributes
-                     * modified before we are done with it. This is done so that
-                     * any created files will have a sane ownership in case
-                     * setting ownership manually fails. */
-                    setExtractedEntryAttributes(
-                            /* File outNode */
-                            thisDir,
-                            /* FSEntry entry */
-                            folder,
-                            /* ExtractProgressMonitor progressMonitor */
-                            pm,
-                            /* LinkedList<String> errorMessages */
-                            errorMessages,
-                            /* ExtractProperties extractProperties */
-                            extractProperties);
 
                     outDirStack.addLast(thisDir);
                     return true;
