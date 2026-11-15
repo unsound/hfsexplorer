@@ -42,6 +42,7 @@ import org.catacombae.storage.io.DataLocator;
 import org.catacombae.storage.io.ReadableStreamDataLocator;
 import org.catacombae.storage.io.SubDataLocator;
 import org.catacombae.storage.fs.FSEntry;
+import org.catacombae.storage.fs.FSFolder;
 import org.catacombae.storage.fs.FileSystemDetector;
 import org.catacombae.storage.fs.FileSystemHandler;
 import org.catacombae.storage.fs.FileSystemHandlerFactory;
@@ -327,7 +328,20 @@ public class UnHFS {
 
         String inputFilename = args[i];
         File inputFile = new File(inputFilename);
-        if(!inputFile.isDirectory() &&
+
+        /*
+         * Raw Win32 device/object paths (e.g. \\.\PhysicalDrive2) are not
+         * resolvable through java.io.File - File.exists() always returns
+         * false for them on Windows, even when the process has sufficient
+         * privileges to open the device. Skip the java.io.File check for
+         * such paths and let ReadableWin32FileStream decide whether the
+         * input can actually be opened below.
+         */
+        boolean isRawDevicePath = ReadableWin32FileStream.isSystemSupported() && (
+                inputFilename.startsWith("\\\\.\\") ||
+                inputFilename.startsWith("\\\\?\\"));
+
+        if(!isRawDevicePath && !inputFile.isDirectory() &&
                 !(inputFile.exists() && inputFile.canRead()))
         {
             System.err.println("Error: Input file \"" + inputFilename + "\" " +
@@ -763,21 +777,58 @@ public class UnHFS {
         FSEntry entry = fsHandler.getEntryByPosixPath(fsRoot);
 
         String[] path = fsHandler.getTruePathFromPosixPath(fsRoot);
+
+        /*
+         * Sanity check: if fsRoot is not the volume root, we must have
+         * resolved it to a non-null entry. A silent fallback to extracting
+         * the entire volume root is dangerous for large volumes (e.g. a
+         * Time Machine backup volume), so fail hard instead.
+         */
+        boolean fsRootIsVolumeRoot = (path == null || path.length == 0);
+        if(!fsRootIsVolumeRoot && entry == null) {
+            System.err.println("Error: fsRoot \"" + fsRoot + "\" could not " +
+                    "be resolved in the file system. Aborting.");
+            System.exit(5);
+            return;
+        }
+
+        /*
+         * Determine what to extract:
+         *
+         * 1. fsRoot is the volume root -> extract the root's contents.
+         *
+         * 2. fsRoot refers to a folder and extractFolderDirectly is set
+         *    (the default, i.e. no -create) -> extract *the contents of that
+         *    folder* into outputDir, as documented. The previous logic used
+         *    getRoot().listEntries() here, which extracted the volume root's
+         *    contents regardless of fsRoot, silently ignoring -fsroot.
+         *
+         * 3. fsRoot refers to a file, or -create was given -> extract
+         *    fsRoot itself (materialized under its parent path when -create).
+         */
         List<FSEntry> entries;
-        if(path == null || path.length == 0 || extractFolderDirectly) {
+        String[] parentPath;
+        if(fsRootIsVolumeRoot) {
             entries = Arrays.asList(fsHandler.getRoot().listEntries());
+            parentPath = new String[0];
+        }
+        else if(extractFolderDirectly && entry instanceof FSFolder) {
+            entries = Arrays.asList(((FSFolder) entry).listEntries());
+            /* Contents of fsRoot go directly into outputDir. */
+            parentPath = new String[0];
         }
         else {
             entries = Arrays.asList(entry);
+            /* -create (or fsRoot is a file): materialize under fsRoot's parent. */
+            parentPath = Util.arrayCopy(path, 0, new String[path.length - 1],
+                    0, path.length - 1);
         }
 
         Extractor.extract(
                 /* FileSystemHandler fsHandler */
                 fsHandler,
                 /* String[] parentPath */
-                (path.length > 0) ?
-                        Util.arrayCopy(path, 0, new String[path.length - 1], 0,
-                        path.length - 1) : path,
+                parentPath,
                 /* List<FSEntry> rec */
                 entries,
                 /* File outDir */
